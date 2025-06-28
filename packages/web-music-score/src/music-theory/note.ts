@@ -11,8 +11,13 @@ import { PitchNotation, SymbolSet } from "./types";
     noteName: C0 D0 E0 F0 G0 A0 B0 C1 ...
 */
 
+/** @public */
 export type Accidental = -2 | -1 | 0 | 1 | 2;
+
+/** @public */
 export type NaturalNote = "C" | "D" | "E" | "F" | "G" | "A" | "B";
+
+/** @public */
 export type ParsedNote = { naturalNote: NaturalNote, accidental: Accidental, octave?: number }
 
 const AccidentalAsciiSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2, "bb"], [-1, "b"], [0, ""], [1, "#"], [2, "x"]]);
@@ -24,6 +29,7 @@ const NoteIdByPitch: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
 
 const NoteNameRule = /^([CDEFGAB])(bb?|b?|#?|x?|𝄫?|♭?|♯?|𝄪?)([0-9]*)$/;
 
+/** @public */
 export class Note {
     private static noteByNameCache = new Map<string, Note>();
     private static noteByIdCache = new Map<number, Note>();
@@ -206,7 +212,7 @@ export class Note {
 
     /**
      * Sort notes by pitch in ascending order.
-     * @param notes Array of notes.
+     * @param notes - Array of notes.
      * @returns Sorted array of notes.
      */
     static sort(notes: ReadonlyArray<Note>): Note[] {
@@ -215,7 +221,7 @@ export class Note {
 
     /**
      * Remove duplicate notes.
-     * @param notes Array of notes.
+     * @param notes - Array of notes.
      * @returns Sorted set of notes.
      */
     static removeDuplicates(notes: ReadonlyArray<Note>): Note[] {

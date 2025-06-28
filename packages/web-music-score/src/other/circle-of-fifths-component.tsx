@@ -37,12 +37,14 @@ const MinorScaleKeyNotes = [
     ["D"]
 ];
 
-interface CircleOfFifthsComponentProps {
+/** @public */
+export interface CircleOfFifthsComponentProps {
     style?: React.CSSProperties;
     scale: Scale;
     onScaleChange: (scale: Scale) => void;
 }
 
+/** @public */
 export class CircleOfFifthsComponent extends React.Component<CircleOfFifthsComponentProps, {}> {
     constructor(props: CircleOfFifthsComponentProps) {
         super(props);

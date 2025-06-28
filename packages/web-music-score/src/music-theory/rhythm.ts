@@ -1,5 +1,6 @@
 import { Assert } from "@tspro/ts-utils-lib";
 
+/** @public */
 export enum NoteLength {
     Whole = 64 * 3, // * 3 because triplets are multiplied by 2 / 3, integer result
     Half = 32 * 3,
@@ -10,7 +11,10 @@ export enum NoteLength {
     SixtyFourth = 1 * 3
 }
 
+/** @public */
 export const MaxNoteLength = NoteLength.Whole;
+
+/** @public */
 export const MinNoteLength = NoteLength.SixtyFourth;
 
 const FlagCountMap = new Map<NoteLength, number>([
@@ -33,11 +37,13 @@ const NoteSymbolMap = new Map<NoteLength, string>([
     [NoteLength.SixtyFourth, "𝅘𝅥𝅱"]
 ]);
 
+/** @public */
 export function validateNoteLength(noteLength: unknown): NoteLength {
     Assert.assert(typeof noteLength === "number" && NoteSymbolMap.has(noteLength));
     return noteLength as NoteLength;
 }
 
+/** @public */
 export class RhythmProps {
     readonly noteLength: NoteLength;
     readonly dotted: boolean;

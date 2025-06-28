@@ -2,6 +2,7 @@ import { Note } from "../../music-theory/note";
 import { DivRect } from "./div-rect";
 import { MMeasure, MusicInterface } from "./interface";
 
+/** @public */
 export enum StaffKind {
     /** Treble staff has treble (G-) clef. */
     Treble,
@@ -13,11 +14,19 @@ export enum StaffKind {
     Grand
 }
 
+/** @public */
 export enum Stem { Auto, Up, Down }
+
+/** @public */
 export enum Arpeggio { Up, Down }
+
+/** @public */
 export enum TieLength { Short = "Short", ToMeasureEnd = "ToMeasureEnd" }
+
+/** @public */
 export enum ArcPos { Auto, Above, Middle, Below, StemTip }
 
+/** @public */
 export type NoteOptions = {
     dotted?: boolean,
     stem?: Stem,
@@ -32,6 +41,7 @@ export type NoteOptions = {
     triplet?: boolean
 }
 
+/** @public */
 export type RestOptions = {
     dotted?: boolean,
     pitch?: string | Note,
@@ -40,22 +50,34 @@ export type RestOptions = {
     triplet?: boolean
 }
 
+/** @public */
 export type PickedPitch = { pitch: number, measure: MMeasure }
 
+/** @public */
 export type ClickPitchListener = (pickedPitch: PickedPitch) => void;
+
+/** @public */
 export type ClickObjectSelector = (arr: MusicInterface[]) => MusicInterface | undefined;
+
+/** @public */
 export type ClickObjectListener = (obj: MusicInterface) => void;
 
+/** @public */
 export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
 
+/** @public */
 export enum PlayState { Playing, Paused, Stopped }
+
+/** @public */
 export type PlayStateChangeListener = (playState: PlayState) => void;
 
+/** @public */
 export enum Fermata {
     AtNote,
     AtMeasureEnd
 }
 
+/** @public */
 export enum Navigation {
     /** Repeat back to beginning and play to the "Fine" marking. */
     DC_al_Fine,
@@ -91,6 +113,7 @@ export enum Navigation {
     Ending
 }
 
+/** @public */
 export enum Annotation {
     /** "ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim." */
     Dynamics,
@@ -99,6 +122,7 @@ export enum Annotation {
     Tempo
 }
 
+/** @public */
 export enum Label {
     /** "C", "C#", "Db", "D", etc. */
     Note,

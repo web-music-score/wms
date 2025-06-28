@@ -14,7 +14,7 @@ export class CollectedArcData {
 
     /**
      * 
-     * @param noteGroup 
+     * @param noteGroup -
      * @returns true if noteGroup was added, false if not.
      */
     add(noteGroup: ObjNoteGroup) {

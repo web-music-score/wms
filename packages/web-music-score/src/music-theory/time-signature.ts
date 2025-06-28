@@ -1,8 +1,10 @@
 import { Assert } from "@tspro/ts-utils-lib";
 import { RhythmProps, NoteLength } from "./rhythm";
 
+/** @public */
 export type TimeSignatureString = "2/4" | "3/4" | "4/4" | "6/8" | "9/8";
 
+/** @public */
 export class TimeSignature {
     readonly beatCount: number;
     readonly beatSize: number;
@@ -15,12 +17,12 @@ export class TimeSignature {
     readonly beamGroupLength: number;
 
     /**
-     * @param str For example "4/4".
+     * @param str - For example "4/4".
      */
     constructor(str: TimeSignatureString);
     /**
-     * @param beatCount Measure beat count.
-     * @param beatSize Size value: whole-note=1, half-note=2, quarter-note=4, etc.
+     * @param beatCount - Measure beat count.
+     * @param beatSize - Size value: whole-note=1, half-note=2, quarter-note=4, etc.
      */
     constructor(beatCount: number, beatSize: number);
     constructor(...args: unknown[]) {
@@ -73,6 +75,7 @@ export class TimeSignature {
 
 let defaultTimeSignature: TimeSignature | undefined;
 
+/** @public */
 export function getDefaultTimeSignature(): TimeSignature {
     if (!defaultTimeSignature) {
         defaultTimeSignature = new TimeSignature(4, 4);

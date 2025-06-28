@@ -38,25 +38,30 @@ class Fret {
     }
 }
 
+/** @public */
 export type UpdateGuitarNoteFunc = (guitarNote: GuitarNote) => void;
 
+/** @public */
 export class CellData {
     constructor(readonly guitarNote: Readonly<GuitarNote>, readonly cellRect: DivRect, readonly noteRect: DivRect) { }
 }
 
-interface GuitarComponentProps {
+/** @public */
+export interface GuitarComponentProps {
     style?: React.CSSProperties;
     guitarContext: GuitarContext;
     updateGuitarNote?: UpdateGuitarNoteFunc;
     onClickNote?: (guitarNote: GuitarNote) => void;
 }
 
+/** @public */
 export interface GuitarComponentState {
     width: number;
     height: number;
     table: CellData[][];
 }
 
+/** @public */
 export class GuitarComponent extends React.Component<GuitarComponentProps, GuitarComponentState> {
     state: GuitarComponentState;
 

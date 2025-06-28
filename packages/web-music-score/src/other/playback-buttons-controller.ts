@@ -30,6 +30,7 @@ function addOnClickListener(btn: HTMLButtonElement, onClick: () => void) {
     savedOnClickListeners.set(btn, [...clickListeners, onClick]);
 }
 
+/** @public */
 export class PlaybackButtonsController {
     private playButton?: HTMLButtonElement;
     private stopButton?: HTMLButtonElement;

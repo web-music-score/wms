@@ -2,8 +2,10 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { MusicError } from "../music-error";
 
+/** @public */
 export type IntervalDirection = "Unison" | "Ascending" | "Descending";
 
+/** @public */
 export type IntervalQuality =
     | "Perfect"
     | "Major"
@@ -115,6 +117,7 @@ function getIntervalQuality(diatonicInterval: number, chromaticInterval: number)
 
 
 
+/** @public */
 export function validateIntervalQuality(q: string): IntervalQuality {
     if (q === "Perfect" || q === "Major" || q === "minor" || q === "Augmented" || q === "diminished" || q === "Doubly Augmented" || q === "doubly diminished") {
         return q;
@@ -135,6 +138,7 @@ class InvalidInterval extends MusicError {
     }
 }
 
+/** @public */
 export class Interval {
     readonly direction: IntervalDirection;
     readonly semitones: number;

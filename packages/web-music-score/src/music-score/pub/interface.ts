@@ -33,10 +33,11 @@ import { ClickObjectListener, ClickObjectSelector, ClickPitchListener, PlayState
 import { NoteOptions, RestOptions, StaffKind } from "./types";
 import { Fermata, Navigation, Annotation, Label } from "./types";
 
+/** @public */
 export abstract class MusicInterface {
     constructor(readonly name: string) { }
 
-    /** @hidden */
+    /** @internal */
     abstract getMusicObject(): MusicObject;
 
     getParent(): MusicInterface | undefined {
@@ -44,15 +45,16 @@ export abstract class MusicInterface {
     }
 }
 
+/** @public */
 export class MAccidental extends MusicInterface {
     static readonly Name = "Accidental";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjAccidental) {
         super(MAccidental.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjAccidental {
         return this.obj;
     }
@@ -62,52 +64,56 @@ export class MAccidental extends MusicInterface {
     }
 }
 
+/** @public */
 export class MArc extends MusicInterface {
     static readonly Name = "Arc";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjArc) {
         super(MArc.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjArc {
         return this.obj;
     }
 }
 
+/** @public */
 export class MArpeggio extends MusicInterface {
     static readonly Name = "Arpeggio";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjArpeggio) {
         super(MArpeggio.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjArpeggio {
         return this.obj;
     }
 }
 
+/** @public */
 export class MBeamGroup extends MusicInterface {
     static readonly Name = "BeamGroup";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjBeamGroup) {
         super(MBeamGroup.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjBeamGroup {
         return this.obj;
     }
 }
 
+/** @public */
 export class MDocument extends MusicInterface {
     static readonly Name = "Document";
 
-    /** @hidden */
+    /** @internal */
     readonly obj: ObjDocument;
 
     constructor(staffKind: StaffKind, measuresPerRow?: number) {
@@ -119,7 +125,7 @@ export class MDocument extends MusicInterface {
         }
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjDocument {
         return this.obj;
     }
@@ -159,15 +165,16 @@ export class MDocument extends MusicInterface {
     }
 }
 
+/** @public */
 export class MEnding extends MusicInterface {
     static readonly Name = "Ending";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjEnding) {
         super(MEnding.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjEnding {
         return this.obj;
     }
@@ -181,29 +188,31 @@ export class MEnding extends MusicInterface {
     }
 }
 
+/** @public */
 export class MFermata extends MusicInterface {
     static readonly Name = "Fermata";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjFermata) {
         super(MFermata.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjFermata {
         return this.obj;
     }
 }
 
+/** @public */
 export class MHeader extends MusicInterface {
     static readonly Name = "Header";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjHeader) {
         super(MHeader.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjHeader {
         return this.obj;
     }
@@ -221,29 +230,31 @@ export class MHeader extends MusicInterface {
     }
 }
 
+/** @public */
 export class MImage extends MusicInterface {
     static readonly Name = "Image";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjImage) {
         super(MImage.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjImage {
         return this.obj;
     }
 }
 
+/** @public */
 export class MMeasure extends MusicInterface {
     static readonly Name = "Measure";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjMeasure) {
         super(MMeasure.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjMeasure {
         return this.obj;
     }
@@ -338,43 +349,46 @@ export class MMeasure extends MusicInterface {
     }
 }
 
+/** @public */
 export class MBarLineRight extends MusicInterface {
     static readonly Name = "BarLineRight";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjBarLineRight) {
         super(MBarLineRight.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjBarLineRight {
         return this.obj;
     }
 }
 
+/** @public */
 export class MBarLineLeft extends MusicInterface {
     static readonly Name = "BarLineLeft";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjBarLineLeft) {
         super(MBarLineLeft.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjBarLineLeft {
         return this.obj;
     }
 }
 
+/** @public */
 export class MNoteGroup extends MusicInterface {
     static readonly Name = "NoteGroup";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjNoteGroup) {
         super(MNoteGroup.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjNoteGroup {
         return this.obj;
     }
@@ -388,15 +402,16 @@ export class MNoteGroup extends MusicInterface {
     }
 }
 
+/** @public */
 export class MRest extends MusicInterface {
     static readonly Name = "Rest";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjRest) {
         super(MRest.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjRest {
         return this.obj;
     }
@@ -406,15 +421,16 @@ export class MRest extends MusicInterface {
     }
 }
 
+/** @public */
 export class MRhythmColumn extends MusicInterface {
     static readonly Name = "RhythmColumn";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjRhythmColumn) {
         super(MRhythmColumn.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjRhythmColumn {
         return this.obj;
     }
@@ -424,15 +440,16 @@ export class MRhythmColumn extends MusicInterface {
     }
 }
 
+/** @public */
 export class MScoreRow extends MusicInterface {
     static readonly Name = "ScoreRow";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjScoreRow) {
         super(MScoreRow.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjScoreRow {
         return this.obj;
     }
@@ -442,43 +459,46 @@ export class MScoreRow extends MusicInterface {
     }
 }
 
+/** @public */
 export class MSignature extends MusicInterface {
     static readonly Name = "Signature";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjSignature) {
         super(MSignature.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjSignature {
         return this.obj;
     }
 }
 
+/** @public */
 export class MSpecialText extends MusicInterface {
     static readonly Name = "SpecialText";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjSpecialText) {
         super(MSpecialText.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjSpecialText {
         return this.obj;
     }
 }
 
+/** @public */
 export class MText extends MusicInterface {
     static readonly Name = "Text";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjText) {
         super(MText.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjText {
         return this.obj;
     }
@@ -488,20 +508,22 @@ export class MText extends MusicInterface {
     }
 }
 
+/** @public */
 export class MExtensionLine extends MusicInterface {
     static readonly Name = "ExtensionLine";
 
-    /** @hidden */
+    /** @internal */
     constructor(private readonly obj: ObjExtensionLine) {
         super(MExtensionLine.Name);
     }
 
-    /** @hidden */
+    /** @internal */
     getMusicObject(): ObjExtensionLine {
         return this.obj;
     }
 }
 
+/** @public */
 export class MPlayer {
     private static currentlyPlaying = new Set<MPlayer>();
 
@@ -551,6 +573,7 @@ export class MPlayer {
     }
 }
 
+/** @public */
 export class MRenderer {
     private readonly renderer: Renderer;
 

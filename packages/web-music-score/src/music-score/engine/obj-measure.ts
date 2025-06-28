@@ -634,7 +634,7 @@ export class ObjMeasure extends MusicObject {
 
     /**
      * 
-     * @param positionTicks get ObjRhythmColumn with positionTicks. Insert new if necessary.
+     * @param positionTicks - get ObjRhythmColumn with positionTicks. Insert new if necessary.
      * @returns 
      */
     private getRhythmColumn(voiceId: number): ObjRhythmColumn {

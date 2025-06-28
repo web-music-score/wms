@@ -2,13 +2,15 @@ import * as React from "react";
 import { MDocument } from "../music-score/pub/interface";
 import { PlaybackButtonsController } from "./playback-buttons-controller";
 
+/** @public */
 export enum PlaybackButtonsLayout {
     PlayStopSingle,
     PlayStop,
     PlayPauseStop
 }
 
-interface PlaybackButtonsProps {
+/** @public */
+export interface PlaybackButtonsProps {
     doc: MDocument;
     buttonLayout?: PlaybackButtonsLayout;
     playLabel?: string;
@@ -16,27 +18,30 @@ interface PlaybackButtonsProps {
     stopLabel?: string;
 }
 
-interface PlaybackButtonsState {
+/** @public */
+export interface PlaybackButtonsState {
     controller: PlaybackButtonsController;
 }
 
 /**
+ * @public
+ * 
  * Usage:
  * 
- *  import * as Score from "@tspro/web-music-score";
+ *  import * as Score from "\@tspro/web-music-score";
  * 
- *  <Score.PlaybackButtons doc={doc} />
+ *  \<Score.PlaybackButtons doc=\{doc\} /\>
  * 
  * To set custom play, pause and stop labels:
  * 
- *  <Score.PlaybackButtons doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" />
+ *  \<Score.PlaybackButtons doc=\{doc\} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" /\>
  * 
  * To use different button layout.
  * 
- *  <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
+ *  \<Score.PlaybackButtons doc=\{doc\} buttonLayout=\{Score.PlaybackButtonsLayout.PlayStopSingle\} /\>
  * 
  */
-export class PlaybackButtons extends React.Component<PlaybackButtonsProps, {}> {
+export class PlaybackButtons extends React.Component<PlaybackButtonsProps, PlaybackButtonsState> {
 
     state: PlaybackButtonsState;
 

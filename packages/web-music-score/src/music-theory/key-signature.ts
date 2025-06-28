@@ -2,6 +2,7 @@ import { Assert } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { Scale, getDefaultScale } from "./scale";
 
+/** @public */
 export class KeySignature {
     private static readonly OrderOfSharps = "FCGDAEB";
     private static readonly OrderOfFlats = "BEADGCF";
@@ -11,8 +12,8 @@ export class KeySignature {
     private readonly orderedAccidentalNotes: Note[];
 
     /**
-     * @param keyNote 
-     * @param mode [1..7], 1 = Ionian/Major, 2 = Dorian, ..., 7 = Locrian
+     * @param keyNote - Key note.
+     * @param mode - [1..7], 1 = Ionian/Major, 2 = Dorian, ..., 7 = Locrian
      */
     constructor(keyNote: string, mode: number) {
 
@@ -90,7 +91,7 @@ export class KeySignature {
 
     /**
      * 
-     * @param degree number 1..7 or string e.g "b5" or "#4"
+     * @param degree - number 1..7 or string e.g "b5" or "#4"
      * @returns 
      */
     getScaleNote(degree: number | string) {
@@ -114,6 +115,7 @@ export class KeySignature {
 
 }
 
+/** @public */
 export function getDefaultKeySignature(): KeySignature {
     return getDefaultScale().getKeySignature();
 }

@@ -5,9 +5,13 @@ import { Assert } from "@tspro/ts-utils-lib";
 import GuitarData from "./assets/guitar.json";
 import TuningData from "./assets/tuning.json";
 
+/** @public */
 export const TuningNameList: ReadonlyArray<string> = TuningData.list.map(data => data.name);
+
+/** @public */
 export const DefaultTuningName = TuningNameList[0];
 
+/** @public */
 export function validateTuningName(tuningName: string): string {
     if (TuningNameList.includes(tuningName)) {
         return tuningName;
@@ -17,10 +21,13 @@ export function validateTuningName(tuningName: string): string {
     }
 }
 
+/** @public */
 export type Handedness = "rh" | "lh";
 
+/** @public */
 export const DefaultHandedness: Handedness = "rh";
 
+/** @public */
 export function validateHandedness(handedness: string): Handedness {
     if (handedness === "rh" || handedness === "lh") {
         return handedness;
@@ -38,6 +45,7 @@ const DefaultColors = {
     TextColor: "white",
 }
 
+/** @public */
 export class GuitarNote {
     readonly preferredNote: Note;
     readonly isScaleNote: boolean;
@@ -95,6 +103,7 @@ export class GuitarNote {
     }
 }
 
+/** @public */
 export class GuitarContext {
     readonly maxFretId: number;
 

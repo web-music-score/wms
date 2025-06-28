@@ -1,6 +1,8 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
 
 /**
+ * @public
+ * 
  * DivRect class, left, top, right, bottom rectangle divided into four sections by centerX, centerY.
  */
 export class DivRect {
@@ -20,22 +22,22 @@ export class DivRect {
      * Create rectangle with left, right, top, bottom.
      * Properties centerX and centerY will be centered in the middle.
      * 
-     * @param left 
-     * @param right 
-     * @param top 
-     * @param bottom 
+     * @param left -
+     * @param right -
+     * @param top -
+     * @param bottom -
      */
     constructor(left: number, right: number, top: number, bottom: number);
 
     /**
      * Create rectangle with full arguments.
      * 
-     * @param left 
-     * @param centerX 
-     * @param right 
-     * @param top 
-     * @param centerY 
-     * @param bottom 
+     * @param left -
+     * @param centerX -
+     * @param right -
+     * @param top -
+     * @param centerY -
+     * @param bottom -
      */
     constructor(left: number, centerX: number, right: number, top: number, centerY: number, bottom: number);
 
@@ -68,10 +70,10 @@ export class DivRect {
     /**
      * Create rect from basic left, top, width and height arguments.
      * 
-     * @param left
-     * @param top 
-     * @param width 
-     * @param height 
+     * @param left -
+     * @param top -
+     * @param width -
+     * @param height -
      * @returns 
      */
     static create(left: number, top: number, width: number, height: number) {
@@ -81,10 +83,10 @@ export class DivRect {
     /**
      * Create rect from centerX, centerY, width, height arguments.
      * 
-     * @param centerX Center x-coordinate.
-     * @param centerY Center y-coordinate.
-     * @param width
-     * @param height
+     * @param centerX - Center x-coordinate.
+     * @param centerY - Center y-coordinate.
+     * @param width -
+     * @param height -
      * @returns 
      */
     static createCentered(centerX: number, centerY: number, width: number, height: number) {
@@ -94,10 +96,10 @@ export class DivRect {
     /**
      * Create rect from sections.
      * 
-     * @param leftw Left section width.
-     * @param rightw Right section width.
-     * @param toph Top section height.
-     * @param bottomh Bottomsection height.
+     * @param leftw - Left section width.
+     * @param rightw - Right section width.
+     * @param toph - Top section height.
+     * @param bottomh - Bottomsection height.
      * @returns 
      */
     static createSections(leftw: number, rightw: number, toph: number, bottomh: number) {
@@ -149,8 +151,8 @@ export class DivRect {
     /**
      * Does this Rect contain given (x, y)-point?
      * 
-     * @param x 
-     * @param y 
+     * @param x -
+     * @param y -
      * @returns 
      */
     contains(x: number, y: number) {
@@ -160,8 +162,8 @@ export class DivRect {
     /**
      * Do a and b rects overlap?
      * 
-     * @param a 
-     * @param b 
+     * @param a -
+     * @param b -
      * @returns 
      */
     static overlap(a: DivRect, b: DivRect) {
@@ -171,8 +173,8 @@ export class DivRect {
     /**
      * Do horizontal measures of a and b rects overlap?
      * 
-     * @param a 
-     * @param b 
+     * @param a -
+     * @param b -
      * @returns 
      */
     static overlapX(a: DivRect, b: DivRect) {
@@ -181,7 +183,7 @@ export class DivRect {
 
     /**
      * Check if this Rect equals with given Rect.
-     * @param o 
+     * @param o -
      * @returns 
      */
     equals(o: DivRect) {
@@ -191,7 +193,7 @@ export class DivRect {
     /**
      * Check if frame (ignoring centerX/Y) of this Rect equals with given Rect, ignoring centerX and centerY.
      * 
-     * @param o 
+     * @param o -
      * @returns 
      */
     equalsFrame(o: DivRect) {
@@ -210,8 +212,8 @@ export class DivRect {
     /**
      * Move this rect by (dx, dy). Modifies this Rect.
      * 
-     * @param dx 
-     * @param dy 
+     * @param dx -
+     * @param dy -
      * @returns 
      */
     offsetInPlace(dx: number, dy: number) {
@@ -227,8 +229,8 @@ export class DivRect {
     /**
      * Move this rect by (dx, dy). Immutable, returns modified copy.
      * 
-     * @param dx 
-     * @param dy 
+     * @param dx -
+     * @param dy -
      * @returns 
      */
     offsetCopy(dx: number, dy: number) {
@@ -238,7 +240,7 @@ export class DivRect {
     /**
      * Expand this Rect by given Rect. Modifies this Rect.
      * 
-     * @param rect 
+     * @param rect - 
      * @returns 
      */
     expandInPlace(rect: DivRect) {
@@ -252,7 +254,7 @@ export class DivRect {
     /**
      * Expand this Rect by given Rect. Immutable, returns modified copy.
      * 
-     * @param rect 
+     * @param rect -
      * @returns 
      */
     expandCopy(rect: DivRect) {
@@ -262,7 +264,7 @@ export class DivRect {
     /**
      * Clip this Rect by given Rect. Mmodifies this Rect.
      * 
-     * @param clipRect 
+     * @param clipRect -
      * @returns 
      */
     clipInPlace(clipRect: DivRect) {
@@ -278,7 +280,7 @@ export class DivRect {
     /**
      * Clip this Rect by given Rect. Immutable, return modified copy.
      * 
-     * @param clipRect 
+     * @param clipRect -
      * @returns 
      */
     clipCopy(clipRect: DivRect) {
@@ -288,8 +290,8 @@ export class DivRect {
     /**
      * Scale Rect. Anchor pos is (centerX, centerY). Modifies this Rect.
      * 
-     * @param scaleX
-     * @param scaleY 
+     * @param scaleX -
+     * @param scaleY -
      * @returns Copy of scaled Rect.
      */
     scaleInPlace(scaleX: number, scaleY?: number) {
@@ -305,8 +307,8 @@ export class DivRect {
     /**
      * Scale Rect. Anchor pos is (centerX, centerY). Immutable, returns modified copy.
      * 
-     * @param scaleX
-     * @param scaleY 
+     * @param scaleX -
+     * @param scaleY -
      * @returns Copy of scaled Rect.
      */
     scaleCopy(scaleX: number, scaleY?: number) {

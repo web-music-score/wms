@@ -10,8 +10,10 @@ const FullKeyNoteList: ReadonlyArray<string> = [
 
 const DegreeRule = /^(bb?|b?|#?|x?)([0-9]*)$/;
 
+/** @public */
 export type Degree = 1 | 2 | "b3" | 3 | 4 | "b5" | 5 | "#5" | 6 | "bb7" | "b7" | 7 | "#7" | "b9" | 9 | "#9" | 11 | 13;
 
+/** @public */
 export enum ScaleType {
     Major = "Major",
     NaturalMinor = "Natural Minor",
@@ -37,6 +39,7 @@ class PreferredChromaticNote {
     constructor(readonly note: Note, readonly isScaleNote: boolean, readonly isScaleRootNote: boolean) { }
 }
 
+/** @public */
 export class Scale {
     private readonly keySignature: KeySignature;
     private readonly scaleDegrees: ReadonlyArray<Degree>;
@@ -252,6 +255,7 @@ export class Scale {
 
 }
 
+/** @public */
 export class ScaleFactory {
     private keyNoteList: string[] = [];
     private scaleMap: Map<string, Scale> = new Map();
@@ -350,6 +354,7 @@ const ScaleFactoryList: ReadonlyArray<ScaleFactory | string> = [
     new ScaleFactory(ScaleType.HeptatonicBlues),
 ];
 
+/** @public */
 export function getScaleFactoryList(filter?: (scaleType: ScaleType) => boolean): ReadonlyArray<ScaleFactory | string> {
     if (!filter) {
         return ScaleFactoryList;
@@ -378,25 +383,28 @@ ScaleFactoryList.forEach(factory => {
     }
 });
 
+/** @public */
 export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
     return Assert.require(ScaleFactoryMap.get(scaleType));
 }
 
+/** @public */
 export function validateScaleType(scaleTypeStr: string): ScaleType {
     let f = ScaleFactoryMap.get(scaleTypeStr as ScaleType);
     return f ? f.getType() : Assert.interrupt("Invalid scale type: " + scaleTypeStr);
 }
 
+/** @public */
 export function getScale(keyNote: string, scaleType: ScaleType): Scale {
     return getScaleFactory(scaleType).getScale(keyNote);
 }
 
 let defaultScale: Scale | undefined;
 
+/** @public */
 export function getDefaultScale() {
     if (!defaultScale) {
         defaultScale = getScale("C", ScaleType.Major);
     }
     return defaultScale;
 }
-

@@ -5,11 +5,13 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { ClassicalGuitarInstrument } from "./classical-guitar/classical-guitar";
 import { SynthInstrument } from "./synth/synth";
 
+/** @public */
 export interface InstrumentInterface {
     playNote(note: string, duration?: number, volume?: number): void;
     stop(): void;
 }
 
+/** @public */
 export namespace Audio {
     export enum Instrument {
         Synth,

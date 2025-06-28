@@ -27,7 +27,8 @@
         "removeComments": false, // Let babel remove comments.
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "stripInternal": true
     },
     "include": [
         "src/**/*"

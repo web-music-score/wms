@@ -2,7 +2,8 @@ import * as React from "react";
 import { MDocument, MRenderer } from "./interface";
 import { ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
 
-interface MusicScoreViewProps {
+/** @public */
+export interface MusicScoreViewProps {
     doc: MDocument;
     onClickPitch?: ClickPitchListener;
     onSelectObject?: ClickObjectSelector;
@@ -10,12 +11,13 @@ interface MusicScoreViewProps {
 }
 
 /**
+ * @public
+ * 
  * Usage:
  * 
- *  import * as Score from "@tspro/web-music-score";
+ *  import * as Score from "\@tspro/web-music-score";
  * 
- *  <Score.MusicScoreView doc={doc} />
- * 
+ *  \<Score.MusicScoreView doc=\{doc\} /\>
  */
 export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
 

@@ -61,7 +61,8 @@ function removeNoteDuplicates(notes: ReadonlyArray<Note>): Note[] {
     return Utils.Arr.removeDuplicatesCmp(notes, isEqualNote);
 }
 
-type ChordInfo = { name: string, degrees: Degree[] }
+/** @public */
+export type ChordInfo = { name: string, degrees: Degree[] }
 
 const ChordInfoList: ReadonlyArray<ChordInfo> = [
     // Power chord
@@ -121,12 +122,14 @@ function canOmitDegree(chordInfo: ChordInfo, degree: Degree) {
     );
 }
 
+/** @public */
 export class InvalidChordException extends MusicError {
     constructor(readonly msg: string) {
         super(msg);
     }
 }
 
+/** @public */
 export class Chord {
     readonly name: string;
     readonly notes: Note[];
@@ -287,7 +290,7 @@ export class Chord {
     }
 
     /**
-     * @param i Degree index
+     * @param i - Degree index
      * @returns Degree string for given degree index, e.g. "3"
      */
     private getDegreeStr(i: number) {
@@ -295,7 +298,7 @@ export class Chord {
     }
 
     /**
-     * @param i Degree index
+     * @param i - Degree index
      * @returns Note string for given degree index, e.g. "E"
      */
     private getNoteStr(i: number) {

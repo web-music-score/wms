@@ -64,8 +64,8 @@ export abstract class MusicObject {
     /**
      * Pick objects.
      * 
-     * @param x X-coordinate.
-     * @param y Y-coordinate.
+     * @param x - X-coordinate.
+     * @param y - Y-coordinate.
      * @returns Array of objects under (x, y)-coordinate in hierarchical order. Last object in array is the top-most object. 
      */
     abstract pick(x: number, y: number): MusicObject[];
