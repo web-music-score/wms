@@ -75,7 +75,10 @@ const makeConfig = ({ env, argv, format, filename, libraryType }) => {
         },
         plugins: [
             new webpack.BannerPlugin({
-                banner: `WebMusicScore v${packageJson.version} | (c) 2023 PahkaSoft | Licensed under the zlib License | Includes TODO... (TODO)`
+                banner: `WebMusicScore v${packageJson.version} 
+(c) 2023 PahkaSoft
+Licensed under the zlib License
+Includes: Bootstrap, React, react-bootstrap, Tone.js (MIT Licenses)`
             }),
         ],
         optimization: {
