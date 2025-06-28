@@ -1,0 +1,15 @@
+{
+    "width": 1223,
+    "height": 234,
+    "maxFret": 18,
+    "nut": {
+        "x": 1099,
+        "topStringY": 59,
+        "bottomStringY": 162
+    },
+    "fret12": {
+        "x": 330,
+        "topStringY": 54,
+        "bottomStringY": 174
+    }
+}

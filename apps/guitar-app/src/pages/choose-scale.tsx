@@ -1,0 +1,97 @@
+import * as React from "react";
+import { Button, Col, Container, Row } from "react-bootstrap";
+import * as Score from "@tspro/web-music-score";
+import { OrderOfAccidentalsInfo, SelectScaleForm, ScaleStepsInfo, Menubar } from "components";
+import { GuitarApp, Page } from "guitar-app";
+
+interface ChooseScaleProps {
+    app: GuitarApp;
+    onChangeScale: (scale: Score.Scale) => void;
+}
+
+interface ChooseScaleState {
+    guitarCtx: Score.GuitarContext;
+    doc: Score.MDocument;
+}
+
+export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleState> {
+    state: ChooseScaleState;
+
+    constructor(props: ChooseScaleProps) {
+        super(props);
+
+        let guitarCtx = props.app.getGuitarContext();
+
+        this.state = this.createNewState(guitarCtx);
+    }
+
+    createNewState(guitarCtx: Score.GuitarContext) {
+        let doc = Score.MDocument.createSimpleScaleArpeggio(Score.StaffKind.TrebleForGuitar, guitarCtx.scale, "B2", 1);
+        return { guitarCtx, doc }
+    }
+
+    onChangeScale(scale: Score.Scale) {
+        try {
+            let guitarCtx = this.state.guitarCtx.alterScale(scale);
+            if (guitarCtx !== this.state.guitarCtx) {
+                Score.MPlayer.stopAll();
+                this.setState(this.createNewState(guitarCtx));
+            }
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    onOK() {
+        try {
+            Score.MPlayer.stopAll();
+            this.props.onChangeScale(this.state.guitarCtx.scale);
+        }
+        catch (err) {
+            console.error(err);
+        }
+    }
+
+    render() {
+        let { doc, guitarCtx } = this.state;
+        let { app } = this.props;
+        let { scale } = guitarCtx;
+
+        return <>
+            <Menubar app={app} />
+
+            <Container>
+                <h1>{Page.ChooseScale}</h1>
+
+                <Row xs="auto">
+                    <Col>
+                        <SelectScaleForm scale={scale} onScaleChange={scale => this.onChangeScale(scale)} />
+                    </Col>
+                    <Col>
+                        <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
+                    </Col>
+                    <Col>
+                        <Button variant="primary" onClick={() => this.onOK()}>OK</Button>
+                    </Col>
+                </Row>
+                <Row xs="auto" className="mt-4">
+                    <Col>
+                        <Score.MusicScoreView doc={doc} />
+                    </Col>
+                </Row>
+                <Row xs="auto">
+                    <Col>
+                        <ScaleStepsInfo scale={scale} />
+                    </Col>
+                </Row>
+                <Row xs="auto">
+                    <Col>
+                        <OrderOfAccidentalsInfo ks={scale.getKeySignature()} />
+                    </Col>
+                </Row>
+            </Container>
+        </>
+    }
+
+}

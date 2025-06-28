@@ -1,0 +1,122 @@
+import { Assert } from "@tspro/ts-utils-lib";
+import { MusicObject } from "./music-object";
+import { Renderer } from "./renderer";
+import { ObjText } from "./obj-text";
+import { ObjMeasure } from "./obj-measure";
+import { DivRect, MEnding, Navigation } from "../pub";
+
+export class ObjEnding extends MusicObject {
+    private endingText: ObjText;
+    private shapeRects: DivRect[] = [];
+
+    readonly mi: MEnding;
+
+    constructor(readonly measure: ObjMeasure, readonly passages: number[]) {
+        super(measure);
+
+        this.mi = new MEnding(this);
+
+        Assert.int_gte(passages.length, 1, "Cannot create ending object because ending passages is empty.");
+
+        this.passages = passages.map(p => Assert.int_gte(p, 1, "Cannot create ending object because passage number " + p + " is invalid."));
+
+        // Sort ascending
+        this.passages.sort((a, b) => a - b);
+
+        let text = this.passages.map(p => p + ".").join("");
+
+        this.endingText = new ObjText(this, text, 0, 1);
+    }
+
+    getMusicInterface(): MEnding {
+        return this.mi;
+    }
+
+    getShapeRects(): DivRect[] {
+        return this.shapeRects;
+    }
+
+    isSingleMeasureEnding(): boolean {
+        let { measure } = this;
+        let next = measure.getNextMeasure();
+
+        return next?.hasNavigation(Navigation.Ending) === true ||
+            measure.hasNavigation(Navigation.EndRepeat) ||
+            measure.isLastMeasure();
+    }
+
+    hasPassage(pass: number) {
+        return this.passages.some(p => p === pass);
+    }
+
+    getHighestPassage() {
+        return Math.max(0, ...this.passages);
+    }
+
+    pick(x: number, y: number): MusicObject[] {
+        return this.rect.contains(x, y) ? [this] : [];
+    }
+
+    layout(renderer: Renderer) {
+        this.rect = new DivRect();
+        this.shapeRects = [this.rect.copy()];
+    }
+
+    layoutFitToMeasure(renderer: Renderer) {
+        let { unitSize } = renderer;
+        let { measure } = this;
+
+        this.endingText.layout(renderer);
+        let textRect = this.endingText.getRect();
+
+        let measureContent = measure.getColumnsContentRect();
+
+        let endingHeight = textRect.height;
+
+        this.rect = new DivRect(measureContent.left + unitSize, measureContent.right - unitSize, -endingHeight, 0);
+
+        this.endingText.offset(this.rect.left + unitSize / 2, this.rect.bottom);
+
+        this.shapeRects = [
+            new DivRect(this.rect.left, this.rect.left + 1, this.rect.top, this.rect.bottom),
+            new DivRect(this.rect.left, this.rect.right, this.rect.top, this.rect.top + 1),
+            new DivRect(this.rect.right - 1, this.rect.right, this.rect.top, this.rect.bottom),
+            this.endingText.getRect().copy()
+        ];
+    }
+
+    offset(dx: number, dy: number) {
+        this.endingText.offset(dx, dy);
+        this.shapeRects.forEach(r => r.offsetInPlace(dx, dy));
+        this.rect.offsetInPlace(dx, dy);
+    }
+
+    draw(renderer: Renderer) {
+        let ctx = renderer.getCanvasContext();
+
+        if (!ctx) {
+            return;
+        }
+
+        let { lineWidth } = renderer;
+        let { rect } = this;
+
+        renderer.drawDebugRect(this.rect);
+
+        ctx.strokeStyle = ctx.fillStyle = "black";
+        ctx.lineWidth = lineWidth;
+
+        ctx.beginPath();
+        ctx.moveTo(rect.left, rect.bottom);
+        ctx.lineTo(rect.left, rect.top);
+        ctx.lineTo(rect.right, rect.top);
+
+        if (this.isSingleMeasureEnding()) {
+            ctx.lineTo(rect.right, rect.bottom);
+        }
+
+        ctx.stroke();
+
+        this.endingText.draw(renderer);
+    }
+}

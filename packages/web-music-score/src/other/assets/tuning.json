@@ -1,0 +1,246 @@
+{
+    "list": [
+        {
+            "name": "Standard",
+            "strings": [
+                "E2",
+                "A2",
+                "D3",
+                "G3",
+                "B3",
+                "E4"
+            ]
+        },
+        {
+            "name": "B Standard",
+            "strings": [
+                "B1",
+                "E2",
+                "A2",
+                "D3",
+                "F#3",
+                "B3"
+            ]
+        },
+        {
+            "name": "C Standard",
+            "strings": [
+                "C2",
+                "F2",
+                "A#2",
+                "D#3",
+                "G3",
+                "C4"
+            ]
+        },
+        {
+            "name": "D Modal",
+            "strings": [
+                "D2",
+                "A2",
+                "D3",
+                "G3",
+                "A3",
+                "D4"
+            ]
+        },
+        {
+            "name": "D Standard",
+            "strings": [
+                "D2",
+                "G2",
+                "C3",
+                "F3",
+                "A3",
+                "D4"
+            ]
+        },
+        {
+            "name": "D# Standard",
+            "strings": [
+                "D#2",
+                "G#2",
+                "C#3",
+                "F#3",
+                "A#3",
+                "D#4"
+            ]
+        },
+        {
+            "name": "Double Drop D",
+            "strings": [
+                "D2",
+                "A2",
+                "D3",
+                "G3",
+                "B3",
+                "D4"
+            ]
+        },
+        {
+            "name": "Drop B",
+            "strings": [
+                "B1",
+                "F#2",
+                "B2",
+                "E3",
+                "G#3",
+                "C#4"
+            ]
+        },
+        {
+            "name": "Drop C",
+            "strings": [
+                "C2",
+                "G2",
+                "C3",
+                "F3",
+                "A3",
+                "D4"
+            ]
+        },
+        {
+            "name": "Drop D",
+            "strings": [
+                "D2",
+                "A2",
+                "D3",
+                "G3",
+                "B3",
+                "E4"
+            ]
+        },
+        {
+            "name": "Low C",
+            "strings": [
+                "C2",
+                "G2",
+                "D3",
+                "G3",
+                "A3",
+                "D4"
+            ]
+        },
+        {
+            "name": "New Standard",
+            "strings": [
+                "C2",
+                "G2",
+                "D3",
+                "A3",
+                "E4",
+                "G4"
+            ]
+        },
+        {
+            "name": "Open A",
+            "strings": [
+                "E2",
+                "A2",
+                "C#3",
+                "E3",
+                "A3",
+                "E4"
+            ]
+        },
+        {
+            "name": "Open A Minor",
+            "strings": [
+                "E2",
+                "A2",
+                "E3",
+                "A3",
+                "C4",
+                "E4"
+            ]
+        },
+        {
+            "name": "Open C",
+            "strings": [
+                "C2",
+                "G2",
+                "C3",
+                "G3",
+                "C4",
+                "E4"
+            ]
+        },
+        {
+            "name": "Open C Minor",
+            "strings": [
+                "C2",
+                "G2",
+                "C3",
+                "G3",
+                "C4",
+                "D#4"
+            ]
+        },
+        {
+            "name": "Open D",
+            "strings": [
+                "D2",
+                "A2",
+                "D3",
+                "F#3",
+                "A3",
+                "D4"
+            ]
+        },
+        {
+            "name": "Open D Minor",
+            "strings": [
+                "D2",
+                "A2",
+                "D3",
+                "F3",
+                "A3",
+                "D4"
+            ]
+        },
+        {
+            "name": "Open E",
+            "strings": [
+                "E2",
+                "B2",
+                "E3",
+                "G#3",
+                "B3",
+                "E4"
+            ]
+        },
+        {
+            "name": "Open E Minor",
+            "strings": [
+                "E2",
+                "B2",
+                "E3",
+                "G3",
+                "B3",
+                "E4"
+            ]
+        },
+        {
+            "name": "Open G",
+            "strings": [
+                "D2",
+                "G2",
+                "D3",
+                "G3",
+                "B3",
+                "D4"
+            ]
+        },
+        {
+            "name": "Open G Minor",
+            "strings": [
+                "D2",
+                "G2",
+                "D3",
+                "G3",
+                "A#3",
+                "D4"
+            ]
+        }
+    ]
+}

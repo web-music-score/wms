@@ -1,0 +1,90 @@
+import { Assert } from "@tspro/ts-utils-lib";
+
+export enum NoteLength {
+    Whole = 64 * 3, // * 3 because triplets are multiplied by 2 / 3, integer result
+    Half = 32 * 3,
+    Quarter = 16 * 3,
+    Eighth = 8 * 3,
+    Sixteenth = 4 * 3,
+    ThirtySecond = 2 * 3,
+    SixtyFourth = 1 * 3
+}
+
+export const MaxNoteLength = NoteLength.Whole;
+export const MinNoteLength = NoteLength.SixtyFourth;
+
+const FlagCountMap = new Map<NoteLength, number>([
+    [NoteLength.Whole, 0],
+    [NoteLength.Half, 0],
+    [NoteLength.Quarter, 0],
+    [NoteLength.Eighth, 1],
+    [NoteLength.Sixteenth, 2],
+    [NoteLength.ThirtySecond, 3],
+    [NoteLength.SixtyFourth, 4]
+]);
+
+const NoteSymbolMap = new Map<NoteLength, string>([
+    [NoteLength.Whole, "𝅝"],
+    [NoteLength.Half, "𝅗𝅥"],
+    [NoteLength.Quarter, "𝅘𝅥"],
+    [NoteLength.Eighth, "𝅘𝅥𝅮"],
+    [NoteLength.Sixteenth, "𝅘𝅥𝅯"],
+    [NoteLength.ThirtySecond, "𝅘𝅥𝅰"],
+    [NoteLength.SixtyFourth, "𝅘𝅥𝅱"]
+]);
+
+export function validateNoteLength(noteLength: unknown): NoteLength {
+    Assert.assert(typeof noteLength === "number" && NoteSymbolMap.has(noteLength));
+    return noteLength as NoteLength;
+}
+
+export class RhythmProps {
+    readonly noteLength: NoteLength;
+    readonly dotted: boolean;
+    readonly triplet: boolean;
+    readonly ticks: number;
+    readonly flagCount: number;
+
+    constructor(noteLength: NoteLength, dotted?: boolean, triplet?: boolean) {
+        this.noteLength = noteLength;
+        this.dotted = dotted === true;
+        this.triplet = triplet === true;
+        this.ticks = this.noteLength;
+        this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
+
+        Assert.assert(NoteLength[this.noteLength], "Invalid noteLength = " + this.noteLength);
+        Assert.assert(!(this.dotted && this.triplet), "Note cannot be both dotted and triplet!");
+        Assert.assert(!(this.dotted && this.noteLength === MinNoteLength), "Shortest note cannot be dotted!");
+
+        if (this.dotted) {
+            this.ticks += this.noteLength / 2;
+        }
+
+        if (this.triplet) {
+            this.ticks = this.ticks * 2 / 3;
+        }
+    }
+
+    static createFromNoteSize(noteSize: number) {
+        /*
+            Calculate noteLength example:
+                noteSize = 16 (16th note),
+                MaxNoteLength = NoteLength.Whole = 64
+                noteLength = 64 / 16 = 4 = NoteLength.Sixteenth (16th note)
+        */
+        return new RhythmProps(MaxNoteLength / noteSize);
+    }
+
+    canDot() {
+        // Already dotted and shortest note cannot be dotted.
+        return !this.dotted && this.noteLength !== MinNoteLength;
+    }
+
+    hasStem() {
+        return this.noteLength < NoteLength.Whole;
+    }
+
+    toString() {
+        return NoteSymbolMap.get(this.noteLength) + (this.dotted ? "." : "");
+    }
+}

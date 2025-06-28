@@ -1,0 +1,74 @@
+{
+    "name": "@tspro/web-music-score",
+    "version": "1.0.0",
+    "author": "PahkaSoft",
+    "private": false,
+    "license": "zlib",
+    "description": "Web component for viewing and playing musical scores/notations.",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.mjs",
+    "browser": "dist/index.umd.min.js",
+    "unpkg": "dist/index.umd.min.js",
+    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "require": "./dist/index.cjs.js",
+            "import": "./dist/index.esm.mjs",
+            "browser": "./dist/index.umd.min.js",
+            "types": "./dist/index.d.ts"
+        }
+    },
+    "dependencies": {
+        "@tspro/ts-utils-lib": "^1.0.0",
+        "bootstrap": "^5.3.3",
+        "react": "^19.0.0",
+        "react-bootstrap": "^2.10.9",
+        "react-dom": "^19.0.0",
+        "tone": "^15.0.4"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.27.2",
+        "@babel/core": "^7.27.1",
+        "@babel/preset-env": "^7.27.2",
+        "@babel/preset-react": "^7.26.3",
+        "@microsoft/api-extractor": "^7.52.8",
+        "@types/react": "^19.0.12",
+        "@types/react-dom": "^19.0.4",
+        "@webpack-cli/serve": "^3.0.1",
+        "api-extractor": "^99.99.99",
+        "babel-loader": "^10.0.0",
+        "benchmark": "^2.1.4",
+        "clean-webpack-plugin": "^4.0.0",
+        "css-loader": "^7.1.2",
+        "npm-watch": "^0.13.0",
+        "rimraf": "^6.0.1",
+        "style-loader": "^4.0.0",
+        "terser-webpack-plugin": "^5.3.14",
+        "ts-loader": "^9.5.2",
+        "typedoc": "^0.28.1",
+        "typescript": "^5.8.3",
+        "url-loader": "^4.1.1",
+        "webpack": "^5.99.8",
+        "webpack-cli": "^6.0.1",
+        "webpack-dev-server": "^5.2.1"
+    },
+    "watch": {
+        "build:esm": {
+            "patterns": [
+                "src"
+            ],
+            "extensions": "ts,tsx",
+            "quiet": false
+        }
+    },
+    "scripts": {
+        "build:dev": "rimraf dist && webpack --mode development --progress && api-extractor run --local && rimraf dist/temp-types",
+        "build:prod": "rimraf dist && webpack --mode production --progress && api-extractor run --local && rimraf dist/temp-types",
+        "build:esm": "rimraf dist && webpack --env target=esm --mode development --progress && api-extractor run --local && rimraf dist/temp-types",
+        "watch": "npm-watch",
+        "docs": "typedoc"
+    },
+    "browserslist": [
+        "defaults"
+    ]
+}
