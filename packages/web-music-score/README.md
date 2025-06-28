@@ -1,17 +1,20 @@
 # Web Music Score
 
-Simple web component for viewing and playing music scores/notation.
+Web component for viewing and playing music scores/notation.
 
 # Install
 
     npm i @tspro/web-music-score
 
 # Library Bundle
-This library is bundled to Universal Module Definition (UMD) - module.
 
-Does transpiling with babel.
+This library is bundled to ESM, CJS and UMD formats.
 
-Does not polyfilling.
+* CJS and UMD bundles are transpiled with Babel for ES5/IE11 compatibility.
+* ESM bundle targets modern environments (ES6+).
+* No polyfills are included.
+
+While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
 
 # Usage
 
