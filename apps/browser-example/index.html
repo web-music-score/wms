@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebMusicScore Browser Example</title>
+</head>
+
+<body>
+    <h1>WebMusicScore Browser Example</h1>
+
+    <!--
+	// Paikallinen
+    <script src="../../node_modules/@tspro/web-music-score/index.umd.min.js"></script>
+
+	// CDN
+    <script src="https://unpkg.com/@tspro/web-music-score@1"></script>
+	-->
+
+    <script src="../../node_modules/@tspro/web-music-score/dist/index.umd.min.js"></script>
+
+    <canvas id="scoreCanvas"></canvas><br />
+    <button id="playButton"></button>
+
+    <script>
+        const Score = window.WebMusicScore;
+
+        Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
+
+        let doc = Score.SamplePieces.createFrereJacques();
+
+        new Score.MRenderer().
+            setCanvas("scoreCanvas").
+            setDocument(doc).
+            draw();
+
+        new Score.PlaybackButtonsController().
+            setPlayStopButton("playButton").
+            setDocument(doc);
+
+    </script>
+</body>
+
+</html>
