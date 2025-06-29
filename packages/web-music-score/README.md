@@ -1,6 +1,11 @@
-# Web Music Score
+# WebMusicScore
 
-Web component for viewing and playing music scores/notation.
+This is a component for viewing and playing music scores/notation.
+
+I am hobbyist programmer and I have some years of classical guitar and music theory studies.
+
+I have been developing this project slowly for several years.
+But it is only now published and has not gone through much testing so there might be weird bugs or unexpected issues.
 
 # Install
 
