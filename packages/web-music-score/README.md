@@ -363,6 +363,8 @@ More playback methods.
 <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayPauseStop}/> // Play, Pause and Stop buttons
 ```
 
+Bootstrap is used for better visual appearance but you must load it.
+
 ## Viewing Using Plain JS/TS
 
 ```html
@@ -387,17 +389,17 @@ let r = new Score.MRenderer().
     draw();
 
 // Add playback buttons
-let c = new Score.PlaybackButtonsController().
+let p = new Score.MPlaybackButtons().
     setPlayButton("playButtonId").
     setPauseButton("pauseButtonId").
     setStopButton("stopButtonId").
     setDocument(doc);
 
 // You can also set combined play/stop button.
-c.setPlayStopButton("playStopButtonId")
+p.setPlayStopButton("playStopButtonId")
 
 // You can also pass HTMLButtonElement instead of element id.
-c.setPlayButton(playButtonElement)
+p.setPlayButton(playButtonElement)
 ```
 
 ## Error Handling

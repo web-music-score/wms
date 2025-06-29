@@ -1,6 +1,6 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
-import { MDocument, MPlayer } from "../music-score/pub/interface";
-import { PlayState } from "../music-score/pub/types";
+import { MDocument, MPlayer } from "./interface";
+import { PlayState } from "./types";
 
 const savedOnClickListeners = new Map<HTMLButtonElement, (() => void)[]>();
 
@@ -31,7 +31,7 @@ function addOnClickListener(btn: HTMLButtonElement, onClick: () => void) {
 }
 
 /** @public */
-export class PlaybackButtonsController {
+export class MPlaybackButtons {
     private playButton?: HTMLButtonElement;
     private stopButton?: HTMLButtonElement;
     private playStopButton?: HTMLButtonElement;

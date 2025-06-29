@@ -12,6 +12,6 @@ new Score.MRenderer().
     setDocument(doc).
     draw();
 
-new Score.PlaybackButtonsController().
+new Score.MPlaybackButtons().
     setPlayStopButton("playButton").
     setDocument(doc);

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { MDocument } from "../music-score/pub/interface";
-import { PlaybackButtonsController } from "./playback-buttons-controller";
+import { MPlaybackButtons } from "../music-score/pub/playback-buttons";
 
 /** @public */
 export enum PlaybackButtonsLayout {
@@ -20,7 +20,7 @@ export interface PlaybackButtonsProps {
 
 /** @public */
 export interface PlaybackButtonsState {
-    controller: PlaybackButtonsController;
+    controller: MPlaybackButtons;
 }
 
 /**
@@ -49,7 +49,7 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
         super(props);
 
         this.state = {
-            controller: new PlaybackButtonsController().setDocument(props.doc)
+            controller: new MPlaybackButtons().setDocument(props.doc)
         }
     }
 
