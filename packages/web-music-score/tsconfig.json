@@ -11,8 +11,6 @@
         "module": "ES2015",
         "moduleResolution": "bundler",
         "declaration": false,
-        //"declarationDir": "./dist/temp-types",
-        //"declarationMap": true,
         "preserveConstEnums": true,
         "sourceMap": true,
         "allowJs": true,
