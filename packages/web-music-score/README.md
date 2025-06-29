@@ -25,21 +25,20 @@ While designed for compatibility in mind, the library has not been explicitly te
 
 # Usage
 
-## Import
-
+## Import Methods
 ```js
+// Import named exports
 import * as Score from "@tspro/web-music-score";
-```
 
-## Require
+// Or import default export
+import Score from "@tspro/web-music-score";
 
-```js
+// Or use require
 const Score = require("@tspro/web-music-score");
 ```
 
-## Browser CDN Example
-
 ```html
+<!-- Or use in browser via unpkg CDN -->
 <script src="https://unpkg.com/@tspro/web-music-score@1"></script>
 
 <canvas id="scoreCanvas"></canvas><br />
@@ -47,20 +46,7 @@ const Score = require("@tspro/web-music-score");
 
 <script>
     const Score = window.WebMusicScore;
-
-    Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
-
-    let doc = Score.SamplePieces.createFrereJacques();
-
-    new Score.MRenderer().
-        setCanvas("scoreCanvas").
-        setDocument(doc).
-        draw();
-
-    new Score.PlaybackButtonsController().
-        setPlayStopButton("playButton").
-        setDocument(doc);
-
+    // ...
 </script>
 ```
 
@@ -365,47 +351,54 @@ MPlayer.stopAll();
 
 More playback methods.
 
-## Draw And Playback Buttons Using React JSX
+## Viewing Using React JSX/TSX
 
 ```js
+// Draw document
 <Score.MusicScoreView doc={doc} />
+
+// Add playback buttons
+<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle}/> // Single Play/Stopo button
+<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStop}/> // Play and Stop buttons
+<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayPauseStop}/> // Play, Pause and Stop buttons
 ```
 
-Draws document.
+## Viewing Using Plain JS/TS
 
-```js
-<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayPauseStop}/>
+```html
+<!-- Add canvas -->
+<canvas id="canvasId"></canvas>
+
+<!-- Add play button -->
+<button id="playButtonId"></button>
+<!-- Add pause button -->
+<button id="pauseButtonId"></button>
+<!-- Add stop button -->
+<button id="stopButtonId"></button>
+<!-- Or add combined play/stop button -->
+<button id="playStopButtonId"></button>
 ```
 
-Add playback buttons. Available buttons layout are PlayStopSingle, PlayStop, PlayPauseStop.
-
-## Draw And Playback Buttons Without React JSX
-
 ```js
-new Score.MRenderer().
+// Draw document
+let r = new Score.MRenderer().
     setCanvas("canvasId").
     setDocument(doc).
     draw();
-```
 
-Draws document to canvas element.
-
-```js
-new Score.PlaybackButtonsController().
-    setPlayStopButton("playStopButtonId").
+// Add playback buttons
+let c = new Score.PlaybackButtonsController().
+    setPlayButton("playButtonId").
+    setPauseButton("pauseButtonId").
+    setStopButton("stopButtonId").
     setDocument(doc);
+
+// You can also set combined play/stop button.
+c.setPlayStopButton("playStopButtonId")
+
+// You can also pass HTMLButtonElement instead of element id.
+c.setPlayButton(playButtonElement)
 ```
-
-Add playback buttons. Following buttons can be added.
-
-```js
-setPlayButton("playButtonId)
-setPauseButton("pauseButtonId")
-setStopButton(stopButtonElement)
-setPlayStopButton(playStopButtonElement)
-```
-
-Argument can be either button id string or HTMLButtonElement.
 
 ## Error Handling
 
