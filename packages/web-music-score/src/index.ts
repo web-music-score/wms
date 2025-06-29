@@ -9,4 +9,4 @@ export default DefaultExport;
 declare const __LIB_INFO__: string;
 
 // Log lib loaded message.
-console.log("Loaded: " + __LIB_INFO__);
+console.log("%c" + __LIB_INFO__, "background: black; color: white; padding: 2px 4px;");
