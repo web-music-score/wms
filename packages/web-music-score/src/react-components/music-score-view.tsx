@@ -1,6 +1,6 @@
 import * as React from "react";
-import { MDocument, MRenderer } from "./interface";
-import { ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
+import { MDocument, MRenderer } from "../music-score/pub/interface";
+import { ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "../music-score/pub/types";
 
 /** @public */
 export interface MusicScoreViewProps {
