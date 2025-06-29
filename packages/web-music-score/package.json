@@ -21,7 +21,6 @@
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.0.0",
         "react": "^19.0.0",
-        "react-dom": "^19.0.0",
         "tone": "^15.0.4"
     },
     "devDependencies": {
