@@ -12,7 +12,8 @@
         "react": "^19.1.0",
         "react-bootstrap": "^2.10.10",
         "react-dom": "^19.1.0",
-        "regenerator-runtime": "^0.14.1"
+        "regenerator-runtime": "^0.14.1",
+        "tone": "^15.1.22"
     },
     "devDependencies": {
         "@babel/cli": "^7.27.2",

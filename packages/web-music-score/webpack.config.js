@@ -7,10 +7,12 @@ const makeConfig = ({ env, argv, format, filename, libraryType }) => {
     const isDevelopment = argv.mode === "development";
     const isMinified = filename.includes(".min.");
     const isModule = libraryType === "module";
+    const entry = format === "umd" ? "src/index.umd.ts" : "src/index.full.ts";
+    const bundleDeps = format === "umd";
 
     return {
         mode: argv.mode,
-        entry: path.resolve(__dirname, "src/index.ts"),
+        entry: path.resolve(__dirname, entry),
         output: {
             filename,
             path: path.resolve(__dirname, "dist"),
@@ -72,6 +74,10 @@ const makeConfig = ({ env, argv, format, filename, libraryType }) => {
                     ],
                 }
             ]
+        },
+        externals: bundleDeps ? undefined : {
+            react: "react",
+            tone: "tone",
         },
         plugins: [
             new webpack.BannerPlugin({

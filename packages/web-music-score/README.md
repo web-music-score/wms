@@ -11,6 +11,9 @@ But it is only now published and has not gone through much testing so there migh
 
 ```sh
 npm i @tspro/web-music-score
+
+# Also make sure to install peer dependencies
+npm i react tone
 ```
 
 # Library Bundle

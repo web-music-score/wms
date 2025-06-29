@@ -19,7 +19,9 @@
         }
     },
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.0.0",
+        "@tspro/ts-utils-lib": "^1.0.0"
+    },
+    "peerDependencies": {
         "react": "^19.1.0",
         "tone": "^15.1.22"
     },
@@ -59,9 +61,10 @@
         }
     },
     "scripts": {
-        "build:dev": "rimraf dist && webpack --mode development --progress && api-extractor run --local && rimraf dist/temp-types",
-        "build:prod": "rimraf dist && webpack --mode production --progress && api-extractor run --local && rimraf dist/temp-types",
-        "build:esm": "rimraf dist && webpack --env target=esm --mode development --progress && api-extractor run --local && rimraf dist/temp-types",
+        "build:types": "tsc --project tsconfig.types.json && api-extractor run --local && rimraf dist/temp-types",
+        "build:dev": "rimraf dist && npm run build:types && webpack --mode development --progress",
+        "build:prod": "rimraf dist && npm run build:types && webpack --mode production --progress",
+        "build:esm": "rimraf dist && npm run build:types && webpack --env target=esm --mode development --progress",
         "watch": "npm-watch",
         "docs": "typedoc"
     },

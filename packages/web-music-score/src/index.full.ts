@@ -1,8 +1,8 @@
 // Export named exports.
-export * from "./exports";
+export * from "./exports.full";
 
 // Export default export.
-import * as DefaultExport from "./exports";
+import * as DefaultExport from "./exports.full";
 export default DefaultExport;
 
 // __LIB_INFO__ is set by webpack.DefinePlugin.
