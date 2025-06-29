@@ -80,6 +80,9 @@ const makeConfig = ({ env, argv, format, filename, libraryType }) => {
 Licensed under the zlib License
 Includes: Bootstrap, React, react-bootstrap, Tone.js (MIT Licenses)`
             }),
+            new webpack.DefinePlugin({
+                __LIB_INFO__: JSON.stringify(`WebMusicScore v${packageJson.version} (${format})`)
+            }),
         ],
         optimization: {
             minimize: isMinified,
