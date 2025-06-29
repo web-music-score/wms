@@ -1,6 +1,7 @@
 import { MDocument, StaffKind } from "../music-score";
 import { NoteLength, ScaleType } from "../music-theory";
 
+/** @public */
 export function createFrereJacques(): MDocument {
     let doc = new MDocument(StaffKind.TrebleForGuitar);
 

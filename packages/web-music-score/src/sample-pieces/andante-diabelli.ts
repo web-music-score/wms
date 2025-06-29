@@ -2,6 +2,7 @@ import { NoteLength, ScaleType } from "../music-theory";
 import { MDocument } from "../music-score/pub/interface";
 import { ArcPos, Navigation, Annotation, StaffKind, Stem } from "../music-score/pub";
 
+/** @public */
 export function createAndanteByDiabelli(): MDocument {
     let doc = new MDocument(StaffKind.TrebleForGuitar);
 

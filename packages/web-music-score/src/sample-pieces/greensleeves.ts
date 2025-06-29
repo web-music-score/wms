@@ -4,6 +4,7 @@ import { Arpeggio, Navigation, StaffKind, Stem, Annotation, Label } from "../mus
 
 // Greensleeves (https://musescore.com/aaron_dc/scores/6167495)
 
+/** @public */
 export function createGreensleeves(): MDocument {
     let doc = new MDocument(StaffKind.TrebleForGuitar);
 
