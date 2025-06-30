@@ -12,6 +12,7 @@ package-lock.json
 babel.config.js
 karma.conf.js
 tsconfig.json
+tsconfig.types.json
 typedoc.json
 webpack.config.js
 api-extractor.json
