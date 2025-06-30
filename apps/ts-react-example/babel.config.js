@@ -1,10 +1,6 @@
 "use strict";
 
 module.exports = function (api) {
-    const isESM = api.env("esm");
-    const isCJS = api.env("cjs");
-    const isUMD = api.env("umd");
-
     api.cache(true); // Enables caching for faster builds
 
     return {
@@ -21,13 +17,16 @@ module.exports = function (api) {
                         ios: "10"
                     },
                     modules: false,
-                    useBuiltIns: false,
+                    useBuiltIns: "entry",
+                    corejs: 3,
                     shippedProposals: false
                 }
             ],
             [
                 "@babel/preset-react"
-            ]],
+            ]
+
+        ],
         plugins: []
     };
 };
