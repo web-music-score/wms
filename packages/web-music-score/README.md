@@ -42,7 +42,10 @@ const Score = require("@tspro/web-music-score");
 ```
 
 ```html
-<!-- Or use in browser via unpkg CDN -->
+<!--
+    Or use in browser via unpkg CDN.
+    Browser version comes without React-components.
+-->
 <script src="https://unpkg.com/@tspro/web-music-score@1"></script>
 
 <canvas id="scoreCanvas"></canvas><br />
