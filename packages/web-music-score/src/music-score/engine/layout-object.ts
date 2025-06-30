@@ -130,8 +130,8 @@ export class LayoutGroup {
         this.layoutObjectTable[VerticalPos.AboveStaff] = [];
         this.layoutObjectTable[VerticalPos.BelowStaff] = [];
 
-        this.rowAlign = RowAlignList.includes(layoutGroupId);
-        this.widensColumn = WidenColumnList.includes(layoutGroupId);
+        this.rowAlign = RowAlignList.indexOf(layoutGroupId) >= 0;
+        this.widensColumn = WidenColumnList.indexOf(layoutGroupId) >= 0;
     }
 
     getLayoutObjects(verticalPos: VerticalPos): Readonly<LayoutObjectWrapper[]> {

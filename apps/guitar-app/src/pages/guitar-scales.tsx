@@ -160,7 +160,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                 this.selectedNoteTimer = undefined;
             }
 
-            if (!variant || !variant.notes.includes(guitarNote)) {
+            if (!variant || variant.notes.indexOf(guitarNote) < 0) {
                 this.selectedNoteTimer = window.setTimeout(() => {
                     this.selectedNoteTimer = undefined;
                     this.setState({ selectedNote: undefined })

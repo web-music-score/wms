@@ -54,15 +54,14 @@ export function getKnownAnnotation(text: string): Annotation | undefined {
     }
 }
 
-
 export function isDynamicsText(text: string) {
-    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim."].includes(text);
+    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim."].indexOf(text) >= 0;
 }
 
 export function isDynamicsLevelText(text: string) {
-    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff"].includes(text);
+    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff"].indexOf(text) >= 0;
 }
 
 export function isTempoText(text: string) {
-    return ["accel.", "rit.", "a tempo"].includes(text);
+    return ["accel.", "rit.", "a tempo"].indexOf(text) >= 0;
 }

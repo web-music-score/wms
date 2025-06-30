@@ -244,10 +244,10 @@ export class ObjNoteGroup extends MusicObject {
     getPlaySlur(): "first" | "slurred" | undefined {
         let slurs = this.slurDatas.map(slurData => slurData.startsWith(this) ? "first" : "slurred");
 
-        if (slurs.includes("first")) {
+        if (slurs.indexOf("first") >= 0) {
             return "first";
         }
-        else if (slurs.includes("slurred")) {
+        else if (slurs.indexOf("slurred") >= 0) {
             return "slurred";
         }
         else {

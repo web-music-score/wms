@@ -13,7 +13,7 @@ export const DefaultTuningName = TuningNameList[0];
 
 /** @public */
 export function validateTuningName(tuningName: string): string {
-    if (TuningNameList.includes(tuningName)) {
+    if (TuningNameList.indexOf(tuningName) >= 0) {
         return tuningName;
     }
     else {
