@@ -5,7 +5,7 @@
     "private": true,
     "license": "zlib",
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.0.0",
+        "@tspro/ts-utils-lib": "^1.0.1",
         "@tspro/web-music-score": "^1.0.0",
         "bootstrap": "^5.3.7",
         "core-js": "^3.43.0",

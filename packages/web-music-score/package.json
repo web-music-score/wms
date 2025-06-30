@@ -19,7 +19,7 @@
         }
     },
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.0.0"
+        "@tspro/ts-utils-lib": "^1.0.1"
     },
     "peerDependencies": {
         "react": "^19.1.0",
