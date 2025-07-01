@@ -8,7 +8,6 @@ const makeConfig = ({ env, argv, format, filename, libraryType }) => {
     const isMinified = filename.includes(".min.");
     const isModule = libraryType === "module";
     const entry = format === "umd" ? "src/index.umd.ts" : "src/index.full.ts";
-    const bundleDeps = format === "umd";
 
     return {
         mode: argv.mode,
@@ -75,13 +74,13 @@ const makeConfig = ({ env, argv, format, filename, libraryType }) => {
                 }
             ]
         },
-        externals: bundleDeps ? undefined : {
-            react: "react",
-            tone: "tone",
+        externals: {
+            // Note! UMD bundle does not include react components.
+            react: "react"
         },
         plugins: [
             new webpack.BannerPlugin({
-                banner: `WebMusicScore v${packageJson.version} | (c) 2023 PahkaSoft | zlib License | Includes: React, Tone.js (MIT Licenses)`
+                banner: `WebMusicScore v${packageJson.version} | (c) 2023 PahkaSoft | zlib License | Includes: Tone.js (MIT License)`
             }),
             new webpack.DefinePlugin({
                 __LIB_INFO__: JSON.stringify(`WebMusicScore v${packageJson.version} (${format})`)

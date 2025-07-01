@@ -19,11 +19,11 @@
         }
     },
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.0.1"
+        "@tspro/ts-utils-lib": "^1.0.1",
+        "tone": "^15.1.22"
     },
     "peerDependencies": {
-        "react": "^19.1.0",
-        "tone": "^15.1.22"
+        "react": "^19.1.0"
     },
     "devDependencies": {
         "@babel/cli": "^7.27.2",
