@@ -1,10 +1,12 @@
 # WebMusicScore
 
-This is a library allows you to view and play music scores (notation) in the browser.
+This library allows you to view and play music scores (notation) in the browser.
 
-Note: I'm not a professional musician. I began learning classical guitar on my own, later taking lessons in both classical and electric guitar. I've also studied music theory independently.
+Note: I'm not a professional musician. I began learning classical guitar on my own, 
+later taking lessons in classical guitar. I've also studied music theory independently.
 
-This project has been a slow and steady effort over several years. It's now ready for public release — though please note that there may still be bugs or unexpected behavior.
+This project has been a slow and steady effort over several years. It's now ready for
+public release — though please note that there may still be bugs or unexpected behavior.
 
 # Install
 
