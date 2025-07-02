@@ -431,3 +431,8 @@ This project is licensed under the [zlib License](https://opensource.org/license
 
 It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
 which is licensed under the [MIT License](https://opensource.org/license/mit).
+
+## Contact
+
+If you have questions or issues, feel free to contact me via [GitHub](https://github.com/pahkasoft).  
+My email is visible to logged-in GitHub users on my profile page.
