@@ -2,8 +2,8 @@
     "name": "guitar-app",
     "version": "1.0.0",
     "author": "PahkaSoft",
+    "license": "MIT",
     "private": true,
-    "license": "zlib",
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.0.1",
         "@tspro/web-music-score": "^1.0.0",

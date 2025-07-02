@@ -427,7 +427,7 @@ catch(e) {
 
 ## License
 
-This project is licensed under the [zlib License](https://opensource.org/license/zlib).
+This project is licensed under the [MIT License](https://mit-license.org/).
 
 It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
 which is licensed under the [MIT License](https://opensource.org/license/mit).

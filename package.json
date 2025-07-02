@@ -2,8 +2,8 @@
     "name": "music-score-project",
     "version": "1.0.0",
     "author": "PahkaSoft",
+    "license": "MIT",
     "private": true,
-    "license": "zlib",
     "workspaces": [
         "./packages/*",
         "./apps/*"
