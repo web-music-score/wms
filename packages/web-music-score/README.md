@@ -8,7 +8,7 @@ later taking lessons in classical guitar. I've also studied music theory indepen
 This project has been a slow and steady effort over several years. It's now ready for
 public release — though please note that there may still be bugs or unexpected behavior.
 
-# Install
+## Install
 
 ```sh
 npm i @tspro/web-music-score
@@ -17,7 +17,7 @@ npm i @tspro/web-music-score
 npm i react
 ```
 
-# Library Bundle
+## Library Bundle
 
 This library is bundled to ESM, CJS and UMD formats.
 
@@ -28,9 +28,9 @@ This library is bundled to ESM, CJS and UMD formats.
 
 While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
 
-# Usage
+## Usage
 
-## Import Methods
+### Import Methods
 ```js
 // Import named exports
 import * as Score from "@tspro/web-music-score";
@@ -58,7 +58,7 @@ const Score = require("@tspro/web-music-score");
 </script>
 ```
 
-## Create Document
+### Create Document
 
 ```js
 let doc = new Score.MDocument(Score.StaffKind.Treble, 4);
@@ -77,13 +77,13 @@ doc.setHeader("Title");
 
 Any of title, composer and arranger can be omitted/set undefined.
 
-## Add Measure
+### Add Measure
 
 ```js
 let m = doc.addMeasure();
 ```
 
-## End Row
+### End Row
 
 ```js
 m.endRow();
@@ -91,7 +91,7 @@ m.endRow();
 
 Manually induce row change. Next measure will be added to new row.
 
-## Set Signature
+### Set Signature
 
 ```js
 m.setKeySignature("C", Score.ScaleType.Major);
@@ -117,7 +117,7 @@ First argument is beats per minute.
 
 Second argument is beat length. Third argument tells if beat length is dotted. Second and third arguments can be omitted.
 
-## Adding Notes and chords
+### Adding Notes and chords
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter);
@@ -130,7 +130,7 @@ Second argument is note or list of notes for chord.
 
 Third argument is note length. Note length can be Whole, Half, Quarter, Eighth, Sixteenth, ThirdySecond or SixtyFourth.
 
-## Add Rest
+### Add Rest
 
 ```js    
 m.addRest(0, Score.NoteLength.Quarter);
@@ -140,16 +140,16 @@ First argument is voice track id and can be 0, 1, 2 or 3.
 
 Second argument is rest length. Rest length can be Whole, Half, Quarter, Eighth, Sixteenth, ThirdySecond or SixtyFourth.
 
-## Note And Rest Options
+### Note And Rest Options
 
-### Doted Note And Rest
+#### Doted Note And Rest
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter, { dotted: true });
 m.addRest(0, Score.NoteLength.Quarter, { dotted: true });
 ```
 
-### Stem Direction
+#### Stem Direction
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter, { stem: Stem.Up });
@@ -157,7 +157,7 @@ m.addNote(0, "C3", Score.NoteLength.Quarter, { stem: Stem.Up });
 
 Stem  direction can be Auto, Up or Down
 
-### Arpeggio
+#### Arpeggio
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter, { arpeggio: Arpeggio.Down });
@@ -165,19 +165,19 @@ m.addNote(0, "C3", Score.NoteLength.Quarter, { arpeggio: Arpeggio.Down });
 
 Play this column of notes in arpeggio. Arpeggio can be Up or Down.
 
-### Staccato
+#### Staccato
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter, { staccato: true });
 ```
 
-### Diamond Note Head
+#### Diamond Note Head
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter, { diamond: true });
 ```
 
-### Add Ties And Slurs
+#### Add Ties And Slurs
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Half, { tieSpan: 2, tiePos: Score.ArcPos.Below })
@@ -195,7 +195,7 @@ Adds a slur.
 
 ArcPos can be Auto, Above (above note head), Middle (next to note head), Below (below note head), StemTip.
 
-### Add Triplet
+#### Add Triplet
 
 ```js
 doc.addMeasure()
@@ -214,7 +214,7 @@ doc.addMeasure()
 
 Triplet can also be added between two notes or rest. Other note or rest is double length of the other.
 
-### Rest Pitch
+#### Rest Pitch
 
 ```js
 m.addRest(0, Score.NoteLength.Quarter, { pitch: "C3" });
@@ -222,7 +222,7 @@ m.addRest(0, Score.NoteLength.Quarter, { pitch: "C3" });
 
 Positions rest at the pitch level of note "C3".
 
-### Hide Rest
+#### Hide Rest
 
 ```js
 m.addRest(0, Score.NoteLength.Quarter, { hide: true });
@@ -230,7 +230,7 @@ m.addRest(0, Score.NoteLength.Quarter, { hide: true });
 
 Creates invisible rest.
 
-## Add Fermata
+### Add Fermata
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter).addFermata(Score.Fermata.AtNote);
@@ -245,7 +245,7 @@ m.addFermata(Score.Fermata.AtMeasureEnd);
 
 Adds fermata at measure end.
 
-## Add Navigation
+### Add Navigation
 
 ```js
 m.addNavigation(Score.Navigation.DC_al_Fine);
@@ -280,7 +280,7 @@ m.addNavigation(Score.Navigation.Ending, 1, 2);
 m.addNavigation(Score.Navigation.Ending, 3);
 ```
 
-## Add Label
+### Add Label
 
 ```js
 m.addChord(0, ["D3", "F3", "A3"], Score.NoteLength.Quarter).addLabel(Score.Label.Chord, "Dm");
@@ -291,7 +291,7 @@ Available Label types are:
 * Label.Note is used to label notes and is positioned below note.
 * Label.Chord is used to label chords and is positioned on top.
 
-## Add Annotation
+### Add Annotation
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter).addAnnotation(Score.Annotation.Dynamics, "fff");
@@ -304,7 +304,7 @@ Available annotations are:
 * Annotation.Dynamics could be for example "fff", "cresc.", "dim.", etc.
 * Annotation.Tempo could be for example "accel.", "rit.", "a tempo", etc.
 
-## Add Extension
+### Add Extension
 
 ```js
 m.addNote(0, "C3", Score.NoteLength.Quarter).
@@ -318,7 +318,7 @@ First argument is extension length, of type number. NoteLength values can be use
 
 Second argument is true/false whether extension line is visible. This argument cvan be omitted, extension line is visible by default.
 
-## Queueing
+### Queueing
 
 Adding stuff to measures can be queued like this:
 
@@ -329,11 +329,11 @@ doc.addMeasure()
     .addRest(1, Score.NoteLength.Quarter);
 ```
 
-## Beams
+### Beams
 
 Beams are detected and added automatically.
 
-## Play Document
+### Play Document
 
 ```js
 Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
@@ -359,7 +359,7 @@ MPlayer.stopAll();
 
 More playback methods.
 
-## Viewing Using React JSX/TSX
+### Viewing Using React JSX/TSX
 
 ```js
 // Draw document
@@ -373,7 +373,7 @@ More playback methods.
 
 Bootstrap is used for better visual appearance but you must load it.
 
-## Viewing Using Plain JS/TS
+### Viewing Using Plain JS/TS
 
 ```html
 <!-- Add canvas -->
@@ -410,7 +410,7 @@ p.setPlayStopButton("playStopButtonId")
 p.setPlayButton(playButtonElement)
 ```
 
-## Error Handling
+### Error Handling
 
 ```js
 try {
@@ -425,7 +425,7 @@ catch(e) {
 }
 ```
 
-# License
+## License
 
 This project is licensed under the [zlib License](https://opensource.org/license/zlib).
 
