@@ -2,6 +2,9 @@
     "name": "@tspro/web-music-score",
     "version": "1.0.0",
     "author": "PahkaSoft",
+    "bugs": {
+        "email": "pahkasoft@outlook.com"
+    },
     "private": false,
     "license": "zlib",
     "description": "Web component for viewing and playing musical scores/notations.",
