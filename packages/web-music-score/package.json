@@ -5,7 +5,7 @@
     "license": "MIT",
     "private": false,
     "bugs": {
-        "email": "pahkasoft@outlook.com"
+        "url": "https://github.com/pahkasoft/issues/issues/new"
     },
     "description": "Web component for viewing and playing musical scores/notations.",
     "main": "dist/index.cjs.js",

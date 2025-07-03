@@ -425,6 +425,16 @@ catch(e) {
 }
 ```
 
+## Report a Bug
+
+Found a bug or unexpected behavior?
+
+[Please open a new issue.](https://github.com/pahkasoft/issues/issues/new)
+
+You can also suggest a feature or impovement.
+
+Thanks for helping improve the project!
+
 ## License
 
 This project is licensed under the [MIT License](https://mit-license.org/).
