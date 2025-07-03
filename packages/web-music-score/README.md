@@ -28,7 +28,24 @@ This library is bundled to ESM, CJS and UMD formats.
 
 While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
 
-## Usage
+## Report a Bug
+
+Found a bug or unexpected behavior?
+
+[Please open a new issue.](https://github.com/pahkasoft/issues/issues/new)
+
+You can also suggest a feature or impovement.
+
+Thanks for helping improve the project!
+
+## License
+
+This project is licensed under the [MIT License](https://mit-license.org/).
+
+It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
+which is licensed under the [MIT License](https://opensource.org/license/mit).
+
+## Usage And API Documentation
 
 ### Import Methods
 ```js
@@ -424,20 +441,3 @@ catch(e) {
     }
 }
 ```
-
-## Report a Bug
-
-Found a bug or unexpected behavior?
-
-[Please open a new issue.](https://github.com/pahkasoft/issues/issues/new)
-
-You can also suggest a feature or impovement.
-
-Thanks for helping improve the project!
-
-## License
-
-This project is licensed under the [MIT License](https://mit-license.org/).
-
-It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
-which is licensed under the [MIT License](https://opensource.org/license/mit).
