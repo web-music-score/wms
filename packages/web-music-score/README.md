@@ -85,7 +85,7 @@ First argument can be Treble, TrebleForGuitar, Bass or Grand. TrebleForGuitar is
 
 Second argument is number of measures per row, and can be omitted.
 
-## Set Header
+### Set Header
 
 ```js
 doc.setHeader("Title", "Composer", "Arranger");
