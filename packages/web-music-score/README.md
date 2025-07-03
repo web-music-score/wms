@@ -8,7 +8,7 @@ later taking lessons in classical guitar. I've also studied music theory indepen
 This project has been a slow and steady effort over several years. It's now ready for
 public release — though please note that there may still be bugs or unexpected behavior.
 
-## Install
+## Installation
 
 ```sh
 npm i @tspro/web-music-score
@@ -17,53 +17,30 @@ npm i @tspro/web-music-score
 npm i react
 ```
 
-## Library Bundle
-
-This library is bundled to ESM, CJS and UMD formats.
-
-* CJS and UMD bundles are transpiled with Babel for ES5/IE11 compatibility.
-* ESM bundle targets modern environments (ES6+).
-* Uses ES6 features like Map, etc.
-* No polyfills are included.
-
-While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
-
-## Report a Bug
-
-Found a bug or unexpected behavior?
-
-[Please open a new issue.](https://github.com/pahkasoft/issues/issues/new)
-
-You can also suggest a feature or impovement.
-
-Thanks for helping improve the project!
-
-## License
-
-This project is licensed under the [MIT License](https://mit-license.org/).
-
-It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
-which is licensed under the [MIT License](https://opensource.org/license/mit).
-
 ## Usage And API Documentation
 
-### Import Methods
+### Usage
+
+#### Import (ESM)
 ```js
 // Import named exports
 import * as Score from "@tspro/web-music-score";
 
-// Or import default export
+// Import default export
 import Score from "@tspro/web-music-score";
+```
 
-// Or use require
+#### Require (CommonJS)
+```js
+// Use require
 const Score = require("@tspro/web-music-score");
 ```
 
+#### Browser Script
+Use in browser via unpkg CDN.
+Browser version comes without React-components.
+
 ```html
-<!--
-    Or use in browser via unpkg CDN.
-    Browser version comes without React-components.
--->
 <script src="https://unpkg.com/@tspro/web-music-score@1"></script>
 
 <canvas id="scoreCanvas"></canvas><br />
@@ -441,3 +418,31 @@ catch(e) {
     }
 }
 ```
+
+## Compatibility
+
+This library is bundled to ESM, CJS and UMD formats.
+
+* CJS and UMD bundles are transpiled with Babel for ES5/IE11 compatibility.
+* ESM bundle targets modern environments (ES6+).
+* Uses ES6 features like Map, etc.
+* No polyfills are included.
+
+While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
+
+## Report a Bug
+
+Found a bug or unexpected behavior?
+
+[Please open a new issue.](https://github.com/pahkasoft/issues/issues/new)
+
+You can also suggest a feature or impovement.
+
+Thanks for helping improve the project!
+
+## License
+
+This project is licensed under the [MIT License](https://mit-license.org/).
+
+It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
+which is licensed under the [MIT License](https://opensource.org/license/mit).
