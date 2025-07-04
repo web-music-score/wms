@@ -69,7 +69,7 @@ doc.setHeader("Title", "Composer", "Arranger");
 doc.setHeader("Title");
 ```
 
-Any of title, composer and arranger can be omitted/set undefined.
+Any of `title`, `composer` and `arranger` can be omitted/set undefined.
 
 ### Add Measure
 
@@ -93,14 +93,14 @@ m.setKeySignature("C", Score.ScaleType.Major);
 
 Firat argument is scale key note.
 
-Second argument is scale type, which can be Major, NaturalMinor, HarmonicMinor, Ionian, Dorian, Phrygian, Lydian, Mixolydian, 
-Aeolian, Locrian, MajorPentatonic, MinorPentatonic, MajorHexatonicBlues, MinorHexatonicBlues or HeptatonicBlues.
+Second argument is `ScaleType`, which can be `Major`, `NaturalMinor`, `HarmonicMinor`, `Ionian`, `Dorian`, `Phrygian`, `Lydian`, `Mixolydian`, 
+`Aeolian`, `Locrian`, `MajorPentatonic`, `MinorPentatonic`, `MajorHexatonicBlues`, `MinorHexatonicBlues` or `HeptatonicBlues`.
 
 ```js
 m.setTimeSignature("4/4");
 ```
 
-Time signature can be "2/4", "3/4", "4/4", "6/8" or "9/8".
+Time signature can be `"2/4"`, `"3/4"`, `"4/4"`, `"6/8"` or `"9/8"`.
 
 ```js
 m.setTempo(80, Score.NoteLength.Quarter, false);
@@ -118,11 +118,11 @@ m.addNote(0, "C3", Score.NoteLength.Quarter);
 m.addChord(1, ["C3", "E3", "G3", "C4"], Score.NoteLength.Whole);
 ```
 
-First argument is voice track id and can be 0, 1, 2 or 3.
+First argument is voice track id and can be `0`, `1`, `2` or `3`.
 
 Second argument is note or list of notes for chord.
 
-Third argument is note length. Note length can be Whole, Half, Quarter, Eighth, Sixteenth, ThirdySecond or SixtyFourth.
+Third argument is note length. `NoteLength` can be `Whole`, `Half`, `Quarter`, `Eighth`, `Sixteenth`, `ThirdySecond` or `SixtyFourth`.
 
 ### Add Rest
 
@@ -130,9 +130,9 @@ Third argument is note length. Note length can be Whole, Half, Quarter, Eighth, 
 m.addRest(0, Score.NoteLength.Quarter);
 ```
 
-First argument is voice track id and can be 0, 1, 2 or 3.
+First argument is voice track id and can be `0`, `1`, `2` or `3`.
 
-Second argument is rest length. Rest length can be Whole, Half, Quarter, Eighth, Sixteenth, ThirdySecond or SixtyFourth.
+Second argument is rest length. Rest length (type of `NoteLEngth`) can be `Whole`, `Half`, `Quarter`, `Eighth`, `Sixteenth`, `ThirdySecond` or `SixtyFourth`.
 
 ### Note And Rest Options
 
@@ -149,7 +149,7 @@ m.addRest(0, Score.NoteLength.Quarter, { dotted: true });
 m.addNote(0, "C3", Score.NoteLength.Quarter, { stem: Stem.Up });
 ```
 
-Stem  direction can be Auto, Up or Down
+`Stem` can be `Auto`, `Up` or `Down`.
 
 #### Arpeggio
 
@@ -157,7 +157,7 @@ Stem  direction can be Auto, Up or Down
 m.addNote(0, "C3", Score.NoteLength.Quarter, { arpeggio: Arpeggio.Down });
 ```
 
-Play this column of notes in arpeggio. Arpeggio can be Up or Down.
+Play this column of notes in arpeggio. `Arpeggio` can be `Up` or `Down`.
 
 #### Staccato
 
@@ -187,7 +187,7 @@ m.addNote(0, "D3", Score.NoteLength.Eight);
 
 Adds a slur.
 
-ArcPos can be Auto, Above (above note head), Middle (next to note head), Below (below note head), StemTip.
+`ArcPos` can be `Auto`, `Above` (above note head), `Middle` (next to note head), `Below` (below note head), `StemTip`.
 
 #### Add Triplet
 
@@ -249,25 +249,25 @@ Adds navigational element to measure.
 
 Available navigations are:
 
-* Navigation.DC\_al\_Fine
-* Navigation.DC\_al\_Coda
-* Navigation.DS\_al\_Fine
-* Navigation.DS\_al\_Coda
-* Navigation.Coda
-* Navigation.toCoda
-* Navigation.Segno
-* Navigation.Fine
-* Navigation.StartRepeat
-* Navigation.EndRepeat
-* Navigation.Ending
+* `Navigation.DC_al_Fine`
+* `Navigation.DC_al_Coda`
+* `Navigation.DS_al_Fine`
+* `Navigation.DS_al_Coda`
+* `Navigation.Coda`
+* `Navigation.toCoda`
+* `Navigation.Segno`
+* `Navigation.Fine`
+* `Navigation.StartRepeat`
+* `Navigation.EndRepeat`
+* `Navigation.Ending`
 
-Navigation.EndRepeat takes optional second argument which is number of repeats. Defaults to 1 if omitted.
+`Navigation.EndRepeat` takes optional second argument which is number of repeats. Defaults to 1 if omitted.
 
 ```js
 m.addNavigation(Score.Navigation.EndRepeat, 2);
 ```
 
-Navigation.Ending takes variable number of arguments, each is a passage number.
+`Navigation.Ending` takes variable number of arguments, each is a passage number.
 
 ```js
 m.addNavigation(Score.Navigation.Ending, 1, 2);
@@ -282,8 +282,8 @@ m.addChord(0, ["D3", "F3", "A3"], Score.NoteLength.Quarter).addLabel(Score.Label
 
 Available Label types are:
 
-* Label.Note is used to label notes and is positioned below note.
-* Label.Chord is used to label chords and is positioned on top.
+* `Label.Note` is used to label notes and is positioned below note.
+* `Label.Chord` is used to label chords and is positioned on top.
 
 ### Add Annotation
 
@@ -291,12 +291,12 @@ Available Label types are:
 m.addNote(0, "C3", Score.NoteLength.Quarter).addAnnotation(Score.Annotation.Dynamics, "fff");
 ```
 
-First argument is Annotation, second argument is the annotation text.
+First argument is `Annotation`, second argument is the annotation text.
 
 Available annotations are:
 
-* Annotation.Dynamics could be for example "fff", "cresc.", "dim.", etc.
-* Annotation.Tempo could be for example "accel.", "rit.", "a tempo", etc.
+* `Annotation.Dynamics` could be for example `"fff"`, `"cresc."`, `"dim."`, etc.
+* `Annotation.Tempo` could be for example `"accel."`, `"rit."`, `"a tempo"`, etc.
 
 ### Add Extension
 
@@ -308,9 +308,9 @@ m.addNote(0, "C3", Score.NoteLength.Quarter).
 
 Adds extension line to element, annotation in this case.
 
-First argument is extension length, of type number. NoteLength values can be used as number, and NoteLength values can be multiplied to set desired extension length.
+First argument is extension length, of type number. `NoteLength` values can be used as number, and `NoteLength` values can be multiplied to set desired extension length.
 
-Second argument is true/false whether extension line is visible. This argument cvan be omitted, extension line is visible by default.
+Second argument is `true`/`false` whether extension line is visible. This argument cvan be omitted, extension line is visible by default.
 
 ### Queueing
 
