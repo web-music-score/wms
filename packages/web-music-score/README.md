@@ -111,118 +111,77 @@ First argument is beats per minute.
 
 Second argument is beat length. Third argument tells if beat length is dotted. Second and third arguments can be omitted.
 
-### Adding Notes and chords
+### Add Note Or Chord
 
 ```js
-m.addNote(0, "C3", Score.NoteLength.Quarter);
-m.addChord(1, ["C3", "E3", "G3", "C4"], Score.NoteLength.Whole);
+m.addNote(voiceId, note, noteLength, noteOptions?);
+m.addChord(voiceId, notes, noteLength, noteOptions);
 ```
 
-First argument is voice track id and can be `0`, `1`, `2` or `3`.
+* `voiceId`: Voice track id `0`, `1`, `2` or `3`
+* `note`: note `string | Note` (e.g. `"C3"`)
+* `notes`: array of notes `(string | Note)[]` (e.g. `["C3", "E3"]`)
+* `noteLength`: Note length (e.g. `NoteLength.Half`), see below
+* `noteOptions`: Optional note otions, see below
 
-Second argument is note or list of notes for chord.
+Examples:
+```js
+m.addNote(0, "C3", Score.NoteLength.Quarter);
+m.addChord(1, ["C3", "E3", "G3", "C4"], Score.NoteLength.Half, { dotted: true });
+```
 
-Third argument is note length. `NoteLength` can be `Whole`, `Half`, `Quarter`, `Eighth`, `Sixteenth`, `ThirdySecond` or `SixtyFourth`.
+#### NoteLength
+
+* `NoteLength.Whole`
+* `NoteLength.Half`
+* `NoteLength.Quarter`
+* `NoteLength.Eighth`
+* `NoteLength.Sixteenth`
+* `NoteLength.ThirtySecond`
+* `NoteLength.SixtyFourth`
+
+#### NoteOptions
+
+Optional object of note options (e.g. `{ stem: Stem.Up }`):
+
+| Note option | Type                    |                    |
+|-------------|-------------------------|--------------------|
+| dotted      | `boolean`               | Create dotted note |
+| stem        | `Stem`                  | Set stem direction (`Stem.Auto`/`Up`/`Down`) |
+| arpeggio    | `Arpeggio`              | Play column in arpeggio `Arpeggio.Up`/`Down` |
+| staccato    | `boolean`               | Play column in staccato |
+| diamond     | `boolean`               | Diamond shaped note head |
+| tieSpan     | `number` \| `TieLength` | How many notes tied, or `TieLength.Short`/`ToMeasureEnd` |
+| tiePos      | `ArcPos`                | Tie attach point: `Arc.Auto`/`Above`/`Middle`/`Below`/`StemTip` |
+| slurSpan    | `number`                | How many notes slurred |
+| slurPos     | `ArcPos`                | Slur attach point: `Arc.Auto`/`Above`/`Middle`/`Below`/`StemTip` |
+| triplet     | `boolean`               | Make this note part of triplet |
+
 
 ### Add Rest
 
 ```js    
+m.addRest(voideId, restLength, restOptions?);
+```
+
+* `voiceId`: Voice track id `0`, `1`, `2` or `3`.
+* `restLength`: Rest length using `NoteLength` (e.g. `NoteLength.Half`), see above.
+* `restOptions`: Optional rest otions, see below.
+
+Example:
+```js
 m.addRest(0, Score.NoteLength.Quarter);
 ```
 
-First argument is voice track id and can be `0`, `1`, `2` or `3`.
+#### RestOptions
 
-Second argument is rest length. Rest length (type of `NoteLEngth`) can be `Whole`, `Half`, `Quarter`, `Eighth`, `Sixteenth`, `ThirdySecond` or `SixtyFourth`.
-
-### Note And Rest Options
-
-#### Doted Note And Rest
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Quarter, { dotted: true });
-m.addRest(0, Score.NoteLength.Quarter, { dotted: true });
-```
-
-#### Stem Direction
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Quarter, { stem: Stem.Up });
-```
-
-`Stem` can be `Auto`, `Up` or `Down`.
-
-#### Arpeggio
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Quarter, { arpeggio: Arpeggio.Down });
-```
-
-Play this column of notes in arpeggio. `Arpeggio` can be `Up` or `Down`.
-
-#### Staccato
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Quarter, { staccato: true });
-```
-
-#### Diamond Note Head
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Quarter, { diamond: true });
-```
-
-#### Add Ties And Slurs
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Half, { tieSpan: 2, tiePos: Score.ArcPos.Below })
-m.addNote(0, "C3", Score.NoteLength.Quarter);
-```
-    
-Adds a tie.
-
-```js
-m.addNote(0, "C3", Score.NoteLength.Eight, { slurSpan: 2, slurPos: Score.ArcPos.Below })
-m.addNote(0, "D3", Score.NoteLength.Eight);
-```
-
-Adds a slur.
-
-`ArcPos` can be `Auto`, `Above` (above note head), `Middle` (next to note head), `Below` (below note head), `StemTip`.
-
-#### Add Triplet
-
-```js
-doc.addMeasure()
-    .addNote(0, "C3", Score.NoteLength.Eight, { triplet: true })
-    .addNote(0, "D3", Score.NoteLength.Eight, { triplet: true })
-    .addNote(0, "E3", Score.NoteLength.Eight, { triplet: true });
-```
-
-Adds triplet between three notes or rest of equal length.
-
-```js
-doc.addMeasure()
-    .addNote(0, "C3", Score.NoteLength.Eight, { triplet: true })
-    .addRest(0, Score.NoteLength.Quarter, { triplet: true });
-```
-
-Triplet can also be added between two notes or rest. Other note or rest is double length of the other.
-
-#### Rest Pitch
-
-```js
-m.addRest(0, Score.NoteLength.Quarter, { pitch: "C3" });
-```
-
-Positions rest at the pitch level of note "C3".
-
-#### Hide Rest
-
-```js
-m.addRest(0, Score.NoteLength.Quarter, { hide: true });
-```
-
-Creates invisible rest.
+Optional object of rest options (e.g. `{ hide: true }`):
+| Rest option | Type                   |                    |
+|-------------|------------------------|--------------------|
+| dotted      | `boolean`              | Create dotted rest |
+| pitch       | `string` \| `Note`     | Positions rest at level of note (e.g. `"C3"`) |
+| hide        | `boolean`              | Add invisible rest |
+| triplet     | `boolean`              | Make this rest part of triplet |
 
 ### Add Fermata
 
@@ -261,7 +220,7 @@ Available navigations are:
 * `Navigation.EndRepeat`
 * `Navigation.Ending`
 
-`Navigation.EndRepeat` takes optional second argument which is number of repeats. Defaults to 1 if omitted.
+`Navigation.EndRepeat` Takes optional second argument which is number of repeats. Defaults to 1 if omitted.
 
 ```js
 m.addNavigation(Score.Navigation.EndRepeat, 2);
