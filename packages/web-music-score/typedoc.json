@@ -1,10 +1,10 @@
 {
     "tsconfig": "./tsconfig.json",
     "entryPoints": [
-        "./src/index.ts"
+        "./src/index.full.ts"
     ],
     "out": "docs/",
-    "readme": "../../README.md",
+    "readme": "README.md",
     "disableSources": true,
     "excludeInternal": true,
     "excludePrivate": true,
