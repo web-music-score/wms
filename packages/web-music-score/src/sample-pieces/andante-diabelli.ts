@@ -4,7 +4,7 @@ import { ArcPos, Navigation, Annotation, StaffKind, Stem } from "../music-score/
 
 /** @public */
 export function createAndanteByDiabelli(): MDocument {
-    let doc = new MDocument(StaffKind.TrebleForGuitar);
+    let doc = new MDocument(StaffKind.GuitarTreble);
 
     doc.setHeader("Andante", "A. Diabelli");
 

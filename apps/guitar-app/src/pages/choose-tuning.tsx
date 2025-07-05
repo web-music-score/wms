@@ -52,7 +52,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         let { guitarCtx } = this.state;
         let { tuningName } = guitarCtx;
 
-        let doc = new Score.MDocument(Score.StaffKind.TrebleForGuitar);
+        let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
         let m = doc.addMeasure().setKeySignature(Score.getScale("C", Score.ScaleType.Major));
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
         notes.forEach(note => {

@@ -12,7 +12,7 @@ import { ObjExtensionLine } from "./obj-extension-line";
 const p = (noteName: string) => Note.getNote(noteName).pitch;
 
 const StaffLine_Treble = new StaffLine(ClefKind.Treble, p("G4"), p("B4"), 0, p("C3"), p("C7"));
-const StaffLine_TrebleForGuitar = new StaffLine(ClefKind.Treble, p("G3"), p("B3"), 0, p("C2"), p("C6"));
+const StaffLine_GuitarTreble = new StaffLine(ClefKind.Treble, p("G3"), p("B3"), 0, p("C2"), p("C6"));
 const StaffLine_Bass = new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 0, p("C1"), p("C5"));
 const StaffLine_Grand_Treble = new StaffLine(ClefKind.Treble, p("G4"), p("B4"), -4, p("C4"), p("C7"));
 const StaffLine_Grand_Bass = new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 4, p("C1"), p("C4") - 1);
@@ -43,8 +43,8 @@ export class ObjScoreRow extends MusicObject {
         this.staffKind = doc.staffKind;
 
         switch (this.staffKind) {
-            case StaffKind.TrebleForGuitar:
-                this.staffLines[0] = StaffLine_TrebleForGuitar;
+            case StaffKind.GuitarTreble:
+                this.staffLines[0] = StaffLine_GuitarTreble;
                 break;
             case StaffKind.Treble:
             default:

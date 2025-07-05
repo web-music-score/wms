@@ -6,7 +6,7 @@ import { Arpeggio, Navigation, StaffKind, Stem, Annotation, Label } from "../mus
 
 /** @public */
 export function createGreensleeves(): MDocument {
-    let doc = new MDocument(StaffKind.TrebleForGuitar);
+    let doc = new MDocument(StaffKind.GuitarTreble);
 
     doc.setHeader("Greensleeves");
 

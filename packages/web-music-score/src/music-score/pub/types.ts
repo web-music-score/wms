@@ -5,13 +5,21 @@ import { MMeasure, MusicInterface } from "./interface";
 /** @public */
 export enum StaffKind {
     /** Treble staff has treble (G-) clef. */
-    Treble,
-    /** TrebleForGuitar has treble clef but is one octave lower. */
-    TrebleForGuitar,
+    Treble = 1,
     /** Bass staff has bass (F-) clef. */
-    Bass,
+    Bass = 2,
     /** Grand staff has both treble and bass clefs. */
-    Grand
+    Grand = Treble | Bass,
+
+    /** GuitarTreble has treble clef but is one octave lower. */
+    GuitarTreble = 4,
+    // /** GuitarTab has tab for guitar. */
+    // GuitarTab = 8,
+    // /** GuitarTrebleAndTab has treble clef and tab for guitar. */
+    // GuitarTrebleAndTab = GuitarTab | GuitarTreble,
+
+    /** @deprecated TrebleForGuitar was replaced by GuitarTreble. */
+    TrebleForGuitar = GuitarTreble,
 }
 
 /** @public */

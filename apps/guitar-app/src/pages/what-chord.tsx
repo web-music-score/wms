@@ -124,7 +124,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             }
         }
 
-        let doc = new Score.MDocument(Score.StaffKind.TrebleForGuitar);
+        let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 

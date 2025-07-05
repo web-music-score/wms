@@ -1,7 +1,7 @@
 import * as Score from "@tspro/web-music-score";
 
 export function createDynamicsAnnotationDemo() {
-    let doc = new Score.MDocument(Score.StaffKind.TrebleForGuitar);
+    let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
 
     doc.setHeader("Dynamics Annotation");
 

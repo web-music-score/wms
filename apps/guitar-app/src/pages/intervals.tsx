@@ -40,7 +40,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let doc = new Score.MDocument(Score.StaffKind.TrebleForGuitar);
+        let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 

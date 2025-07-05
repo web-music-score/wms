@@ -198,7 +198,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         let variantNames = Utils.Map.getMapKeys(variants);
 
-        let doc = new Score.MDocument(Score.StaffKind.TrebleForGuitar);
+        let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 

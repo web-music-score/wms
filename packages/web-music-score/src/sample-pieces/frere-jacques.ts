@@ -3,7 +3,7 @@ import { NoteLength, ScaleType } from "../music-theory";
 
 /** @public */
 export function createFrereJacques(): MDocument {
-    let doc = new MDocument(StaffKind.TrebleForGuitar);
+    let doc = new MDocument(StaffKind.GuitarTreble);
 
     doc.setHeader("Frere Jacques");
 

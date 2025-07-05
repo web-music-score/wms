@@ -58,7 +58,7 @@ Browser version comes without React-components.
 let doc = new Score.MDocument(Score.StaffKind.Treble, 4);
 ```
 
-First argument can be Treble, TrebleForGuitar, Bass or Grand. TrebleForGuitar is same as Treble but one octave lower.
+First argument can be Treble, Bass, Grand or GuitarTreble. GuitarTreble is same as Treble but one octave lower.
 
 Second argument is number of measures per row, and can be omitted.
 
