@@ -8,5 +8,10 @@
     "disableSources": true,
     "excludeInternal": true,
     "excludePrivate": true,
-    "excludeProtected": true
+    "excludeProtected": true,
+    "externalSymbolLinkMappings": {
+        "@types/react": {
+            "*": "#"
+        }
+    }
 }
