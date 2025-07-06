@@ -6,4 +6,5 @@ export * from "./key-signature";
 export * from "./time-signature";
 export * from "./tempo";
 export * from "./rhythm";
+export * from "./tuning";
 export * from "./types";

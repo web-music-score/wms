@@ -1,25 +1,9 @@
 import { GuitarNoteLabel, PitchNotation, SymbolSet } from "../music-theory/types";
+import { getTuningStrings } from "../music-theory/tuning";
 import { Note } from "../music-theory/note";
 import { Scale } from "../music-theory/scale";
 import { Assert } from "@tspro/ts-utils-lib";
 import GuitarData from "./assets/guitar.json";
-import TuningData from "./assets/tuning.json";
-
-/** @public */
-export const TuningNameList: ReadonlyArray<string> = TuningData.list.map(data => data.name);
-
-/** @public */
-export const DefaultTuningName = TuningNameList[0];
-
-/** @public */
-export function validateTuningName(tuningName: string): string {
-    if (TuningNameList.indexOf(tuningName) >= 0) {
-        return tuningName;
-    }
-    else {
-        return Assert.interrupt("Invalid tuning name: " + tuningName);
-    }
-}
 
 /** @public */
 export type Handedness = "rh" | "lh";
@@ -108,20 +92,18 @@ export class GuitarContext {
     readonly maxFretId: number;
 
     private readonly guitarNoteTable: Readonly<GuitarNote>[][];
-    private readonly stringTunings: ReadonlyArray<Note>;
+    private readonly tuningStrings: ReadonlyArray<Note>;
 
     constructor(readonly tuningName: string, readonly scale: Scale, readonly handedness: Handedness, readonly pitchNotation: PitchNotation, readonly guitarNoteLabel: GuitarNoteLabel) {
         // Nut = fret0, FretCount = maxFret + 1
         this.maxFretId = GuitarData.maxFret;
 
-        let tuningData = Assert.require(TuningData.list.find(data => data.name === tuningName), "Invalid tuning name: " + tuningName);
-
-        this.stringTunings = tuningData.strings.slice().reverse().map(noteName => Note.getNote(noteName));
+        this.tuningStrings = getTuningStrings(tuningName);
 
         this.guitarNoteTable = [[], [], [], [], [], []];
 
         for (let stringId = 0; stringId < 6; stringId++) {
-            let openStringNoteId = this.stringTunings[stringId].noteId;
+            let openStringNoteId = this.tuningStrings[stringId].noteId;
 
             for (let fretId = 0; fretId <= this.maxFretId; fretId++) {
                 let noteId = openStringNoteId + fretId;
@@ -137,11 +119,11 @@ export class GuitarContext {
     }
 
     getStringTuning(stringId: number) {
-        return this.stringTunings[stringId];
+        return this.tuningStrings[stringId];
     }
 
     getTuningOverview() {
-        return this.stringTunings.slice().reverse().map(note => note.format(this.pitchNotation, SymbolSet.Unicode)).join(" - ");
+        return this.tuningStrings.slice().reverse().map(note => note.format(this.pitchNotation, SymbolSet.Unicode)).join(" - ");
     }
 
     alterTuningName(tuningName: string) {
