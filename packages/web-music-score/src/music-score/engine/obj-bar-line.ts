@@ -37,8 +37,24 @@ abstract class ObjBarLine extends MusicObject {
         let dotRadius = dotW / 2;
         let dotOffset = this.measure.row.getPitchSpacing();
 
-        let top = (row.getTopStaffLine().middleLineOffset - 2) * lineSpacing;
-        let bottom = (row.getBottomStaffLine().middleLineOffset + 2) * lineSpacing;
+        let centerYs = row.getStaffLines().map(staffLine => staffLine.middleLineOffset * lineSpacing);
+
+        if (row.hasTab) {
+            centerYs.push((row.tabBottom + row.tabTop) / 2);
+        }
+
+        let top: number, bottom: number;
+
+        if (row.hasStaffLines) {
+            top = row.getPitchY(row.getTopStaffLine().topLinePitch);
+            bottom = row.hasTab
+                ? bottom = row.getTabStringY(0)
+                : row.getPitchY(row.getBottomStaffLine().bottomLinePitch);
+        }
+        else {
+            top = row.getTabStringY(5);
+            bottom = row.getTabStringY(0);
+        }
 
         this.lineRects = [];
         this.dotRects = [];
@@ -48,11 +64,11 @@ abstract class ObjBarLine extends MusicObject {
         }
 
         const addDots = (cx: number) => {
-            row.getStaffLines().forEach(staffLine => {
-                let cy = staffLine.middleLineOffset * lineSpacing - dotOffset;
-                this.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, cy - dotRadius, cy, cy + dotRadius));
-                cy += 2 * dotOffset;
-                this.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, cy - dotRadius, cy, cy + dotRadius));
+            centerYs.forEach(cy => {
+                for (let i = -1; i <= 1; i += 2) {
+                    let y = cy + i * dotOffset;
+                    this.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, y - dotRadius, y, y + dotRadius));
+                }
             });
         }
 

@@ -16,5 +16,9 @@ export function createGuitarTrebleAndTabDemo() {
         .addNote(0, "D4", Score.NoteLength.Eighth)
         .addNote(0, "C4", Score.NoteLength.Quarter);
 
+    doc.addMeasure()
+        .addNote(0, "E4", Score.NoteLength.Whole)
+        .addNavigation(Score.Navigation.EndRepeat);
+
     return doc;
 }

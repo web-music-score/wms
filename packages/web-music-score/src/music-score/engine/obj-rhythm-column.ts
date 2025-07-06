@@ -266,6 +266,14 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
+    getLowestNotePitch(pitch: number): number {
+        return Math.min(pitch, ...this.voiceSymbol.map(s => {
+            return s instanceof ObjNoteGroup
+                ? Math.min(...s.notes.map(n => n.pitch))
+                : s.ownAvgPitch;
+        }));
+    }
+
     getPlayerNotes() {
         let playerNotes: ScorePlayerNote[] = [];
 

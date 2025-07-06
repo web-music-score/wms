@@ -113,6 +113,14 @@ export class ObjMeasure extends MusicObject {
         return this.row.doc;
     }
 
+    get tabBottom(): number {
+        return this.row.tabBottom;
+    }
+
+    get tabTop(): number {
+        return this.row.tabTop;
+    }
+
     isPartialMeasure() {
         return this.getConsumedTicks() < this.getMeasureTicks();
     }
@@ -478,7 +486,7 @@ export class ObjMeasure extends MusicObject {
                 this.endRepeatCount = Math.floor(typeof args[0] === "number" ? args[0] : 1);
 
                 Assert.int_gte(this.endRepeatCount, 1, "Cannot add end repeat because invalid end repeat count: " + this.endRepeatCount);
-                
+
                 if (this.endRepeatCount > 1) {
                     let textProps: TextProps = {
                         text: "" + this.endRepeatCount + "x",
@@ -977,6 +985,10 @@ export class ObjMeasure extends MusicObject {
         rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotted }));
     }
 
+    getLowestNotePitch(pitch: number): number {
+        return Math.min(pitch, ...this.columns.map(c => c.getLowestNotePitch(pitch)));
+    }
+
     requestLayout() {
         if (!this.needLayout) {
             this.needLayout = true;
@@ -1051,6 +1063,10 @@ export class ObjMeasure extends MusicObject {
             ...this.columns.map(col => col.getRect().bottom),
             this.barLineRight.getRect().bottom
         );
+
+        if (this.row.hasTab) {
+            bottom = this.tabBottom;
+        }
 
         // Set rect toph and bottomh
         this.rect = new DivRect(0, 0, 0, top, 0, bottom);
@@ -1186,12 +1202,21 @@ export class ObjMeasure extends MusicObject {
         let left = this.getStaffLineLeft();
         let right = this.getStaffLineRight();
 
-        this.row.getStaffLines().forEach(staffLine => {
-            for (let p = staffLine.bottomLinePitch; p <= staffLine.topLinePitch; p += 2) {
-                let y = this.row.getPitchY(p);
-                renderer.drawLine(left, y, right, y);
+        const drawLine = (y: number) => renderer.drawLine(left, y, right, y);
+
+        if (this.row.hasStaffLines) {
+            this.row.getStaffLines().forEach(staffLine => {
+                for (let p = staffLine.bottomLinePitch; p <= staffLine.topLinePitch; p += 2) {
+                    drawLine(this.row.getPitchY(p));
+                }
+            });
+        }
+
+        if (this.row.hasTab) {
+            for (let stringId = 0; stringId < 6; stringId++) {
+                drawLine(this.row.getTabStringY(stringId));
             }
-        });
+        }
 
         this.signatures.forEach(signature => signature.draw(renderer));
 
