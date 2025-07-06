@@ -61,7 +61,14 @@ let doc = new Score.MDocument(Score.StaffKind.Treble, { measuresPerRow: 4 });
 First argument can be `Treble`, `Bass`, `Grand` or `GuitarTreble`.
 `GuitarTreble` is same as `Treble` but one octave lower.
 
-Second argument is optional `DocumentOptions`.
+Second argument is optional `DocumentOptions`
+
+#### DocumentOptions
+
+| option          | description                                                  |
+|-----------------|--------------------------------------------------------------|
+| measuresPerRow? | Automatically split rows to have number of measures per row. |
+| tuning          | Tuning name to use with guitar tabs.                         |
 
 ### Set Header
 
