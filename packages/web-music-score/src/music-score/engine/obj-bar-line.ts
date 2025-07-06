@@ -48,12 +48,12 @@ abstract class ObjBarLine extends MusicObject {
         if (row.hasStaffLines) {
             top = row.getPitchY(row.getTopStaffLine().topLinePitch);
             bottom = row.hasTab
-                ? bottom = row.getTabStringY(0)
+                ? bottom = row.getTabStringY(5)
                 : row.getPitchY(row.getBottomStaffLine().bottomLinePitch);
         }
         else {
-            top = row.getTabStringY(5);
-            bottom = row.getTabStringY(0);
+            top = row.getTabStringY(0);
+            bottom = row.getTabStringY(5);
         }
 
         this.lineRects = [];

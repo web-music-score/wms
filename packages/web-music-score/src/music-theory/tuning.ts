@@ -2,6 +2,14 @@ import { Assert } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 
+/*
+ * | string | stringId | freq    | fretboard (RH) | on tab        |
+ * |--------|----------|---------|----------------|---------------|
+ * |   1    |    0     | highest | bottom string  | top string    |
+ * |   6    |    5     | lowest  | top string     | bottom string |
+ * |--------|----------|---------|----------------|---------------|
+ */
+
 /** @public */
 export const TuningNameList: ReadonlyArray<string> = TuningData.list.map(data => data.name);
 

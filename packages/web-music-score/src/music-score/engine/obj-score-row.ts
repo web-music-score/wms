@@ -125,9 +125,10 @@ export class ObjScoreRow extends MusicObject {
         return this.closestStaffLineCache[pitch];
     }
 
+    /** Return Y coordinate of string. */
     getTabStringY(stringId: number): number {
         return this.hasTab
-            ? this.tabBottom - (this.tabBottom - this.tabTop) / 6 * (stringId + 0.5)
+            ? this.tabTop + (this.tabBottom - this.tabTop) / 6 * (stringId + 0.5)
             : 0;
     }
 
@@ -488,11 +489,11 @@ export class ObjScoreRow extends MusicObject {
 
             if (this.hasStaffLines) {
                 top = this.getPitchY(this.getTopStaffLine().topLinePitch);
-                bottom = this.hasTab ? this.getTabStringY(0) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
+                bottom = this.hasTab ? this.getTabStringY(5) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
             }
             else {
-                top = this.getTabStringY(5);
-                bottom = this.getTabStringY(0);
+                top = this.getTabStringY(0);
+                bottom = this.getTabStringY(5);
             }
 
             renderer.drawLine(left, top, left, bottom);

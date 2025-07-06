@@ -35,6 +35,9 @@ export enum TieLength { Short = "Short", ToMeasureEnd = "ToMeasureEnd" }
 export enum ArcPos { Auto, Above, Middle, Below, StemTip }
 
 /** @public */
+export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
+
+/** @public */
 export type NoteOptions = {
     dotted?: boolean,
     stem?: Stem,
@@ -46,7 +49,8 @@ export type NoteOptions = {
     tiePos?: ArcPos,
     slurSpan?: number,
     slurPos?: ArcPos,
-    triplet?: boolean
+    triplet?: boolean,
+    string?: StringNumber | StringNumber[];
 }
 
 /** @public */

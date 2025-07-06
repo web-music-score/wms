@@ -14,6 +14,7 @@ export type TextProps = string | {
     italic?: boolean,
     boxed?: BoxType,
     padding?: number,
+    bgcolor?: string
 }
 
 export class ObjText extends MusicObject {
@@ -24,6 +25,7 @@ export class ObjText extends MusicObject {
     private readonly italic: boolean;
     private readonly boxed: BoxType | false;
     private readonly padding: number;
+    private readonly bgcolor?: string;
 
     private font = "";
     private textLines: string[];
@@ -44,6 +46,7 @@ export class ObjText extends MusicObject {
         this.italic = textProps.italic ?? false;
         this.boxed = textProps.boxed ?? false;
         this.padding = textProps.padding ?? (this.boxed ? DefaultBoxedPadding : 0);
+        this.bgcolor = textProps.bgcolor;
 
         if (!isFinite(this.padding) || this.padding < 0) {
             this.padding = 0;
@@ -128,6 +131,15 @@ export class ObjText extends MusicObject {
         ctx.font = this.font;
 
         let { rect, padding, lineHeight, lineWidths, anchorX, anchorY, italic } = this;
+
+        if (this.bgcolor !== undefined) {
+            ctx.save();
+            ctx.fillStyle = this.bgcolor;
+            ctx.beginPath();
+            ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
+            ctx.fill();
+            ctx.restore();
+        }
 
         let lineCount = this.textLines.length;
         let textHeight = lineCount * lineHeight;

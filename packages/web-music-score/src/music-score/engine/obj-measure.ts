@@ -1,6 +1,6 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { Note, NoteLength, RhythmProps } from "../../music-theory";
@@ -58,8 +58,9 @@ export class ObjMeasure extends MusicObject {
     private minColumnsAreaWidth = 0;
     private rightSolidAreaWidth = 0;
 
-    private useStemDir: (Stem | undefined)[/* voiceId */] = [];
     private usePitch: (number | undefined)[/* voiceId */] = [];
+    private useStemDir: (Stem | undefined)[/* voiceId */] = [];
+    private useString: (StringNumber[] | undefined)[/* voiceId */] = [];
 
     private voiceSymbols: RhythmSymbol[/* voiceId */][] = [];
 
@@ -137,6 +138,29 @@ export class ObjMeasure extends MusicObject {
         return this.passCount;
     }
 
+    updateOwnAvgPitch(voiceId: number, setPitch?: string | number | Note): number {
+        if (typeof setPitch == "string") {
+            this.usePitch[voiceId] = Note.getNote(setPitch).pitch;
+        }
+        else if (typeof setPitch == "number") {
+            this.usePitch[voiceId] = setPitch;
+        }
+        else if (setPitch instanceof Note) {
+            this.usePitch[voiceId] = setPitch.pitch;
+        }
+        else if (this.usePitch[voiceId] === undefined) {
+            let prevMeasure = this.getPrevMeasure();
+
+            if (prevMeasure && prevMeasure.usePitch[voiceId] !== undefined) {
+                this.usePitch[voiceId] = prevMeasure.usePitch[voiceId];
+            }
+        }
+
+        let pitch = this.usePitch[voiceId] ?? this.row.getTopStaffLine().middleLinePitch;
+
+        return this.usePitch[voiceId] = Note.validatePitch(pitch);
+    }
+
     updateOwnStemDir(symbol: RhythmSymbol, setStemDir?: Stem): Stem.Up | Stem.Down {
         let { voiceId } = symbol;
 
@@ -159,27 +183,17 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    updateOwnAvgPitch(voiceId: number, setPitch?: string | number | Note): number {
-        if (typeof setPitch == "string") {
-            this.usePitch[voiceId] = Note.getNote(setPitch).pitch;
-        }
-        else if (typeof setPitch == "number") {
-            this.usePitch[voiceId] = setPitch;
-        }
-        else if (setPitch instanceof Note) {
-            this.usePitch[voiceId] = setPitch.pitch;
-        }
-        else if (this.usePitch[voiceId] === undefined) {
-            let prevMeasure = this.getPrevMeasure();
+    updateOwnString(symbol: RhythmSymbol, setString?: StringNumber[]): StringNumber[] {
+        let { voiceId } = symbol;
 
-            if (prevMeasure && prevMeasure.usePitch[voiceId] !== undefined) {
-                this.usePitch[voiceId] = prevMeasure.usePitch[voiceId];
-            }
+        if (setString !== undefined) {
+            this.useString[voiceId] = setString;
+        }
+        else if (this.useString[voiceId] === undefined) {
+            this.useString[voiceId] = this.getPrevMeasure()?.useString[voiceId] ?? [];
         }
 
-        let pitch = this.usePitch[voiceId] ?? this.row.getTopStaffLine().middleLinePitch;
-
-        return this.usePitch[voiceId] = Note.validatePitch(pitch);
+        return this.useString[voiceId];
     }
 
     pick(x: number, y: number): MusicObject[] {

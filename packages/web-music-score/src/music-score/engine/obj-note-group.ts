@@ -3,13 +3,14 @@ import { NoteLength, RhythmProps } from "../../music-theory/rhythm";
 import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
-import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, ArcPos, TieLength } from "../pub";
+import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, ArcPos, TieLength, StringNumber } from "../pub";
 import { CollectedArcData } from "./arc-data";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
+import { ObjText } from "./obj-text";
 
 export class ObjNoteGroup extends MusicObject {
     readonly minPitch: number;
@@ -17,6 +18,7 @@ export class ObjNoteGroup extends MusicObject {
 
     readonly ownAvgPitch: number;
     readonly ownStemDir: Stem.Up | Stem.Down;
+    readonly ownString: StringNumber[];
 
     readonly color: string;
     readonly staccato: boolean;
@@ -35,6 +37,7 @@ export class ObjNoteGroup extends MusicObject {
     private accidentals: ObjAccidental[] = [];
     private stemRect: DivRect | undefined;
     private flagRects: DivRect[] = [];
+    private tabFretNumbers: ObjText[] = [];
 
     private beamGroup?: ObjBeamGroup;
 
@@ -55,6 +58,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, Math.round((this.minPitch + this.maxPitch) / 2));
         this.ownStemDir = this.measure.updateOwnStemDir(this, options?.stem);
+        this.ownString = this.measure.updateOwnString(this, Utils.Arr.isArray(options?.string) ? options.string : (options?.string !== undefined ? [options.string] : undefined));
 
         this.color = options?.color ?? "black";
         this.staccato = options?.staccato ?? false;
@@ -359,6 +363,7 @@ export class ObjNoteGroup extends MusicObject {
         this.dotRects = [];
         this.accidentals = [];
         this.stemRect = undefined;
+        this.tabFretNumbers = [];
 
         let dotWidth = Renderer.DotSize * unitSize;
 
@@ -387,6 +392,23 @@ export class ObjNoteGroup extends MusicObject {
                 let dotY = noteY + this.getDotVerticalDisplacement(note.pitch, stemDir) * unitSize;
 
                 this.dotRects[noteId] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+            }
+
+            // Add tab fret numbers
+            if (row.hasTab && this.ownString[noteId] !== undefined) {
+                let stringId = this.ownString[noteId] - 1;
+                let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
+
+                if (fretId >= 0 && fretId < 100) {
+                    let fretNumber = new ObjText(this, { text: String(fretId), bgcolor: "white" }, 0.5, 0.5);
+                    this.tabFretNumbers.push(fretNumber);
+
+                    fretNumber.layout(renderer);
+
+                    let x = noteX;
+                    let y = row.getTabStringY(stringId)
+                    fretNumber.offset(x, y);
+                }
             }
         });
 
@@ -490,6 +512,7 @@ export class ObjNoteGroup extends MusicObject {
         }
         this.flagRects.forEach(r => r.offsetInPlace(dx, dy));
         this.rect.offsetInPlace(dx, dy);
+        this.tabFretNumbers.forEach(fn => fn.offset(dx, dy));
     }
 
     draw(renderer: Renderer) {
@@ -582,6 +605,13 @@ export class ObjNoteGroup extends MusicObject {
                 left + width * 1.5, top * 0.5 + bottom * 0.5,
                 left + width * 0.5, bottom);
             ctx.stroke();
+        });
+
+        // Draw tab fret numbers
+        this.tabFretNumbers.forEach(fn => {
+            let r = fn.getRect();
+            renderer.fillCircle(r.centerX, r.centerY, (r.leftw + r.toph) / 2, "white");
+            fn.draw(renderer);
         });
     }
 
