@@ -299,6 +299,9 @@ export class ObjDocument extends MusicObject {
         for (let ri = 0; ri < this.rows.length; ri++) {
             let row = this.rows[ri];
 
+            let minPitch = row.getBottomStaffLine().minPitch;
+            let maxPitch = row.getTopStaffLine().maxPitch;
+
             if (!row.getRect().contains(x, y)) {
                 continue;
             }
@@ -309,7 +312,7 @@ export class ObjDocument extends MusicObject {
 
                 if (x >= rect.left && x <= rect.right) {
                     let pitch = row.getPitchAt(y);
-                    if (pitch !== undefined && pitch >= row.minPitch && pitch <= row.maxPitch) {
+                    if (pitch !== undefined && pitch >= minPitch && pitch <= maxPitch) {
                         return { measure, pitch };
                     }
                 }

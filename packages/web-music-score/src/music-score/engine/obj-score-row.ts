@@ -8,6 +8,7 @@ import { ClefKind, StaffLine } from "./staff-line";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
+import { Assert } from "@tspro/ts-utils-lib";
 
 const p = (noteName: string) => Note.getNote(noteName).pitch;
 
@@ -28,6 +29,8 @@ export class ObjScoreRow extends MusicObject {
     private minWidth = 0;
 
     private readonly staffLines: StaffLine[] = [];
+    public readonly hasTab: boolean = false;
+
     private readonly measures: ObjMeasure[] = [];
 
     private readonly closestStaffLineCache: StaffLine[/* pitch */] = [];
@@ -43,11 +46,7 @@ export class ObjScoreRow extends MusicObject {
         this.staffKind = doc.staffKind;
 
         switch (this.staffKind) {
-            case StaffKind.GuitarTreble:
-                this.staffLines[0] = StaffLine_GuitarTreble;
-                break;
             case StaffKind.Treble:
-            default:
                 this.staffLines[0] = StaffLine_Treble;
                 break;
             case StaffKind.Bass:
@@ -57,6 +56,18 @@ export class ObjScoreRow extends MusicObject {
                 this.staffLines[0] = StaffLine_Grand_Treble;
                 this.staffLines[1] = StaffLine_Grand_Bass;
                 break;
+            case StaffKind.GuitarTreble:
+                this.staffLines[0] = StaffLine_GuitarTreble;
+                break;
+            case StaffKind.GuitarTab:
+                this.hasTab = true;
+                break;
+            case StaffKind.GuitarTrebleAndTab:
+                this.staffLines[0] = StaffLine_GuitarTreble;
+                this.hasTab = true;
+                break;
+            default:
+                Assert.assert("Invalid staffKind = " + this.staffKind);
         }
 
         // Set prevRow
@@ -74,23 +85,19 @@ export class ObjScoreRow extends MusicObject {
         return this.mi;
     }
 
-    get minPitch() {
-        return this.getBottomStaffLine().minPitch;
+    get hasStaffLines(): boolean {
+        return true;
     }
 
-    get maxPitch() {
-        return this.getTopStaffLine().maxPitch;
-    }
-
-    getStaffLines() {
+    getStaffLines(): ReadonlyArray<StaffLine> {
         return this.staffLines;
     }
 
-    getTopStaffLine() {
+    getTopStaffLine(): StaffLine {
         return this.staffLines[0];
     }
 
-    getBottomStaffLine() {
+    getBottomStaffLine(): StaffLine {
         return this.staffLines[this.staffLines.length - 1];
     }
 
@@ -267,8 +274,10 @@ export class ObjScoreRow extends MusicObject {
         let toph = 0, bottomh = 0;
 
         if (this.doc.needFullPitchRange()) {
-            toph = -this.getPitchY(this.maxPitch + 1);
-            bottomh = this.getPitchY(this.minPitch - 1);
+            let minPitch = this.getBottomStaffLine().minPitch;
+            let maxPitch = this.getTopStaffLine().maxPitch;
+            toph = -this.getPitchY(maxPitch + 1);
+            bottomh = this.getPitchY(minPitch - 1);
         }
         else {
             toph = -this.getPitchY(this.getTopStaffLine().topLinePitch + 1);

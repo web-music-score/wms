@@ -14,9 +14,9 @@ export enum StaffKind {
     /** GuitarTreble has treble clef but is one octave lower. */
     GuitarTreble = 4,
     // /** GuitarTab has tab for guitar. */
-    // GuitarTab = 8,
+    GuitarTab = 8,
     // /** GuitarTrebleAndTab has treble clef and tab for guitar. */
-    // GuitarTrebleAndTab = GuitarTab | GuitarTreble,
+    GuitarTrebleAndTab = GuitarTab | GuitarTreble,
 
     /** @deprecated TrebleForGuitar was replaced by GuitarTreble. */
     TrebleForGuitar = GuitarTreble,
