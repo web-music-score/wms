@@ -12,6 +12,19 @@ import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 
+class NoteStaffObjects {
+    public noteHeadRects: DivRect[] = [];
+    public dotRects: DivRect[] = [];
+    public accidentals: ObjAccidental[] = [];
+    public stemRect: DivRect | undefined;
+    public flagRects: DivRect[] = [];
+    public beamGroup?: ObjBeamGroup;
+}
+
+class NoteTabObjects {
+    public fretNumbers: ObjText[] = [];
+}
+
 export class ObjNoteGroup extends MusicObject {
     readonly minPitch: number;
     readonly maxPitch: number;
@@ -32,17 +45,11 @@ export class ObjNoteGroup extends MusicObject {
     private tieDatas: CollectedArcData[] = [];
     private slurDatas: CollectedArcData[] = [];
 
-    private noteHeadRects: DivRect[] = [];
-    private dotRects: DivRect[] = [];
-    private accidentals: ObjAccidental[] = [];
-    private stemRect: DivRect | undefined;
-    private flagRects: DivRect[] = [];
-    private tabFretNumbers: ObjText[] = [];
-
-    private beamGroup?: ObjBeamGroup;
-
     private leftBeamCount = 0;
     private rightBeamCount = 0;
+
+    private readonly staffObjs?: NoteStaffObjects;
+    private readonly tabObjs?: NoteTabObjects;
 
     readonly mi: MNoteGroup;
 
@@ -74,6 +81,9 @@ export class ObjNoteGroup extends MusicObject {
             Assert.assert(this.slurSpan === undefined, "Slurs not implemented for guitar tabs, staff is required!");
         }
 
+        this.staffObjs = this.row.hasStaff ? new NoteStaffObjects() : undefined;
+        this.tabObjs = this.row.hasStaff ? new NoteTabObjects() : undefined;
+
         this.mi = new MNoteGroup(this);
     }
 
@@ -94,7 +104,12 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     get stemDir(): Stem.Up | Stem.Down {
-        return this.beamGroup ? this.beamGroup.stemDir : this.ownStemDir;
+        if (this.staffObjs) {
+            return this.staffObjs.beamGroup ? this.staffObjs.beamGroup.stemDir : this.ownStemDir;
+        }
+        else {
+            return Stem.Up;
+        }
     }
 
     get triplet() {
@@ -106,22 +121,26 @@ export class ObjNoteGroup extends MusicObject {
             return [];
         }
 
-        for (let i = 0; i < this.accidentals.length; i++) {
-            let acc = this.accidentals[i];
-            if (acc) {
-                let arr = acc.pick(x, y);
-                if (arr.length > 0) {
-                    return [this, ...arr];
+        if (this.staffObjs) {
+            for (let i = 0; i < this.staffObjs.accidentals.length; i++) {
+                let acc = this.staffObjs.accidentals[i];
+                if (acc) {
+                    let arr = acc.pick(x, y);
+                    if (arr.length > 0) {
+                        return [this, ...arr];
+                    }
                 }
             }
         }
 
-        for (let i = 0; i < this.tabFretNumbers.length; i++) {
-            let fn = this.tabFretNumbers[i];
-            if (fn) {
-                let arr = fn.pick(x, y);
-                if (arr.length > 0) {
-                    return [this, ...arr];
+        if (this.tabObjs) {
+            for (let i = 0; i < this.tabObjs.fretNumbers.length; i++) {
+                let fn = this.tabObjs.fretNumbers[i];
+                if (fn) {
+                    let arr = fn.pick(x, y);
+                    if (arr.length > 0) {
+                        return [this, ...arr];
+                    }
                 }
             }
         }
@@ -138,11 +157,15 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getArcAnchorPoint(renderer: Renderer, noteGroup: ObjNoteGroup, note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } | undefined {
+        if (!this.staffObjs) {
+            return undefined;
+        }
+
         if (arcPos === ArcPos.Auto) {
             arcPos = ArcPos.Below;
         }
 
-        let hasStem = !!this.stemRect;
+        let hasStem = !!this.staffObjs.stemRect;
         let stemSide: "left" | "right" | undefined = !hasStem ? undefined : (this.stemDir === Stem.Up ? "right" : "left");
         let stemDir = this.stemDir;
 
@@ -152,7 +175,7 @@ export class ObjNoteGroup extends MusicObject {
             return undefined;
         }
 
-        let r = this.noteHeadRects[noteId];
+        let r = this.staffObjs.noteHeadRects[noteId];
 
         if (!r) {
             return undefined;
@@ -197,7 +220,7 @@ export class ObjNoteGroup extends MusicObject {
             }
         }
         else if (arcPos === ArcPos.StemTip) {
-            let stemRect = Assert.require(this.stemRect, "Cannot get stem tip arc anchort point because this note group has no stem.");
+            let stemRect = Assert.require(this.staffObjs.stemRect, "Cannot get stem tip arc anchort point because this note group has no stem.");
 
             if (noteGroup.stemDir === Stem.Up) {
                 return { x: centerX, y: stemRect.top - unitSize }
@@ -279,26 +302,30 @@ export class ObjNoteGroup extends MusicObject {
         this.slurDatas.forEach(slurData => slurData.createObjArcs());
     }
 
-    getBeamGroup() {
-        return this.beamGroup;
+    getBeamGroup(): ObjBeamGroup | undefined {
+        return this.staffObjs?.beamGroup;
     }
 
     setBeamGroup(beam: ObjBeamGroup) {
-        this.beamGroup = beam;
+        if (this.staffObjs) {
+            this.staffObjs.beamGroup = beam;
+        }
     }
 
     resetBeamGroup() {
-        this.leftBeamCount = this.rightBeamCount = 0;
-        this.beamGroup = undefined;
+        if (this.staffObjs) {
+            this.leftBeamCount = this.rightBeamCount = 0;
+            this.staffObjs.beamGroup = undefined;
+        }
     }
 
     getBeamX() {
-        let stemRect = Assert.require(this.stemRect, "Cannot get beam x-coordinate because this note group has no stem.");
+        let stemRect = Assert.require(this.staffObjs?.stemRect, "Cannot get beam x-coordinate because this note group has no stem.");
         return stemRect.centerX;
     }
 
     getBeamY() {
-        let stemRect = Assert.require(this.stemRect, "Cannot get beam y-coordinate because this note group has no stem.");
+        let stemRect = Assert.require(this.staffObjs?.stemRect, "Cannot get beam y-coordinate because this note group has no stem.");
         return this.stemDir === Stem.Up ? stemRect.top : stemRect.bottom;
     }
 
@@ -374,11 +401,16 @@ export class ObjNoteGroup extends MusicObject {
         let { row, stemDir } = this;
         let { dotted, flagCount, noteLength } = this.rhythmProps;
 
-        this.noteHeadRects = [];
-        this.dotRects = [];
-        this.accidentals = [];
-        this.stemRect = undefined;
-        this.tabFretNumbers = [];
+        if (this.staffObjs) {
+            this.staffObjs.noteHeadRects = [];
+            this.staffObjs.dotRects = [];
+            this.staffObjs.accidentals = [];
+            this.staffObjs.stemRect = undefined;
+        }
+
+        if (this.tabObjs) {
+            this.tabObjs.fretNumbers = [];
+        }
 
         let dotWidth = Renderer.DotSize * unitSize;
 
@@ -386,38 +418,39 @@ export class ObjNoteGroup extends MusicObject {
         let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;
 
         this.notes.forEach((note, noteId) => {
-
             let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
             let noteY = this.row.getPitchY(note.pitch);
-            
-            // Setup note head
-            let noteHeadRect = this.noteHeadRects[noteId] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
-            // Setup accidental
-            if (accState.needAccidental(note)) {
-                let acc = this.accidentals[noteId] = new ObjAccidental(this, note.accidental, this.color);
-                if (acc) {
-                    acc.layout(renderer);
-                    acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
+            if (this.staffObjs) {
+                // Setup note head
+                let noteHeadRect = this.staffObjs.noteHeadRects[noteId] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
+
+                // Setup accidental
+                if (accState.needAccidental(note)) {
+                    let acc = this.staffObjs.accidentals[noteId] = new ObjAccidental(this, note.accidental, this.color);
+                    if (acc) {
+                        acc.layout(renderer);
+                        acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
+                    }
+                }
+
+                // Setup dot
+                if (dotted) {
+                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
+                    let dotY = noteY + this.getDotVerticalDisplacement(note.pitch, stemDir) * unitSize;
+
+                    this.staffObjs.dotRects[noteId] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                 }
             }
 
-            // Setup dot
-            if (dotted) {
-                let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
-                let dotY = noteY + this.getDotVerticalDisplacement(note.pitch, stemDir) * unitSize;
-
-                this.dotRects[noteId] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
-            }
-
             // Add tab fret numbers
-            if (row.hasTab && this.ownString[noteId] !== undefined) {
+            if (this.tabObjs && this.ownString[noteId] !== undefined) {
                 let stringId = this.ownString[noteId] - 1;
                 let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
 
                 if (fretId >= 0 && fretId < 100) {
                     let fretNumber = new ObjText(this, { text: String(fretId), bgcolor: "white" }, 0.5, 0.5);
-                    this.tabFretNumbers.push(fretNumber);
+                    this.tabObjs.fretNumbers.push(fretNumber);
 
                     fretNumber.layout(renderer);
 
@@ -429,8 +462,8 @@ export class ObjNoteGroup extends MusicObject {
         });
 
         // Add staccato dot
-        if (this.staccato) {
-            let dotX = this.noteHeadRects[0].centerX;
+        if (this.staccato && this.staffObjs) {
+            let dotX = this.staffObjs.noteHeadRects[0].centerX;
             let dotY = 0;
 
             if (stemDir === Stem.Up) {
@@ -442,42 +475,44 @@ export class ObjNoteGroup extends MusicObject {
                 dotY = this.row.getPitchY(pitch) - unitSize * (row.isPitchLine(pitch) ? 3 : 2);
             }
 
-            this.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+            this.staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
         }
 
-        // Calculate stem
-        let bottomNoteY = this.row.getPitchY(this.getBottomNote().pitch);
-        let topNoteY = this.row.getPitchY(this.getTopNote().pitch);
+        if (this.staffObjs) {
+            // Calculate stem
+            let bottomNoteY = this.row.getPitchY(this.getBottomNote().pitch);
+            let topNoteY = this.row.getPitchY(this.getTopNote().pitch);
 
-        let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
+            let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
 
-        let stemHeight = this.getStemHeight(renderer);
+            let stemHeight = this.getStemHeight(renderer);
 
-        let stemTipY = stemDir === Stem.Up
-            ? topNoteY - stemHeight
-            : bottomNoteY + stemHeight;
+            let stemTipY = stemDir === Stem.Up
+                ? topNoteY - stemHeight
+                : bottomNoteY + stemHeight;
 
-        let stemBaseY = stemDir === Stem.Up
-            ? bottomNoteY
-            : topNoteY;
+            let stemBaseY = stemDir === Stem.Up
+                ? bottomNoteY
+                : topNoteY;
 
-        if (this.rhythmProps.hasStem()) {
-            this.stemRect = new DivRect(stemX, stemX, Math.min(stemBaseY, stemTipY), Math.max(stemBaseY, stemTipY));
-        }
+            if (this.rhythmProps.hasStem()) {
+                this.staffObjs.stemRect = new DivRect(stemX, stemX, Math.min(stemBaseY, stemTipY), Math.max(stemBaseY, stemTipY));
+            }
 
-        // Setup flag rects
-        this.flagRects = [];
+            // Setup flag rects
+            this.staffObjs.flagRects = [];
 
-        if (!this.hasBeamCount()) {
-            let flagWidth = flagCount === 0 ? 0 : DocumentSettings.FlagWidth * unitSize;
-            let flagHeight = flagCount === 0 ? 0 : DocumentSettings.FlagHeight * unitSize;
+            if (!this.hasBeamCount()) {
+                let flagWidth = flagCount === 0 ? 0 : DocumentSettings.FlagWidth * unitSize;
+                let flagHeight = flagCount === 0 ? 0 : DocumentSettings.FlagHeight * unitSize;
 
-            for (let i = 0; i < flagCount; i++) {
-                let flagAddY = i * unitSize * DocumentSettings.FlagSeparation;
+                for (let i = 0; i < flagCount; i++) {
+                    let flagAddY = i * unitSize * DocumentSettings.FlagSeparation;
 
-                this.flagRects[i] = stemDir === Stem.Up
-                    ? new DivRect(stemX, stemX + flagWidth, stemTipY + flagAddY, stemTipY + flagHeight + flagAddY)
-                    : new DivRect(stemX, stemX + flagWidth, stemTipY - flagHeight - flagAddY, stemTipY - flagAddY);
+                    this.staffObjs.flagRects[i] = stemDir === Stem.Up
+                        ? new DivRect(stemX, stemX + flagWidth, stemTipY + flagAddY, stemTipY + flagHeight + flagAddY)
+                        : new DivRect(stemX, stemX + flagWidth, stemTipY - flagHeight - flagAddY, stemTipY - flagAddY);
+                }
             }
         }
 
@@ -485,51 +520,68 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     updateRect() {
-        this.rect = this.noteHeadRects[0].copy();
+        if (this.staffObjs) {
+            this.rect = this.staffObjs.noteHeadRects[0].copy();
 
-        this.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
+            this.staffObjs.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
 
-        if (this.stemRect) {
-            this.rect.expandInPlace(this.stemRect);
+            if (this.staffObjs.stemRect) {
+                this.rect.expandInPlace(this.staffObjs.stemRect);
+            }
+
+            this.staffObjs.dotRects.forEach(r => this.rect.expandInPlace(r));
+            this.staffObjs.flagRects.forEach(r => this.rect.expandInPlace(r));
+            this.staffObjs.accidentals.forEach(a => this.rect.expandInPlace(a.getRect()));
+        }
+        else if (this.tabObjs && this.tabObjs.fretNumbers.length > 0) {
+            this.rect = this.tabObjs.fretNumbers[0].getRect().copy();
+        }
+        else {
+            this.rect = new DivRect();
         }
 
-        this.dotRects.forEach(r => this.rect.expandInPlace(r));
-        this.flagRects.forEach(r => this.rect.expandInPlace(r));
-        this.accidentals.forEach(acc => this.rect.expandInPlace(acc.getRect()));
-        this.tabFretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
+        if (this.tabObjs) {
+            this.tabObjs.fretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
+        }
     }
 
     setStemTipY(stemTipY: number) {
-        if (!this.stemRect) {
+        if (!this.staffObjs || !this.staffObjs.stemRect) {
             return;
         }
 
-        let oldStemTipY = this.stemDir === Stem.Up ? this.stemRect.top : this.stemRect.bottom;
+        let oldStemTipY = this.stemDir === Stem.Up ? this.staffObjs.stemRect.top : this.staffObjs.stemRect.bottom;
 
         if (stemTipY === oldStemTipY) {
             return;
         }
 
-        let r = this.stemRect;
+        let r = this.staffObjs.stemRect;
 
         let top = this.stemDir === Stem.Up ? stemTipY : r.top;
         let bottom = this.stemDir === Stem.Up ? r.bottom : stemTipY;
 
-        this.stemRect = new DivRect(r.left, r.right, top, bottom);
+        this.staffObjs.stemRect = new DivRect(r.left, r.right, top, bottom);
 
         this.updateRect();
     }
 
     offset(dx: number, dy: number) {
-        this.noteHeadRects.forEach(r => r.offsetInPlace(dx, dy));
-        this.dotRects.forEach(r => r.offsetInPlace(dx, dy));
-        this.accidentals.forEach(d => d.offset(dx, dy));
-        if (this.stemRect) {
-            this.stemRect.offsetInPlace(dx, dy);
+        if (this.staffObjs) {
+            this.staffObjs.noteHeadRects.forEach(r => r.offsetInPlace(dx, dy));
+            this.staffObjs.dotRects.forEach(r => r.offsetInPlace(dx, dy));
+            this.staffObjs.accidentals.forEach(d => d.offset(dx, dy));
+            if (this.staffObjs.stemRect) {
+                this.staffObjs.stemRect.offsetInPlace(dx, dy);
+            }
+            this.staffObjs.flagRects.forEach(r => r.offsetInPlace(dx, dy));
         }
-        this.flagRects.forEach(r => r.offsetInPlace(dx, dy));
+
+        if (this.tabObjs) {
+            this.tabObjs.fretNumbers.forEach(fn => fn.offset(dx, dy));
+        }
+
         this.rect.offsetInPlace(dx, dy);
-        this.tabFretNumbers.forEach(fn => fn.offset(dx, dy));
     }
 
     draw(renderer: Renderer) {
@@ -545,91 +597,95 @@ export class ObjNoteGroup extends MusicObject {
         let { color, stemDir } = this;
         let { noteLength } = this.rhythmProps;
 
-        // Draw accidentals
-        this.accidentals.forEach(d => d.draw(renderer));
+        if (this.staffObjs) {
+            // Draw accidentals
+            this.staffObjs.accidentals.forEach(d => d.draw(renderer));
 
-        ctx.strokeStyle = ctx.fillStyle = color;
-        ctx.lineWidth = lineWidth;
+            ctx.strokeStyle = ctx.fillStyle = color;
+            ctx.lineWidth = lineWidth;
 
-        // Draw note heads
-        this.noteHeadRects.forEach(r => {
-            let outlinedNoteHead = noteLength >= NoteLength.Half;
+            // Draw note heads
+            this.staffObjs.noteHeadRects.forEach(r => {
+                let outlinedNoteHead = noteLength >= NoteLength.Half;
 
-            if (this.diamond) {
-                if (outlinedNoteHead) {
-                    ctx.beginPath();
-                    ctx.lineWidth = lineWidth * 2.5;
-                    ctx.moveTo(r.centerX, r.top);
-                    ctx.lineTo(r.right, r.centerY);
-                    ctx.moveTo(r.left, r.centerY);
-                    ctx.lineTo(r.centerX, r.bottom);
-                    ctx.stroke();
+                if (this.diamond) {
+                    if (outlinedNoteHead) {
+                        ctx.beginPath();
+                        ctx.lineWidth = lineWidth * 2.5;
+                        ctx.moveTo(r.centerX, r.top);
+                        ctx.lineTo(r.right, r.centerY);
+                        ctx.moveTo(r.left, r.centerY);
+                        ctx.lineTo(r.centerX, r.bottom);
+                        ctx.stroke();
 
-                    ctx.beginPath();
-                    ctx.lineWidth = lineWidth;
-                    ctx.moveTo(r.right, r.centerY);
-                    ctx.lineTo(r.centerX, r.bottom);
-                    ctx.moveTo(r.centerX, r.top);
-                    ctx.lineTo(r.left, r.centerY);
-                    ctx.stroke();
+                        ctx.beginPath();
+                        ctx.lineWidth = lineWidth;
+                        ctx.moveTo(r.right, r.centerY);
+                        ctx.lineTo(r.centerX, r.bottom);
+                        ctx.moveTo(r.centerX, r.top);
+                        ctx.lineTo(r.left, r.centerY);
+                        ctx.stroke();
+                    }
+                    else {
+                        ctx.beginPath();
+                        ctx.moveTo(r.centerX, r.top);
+                        ctx.lineTo(r.right, r.centerY);
+                        ctx.lineTo(r.centerX, r.bottom);
+                        ctx.lineTo(r.left, r.centerY);
+                        ctx.lineTo(r.centerX, r.top);
+                        ctx.fill();
+                    }
                 }
                 else {
                     ctx.beginPath();
-                    ctx.moveTo(r.centerX, r.top);
-                    ctx.lineTo(r.right, r.centerY);
-                    ctx.lineTo(r.centerX, r.bottom);
-                    ctx.lineTo(r.left, r.centerY);
-                    ctx.lineTo(r.centerX, r.top);
-                    ctx.fill();
+                    ctx.ellipse(r.centerX, r.centerY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
+
+                    if (outlinedNoteHead) {
+                        ctx.stroke();
+                    }
+                    else {
+                        ctx.fill();
+                    }
                 }
-            }
-            else {
+            });
+
+            // Draw dots
+            this.staffObjs.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
+
+            // Draw stem
+            if (this.staffObjs.stemRect) {
                 ctx.beginPath();
-                ctx.ellipse(r.centerX, r.centerY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
-
-                if (outlinedNoteHead) {
-                    ctx.stroke();
-                }
-                else {
-                    ctx.fill();
-                }
+                ctx.moveTo(this.staffObjs.stemRect.centerX, this.staffObjs.stemRect.bottom);
+                ctx.lineTo(this.staffObjs.stemRect.centerX, this.staffObjs.stemRect.top);
+                ctx.stroke();
             }
-        });
 
-        // Draw dots
-        this.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
+            // Draw flags
+            this.staffObjs.flagRects.forEach(rect => {
+                let left = rect.left;
+                let right = rect.right;
+                let width = right - left;
+                let top = stemDir === Stem.Up ? rect.top : rect.bottom;
+                let bottom = stemDir === Stem.Up ? rect.bottom : rect.top;
 
-        // Draw stem
-        if (this.stemRect) {
-            ctx.beginPath();
-            ctx.moveTo(this.stemRect.centerX, this.stemRect.bottom);
-            ctx.lineTo(this.stemRect.centerX, this.stemRect.top);
-            ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(left, top);
+                ctx.bezierCurveTo(
+                    left, top * 0.75 + bottom * 0.25,
+                    left + width * 1.5, top * 0.5 + bottom * 0.5,
+                    left + width * 0.5, bottom);
+                ctx.stroke();
+            });
         }
 
-        // Draw flags
-        this.flagRects.forEach(rect => {
-            let left = rect.left;
-            let right = rect.right;
-            let width = right - left;
-            let top = stemDir === Stem.Up ? rect.top : rect.bottom;
-            let bottom = stemDir === Stem.Up ? rect.bottom : rect.top;
-
-            ctx.beginPath();
-            ctx.moveTo(left, top);
-            ctx.bezierCurveTo(
-                left, top * 0.75 + bottom * 0.25,
-                left + width * 1.5, top * 0.5 + bottom * 0.5,
-                left + width * 0.5, bottom);
-            ctx.stroke();
-        });
-
-        // Draw tab fret numbers
-        this.tabFretNumbers.forEach(fn => {
-            let r = fn.getRect();
-            renderer.fillCircle(r.centerX, r.centerY, (r.leftw + r.toph) / 2, "white");
-            fn.draw(renderer);
-        });
+        if (this.tabObjs) {
+            // Draw tab fret numbers
+            this.tabObjs.fretNumbers.forEach(fn => {
+                let r = fn.getRect();
+                renderer.fillCircle(r.centerX, r.centerY, (r.leftw + r.toph) / 2, "white");
+                fn.draw(renderer);
+            });
+        }
     }
 
     static setBeamCounts(groupNotes: (ObjNoteGroup | undefined)[]) {
