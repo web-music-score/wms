@@ -1218,7 +1218,7 @@ export class ObjMeasure extends MusicObject {
 
         const drawLine = (y: number) => renderer.drawLine(left, y, right, y);
 
-        if (this.row.hasStaffLines) {
+        if (this.row.hasStaff) {
             this.row.getStaffLines().forEach(staffLine => {
                 for (let p = staffLine.bottomLinePitch; p <= staffLine.topLinePitch; p += 2) {
                     drawLine(this.row.getPitchY(p));

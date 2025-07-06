@@ -45,7 +45,7 @@ abstract class ObjBarLine extends MusicObject {
 
         let top: number, bottom: number;
 
-        if (row.hasStaffLines) {
+        if (row.hasStaff) {
             top = row.getPitchY(row.getTopStaffLine().topLinePitch);
             bottom = row.hasTab
                 ? bottom = row.getTabStringY(5)

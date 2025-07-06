@@ -69,7 +69,7 @@ export class ObjNoteGroup extends MusicObject {
         this.arcPos = options?.tiePos ?? options?.slurPos ?? ArcPos.Auto;
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
-        if (!this.row.hasStaffLines) {
+        if (!this.row.hasStaff) {
             Assert.assert(this.tieSpan === undefined, "Ties not implemented for guitar tabs, staff is required!");
             Assert.assert(this.slurSpan === undefined, "Slurs not implemented for guitar tabs, staff is required!");
         }

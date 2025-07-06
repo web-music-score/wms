@@ -88,7 +88,7 @@ export class ObjScoreRow extends MusicObject {
         return this.mi;
     }
 
-    get hasStaffLines(): boolean {
+    get hasStaff(): boolean {
         return true;
     }
 
@@ -487,7 +487,7 @@ export class ObjScoreRow extends MusicObject {
 
             let top: number, bottom: number;
 
-            if (this.hasStaffLines) {
+            if (this.hasStaff) {
                 top = this.getPitchY(this.getTopStaffLine().topLinePitch);
                 bottom = this.hasTab ? this.getTabStringY(5) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
             }
