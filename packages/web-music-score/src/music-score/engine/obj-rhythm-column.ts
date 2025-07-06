@@ -10,6 +10,7 @@ import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Assert } from "@tspro/ts-utils-lib";
 import { PlayerColumnProps } from "./player";
+import { DocumentSettings } from "./settings";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -201,11 +202,14 @@ export class ObjRhythmColumn extends MusicObject {
 
     getMinWidth() {
         let maxNoteLength = Math.max(...this.voiceSymbol.map(s => s.rhythmProps.noteLength));
+
+        let w = DocumentSettings.NoteHeadWidth;
+
         switch (maxNoteLength) {
-            case NoteLength.Whole: return 5;
-            case NoteLength.Half: return 4;
-            case NoteLength.Quarter: return 3;
-            default: return 2;
+            case NoteLength.Whole: return w * 5;
+            case NoteLength.Half: return w * 3;
+            case NoteLength.Quarter: return w * 2;
+            default: return w;
         }
     }
 
@@ -336,7 +340,7 @@ export class ObjRhythmColumn extends MusicObject {
             return;
         }
 
-        let { row, doc } = this;
+        let { row } = this;
         let { unitSize } = renderer;
 
         // Set initially column's min width
