@@ -59,6 +59,12 @@ export type RestOptions = {
 }
 
 /** @public */
+export type DocumentOptions = {
+    measuresPerRow?: number,
+    tuning?: string
+}
+
+/** @public */
 export type PickedPitch = { pitch: number, measure: MMeasure }
 
 /** @public */

@@ -29,7 +29,7 @@ import { ObjSpecialText } from "../engine/obj-special-text";
 import { KeySignature } from "../../music-theory/key-signature";
 import { TimeSignature, TimeSignatureString } from "../../music-theory/time-signature";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { ClickObjectListener, ClickObjectSelector, ClickPitchListener, PlayStateChangeListener } from "./types";
+import { ClickObjectListener, ClickObjectSelector, ClickPitchListener, DocumentOptions, PlayStateChangeListener } from "./types";
 import { NoteOptions, RestOptions, StaffKind } from "./types";
 import { Fermata, Navigation, Annotation, Label, PlayState } from "./types";
 
@@ -116,12 +116,15 @@ export class MDocument extends MusicInterface {
     /** @internal */
     readonly obj: ObjDocument;
 
-    constructor(staffKind: StaffKind, measuresPerRow?: number) {
+    constructor(staffKind: StaffKind, options?: DocumentOptions | number) {
         super(MDocument.Name);
-        this.obj = new ObjDocument(this, staffKind, measuresPerRow);
 
-        if (measuresPerRow !== undefined) {
-            Assert.int_gte(measuresPerRow, 1, "Cannot create music document because invalid measures per row value: " + measuresPerRow);
+        if (typeof options === "number") {
+            // Deprecated: second argument was measuresPerRow.
+            this.obj = new ObjDocument(this, staffKind, { measuresPerRow: options });
+        }
+        else {
+            this.obj = new ObjDocument(this, staffKind, options);
         }
     }
 

@@ -55,12 +55,13 @@ Browser version comes without React-components.
 ### Create Document
 
 ```js
-let doc = new Score.MDocument(Score.StaffKind.Treble, 4);
+let doc = new Score.MDocument(Score.StaffKind.Treble, { measuresPerRow: 4 });
 ```
 
-First argument can be Treble, Bass, Grand or GuitarTreble. GuitarTreble is same as Treble but one octave lower.
+First argument can be `Treble`, `Bass`, `Grand` or `GuitarTreble`.
+`GuitarTreble` is same as `Treble` but one octave lower.
 
-Second argument is number of measures per row, and can be omitted.
+Second argument is optional `DocumentOptions`.
 
 ### Set Header
 

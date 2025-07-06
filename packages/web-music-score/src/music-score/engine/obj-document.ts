@@ -3,11 +3,12 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { DivRect, MDocument, PickedPitch, StaffKind } from "../pub";
+import { DivRect, DocumentOptions, MDocument, PickedPitch, StaffKind } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { Assert } from "@tspro/ts-utils-lib";
+import { DefaultTuningName, getTuningStrings, Note, SymbolSet, validateTuningName } from "../../music-theory";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -18,14 +19,29 @@ export class ObjDocument extends MusicObject {
     private readonly rows: ObjScoreRow[] = [];
     private readonly measures: ObjMeasure[] = [];
 
+    public readonly measuresPerRow?: number;
+    public readonly tuningName: string;
+    public readonly tuningStrings: ReadonlyArray<Note>;
+    public readonly tuningLabel: string;
+
     private header?: ObjHeader;
 
     private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
 
     private newRowRequested: boolean = false;
 
-    constructor(readonly mi: MDocument, readonly staffKind: StaffKind, readonly measuresPerRow?: number) {
+    constructor(readonly mi: MDocument, readonly staffKind: StaffKind, readonly options?: DocumentOptions) {
         super(undefined);
+
+        this.measuresPerRow = options?.measuresPerRow;
+
+        if (this.measuresPerRow !== undefined) {
+            Assert.int_gte(this.measuresPerRow, 1, "Invalid measuresPerRow = " + this.measuresPerRow);
+        }
+
+        this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
+        this.tuningStrings = getTuningStrings(this.tuningName);
+        this.tuningLabel = this.tuningStrings.map(n => n.formatOmitOctave(SymbolSet.Ascii)).join(" ");
 
         // There is always row
         this.rows.push(new ObjScoreRow(this));
