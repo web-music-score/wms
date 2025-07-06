@@ -12,7 +12,7 @@ export function createGuitarTrebleAndTabDemo() {
         .addNavigation(Score.Navigation.StartRepeat)
         .addNote(0, "C4", Score.NoteLength.Eighth, { string: 1 })
         .addNote(0, "D4", Score.NoteLength.Eighth, { string: 3 })
-        .addNote(0, "C4", Score.NoteLength.Quarter, { string: 2 })
+        .addChord(0, ["C4", "E4"], Score.NoteLength.Quarter, { string: [2, 1] })
         .addNote(0, "C4", Score.NoteLength.Eighth)
         .addNote(0, "D4", Score.NoteLength.Eighth, { string: 3 })
         .addNote(0, "C4", Score.NoteLength.Quarter, { string: 4 });
