@@ -69,6 +69,11 @@ export class ObjNoteGroup extends MusicObject {
         this.arcPos = options?.tiePos ?? options?.slurPos ?? ArcPos.Auto;
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
+        if (!this.row.hasStaffLines) {
+            Assert.assert(this.tieSpan === undefined, "Ties not implemented for guitar tabs, staff is required!");
+            Assert.assert(this.slurSpan === undefined, "Slurs not implemented for guitar tabs, staff is required!");
+        }
+
         this.mi = new MNoteGroup(this);
     }
 
@@ -384,10 +389,11 @@ export class ObjNoteGroup extends MusicObject {
 
             let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
             let noteY = this.row.getPitchY(note.pitch);
-
+            
             // Setup note head
             let noteHeadRect = this.noteHeadRects[noteId] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
+            // Setup accidental
             if (accState.needAccidental(note)) {
                 let acc = this.accidentals[noteId] = new ObjAccidental(this, note.accidental, this.color);
                 if (acc) {
@@ -396,7 +402,7 @@ export class ObjNoteGroup extends MusicObject {
                 }
             }
 
-            // Set dot
+            // Setup dot
             if (dotted) {
                 let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
                 let dotY = noteY + this.getDotVerticalDisplacement(note.pitch, stemDir) * unitSize;
