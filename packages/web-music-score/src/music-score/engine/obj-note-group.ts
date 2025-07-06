@@ -111,6 +111,16 @@ export class ObjNoteGroup extends MusicObject {
             }
         }
 
+        for (let i = 0; i < this.tabFretNumbers.length; i++) {
+            let fn = this.tabFretNumbers[i];
+            if (fn) {
+                let arr = fn.pick(x, y);
+                if (arr.length > 0) {
+                    return [this, ...arr];
+                }
+            }
+        }
+
         return [this];
     }
 
@@ -480,6 +490,7 @@ export class ObjNoteGroup extends MusicObject {
         this.dotRects.forEach(r => this.rect.expandInPlace(r));
         this.flagRects.forEach(r => this.rect.expandInPlace(r));
         this.accidentals.forEach(acc => this.rect.expandInPlace(acc.getRect()));
+        this.tabFretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
     }
 
     setStemTipY(stemTipY: number) {
