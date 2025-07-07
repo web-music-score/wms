@@ -58,6 +58,14 @@ export class MusicStaff {
             ? undefined
             : Note.validatePitch(pitch)
     }
+
+    isPitchLine(pitch: number) {
+        return pitch % 2 === this.middleLinePitch % 2;
+    }
+
+    isPitchSpace(pitch: number) {
+        return pitch % 2 !== this.middleLinePitch % 2;
+    }
 }
 
 export class GuitarTab {

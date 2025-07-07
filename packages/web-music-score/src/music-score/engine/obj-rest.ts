@@ -182,8 +182,8 @@ export class ObjRest extends MusicObject {
         let restPitch = ownAvgPitch;
 
         // Make sure restPitch is line, not space
-        if (this.row.isPitchSpace(restPitch)) {
-            let staff = this.row.getClosestStaff(restPitch);
+        let staff = this.row.getClosestStaff(restPitch);
+        if (staff.isPitchSpace(restPitch)) {
             restPitch += restPitch >= staff.middleLinePitch ? 1 : -1;
         }
 

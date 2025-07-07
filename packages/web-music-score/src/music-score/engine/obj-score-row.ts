@@ -130,14 +130,6 @@ export class ObjScoreRow extends MusicObject {
         return this.closestStaffCache[pitch];
     }
 
-    isPitchLine(pitch: number) {
-        return pitch % 2 === this.staves[0].middleLinePitch % 2;
-    }
-
-    isPitchSpace(pitch: number) {
-        return pitch % 2 !== this.staves[0].middleLinePitch % 2;
-    }
-
     pick(x: number, y: number): MusicObject[] {
         if (!this.rect.contains(x, y)) {
             return [];
@@ -258,10 +250,10 @@ export class ObjScoreRow extends MusicObject {
         });
 
         if (this.staves.length === 2) {
-            this.staves[0].topLineY -= lineSpacing * 6;
-            this.staves[0].bottomLineY -= lineSpacing * 6;
-            this.staves[1].topLineY += lineSpacing * 6;
-            this.staves[1].bottomLineY += lineSpacing * 6;
+            this.staves[0].topLineY -= lineSpacing * 4;
+            this.staves[0].bottomLineY -= lineSpacing * 4;
+            this.staves[1].topLineY += lineSpacing * 4;
+            this.staves[1].bottomLineY += lineSpacing * 4;
         }
 
         // Compute toph and bottomh
