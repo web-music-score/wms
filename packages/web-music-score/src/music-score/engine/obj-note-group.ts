@@ -399,7 +399,7 @@ export class ObjNoteGroup extends MusicObject {
     layout(renderer: Renderer, accState: AccidentalState) {
         let { unitSize } = renderer;
         let { row, stemDir } = this;
-        let { dotted, flagCount, noteLength } = this.rhythmProps;
+        let { dotted, flagCount } = this.rhythmProps;
 
         if (this.staffObjs) {
             this.staffObjs.noteHeadRects = [];
@@ -418,9 +418,8 @@ export class ObjNoteGroup extends MusicObject {
         let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;
 
         this.notes.forEach((note, noteId) => {
-            let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-
             if (this.staffObjs) {
+                let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
                 let noteY = this.row.getPitchY(note.pitch);
 
                 // Setup note head
@@ -442,22 +441,6 @@ export class ObjNoteGroup extends MusicObject {
 
                     this.staffObjs.dotRects[noteId] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                 }
-            }
-
-            // Add tab fret numbers
-            if (this.tabObjs && this.ownString[noteId] !== undefined) {
-                let stringId = this.ownString[noteId] - 1;
-                let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
-                let color = fretId < 0 ? "red" : "black";
-
-                let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
-                this.tabObjs.fretNumbers.push(fretNumber);
-
-                fretNumber.layout(renderer);
-
-                let x = noteX;
-                let y = row.getTabStringY(stringId);
-                fretNumber.offset(x, y);
             }
         });
 
@@ -515,6 +498,27 @@ export class ObjNoteGroup extends MusicObject {
                 }
             }
         }
+
+        this.notes.forEach((note, noteId) => {
+            // Add tab fret numbers
+            if (this.tabObjs && this.ownString[noteId] !== undefined) {
+                let stringId = this.ownString[noteId] - 1;
+                let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
+                let color = fretId < 0 ? "red" : "black";
+
+                let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
+                this.tabObjs.fretNumbers.push(fretNumber);
+
+                fretNumber.layout(renderer);
+
+                let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
+                let stemX = this.staffObjs?.stemRect ? this.staffObjs.stemRect.centerX : undefined;
+
+                let x = stemX ?? noteX;
+                let y = row.getTabStringY(stringId);
+                fretNumber.offset(x, y);
+            }
+        });
 
         this.updateRect();
     }
