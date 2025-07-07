@@ -39,23 +39,25 @@ abstract class ObjBarLine extends MusicObject {
         let lineCenterYs = row.getStaffLines().map(staffLine => staffLine.middleLineOffset * lineSpacing);
         let lineDotOffs = row.getStaffLines().map(() => row.getPitchSpacing());
 
-        if (row.hasTab) {
-            lineCenterYs.push((row.tabBottom + row.tabTop) / 2);
-            lineDotOffs.push((row.tabBottom - row.tabTop) / 6);
+        let tab = row.getTab();
+
+        if (tab) {
+            lineCenterYs.push((tab.bottom + tab.top) / 2);
+            lineDotOffs.push((tab.bottom - tab.top) / 6);
         }
 
         let top: number, bottom: number;
 
         if (row.hasStaff) {
             top = row.getPitchY(row.getTopStaffLine().topLinePitch);
-            bottom = row.hasTab
-                ? bottom = row.getTabStringY(5)
+            bottom = tab
+                ? bottom = tab.getStringY(5)
                 : row.getPitchY(row.getBottomStaffLine().bottomLinePitch);
         }
         else {
             // hasTab is true
-            top = row.getTabStringY(0);
-            bottom = row.getTabStringY(5);
+            top = tab?.getStringY(0) ?? 0;
+            bottom = tab?.getStringY(5) ?? 0;
         }
 
         this.lineRects = [];

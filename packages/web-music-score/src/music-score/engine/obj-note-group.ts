@@ -520,9 +520,11 @@ export class ObjNoteGroup extends MusicObject {
             }
         }
 
+        let tab = row.getTab();
+
         this.notes.forEach((note, noteId) => {
             // Add tab fret numbers
-            if (this.tabObjs && this.ownString[noteId] !== undefined) {
+            if (tab && this.tabObjs && this.ownString[noteId] !== undefined) {
                 let stringId = this.ownString[noteId] - 1;
                 let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
                 let color = fretId < 0 ? "red" : "black";
@@ -536,7 +538,7 @@ export class ObjNoteGroup extends MusicObject {
                 let stemX = this.staffObjs?.stemRect ? this.staffObjs.stemRect.centerX : undefined;
 
                 let x = stemX ?? noteX;
-                let y = row.getTabStringY(stringId);
+                let y = tab.getStringY(stringId);
                 fretNumber.offset(x, y);
             }
         });

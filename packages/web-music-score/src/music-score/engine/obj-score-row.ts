@@ -4,7 +4,7 @@ import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
 import { Note } from "../../music-theory/note";
-import { ClefKind, StaffLine } from "./staff-line";
+import { ClefKind, GuitarTab, StaffLine } from "./staff-line";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -13,11 +13,11 @@ import { DocumentSettings } from "./settings";
 
 const p = (noteName: string) => Note.getNote(noteName).pitch;
 
-const StaffLine_Treble = new StaffLine(ClefKind.Treble, p("G4"), p("B4"), 0, p("C3"), p("C7"));
-const StaffLine_GuitarTreble = new StaffLine(ClefKind.Treble, p("G3"), p("B3"), 0, p("C2"), p("C6"));
-const StaffLine_Bass = new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 0, p("C1"), p("C5"));
-const StaffLine_Grand_Treble = new StaffLine(ClefKind.Treble, p("G4"), p("B4"), -4, p("C4"), p("C7"));
-const StaffLine_Grand_Bass = new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 4, p("C1"), p("C4") - 1);
+const createStaffLine_Treble = () => new StaffLine(ClefKind.Treble, p("G4"), p("B4"), 0, p("C3"), p("C7"));
+const createStaffLine_GuitarTreble = () => new StaffLine(ClefKind.Treble, p("G3"), p("B3"), 0, p("C2"), p("C6"));
+const createStaffLine_Bass = () => new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 0, p("C1"), p("C5"));
+const createStaffLine_Grand_Treble = () => new StaffLine(ClefKind.Treble, p("G4"), p("B4"), -4, p("C4"), p("C7"));
+const createStaffLine_Grand_Bass = () => new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 4, p("C1"), p("C4") - 1);
 
 export class ObjScoreRow extends MusicObject {
     public readonly staffKind: StaffKind;
@@ -29,11 +29,9 @@ export class ObjScoreRow extends MusicObject {
     private lineSpacing = 0;
     private minWidth = 0;
 
-    public tabTop: number = 0;
-    public tabBottom: number = 0;
 
     private readonly staffLines: StaffLine[] = [];
-    public readonly hasTab: boolean = false;
+    private tab?: GuitarTab;
 
     private readonly measures: ObjMeasure[] = [];
 
@@ -51,24 +49,24 @@ export class ObjScoreRow extends MusicObject {
 
         switch (this.staffKind) {
             case StaffKind.Treble:
-                this.staffLines[0] = StaffLine_Treble;
+                this.staffLines[0] = createStaffLine_Treble();
                 break;
             case StaffKind.Bass:
-                this.staffLines[0] = StaffLine_Bass;
+                this.staffLines[0] = createStaffLine_Bass();
                 break;
             case StaffKind.Grand:
-                this.staffLines[0] = StaffLine_Grand_Treble;
-                this.staffLines[1] = StaffLine_Grand_Bass;
+                this.staffLines[0] = createStaffLine_Grand_Treble();
+                this.staffLines[1] = createStaffLine_Grand_Bass();
                 break;
             case StaffKind.GuitarTreble:
-                this.staffLines[0] = StaffLine_GuitarTreble;
+                this.staffLines[0] = createStaffLine_GuitarTreble();
                 break;
             case StaffKind.GuitarTab:
-                this.hasTab = true;
+                this.tab = new GuitarTab();
                 break;
             case StaffKind.GuitarTrebleAndTab:
-                this.staffLines[0] = StaffLine_GuitarTreble;
-                this.hasTab = true;
+                this.staffLines[0] = createStaffLine_GuitarTreble();
+                this.tab = new GuitarTab();
                 break;
             default:
                 Assert.assert("Invalid staffKind = " + this.staffKind);
@@ -91,6 +89,14 @@ export class ObjScoreRow extends MusicObject {
 
     get hasStaff(): boolean {
         return this.staffLines[0] !== undefined;
+    }
+
+    get hasTab(): boolean {
+        return this.tab !== undefined;
+    }
+
+    getTab(): GuitarTab | undefined {
+        return this.tab;
     }
 
     getStaffLines(): ReadonlyArray<StaffLine> {
@@ -126,12 +132,6 @@ export class ObjScoreRow extends MusicObject {
         }
 
         return this.closestStaffLineCache[pitch];
-    }
-
-    /** Return Y coordinate of string. */
-    getTabStringY(stringId: number): number {
-        Assert.assert(this.hasTab, "Guitar tab is required for getTabStringY()!");
-        return this.tabTop + (this.tabBottom - this.tabTop) / 6 * (stringId + 0.5);
     }
 
     isPitchLine(pitch: number) {
@@ -251,13 +251,13 @@ export class ObjScoreRow extends MusicObject {
     getTopStaffLineTop(): number {
         return this.hasStaff
             ? this.getPitchY(this.getTopStaffLine().topLinePitch)
-            : this.tabTop;
+            : (this.tab ? this.tab.top : 0);
     }
 
     getBottomStaffLineBottom(): number {
         return this.hasStaff
             ? this.getPitchY(this.getBottomStaffLine().bottomLinePitch)
-            : this.tabTop;
+            : (this.tab ? this.tab.top : 0);
     }
 
     getLowestNotePitch(): number | undefined {
@@ -312,12 +312,12 @@ export class ObjScoreRow extends MusicObject {
             bottomh = this.getPitchY(this.getBottomStaffLine().bottomLinePitch - 1);
         }
 
-        if (this.hasTab) {
+        if (this.tab) {
             let lowestPitch = this.getLowestNotePitch();
-            this.tabTop = lowestPitch !== undefined
+            this.tab.top = lowestPitch !== undefined
                 ? this.getPitchY(lowestPitch) + unitSize * 8
                 : 0;
-            this.tabBottom = this.tabTop + unitSize * DocumentSettings.GuitarTabHeight;
+            this.tab.bottom = this.tab.top + unitSize * DocumentSettings.GuitarTabHeight;
         }
 
         // Calc min width
@@ -478,8 +478,9 @@ export class ObjScoreRow extends MusicObject {
     offset(dx: number, dy: number) {
         this.measures.forEach(m => m.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
-        this.tabTop += dy;
-        this.tabBottom += dy;
+        if(this.tab) {
+            this.tab.offset(dx,dy);
+        }
     }
 
     draw(renderer: Renderer) {
@@ -497,18 +498,18 @@ export class ObjScoreRow extends MusicObject {
         ctx.clip();
 
         // For multiple staff lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && (this.staffLines.length > 1 || this.hasTab)) {
+        if (this.getFirstMeasure() && (this.staffLines.length > 1 || this.tab)) {
             let left = this.getFirstMeasure()!.getStaffLineLeft();
 
             let top: number, bottom: number;
 
             if (this.hasStaff) {
                 top = this.getPitchY(this.getTopStaffLine().topLinePitch);
-                bottom = this.hasTab ? this.getTabStringY(5) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
+                bottom = this.tab ? this.tab.getStringY(5) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
             }
-            else if (this.hasTab) {
-                top = this.getTabStringY(0);
-                bottom = this.getTabStringY(5);
+            else if (this.tab) {
+                top = this.tab.getStringY(0);
+                bottom = this.tab.getStringY(5);
             }
             else {
                 top = bottom = 0;

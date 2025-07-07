@@ -114,14 +114,6 @@ export class ObjMeasure extends MusicObject {
         return this.row.doc;
     }
 
-    get tabBottom(): number {
-        return this.row.tabBottom;
-    }
-
-    get tabTop(): number {
-        return this.row.tabTop;
-    }
-
     isPartialMeasure() {
         return this.getConsumedTicks() < this.getMeasureTicks();
     }
@@ -1096,9 +1088,11 @@ export class ObjMeasure extends MusicObject {
             this.barLineRight.getRect().bottom
         );
 
-        if (this.row.hasTab) {
-            top = Math.min(top, this.tabTop);
-            bottom = Math.max(bottom, this.tabBottom);
+        let tab = this.row.getTab();
+
+        if (tab) {
+            top = Math.min(top, tab.top);
+            bottom = Math.max(bottom, tab.bottom);
         }
 
         // Set rect toph and bottomh
@@ -1245,9 +1239,11 @@ export class ObjMeasure extends MusicObject {
             });
         }
 
-        if (this.row.hasTab) {
+        let tab = this.row.getTab();
+
+        if (tab) {
             for (let stringId = 0; stringId < 6; stringId++) {
-                drawLine(this.row.getTabStringY(stringId));
+                drawLine(tab.getStringY(stringId));
             }
         }
 

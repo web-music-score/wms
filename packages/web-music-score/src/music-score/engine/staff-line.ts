@@ -22,3 +22,18 @@ export class StaffLine {
         this.octaveLower = this.clefLinePitch === Note.getNote("G3").pitch; // Guitar is played octave lower
     }
 }
+
+export class GuitarTab {
+    top: number = 0;
+    bottom: number = 0;
+
+    /** Return Y coordinate of string. */
+    getStringY(stringId: number): number {
+        return this.top + (this.bottom - this.top) / 6 * (stringId + 0.5);
+    }
+
+    offset(dx: number, dy: number) {
+        this.top += dy;
+        this.bottom += dy;
+    }
+}
