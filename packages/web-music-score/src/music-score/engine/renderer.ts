@@ -450,17 +450,17 @@ export class Renderer {
 
         let { unitSize } = this;
 
-        let staffLine = row.getClosestStaffLine(pitch);
+        let staff = row.getClosestStaff(pitch);
         let ledgerLineWidth = unitSize * DocumentSettings.LedgerLineWidth;
 
-        if (pitch >= staffLine.topLinePitch + 2) {
-            for (let linePitch = staffLine.topLinePitch + 2; linePitch <= pitch; linePitch += 2) {
+        if (pitch >= staff.topLinePitch + 2) {
+            for (let linePitch = staff.topLinePitch + 2; linePitch <= pitch; linePitch += 2) {
                 let y = row.getPitchY(linePitch);
                 this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
             }
         }
-        else if (pitch <= staffLine.bottomLinePitch - 2) {
-            for (let linePitch = staffLine.bottomLinePitch - 2; linePitch >= pitch; linePitch -= 2) {
+        else if (pitch <= staff.bottomLinePitch - 2) {
+            for (let linePitch = staff.bottomLinePitch - 2; linePitch >= pitch; linePitch -= 2) {
                 let y = row.getPitchY(linePitch);
                 this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
             }

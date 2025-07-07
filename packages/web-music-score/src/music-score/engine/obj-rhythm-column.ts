@@ -363,17 +363,17 @@ export class ObjRhythmColumn extends MusicObject {
         });
 
         if (initRect) {
-            let staffTop = row.hasStaff ? row.getTopStaffLineTop() : 0;
-            let staffBottom = row.hasStaff ? row.getBottomStaffLineBottom() : 0;
+            let staffTop = row.hasStaff ? row.getTopStaffTop() : 0;
+            let staffBottom = row.hasStaff ? row.getBottomStaffBottom() : 0;
 
             this.rect = new DivRect(-halfMinWidth, 0, halfMinWidth, (staffTop + staffBottom) / 2, 0, (staffTop + staffBottom) / 2);
         }
 
         if (this.arpeggioDir !== undefined) {
-            this.arpeggios = row.getStaffLines().map(staffLine => {
+            this.arpeggios = row.getStaves().map(staff => {
                 let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
                 arpeggio.layout(renderer);
-                arpeggio.offset(this.rect.left - arpeggio.getRect().width, staffLine.middleLineOffset * row.getLineSpacing());
+                arpeggio.offset(this.rect.left - arpeggio.getRect().width, staff.middleLineY - arpeggio.getRect().centerY);
                 return arpeggio;
             });
             this.arpeggios.forEach(arpeggio => this.rect.expandInPlace(arpeggio.getRect()));

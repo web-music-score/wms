@@ -4,7 +4,7 @@ import { Accidental, Note } from "../../music-theory/note";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjImage } from "./obj-image";
-import { ClefKind, StaffLine } from "./staff-line";
+import { ClefKind, MusicStaff } from "./staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
@@ -24,7 +24,7 @@ export class ObjSignature extends MusicObject {
 
     readonly mi: MSignature;
 
-    constructor(readonly measure: ObjMeasure, readonly staffLine: StaffLine) {
+    constructor(readonly measure: ObjMeasure, readonly staff: MusicStaff) {
         super(measure);
 
         this.mi = new MSignature(this);
@@ -40,10 +40,10 @@ export class ObjSignature extends MusicObject {
 
     updateClefImage(renderer: Renderer, showClef: boolean) {
         if (showClef) {
-            let img = renderer.getImageAsset(this.staffLine.clefImageAsset);
+            let img = renderer.getImageAsset(this.staff.clefImageAsset);
             this.clefImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
 
-            this.eightBelowClef = this.clefImage && this.staffLine.octaveLower
+            this.eightBelowClef = this.clefImage && this.staff.octaveLower
                 ? new ObjText(this, "8", 0.5, 0)
                 : undefined;
         }
@@ -118,24 +118,24 @@ export class ObjSignature extends MusicObject {
     }
 
     private getAccidentalPitch(accNote: Note): number {
-        let clefKind = this.staffLine.clefKind;
+        let clefKind = this.staff.clefKind;
 
         let lowestAccidentalPitch: number | undefined = undefined;
 
         if (clefKind === ClefKind.Treble) {
             if (accNote.accidental > 0) {
-                lowestAccidentalPitch = this.staffLine.bottomLinePitch + 3;
+                lowestAccidentalPitch = this.staff.bottomLinePitch + 3;
             }
             else if (accNote.accidental < 0) {
-                lowestAccidentalPitch = this.staffLine.bottomLinePitch + 1;
+                lowestAccidentalPitch = this.staff.bottomLinePitch + 1;
             }
         }
         else if (clefKind === ClefKind.Bass) {
             if (accNote.accidental > 0) {
-                lowestAccidentalPitch = this.staffLine.bottomLinePitch + 1;
+                lowestAccidentalPitch = this.staff.bottomLinePitch + 1;
             }
             else if (accNote.accidental < 0) {
-                lowestAccidentalPitch = this.staffLine.bottomLinePitch - 1;
+                lowestAccidentalPitch = this.staff.bottomLinePitch - 1;
             }
         }
 
@@ -221,7 +221,7 @@ export class ObjSignature extends MusicObject {
         if (this.clefImage) {
             x += paddingX;
             this.clefImage.layout(renderer);
-            this.clefImage.offset(x, row.getPitchY(this.staffLine.clefLinePitch));
+            this.clefImage.offset(x, row.getPitchY(this.staff.clefLinePitch));
             this.rect.expandInPlace(this.clefImage.getRect());
             x = this.rect.right;
 
@@ -235,7 +235,7 @@ export class ObjSignature extends MusicObject {
 
         if (this.measureNumber) {
             this.measureNumber.layout(renderer);
-            let y = this.clefImage ? this.clefImage.getRect().top : row.getPitchY(this.staffLine.topLinePitch);
+            let y = this.clefImage ? this.clefImage.getRect().top : row.getPitchY(this.staff.topLinePitch);
             this.measureNumber.offset(0, y);
             this.rect.expandInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
@@ -267,14 +267,14 @@ export class ObjSignature extends MusicObject {
 
         if (this.beatCountText) {
             this.beatCountText.layout(renderer);
-            this.beatCountText.offset(x + paddingX, row.getPitchY(this.staffLine.middleLinePitch + 2));
+            this.beatCountText.offset(x + paddingX, row.getPitchY(this.staff.middleLinePitch + 2));
             this.rect.expandInPlace(this.beatCountText.getRect());
             right = Math.max(right, this.rect.right);
         }
 
         if (this.beatSizeText) {
             this.beatSizeText.layout(renderer);
-            this.beatSizeText.offset(x + paddingX, row.getPitchY(this.staffLine.bottomLinePitch + 2));
+            this.beatSizeText.offset(x + paddingX, row.getPitchY(this.staff.bottomLinePitch + 2));
             this.rect.expandInPlace(this.beatSizeText.getRect());
             right = Math.max(right, this.rect.right);
         }
@@ -283,7 +283,7 @@ export class ObjSignature extends MusicObject {
 
         if (this.tempoText) {
             this.tempoText.layout(renderer);
-            this.tempoText.offset(x, Math.min(this.rect.top, row.getPitchY(this.staffLine.topLinePitch)));
+            this.tempoText.offset(x, Math.min(this.rect.top, row.getPitchY(this.staff.topLinePitch)));
             this.rect.expandInPlace(this.tempoText.getRect());
         }
 

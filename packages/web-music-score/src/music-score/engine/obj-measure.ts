@@ -152,7 +152,7 @@ export class ObjMeasure extends MusicObject {
 
         if (pitch === undefined) {
             if (this.row.hasStaff) {
-                pitch = this.row.getTopStaffLine().middleLinePitch;
+                pitch = this.row.getTopStaff().middleLinePitch;
             }
             else {
                 pitch = Note.getNote("C4").pitch;
@@ -177,8 +177,8 @@ export class ObjMeasure extends MusicObject {
         if (stemDir === Stem.Auto || stemDir === undefined) {
 
             if (this.row.hasStaff) {
-                let staffLine = this.row.getClosestStaffLine(symbol.ownAvgPitch);
-                return symbol.ownAvgPitch > staffLine.middleLinePitch ? Stem.Down : Stem.Up;
+                let staff = this.row.getClosestStaff(symbol.ownAvgPitch);
+                return symbol.ownAvgPitch > staff.middleLinePitch ? Stem.Down : Stem.Up;
             }
             else {
                 return Stem.Up;
@@ -1041,14 +1041,14 @@ export class ObjMeasure extends MusicObject {
         let showTempo = !!this.alterTempo;
 
         if (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo) {
-            this.signatures = this.row.getStaffLines().map((staffLine, staffLineId) => {
-                let signature = this.signatures[staffLineId] ?? new ObjSignature(this, staffLine);
+            this.signatures = this.row.getStaves().map((staff, staffId) => {
+                let signature = this.signatures[staffId] ?? new ObjSignature(this, staff);
 
                 signature.updateClefImage(renderer, showClef);
-                signature.updateMeasureNumber(showMeasureNumber && staffLineId === 0);
+                signature.updateMeasureNumber(showMeasureNumber && staffId === 0);
                 signature.updateKeySignature(showKeySignature);
                 signature.updateTimeSignature(showTimeSignature);
-                signature.updateTempo(showTempo && staffLineId === 0);
+                signature.updateTempo(showTempo && staffId === 0);
 
                 signature.layout(renderer);
 
@@ -1232,8 +1232,8 @@ export class ObjMeasure extends MusicObject {
         const drawLine = (y: number) => renderer.drawLine(left, y, right, y);
 
         if (this.row.hasStaff) {
-            this.row.getStaffLines().forEach(staffLine => {
-                for (let p = staffLine.bottomLinePitch; p <= staffLine.topLinePitch; p += 2) {
+            this.row.getStaves().forEach(staff => {
+                for (let p = staff.bottomLinePitch; p <= staff.topLinePitch; p += 2) {
                     drawLine(this.row.getPitchY(p));
                 }
             });

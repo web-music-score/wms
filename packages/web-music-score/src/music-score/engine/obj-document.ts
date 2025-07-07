@@ -303,8 +303,8 @@ export class ObjDocument extends MusicObject {
                 continue;
             }
 
-            let minPitch = row.getBottomStaffLine().minPitch;
-            let maxPitch = row.getTopStaffLine().maxPitch;
+            let minPitch = row.getBottomStaff().minPitch;
+            let maxPitch = row.getTopStaff().maxPitch;
 
             if (!row.getRect().contains(x, y)) {
                 continue;

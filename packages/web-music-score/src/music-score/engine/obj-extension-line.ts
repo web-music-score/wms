@@ -97,7 +97,7 @@ export class ObjExtensionLine extends MusicObject {
         // Draw tip end of last line
         let tails = this.extension.getTails();
         if (tails.length > 0 && this === tails[tails.length - 1]) {
-            let tipH = rect.centerY > this.measure.row.getBottomStaffLineBottom() ? -renderer.unitSize : renderer.unitSize;
+            let tipH = rect.centerY > this.measure.row.getBottomStaffBottom() ? -renderer.unitSize : renderer.unitSize;
             renderer.drawLine(rect.right, rect.centerY, rect.right, rect.centerY + tipH, "black", renderer.lineWidth);
         }
     }

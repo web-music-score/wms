@@ -183,8 +183,8 @@ export class ObjRest extends MusicObject {
 
         // Make sure restPitch is line, not space
         if (this.row.isPitchSpace(restPitch)) {
-            let staffLine = this.row.getClosestStaffLine(restPitch);
-            restPitch += restPitch >= staffLine.middleLinePitch ? 1 : -1;
+            let staff = this.row.getClosestStaff(restPitch);
+            restPitch += restPitch >= staff.middleLinePitch ? 1 : -1;
         }
 
         this.offset(0, this.row.getPitchY(restPitch));

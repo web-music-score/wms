@@ -33,11 +33,10 @@ abstract class ObjBarLine extends MusicObject {
         let thicW = 0.7 * unitSize;
         let spaceW = 0.7 * unitSize;
         let dotW = Renderer.DotSize * unitSize;
-        let lineSpacing = row.getLineSpacing();
         let dotRadius = dotW / 2;
 
-        let lineCenterYs = row.getStaffLines().map(staffLine => staffLine.middleLineOffset * lineSpacing);
-        let lineDotOffs = row.getStaffLines().map(() => row.getPitchSpacing());
+        let lineCenterYs = row.getStaves().map(staff => staff.middleLineY);
+        let lineDotOffs = row.getStaves().map(staff => staff.getPitchSpacing());
 
         let tab = row.getTab();
 
@@ -49,10 +48,10 @@ abstract class ObjBarLine extends MusicObject {
         let top: number, bottom: number;
 
         if (row.hasStaff) {
-            top = row.getPitchY(row.getTopStaffLine().topLinePitch);
+            top = row.getPitchY(row.getTopStaff().topLinePitch);
             bottom = tab
                 ? bottom = tab.getStringY(5)
-                : row.getPitchY(row.getBottomStaffLine().bottomLinePitch);
+                : row.getPitchY(row.getBottomStaff().bottomLinePitch);
         }
         else {
             // hasTab is true

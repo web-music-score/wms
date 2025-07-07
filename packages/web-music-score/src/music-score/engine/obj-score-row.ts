@@ -4,7 +4,7 @@ import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
 import { Note } from "../../music-theory/note";
-import { ClefKind, GuitarTab, StaffLine } from "./staff-line";
+import { ClefKind, GuitarTab, MusicStaff } from "./staff-and-tab";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -13,11 +13,11 @@ import { DocumentSettings } from "./settings";
 
 const p = (noteName: string) => Note.getNote(noteName).pitch;
 
-const createStaffLine_Treble = () => new StaffLine(ClefKind.Treble, p("G4"), p("B4"), 0, p("C3"), p("C7"));
-const createStaffLine_GuitarTreble = () => new StaffLine(ClefKind.Treble, p("G3"), p("B3"), 0, p("C2"), p("C6"));
-const createStaffLine_Bass = () => new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 0, p("C1"), p("C5"));
-const createStaffLine_Grand_Treble = () => new StaffLine(ClefKind.Treble, p("G4"), p("B4"), -4, p("C4"), p("C7"));
-const createStaffLine_Grand_Bass = () => new StaffLine(ClefKind.Bass, p("F3"), p("D3"), 4, p("C1"), p("C4") - 1);
+const createStaff_Treble = () => new MusicStaff(ClefKind.Treble, p("G4"), p("B4"), p("C3"), p("C7"));
+const createStaff_GuitarTreble = () => new MusicStaff(ClefKind.Treble, p("G3"), p("B3"), p("C2"), p("C6"));
+const createStaff_Bass = () => new MusicStaff(ClefKind.Bass, p("F3"), p("D3"), p("C1"), p("C5"));
+const createStaff_Grand_Treble = () => new MusicStaff(ClefKind.Treble, p("G4"), p("B4"), p("C4"), p("C7"));
+const createStaff_Grand_Bass = () => new MusicStaff(ClefKind.Bass, p("F3"), p("D3"), p("C1"), p("C4") - 1);
 
 export class ObjScoreRow extends MusicObject {
     public readonly staffKind: StaffKind;
@@ -25,18 +25,14 @@ export class ObjScoreRow extends MusicObject {
     private prevRow?: ObjScoreRow;
     private nextRow?: ObjScoreRow;
 
-    private pitchSpacing = 0;
-    private lineSpacing = 0;
     private minWidth = 0;
 
-
-    private readonly staffLines: StaffLine[] = [];
+    private readonly staves: MusicStaff[] = [];
     private tab?: GuitarTab;
 
     private readonly measures: ObjMeasure[] = [];
 
-    private readonly closestStaffLineCache: StaffLine[/* pitch */] = [];
-    private readonly cachedPitchY: number[/* pitch */] = [];
+    private readonly closestStaffCache: MusicStaff[/* pitch */] = [];
 
     private needLayout = true;
 
@@ -49,23 +45,23 @@ export class ObjScoreRow extends MusicObject {
 
         switch (this.staffKind) {
             case StaffKind.Treble:
-                this.staffLines[0] = createStaffLine_Treble();
+                this.staves[0] = createStaff_Treble();
                 break;
             case StaffKind.Bass:
-                this.staffLines[0] = createStaffLine_Bass();
+                this.staves[0] = createStaff_Bass();
                 break;
             case StaffKind.Grand:
-                this.staffLines[0] = createStaffLine_Grand_Treble();
-                this.staffLines[1] = createStaffLine_Grand_Bass();
+                this.staves[0] = createStaff_Grand_Treble();
+                this.staves[1] = createStaff_Grand_Bass();
                 break;
             case StaffKind.GuitarTreble:
-                this.staffLines[0] = createStaffLine_GuitarTreble();
+                this.staves[0] = createStaff_GuitarTreble();
                 break;
             case StaffKind.GuitarTab:
                 this.tab = new GuitarTab();
                 break;
             case StaffKind.GuitarTrebleAndTab:
-                this.staffLines[0] = createStaffLine_GuitarTreble();
+                this.staves[0] = createStaff_GuitarTreble();
                 this.tab = new GuitarTab();
                 break;
             default:
@@ -88,7 +84,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     get hasStaff(): boolean {
-        return this.staffLines[0] !== undefined;
+        return this.staves[0] !== undefined;
     }
 
     get hasTab(): boolean {
@@ -99,47 +95,47 @@ export class ObjScoreRow extends MusicObject {
         return this.tab;
     }
 
-    getStaffLines(): ReadonlyArray<StaffLine> {
-        return this.staffLines;
+    getStaves(): ReadonlyArray<MusicStaff> {
+        return this.staves;
     }
 
-    getTopStaffLine(): StaffLine {
-        return Assert.require(this.staffLines[0], "Top staff line is required!");
+    getTopStaff(): MusicStaff {
+        return Assert.require(this.staves[0], "Top staff line is required!");
     }
 
-    getBottomStaffLine(): StaffLine {
-        return Assert.require(this.staffLines[this.staffLines.length - 1], "Bottom staff line is required!");
+    getBottomStaff(): MusicStaff {
+        return Assert.require(this.staves[this.staves.length - 1], "Bottom staff line is required!");
     }
 
-    getClosestStaffLine(pitch: number): StaffLine {
-        Assert.assert(this.hasStaff, "Staff line is required for getClosestStaffLine()!");
+    getClosestStaff(pitch: number): MusicStaff {
+        Assert.assert(this.hasStaff, "Staff line is required for getClosestStaff()!");
 
         Note.validatePitch(pitch);
 
-        if (this.closestStaffLineCache[pitch] === undefined) {
-            let closestDistToPitch = Math.abs(pitch - this.staffLines[0].middleLinePitch);
-            let closestStaffLine = this.staffLines[0];
+        if (this.closestStaffCache[pitch] === undefined) {
+            let closestDistToPitch = Math.abs(pitch - this.staves[0].middleLinePitch);
+            let closestStaff = this.staves[0];
 
-            for (let i = 1; i < this.staffLines.length; i++) {
-                let dist = Math.abs(pitch - this.staffLines[i].middleLinePitch);
+            for (let i = 1; i < this.staves.length; i++) {
+                let dist = Math.abs(pitch - this.staves[i].middleLinePitch);
                 if (dist < closestDistToPitch) {
                     closestDistToPitch = dist;
-                    closestStaffLine = this.staffLines[i];
+                    closestStaff = this.staves[i];
                 }
             }
 
-            this.closestStaffLineCache[pitch] = closestStaffLine;
+            this.closestStaffCache[pitch] = closestStaff;
         }
 
-        return this.closestStaffLineCache[pitch];
+        return this.closestStaffCache[pitch];
     }
 
     isPitchLine(pitch: number) {
-        return pitch % 2 === this.staffLines[0].middleLinePitch % 2;
+        return pitch % 2 === this.staves[0].middleLinePitch % 2;
     }
 
     isPitchSpace(pitch: number) {
-        return pitch % 2 !== this.staffLines[0].middleLinePitch % 2;
+        return pitch % 2 !== this.staves[0].middleLinePitch % 2;
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -166,50 +162,14 @@ export class ObjScoreRow extends MusicObject {
         return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.centerY, r.bottom);
     }
 
-    getPitchSpacing(): number {
-        return this.pitchSpacing;
-    }
-
-    getLineSpacing(): number {
-        return this.lineSpacing;
-    }
-
     getPitchY(pitch: number): number {
-        Assert.assert(this.hasStaff, "Staff is required for getPitchY()!");
-
-        Note.validatePitch(pitch);
-
-        if (this.cachedPitchY[pitch] === undefined) {
-            let staffLine = this.staffLines.length === 1 || pitch >= this.staffLines[0].minPitch
-                ? this.staffLines[0]
-                : this.staffLines[1];
-
-            let { pitchSpacing, lineSpacing } = this;
-
-            let offsetY = staffLine.middleLineOffset * lineSpacing;
-
-            this.cachedPitchY[pitch] = offsetY - (pitch - staffLine.middleLinePitch) * pitchSpacing;
-        }
-
-        return this.cachedPitchY[pitch] + this.rect.centerY;
+        let y = this.staves[0]?.getPitchY(pitch) ?? this.staves[1]?.getPitchY(pitch);
+        return Assert.require(y, "Staff is required for getPitchY()!");
     }
 
     getPitchAt(y: number): number | undefined {
-        let { pitchSpacing, lineSpacing } = this;
-
-        for (let i = 0; i < this.staffLines.length; i++) {
-            let staffLine = this.staffLines[i];
-
-            let offsetY = staffLine.middleLineOffset * lineSpacing;
-
-            let pitch = Math.round(staffLine.middleLinePitch - (y - this.rect.centerY - offsetY) / pitchSpacing);
-
-            if (pitch >= staffLine.minPitch && pitch <= staffLine.maxPitch) {
-                return pitch;
-            }
-        }
-
-        return undefined;
+        let pitch = this.staves[0]?.getPitchAt(y) ?? this.staves[1]?.getPitchAt(y);
+        return Assert.require(pitch, "Staff is required for getPitchY()!");
     }
 
     addMeasure(m: ObjMeasure) {
@@ -248,15 +208,15 @@ export class ObjScoreRow extends MusicObject {
         return this.minWidth;
     }
 
-    getTopStaffLineTop(): number {
+    getTopStaffTop(): number {
         return this.hasStaff
-            ? this.getPitchY(this.getTopStaffLine().topLinePitch)
+            ? this.getPitchY(this.getTopStaff().topLinePitch)
             : (this.tab ? this.tab.top : 0);
     }
 
-    getBottomStaffLineBottom(): number {
+    getBottomStaffBottom(): number {
         return this.hasStaff
-            ? this.getPitchY(this.getBottomStaffLine().bottomLinePitch)
+            ? this.getPitchY(this.getBottomStaff().bottomLinePitch)
             : (this.tab ? this.tab.top : 0);
     }
 
@@ -265,10 +225,10 @@ export class ObjScoreRow extends MusicObject {
             return undefined;
         }
         else if (this.doc.needFullPitchRange()) {
-            return this.getBottomStaffLine().minPitch;
+            return this.getBottomStaff().minPitch;
         }
         else {
-            let pitch = this.getBottomStaffLine().bottomLinePitch;
+            let pitch = this.getBottomStaff().bottomLinePitch;
             return Math.min(pitch, ...this.measures.map(m => m.getLowestNotePitch(pitch)));
         }
     }
@@ -289,27 +249,34 @@ export class ObjScoreRow extends MusicObject {
 
         this.rect = new DivRect();
 
-        if (this.pitchSpacing !== unitSize) {
-            this.pitchSpacing = unitSize;
-            this.lineSpacing = this.pitchSpacing * 2;
+        let lineSpacing = unitSize * 2;
 
-            // pitch spacing changed, clear pitch y cache.
-            this.cachedPitchY.length = 0;
+        // Compute staff top/bottom line y
+        this.staves.forEach(staff => {
+            staff.topLineY = -lineSpacing * 2;
+            staff.bottomLineY = lineSpacing * 2;
+        });
+
+        if (this.staves.length === 2) {
+            this.staves[0].topLineY -= lineSpacing * 6;
+            this.staves[0].bottomLineY -= lineSpacing * 6;
+            this.staves[1].topLineY += lineSpacing * 6;
+            this.staves[1].bottomLineY += lineSpacing * 6;
         }
 
         // Compute toph and bottomh
-        let toph = 0, bottomh = 0;
+        let rect = new DivRect();
 
-        if (!this.hasStaff) {
-            toph = bottomh = 0;
-        }
-        else if (this.doc.needFullPitchRange()) {
-            toph = -this.getPitchY(this.getTopStaffLine().maxPitch + 1);
-            bottomh = this.getPitchY(this.getBottomStaffLine().minPitch - 1);
-        }
-        else {
-            toph = -this.getPitchY(this.getTopStaffLine().topLinePitch + 1);
-            bottomh = this.getPitchY(this.getBottomStaffLine().bottomLinePitch - 1);
+        this.staves.forEach(staff => rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY)));
+
+        if (this.hasStaff && this.doc.needFullPitchRange()) {
+            this.staves.forEach(staff => {
+                let top = staff.getPitchY(staff.maxPitch + 1);
+                let bottom = staff.getPitchY(staff.minPitch - 1);
+                if (top !== undefined && bottom !== undefined) {
+                    rect.expandInPlace(new DivRect(0, 0, top, bottom));
+                }
+            });
         }
 
         if (this.tab) {
@@ -318,6 +285,7 @@ export class ObjScoreRow extends MusicObject {
                 ? this.getPitchY(lowestPitch) + unitSize * 8
                 : 0;
             this.tab.bottom = this.tab.top + unitSize * DocumentSettings.GuitarTabHeight;
+            rect.expandInPlace(new DivRect(0, 0, this.tab.top, this.tab.bottom));
         }
 
         // Calc min width
@@ -326,15 +294,12 @@ export class ObjScoreRow extends MusicObject {
         // Layout measures
         this.measures.forEach(m => {
             m.layout(renderer);
-
-            toph = Math.max(toph, m.getRect().toph);
-            bottomh = Math.max(bottomh, m.getRect().bottomh);
-
+            rect.expandInPlace(new DivRect(0, 0, m.getRect().top, m.getRect().bottom));
             this.minWidth += m.getMinWidth();
             this.minWidth += m.getPostMeasureBreakWidth();
         });
 
-        this.rect = new DivRect(0, 0, 0, -toph, 0, bottomh);
+        this.rect = rect;
     }
 
     layoutWidth(renderer: Renderer, width: number) {
@@ -478,8 +443,9 @@ export class ObjScoreRow extends MusicObject {
     offset(dx: number, dy: number) {
         this.measures.forEach(m => m.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
-        if(this.tab) {
-            this.tab.offset(dx,dy);
+        this.staves.forEach(s => s.offset(dx, dy));
+        if (this.tab) {
+            this.tab.offset(dx, dy);
         }
     }
 
@@ -498,14 +464,14 @@ export class ObjScoreRow extends MusicObject {
         ctx.clip();
 
         // For multiple staff lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && (this.staffLines.length > 1 || this.tab)) {
+        if (this.getFirstMeasure() && (this.staves.length > 1 || this.tab)) {
             let left = this.getFirstMeasure()!.getStaffLineLeft();
 
             let top: number, bottom: number;
 
             if (this.hasStaff) {
-                top = this.getPitchY(this.getTopStaffLine().topLinePitch);
-                bottom = this.tab ? this.tab.getStringY(5) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
+                top = this.getPitchY(this.getTopStaff().topLinePitch);
+                bottom = this.tab ? this.tab.getStringY(5) : this.getPitchY(this.getBottomStaff().bottomLinePitch);
             }
             else if (this.tab) {
                 top = this.tab.getStringY(0);
