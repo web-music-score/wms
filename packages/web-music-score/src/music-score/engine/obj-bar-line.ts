@@ -35,12 +35,13 @@ abstract class ObjBarLine extends MusicObject {
         let dotW = Renderer.DotSize * unitSize;
         let lineSpacing = row.getLineSpacing();
         let dotRadius = dotW / 2;
-        let dotOffset = this.measure.row.getPitchSpacing();
 
-        let centerYs = row.getStaffLines().map(staffLine => staffLine.middleLineOffset * lineSpacing);
+        let lineCenterYs = row.getStaffLines().map(staffLine => staffLine.middleLineOffset * lineSpacing);
+        let lineDotOffs = row.getStaffLines().map(() => row.getPitchSpacing());
 
         if (row.hasTab) {
-            centerYs.push((row.tabBottom + row.tabTop) / 2);
+            lineCenterYs.push((row.tabBottom + row.tabTop) / 2);
+            lineDotOffs.push((row.tabBottom - row.tabTop) / 6);
         }
 
         let top: number, bottom: number;
@@ -65,9 +66,9 @@ abstract class ObjBarLine extends MusicObject {
         }
 
         const addDots = (cx: number) => {
-            centerYs.forEach(cy => {
+            lineCenterYs.forEach((cy, id) => {
                 for (let i = -1; i <= 1; i += 2) {
-                    let y = cy + i * dotOffset;
+                    let y = cy + i * lineDotOffs[id];
                     this.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, y - dotRadius, y, y + dotRadius));
                 }
             });
