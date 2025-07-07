@@ -30,7 +30,7 @@ export class ObjHeader extends MusicObject {
             : undefined;
 
         this.tuningText = doc.getFirstRow()?.hasTab === true
-            ? new ObjText(this, "Tuning: " + doc.tuningLabel, 0, 0)
+            ? new ObjText(this, doc.tuningName + " tuning:\n" + doc.tuningLabel, 0, 0)
             : undefined;
     }
 

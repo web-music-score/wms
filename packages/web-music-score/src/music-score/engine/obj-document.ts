@@ -41,7 +41,7 @@ export class ObjDocument extends MusicObject {
 
         this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
         this.tuningStrings = getTuningStrings(this.tuningName);
-        this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join(" ");
+        this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join("-");
 
         // There is always row
         this.rows.push(new ObjScoreRow(this));
