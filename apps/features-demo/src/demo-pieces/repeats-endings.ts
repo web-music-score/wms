@@ -14,7 +14,7 @@ export function createRepeatsAndEndingsDemo() {
     doc.addMeasure()
         .addNote(0, "A3", Score.NoteLength.Quarter)
         .addNote(0, "A3", Score.NoteLength.Half)
-        .addNavigation(Score.Navigation.EndRepeat, 2);
+        .addNavigation(Score.Navigation.EndRepeat, 3);
 
     doc.addMeasure()
         .addNavigation(Score.Navigation.StartRepeat)
