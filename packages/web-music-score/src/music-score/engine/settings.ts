@@ -30,4 +30,6 @@ export const DocumentSettings = {
     LedgerLineWidth: 3.6,
 
     ShortTieLength: 5,
+
+    GuitarTabHeight: 20
 }

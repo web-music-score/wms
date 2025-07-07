@@ -9,6 +9,7 @@ import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { Assert } from "@tspro/ts-utils-lib";
+import { DocumentSettings } from "./settings";
 
 const p = (noteName: string) => Note.getNote(noteName).pitch;
 
@@ -316,7 +317,7 @@ export class ObjScoreRow extends MusicObject {
             this.tabTop = lowestPitch !== undefined
                 ? this.getPitchY(lowestPitch) + unitSize * 8
                 : 0;
-            this.tabBottom = this.tabTop + unitSize * 22;
+            this.tabBottom = this.tabTop + unitSize * DocumentSettings.GuitarTabHeight;
         }
 
         // Calc min width
