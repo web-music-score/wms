@@ -448,17 +448,16 @@ export class ObjNoteGroup extends MusicObject {
             if (this.tabObjs && this.ownString[noteId] !== undefined) {
                 let stringId = this.ownString[noteId] - 1;
                 let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
+                let color = fretId < 0 ? "red" : "black";
 
-                if (fretId >= 0 && fretId < 100) {
-                    let fretNumber = new ObjText(this, { text: String(fretId), bgcolor: "white" }, 0.5, 0.5);
-                    this.tabObjs.fretNumbers.push(fretNumber);
+                let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
+                this.tabObjs.fretNumbers.push(fretNumber);
 
-                    fretNumber.layout(renderer);
+                fretNumber.layout(renderer);
 
-                    let x = noteX;
-                    let y = row.getTabStringY(stringId);
-                    fretNumber.offset(x, y);
-                }
+                let x = noteX;
+                let y = row.getTabStringY(stringId);
+                fretNumber.offset(x, y);
             }
         });
 
@@ -681,11 +680,7 @@ export class ObjNoteGroup extends MusicObject {
 
         if (this.tabObjs) {
             // Draw tab fret numbers
-            this.tabObjs.fretNumbers.forEach(fn => {
-                let r = fn.getRect();
-                renderer.fillCircle(r.centerX, r.centerY, (r.leftw + r.toph) / 2, "white");
-                fn.draw(renderer);
-            });
+            this.tabObjs.fretNumbers.forEach(fn => fn.draw(renderer));
         }
     }
 
