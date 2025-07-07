@@ -27,6 +27,10 @@ function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber |
     }
 }
 
+function solveArpeggio(a: Arpeggio | boolean | undefined): Arpeggio | undefined {
+    return a === true || a === Arpeggio.Up ? Arpeggio.Up : (a === Arpeggio.Down ? Arpeggio.Down : undefined);
+}
+
 class NoteStaffObjects {
     public noteHeadRects: DivRect[] = [];
     public dotRects: DivRect[] = [];
@@ -87,7 +91,7 @@ export class ObjNoteGroup extends MusicObject {
         this.color = options?.color ?? "black";
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
-        this.arpeggio = options?.arpeggio;
+        this.arpeggio = solveArpeggio(options?.arpeggio);
         this.tieSpan = options?.tieSpan;
         this.slurSpan = options?.slurSpan;
         this.arcPos = options?.tiePos ?? options?.slurPos ?? ArcPos.Auto;

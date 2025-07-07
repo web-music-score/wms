@@ -42,7 +42,7 @@ export type NoteOptions = {
     dotted?: boolean,
     stem?: Stem,
     color?: string,
-    arpeggio?: Arpeggio,
+    arpeggio?: Arpeggio | boolean,
     staccato?: boolean,
     diamond?: boolean,
     tieSpan?: number | TieLength,
