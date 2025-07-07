@@ -14,6 +14,7 @@ import { createDynamicsAnnotationDemo } from "./dynamics-annotation";
 import { createCompleteRestsDemo } from "./complete-rests";
 import { createNoteHeadsDemo } from "./note-heads";
 import { createGuitarTrebleAndTabDemo } from "./guitar-treble-and-tab";
+import { createGuitarTabDemo } from "./guitar-tab";
 
 export class DemoPieces {
     private static instance?: DemoPieces;
@@ -51,6 +52,7 @@ export class DemoPieces {
         demos.push(createCompleteRestsDemo());
         demos.push(createNoteHeadsDemo());
         demos.push(createGuitarTrebleAndTabDemo());
+        demos.push(createGuitarTabDemo());
 
         // Sort by title
         pieces.sort((a, b) => (a.getTitle() ?? "").localeCompare(b.getTitle() ?? ""));
