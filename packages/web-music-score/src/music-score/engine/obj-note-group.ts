@@ -12,6 +12,21 @@ import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 
+function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
+    let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
+
+    let noteStringData = notes.map((note, i) => { return { note, string: stringArr[i] } });
+
+    noteStringData = Utils.Arr
+        .removeDuplicatesCmp(noteStringData, (a, b) => a.note.equals(b.note))
+        .sort((a, b) => Note.compareFunc(a.note, b.note));
+
+    return {
+        notes: noteStringData.map(e => e.note),
+        strings: noteStringData.every(e => e.string === undefined) ? undefined : noteStringData.map(e => e.string)
+    }
+}
+
 class NoteStaffObjects {
     public noteHeadRects: DivRect[] = [];
     public dotRects: DivRect[] = [];
@@ -58,14 +73,16 @@ export class ObjNoteGroup extends MusicObject {
 
         Assert.int_gte(notes.length, 1, "Cannot create note group object because notes array is empty.");
 
-        this.notes = Note.sort(Note.removeDuplicates(notes));
+        let noteStringData = sortNoteStringData(notes, options?.string);
+
+        this.notes = noteStringData.notes;
 
         this.minPitch = this.notes[0].pitch;
         this.maxPitch = this.notes[this.notes.length - 1].pitch;
 
         this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, Math.round((this.minPitch + this.maxPitch) / 2));
         this.ownStemDir = this.measure.updateOwnStemDir(this, options?.stem);
-        this.ownString = this.measure.updateOwnString(this, Utils.Arr.isArray(options?.string) ? options.string : (options?.string !== undefined ? [options.string] : undefined));
+        this.ownString = this.measure.updateOwnString(this, noteStringData.strings);
 
         this.color = options?.color ?? "black";
         this.staccato = options?.staccato ?? false;
