@@ -1,4 +1,4 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Assert, LRUCache } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 
@@ -26,11 +26,24 @@ export function validateTuningName(tuningName: string): string {
     }
 }
 
+const TuningStringsCache = new LRUCache<string, ReadonlyArray<Note>>(100);
+
 /**
  * @public
  * @returns Array of open string notes, note for each string.
  */
 export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {
-    let tuningData = Assert.require(TuningData.list.find(data => data.name === tuningName), "Invalid tuning name: " + tuningName);
-    return tuningData.strings.slice().reverse().map(noteName => Note.getNote(noteName));
+    let tuningStrings = TuningStringsCache.get(tuningName);
+
+    if (!tuningStrings) {
+        let tuningData = Assert.require(TuningData.list.find(data => data.name === tuningName), "Invalid tuning name: " + tuningName);
+
+        tuningStrings = tuningData.strings.slice().reverse().map(noteName => Note.getNote(noteName));
+        Assert.int_eq(tuningStrings.length, 6, "Tuning should have 6 strings but has " + tuningStrings.length + " strings.");
+
+        TuningStringsCache.set(tuningName, tuningStrings);
+
+    }
+
+    return tuningStrings;
 }
