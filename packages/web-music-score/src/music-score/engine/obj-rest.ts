@@ -22,7 +22,7 @@ export class ObjRest extends MusicObject {
     readonly hide: boolean;
     readonly rhythmProps: RhythmProps;
 
-    readonly objs?: RestStaffObjects;
+    readonly staffObjs?: RestStaffObjects;
 
     readonly mi: MRest;
 
@@ -36,7 +36,7 @@ export class ObjRest extends MusicObject {
         this.hide = options?.hide ?? false;
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
-        this.objs = this.row.hasStaff ? new RestStaffObjects() : undefined;
+        this.staffObjs = this.row.hasStaff ? new RestStaffObjects() : undefined;
 
         this.mi = new MRest(this);
     }
@@ -66,8 +66,8 @@ export class ObjRest extends MusicObject {
     }
 
     get stemDir(): Stem.Up | Stem.Down {
-        if (this.objs) {
-            return this.objs.beamGroup ? this.objs.beamGroup.stemDir : this.ownStemDir;
+        if (this.staffObjs) {
+            return this.staffObjs.beamGroup ? this.staffObjs.beamGroup.stemDir : this.ownStemDir;
         }
         else {
             return Stem.Up;
@@ -84,18 +84,18 @@ export class ObjRest extends MusicObject {
 
 
     getBeamGroup(): ObjBeamGroup | undefined {
-        return this.objs?.beamGroup;
+        return this.staffObjs?.beamGroup;
     }
 
     setBeamGroup(beam: ObjBeamGroup) {
-        if (this.objs) {
-            this.objs.beamGroup = beam;
+        if (this.staffObjs) {
+            this.staffObjs.beamGroup = beam;
         }
     }
 
     resetBeamGroup() {
-        if (this.objs) {
-            this.objs.beamGroup = undefined;
+        if (this.staffObjs) {
+            this.staffObjs.beamGroup = undefined;
         }
     }
 
@@ -124,7 +124,7 @@ export class ObjRest extends MusicObject {
     updateAccidentalState(accState: AccidentalState) { }
 
     layout(renderer: Renderer, accState: AccidentalState) {
-        if (this.hide || !this.objs) {
+        if (this.hide || !this.staffObjs) {
             this.rect = new DivRect();
             return;
         }
@@ -170,10 +170,10 @@ export class ObjRest extends MusicObject {
             let dotX = rightw + (DocumentSettings.RestDotSpace + Renderer.DotSize / 2) * unitSize;
             let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
-            this.objs.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+            this.staffObjs.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
 
-            toph = Math.max(toph, this.objs.dotRect.toph);
-            bottomh = Math.max(bottomh, this.objs.dotRect.bottomh);
+            toph = Math.max(toph, this.staffObjs.dotRect.toph);
+            bottomh = Math.max(bottomh, this.staffObjs.dotRect.bottomh);
             rightw += (DocumentSettings.RestDotSpace + Renderer.DotSize) * unitSize;
         }
 
@@ -191,8 +191,8 @@ export class ObjRest extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        if (this.objs) {
-            this.objs.dotRect.offsetInPlace(dx, dy);
+        if (this.staffObjs) {
+            this.staffObjs.dotRect.offsetInPlace(dx, dy);
         }
 
         this.rect.offsetInPlace(dx, dy);
@@ -201,7 +201,7 @@ export class ObjRest extends MusicObject {
     draw(renderer: Renderer) {
         let ctx = renderer.getCanvasContext();
 
-        if (!ctx || this.hide || !this.objs) {
+        if (!ctx || this.hide || !this.staffObjs) {
             return;
         }
 
@@ -276,7 +276,7 @@ export class ObjRest extends MusicObject {
         }
 
         if (dotted) {
-            let r = this.objs.dotRect;
+            let r = this.staffObjs.dotRect;
             renderer.fillCircle(r.centerX, r.centerY, r.width / 2);
         }
     }

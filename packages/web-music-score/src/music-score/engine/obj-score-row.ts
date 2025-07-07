@@ -89,7 +89,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     get hasStaff(): boolean {
-        return true;
+        return this.staffLines[0] !== undefined;
     }
 
     getStaffLines(): ReadonlyArray<StaffLine> {
@@ -97,14 +97,16 @@ export class ObjScoreRow extends MusicObject {
     }
 
     getTopStaffLine(): StaffLine {
-        return this.staffLines[0];
+        return Assert.require(this.staffLines[0], "Top staff line is required!");
     }
 
     getBottomStaffLine(): StaffLine {
-        return this.staffLines[this.staffLines.length - 1];
+        return Assert.require(this.staffLines[this.staffLines.length - 1], "Bottom staff line is required!");
     }
 
     getClosestStaffLine(pitch: number): StaffLine {
+        Assert.assert(this.hasStaff, "Staff line is required for getClosestStaffLine()!");
+
         Note.validatePitch(pitch);
 
         if (this.closestStaffLineCache[pitch] === undefined) {
@@ -127,9 +129,8 @@ export class ObjScoreRow extends MusicObject {
 
     /** Return Y coordinate of string. */
     getTabStringY(stringId: number): number {
-        return this.hasTab
-            ? this.tabTop + (this.tabBottom - this.tabTop) / 6 * (stringId + 0.5)
-            : 0;
+        Assert.assert(this.hasTab, "Guitar tab is required for getTabStringY()!");
+        return this.tabTop + (this.tabBottom - this.tabTop) / 6 * (stringId + 0.5);
     }
 
     isPitchLine(pitch: number) {
@@ -155,7 +156,7 @@ export class ObjScoreRow extends MusicObject {
         return [this];
     }
 
-    getArcsContentRect() {
+    getArcsContentRect(): DivRect {
         let r = this.rect;
 
         let firstMeasure = this.getFirstMeasure();
@@ -164,15 +165,17 @@ export class ObjScoreRow extends MusicObject {
         return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.centerY, r.bottom);
     }
 
-    getPitchSpacing() {
+    getPitchSpacing(): number {
         return this.pitchSpacing;
     }
 
-    getLineSpacing() {
+    getLineSpacing(): number {
         return this.lineSpacing;
     }
 
     getPitchY(pitch: number): number {
+        Assert.assert(this.hasStaff, "Staff is required for getPitchY()!");
+
         Note.validatePitch(pitch);
 
         if (this.cachedPitchY[pitch] === undefined) {
@@ -244,20 +247,27 @@ export class ObjScoreRow extends MusicObject {
         return this.minWidth;
     }
 
-    getTopStaffLineTop() {
-        return this.getPitchY(this.getTopStaffLine().topLinePitch);
+    getTopStaffLineTop(): number {
+        return this.hasStaff
+            ? this.getPitchY(this.getTopStaffLine().topLinePitch)
+            : this.tabTop;
     }
 
-    getBottomStaffLineBottom() {
-        return this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
+    getBottomStaffLineBottom(): number {
+        return this.hasStaff
+            ? this.getPitchY(this.getBottomStaffLine().bottomLinePitch)
+            : this.tabTop;
     }
 
-    getLowestNotePitch(): number {
-        if (this.doc.needFullPitchRange()) {
+    getLowestNotePitch(): number | undefined {
+        if (!this.hasStaff) {
+            return undefined;
+        }
+        else if (this.doc.needFullPitchRange()) {
             return this.getBottomStaffLine().minPitch;
         }
         else {
-            let pitch = this.getBottomStaffLine().minPitch;
+            let pitch = this.getBottomStaffLine().bottomLinePitch;
             return Math.min(pitch, ...this.measures.map(m => m.getLowestNotePitch(pitch)));
         }
     }
@@ -289,7 +299,10 @@ export class ObjScoreRow extends MusicObject {
         // Compute toph and bottomh
         let toph = 0, bottomh = 0;
 
-        if (this.doc.needFullPitchRange()) {
+        if (!this.hasStaff) {
+            toph = bottomh = 0;
+        }
+        else if (this.doc.needFullPitchRange()) {
             toph = -this.getPitchY(this.getTopStaffLine().maxPitch + 1);
             bottomh = this.getPitchY(this.getBottomStaffLine().minPitch - 1);
         }
@@ -300,10 +313,11 @@ export class ObjScoreRow extends MusicObject {
 
         if (this.hasTab) {
             let lowestPitch = this.getLowestNotePitch();
-            this.tabTop = this.getPitchY(lowestPitch) + unitSize * 2;
+            this.tabTop = lowestPitch !== undefined
+                ? this.getPitchY(lowestPitch) + unitSize * 8
+                : 0;
             this.tabBottom = this.tabTop + unitSize * 22;
         }
-
 
         // Calc min width
         this.minWidth = 0;
@@ -491,9 +505,12 @@ export class ObjScoreRow extends MusicObject {
                 top = this.getPitchY(this.getTopStaffLine().topLinePitch);
                 bottom = this.hasTab ? this.getTabStringY(5) : this.getPitchY(this.getBottomStaffLine().bottomLinePitch);
             }
-            else {
+            else if (this.hasTab) {
                 top = this.getTabStringY(0);
                 bottom = this.getTabStringY(5);
+            }
+            else {
+                top = bottom = 0;
             }
 
             renderer.drawLine(left, top, left, bottom);

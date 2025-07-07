@@ -156,7 +156,16 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        let pitch = this.usePitch[voiceId] ?? this.row.getTopStaffLine().middleLinePitch;
+        let pitch = this.usePitch[voiceId];
+
+        if (pitch === undefined) {
+            if (this.row.hasStaff) {
+                pitch = this.row.getTopStaffLine().middleLinePitch;
+            }
+            else {
+                pitch = Note.getNote("C4").pitch;
+            }
+        }
 
         return this.usePitch[voiceId] = Note.validatePitch(pitch);
     }
@@ -174,9 +183,14 @@ export class ObjMeasure extends MusicObject {
         let stemDir = this.useStemDir[voiceId];
 
         if (stemDir === Stem.Auto || stemDir === undefined) {
-            let staffLine = this.row.getClosestStaffLine(symbol.ownAvgPitch);
 
-            return symbol.ownAvgPitch > staffLine.middleLinePitch ? Stem.Down : Stem.Up;
+            if (this.row.hasStaff) {
+                let staffLine = this.row.getClosestStaffLine(symbol.ownAvgPitch);
+                return symbol.ownAvgPitch > staffLine.middleLinePitch ? Stem.Down : Stem.Up;
+            }
+            else {
+                return Stem.Up;
+            }
         }
         else {
             return stemDir;
@@ -786,6 +800,10 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateArcs() {
+        if (!this.row.hasStaff) {
+            return;
+        }
+
         // Remove arcs
         if (this.arcs.length > 0) {
             this.arcs = [];
@@ -836,7 +854,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateBeams() {
-        if (!this.needBeamsUpdate) {
+        if (!this.needBeamsUpdate || !this.row.hasStaff) {
             return;
         }
 
@@ -1079,7 +1097,8 @@ export class ObjMeasure extends MusicObject {
         );
 
         if (this.row.hasTab) {
-            bottom = this.tabBottom;
+            top = Math.min(top, this.tabTop);
+            bottom = Math.max(bottom, this.tabBottom);
         }
 
         // Set rect toph and bottomh

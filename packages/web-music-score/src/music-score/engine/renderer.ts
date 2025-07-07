@@ -312,6 +312,10 @@ export class Renderer {
         let { measure, pitch } = hilightPitch;
         let { row } = measure.getMusicObject();
 
+        if (!row.hasStaff) {
+            return;
+        }
+
         ctx.fillStyle = HilightPitchRectColor;
         ctx.fillRect(0, row.getPitchY(pitch) - unitSize, ctx.canvas.width, 2 * unitSize);
 
@@ -440,6 +444,10 @@ export class Renderer {
     }
 
     drawLedgerLines(row: ObjScoreRow, pitch: number, x: number) {
+        if (!row.hasStaff) {
+            return;
+        }
+
         let { unitSize } = this;
 
         let staffLine = row.getClosestStaffLine(pitch);

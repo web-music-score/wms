@@ -52,6 +52,7 @@ abstract class ObjBarLine extends MusicObject {
                 : row.getPitchY(row.getBottomStaffLine().bottomLinePitch);
         }
         else {
+            // hasTab is true
             top = row.getTabStringY(0);
             bottom = row.getTabStringY(5);
         }

@@ -82,7 +82,7 @@ export class ObjNoteGroup extends MusicObject {
         }
 
         this.staffObjs = this.row.hasStaff ? new NoteStaffObjects() : undefined;
-        this.tabObjs = this.row.hasStaff ? new NoteTabObjects() : undefined;
+        this.tabObjs = this.row.hasTab ? new NoteTabObjects() : undefined;
 
         this.mi = new MNoteGroup(this);
     }
@@ -419,9 +419,10 @@ export class ObjNoteGroup extends MusicObject {
 
         this.notes.forEach((note, noteId) => {
             let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-            let noteY = this.row.getPitchY(note.pitch);
 
             if (this.staffObjs) {
+                let noteY = this.row.getPitchY(note.pitch);
+
                 // Setup note head
                 let noteHeadRect = this.staffObjs.noteHeadRects[noteId] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
@@ -455,7 +456,7 @@ export class ObjNoteGroup extends MusicObject {
                     fretNumber.layout(renderer);
 
                     let x = noteX;
-                    let y = row.getTabStringY(stringId)
+                    let y = row.getTabStringY(stringId);
                     fretNumber.offset(x, y);
                 }
             }

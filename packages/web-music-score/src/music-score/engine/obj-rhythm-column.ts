@@ -346,9 +346,6 @@ export class ObjRhythmColumn extends MusicObject {
         // Set initially column's min width
         let halfMinWidth = this.getMinWidth() * unitSize / 2;
 
-        let staffTop = row.getTopStaffLineTop();
-        let staffBottom = row.getBottomStaffLineBottom();
-
         let initRect = true;
 
         // Layout voice symbols
@@ -366,6 +363,9 @@ export class ObjRhythmColumn extends MusicObject {
         });
 
         if (initRect) {
+            let staffTop = row.hasStaff ? row.getTopStaffLineTop() : 0;
+            let staffBottom = row.hasStaff ? row.getBottomStaffLineBottom() : 0;
+
             this.rect = new DivRect(-halfMinWidth, 0, halfMinWidth, (staffTop + staffBottom) / 2, 0, (staffTop + staffBottom) / 2);
         }
 

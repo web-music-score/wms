@@ -58,9 +58,8 @@ export class CollectedArcData {
             let { row } = this.noteGroups[0].measure;
 
             let notePitch = this.noteGroups[0].ownAvgPitch;
-            let staffLine = row.getClosestStaffLine(notePitch);
 
-            this.arcDir = notePitch < staffLine.middleLinePitch ? "down" : "up";
+            this.arcDir = !row.hasStaff || notePitch < row.getClosestStaffLine(notePitch).middleLinePitch ? "down" : "up";
         }
         else if (this.arcPos === ArcPos.Above) {
             this.arcDir = "up";

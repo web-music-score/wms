@@ -299,6 +299,10 @@ export class ObjDocument extends MusicObject {
         for (let ri = 0; ri < this.rows.length; ri++) {
             let row = this.rows[ri];
 
+            if (!row.hasStaff) {
+                continue;
+            }
+
             let minPitch = row.getBottomStaffLine().minPitch;
             let maxPitch = row.getTopStaffLine().maxPitch;
 
