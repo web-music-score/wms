@@ -58,17 +58,20 @@ Browser version comes without React-components.
 let doc = new Score.MDocument(Score.StaffKind.Treble, { measuresPerRow: 4 });
 ```
 
-First argument can be `Treble`, `Bass`, `Grand` or `GuitarTreble`.
-`GuitarTreble` is same as `Treble` but one octave lower.
+First argument is `StaffKind`:
+* `Treble`: Staff with treble (G-) clef.
+* `Bass`: Staff with bass (F-) clef.
+* `Grand`: Both treble and bas staves.
+* `GuitarTreble`: `Treble` but one octave lower.
+* `GuitarTab`: Guitar tab only.
+* `GuitarTrebleAndTab`: Treble and tab for guitar.
 
-Second argument is optional `DocumentOptions`
+Second argument is optional `DocumentOptions`:
+```ts
+DocumentOptions = { measuresPerRow?: number, tuning?: string }
+```
 
-#### DocumentOptions
-
-| option          | description                                                  |
-|-----------------|--------------------------------------------------------------|
-| measuresPerRow? | Automatically split rows to have number of measures per row. |
-| tuning          | Tuning name to use with guitar tabs.                         |
+Default tuning is `"Standard"`. `TuningNameList` is array of available tuning names.
 
 ### Set Header
 
@@ -154,17 +157,17 @@ Optional object of note options (e.g. `{ stem: Stem.Up }`):
 
 | Note option | Type                    |                    |
 |-------------|-------------------------|--------------------|
-| dotted      | `boolean`               | Create dotted note |
+| dotted      | `boolean`               | Create dotted note. |
 | stem        | `Stem`                  | Set stem direction (`Stem.Auto`/`Up`/`Down`) |
 | arpeggio    | `Arpeggio`              | Play column in arpeggio `Arpeggio.Up`/`Down` |
-| staccato    | `boolean`               | Play column in staccato |
-| diamond     | `boolean`               | Diamond shaped note head |
+| staccato    | `boolean`               | Play column in staccato. |
+| diamond     | `boolean`               | Diamond shaped note head. |
 | tieSpan     | `number` \| `TieLength` | How many notes tied, or `TieLength.Short`/`ToMeasureEnd` |
 | tiePos      | `ArcPos`                | Tie attach point: `Arc.Auto`/`Above`/`Middle`/`Below`/`StemTip` |
-| slurSpan    | `number`                | How many notes slurred |
+| slurSpan    | `number`                | How many notes slurred. |
 | slurPos     | `ArcPos`                | Slur attach point: `Arc.Auto`/`Above`/`Middle`/`Below`/`StemTip` |
-| triplet     | `boolean`               | Make this note part of triplet |
-
+| triplet     | `boolean`               | Make this note part of triplet. |
+| string      | `number` \| `number[]`  | What string does the note fret number belong to in guitar tab. Array of strings for chord. |
 
 ### Add Rest
 
