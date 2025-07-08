@@ -156,12 +156,11 @@ export class ObjScoreRow extends MusicObject {
 
     getPitchY(pitch: number): number {
         let y = this.staves[0]?.getPitchY(pitch) ?? this.staves[1]?.getPitchY(pitch);
-        return Assert.require(y, "Staff is required for getPitchY()!");
+        return Assert.require(y, "Pitch is out of staff on getPitchY()!");
     }
 
     getPitchAt(y: number): number | undefined {
-        let pitch = this.staves[0]?.getPitchAt(y) ?? this.staves[1]?.getPitchAt(y);
-        return Assert.require(pitch, "Staff is required for getPitchY()!");
+        return this.staves[0]?.getPitchAt(y) ?? this.staves[1]?.getPitchAt(y);
     }
 
     addMeasure(m: ObjMeasure) {
@@ -263,11 +262,9 @@ export class ObjScoreRow extends MusicObject {
 
         if (this.hasStaff && this.doc.needFullPitchRange()) {
             this.staves.forEach(staff => {
-                let top = staff.getPitchY(staff.maxPitch + 1);
-                let bottom = staff.getPitchY(staff.minPitch - 1);
-                if (top !== undefined && bottom !== undefined) {
-                    rect.expandInPlace(new DivRect(0, 0, top, bottom));
-                }
+                let top = staff.getPitchY(staff.maxPitch)! - staff.getLineSpacing();
+                let bottom = staff.getPitchY(staff.minPitch)! + staff.getLineSpacing();
+                rect.expandInPlace(new DivRect(0, 0, top, bottom));
             });
         }
 
