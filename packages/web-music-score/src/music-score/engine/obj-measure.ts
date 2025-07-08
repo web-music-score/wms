@@ -175,9 +175,8 @@ export class ObjMeasure extends MusicObject {
         let stemDir = this.useStemDir[voiceId];
 
         if (stemDir === Stem.Auto || stemDir === undefined) {
-
-            if (this.row.hasStaff) {
-                let staff = this.row.getClosestStaff(symbol.ownAvgPitch);
+            let staff = this.row.getStaff(symbol.ownAvgPitch);
+            if (staff) {
                 return symbol.ownAvgPitch > staff.middleLinePitch ? Stem.Down : Stem.Up;
             }
             else {

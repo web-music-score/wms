@@ -472,13 +472,13 @@ export class ObjNoteGroup extends MusicObject {
 
             if (stemDir === Stem.Up) {
                 let pitch = this.notes[0].pitch;
-                let staff = row.getClosestStaff(pitch);
-                dotY = this.row.getPitchY(pitch) + unitSize * (staff.isPitchLine(pitch) ? 3 : 2);
+                let staff = row.getStaff(pitch);
+                dotY = this.row.getPitchY(pitch) + unitSize * (staff && staff.isPitchLine(pitch) ? 3 : 2);
             }
             else {
                 let pitch = this.notes[this.notes.length - 1].pitch;
-                let staff = row.getClosestStaff(pitch);
-                dotY = this.row.getPitchY(pitch) - unitSize * (staff.isPitchLine(pitch) ? 3 : 2);
+                let staff = row.getStaff(pitch);
+                dotY = this.row.getPitchY(pitch) - unitSize * (staff && staff.isPitchLine(pitch) ? 3 : 2);
             }
 
             this.staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
@@ -806,8 +806,8 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getDotVerticalDisplacement(pitch: number, stemDir: Stem) {
-        let staff = this.row.getClosestStaff(pitch);
-        if (staff.isPitchLine(pitch)) {
+        let staff = this.row.getStaff(pitch);
+        if (staff && staff.isPitchLine(pitch)) {
             return stemDir === Stem.Up ? -1 : 1;
         }
         else {

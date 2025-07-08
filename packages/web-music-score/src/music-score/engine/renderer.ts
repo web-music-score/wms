@@ -444,13 +444,14 @@ export class Renderer {
     }
 
     drawLedgerLines(row: ObjScoreRow, pitch: number, x: number) {
-        if (!row.hasStaff) {
+        let staff = row.getStaff(pitch);
+
+        if (!staff) {
             return;
         }
 
         let { unitSize } = this;
 
-        let staff = row.getClosestStaff(pitch);
         let ledgerLineWidth = unitSize * DocumentSettings.LedgerLineWidth;
 
         if (pitch >= staff.topLinePitch + 2) {

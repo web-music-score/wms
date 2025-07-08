@@ -32,8 +32,6 @@ export class ObjScoreRow extends MusicObject {
 
     private readonly measures: ObjMeasure[] = [];
 
-    private readonly closestStaffCache: MusicStaff[/* pitch */] = [];
-
     private needLayout = true;
 
     readonly mi: MScoreRow;
@@ -107,27 +105,30 @@ export class ObjScoreRow extends MusicObject {
         return Assert.require(this.staves[this.staves.length - 1], "Bottom staff line is required!");
     }
 
-    getClosestStaff(pitch: number): MusicStaff {
-        Assert.assert(this.hasStaff, "Staff line is required for getClosestStaff()!");
-
+    getStaff(pitch: number): MusicStaff | undefined {
         Note.validatePitch(pitch);
 
-        if (this.closestStaffCache[pitch] === undefined) {
-            let closestDistToPitch = Math.abs(pitch - this.staves[0].middleLinePitch);
-            let closestStaff = this.staves[0];
-
-            for (let i = 1; i < this.staves.length; i++) {
-                let dist = Math.abs(pitch - this.staves[i].middleLinePitch);
-                if (dist < closestDistToPitch) {
-                    closestDistToPitch = dist;
-                    closestStaff = this.staves[i];
-                }
+        for (let i = 1; i < this.staves.length; i++) {
+            let staff = this.staves[i];
+            if (pitch >= staff.minPitch && pitch <= staff.maxPitch) {
+                return staff;
             }
-
-            this.closestStaffCache[pitch] = closestStaff;
         }
 
-        return this.closestStaffCache[pitch];
+        return undefined;
+    }
+
+    getLowestNotePitch(): number | undefined {
+        if (!this.hasStaff) {
+            return undefined;
+        }
+        else if (this.doc.needFullPitchRange()) {
+            return this.getBottomStaff().minPitch;
+        }
+        else {
+            let pitch = this.getBottomStaff().bottomLinePitch;
+            return Math.min(pitch, ...this.measures.map(m => m.getLowestNotePitch(pitch)));
+        }
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -197,19 +198,6 @@ export class ObjScoreRow extends MusicObject {
 
     getMinWidth() {
         return this.minWidth;
-    }
-
-    getLowestNotePitch(): number | undefined {
-        if (!this.hasStaff) {
-            return undefined;
-        }
-        else if (this.doc.needFullPitchRange()) {
-            return this.getBottomStaff().minPitch;
-        }
-        else {
-            let pitch = this.getBottomStaff().bottomLinePitch;
-            return Math.min(pitch, ...this.measures.map(m => m.getLowestNotePitch(pitch)));
-        }
     }
 
     requestLayout() {
