@@ -41,22 +41,22 @@ export class MusicStaff {
         return this.getLineSpacing() / 2;
     }
 
-    getPitchY(pitch: number): number | undefined {
+    containsPitch(pitch: number): boolean {
         Note.validatePitch(pitch);
 
-        if (pitch < this.minPitch || pitch > this.maxPitch) {
-            return undefined;
-        }
+        return pitch >= this.minPitch && pitch <= this.maxPitch;
+    }
 
-        return this.bottomLineY + (this.bottomLinePitch - pitch) * this.getPitchSpacing();
+    getPitchY(pitch: number): number | undefined {
+        return this.containsPitch(pitch)
+            ? this.bottomLineY + (this.bottomLinePitch - pitch) * this.getPitchSpacing()
+            : undefined;
     }
 
     getPitchAt(y: number): number | undefined {
         let pitch = Math.round(this.bottomLinePitch - (y - this.bottomLineY) / this.getPitchSpacing());
 
-        return pitch < this.minPitch || pitch > this.maxPitch
-            ? undefined
-            : Note.validatePitch(pitch)
+        return this.containsPitch(pitch) ? pitch : undefined;
     }
 
     isPitchLine(pitch: number) {

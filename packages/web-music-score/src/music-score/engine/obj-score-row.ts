@@ -108,9 +108,9 @@ export class ObjScoreRow extends MusicObject {
     getStaff(pitch: number): MusicStaff | undefined {
         Note.validatePitch(pitch);
 
-        for (let i = 1; i < this.staves.length; i++) {
+        for (let i = 0; i < this.staves.length; i++) {
             let staff = this.staves[i];
-            if (pitch >= staff.minPitch && pitch <= staff.maxPitch) {
+            if (staff.containsPitch(pitch)) {
                 return staff;
             }
         }
@@ -156,12 +156,21 @@ export class ObjScoreRow extends MusicObject {
     }
 
     getPitchY(pitch: number): number {
-        let y = this.staves[0]?.getPitchY(pitch) ?? this.staves[1]?.getPitchY(pitch);
-        return Assert.require(y, "Pitch is out of staff on getPitchY()!");
+        let y = this.getStaff(pitch)?.getPitchY(pitch);
+
+        return Assert.require(y, "y is required in getPitchY().");
     }
 
     getPitchAt(y: number): number | undefined {
-        return this.staves[0]?.getPitchAt(y) ?? this.staves[1]?.getPitchAt(y);
+        for (let i = 0; i < this.staves.length; i++) {
+            let pitch = this.staves[i].getPitchAt(y);
+
+            if (pitch !== undefined) {
+                return pitch;
+            }
+        }
+
+        return undefined;
     }
 
     addMeasure(m: ObjMeasure) {
