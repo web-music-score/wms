@@ -9,7 +9,6 @@ export function createGuitarTrebleAndTabDemo() {
         .setKeySignature("C", Score.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(60)
-        .addRest(0, Score.NoteLength.Eighth, { hide: true }) // FIXME Kohotahti pakit menee väärin.
         .addNote(0, "G3", Score.NoteLength.Eighth, { string: 3 })
         .addNote(0, "G3", Score.NoteLength.Eighth, { string: 3 })
         .addNote(0, "C4", Score.NoteLength.Eighth, { string: 2 });

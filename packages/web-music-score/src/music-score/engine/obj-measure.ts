@@ -118,6 +118,10 @@ export class ObjMeasure extends MusicObject {
         return this.getConsumedTicks() < this.getMeasureTicks();
     }
 
+    isUpBeat() {
+        return this === this.doc.getFirstMeasure();
+    }
+
     resetPassCount() {
         this.passCount = 0;
     }
@@ -863,7 +867,7 @@ export class ObjMeasure extends MusicObject {
             let symbols = this.getVoiceSymbols(voiceId);
 
             ObjMeasure.createTriplets(symbols);
-            ObjMeasure.createBeams(symbols, ts);
+            ObjMeasure.createBeams(this, symbols, ts);
         });
 
         this.needBeamsUpdate = false;
@@ -871,7 +875,7 @@ export class ObjMeasure extends MusicObject {
         this.requestLayout();
     }
 
-    private static createBeams(symbols: ReadonlyArray<RhythmSymbol>, ts: TimeSignature) {
+    private static createBeams(measure: ObjMeasure, symbols: ReadonlyArray<RhythmSymbol>, ts: TimeSignature) {
         if (DebugSettings.DisableBeams || symbols.length < 2) {
             return;
         }
@@ -879,6 +883,12 @@ export class ObjMeasure extends MusicObject {
         let groupSymbols: RhythmSymbol[] = [];
         let groupStartTicks = 0;
         let groupEndTicks = 0;
+
+        // Is upbeat? Set starting ticks position.
+        if (measure.isUpBeat()) {
+            let startTicks = Math.max(0, measure.getMeasureTicks() - measure.getConsumedTicks());
+            groupStartTicks = groupEndTicks = startTicks;
+        }
 
         symbols.forEach(symbol => {
             groupSymbols.push(symbol);
