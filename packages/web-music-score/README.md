@@ -282,6 +282,26 @@ First argument is extension length, of type number. `NoteLength` values can be u
 
 Second argument is `true`/`false` whether extension line is visible. This argument cvan be omitted, extension line is visible by default.
 
+### Guitar Tab
+
+Has preliminary support for rendering guitar tabs. 
+Create document with `StaffKind.GuitarTab` or `StaffKind.GuitarTrebleAndTab`, and specify tuning (optional, defaults to Standard tuning):
+
+```js
+let doc = new Score.MDocument(Score.StaffKind.GuitarTrebleAndTab, { tuning: "Standard" });
+```
+
+Add notes with `string` option to specify which string the fret number is rendered in tab view.
+
+```js
+// Single note
+m.addNote(0, "G3", Score.NoteLength.Eighth, { string: 3 });
+
+// Multi note
+m.addChord(0, ["E4", "C3"], Score.NoteLength.Eighth, { string: [1, 5] });
+```
+
+
 ### Queueing
 
 Adding stuff to measures can be queued like this:
