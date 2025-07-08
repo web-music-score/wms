@@ -74,9 +74,10 @@ export class LayoutObjectWrapper {
 
     resolveClosestToStaffY(renderer: Renderer): number {
         let { musicObj, measure, verticalPos } = this;
+        let { row } = measure;
 
-        let staffTop = measure.row.getTopStaffTop();
-        let staffBottom = measure.row.getBottomStaffBottom();
+        let staffTop = row.hasStaff ? row.getTopStaff().topLineY : row.getRect().centerY;
+        let staffBottom = row.hasStaff ? row.getBottomStaff().bottomLineY : row.getRect().centerY;
         let staffPadding = renderer.unitSize * 2;
 
         let y = verticalPos === VerticalPos.BelowStaff

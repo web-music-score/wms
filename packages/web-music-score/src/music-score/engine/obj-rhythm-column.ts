@@ -363,8 +363,8 @@ export class ObjRhythmColumn extends MusicObject {
         });
 
         if (initRect) {
-            let staffTop = row.hasStaff ? row.getTopStaffTop() : 0;
-            let staffBottom = row.hasStaff ? row.getBottomStaffBottom() : 0;
+            let staffTop = row.hasStaff ? row.getTopStaff().topLineY : 0;
+            let staffBottom = row.hasStaff ? row.getBottomStaff().bottomLineY : 0;
 
             this.rect = new DivRect(-halfMinWidth, 0, halfMinWidth, (staffTop + staffBottom) / 2, 0, (staffTop + staffBottom) / 2);
         }

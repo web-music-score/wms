@@ -199,18 +199,6 @@ export class ObjScoreRow extends MusicObject {
         return this.minWidth;
     }
 
-    getTopStaffTop(): number {
-        return this.hasStaff
-            ? this.getPitchY(this.getTopStaff().topLinePitch)
-            : (this.tab ? this.tab.top : 0);
-    }
-
-    getBottomStaffBottom(): number {
-        return this.hasStaff
-            ? this.getPitchY(this.getBottomStaff().bottomLinePitch)
-            : (this.tab ? this.tab.top : 0);
-    }
-
     getLowestNotePitch(): number | undefined {
         if (!this.hasStaff) {
             return undefined;
