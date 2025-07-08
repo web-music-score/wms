@@ -155,12 +155,6 @@ export class ObjScoreRow extends MusicObject {
         return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.centerY, r.bottom);
     }
 
-    getPitchY(pitch: number): number {
-        let y = this.getStaff(pitch)?.getPitchY(pitch);
-
-        return Assert.require(y, "y is required in getPitchY().");
-    }
-
     getPitchAt(y: number): number | undefined {
         for (let i = 0; i < this.staves.length; i++) {
             let pitch = this.staves[i].getPitchAt(y);
@@ -247,17 +241,16 @@ export class ObjScoreRow extends MusicObject {
 
         if (this.hasStaff && this.doc.needFullPitchRange()) {
             this.staves.forEach(staff => {
-                let top = staff.getPitchY(staff.maxPitch)! - staff.getLineSpacing();
-                let bottom = staff.getPitchY(staff.minPitch)! + staff.getLineSpacing();
+                let top = staff.getPitchY(staff.maxPitch) - staff.getLineSpacing();
+                let bottom = staff.getPitchY(staff.minPitch) + staff.getLineSpacing();
                 rect.expandInPlace(new DivRect(0, 0, top, bottom));
             });
         }
 
         if (this.tab) {
             let lowestPitch = this.getLowestNotePitch();
-            this.tab.top = lowestPitch !== undefined
-                ? this.getPitchY(lowestPitch) + unitSize * 8
-                : 0;
+            let lowestY = lowestPitch !== undefined ? this.getStaff(lowestPitch)?.getPitchY(lowestPitch) : undefined;
+            this.tab.top = lowestY !== undefined ? lowestY + unitSize * 8 : 0;
             this.tab.bottom = this.tab.top + unitSize * DocumentSettings.GuitarTabHeight;
             rect.expandInPlace(new DivRect(0, 0, this.tab.top, this.tab.bottom));
         }
@@ -444,8 +437,8 @@ export class ObjScoreRow extends MusicObject {
             let top: number, bottom: number;
 
             if (this.hasStaff) {
-                top = this.getPitchY(this.getTopStaff().topLinePitch);
-                bottom = this.tab ? this.tab.getStringY(5) : this.getPitchY(this.getBottomStaff().bottomLinePitch);
+                top = this.getTopStaff().topLineY;
+                bottom = this.tab ? this.tab.getStringY(5) : this.getBottomStaff().bottomLineY;
             }
             else if (this.tab) {
                 top = this.tab.getStringY(0);

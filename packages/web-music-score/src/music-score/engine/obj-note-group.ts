@@ -439,9 +439,10 @@ export class ObjNoteGroup extends MusicObject {
         let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;
 
         this.notes.forEach((note, noteId) => {
-            if (this.staffObjs) {
+            let staff = row.getStaff(note.pitch);
+            if (this.staffObjs && staff) {
                 let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                let noteY = this.row.getPitchY(note.pitch);
+                let noteY = staff.getPitchY(note.pitch);
 
                 // Setup note head
                 let noteHeadRect = this.staffObjs.noteHeadRects[noteId] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
@@ -468,26 +469,33 @@ export class ObjNoteGroup extends MusicObject {
         // Add staccato dot
         if (this.staccato && this.staffObjs) {
             let dotX = this.staffObjs.noteHeadRects[0].centerX;
-            let dotY = 0;
 
             if (stemDir === Stem.Up) {
-                let pitch = this.notes[0].pitch;
+                let pitch = this.getBottomNote().pitch;
                 let staff = row.getStaff(pitch);
-                dotY = this.row.getPitchY(pitch) + unitSize * (staff && staff.isPitchLine(pitch) ? 3 : 2);
+                if (staff) {
+                    let dotY = staff.getPitchY(pitch) + unitSize * (staff.isPitchLine(pitch) ? 3 : 2);
+                    this.staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                }
             }
             else {
-                let pitch = this.notes[this.notes.length - 1].pitch;
+                let pitch = this.getTopNote().pitch;
                 let staff = row.getStaff(pitch);
-                dotY = this.row.getPitchY(pitch) - unitSize * (staff && staff.isPitchLine(pitch) ? 3 : 2);
+                if (staff) {
+                    let dotY = staff.getPitchY(pitch) - unitSize * (staff.isPitchLine(pitch) ? 3 : 2);
+                    this.staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                }
             }
-
-            this.staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
         }
 
         if (this.staffObjs) {
             // Calculate stem
-            let bottomNoteY = this.row.getPitchY(this.getBottomNote().pitch);
-            let topNoteY = this.row.getPitchY(this.getTopNote().pitch);
+            let bottomNoteY = row.getStaff(this.getBottomNote().pitch)?.getPitchY(this.getBottomNote().pitch);
+            let topNoteY = row.getStaff(this.getTopNote().pitch)?.getPitchY(this.getTopNote().pitch);
+
+            if (bottomNoteY === undefined || topNoteY === undefined) {
+                Assert.interrupt("Top or bottom note is undefined!");
+            }
 
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
 

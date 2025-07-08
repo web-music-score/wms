@@ -185,9 +185,8 @@ export class ObjRest extends MusicObject {
         let staff = this.row.getStaff(restPitch);
         if (staff && staff.isPitchSpace(restPitch)) {
             restPitch += restPitch >= staff.middleLinePitch ? 1 : -1;
+            this.offset(0, staff.getPitchY(restPitch));
         }
-
-        this.offset(0, this.row.getPitchY(restPitch));
     }
 
     offset(dx: number, dy: number) {

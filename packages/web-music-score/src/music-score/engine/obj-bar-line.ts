@@ -48,10 +48,8 @@ abstract class ObjBarLine extends MusicObject {
         let top: number, bottom: number;
 
         if (row.hasStaff) {
-            top = row.getPitchY(row.getTopStaff().topLinePitch);
-            bottom = tab
-                ? bottom = tab.getStringY(5)
-                : row.getPitchY(row.getBottomStaff().bottomLinePitch);
+            top = row.getTopStaff().topLineY;
+            bottom = tab ? tab.getStringY(5) : row.getBottomStaff().bottomLineY;
         }
         else {
             // hasTab is true

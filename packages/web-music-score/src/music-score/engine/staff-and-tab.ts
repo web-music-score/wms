@@ -1,3 +1,4 @@
+import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "../../music-theory/note";
 import { ImageAsset } from "./renderer";
 
@@ -47,10 +48,10 @@ export class MusicStaff {
         return pitch >= this.minPitch && pitch <= this.maxPitch;
     }
 
-    getPitchY(pitch: number): number | undefined {
-        return this.containsPitch(pitch)
-            ? this.bottomLineY + (this.bottomLinePitch - pitch) * this.getPitchSpacing()
-            : undefined;
+    getPitchY(pitch: number): number {
+        Assert.assert(this.containsPitch(pitch), "getPitchY: staff does not contain pitch " + pitch);
+
+        return this.bottomLineY + (this.bottomLinePitch - pitch) * this.getPitchSpacing();
     }
 
     getPitchAt(y: number): number | undefined {

@@ -209,7 +209,7 @@ export class ObjSignature extends MusicObject {
 
     layout(renderer: Renderer) {
         let { unitSize } = renderer;
-        let { measure } = this;
+        let { measure, staff } = this;
         let { row } = measure;
 
         let paddingX = unitSize;
@@ -221,7 +221,7 @@ export class ObjSignature extends MusicObject {
         if (this.clefImage) {
             x += paddingX;
             this.clefImage.layout(renderer);
-            this.clefImage.offset(x, row.getPitchY(this.staff.clefLinePitch));
+            this.clefImage.offset(x, staff.getPitchY(staff.clefLinePitch));
             this.rect.expandInPlace(this.clefImage.getRect());
             x = this.rect.right;
 
@@ -235,7 +235,7 @@ export class ObjSignature extends MusicObject {
 
         if (this.measureNumber) {
             this.measureNumber.layout(renderer);
-            let y = this.clefImage ? this.clefImage.getRect().top : row.getPitchY(this.staff.topLinePitch);
+            let y = this.clefImage ? this.clefImage.getRect().top : staff.topLineY;
             this.measureNumber.offset(0, y);
             this.rect.expandInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
@@ -245,10 +245,13 @@ export class ObjSignature extends MusicObject {
             x += paddingX;
 
             this.ksNeutralizeAccidentals.forEach(acc => {
-                acc.obj.layout(renderer);
-                acc.obj.offset(x + acc.obj.getRect().leftw, row.getPitchY(acc.pitch));
-                this.rect.expandInPlace(acc.obj.getRect());
-                x = this.rect.right;
+                let accStaff = row.getStaff(acc.pitch);
+                if (accStaff) {
+                    acc.obj.layout(renderer);
+                    acc.obj.offset(x + acc.obj.getRect().leftw, accStaff.getPitchY(acc.pitch));
+                    this.rect.expandInPlace(acc.obj.getRect());
+                    x = this.rect.right;
+                }
             });
         }
 
@@ -256,10 +259,13 @@ export class ObjSignature extends MusicObject {
             x += paddingX;
 
             this.ksNewAccidentals.forEach(acc => {
-                acc.obj.layout(renderer);
-                acc.obj.offset(x + acc.obj.getRect().leftw, row.getPitchY(acc.pitch));
-                this.rect.expandInPlace(acc.obj.getRect());
-                x = this.rect.right;
+                let accStaff = row.getStaff(acc.pitch);
+                if (accStaff) {
+                    acc.obj.layout(renderer);
+                    acc.obj.offset(x + acc.obj.getRect().leftw, accStaff.getPitchY(acc.pitch));
+                    this.rect.expandInPlace(acc.obj.getRect());
+                    x = this.rect.right;
+                }
             });
         }
 
@@ -267,14 +273,14 @@ export class ObjSignature extends MusicObject {
 
         if (this.beatCountText) {
             this.beatCountText.layout(renderer);
-            this.beatCountText.offset(x + paddingX, row.getPitchY(this.staff.middleLinePitch + 2));
+            this.beatCountText.offset(x + paddingX, staff.getPitchY(staff.middleLinePitch + 2));
             this.rect.expandInPlace(this.beatCountText.getRect());
             right = Math.max(right, this.rect.right);
         }
 
         if (this.beatSizeText) {
             this.beatSizeText.layout(renderer);
-            this.beatSizeText.offset(x + paddingX, row.getPitchY(this.staff.bottomLinePitch + 2));
+            this.beatSizeText.offset(x + paddingX, staff.getPitchY(staff.bottomLinePitch + 2));
             this.rect.expandInPlace(this.beatSizeText.getRect());
             right = Math.max(right, this.rect.right);
         }
@@ -283,7 +289,7 @@ export class ObjSignature extends MusicObject {
 
         if (this.tempoText) {
             this.tempoText.layout(renderer);
-            this.tempoText.offset(x, Math.min(this.rect.top, row.getPitchY(this.staff.topLinePitch)));
+            this.tempoText.offset(x, Math.min(this.rect.top, staff.topLineY));
             this.rect.expandInPlace(this.tempoText.getRect());
         }
 

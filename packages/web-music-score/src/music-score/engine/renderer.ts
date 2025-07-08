@@ -311,13 +311,14 @@ export class Renderer {
 
         let { measure, pitch } = hilightPitch;
         let { row } = measure.getMusicObject();
+        let staff = row.getStaff(pitch);
 
-        if (!row.hasStaff) {
+        if (!staff) {
             return;
         }
 
         ctx.fillStyle = HilightPitchRectColor;
-        ctx.fillRect(0, row.getPitchY(pitch) - unitSize, ctx.canvas.width, 2 * unitSize);
+        ctx.fillRect(0, staff.getPitchY(pitch) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
             this.drawLedgerLines(row, pitch, mousePos.x);
@@ -456,14 +457,18 @@ export class Renderer {
 
         if (pitch >= staff.topLinePitch + 2) {
             for (let linePitch = staff.topLinePitch + 2; linePitch <= pitch; linePitch += 2) {
-                let y = row.getPitchY(linePitch);
-                this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
+                if (staff.containsPitch(linePitch)) {
+                    let y = staff.getPitchY(linePitch);
+                    this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
+                }
             }
         }
         else if (pitch <= staff.bottomLinePitch - 2) {
             for (let linePitch = staff.bottomLinePitch - 2; linePitch >= pitch; linePitch -= 2) {
-                let y = row.getPitchY(linePitch);
-                this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
+                if (staff.containsPitch(linePitch)) {
+                    let y = staff.getPitchY(linePitch);
+                    this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
+                }
             }
         }
     }
