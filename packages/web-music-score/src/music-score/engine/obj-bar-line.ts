@@ -3,6 +3,7 @@ import { Renderer } from "./renderer";
 import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, DivRect } from "../pub";
 import { PlayerColumnProps } from "./player";
+import { DocumentSettings } from "./settings";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
@@ -32,7 +33,7 @@ abstract class ObjBarLine extends MusicObject {
         let thinW = lineWidth;
         let thicW = 0.7 * unitSize;
         let spaceW = 0.7 * unitSize;
-        let dotW = Renderer.DotSize * unitSize;
+        let dotW = DocumentSettings.DotSize * unitSize;
         let dotRadius = dotW / 2;
 
         let lineCenterYs = row.getStaves().map(staff => staff.middleLineY);

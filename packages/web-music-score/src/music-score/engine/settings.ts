@@ -16,6 +16,8 @@ export const DocumentSettings = {
     NoteHeadHeight: 1.3,
     DiamondNoteHeadSize: 1.8,
 
+    DotSize: 0.8,
+
     StemHeight: 7, // One octave
 
     FlagWidth: 1.5,

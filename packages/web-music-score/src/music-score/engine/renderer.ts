@@ -24,8 +24,6 @@ const ImageAssets = new Map<ImageAsset, ImageAssetData>([
 ]);
 
 export class Renderer {
-    static readonly DotSize = 0.8;
-
     readonly devicePixelRatio: number;
 
     readonly fontSize: number;

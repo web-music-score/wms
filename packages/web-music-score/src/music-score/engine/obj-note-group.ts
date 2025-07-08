@@ -433,7 +433,7 @@ export class ObjNoteGroup extends MusicObject {
             this.tabObjs.fretNumbers = [];
         }
 
-        let dotWidth = Renderer.DotSize * unitSize;
+        let dotWidth = DocumentSettings.DotSize * unitSize;
 
         let noteHeadWidth = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadWidth) * unitSize;
         let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;

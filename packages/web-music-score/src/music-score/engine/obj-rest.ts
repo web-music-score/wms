@@ -165,16 +165,16 @@ export class ObjRest extends MusicObject {
         }
 
         if (dotted) {
-            let dotWidth = Renderer.DotSize * unitSize;
+            let dotWidth = DocumentSettings.DotSize * unitSize;
 
-            let dotX = rightw + (DocumentSettings.RestDotSpace + Renderer.DotSize / 2) * unitSize;
+            let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize / 2) * unitSize;
             let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
             this.staffObjs.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
 
             toph = Math.max(toph, this.staffObjs.dotRect.toph);
             bottomh = Math.max(bottomh, this.staffObjs.dotRect.bottomh);
-            rightw += (DocumentSettings.RestDotSpace + Renderer.DotSize) * unitSize;
+            rightw += (DocumentSettings.RestDotSpace + DocumentSettings.DotSize) * unitSize;
         }
 
         this.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
