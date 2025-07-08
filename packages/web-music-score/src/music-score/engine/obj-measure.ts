@@ -866,45 +866,59 @@ export class ObjMeasure extends MusicObject {
         ObjMeasure.VoiceIdList.forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId);
 
-            ObjMeasure.createTriplets(symbols);
-            ObjMeasure.createBeams(this, symbols, ts);
+            if (symbols.length <= 2) {
+                return;
+            }
+
+            // Create triplets
+            for (let i = 0; i < symbols.length;) {
+                let s2 = symbols.slice(i, i + 2);
+                let s3 = symbols.slice(i, i + 3);
+
+                if (s2.length === 2 && ObjBeamGroup.createTriplet(s2)) {
+                    i += 2;
+                }
+                else if (s3.length === 3 && ObjBeamGroup.createTriplet(s3)) {
+                    i += 3;
+                }
+                else {
+                    i++;
+                }
+            }
+
+            // Create beams
+            if (!DebugSettings.DisableBeams) {
+                let groupSymbols: RhythmSymbol[] = [];
+                let groupStartTicks = 0;
+                let groupEndTicks = 0;
+
+                // Is upbeat? Set starting ticks position.
+                if (this.isUpBeat()) {
+                    let startTicks = Math.max(0, this.getMeasureTicks() - this.getConsumedTicks());
+                    groupStartTicks = groupEndTicks = startTicks;
+                }
+
+                symbols.forEach(symbol => {
+                    groupSymbols.push(symbol);
+
+                    groupEndTicks += symbol.rhythmProps.ticks;
+
+                    if (groupStartTicks === 0 && groupEndTicks === ts.beamGroupLength) {
+                        // Perfect group, setup beams
+                        ObjMeasure.setupBeamGroup(groupSymbols);
+                    }
+
+                    while (groupEndTicks >= ts.beamGroupLength) {
+                        groupSymbols = [];
+                        groupStartTicks = groupEndTicks = groupEndTicks - ts.beamGroupLength;
+                    }
+                });
+            }
         });
 
         this.needBeamsUpdate = false;
 
         this.requestLayout();
-    }
-
-    private static createBeams(measure: ObjMeasure, symbols: ReadonlyArray<RhythmSymbol>, ts: TimeSignature) {
-        if (DebugSettings.DisableBeams || symbols.length < 2) {
-            return;
-        }
-
-        let groupSymbols: RhythmSymbol[] = [];
-        let groupStartTicks = 0;
-        let groupEndTicks = 0;
-
-        // Is upbeat? Set starting ticks position.
-        if (measure.isUpBeat()) {
-            let startTicks = Math.max(0, measure.getMeasureTicks() - measure.getConsumedTicks());
-            groupStartTicks = groupEndTicks = startTicks;
-        }
-
-        symbols.forEach(symbol => {
-            groupSymbols.push(symbol);
-
-            groupEndTicks += symbol.rhythmProps.ticks;
-
-            if (groupStartTicks === 0 && groupEndTicks === ts.beamGroupLength) {
-                // Perfect group, setup beams
-                ObjMeasure.setupBeamGroup(groupSymbols);
-            }
-
-            while (groupEndTicks >= ts.beamGroupLength) {
-                groupSymbols = [];
-                groupStartTicks = groupEndTicks = groupEndTicks - ts.beamGroupLength;
-            }
-        });
     }
 
     private static setupBeamGroup(groupSymbols: RhythmSymbol[]) {
@@ -928,23 +942,6 @@ export class ObjMeasure extends MusicObject {
         });
 
         ObjBeamGroup.createBeam(beamNotes);
-    }
-
-    private static createTriplets(symbols: ReadonlyArray<RhythmSymbol>) {
-        for (let i = 0; i < symbols.length;) {
-            let s2 = symbols.slice(i, i + 2);
-            let s3 = symbols.slice(i, i + 3);
-
-            if (s2.length === 2 && ObjBeamGroup.createTriplet(s2)) {
-                i += 2;
-            }
-            else if (s3.length === 3 && ObjBeamGroup.createTriplet(s3)) {
-                i += 3;
-            }
-            else {
-                i++;
-            }
-        }
     }
 
     static validateVoiceId(voiceId: number): number {
