@@ -861,8 +861,6 @@ export class ObjMeasure extends MusicObject {
         this.beamGroups = [];
 
         // Recreate beams/triplets
-        let ts = this.getTimeSignature();
-
         ObjMeasure.VoiceIdList.forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId);
 
@@ -897,6 +895,8 @@ export class ObjMeasure extends MusicObject {
                     let startTicks = Math.max(0, this.getMeasureTicks() - this.getConsumedTicks());
                     groupStartTicks = groupEndTicks = startTicks;
                 }
+
+                let ts = this.getTimeSignature();
 
                 symbols.forEach(symbol => {
                     groupSymbols.push(symbol);
