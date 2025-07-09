@@ -177,20 +177,27 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getArcAnchorPoint(note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } | undefined {
-        if (!this.staffObjs) {
-            return undefined;
-        }
-
-        let hasStem = !!this.staffObjs.stemRect;
-        let stemSide: "left" | "right" | undefined = !hasStem ? undefined : (this.stemDir === Stem.Up ? "right" : "left");
-        let stemDir = this.stemDir;
-
+    getArcAnchorPoint(note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } {
         let noteId = this.notes.findIndex(note2 => note2.equals(note));
 
-        if (noteId < 0) {
-            return undefined;
+        if (!this.staffObjs || noteId < 0 || noteId >= this.staffObjs.noteHeadRects.length) {
+            let r = this.getRect();
+            return { x: r.centerX, y: r.bottom }
         }
+
+        let noteHeadRect = this.staffObjs.noteHeadRects[noteId];
+        let stemRect = this.staffObjs.stemRect;
+        let stemDir = this.stemDir;
+        let hasStem = stemRect !== undefined;
+        let stemSide: "left" | "right" | undefined = !hasStem ? undefined : (stemDir === Stem.Up ? "right" : "left");
+
+        let padding = noteHeadRect.height / 2;
+        let centerX = noteHeadRect.centerX;
+        let centerY = noteHeadRect.centerY;
+        let leftX = noteHeadRect.left - padding;
+        let rightX = noteHeadRect.right + padding;
+        let aboveY = noteHeadRect.top - padding;
+        let belowY = noteHeadRect.bottom + padding;
 
         if (arcPos === ArcPos.Auto) {
             arcPos = ArcPos.Below;
@@ -199,57 +206,40 @@ export class ObjNoteGroup extends MusicObject {
             arcPos = stemDir === Stem.Up ? ArcPos.Above : ArcPos.Below;
         }
 
-        let r = this.staffObjs.noteHeadRects[noteId];
-
-        if (!r) {
-            return undefined;
-        }
-
-        let padding = r.height / 2;
-        let centerX = r.centerX;
-        let centerY = r.centerY;
-        let leftX = r.left - padding;
-        let rightX = r.right + padding;
-        let aboveY = r.top - padding;
-        let belowY = r.bottom + padding;
-
-        if (arcPos === ArcPos.Middle) {
-            return side === "left" ? { x: rightX, y: centerY } : { x: leftX, y: centerY };
-        }
-        else if (arcPos === ArcPos.Above) {
-            if (!hasStem || stemDir === Stem.Down) {
-                return { x: centerX, y: aboveY }
-            }
-            else {
-                return {
-                    x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : centerX),
-                    y: aboveY
+        switch (arcPos) {
+            case ArcPos.Middle:
+                return side === "left" ? { x: rightX, y: centerY } : { x: leftX, y: centerY };
+            case ArcPos.Above:
+                if (!hasStem || stemDir === Stem.Down) {
+                    return { x: centerX, y: aboveY }
                 }
-            }
-        }
-        else if (arcPos === ArcPos.Below) {
-            if (!hasStem || stemDir === Stem.Up) {
-                return { x: centerX, y: belowY }
-            }
-            else {
-                return {
-                    x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : centerX),
-                    y: belowY
+                else {
+                    return {
+                        x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : centerX),
+                        y: aboveY
+                    }
                 }
-            }
+            case ArcPos.Below:
+                if (!hasStem || stemDir === Stem.Up) {
+                    return { x: centerX, y: belowY }
+                }
+                else {
+                    return {
+                        x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : centerX),
+                        y: belowY
+                    }
+                }
+            case ArcPos.StemTip:
+                // stemRect is defined.
+                if (stemDir === Stem.Up) {
+                    return { x: centerX, y: stemRect!.top - padding }
+                }
+                else if (stemDir === Stem.Down) {
+                    return { x: centerX, y: stemRect!.bottom + padding }
+                }
+            default:
+                Assert.interrupt("Invalid arcPos: " + arcPos);
         }
-        else if (arcPos === ArcPos.StemTip) {
-            let stemRect = Assert.require(this.staffObjs.stemRect, "Cannot get stem tip arc anchort point because this note group has no stem.");
-
-            if (this.stemDir === Stem.Up) {
-                return { x: centerX, y: stemRect.top - padding }
-            }
-            else if (this.stemDir === Stem.Down) {
-                return { x: centerX, y: stemRect.bottom + padding }
-            }
-        }
-
-        return undefined;
     }
 
     getPrevNoteGroup(): ObjNoteGroup | undefined {
