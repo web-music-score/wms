@@ -4,7 +4,7 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, ArcPos, TieLength, StringNumber } from "../pub";
-import { CollectedArcData } from "./arc-data";
+import { ArcProps } from "./arc-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
@@ -61,8 +61,8 @@ export class ObjNoteGroup extends MusicObject {
     readonly arcPos: ArcPos;
     readonly rhythmProps: RhythmProps;
 
-    private tieDatas: CollectedArcData[] = [];
-    private slurDatas: CollectedArcData[] = [];
+    private tieDatas: ArcProps[] = [];
+    private slurDatas: ArcProps[] = [];
 
     private leftBeamCount = 0;
     private rightBeamCount = 0;
@@ -266,13 +266,13 @@ export class ObjNoteGroup extends MusicObject {
         return undefined;
     }
 
-    collectArcDatas() {
+    collectArcProps() {
         if (this.tieSpan !== undefined) {
-            this.tieDatas.push(new CollectedArcData("tie", this.tieSpan, this.arcPos, this));
+            this.tieDatas.push(new ArcProps("tie", this.tieSpan, this.arcPos, this));
         }
 
         if (this.slurSpan !== undefined) {
-            this.slurDatas.push(new CollectedArcData("slur", this.slurSpan, this.arcPos, this));
+            this.slurDatas.push(new ArcProps("slur", this.slurSpan, this.arcPos, this));
         }
 
         let prevNoteGroup = this.getPrevNoteGroup();

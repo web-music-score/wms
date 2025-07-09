@@ -4,7 +4,7 @@ import { Note } from "../../music-theory/note";
 import { ArcPos, Stem, TieLength } from "../pub/types";
 import { Assert } from "@tspro/ts-utils-lib";
 
-export class CollectedArcData {
+export class ArcProps {
     noteGroups: ObjNoteGroup[] = [];
     arcDir: "up" | "down" = "down";
 
@@ -87,10 +87,10 @@ export class CollectedArcData {
                     let leftNoteGroup = this.noteGroups[i];
                     let rightNoteGroup = this.noteGroups[i + 1];
 
-                    leftNoteGroup.notes.forEach(note => {
-                        // Create arc from left to right only if note is found in all note-groups so far.
-                        if (this.noteGroups.every(noteGroup => noteGroup.notes.some(n => n.equals(note)))) {
-                            this.createObjArc(leftNoteGroup, note, rightNoteGroup, note);
+                    leftNoteGroup.notes.forEach(leftNote => {
+                        let rightNote = rightNoteGroup.notes.find(rightNote => rightNote.equals(leftNote));
+                        if (rightNote) {
+                            this.createObjArc(leftNoteGroup, leftNote, rightNoteGroup, leftNote);
                         }
                     });
                 }

@@ -700,7 +700,7 @@ export class ObjMeasure extends MusicObject {
     onAddRhythmColumn(col: ObjRhythmColumn) { }
 
     private onAddNoteGroup(noteGroup: ObjNoteGroup) {
-        noteGroup.collectArcDatas();
+        noteGroup.collectArcProps();
     }
 
     getMeasureTicks() {

@@ -2,7 +2,7 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
-import { CollectedArcData } from "./arc-data";
+import { ArcProps } from "./arc-props";
 import { Note } from "../../music-theory/note";
 import { ObjMeasure } from "./obj-measure";
 import { MArc, DivRect } from "../pub";
@@ -21,7 +21,6 @@ export class ObjArc extends MusicObject {
     private arcHeight = 0;
 
     private readonly measure: ObjMeasure;
-    private readonly arcData: CollectedArcData;
     private readonly leftNoteGroup: ObjNoteGroup;
     private readonly leftNote: Note;
     private readonly rightNoteGroup?: ObjNoteGroup;
@@ -31,14 +30,12 @@ export class ObjArc extends MusicObject {
 
     readonly mi: MArc;
 
-    constructor(arcData: CollectedArcData, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
-    constructor(arcData: CollectedArcData, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tieLength: TieLength);
-    constructor(arcData: CollectedArcData, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
+    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
+    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tieLength: TieLength);
+    constructor(readonly arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
         super(measure);
 
         this.measure = measure;
-
-        this.arcData = arcData;
 
         this.leftNoteGroup = leftNoteGroup;
         this.leftNote = leftNote;
@@ -63,16 +60,12 @@ export class ObjArc extends MusicObject {
         return this.mi;
     }
 
-    getArcData() {
-        return this.arcData;
-    }
-
     isTie() {
-        return this.arcData.arcType === "tie";
+        return this.arcProps.arcType === "tie";
     }
 
     isSlur() {
-        return this.arcData.arcType === "slur";
+        return this.arcProps.arcType === "slur";
     }
 
     isInsideMeasure() {
@@ -92,7 +85,7 @@ export class ObjArc extends MusicObject {
 
         let contentRect = row.getArcsContentRect();
 
-        let { arcPos, arcDir } = this.arcData;
+        let { arcPos, arcDir } = this.arcProps;
 
         let leftPos = leftNoteGroup.getArcAnchorPoint(leftNote, arcPos, "left");
 
