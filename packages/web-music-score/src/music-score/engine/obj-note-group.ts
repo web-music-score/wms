@@ -177,13 +177,9 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getArcAnchorPoint(renderer: Renderer, noteGroup: ObjNoteGroup, note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } | undefined {
+    getArcAnchorPoint(note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } | undefined {
         if (!this.staffObjs) {
             return undefined;
-        }
-
-        if (arcPos === ArcPos.Auto) {
-            arcPos = ArcPos.Below;
         }
 
         let hasStem = !!this.staffObjs.stemRect;
@@ -196,24 +192,26 @@ export class ObjNoteGroup extends MusicObject {
             return undefined;
         }
 
+        if (arcPos === ArcPos.Auto) {
+            arcPos = ArcPos.Below;
+        }
+        else if (arcPos === ArcPos.StemTip && !hasStem) {
+            arcPos = stemDir === Stem.Up ? ArcPos.Above : ArcPos.Below;
+        }
+
         let r = this.staffObjs.noteHeadRects[noteId];
 
         if (!r) {
             return undefined;
         }
 
-        let { unitSize } = renderer;
-
-        if (arcPos === ArcPos.StemTip && !hasStem) {
-            arcPos = this.stemDir === Stem.Up ? ArcPos.Above : ArcPos.Below;
-        }
-
+        let padding = r.height / 2;
         let centerX = r.centerX;
         let centerY = r.centerY;
-        let leftX = centerX - unitSize * 1.5;
-        let rightX = centerX + unitSize * 1.5;
-        let aboveY = centerY - unitSize * 1.5;
-        let belowY = centerY + unitSize * 1.5;
+        let leftX = r.left - padding;
+        let rightX = r.right + padding;
+        let aboveY = r.top - padding;
+        let belowY = r.bottom + padding;
 
         if (arcPos === ArcPos.Middle) {
             return side === "left" ? { x: rightX, y: centerY } : { x: leftX, y: centerY };
@@ -243,11 +241,11 @@ export class ObjNoteGroup extends MusicObject {
         else if (arcPos === ArcPos.StemTip) {
             let stemRect = Assert.require(this.staffObjs.stemRect, "Cannot get stem tip arc anchort point because this note group has no stem.");
 
-            if (noteGroup.stemDir === Stem.Up) {
-                return { x: centerX, y: stemRect.top - unitSize }
+            if (this.stemDir === Stem.Up) {
+                return { x: centerX, y: stemRect.top - padding }
             }
-            else if (noteGroup.stemDir === Stem.Down) {
-                return { x: centerX, y: stemRect.bottom + unitSize }
+            else if (this.stemDir === Stem.Down) {
+                return { x: centerX, y: stemRect.bottom + padding }
             }
         }
 
