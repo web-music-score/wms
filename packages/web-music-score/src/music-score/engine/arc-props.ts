@@ -75,12 +75,12 @@ export class ArcProps {
     }
 
     removeArcs() {
-        this.noteGroups.length = 1;
-
         this.noteGroups.forEach(n => {
             n.measure.removeArcObjects();
             n.removeArcProps();
         });
+
+        this.noteGroups.length = 1;
     }
 
     createArcs() {
