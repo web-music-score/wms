@@ -5,11 +5,19 @@ import { ArcPos, Stem, TieLength } from "../pub/types";
 import { Assert } from "@tspro/ts-utils-lib";
 
 export class ArcProps {
-    noteGroups: ObjNoteGroup[] = [];
+    noteGroups: ObjNoteGroup[];
     arcDir: "up" | "down" = "down";
 
     constructor(readonly arcType: "tie" | "slur", readonly arcSpan: number | TieLength, public arcPos: ArcPos, startNoteGroup: ObjNoteGroup) {
-        this.noteGroups.push(startNoteGroup);
+        this.noteGroups = [startNoteGroup];
+    }
+
+    getStartNoteGroup() {
+        return this.noteGroups[0];
+    }
+
+    startsWith(noteGroup: ObjNoteGroup) {
+        return this.noteGroups[0] === noteGroup;
     }
 
     /**
@@ -17,7 +25,7 @@ export class ArcProps {
      * @param noteGroup -
      * @returns true if noteGroup was added, false if not.
      */
-    add(noteGroup: ObjNoteGroup) {
+    addNoteGroup(noteGroup: ObjNoteGroup) {
         if (this.arcSpan === TieLength.Short || this.arcSpan === TieLength.ToMeasureEnd) {
             // Contains already 1 NoteGroup
             return false;
@@ -29,10 +37,6 @@ export class ArcProps {
         else {
             return false;
         }
-    }
-
-    startsWith(noteGroup: ObjNoteGroup) {
-        return this.noteGroups[0] === noteGroup;
     }
 
     private computeParams() {
@@ -70,7 +74,18 @@ export class ArcProps {
         }
     }
 
-    createArcObjects() {
+    removeArcs() {
+        this.noteGroups.length = 1;
+
+        this.noteGroups.forEach(n => {
+            n.measure.removeArcObjects();
+            n.removeArcProps();
+        });
+    }
+
+    createArcs() {
+        this.getStartNoteGroup().collectArcProps();
+
         this.computeParams();
 
         let { arcSpan, arcType } = this;

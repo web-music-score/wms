@@ -642,11 +642,6 @@ export class ObjMeasure extends MusicObject {
         this.requestBeamsUpdate();
 
         this.lastAddedRhythmColumn = col;
-
-        // Collect arc data now that symbol is set
-        if (symbol instanceof ObjNoteGroup) {
-            this.onAddNoteGroup(symbol);
-        }
     }
 
     addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions) {
@@ -689,18 +684,11 @@ export class ObjMeasure extends MusicObject {
             else if (!col || col.positionTicks > positionTicks) {
                 let col = new ObjRhythmColumn(this, positionTicks);
                 this.columns.splice(i, 0, col);
-                this.onAddRhythmColumn(col);
                 return col;
             }
         }
 
         Assert.interrupt("Error in rhythm column. Should never get here.");
-    }
-
-    onAddRhythmColumn(col: ObjRhythmColumn) { }
-
-    private onAddNoteGroup(noteGroup: ObjNoteGroup) {
-        noteGroup.collectArcProps();
     }
 
     getMeasureTicks() {

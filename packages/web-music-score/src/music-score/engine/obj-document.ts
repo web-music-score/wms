@@ -177,8 +177,8 @@ export class ObjDocument extends MusicObject {
         this.forEachMeasure(m => m.updateExtensions());
 
         // Update arcs.
-        this.forEachMeasure(m => m.removeArcObjects());
-        this.allArcsProps.forEach(arc => arc.createArcObjects());
+        this.allArcsProps.forEach(arc => arc.removeArcs());
+        this.allArcsProps.forEach(arc => arc.createArcs());
 
         this.needUpdate = false;
     }

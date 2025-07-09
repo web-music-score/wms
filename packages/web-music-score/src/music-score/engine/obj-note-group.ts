@@ -249,58 +249,65 @@ export class ObjNoteGroup extends MusicObject {
         }
     }
 
-    getPrevNoteGroup(): ObjNoteGroup | undefined {
+    private getNextNoteGroup(): ObjNoteGroup | undefined {
         let voiceNoteGroups = this.measure.getVoiceSymbols(this.voiceId).filter(s => s instanceof ObjNoteGroup);
 
         let i = voiceNoteGroups.indexOf(this);
-
-        if (i > 0) {
-            return voiceNoteGroups[i - 1];
+        if (i < 0) {
+            return undefined;
+        }
+        else if (i < voiceNoteGroups.length - 1) {
+            return voiceNoteGroups[i + 1];
         }
 
-        let m = this.measure.getPrevMeasure();
+        let m = this.measure.getNextMeasure();
 
         while (m) {
             let voiceNoteGroups = m.getVoiceSymbols(this.voiceId).filter(s => s instanceof ObjNoteGroup);
 
             if (voiceNoteGroups.length > 0) {
-                return voiceNoteGroups[voiceNoteGroups.length - 1];
+                return voiceNoteGroups[0];
             }
 
-            m = m.getPrevMeasure();
+            m = m.getNextMeasure();
         }
 
         return undefined;
     }
 
     collectArcProps() {
-        if (this.startTie !== undefined) {
+        if (this.startTie) {
             this.tieProps.push(this.startTie);
+
+            let next = this.getNextNoteGroup();
+
+            while (next && this.startTie.addNoteGroup(next)) {
+                next.tieProps.push(this.startTie);
+
+                next = next.getNextNoteGroup();
+            }
         }
 
-        if (this.startSlur !== undefined) {
+        if (this.startSlur) {
             this.slurProps.push(this.startSlur);
-        }
 
-        let prevNoteGroup = this.getPrevNoteGroup();
+            let next = this.getNextNoteGroup();
 
-        if (prevNoteGroup) {
-            prevNoteGroup.tieProps.forEach(tie => {
-                if (tie.add(this)) {
-                    this.tieProps.push(tie);
-                }
-            });
+            while (next && this.startSlur.addNoteGroup(next)) {
+                next.slurProps.push(this.startSlur);
 
-            prevNoteGroup.slurProps.forEach(slur => {
-                if (slur.add(this)) {
-                    this.slurProps.push(slur);
-                }
-            });
+                next = next.getNextNoteGroup();
+            }
         }
     }
 
+    removeArcProps() {
+        this.tieProps = [];
+        this.slurProps = [];
+    }
+
     getPlaySlur(): "first" | "slurred" | undefined {
-        let slurs = this.slurProps.map(slurData => slurData.startsWith(this) ? "first" : "slurred");
+        let slurs = this.slurProps.map(slur => slur.startsWith(this) ? "first" : "slurred");
 
         if (slurs.indexOf("first") >= 0) {
             return "first";
