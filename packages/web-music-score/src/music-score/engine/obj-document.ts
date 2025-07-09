@@ -9,6 +9,7 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { Assert } from "@tspro/ts-utils-lib";
 import { DefaultTuningName, getTuningStrings, Note, SymbolSet, validateTuningName } from "../../music-theory";
+import { ArcProps } from "./arc-props";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -30,6 +31,8 @@ export class ObjDocument extends MusicObject {
 
     private newRowRequested: boolean = false;
 
+    private allArcsProps: ArcProps[] = [];
+
     constructor(readonly mi: MDocument, readonly staffKind: StaffKind, readonly options?: DocumentOptions) {
         super(undefined);
 
@@ -49,6 +52,10 @@ export class ObjDocument extends MusicObject {
 
     getMusicInterface(): MDocument {
         return this.mi;
+    }
+
+    addArcProps(arc: ArcProps) {
+        this.allArcsProps.push(arc);
     }
 
     getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
@@ -170,7 +177,8 @@ export class ObjDocument extends MusicObject {
         this.forEachMeasure(m => m.updateExtensions());
 
         // Update arcs.
-        this.forEachMeasure(m => m.updateArcs());
+        this.forEachMeasure(m => m.removeArcObjects());
+        this.allArcsProps.forEach(arc => arc.createArcObjects());
 
         this.needUpdate = false;
     }

@@ -789,30 +789,16 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    addArc(arc: ObjArc) {
+    addArcObject(arc: ObjArc) {
         this.arcs.push(arc);
         this.requestLayout();
     }
 
-    updateArcs() {
-        if (!this.row.hasStaff) {
-            return;
-        }
-
-        // Remove arcs
+    removeArcObjects() {
         if (this.arcs.length > 0) {
             this.arcs = [];
             this.requestLayout();
         }
-
-        // Recreate arcs
-        ObjMeasure.VoiceIdList.forEach(voiceId => {
-            this.getVoiceSymbols(voiceId).forEach(symbol => {
-                if (symbol instanceof ObjNoteGroup) {
-                    symbol.createObjArcs();
-                }
-            });
-        });
     }
 
     updateExtensions() {

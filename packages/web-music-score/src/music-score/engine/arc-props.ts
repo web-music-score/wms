@@ -70,7 +70,7 @@ export class ArcProps {
         }
     }
 
-    createObjArcs() {
+    createArcObjects() {
         this.computeParams();
 
         let { arcSpan, arcType } = this;

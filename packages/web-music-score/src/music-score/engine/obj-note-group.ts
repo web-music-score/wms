@@ -56,13 +56,13 @@ export class ObjNoteGroup extends MusicObject {
     readonly staccato: boolean;
     readonly diamond: boolean;
     readonly arpeggio: Arpeggio | undefined;
-    readonly tieSpan: number | TieLength | undefined;
-    readonly slurSpan: number | undefined;
-    readonly arcPos: ArcPos;
     readonly rhythmProps: RhythmProps;
 
-    private tieDatas: ArcProps[] = [];
-    private slurDatas: ArcProps[] = [];
+    private startTie?: ArcProps;
+    private startSlur?: ArcProps;
+
+    private tieProps: ArcProps[] = [];
+    private slurProps: ArcProps[] = [];
 
     private leftBeamCount = 0;
     private rightBeamCount = 0;
@@ -92,14 +92,21 @@ export class ObjNoteGroup extends MusicObject {
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = solveArpeggio(options?.arpeggio);
-        this.tieSpan = options?.tieSpan;
-        this.slurSpan = options?.slurSpan;
-        this.arcPos = options?.tiePos ?? options?.slurPos ?? ArcPos.Auto;
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
+        if (options?.tieSpan !== undefined) {
+            this.startTie = new ArcProps("tie", options.tieSpan, options.tiePos ?? ArcPos.Auto, this);
+            this.doc.addArcProps(this.startTie);
+        }
+
+        if (options?.slurSpan !== undefined) {
+            this.startSlur = new ArcProps("slur", options.slurSpan, options.slurPos ?? ArcPos.Auto, this);
+            this.doc.addArcProps(this.startSlur);
+        }
+
         if (!this.row.hasStaff) {
-            Assert.assert(this.tieSpan === undefined, "Ties not implemented for guitar tabs, staff is required!");
-            Assert.assert(this.slurSpan === undefined, "Slurs not implemented for guitar tabs, staff is required!");
+            Assert.assert(this.startTie === undefined, "Ties not implemented for guitar tabs alone, staff is required!");
+            Assert.assert(this.startSlur === undefined, "Slurs not implemented for guitar tabs alone, staff is required!");
         }
 
         this.staffObjs = this.row.hasStaff ? new NoteStaffObjects() : undefined;
@@ -267,33 +274,33 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     collectArcProps() {
-        if (this.tieSpan !== undefined) {
-            this.tieDatas.push(new ArcProps("tie", this.tieSpan, this.arcPos, this));
+        if (this.startTie !== undefined) {
+            this.tieProps.push(this.startTie);
         }
 
-        if (this.slurSpan !== undefined) {
-            this.slurDatas.push(new ArcProps("slur", this.slurSpan, this.arcPos, this));
+        if (this.startSlur !== undefined) {
+            this.slurProps.push(this.startSlur);
         }
 
         let prevNoteGroup = this.getPrevNoteGroup();
 
         if (prevNoteGroup) {
-            prevNoteGroup.tieDatas.forEach(tieData => {
-                if (tieData.add(this)) {
-                    this.tieDatas.push(tieData);
+            prevNoteGroup.tieProps.forEach(tie => {
+                if (tie.add(this)) {
+                    this.tieProps.push(tie);
                 }
             });
 
-            prevNoteGroup.slurDatas.forEach(slurData => {
-                if (slurData.add(this)) {
-                    this.slurDatas.push(slurData);
+            prevNoteGroup.slurProps.forEach(slur => {
+                if (slur.add(this)) {
+                    this.slurProps.push(slur);
                 }
             });
         }
     }
 
     getPlaySlur(): "first" | "slurred" | undefined {
-        let slurs = this.slurDatas.map(slurData => slurData.startsWith(this) ? "first" : "slurred");
+        let slurs = this.slurProps.map(slurData => slurData.startsWith(this) ? "first" : "slurred");
 
         if (slurs.indexOf("first") >= 0) {
             return "first";
@@ -304,11 +311,6 @@ export class ObjNoteGroup extends MusicObject {
         else {
             return undefined;
         }
-    }
-
-    createObjArcs() {
-        this.tieDatas.forEach(tieData => tieData.createObjArcs());
-        this.slurDatas.forEach(slurData => slurData.createObjArcs());
     }
 
     getBeamGroup(): ObjBeamGroup | undefined {
@@ -364,8 +366,8 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getPlayTicks(note: Note) {
-        let tiedTicks = this.tieDatas.map(tieData => {
-            let tieNoteGroups = tieData.noteGroups;
+        let tiedTicks = this.tieProps.map(tie => {
+            let tieNoteGroups = tie.noteGroups;
 
             let j = tieNoteGroups.indexOf(this);
 
@@ -373,7 +375,7 @@ export class ObjNoteGroup extends MusicObject {
                 return 0;
             }
 
-            if (tieData.arcSpan === TieLength.Short || tieData.arcSpan === TieLength.ToMeasureEnd) {
+            if (tie.arcSpan === TieLength.Short || tie.arcSpan === TieLength.ToMeasureEnd) {
                 return Math.max(this.rhythmProps.ticks, this.measure.getMeasureTicks() - this.col.positionTicks);
             }
 

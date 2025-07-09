@@ -53,7 +53,7 @@ export class ObjArc extends MusicObject {
 
         this.mi = new MArc(this);
 
-        this.measure.addArc(this);
+        this.measure.addArcObject(this);
     }
 
     getMusicInterface(): MArc {
