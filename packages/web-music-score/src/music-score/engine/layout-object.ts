@@ -84,14 +84,7 @@ export class LayoutObjectWrapper {
             ? staffBottom + staffPadding + musicObj.getRect().toph
             : staffTop - staffPadding - musicObj.getRect().bottomh;
 
-        let staticObjects: (LayoutableMusicObject | ObjRhythmColumn)[] = [...measure.getColumns()];
-
-        measure.forEachLayoutObject(layoutObj => {
-            if (layoutObj.isPositionResolved()) {
-                staticObjects.push(layoutObj.musicObj);
-            }
-        });
-
+        let staticObjects = measure.getStaticObjects();
         let objShapeRects = musicObj.getShapeRects();
 
         staticObjects.forEach(resolveObj => {

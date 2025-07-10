@@ -754,8 +754,13 @@ export class ObjMeasure extends MusicObject {
         return this.barLineRight.getRect().centerX;
     }
 
-    forEachLayoutObject(fn: (layoutObject: LayoutObjectWrapper) => void) {
-        this.layoutObjects.forEach(layoutObj => fn(layoutObj));
+    getStaticObjects(): ReadonlyArray<ObjRhythmColumn | LayoutableMusicObject> {
+        return [
+            ...this.getColumns(),
+            ...this.layoutObjects
+                .filter(layoutObj => layoutObj.isPositionResolved())
+                .map(layoutObj => layoutObj.musicObj)
+        ];
     }
 
     removeLayoutObjects(musicObj: MusicObject) {
@@ -790,7 +795,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateExtensions() {
-        this.forEachLayoutObject(layoutObj => {
+        this.layoutObjects.forEach(layoutObj => {
             if (layoutObj.musicObj.getLink() instanceof Extension) {
                 let extension = layoutObj.musicObj.getLink() as Extension;
 
@@ -1197,7 +1202,7 @@ export class ObjMeasure extends MusicObject {
 
         this.beamGroups.forEach(beam => beam.offset(dx, dy));
 
-        this.forEachLayoutObject(layoutObj => layoutObj.musicObj.offset(dx, dy));
+        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.offset(dx, dy));
 
         this.rect.offsetInPlace(dx, dy);
     }
@@ -1240,7 +1245,7 @@ export class ObjMeasure extends MusicObject {
 
         this.arcs.forEach(arc => arc.draw(renderer));
 
-        this.forEachLayoutObject(layoutObj => layoutObj.musicObj.draw(renderer));
+        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(renderer));
 
         this.beamGroups.forEach(beam => beam.draw(renderer));
 
