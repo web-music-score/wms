@@ -1,7 +1,6 @@
-
-// tsup.config.ts
 import { defineConfig } from 'tsup'
 import pkg from './package.json' assert { type: 'json' }
+import { inlineAssetsPlugin } from "./tools/inlineAssetPlugin";
 
 const bannerText = `/* WebMusicScore v${pkg.version} | (c) 2023 PahkaSoft | MIT License | Includes: Tone.js (MIT License) */`;
 
@@ -22,6 +21,7 @@ export default defineConfig([
         define: {
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (esm)`)
         },
+        esbuildPlugins: [inlineAssetsPlugin()]
     },
 
     // CJS bundle
@@ -40,6 +40,7 @@ export default defineConfig([
         define: {
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (cjs)`)
         },
+        esbuildPlugins: [inlineAssetsPlugin()]
     },
 
     // IIFE bundle
@@ -58,6 +59,7 @@ export default defineConfig([
         },
         define: {
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (iife)`)
-        }
+        },
+        esbuildPlugins: [inlineAssetsPlugin()]
     }
 ]);
