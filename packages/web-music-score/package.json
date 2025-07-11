@@ -8,19 +8,32 @@
         "url": "https://github.com/pahkasoft/issues/issues/new"
     },
     "description": "TS/JS component for rendering and playing music scores in the browser.",
-    "main": "dist/index.cjs.js",
-    "module": "dist/index.esm.mjs",
-    "browser": "dist/index.umd.min.js",
-    "unpkg": "dist/index.umd.min.js",
-    "types": "dist/index.d.ts",
+    "types": "./dist/index.full.d.ts",
+    "main": "./dist/index.full.js",
+    "module": "./dist/index.full.mjs",
     "exports": {
         ".": {
-            "require": "./dist/index.cjs.js",
-            "import": "./dist/index.esm.mjs",
-            "browser": "./dist/index.umd.min.js",
-            "types": "./dist/index.d.ts"
+            "browser": {
+                "require": {
+                    "types": "./dist/index.full.d.ts",
+                    "default": "./dist/index.full.js"
+                },
+                "import": {
+                    "types": "./dist/index.full.d.mts",
+                    "default": "./dist/index.full.mjs"
+                }
+            },
+            "require": {
+                "types": "./dist/index.full.d.ts",
+                "default": "./dist/index.full.js"
+            },
+            "import": {
+                "types": "./dist/index.full.d.mts",
+                "default": "./dist/index.full.mjs"
+            }
         }
     },
+    "unpkg": "./dist/index.no-react.global.js",
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.0.1",
         "tone": "^15.1.22"
@@ -29,46 +42,15 @@
         "react": "^19.1.0"
     },
     "devDependencies": {
-        "@babel/cli": "^7.27.2",
-        "@babel/core": "^7.27.7",
-        "@babel/preset-env": "^7.27.2",
-        "@babel/preset-react": "^7.27.1",
-        "@microsoft/api-extractor": "^7.52.8",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",
-        "@webpack-cli/serve": "^3.0.1",
-        "api-extractor": "^99.99.99",
-        "babel-loader": "^10.0.0",
-        "benchmark": "^2.1.4",
-        "clean-webpack-plugin": "^4.0.0",
-        "css-loader": "^7.1.2",
-        "npm-watch": "^0.13.0",
-        "rimraf": "^6.0.1",
-        "style-loader": "^4.0.0",
-        "terser-webpack-plugin": "^5.3.14",
-        "ts-loader": "^9.5.2",
+        "tsup": "^8.5.0",
         "typedoc": "^0.28.6",
-        "typescript": "^5.8.3",
-        "url-loader": "^4.1.1",
-        "webpack": "^5.99.9",
-        "webpack-cli": "^6.0.1",
-        "webpack-dev-server": "^5.2.2"
-    },
-    "watch": {
-        "build:esm": {
-            "patterns": [
-                "src"
-            ],
-            "extensions": "ts,tsx",
-            "quiet": false
-        }
+        "typescript": "latest"
     },
     "scripts": {
-        "build:types": "tsc --project tsconfig.types.json && api-extractor run --local && rimraf dist/temp-types",
-        "build:dev": "rimraf dist && npm run build:types && webpack --mode development --progress",
-        "build:prod": "rimraf dist && npm run build:types && webpack --mode production --progress",
-        "build:esm": "rimraf dist && npm run build:types && webpack --env target=esm --mode development --progress",
-        "watch": "npm-watch",
+        "build": "tsup",
+        "watch": "tsup --watch",
         "docs": "typedoc"
     },
     "browserslist": [

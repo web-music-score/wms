@@ -9,12 +9,8 @@
 .gitattributes
 .npmignore
 package-lock.json
-babel.config.js
-karma.conf.js
 tsconfig.json
-tsconfig.types.json
+tsup.config.ts
 typedoc.json
-webpack.config.js
-api-extractor.json
 workspace.code-workspace
 INSTRUCTIONS.md

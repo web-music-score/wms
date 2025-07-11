@@ -9,7 +9,8 @@
         "./apps/*"
     ],
     "scripts": {
-        "build:dev (all workspaces)": "npm run build:dev --workspaces --if-present",
-        "build:prod (all workspaces)": "npm run build:prod --workspaces --if-present"
+        "build:lib": "npm run build -w packages/web-music-score",
+        "build:dev (all workspaces)": "npm run build:lib && npm run build:dev --workspaces --if-present",
+        "build:prod (all workspaces)": "npm run build:lib && npm run build:prod --workspaces --if-present"
     }
 }
