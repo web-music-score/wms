@@ -7,7 +7,9 @@ const bannerText = `/* WebMusicScore v${pkg.version} | (c) 2023 PahkaSoft | MIT 
 export default defineConfig([
     // ESM bundle
     {
-        entry: ['src/index.full.ts'],
+        entry: {
+            'index': 'src/index.full.ts'
+        },
         outDir: 'dist',
         target: 'es2015',
         format: ['esm'],
@@ -26,7 +28,9 @@ export default defineConfig([
 
     // CJS bundle
     {
-        entry: ['src/index.full.ts'],
+        entry: {
+            'index': 'src/index.full.ts'
+        },
         outDir: 'dist',
         target: 'es2015',
         format: ['cjs'],
@@ -45,7 +49,9 @@ export default defineConfig([
 
     // IIFE bundle
     {
-        entry: ['src/index.no-react.ts'],
+        entry: {
+            'index': 'src/index.no-react.ts'
+        },
         outDir: 'dist',
         target: 'es2015',
         format: ['iife'],
