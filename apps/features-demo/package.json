@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "private": true,
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.0.1",
+        "@tspro/ts-utils-lib": "^1.1.0",
         "@tspro/web-music-score": "^1.0.0",
         "@types/react": "^19.1.8",
         "@types/react-dom": "^19.1.6",

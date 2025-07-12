@@ -35,7 +35,7 @@
     },
     "unpkg": "./dist/index.global.js",
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.0.1",
+        "@tspro/ts-utils-lib": "^1.1.0",
         "tone": "^15.1.22"
     },
     "peerDependencies": {

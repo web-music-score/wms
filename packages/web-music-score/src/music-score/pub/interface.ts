@@ -33,10 +33,6 @@ import { ClickObjectListener, ClickObjectSelector, ClickPitchListener, DocumentO
 import { NoteOptions, RestOptions, StaffKind } from "./types";
 import { Fermata, Navigation, Annotation, Label, PlayState } from "./types";
 
-function isObject(value: unknown): value is Record<string, unknown> {
-    return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 /** @public */
 export abstract class MusicInterface {
     constructor(readonly name: string) { }
@@ -130,7 +126,7 @@ export class MDocument extends MusicInterface {
         if (typeof options === "number") {
             this.obj = new ObjDocument(this, staffKind, { measuresPerRow: options });
         }
-        else if (isObject(options)) {
+        else if (Utils.Obj.isObject(options)) {
             this.obj = new ObjDocument(this, staffKind, options);
         }
         else {
