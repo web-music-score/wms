@@ -2,9 +2,10 @@ import { Utils, Vec2, Device, Assert } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
 import { MusicInterface, MDocument, DivRect, ClickObjectListener, ClickObjectSelector, ClickPitchListener, PickedPitch } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
+import { DebugSettings, DocumentSettings } from "./settings";
+
 import TrebleClefPng from "./assets/treble-clef.png";
 import BassClefPng from "./assets/bass-clef.png";
-import { DebugSettings, DocumentSettings } from "./settings";
 
 export enum ImageAsset { TrebleClefPng, BassClefPng }
 
@@ -13,14 +14,14 @@ const HilightObjectRectColor = "#55cc55";
 const PlayPosIndicatorColor = "#44aa44";
 
 type ImageAssetData = {
-    url: string,
+    src: string,
     finished?: true,
     img?: HTMLImageElement
 }
 
 const ImageAssets = new Map<ImageAsset, ImageAssetData>([
-    [ImageAsset.TrebleClefPng, { url: TrebleClefPng }],
-    [ImageAsset.BassClefPng, { url: BassClefPng }]
+    [ImageAsset.TrebleClefPng, { src: TrebleClefPng }],
+    [ImageAsset.BassClefPng, { src: BassClefPng }]
 ]);
 
 export class Renderer {
@@ -64,14 +65,14 @@ export class Renderer {
         ImageAssets.forEach(asset => {
             if (asset.finished !== true) {
                 const img = new Image();
-                img.src = asset.url;
+                img.src = asset.src;
                 img.onload = () => {
                     asset.img = img;
                     this.finishImageAsset(asset);
                 }
                 img.onerror = () => {
                     this.finishImageAsset(asset);
-                    Assert.interrupt("Failed to load image: " + asset.url);
+                    Assert.interrupt("Failed to load image: " + asset.src);
                 }
             }
         });
