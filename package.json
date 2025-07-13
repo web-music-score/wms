@@ -39,7 +39,7 @@
         "tone": "^15.1.22"
     },
     "peerDependencies": {
-        "react": "^19.1.0"
+        "react": "^19.0.0"
     },
     "devDependencies": {
         "@tspro/tsup-plugin-inline-assets": "^1.0.0",
