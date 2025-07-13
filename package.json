@@ -49,14 +49,15 @@
         "typedoc": "^0.28.6",
         "typescript": "latest"
     },
+    "workspaces": [
+        ".",
+        "./apps/*"
+    ],
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",
         "build:dev (all workspaces)": "npm run build && npm run build:dev --workspaces --if-present",
         "build:prod (all workspaces)": "npm run build && npm run build:prod --workspaces --if-present",
         "docs": "typedoc"
-    },
-    "workspaces": [
-        ".",
-        "./apps/*"
-    ]}
+    }
+}
