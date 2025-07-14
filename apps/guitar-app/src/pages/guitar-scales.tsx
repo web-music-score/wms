@@ -241,7 +241,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
             <br />
 
-            <Score.GuitarComponent
+            <Score.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}

@@ -283,7 +283,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
 
             <br />
 
-            <Score.GuitarComponent
+            <Score.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}

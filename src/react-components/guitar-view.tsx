@@ -47,7 +47,7 @@ export class CellData {
 }
 
 /** @public */
-export interface GuitarComponentProps {
+export interface GuitarViewProps {
     style?: React.CSSProperties;
     guitarContext: GuitarContext;
     updateGuitarNote?: UpdateGuitarNoteFunc;
@@ -55,23 +55,23 @@ export interface GuitarComponentProps {
 }
 
 /** @public */
-export interface GuitarComponentState {
+export interface GuitarViewState {
     width: number;
     height: number;
     table: CellData[][];
 }
 
 /** @public */
-export class GuitarComponent extends React.Component<GuitarComponentProps, GuitarComponentState> {
-    state: GuitarComponentState;
+export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState> {
+    state: GuitarViewState;
 
-    constructor(props: GuitarComponentProps) {
+    constructor(props: GuitarViewProps) {
         super(props);
 
         this.state = this.getLayoutState();
     }
 
-    componentDidUpdate(prevProps: GuitarComponentProps) {
+    componentDidUpdate(prevProps: GuitarViewProps) {
         let { style, guitarContext: guitarCtx } = this.props;
 
         if (Utils.Dom.styleLayoutChanged(style, prevProps.style) || guitarCtx !== prevProps.guitarContext) {

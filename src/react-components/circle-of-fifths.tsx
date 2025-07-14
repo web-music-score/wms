@@ -38,15 +38,15 @@ const MinorScaleKeyNotes = [
 ];
 
 /** @public */
-export interface CircleOfFifthsComponentProps {
+export interface CircleOfFifthsProps {
     style?: React.CSSProperties;
     scale: Scale;
     onScaleChange: (scale: Scale) => void;
 }
 
 /** @public */
-export class CircleOfFifthsComponent extends React.Component<CircleOfFifthsComponentProps, {}> {
-    constructor(props: CircleOfFifthsComponentProps) {
+export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
+    constructor(props: CircleOfFifthsProps) {
         super(props);
     }
 

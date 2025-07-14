@@ -98,7 +98,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
                 </Row>
             </Container>
 
-            <Score.GuitarComponent
+            <Score.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}

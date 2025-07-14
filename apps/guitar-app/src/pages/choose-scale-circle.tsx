@@ -82,7 +82,7 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
                 </Row>
                 <Row xs="auto">
                     <Col>
-                        <Score.CircleOfFifthsComponent
+                        <Score.CircleOfFifths
                             style={{ position: "relative", padding: "0.5em" }}
                             scale={scale}
                             onScaleChange={newScale => this.onChangeScale(newScale)} />

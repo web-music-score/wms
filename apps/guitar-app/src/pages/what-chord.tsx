@@ -155,7 +155,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
                 </Row>
             </Container>
 
-            <Score.GuitarComponent
+            <Score.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}
