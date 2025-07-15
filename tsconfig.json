@@ -24,7 +24,12 @@
         "noImplicitReturns": true,
         "alwaysStrict": true,
         "removeComments": false,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "paths": {
+            "web-music-score/core": [
+                "core"
+            ]
+        }
     },
     "include": [
         "src/**/*.ts"

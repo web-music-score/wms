@@ -1,8 +1,8 @@
 // Export named exports.
-export * from "./exports.umd";
+export * from "./exports.no-react";
 
 // Export default export.
-import * as DefaultExport from "./exports.umd";
+import * as DefaultExport from "./exports.no-react";
 export default DefaultExport;
 
 // __LIB_INFO__ is set by webpack.DefinePlugin.
