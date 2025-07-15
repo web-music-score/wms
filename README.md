@@ -21,26 +21,29 @@ npm i react
 
 ### Usage
 
-#### Import (ESM)
+#### Import
 ```js
+// Import core
 import * as Score from "@tspro/web-music-score";
-```
 
-#### Require (CommonJS)
-```js
-// Use require
+// Import react ui components
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
+
+// Import demo pieces
+import * as Pieces from "@tspro/web-music-score/pieces";
+
+// you can also use require
 const Score = require("@tspro/web-music-score");
+
+// ...
 ```
 
-#### Browser Script
+#### Browser Script (experimantal)
 Use in browser via unpkg CDN.
-Browser version comes without React-components.
+Browser version is core module, without /react-ui or /pieces subpaths.
 
 ```html
-<script src="https://unpkg.com/@tspro/web-music-score@1"></script>
-
-<canvas id="scoreCanvas"></canvas><br />
-<button id="playButton"></button>
+<script src="https://unpkg.com/@tspro/web-music-score@2"></script>
 
 <script>
     const Score = window.WebMusicScore;
@@ -343,12 +346,12 @@ More playback methods.
 
 ```js
 // Draw document
-<Score.MusicScoreView doc={doc} />
+<ScoreUI.MusicScoreView doc={doc} />
 
 // Add playback buttons
-<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle}/> // Single Play/Stopo button
-<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStop}/> // Play and Stop buttons
-<Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayPauseStop}/> // Play, Pause and Stop buttons
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle}/> // Single Play/Stopo button
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStop}/> // Play and Stop buttons
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayPauseStop}/> // Play, Pause and Stop buttons
 ```
 
 Bootstrap is used for better visual appearance but you must load it.
