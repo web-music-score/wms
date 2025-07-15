@@ -1,15 +1,16 @@
 import * as React from "react";
 import { Alert, Col, Container, Form, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import { Utils } from "@tspro/ts-utils-lib";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 class ScaleVariant {
     readonly name: string;
     readonly fretExtentByString: number[];
 
-    constructor(readonly position: number, readonly notes: ReadonlyArray<Score.GuitarNote>) {
+    constructor(readonly position: number, readonly notes: ReadonlyArray<ScoreUI.GuitarNote>) {
         this.name = position === 0 ? "Open" : Utils.Math.toOrdinalNumber(position) + " position";
         this.fretExtentByString = [0, 1, 2, 3, 4, 5].map(stringId => {
             let max = Math.max(...notes.filter(note => note.stringId === stringId).map(note => note.fretId));
@@ -25,8 +26,8 @@ interface GuitarScalesProps {
 }
 
 interface GuitarScalesState {
-    guitarCtx: Score.GuitarContext;
-    selectedNote?: Score.GuitarNote;
+    guitarCtx: ScoreUI.GuitarContext;
+    selectedNote?: ScoreUI.GuitarNote;
     variants: Map<string, ScaleVariant>;
     variantName: string;
 }
@@ -60,19 +61,19 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         }
     }
 
-    createVariants(guitarCtx: Score.GuitarContext, variantName: string) {
+    createVariants(guitarCtx: ScoreUI.GuitarContext, variantName: string) {
         let openStringNoteId = [0, 1, 2, 3, 4, 5].map(stringId => guitarCtx.getStringTuning(stringId).noteId);
 
         let variants = new Map<string, ScaleVariant>();
 
-        function saveVariant(position: number, notes: Score.GuitarNote[]) {
+        function saveVariant(position: number, notes: ScoreUI.GuitarNote[]) {
             let v = new ScaleVariant(position, notes);
             variants.set(v.name, v);
         }
 
         for (let position = 0; position < guitarCtx.maxFretId; position++) {
             try {
-                let notes: Score.GuitarNote[] = [];
+                let notes: ScoreUI.GuitarNote[] = [];
 
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let highFret = stringId === 0
@@ -137,7 +138,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         let variant = variants.get(variantName);
 
-        const updateGuitarNote: Score.UpdateGuitarNoteFunc = (guitarNote) => {
+        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
             let scaleNote = variant?.notes.find(note => note === guitarNote);
 
             if (scaleNote || selectedNote === guitarNote) {
@@ -151,7 +152,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
             }
         }
 
-        const selectNote = (guitarNote: Score.GuitarNote) => {
+        const selectNote = (guitarNote: ScoreUI.GuitarNote) => {
             Score.Audio.playNote(guitarNote.preferredNote);
             this.setState({ selectedNote: guitarNote });
 
@@ -168,7 +169,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
             }
         }
 
-        const onClickGuitar = (guitarNote: Score.GuitarNote) => selectNote(guitarNote);
+        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => selectNote(guitarNote);
 
         const onScoreSelectObject = (arr: Score.MusicInterface[]) => {
             for (let i = 0; i < arr.length; i++) {
@@ -226,7 +227,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                 </Row>
                 <Row xs="auto">
                     <Col>
-                        <Score.MusicScoreView doc={doc} onSelectObject={onScoreSelectObject} onClickObject={onScoreClickObject} />
+                        <ScoreUI.MusicScoreView doc={doc} onSelectObject={onScoreSelectObject} onClickObject={onScoreClickObject} />
                     </Col>
                 </Row>
 
@@ -241,7 +242,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
             <br />
 
-            <Score.GuitarView
+            <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}

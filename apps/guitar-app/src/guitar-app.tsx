@@ -1,8 +1,9 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { CAGEDScales, ChooseScale, ChooseScaleCircle, ChooseTuning, DiatonicChords, FrontPage, GuitarScales, Intervals, PlayNotes, WhatChord } from "./pages";
-import * as Score from "@tspro/web-music-score";
 import { Cookies, Utils } from "@tspro/ts-utils-lib";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const AppCookies = {
     PitchNotation: "pitchNotation",
@@ -42,7 +43,7 @@ interface GuitarAppState {
     windowRect: Score.DivRect;
     currentPage: string;
     instrument: Score.Audio.Instrument;
-    guitarCtx: Score.GuitarContext;
+    guitarCtx: ScoreUI.GuitarContext;
 }
 
 export class GuitarApp extends React.Component<{}, GuitarAppState> {
@@ -64,7 +65,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
 
         let pitchNotation: Score.PitchNotation;
         let guitarNoteLabel: Score.GuitarNoteLabel;
-        let handedness: Score.Handedness;
+        let handedness: ScoreUI.Handedness;
         let tuningName: string;
         let scale: Score.Scale;
         let instrument: Score.Audio.Instrument;
@@ -84,10 +85,10 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
 
         try {
-            handedness = Score.validateHandedness(Cookies.read(AppCookies.Handedness, Score.DefaultHandedness));
+            handedness = ScoreUI.validateHandedness(Cookies.read(AppCookies.Handedness, ScoreUI.DefaultHandedness));
         }
         catch (err) {
-            handedness = Score.DefaultHandedness;
+            handedness = ScoreUI.DefaultHandedness;
         }
 
         try {
@@ -117,7 +118,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
 
         let windowRect = new Score.DivRect();
 
-        let guitarCtx = new Score.GuitarContext(tuningName, scale, handedness, pitchNotation, guitarNoteLabel);
+        let guitarCtx = new ScoreUI.GuitarContext(tuningName, scale, handedness, pitchNotation, guitarNoteLabel);
 
         this.state = {
             windowRect,
@@ -167,7 +168,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
     }
 
-    setHandedness(handedness: Score.Handedness) {
+    setHandedness(handedness: ScoreUI.Handedness) {
         let guitarCtx = this.state.guitarCtx.alterHandedness(handedness);
         if (guitarCtx !== this.state.guitarCtx) {
             this.setState({ guitarCtx });

@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
 
 type DemoAppState = {
@@ -65,7 +66,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
                     </select>
                 </div>
                 <div className="col-1">
-                    <Score.PlaybackButtons doc={doc} />
+                    <ScoreUI.PlaybackButtons doc={doc} />
                 </div>
             </div>
             <br />
@@ -80,7 +81,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             <br />
             {hoverText}
             <br />
-            <Score.MusicScoreView doc={doc} onClickObject={() => { }} onSelectObject={onSelectObject} />
+            <ScoreUI.MusicScoreView doc={doc} onClickObject={() => { }} onSelectObject={onSelectObject} />
         </div >
     }
 }

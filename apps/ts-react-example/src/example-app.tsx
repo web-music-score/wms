@@ -1,5 +1,7 @@
 import * as React from "react";
 import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import { createFrereJacques } from "@tspro/web-music-score/pieces";
 
 type ExampleAppState = { doc: Score.MDocument }
 
@@ -12,7 +14,7 @@ export class ExampleApp extends React.Component<{}, ExampleAppState> {
 
         Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
 
-        let doc = Score.SamplePieces.createFrereJacques();
+        let doc = createFrereJacques();
 
         this.state = { doc }
     }
@@ -22,9 +24,9 @@ export class ExampleApp extends React.Component<{}, ExampleAppState> {
 
         return (
             <div>
-                <Score.MusicScoreView doc={doc} />
+                <ScoreUI.MusicScoreView doc={doc} />
                 <br />
-                <Score.PlaybackButtons doc={doc} />
+                <ScoreUI.PlaybackButtons doc={doc} />
             </div>
         );
     }

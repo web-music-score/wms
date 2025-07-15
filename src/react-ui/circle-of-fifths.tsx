@@ -1,6 +1,6 @@
 import * as React from "react";
-import { getScale, Scale, ScaleType } from "web-music-score/core";
-import { DivRect, Note, SymbolSet } from "web-music-score/core";
+import { getScale, Scale, ScaleType } from "@tspro/web-music-score";
+import { DivRect, Note, SymbolSet } from "@tspro/web-music-score";
 import { Device, Utils } from "@tspro/ts-utils-lib";
 
 const SelectedColor = "#0A0";

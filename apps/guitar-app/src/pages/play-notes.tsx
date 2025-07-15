@@ -1,8 +1,9 @@
 import * as React from "react";
-import { Alert, Col, Container, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import { SelectAccidental, Menubar, TuningScaleInfo } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface PlayNotesProps {
     app: GuitarApp;
@@ -42,7 +43,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             m.addLabel(Score.Label.Note, noteName);
         }
 
-        const updateGuitarNote: Score.UpdateGuitarNoteFunc = (guitarNote) => {
+        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
             if (selectedNote && selectedNote.noteId === guitarNote.noteId) {
                 guitarNote.setDefaultBorderColor(true);
                 guitarNote.setDefaultFillColor();
@@ -65,7 +66,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             this.setState({ selectedNote: note });
         }
 
-        const onClickGuitar = (guitarNote: Score.GuitarNote) => {
+        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {
             Score.Audio.playNote(guitarNote.preferredNote);
             this.setState({ selectedNote: guitarNote.preferredNote });
         }
@@ -93,12 +94,12 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
 
                 <Row xs="auto">
                     <Col>
-                        <Score.MusicScoreView doc={doc} onClickPitch={onClickPitch} />
+                        <ScoreUI.MusicScoreView doc={doc} onClickPitch={onClickPitch} />
                     </Col>
                 </Row>
             </Container>
 
-            <Score.GuitarView
+            <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}

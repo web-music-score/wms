@@ -2,6 +2,8 @@ import * as React from "react";
 
 // Try require
 const Score = require("@tspro/web-music-score");
+const ScoreUI = require("@tspro/web-music-score/react-ui");
+const { createFrereJacques } = require("@tspro/web-music-score/pieces");
 
 export class ExampleApp extends React.Component {
     constructor(props) {
@@ -9,7 +11,7 @@ export class ExampleApp extends React.Component {
 
         Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
 
-        let doc = Score.SamplePieces.createFrereJacques();
+        let doc = createFrereJacques();
 
         this.state = { doc }
     }
@@ -19,9 +21,9 @@ export class ExampleApp extends React.Component {
 
         return (
             <div>
-                <Score.MusicScoreView doc={doc} />
+                <ScoreUI.MusicScoreView doc={doc} />
                 <br />
-                <Score.PlaybackButtons doc={doc} />
+                <ScoreUI.PlaybackButtons doc={doc} />
             </div>
         );
     }

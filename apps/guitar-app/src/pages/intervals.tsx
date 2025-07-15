@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Col, Container, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { GuitarApp, Page } from "guitar-app";
 import { SelectAccidental, Menubar, TuningScaleInfo } from "components";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const tdStyle: React.CSSProperties = {
     paddingLeft: "1em",
@@ -108,7 +109,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
                 <Row xs="auto">
                     <Col>
-                        <Score.MusicScoreView doc={doc} onClickPitch={onClickPitch} />
+                        <ScoreUI.MusicScoreView doc={doc} onClickPitch={onClickPitch} />
                     </Col>
                 </Row>
 

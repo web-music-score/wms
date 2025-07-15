@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Alert, Col, Container, Form, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { GuitarApp, Page } from "guitar-app";
 import { TuningScaleInfo, Menubar } from "components";
 import { Utils } from "@tspro/ts-utils-lib";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 enum ChordType {
     Triads = "Triads",
@@ -122,7 +123,7 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
 
                 <Row xs="auto" className="mt-4">
                     <Col>
-                        <Score.MusicScoreView doc={doc} />
+                        <ScoreUI.MusicScoreView doc={doc} />
                     </Col>
                 </Row>
             </Container>

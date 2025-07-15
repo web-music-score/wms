@@ -1,4 +1,5 @@
 import * as Score from "@tspro/web-music-score";
+import { createAndanteByDiabelli, createGreensleeves } from "@tspro/web-music-score/pieces";
 import { createRepeatsAndEndingsDemo } from "demo-pieces/repeats-endings";
 import { createDaCapoDemo } from "demo-pieces/da-capo";
 import { createDalSegnoDemo } from "demo-pieces/dal-segno";
@@ -33,8 +34,8 @@ export class DemoPieces {
         let demos: Score.MDocument[] = [];
 
         // Add sample pieces
-        pieces.push(Score.SamplePieces.createGreensleeves());
-        pieces.push(Score.SamplePieces.createAndanteByDiabelli());
+        pieces.push(createGreensleeves());
+        pieces.push(createAndanteByDiabelli());
 
         // Add features demos
         demos.push(createRepeatsAndEndingsDemo());

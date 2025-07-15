@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { Menubar, SelectTuningForm } from "components";
 import { GuitarApp, Page } from "guitar-app";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface ChooseTuningProps {
     app: GuitarApp;
@@ -10,7 +11,7 @@ interface ChooseTuningProps {
 }
 
 interface ChooseTuningState {
-    guitarCtx: Score.GuitarContext;
+    guitarCtx: ScoreUI.GuitarContext;
 }
 
 export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTuningState> {
@@ -97,11 +98,11 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
                 <br />
                 <Row xs="auto">
                     <Col>
-                        <Score.MusicScoreView doc={doc} />
+                        <ScoreUI.MusicScoreView doc={doc} />
                     </Col>
                 </Row>
                 <Row xs="auto">
-                    <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
+                    <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
                 </Row>
 
             </Container>

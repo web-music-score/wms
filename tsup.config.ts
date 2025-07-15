@@ -8,7 +8,9 @@ export default defineConfig([
     // ESM bundle
     {
         entry: {
-            'index': 'src/index.full.ts'
+            'core/index': 'src/core/index.ts',
+            'react-ui/index': 'src/react-ui/index.ts',
+            'pieces/index': 'src/pieces/index.ts'
         },
         outDir: 'dist',
         target: 'es2015',
@@ -16,7 +18,7 @@ export default defineConfig([
         dts: true,
         sourcemap: true,
         clean: true,
-        external: ['react'],
+        external: ['react', '@tspro/web-music-score'],
         banner: {
             js: bannerText
         },
@@ -29,7 +31,9 @@ export default defineConfig([
     // CJS bundle
     {
         entry: {
-            'index': 'src/index.full.ts'
+            'core/index': 'src/core/index.ts',
+            'react-ui/index': 'src/react-ui/index.ts',
+            'pieces/index': 'src/pieces/index.ts'
         },
         outDir: 'dist',
         target: 'es2015',
@@ -37,7 +41,7 @@ export default defineConfig([
         dts: true,
         sourcemap: true,
         clean: false, // Don't wipe dist from the previous build
-        external: ['react'],
+        external: ['react', '@tspro/web-music-score'],
         banner: {
             js: bannerText
         },
@@ -50,7 +54,7 @@ export default defineConfig([
     // IIFE bundle
     {
         entry: {
-            'index': 'src/index.no-react.ts'
+            'core/index': 'src/core/index.ts'
         },
         outDir: 'dist',
         target: 'es2015',

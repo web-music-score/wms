@@ -1,9 +1,10 @@
 import * as React from "react";
 import { Alert, Col, Container, Form, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import { Utils } from "@tspro/ts-utils-lib";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const LowestNote = "E2";
 
@@ -12,7 +13,7 @@ class GuitarChord {
     readonly maxFretId: number;
     readonly minScaleFretId: number;
 
-    constructor(readonly positionName: PositionName, readonly guitarNotes: Score.GuitarNote[]) {
+    constructor(readonly positionName: PositionName, readonly guitarNotes: ScoreUI.GuitarNote[]) {
         this.minFretId = Math.min(...guitarNotes.map(n => n.fretId));
         this.maxFretId = Math.max(...guitarNotes.map(n => n.fretId));
         this.minScaleFretId = Math.max(0, this.minFretId - (positionName === PositionName.C ? 0 : 1));
@@ -22,7 +23,7 @@ class GuitarChord {
         return this.guitarNotes.every(n1 => triadNotes.some(n2 => n2.noteId % 12 === n1.noteId % 12));
     }
 
-    hasGuitarNote(guitarNote: Score.GuitarNote) {
+    hasGuitarNote(guitarNote: ScoreUI.GuitarNote) {
         return this.guitarNotes.some(n => n === guitarNote);
     }
 }
@@ -41,12 +42,12 @@ interface CAGEDScalesProps {
 }
 
 interface CAGEDScalesState {
-    guitarCtx: Score.GuitarContext;
+    guitarCtx: ScoreUI.GuitarContext;
     positionNameList: PositionName[];
     positionName: PositionName;
     positionChords: GuitarChord[];
-    scaleNotes: Score.GuitarNote[];
-    selectedNote?: Score.GuitarNote;
+    scaleNotes: ScoreUI.GuitarNote[];
+    selectedNote?: ScoreUI.GuitarNote;
 }
 
 export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesState> {
@@ -79,12 +80,12 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
         }
     }
 
-    private createStateUpdate(guitarCtx: Score.GuitarContext, positionName: PositionName | "start"): {
-        guitarCtx: Score.GuitarContext,
+    private createStateUpdate(guitarCtx: ScoreUI.GuitarContext, positionName: PositionName | "start"): {
+        guitarCtx: ScoreUI.GuitarContext,
         positionNameList: PositionName[],
         positionName: PositionName,
         positionChords: GuitarChord[],
-        scaleNotes: Score.GuitarNote[]
+        scaleNotes: ScoreUI.GuitarNote[]
     } {
 
         if (guitarCtx.tuningName !== Score.DefaultTuningName || guitarCtx.scale.scaleType !== Score.ScaleType.Major) {
@@ -135,10 +136,10 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
         positionChords = positionChords.filter(c => c.positionName === positionName);
 
         // Create scales
-        let scaleNotes: Score.GuitarNote[] = [];
+        let scaleNotes: ScoreUI.GuitarNote[] = [];
 
         positionChords.forEach(chord => {
-            let notes: Score.GuitarNote[] = [];
+            let notes: ScoreUI.GuitarNote[] = [];
 
             for (let stringId = 0; stringId <= 5; stringId++) {
                 let startFret = chord.minScaleFretId;
@@ -202,7 +203,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
             ][i];
         });
 
-        const updateGuitarNote: Score.UpdateGuitarNoteFunc = (guitarNote) => {
+        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
             let scaleNote = scaleNotes.find(note => note === guitarNote);
 
             if (scaleNote || selectedNote === guitarNote) {
@@ -226,7 +227,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
             }
         }
 
-        const selectNote = (guitarNote: Score.GuitarNote) => {
+        const selectNote = (guitarNote: ScoreUI.GuitarNote) => {
             Score.Audio.playNote(guitarNote.preferredNote);
             this.setState({ selectedNote: guitarNote });
 
@@ -241,7 +242,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
             }, 1000);
         }
 
-        const onClickGuitar = (guitarNote: Score.GuitarNote) => selectNote(guitarNote);
+        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => selectNote(guitarNote);
 
         const onSetPositionName = (positionName: string) => {
             this.setState(this.createStateUpdate(guitarCtx, positionName as PositionName));
@@ -283,7 +284,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
 
             <br />
 
-            <Score.GuitarView
+            <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}

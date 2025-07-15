@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Col, Container, Form, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const tdStyle: React.CSSProperties = {
     paddingLeft: "1em",
@@ -19,7 +20,7 @@ interface WhatChordProps {
 }
 
 interface WhatChordState {
-    guitarCtx: Score.GuitarContext;
+    guitarCtx: ScoreUI.GuitarContext;
     selectedNote?: Score.Note;
     stringFrettingPos: FrettingPos[/* stringId */];
 }
@@ -55,7 +56,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
         let { app, windowRect } = this.props;
         let { guitarCtx, stringFrettingPos, selectedNote } = this.state;
 
-        const updateGuitarNote: Score.UpdateGuitarNoteFunc = (guitarNote) => {
+        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
             let frettingPos = stringFrettingPos.find((fingerPos, stringId) => {
                 return stringId === guitarNote.stringId && (fingerPos === guitarNote.fretId || fingerPos === "mute" && guitarNote.fretId === 0);
             });
@@ -84,9 +85,9 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             return fingerPos === "mute"
                 ? undefined
                 : guitarCtx.getGuitarNote(stringId, fingerPos);
-        }).reverse().filter(note => note !== undefined) as Score.GuitarNote[];
+        }).reverse().filter(note => note !== undefined) as ScoreUI.GuitarNote[];
 
-        const onClickGuitar = (guitarNote: Score.GuitarNote) => {
+        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {
             Score.Audio.playNote(guitarNote.preferredNote);
 
             let newStringFrettingPos = stringFrettingPos.slice();
@@ -155,7 +156,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
                 </Row>
             </Container>
 
-            <Score.GuitarView
+            <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
                 updateGuitarNote={updateGuitarNote}
@@ -164,11 +165,11 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             <Container>
                 <Row xs="auto">
                     <Col>
-                        <Score.MusicScoreView doc={doc} onSelectObject={onScoreSelectObject} onClickObject={onScoreClickObject} />
+                        <ScoreUI.MusicScoreView doc={doc} onSelectObject={onScoreSelectObject} onClickObject={onScoreClickObject} />
                     </Col>
                 </Row>
                 <Row xs="auto">
-                    <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
+                    <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
                 </Row>
                 <br />
                 <Row xs="auto">

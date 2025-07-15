@@ -1,6 +1,6 @@
 import * as React from "react";
-import { MDocument, MRenderer } from "web-music-score/core";
-import { ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "web-music-score/core";
+import { MDocument, MRenderer } from "@tspro/web-music-score";
+import { ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "@tspro/web-music-score";
 
 /** @public */
 export interface MusicScoreViewProps {

@@ -1,1 +1,3 @@
-export * as SamplePieces from "./exports";
+export * from "./frere-jacques";
+export * from "./greensleeves";
+export * from "./andante-diabelli";

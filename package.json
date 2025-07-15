@@ -8,32 +8,39 @@
         "url": "https://github.com/pahkasoft/issues/issues/new"
     },
     "description": "TS/JS component for rendering and playing music scores in the browser.",
-    "types": "./dist/index.d.ts",
-    "main": "./dist/index.js",
-    "module": "./dist/index.mjs",
     "exports": {
         ".": {
-            "browser": {
-                "require": {
-                    "types": "./dist/index.d.ts",
-                    "default": "./dist/index.js"
-                },
-                "import": {
-                    "types": "./dist/index.d.mts",
-                    "default": "./dist/index.mjs"
-                }
-            },
             "require": {
-                "types": "./dist/index.d.ts",
-                "default": "./dist/index.js"
+                "types": "./dist/core/index.d.ts",
+                "default": "./dist/core/index.js"
             },
             "import": {
-                "types": "./dist/index.d.mts",
-                "default": "./dist/index.mjs"
+                "types": "./dist/core/index.d.mts",
+                "default": "./dist/core/index.mjs"
+            }
+        },
+        "./react-ui": {
+            "require": {
+                "types": "./dist/react-ui/index.d.ts",
+                "default": "./dist/react-ui/index.js"
+            },
+            "import": {
+                "types": "./dist/react-ui/index.d.mts",
+                "default": "./dist/react-ui/index.mjs"
+            }
+        },
+        "./pieces": {
+            "require": {
+                "types": "./dist/pieces/index.d.ts",
+                "default": "./dist/pieces/index.js"
+            },
+            "import": {
+                "types": "./dist/pieces/index.d.mts",
+                "default": "./dist/pieces/index.mjs"
             }
         }
     },
-    "unpkg": "./dist/index.global.js",
+    "unpkg": "./dist/core/index.global.js",
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.1.0",
         "tone": "^15.1.22"

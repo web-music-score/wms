@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Alert, Button, Col, Container, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface ChooseScaleCircleProps {
     app: GuitarApp;
@@ -10,7 +11,7 @@ interface ChooseScaleCircleProps {
 }
 
 interface ChooseScaleCircleState {
-    guitarCtx: Score.GuitarContext;
+    guitarCtx: ScoreUI.GuitarContext;
     doc: Score.MDocument;
 }
 
@@ -25,7 +26,7 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
         this.state = this.createNewState(guitarCtx);
     }
 
-    createNewState(guitarCtx: Score.GuitarContext) {
+    createNewState(guitarCtx: ScoreUI.GuitarContext) {
         let doc = Score.MDocument.createSimpleScaleArpeggio(Score.StaffKind.GuitarTreble, guitarCtx.scale, "B2", 1);
         return { guitarCtx, doc }
     }
@@ -69,7 +70,7 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
                         <Alert variant="info">{scale.getScaleName()} - scale</Alert>
                     </Col>
                     <Col>
-                        <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
+                        <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
                     </Col>
                     <Col>
                         <Button variant="primary" onClick={() => this.onOK()}>OK</Button>
@@ -77,12 +78,12 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
                 </Row>
                 <Row xs="auto">
                     <Col>
-                        <Score.MusicScoreView doc={doc} />
+                        <ScoreUI.MusicScoreView doc={doc} />
                     </Col>
                 </Row>
                 <Row xs="auto">
                     <Col>
-                        <Score.CircleOfFifths
+                        <ScoreUI.CircleOfFifths
                             style={{ position: "relative", padding: "0.5em" }}
                             scale={scale}
                             onScaleChange={newScale => this.onChangeScale(newScale)} />

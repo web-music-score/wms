@@ -1,8 +1,9 @@
 import * as React from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { OrderOfAccidentalsInfo, SelectScaleForm, ScaleStepsInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
+import * as Score from "@tspro/web-music-score";
+import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface ChooseScaleProps {
     app: GuitarApp;
@@ -10,7 +11,7 @@ interface ChooseScaleProps {
 }
 
 interface ChooseScaleState {
-    guitarCtx: Score.GuitarContext;
+    guitarCtx: ScoreUI.GuitarContext;
     doc: Score.MDocument;
 }
 
@@ -25,7 +26,7 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
         this.state = this.createNewState(guitarCtx);
     }
 
-    createNewState(guitarCtx: Score.GuitarContext) {
+    createNewState(guitarCtx: ScoreUI.GuitarContext) {
         let doc = Score.MDocument.createSimpleScaleArpeggio(Score.StaffKind.GuitarTreble, guitarCtx.scale, "B2", 1);
         return { guitarCtx, doc }
     }
@@ -69,7 +70,7 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
                         <SelectScaleForm scale={scale} onScaleChange={scale => this.onChangeScale(scale)} />
                     </Col>
                     <Col>
-                        <Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
+                        <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
                     </Col>
                     <Col>
                         <Button variant="primary" onClick={() => this.onOK()}>OK</Button>
@@ -77,7 +78,7 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
                 </Row>
                 <Row xs="auto" className="mt-4">
                     <Col>
-                        <Score.MusicScoreView doc={doc} />
+                        <ScoreUI.MusicScoreView doc={doc} />
                     </Col>
                 </Row>
                 <Row xs="auto">

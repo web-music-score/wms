@@ -26,7 +26,7 @@
         "removeComments": false,
         "skipLibCheck": true,
         "paths": {
-            "web-music-score/core": [
+            "@tspro/web-music-score": [
                 "core"
             ]
         }
