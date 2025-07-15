@@ -60,7 +60,7 @@ export default defineConfig([
     // IIFE bundle
     {
         entry: {
-            'core/index': 'src/core/index.ts'
+            'iife/index': 'src/index.iife.ts'
         },
         outDir: 'dist',
         target: 'es2015',
@@ -69,7 +69,6 @@ export default defineConfig([
         sourcemap: true,
         minify: true,
         clean: false, // Don't wipe dist from the previous build
-        external: ['react'], // does not include react components
         banner: {
             js: bannerText
         },
