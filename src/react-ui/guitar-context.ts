@@ -1,23 +1,7 @@
-import { GuitarNoteLabel, PitchNotation, SymbolSet } from "@tspro/web-music-score";
+import { GuitarNoteLabel, Handedness, PitchNotation, SymbolSet } from "@tspro/web-music-score";
 import { getTuningStrings, Note, Scale } from "@tspro/web-music-score";
 import { Assert } from "@tspro/ts-utils-lib";
 import GuitarData from "./assets/guitar.json";
-
-/** @public */
-export type Handedness = "rh" | "lh";
-
-/** @public */
-export const DefaultHandedness: Handedness = "rh";
-
-/** @public */
-export function validateHandedness(handedness: string): Handedness {
-    if (handedness === "rh" || handedness === "lh") {
-        return handedness;
-    }
-    else {
-        return Assert.interrupt("Invalid handedness: " + handedness);
-    }
-}
 
 const DefaultColors = {
     ScaleNoteColor: "#0A0",

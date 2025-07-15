@@ -2,6 +2,18 @@ import { Assert, LRUCache } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 
+/** @public */
+export enum Handedness { RightHanded, LeftHanded }
+
+/** @public */
+export const DefaultHandedness = Handedness.RightHanded;
+
+/** @public */
+export function validateHandedness(h: unknown): Handedness {
+    Assert.assert(h === Handedness.RightHanded || h === Handedness.LeftHanded, "Invalid handedness: " + h);
+    return h as Handedness;
+}
+
 /*
  * | string | stringId | freq    | fretboard (RH) | on tab        |
  * |--------|----------|---------|----------------|---------------|

@@ -57,11 +57,11 @@ export class Menubar extends React.Component<MenubarProps, {}> {
                         <Dropdown.Toggle id="dropdown-guitars-settings">Guitar Settings</Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Header>Handedness</Dropdown.Header>
-                            <Dropdown.Item onClick={() => app.setHandedness("rh")}>
-                                Right Handed {guitarCtx.handedness === "rh" ? CheckIcon : undefined}
+                            <Dropdown.Item onClick={() => app.setHandedness(Score.Handedness.RightHanded)}>
+                                Right Handed {guitarCtx.handedness === Score.Handedness.RightHanded ? CheckIcon : undefined}
                             </Dropdown.Item>
-                            <Dropdown.Item onClick={() => app.setHandedness("lh")}>
-                                Left Handed {guitarCtx.handedness === "lh" ? CheckIcon : undefined}
+                            <Dropdown.Item onClick={() => app.setHandedness(Score.Handedness.LeftHanded)}>
+                                Left Handed {guitarCtx.handedness === Score.Handedness.LeftHanded ? CheckIcon : undefined}
                             </Dropdown.Item>
 
                             <Dropdown.Divider />

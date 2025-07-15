@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Assert, Utils } from "@tspro/ts-utils-lib";
-import { DivRect } from "@tspro/web-music-score";
+import { DivRect, Handedness } from "@tspro/web-music-score";
 import { GuitarContext, GuitarNote, } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
 import GuitarImg from "./assets/guitar.png";
@@ -116,12 +116,12 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
                     right.x - left.x,
                     cellHeight);
 
-                if (guitarCtx.handedness === "lh") {
+                if (guitarCtx.handedness === Handedness.LeftHanded) {
                     cellRect = new DivRect(width - cellRect.right, width - cellRect.left, cellRect.top, cellRect.bottom);
                 }
 
                 let noteRect = DivRect.create(
-                    cellRect.left + (guitarCtx.handedness === "lh" ? cellRect.width - noteWidth : 0),
+                    cellRect.left + (guitarCtx.handedness === Handedness.LeftHanded ? cellRect.width - noteWidth : 0),
                     cellRect.top,
                     noteWidth,
                     cellRect.height).scaleCopy(0.75, 0.95);
@@ -156,7 +156,7 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
         components.push(<img
             key={"guitar"}
             src={GuitarImg}
-            className={guitarCtx.handedness === "lh" ? "left-handed" : ""}
+            className={guitarCtx.handedness === Handedness.LeftHanded ? "left-handed" : ""}
             style={{ position: "absolute", width, height, zIndex: 0 }} />
         );
 
