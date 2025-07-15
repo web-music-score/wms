@@ -1,5 +1,7 @@
 import * as React from "react";
-import * as Score from "@tspro/web-music-score";
+
+// Try require
+const Score = require("@tspro/web-music-score");
 
 export class ExampleApp extends React.Component {
     constructor(props) {
