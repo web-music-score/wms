@@ -1,9 +1,7 @@
-// Export named exports.
-export * from "./exports.full";
-
-// Export default export.
-import * as DefaultExport from "./exports.full";
-export default DefaultExport;
+// Export all
+export * from "./core";
+export * from "./react-ui";
+export * from "./pieces";
 
 // __LIB_INFO__ is set by webpack.DefinePlugin.
 declare const __LIB_INFO__: string;

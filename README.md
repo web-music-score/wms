@@ -23,11 +23,7 @@ npm i react
 
 #### Import (ESM)
 ```js
-// Import named exports
 import * as Score from "@tspro/web-music-score";
-
-// Import default export
-import Score from "@tspro/web-music-score";
 ```
 
 #### Require (CommonJS)
