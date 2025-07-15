@@ -26,8 +26,23 @@
         "removeComments": false,
         "skipLibCheck": true,
         "paths": {
-            "@tspro/web-music-score": [
+            "@tspro/web-music-score/core": [
                 "core"
+            ],
+            "@tspro/web-music-score/audio": [
+                "audio"
+            ],
+            "@tspro/web-music-score/theory": [
+                "theory"
+            ],
+            "@tspro/web-music-score/score": [
+                "score"
+            ],
+            "@tspro/web-music-score/react-ui": [
+                "react-ui"
+            ],
+            "@tspro/web-music-score/pieces": [
+                "pieces"
             ]
         }
     },

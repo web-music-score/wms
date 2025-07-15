@@ -2,7 +2,9 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { CAGEDScales, ChooseScale, ChooseScaleCircle, ChooseTuning, DiatonicChords, FrontPage, GuitarScales, Intervals, PlayNotes, WhatChord } from "./pages";
 import { Cookies, Utils } from "@tspro/ts-utils-lib";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const AppCookies = {
@@ -42,7 +44,7 @@ export enum Page {
 interface GuitarAppState {
     windowRect: Score.DivRect;
     currentPage: string;
-    instrument: Score.Audio.Instrument;
+    instrument: Audio.Instrument;
     guitarCtx: ScoreUI.GuitarContext;
 }
 
@@ -63,58 +65,58 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
             currentPage = Page.FrontPage;
         }
 
-        let pitchNotation: Score.PitchNotation;
-        let guitarNoteLabel: Score.GuitarNoteLabel;
-        let handedness: Score.Handedness;
+        let pitchNotation: Theory.PitchNotation;
+        let guitarNoteLabel: Theory.GuitarNoteLabel;
+        let handedness: Theory.Handedness;
         let tuningName: string;
-        let scale: Score.Scale;
-        let instrument: Score.Audio.Instrument;
+        let scale: Theory.Scale;
+        let instrument: Audio.Instrument;
 
         try {
-            pitchNotation = Score.validatePitchNotation(Cookies.read(AppCookies.PitchNotation, Score.DefaultPitchNotation));
+            pitchNotation = Theory.validatePitchNotation(Cookies.read(AppCookies.PitchNotation, Theory.DefaultPitchNotation));
         }
         catch (err) {
-            pitchNotation = Score.DefaultPitchNotation;
+            pitchNotation = Theory.DefaultPitchNotation;
         }
 
         try {
-            guitarNoteLabel = Score.validateGuitarNoteLabel(Cookies.read(AppCookies.GuitarNoteLabel, Score.DefaultGuitarNoteLabel));
+            guitarNoteLabel = Theory.validateGuitarNoteLabel(Cookies.read(AppCookies.GuitarNoteLabel, Theory.DefaultGuitarNoteLabel));
         }
         catch (err) {
-            guitarNoteLabel = Score.DefaultGuitarNoteLabel;
+            guitarNoteLabel = Theory.DefaultGuitarNoteLabel;
         }
 
         try {
-            handedness = Score.validateHandedness(Cookies.readInt(AppCookies.Handedness, Score.DefaultHandedness));
+            handedness = Theory.validateHandedness(Cookies.readInt(AppCookies.Handedness, Theory.DefaultHandedness));
         }
         catch (err) {
-            handedness = Score.DefaultHandedness;
+            handedness = Theory.DefaultHandedness;
         }
 
         try {
-            tuningName = Score.validateTuningName(Cookies.read(AppCookies.TuningName, Score.DefaultTuningName));
+            tuningName = Theory.validateTuningName(Cookies.read(AppCookies.TuningName, Theory.DefaultTuningName));
         }
         catch (err) {
-            tuningName = Score.DefaultTuningName;
+            tuningName = Theory.DefaultTuningName;
         }
 
         try {
-            let scaleType = Score.validateScaleType(Cookies.read(AppCookies.ScaleType, ""));
+            let scaleType = Theory.validateScaleType(Cookies.read(AppCookies.ScaleType, ""));
             let scaleKeyNote = Cookies.read(AppCookies.ScaleKeyNote, "");
-            scale = Score.getScale(scaleKeyNote, scaleType);
+            scale = Theory.getScale(scaleKeyNote, scaleType);
         }
         catch (err) {
-            scale = Score.getDefaultScale();
+            scale = Theory.getDefaultScale();
         }
 
         try {
-            instrument = Score.Audio.validateInstrument(Cookies.readInt(AppCookies.Instrument, Score.Audio.Instrument.ClassicalGuitar));
+            instrument = Audio.validateInstrument(Cookies.readInt(AppCookies.Instrument, Audio.Instrument.ClassicalGuitar));
         }
         catch (err) {
-            instrument = Score.Audio.Instrument.ClassicalGuitar;
+            instrument = Audio.Instrument.ClassicalGuitar;
         }
 
-        Score.Audio.setInstrument(instrument);
+        Audio.setInstrument(instrument);
 
         let windowRect = new Score.DivRect();
 
@@ -152,7 +154,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
     }
 
-    setPitchNotation(pitchNotation: Score.PitchNotation) {
+    setPitchNotation(pitchNotation: Theory.PitchNotation) {
         let guitarCtx = this.state.guitarCtx.alterPitchNotation(pitchNotation);
         if (guitarCtx !== this.state.guitarCtx) {
             this.setState({ guitarCtx });
@@ -160,7 +162,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
     }
 
-    setGuitarNoteLabel(guitarNoteLabel: Score.GuitarNoteLabel) {
+    setGuitarNoteLabel(guitarNoteLabel: Theory.GuitarNoteLabel) {
         let guitarCtx = this.state.guitarCtx.alterGuitarNoteLabel(guitarNoteLabel);
         if (guitarCtx !== this.state.guitarCtx) {
             this.setState({ guitarCtx });
@@ -168,7 +170,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
     }
 
-    setHandedness(handedness: Score.Handedness) {
+    setHandedness(handedness: Theory.Handedness) {
         let guitarCtx = this.state.guitarCtx.alterHandedness(handedness);
         if (guitarCtx !== this.state.guitarCtx) {
             this.setState({ guitarCtx });
@@ -185,7 +187,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         GuitarApp.back();
     }
 
-    setScale(scale: Score.Scale) {
+    setScale(scale: Theory.Scale) {
         let guitarCtx = this.state.guitarCtx.alterScale(scale);
         if (guitarCtx !== this.state.guitarCtx) {
             this.setState({ guitarCtx });
@@ -195,11 +197,11 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         GuitarApp.back();
     }
 
-    setInstrument(instr: Score.Audio.Instrument) {
+    setInstrument(instr: Audio.Instrument) {
         if (instr !== this.state.instrument) {
             this.setState({ instrument: instr });
             Cookies.save(AppCookies.Instrument, instr);
-            Score.Audio.setInstrument(instr);
+            Audio.setInstrument(instr);
         }
     }
 

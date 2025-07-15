@@ -2,7 +2,9 @@ import * as React from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { GuitarApp, Page } from "guitar-app";
 import { SelectAccidental, Menubar, TuningScaleInfo } from "components";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const tdStyle: React.CSSProperties = {
@@ -17,9 +19,9 @@ interface IntervalsProps {
 }
 
 interface IntervalsState {
-    accidental: Score.Accidental | undefined;
-    note1?: Score.Note;
-    note2?: Score.Note;
+    accidental: Theory.Accidental | undefined;
+    note1?: Theory.Note;
+    note2?: Theory.Note;
 }
 
 export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
@@ -46,24 +48,24 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
         if (note1) {
-            let noteName1 = note1.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode);
-            m.addNote(0, note1, Score.NoteLength.Half);
+            let noteName1 = note1.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
+            m.addNote(0, note1, Theory.NoteLength.Half);
             m.addLabel(Score.Label.Note, noteName1);
         }
         if (note2) {
-            let noteName2 = note2.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode);
-            m.addNote(0, note2, Score.NoteLength.Half);
+            let noteName2 = note2.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
+            m.addNote(0, note2, Theory.NoteLength.Half);
             m.addLabel(Score.Label.Note, noteName2);
         }
 
-        let note1Str = note1 ? note1.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode) : "";
-        let note2Str = note2 ? note2.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode) : "";
+        let note1Str = note1 ? note1.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode) : "";
+        let note2Str = note2 ? note2.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode) : "";
 
         let intervalStr = "";
         let intervalAbbr = "";
 
         if (note1 && note2) {
-            let iv = Score.Interval.get(note1, note2);
+            let iv = Theory.Interval.get(note1, note2);
             intervalStr = iv ? iv.toString() : "Unknown";
             intervalAbbr = iv ? iv.toAbbrString() : "?";
         }
@@ -72,7 +74,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
             let { note1, note2, accidental } = this.state;
             let { pitch } = pickedPitch;
 
-            let note = new Score.Note(pitch, accidental ?? guitarCtx.scale.getKeySignature().getAccidental(pitch));
+            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getKeySignature().getAccidental(pitch));
 
             if (note1 === undefined || note1 !== undefined && note2 !== undefined) {
                 this.setState({ note1: note, note2: undefined });
@@ -82,10 +84,10 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
                 this.setState({ note1, note2 });
             }
 
-            Score.Audio.playNote(note);
+            Audio.playNote(note);
         }
 
-        const onChangeAccidental = (accidental: Score.Accidental | undefined) => {
+        const onChangeAccidental = (accidental: Theory.Accidental | undefined) => {
             this.setState({ accidental })
         }
 

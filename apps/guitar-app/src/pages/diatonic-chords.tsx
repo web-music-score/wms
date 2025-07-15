@@ -3,7 +3,8 @@ import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { GuitarApp, Page } from "guitar-app";
 import { TuningScaleInfo, Menubar } from "components";
 import { Utils } from "@tspro/ts-utils-lib";
-import * as Score from "@tspro/web-music-score";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 enum ChordType {
@@ -32,18 +33,18 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
         }
     }
 
-    static isCompatibleScaleType(scaleType: Score.ScaleType) {
+    static isCompatibleScaleType(scaleType: Theory.ScaleType) {
         switch (scaleType) {
-            case Score.ScaleType.Major:
-            case Score.ScaleType.NaturalMinor:
-            //case Score.ScaleType.HarmonicMinor: ?
-            case Score.ScaleType.Ionian:
-            case Score.ScaleType.Dorian:
-            case Score.ScaleType.Phrygian:
-            case Score.ScaleType.Lydian:
-            case Score.ScaleType.Mixolydian:
-            case Score.ScaleType.Aeolian:
-            case Score.ScaleType.Locrian:
+            case Theory.ScaleType.Major:
+            case Theory.ScaleType.NaturalMinor:
+            //case Theory.ScaleType.HarmonicMinor: ?
+            case Theory.ScaleType.Ionian:
+            case Theory.ScaleType.Dorian:
+            case Theory.ScaleType.Phrygian:
+            case Theory.ScaleType.Lydian:
+            case Theory.ScaleType.Mixolydian:
+            case Theory.ScaleType.Aeolian:
+            case Theory.ScaleType.Locrian:
                 return true;
             default:
                 return false;
@@ -77,10 +78,10 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
 
             scaleNotes.forEach((rootNote, rootNoteId) => {
                 const addChord = (...degrees: number[]) => {
-                    let notes = degrees.map(d => new Score.Note(rootNote.pitch + d - 1, scaleNotes[(rootNoteId + d - 1) % 7].accidental));
-                    let chordName = (Score.Chord.getChords(notes)[0] ?? "?").toString();
+                    let notes = degrees.map(d => new Theory.Note(rootNote.pitch + d - 1, scaleNotes[(rootNoteId + d - 1) % 7].accidental));
+                    let chordName = (Theory.Chord.getChords(notes)[0] ?? "?").toString();
                     let chordOrder = Utils.Math.romanize(rootNoteId % 7 + 1);
-                    m.addChord(0, notes, Score.NoteLength.Quarter);
+                    m.addChord(0, notes, Theory.NoteLength.Quarter);
                     m.addLabel(Score.Label.Chord, chordName);
                     m.addLabel(Score.Label.Note, chordOrder);
                 }

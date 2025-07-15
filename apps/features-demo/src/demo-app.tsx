@@ -1,10 +1,11 @@
 import * as React from "react";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
 
 type DemoAppState = {
-    instrument: Score.Audio.Instrument;
+    instrument: Audio.Instrument;
     doc: Score.MDocument;
     hoverText: string;
 }
@@ -16,10 +17,10 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
     constructor(props: {}) {
         super(props);
 
-        Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
+        Audio.setInstrument(Audio.Instrument.ClassicalGuitar);
 
         this.state = {
-            instrument: Score.Audio.Instrument.ClassicalGuitar,
+            instrument: Audio.Instrument.ClassicalGuitar,
             doc: DemoPieces.getInstance().getDefault(),
             hoverText: ""
         }
@@ -40,8 +41,8 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
         }
 
         const onChangeInstrument = (instr: number) => {
-            Score.Audio.setInstrument(Score.Audio.validateInstrument(instr));
-            this.setState({ instrument: Score.Audio.validateInstrument(instr) });
+            Audio.setInstrument(Audio.validateInstrument(instr));
+            this.setState({ instrument: Audio.validateInstrument(instr) });
         }
 
         const onSelectObject = (arr: Score.MusicInterface[]) => {
@@ -74,7 +75,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
                 <label className="form-label">Instrument:</label>
                 <div className="col-3">
                     <select className="form-select" name="select" value={instrument} onChange={e => onChangeInstrument(+e.target.value)}>
-                        {Score.Audio.InstrumentList.map(instr => <option key={instr} value={instr}>{Score.Audio.getInstrumentName(instr)}</option>)}
+                        {Audio.InstrumentList.map(instr => <option key={instr} value={instr}>{Audio.getInstrumentName(instr)}</option>)}
                     </select>
                 </div>
             </div>

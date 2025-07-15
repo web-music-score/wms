@@ -1,5 +1,6 @@
 import * as React from "react";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 import { createFrereJacques } from "@tspro/web-music-score/pieces";
 
@@ -12,7 +13,7 @@ export class ExampleApp extends React.Component<{}, ExampleAppState> {
     constructor(props: {}) {
         super(props);
 
-        Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
+        Audio.setInstrument(Audio.Instrument.ClassicalGuitar);
 
         let doc = createFrereJacques();
 

@@ -1,4 +1,5 @@
-import * as Score from "@tspro/web-music-score";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 
 export function createNoteHeadsDemo() {
     let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
@@ -6,61 +7,61 @@ export function createNoteHeadsDemo() {
     doc.setHeader("Note Heads");
 
     doc.addMeasure()
-        .setKeySignature("A", Score.ScaleType.NaturalMinor)
+        .setKeySignature("A", Theory.ScaleType.NaturalMinor)
         .setTimeSignature("4/4")
         .setTempo(80)
-        .addNote(0, "A3", Score.NoteLength.Whole);
+        .addNote(0, "A3", Theory.NoteLength.Whole);
 
     doc.addMeasure()
-        .addNote(0, "A3", Score.NoteLength.Half)
-        .addNote(0, "B3", Score.NoteLength.Quarter)
-        .addNote(0, "A3", Score.NoteLength.Eighth)
-        .addNote(0, "A3", Score.NoteLength.Eighth);
+        .addNote(0, "A3", Theory.NoteLength.Half)
+        .addNote(0, "B3", Theory.NoteLength.Quarter)
+        .addNote(0, "A3", Theory.NoteLength.Eighth)
+        .addNote(0, "A3", Theory.NoteLength.Eighth);
 
     doc.addMeasure()
-        .addNote(0, "A3", Score.NoteLength.Whole, { diamond: true });
+        .addNote(0, "A3", Theory.NoteLength.Whole, { diamond: true });
 
     doc.addMeasure()
-        .addNote(0, "A3", Score.NoteLength.Half, { diamond: true })
-        .addNote(0, "B3", Score.NoteLength.Quarter, { diamond: true })
-        .addNote(0, "A3", Score.NoteLength.Eighth, { diamond: true })
-        .addNote(0, "A3", Score.NoteLength.Eighth, { diamond: true });
+        .addNote(0, "A3", Theory.NoteLength.Half, { diamond: true })
+        .addNote(0, "B3", Theory.NoteLength.Quarter, { diamond: true })
+        .addNote(0, "A3", Theory.NoteLength.Eighth, { diamond: true })
+        .addNote(0, "A3", Theory.NoteLength.Eighth, { diamond: true });
 
     doc.addMeasure()
-        .addNote(0, "A3", Score.NoteLength.Quarter, { dotted: true })
-        .addNote(0, "A3", Score.NoteLength.Quarter, { dotted: true })
-        .addNote(0, "A3", Score.NoteLength.Eighth)
-        .addNote(0, "A3", Score.NoteLength.Eighth)
+        .addNote(0, "A3", Theory.NoteLength.Quarter, { dotted: true })
+        .addNote(0, "A3", Theory.NoteLength.Quarter, { dotted: true })
+        .addNote(0, "A3", Theory.NoteLength.Eighth)
+        .addNote(0, "A3", Theory.NoteLength.Eighth)
         .endRow();
 
     doc.addMeasure()
-        .setKeySignature("D", Score.ScaleType.Major)
+        .setKeySignature("D", Theory.ScaleType.Major)
         .setTimeSignature("3/4")
-        .addNote(0, "D4", Score.NoteLength.Quarter, { stem: Score.Stem.Up })
-        .addRest(1, Score.NoteLength.Quarter, { pitch: "D3" })
-        .addNote(0, "D3", Score.NoteLength.Quarter, { stem: Score.Stem.Up }) // Stem up... 
-        .addNote(1, "D3", Score.NoteLength.Quarter, { stem: Score.Stem.Down }) // ...and down
-        .addRest(1, Score.NoteLength.Quarter, { pitch: "B3" });
+        .addNote(0, "D4", Theory.NoteLength.Quarter, { stem: Score.Stem.Up })
+        .addRest(1, Theory.NoteLength.Quarter, { pitch: "D3" })
+        .addNote(0, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Up }) // Stem up... 
+        .addNote(1, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Down }) // ...and down
+        .addRest(1, Theory.NoteLength.Quarter, { pitch: "B3" });
 
     doc.addMeasure()
-        .setKeySignature("G", Score.ScaleType.Major)
+        .setKeySignature("G", Theory.ScaleType.Major)
         .setTimeSignature("2/4")
-        .addNote(0, "C3", Score.NoteLength.Sixteenth, { stem: Score.Stem.Up })
-        .addNote(0, "E4", Score.NoteLength.Sixteenth)
-        .addNote(0, "B2", Score.NoteLength.Sixteenth)
-        .addNote(0, "D4", Score.NoteLength.Sixteenth)
-        .addNote(0, "A2", Score.NoteLength.Sixteenth)
-        .addNote(0, "C4", Score.NoteLength.Sixteenth)
-        .addNote(0, "G2", Score.NoteLength.Sixteenth)
-        .addNote(0, "B3", Score.NoteLength.Sixteenth)
-        .addNote(1, "C3", Score.NoteLength.Eighth, { stem: Score.Stem.Down })
-        .addNote(1, "B2", Score.NoteLength.Eighth)
-        .addNote(1, "A2", Score.NoteLength.Eighth)
-        .addNote(1, "G2", Score.NoteLength.Eighth);
+        .addNote(0, "C3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Up })
+        .addNote(0, "E4", Theory.NoteLength.Sixteenth)
+        .addNote(0, "B2", Theory.NoteLength.Sixteenth)
+        .addNote(0, "D4", Theory.NoteLength.Sixteenth)
+        .addNote(0, "A2", Theory.NoteLength.Sixteenth)
+        .addNote(0, "C4", Theory.NoteLength.Sixteenth)
+        .addNote(0, "G2", Theory.NoteLength.Sixteenth)
+        .addNote(0, "B3", Theory.NoteLength.Sixteenth)
+        .addNote(1, "C3", Theory.NoteLength.Eighth, { stem: Score.Stem.Down })
+        .addNote(1, "B2", Theory.NoteLength.Eighth)
+        .addNote(1, "A2", Theory.NoteLength.Eighth)
+        .addNote(1, "G2", Theory.NoteLength.Eighth);
 
     doc.addMeasure()
-        .addChord(0, ["C3", "E3", "F#3", "A3", "B3", "C4"], Score.NoteLength.Quarter, { stem: Score.Stem.Up })
-        .addChord(0, ["C3", "E3", "F#3", "A3", "B3", "C4"], Score.NoteLength.Quarter, { stem: Score.Stem.Down })
+        .addChord(0, ["C3", "E3", "F#3", "A3", "B3", "C4"], Theory.NoteLength.Quarter, { stem: Score.Stem.Up })
+        .addChord(0, ["C3", "E3", "F#3", "A3", "B3", "C4"], Theory.NoteLength.Quarter, { stem: Score.Stem.Down })
 
     return doc;
 }

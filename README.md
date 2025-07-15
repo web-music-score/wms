@@ -98,7 +98,7 @@ Manually induce row change. Next measure will be added to new row.
 ### Set Signature
 
 ```js
-m.setKeySignature("C", Score.ScaleType.Major);
+m.setKeySignature("C", Theory.ScaleType.Major);
 ```
 
 Firat argument is scale key note.
@@ -113,7 +113,7 @@ m.setTimeSignature("4/4");
 Time signature can be `"2/4"`, `"3/4"`, `"4/4"`, `"6/8"` or `"9/8"`.
 
 ```js
-m.setTempo(80, Score.NoteLength.Quarter, false);
+m.setTempo(80, Theory.NoteLength.Quarter, false);
 m.setTempo(80);
 ```
 
@@ -136,8 +136,8 @@ m.addChord(voiceId, notes, noteLength, noteOptions);
 
 Examples:
 ```js
-m.addNote(0, "C3", Score.NoteLength.Quarter);
-m.addChord(1, ["C3", "E3", "G3", "C4"], Score.NoteLength.Half, { dotted: true });
+m.addNote(0, "C3", Theory.NoteLength.Quarter);
+m.addChord(1, ["C3", "E3", "G3", "C4"], Theory.NoteLength.Half, { dotted: true });
 ```
 
 #### NoteLength
@@ -180,7 +180,7 @@ m.addRest(voideId, restLength, restOptions?);
 
 Example:
 ```js
-m.addRest(0, Score.NoteLength.Quarter);
+m.addRest(0, Theory.NoteLength.Quarter);
 ```
 
 #### RestOptions
@@ -196,8 +196,8 @@ Optional object of rest options (e.g. `{ hide: true }`):
 ### Add Fermata
 
 ```js
-m.addNote(0, "C3", Score.NoteLength.Quarter).addFermata(Score.Fermata.AtNote);
-m.addRest(0, Score.NoteLength.Quarter).addFermata();
+m.addNote(0, "C3", Theory.NoteLength.Quarter).addFermata(Score.Fermata.AtNote);
+m.addRest(0, Theory.NoteLength.Quarter).addFermata();
 ```
 
 Adds fermata anchored to previously added note or rest.
@@ -246,7 +246,7 @@ m.addNavigation(Score.Navigation.Ending, 3);
 ### Add Label
 
 ```js
-m.addChord(0, ["D3", "F3", "A3"], Score.NoteLength.Quarter).addLabel(Score.Label.Chord, "Dm");
+m.addChord(0, ["D3", "F3", "A3"], Theory.NoteLength.Quarter).addLabel(Score.Label.Chord, "Dm");
 ```
 
 Available Label types are:
@@ -257,7 +257,7 @@ Available Label types are:
 ### Add Annotation
 
 ```js
-m.addNote(0, "C3", Score.NoteLength.Quarter).addAnnotation(Score.Annotation.Dynamics, "fff");
+m.addNote(0, "C3", Theory.NoteLength.Quarter).addAnnotation(Score.Annotation.Dynamics, "fff");
 ```
 
 First argument is `Annotation`, second argument is the annotation text.
@@ -270,9 +270,9 @@ Available annotations are:
 ### Add Extension
 
 ```js
-m.addNote(0, "C3", Score.NoteLength.Quarter).
+m.addNote(0, "C3", Theory.NoteLength.Quarter).
     addAnnotation(Score.Annotation.Tempo, "accel.").
-    addExtension(Score.NoteLength.Whole * 2, true);
+    addExtension(Theory.NoteLength.Whole * 2, true);
 ```
 
 Adds extension line to element, annotation in this case.
@@ -294,10 +294,10 @@ Add notes with `string` option to specify which string the fret number is render
 
 ```js
 // Single note
-m.addNote(0, "G3", Score.NoteLength.Eighth, { string: 3 });
+m.addNote(0, "G3", Theory.NoteLength.Eighth, { string: 3 });
 
 // Multi note
-m.addChord(0, ["E4", "C3"], Score.NoteLength.Eighth, { string: [1, 5] });
+m.addChord(0, ["E4", "C3"], Theory.NoteLength.Eighth, { string: [1, 5] });
 ```
 
 
@@ -307,9 +307,9 @@ Adding stuff to measures can be queued like this:
 
 ```js
 doc.addMeasure()
-    .addNote(1, "C3", Score.NoteLength.Quarter)
-    .addChord(1, ["C3", "E3", "G3"], Score.NoteLength.Quarter).addLabel(Score.Label.Chord, "C")
-    .addRest(1, Score.NoteLength.Quarter);
+    .addNote(1, "C3", Theory.NoteLength.Quarter)
+    .addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Quarter).addLabel(Score.Label.Chord, "C")
+    .addRest(1, Theory.NoteLength.Quarter);
 ```
 
 ### Beams
@@ -319,7 +319,7 @@ Beams are detected and added automatically.
 ### Play Document
 
 ```js
-Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
+Audio.setInstrument(Audio.Instrument.ClassicalGuitar);
 ```
 
 Sets instrument. Instrument can be ClassicalGuitar or Synth.
@@ -398,7 +398,7 @@ p.setPlayButton(playButtonElement)
 ```js
 try {
     // Invalid note "C" without octave.
-    m.addNote(0, "C", Score.NoteLength.Quarter);        
+    m.addNote(0, "C", Theory.NoteLength.Quarter);        
 }
 catch(e) {
     // MusicError is raised on errors.

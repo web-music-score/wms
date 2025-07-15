@@ -1,4 +1,5 @@
-import * as Score from "@tspro/web-music-score";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 
 export function createCompleteRestsDemo() {
     let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
@@ -6,45 +7,45 @@ export function createCompleteRestsDemo() {
     doc.setHeader("Complete Rests");
 
     doc.addMeasure()
-        .setKeySignature("C", Score.ScaleType.Major)
+        .setKeySignature("C", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(80)
-        .addNote(0, "G3", Score.NoteLength.Whole)
+        .addNote(0, "G3", Theory.NoteLength.Whole)
         .completeRests();
 
     doc.addMeasure()
         .completeRests();
 
     doc.addMeasure()
-        .addNote(0, "B3", Score.NoteLength.Half)
+        .addNote(0, "B3", Theory.NoteLength.Half)
         .completeRests();
 
     doc.addMeasure()
-        .addNote(0, "G3", Score.NoteLength.Half, { dotted: true })
+        .addNote(0, "G3", Theory.NoteLength.Half, { dotted: true })
         .completeRests()
         .endRow();
 
     doc.addMeasure()
-        .addNote(0, "A3", Score.NoteLength.Quarter)
+        .addNote(0, "A3", Theory.NoteLength.Quarter)
         .completeRests();
 
     doc.addMeasure()
-        .addNote(0, "B3", Score.NoteLength.Eighth)
+        .addNote(0, "B3", Theory.NoteLength.Eighth)
         .completeRests();
 
     doc.addMeasure()
-        .addNote(0, "B3", Score.NoteLength.Sixteenth)
+        .addNote(0, "B3", Theory.NoteLength.Sixteenth)
         .completeRests()
         .endRow();
 
     doc.addMeasure()
-        .addNote(0, "C4", Score.NoteLength.Eighth, { stem: Score.Stem.Up })
-        .addNote(1, "D3", Score.NoteLength.Quarter, { stem: Score.Stem.Down })
+        .addNote(0, "C4", Theory.NoteLength.Eighth, { stem: Score.Stem.Up })
+        .addNote(1, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Down })
         .completeRests();
 
     doc.addMeasure()
-        .addNote(0, "E4", Score.NoteLength.Half, { stem: Score.Stem.Up, dotted: true })
-        .addNote(1, "F3", Score.NoteLength.Half, { stem: Score.Stem.Down })
+        .addNote(0, "E4", Theory.NoteLength.Half, { stem: Score.Stem.Up, dotted: true })
+        .addNote(1, "F3", Theory.NoteLength.Half, { stem: Score.Stem.Down })
         .completeRests();
 
     return doc;

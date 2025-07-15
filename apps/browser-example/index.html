@@ -26,18 +26,18 @@
     <script>
         const Score = window.WebMusicScore;
 
-        Score.Audio.setInstrument(Score.Audio.Instrument.ClassicalGuitar);
+        Audio.setInstrument(Audio.Instrument.ClassicalGuitar);
 
         let doc = new Score.MDocument(Score.StaffKind.Treble);
 
         doc.addMeasure()
             .setTimeSignature("3/4")
-            .addNote(0, "C4", Score.NoteLength.Quarter)
-            .addNote(0, "E4", Score.NoteLength.Quarter)
-            .addNote(0, "G4", Score.NoteLength.Quarter)
+            .addNote(0, "C4", Theory.NoteLength.Quarter)
+            .addNote(0, "E4", Theory.NoteLength.Quarter)
+            .addNote(0, "G4", Theory.NoteLength.Quarter)
 
         doc.addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], Score.NoteLength.Half, { dotted: true, arpeggio: true });
+            .addChord(0, ["C4", "E4", "G4"], Theory.NoteLength.Half, { dotted: true, arpeggio: true });
 
         new Score.MRenderer().
             setCanvas("scoreCanvas").

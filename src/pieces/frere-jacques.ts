@@ -1,4 +1,5 @@
-import { MDocument, StaffKind, NoteLength, ScaleType } from "@tspro/web-music-score";
+import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
+import { MDocument, StaffKind } from "@tspro/web-music-score/score";
 
 /** @public */
 export function createFrereJacques(): MDocument {

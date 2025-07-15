@@ -2,12 +2,13 @@ import * as React from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { OrderOfAccidentalsInfo, SelectScaleForm, ScaleStepsInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Score from "@tspro/web-music-score";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface ChooseScaleProps {
     app: GuitarApp;
-    onChangeScale: (scale: Score.Scale) => void;
+    onChangeScale: (scale: Theory.Scale) => void;
 }
 
 interface ChooseScaleState {
@@ -31,7 +32,7 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
         return { guitarCtx, doc }
     }
 
-    onChangeScale(scale: Score.Scale) {
+    onChangeScale(scale: Theory.Scale) {
         try {
             let guitarCtx = this.state.guitarCtx.alterScale(scale);
             if (guitarCtx !== this.state.guitarCtx) {

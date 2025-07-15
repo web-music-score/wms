@@ -3,7 +3,9 @@ import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import { Utils } from "@tspro/ts-utils-lib";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const LowestNote = "E2";
@@ -19,7 +21,7 @@ class GuitarChord {
         this.minScaleFretId = Math.max(0, this.minFretId - (positionName === PositionName.C ? 0 : 1));
     }
 
-    consistsOfTriad(triadNotes: Score.Note[]) {
+    consistsOfTriad(triadNotes: Theory.Note[]) {
         return this.guitarNotes.every(n1 => triadNotes.some(n2 => n2.noteId % 12 === n1.noteId % 12));
     }
 
@@ -88,7 +90,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
         scaleNotes: ScoreUI.GuitarNote[]
     } {
 
-        if (guitarCtx.tuningName !== Score.DefaultTuningName || guitarCtx.scale.scaleType !== Score.ScaleType.Major) {
+        if (guitarCtx.tuningName !== Theory.DefaultTuningName || guitarCtx.scale.scaleType !== Theory.ScaleType.Major) {
             return {
                 guitarCtx,
                 positionNameList: [],
@@ -177,21 +179,21 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
 
         let errorMsgs: string[] = [];
 
-        if (scale.scaleType !== Score.ScaleType.Major) {
+        if (scale.scaleType !== Theory.ScaleType.Major) {
             errorMsgs.push("This page only works with Major scales. Please select Major scale from the top menu bar.");
         }
 
-        if (guitarCtx.tuningName !== Score.DefaultTuningName) {
+        if (guitarCtx.tuningName !== Theory.DefaultTuningName) {
             errorMsgs.push("This page only works with Standard tuning. Please select tuning from the top menu bar.");
         }
 
-        const ScaleOctave = scale.scaleType === Score.ScaleType.Major
+        const ScaleOctave = scale.scaleType === Theory.ScaleType.Major
             ? scale.getScaleNotes(LowestNote, 1).slice(0, 7)
             : [];
 
         // Create relative modes list
         let relativeModes = ScaleOctave.map((note, i) => {
-            let keyNote = note.formatOmitOctave(Score.SymbolSet.Unicode);
+            let keyNote = note.formatOmitOctave(Theory.SymbolSet.Unicode);
             return "" + (i + 1) + ". " + keyNote + [
                 " Ionian / " + keyNote + " Major",
                 " Dorian",
@@ -228,7 +230,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
         }
 
         const selectNote = (guitarNote: ScoreUI.GuitarNote) => {
-            Score.Audio.playNote(guitarNote.preferredNote);
+            Audio.playNote(guitarNote.preferredNote);
             this.setState({ selectedNote: guitarNote });
 
             if (this.selectedNoteTimer) {

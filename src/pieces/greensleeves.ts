@@ -1,5 +1,5 @@
-import { NoteLength, ScaleType, MDocument } from "@tspro/web-music-score";
-import { Arpeggio, Navigation, StaffKind, Stem, Label } from "@tspro/web-music-score";
+import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
+import { MDocument, Arpeggio, Navigation, StaffKind, Stem, Label } from "@tspro/web-music-score/score";
 
 // Greensleeves (https://musescore.com/aaron_dc/scores/6167495)
 

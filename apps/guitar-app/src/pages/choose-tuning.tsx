@@ -2,7 +2,9 @@ import * as React from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Menubar, SelectTuningForm } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface ChooseTuningProps {
@@ -27,7 +29,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
 
     onChangeTuning(tuningName: string) {
         try {
-            let guitarCtx = this.state.guitarCtx.alterTuningName(Score.validateTuningName(tuningName));
+            let guitarCtx = this.state.guitarCtx.alterTuningName(Theory.validateTuningName(tuningName));
             if (guitarCtx !== this.state.guitarCtx) {
                 Score.MPlayer.stopAll();
                 this.setState({ guitarCtx });
@@ -53,18 +55,24 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         let { guitarCtx } = this.state;
         let { tuningName } = guitarCtx;
 
-        let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
-        let m = doc.addMeasure().setKeySignature(Score.getScale("C", Score.ScaleType.Major));
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
+
+        let doc = Math.min(...notes.map(n => n.pitch)) < Theory.Note.getNote("C2").pitch
+            ? new Score.MDocument(Score.StaffKind.Grand) // Low notes do not fit into guitar staff (min visible note is C2).
+            : new Score.MDocument(Score.StaffKind.GuitarTreble);
+
+        let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
+
         notes.forEach(note => {
-            m.addNote(0, note, Score.NoteLength.Quarter);
-            m.addLabel(Score.Label.Note, note.format(Score.PitchNotation.Scientific, Score.SymbolSet.Unicode));
+            m.addNote(0, note, Theory.NoteLength.Quarter);
+            m.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
         });
-        m.addChord(0, notes, Score.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
+
+        m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
 
 
         const openStringNoteName = (stringId: number) => {
-            return guitarCtx.getStringTuning(stringId).format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode);
+            return guitarCtx.getStringTuning(stringId).format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
         }
 
         return <>

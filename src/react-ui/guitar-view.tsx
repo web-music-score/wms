@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Assert, Utils } from "@tspro/ts-utils-lib";
-import { DivRect, Handedness } from "@tspro/web-music-score";
+import { DivRect } from "@tspro/web-music-score/score";
+import { Handedness } from "@tspro/web-music-score/theory";
 import { GuitarContext, GuitarNote, } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
 import GuitarImg from "./assets/guitar.png";

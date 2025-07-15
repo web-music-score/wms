@@ -3,7 +3,9 @@ import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import { Utils } from "@tspro/ts-utils-lib";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 class ScaleVariant {
@@ -85,7 +87,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
                     for (let fretId = highFret; fretId >= position; fretId--) {
 
-                        let note = Score.Note.getNoteById(openStringNoteId[stringId] + fretId);
+                        let note = Theory.Note.getNoteById(openStringNoteId[stringId] + fretId);
 
                         if (guitarCtx.scale.isScaleNote(note)) {
                             if (fretId > guitarCtx.maxFretId) {
@@ -153,7 +155,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         }
 
         const selectNote = (guitarNote: ScoreUI.GuitarNote) => {
-            Score.Audio.playNote(guitarNote.preferredNote);
+            Audio.playNote(guitarNote.preferredNote);
             this.setState({ selectedNote: guitarNote });
 
             if (this.selectedNoteTimer) {
@@ -205,9 +207,9 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         if (variant) {
             variant.notes.forEach(note => {
-                let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode);
+                let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
                 let color = selectedNote?.noteId === note.noteId ? "green" : "black";
-                m.addNote(0, note.preferredNote, Score.NoteLength.Quarter, { color });
+                m.addNote(0, note.preferredNote, Theory.NoteLength.Quarter, { color });
                 m.addLabel(Score.Label.Note, noteName);
             });
         }

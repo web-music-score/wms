@@ -2,6 +2,9 @@
     "tsconfig": "./tsconfig.json",
     "entryPoints": [
         "./src/core/index.ts",
+        "./src/audio/index.ts",
+        "./src/theory/index.ts",
+        "./src/score/index.ts",
         "./src/react-ui/index.ts",
         "./src/pieces/index.ts"
     ],

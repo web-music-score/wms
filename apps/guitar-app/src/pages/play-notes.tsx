@@ -2,7 +2,9 @@ import * as React from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { SelectAccidental, Menubar, TuningScaleInfo } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface PlayNotesProps {
@@ -11,8 +13,8 @@ interface PlayNotesProps {
 }
 
 interface PlayNotesState {
-    accidental: Score.Accidental | undefined;
-    selectedNote?: Score.Note;
+    accidental: Theory.Accidental | undefined;
+    selectedNote?: Theory.Note;
 }
 
 export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
@@ -38,8 +40,8 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
         if (selectedNote) {
-            let noteName = selectedNote.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode);
-            m.addNote(0, selectedNote, Score.NoteLength.Whole);
+            let noteName = selectedNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
+            m.addNote(0, selectedNote, Theory.NoteLength.Whole);
             m.addLabel(Score.Label.Note, noteName);
         }
 
@@ -59,19 +61,19 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             let { pitch } = pickedPitch;
             let { accidental } = this.state;
 
-            let note = new Score.Note(pitch, accidental ?? guitarCtx.scale.getKeySignature().getAccidental(pitch));
+            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getKeySignature().getAccidental(pitch));
 
-            Score.Audio.playNote(note);
+            Audio.playNote(note);
 
             this.setState({ selectedNote: note });
         }
 
         const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {
-            Score.Audio.playNote(guitarNote.preferredNote);
+            Audio.playNote(guitarNote.preferredNote);
             this.setState({ selectedNote: guitarNote.preferredNote });
         }
 
-        const onChangeAccidental = (accidental: Score.Accidental | undefined) => {
+        const onChangeAccidental = (accidental: Theory.Accidental | undefined) => {
             this.setState({ accidental });
         }
 

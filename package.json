@@ -9,7 +9,7 @@
     },
     "description": "TS/JS component for rendering and playing music scores in the browser.",
     "exports": {
-        ".": {
+        "./core": {
             "require": {
                 "types": "./dist/core/index.d.ts",
                 "default": "./dist/core/index.js"
@@ -17,6 +17,36 @@
             "import": {
                 "types": "./dist/core/index.d.mts",
                 "default": "./dist/core/index.mjs"
+            }
+        },
+        "./audio": {
+            "require": {
+                "types": "./dist/audio/index.d.ts",
+                "default": "./dist/audio/index.js"
+            },
+            "import": {
+                "types": "./dist/audio/index.d.mts",
+                "default": "./dist/audio/index.mjs"
+            }
+        },
+        "./theory": {
+            "require": {
+                "types": "./dist/theory/index.d.ts",
+                "default": "./dist/theory/index.js"
+            },
+            "import": {
+                "types": "./dist/theory/index.d.mts",
+                "default": "./dist/theory/index.mjs"
+            }
+        },
+        "./score": {
+            "require": {
+                "types": "./dist/score/index.d.ts",
+                "default": "./dist/score/index.js"
+            },
+            "import": {
+                "types": "./dist/score/index.d.mts",
+                "default": "./dist/score/index.mjs"
             }
         },
         "./react-ui": {

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Button, Dropdown, Navbar, Row } from "react-bootstrap";
 import { GuitarApp, Page } from "guitar-app";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Theory from "@tspro/web-music-score/theory";
 
 // Icons I got from https://materialdesignicons.com/
 const HomeIcon = <svg style={{ width: "24px", height: "24px" }}>
@@ -57,17 +58,17 @@ export class Menubar extends React.Component<MenubarProps, {}> {
                         <Dropdown.Toggle id="dropdown-guitars-settings">Guitar Settings</Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Header>Handedness</Dropdown.Header>
-                            <Dropdown.Item onClick={() => app.setHandedness(Score.Handedness.RightHanded)}>
-                                Right Handed {guitarCtx.handedness === Score.Handedness.RightHanded ? CheckIcon : undefined}
+                            <Dropdown.Item onClick={() => app.setHandedness(Theory.Handedness.RightHanded)}>
+                                Right Handed {guitarCtx.handedness === Theory.Handedness.RightHanded ? CheckIcon : undefined}
                             </Dropdown.Item>
-                            <Dropdown.Item onClick={() => app.setHandedness(Score.Handedness.LeftHanded)}>
-                                Left Handed {guitarCtx.handedness === Score.Handedness.LeftHanded ? CheckIcon : undefined}
+                            <Dropdown.Item onClick={() => app.setHandedness(Theory.Handedness.LeftHanded)}>
+                                Left Handed {guitarCtx.handedness === Theory.Handedness.LeftHanded ? CheckIcon : undefined}
                             </Dropdown.Item>
 
                             <Dropdown.Divider />
 
                             <Dropdown.Header>Note Labels</Dropdown.Header>
-                            {Score.GuitarNoteLabelList.map(guitarNoteLabel => (
+                            {Theory.GuitarNoteLabelList.map(guitarNoteLabel => (
                                 <Dropdown.Item key={guitarNoteLabel} onClick={() => app.setGuitarNoteLabel(guitarNoteLabel)}>
                                     {guitarNoteLabel.toString()} {guitarCtx.guitarNoteLabel === guitarNoteLabel ? CheckIcon : undefined}
                                 </Dropdown.Item>
@@ -78,7 +79,7 @@ export class Menubar extends React.Component<MenubarProps, {}> {
                         <Dropdown.Toggle id="dropdown-settings">Settings</Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Header>Pitch Notation</Dropdown.Header>
-                            {Score.PitchNotationList.map(pitchNotation => (
+                            {Theory.PitchNotationList.map(pitchNotation => (
                                 <Dropdown.Item key={pitchNotation} onClick={() => app.setPitchNotation(pitchNotation)}>
                                     {pitchNotation.toString()} {guitarCtx.pitchNotation === pitchNotation ? CheckIcon : undefined}
                                 </Dropdown.Item>
@@ -87,9 +88,9 @@ export class Menubar extends React.Component<MenubarProps, {}> {
                             <Dropdown.Divider />
 
                             <Dropdown.Header>Instrument</Dropdown.Header>
-                            {Score.Audio.InstrumentList.map(instr => (
+                            {Audio.InstrumentList.map(instr => (
                                 <Dropdown.Item key={instr} onClick={() => app.setInstrument(instr)}>
-                                    {Score.Audio.getInstrumentName(instr)} {app.getInstrument() === instr ? CheckIcon : undefined}
+                                    {Audio.getInstrumentName(instr)} {app.getInstrument() === instr ? CheckIcon : undefined}
                                 </Dropdown.Item>
                             ))}
                         </Dropdown.Menu>

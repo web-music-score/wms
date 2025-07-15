@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Alert, Container } from "react-bootstrap";
-import * as Score from "@tspro/web-music-score";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import { Cookies } from "@tspro/ts-utils-lib";

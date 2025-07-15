@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MDocument, MPlaybackButtons } from "@tspro/web-music-score";
+import { MDocument, MPlaybackButtons } from "@tspro/web-music-score/score";
 
 /** @public */
 export enum PlaybackButtonsLayout {

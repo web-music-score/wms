@@ -1,4 +1,3 @@
-import * as Score from "@tspro/web-music-score";
 import { createAndanteByDiabelli, createGreensleeves } from "@tspro/web-music-score/pieces";
 import { createRepeatsAndEndingsDemo } from "demo-pieces/repeats-endings";
 import { createDaCapoDemo } from "demo-pieces/da-capo";
@@ -16,6 +15,7 @@ import { createCompleteRestsDemo } from "./complete-rests";
 import { createNoteHeadsDemo } from "./note-heads";
 import { createGuitarTrebleAndTabDemo } from "./guitar-treble-and-tab";
 import { createGuitarTabDemo } from "./guitar-tab";
+import * as Score from "@tspro/web-music-score/score";
 
 export class DemoPieces {
     private static instance?: DemoPieces;

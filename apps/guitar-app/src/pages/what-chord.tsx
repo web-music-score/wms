@@ -1,8 +1,10 @@
 import * as React from "react";
-import { Col, Container, Form, Row } from "react-bootstrap";
+import { Col, Container, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Score from "@tspro/web-music-score";
+import * as Audio from "@tspro/web-music-score/audio";
+import * as Score from "@tspro/web-music-score/score";
+import * as Theory from "@tspro/web-music-score/theory";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const tdStyle: React.CSSProperties = {
@@ -21,7 +23,7 @@ interface WhatChordProps {
 
 interface WhatChordState {
     guitarCtx: ScoreUI.GuitarContext;
-    selectedNote?: Score.Note;
+    selectedNote?: Theory.Note;
     stringFrettingPos: FrettingPos[/* stringId */];
 }
 
@@ -33,7 +35,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
 
         let guitarCtx = props.app.getGuitarContext();
 
-        let stringFrettingPos = guitarCtx.tuningName === Score.DefaultTuningName
+        let stringFrettingPos = guitarCtx.tuningName === Theory.DefaultTuningName
             ? [0, 1, 0, 2, 3, "mute" as const] // C Chord on E Standard tuning.
             : ["mute" as const, "mute" as const, "mute" as const, "mute" as const, "mute" as const, "mute" as const]
 
@@ -88,10 +90,10 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
         }).reverse().filter(note => note !== undefined) as ScoreUI.GuitarNote[];
 
         const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {
-            Score.Audio.playNote(guitarNote.preferredNote);
+            Audio.playNote(guitarNote.preferredNote);
 
             let newStringFrettingPos = stringFrettingPos.slice();
-            let newSelectedNote: Score.Note | undefined;
+            let newSelectedNote: Theory.Note | undefined;
 
             if (selectedNote?.noteId === guitarNote.noteId) {
                 newStringFrettingPos[guitarNote.stringId] = "mute";
@@ -117,7 +119,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
         const onScoreClickObject = (obj: Score.MusicInterface) => {
             if (obj instanceof Score.MNoteGroup && obj.getNotes().length === 1) {
                 let note = obj.getNotes()[0];
-                Score.Audio.playNote(note);
+                Audio.playNote(note);
                 this.setState({ selectedNote: note });
             }
             else {
@@ -130,19 +132,19 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
         frettedGuitarNotes.forEach(note => {
-            let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Score.SymbolSet.Unicode);
+            let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
             let color = selectedNote?.noteId === note.noteId ? "green" : "black";
-            m.addNote(0, note.preferredNote, Score.NoteLength.Quarter, { color });
+            m.addNote(0, note.preferredNote, Theory.NoteLength.Quarter, { color });
             m.addLabel(Score.Label.Note, noteName);
         });
 
         if (frettedGuitarNotes.length >= 2) {
             let chordNotes = frettedGuitarNotes.map(note => note.preferredNote)
-            m.addChord(0, chordNotes, Score.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
+            m.addChord(0, chordNotes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
         }
 
         let chordNotes = frettedGuitarNotes.map(gn => gn.preferredNote);
-        let chordCandidates = Score.Chord.getChords(chordNotes);
+        let chordCandidates = Theory.Chord.getChords(chordNotes);
 
         return (<>
             <Menubar app={app} />

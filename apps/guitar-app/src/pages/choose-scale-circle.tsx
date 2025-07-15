@@ -2,12 +2,13 @@ import * as React from "react";
 import { Alert, Button, Col, Container, Row } from "react-bootstrap";
 import { Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Score from "@tspro/web-music-score";
+import * as Theory from "@tspro/web-music-score/theory";
+import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 interface ChooseScaleCircleProps {
     app: GuitarApp;
-    onChangeScale: (scale: Score.Scale) => void;
+    onChangeScale: (scale: Theory.Scale) => void;
 }
 
 interface ChooseScaleCircleState {
@@ -31,7 +32,7 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
         return { guitarCtx, doc }
     }
 
-    onChangeScale(scale: Score.Scale) {
+    onChangeScale(scale: Theory.Scale) {
         try {
             let guitarCtx = this.state.guitarCtx.alterScale(scale);
             if (guitarCtx !== this.state.guitarCtx) {

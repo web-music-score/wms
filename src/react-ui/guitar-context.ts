@@ -1,5 +1,5 @@
-import { GuitarNoteLabel, Handedness, PitchNotation, SymbolSet } from "@tspro/web-music-score";
-import { getTuningStrings, Note, Scale } from "@tspro/web-music-score";
+import { GuitarNoteLabel, Handedness, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
+import { getTuningStrings, Note, Scale } from "@tspro/web-music-score/theory";
 import { Assert } from "@tspro/ts-utils-lib";
 import GuitarData from "./assets/guitar.json";
 

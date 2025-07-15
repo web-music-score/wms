@@ -1,6 +1,5 @@
-import { NoteLength, ScaleType } from "@tspro/web-music-score";
-import { MDocument } from "@tspro/web-music-score";
-import { ArcPos, Navigation, Annotation, StaffKind, Stem } from "@tspro/web-music-score";
+import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
+import { MDocument, ArcPos, Navigation, Annotation, StaffKind, Stem } from "@tspro/web-music-score/score";
 
 /** @public */
 export function createAndanteByDiabelli(): MDocument {
