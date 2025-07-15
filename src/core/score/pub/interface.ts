@@ -118,15 +118,10 @@ export class MDocument extends MusicInterface {
 
     constructor(staffKind: StaffKind);
     constructor(staffKind: StaffKind, options: DocumentOptions);
-    /** @deprecated */
-    constructor(staffKind: StaffKind, measuresPerRow: number);
     constructor(staffKind: StaffKind, options?: unknown) {
         super(MDocument.Name);
 
-        if (typeof options === "number") {
-            this.obj = new ObjDocument(this, staffKind, { measuresPerRow: options });
-        }
-        else if (Utils.Obj.isObject(options)) {
+        if (Utils.Obj.isObject(options)) {
             this.obj = new ObjDocument(this, staffKind, options);
         }
         else {

@@ -16,11 +16,7 @@ export enum StaffKind {
     // /** GuitarTab has tab for guitar. */
     GuitarTab = 8,
     // /** GuitarTrebleAndTab has treble clef and tab for guitar. */
-    GuitarTrebleAndTab = GuitarTab | GuitarTreble,
-
-    /** @deprecated TrebleForGuitar was replaced by GuitarTreble. */
-    TrebleForGuitar = GuitarTreble,
-}
+    GuitarTrebleAndTab = GuitarTab | GuitarTreble}
 
 /** @public */
 export enum Stem { Auto, Up, Down }
