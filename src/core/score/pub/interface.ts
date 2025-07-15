@@ -116,17 +116,10 @@ export class MDocument extends MusicInterface {
     /** @internal */
     readonly obj: ObjDocument;
 
-    constructor(staffKind: StaffKind);
-    constructor(staffKind: StaffKind, options: DocumentOptions);
-    constructor(staffKind: StaffKind, options?: unknown) {
+    constructor(staffKind: StaffKind, options?: DocumentOptions) {
         super(MDocument.Name);
 
-        if (Utils.Obj.isObject(options)) {
-            this.obj = new ObjDocument(this, staffKind, options);
-        }
-        else {
-            this.obj = new ObjDocument(this, staffKind);
-        }
+        this.obj = new ObjDocument(this, staffKind, options);
     }
 
     /** @internal */

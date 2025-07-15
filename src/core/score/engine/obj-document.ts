@@ -7,9 +7,18 @@ import { DivRect, DocumentOptions, MDocument, PickedPitch, StaffKind } from "../
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
-import { Assert } from "@tspro/ts-utils-lib";
+import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { DefaultTuningName, getTuningStrings, Note, SymbolSet, validateTuningName } from "../../theory";
 import { ArcProps } from "./arc-props";
+
+function validateMeasuresPerRow(measuresPerRow: number | undefined): number | undefined {
+    if (measuresPerRow === undefined || typeof measuresPerRow === "number" && Utils.Math.isInteger(measuresPerRow) && measuresPerRow >= 1) {
+        return measuresPerRow;
+    }
+    else {
+        Assert.interrupt("Invalid measuresPerRow: " + measuresPerRow);
+    }
+}
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -36,11 +45,7 @@ export class ObjDocument extends MusicObject {
     constructor(readonly mi: MDocument, readonly staffKind: StaffKind, readonly options?: DocumentOptions) {
         super(undefined);
 
-        this.measuresPerRow = options?.measuresPerRow;
-
-        if (this.measuresPerRow !== undefined) {
-            Assert.int_gte(this.measuresPerRow, 1, "Invalid measuresPerRow = " + this.measuresPerRow);
-        }
+        this.measuresPerRow = validateMeasuresPerRow(options?.measuresPerRow);
 
         this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
         this.tuningStrings = getTuningStrings(this.tuningName);
