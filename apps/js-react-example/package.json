@@ -5,8 +5,8 @@
     "dependencies": {
         "@tspro/web-music-score": "^1.0.0",
         "core-js": "^3.43.0",
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
         "regenerator-runtime": "^0.14.1"
     },
     "devDependencies": {

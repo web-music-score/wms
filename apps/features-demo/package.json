@@ -5,12 +5,10 @@
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.1.0",
         "@tspro/web-music-score": "^1.0.0",
-        "@types/react": "^19.1.8",
-        "@types/react-dom": "^19.1.6",
         "bootstrap": "^5.3.7",
         "core-js": "^3.43.0",
-        "react": "^19.1.0",
-        "react-dom": "^19.1.0",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
         "regenerator-runtime": "^0.14.1"
     },
     "devDependencies": {
@@ -18,6 +16,8 @@
         "@babel/core": "^7.27.7",
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-react": "^7.27.1",
+        "@types/react": "^18.0.0",
+        "@types/react-dom": "^18.0.0",
         "@webpack-cli/serve": "^3.0.1",
         "babel-loader": "^10.0.0",
         "css-loader": "^7.1.2",
