@@ -130,15 +130,9 @@ export class ObjMeasure extends MusicObject {
         return this.passCount;
     }
 
-    updateOwnAvgPitch(voiceId: number, setPitch?: string | number | Note): number {
-        if (typeof setPitch == "string") {
-            this.usePitch[voiceId] = Note.getNote(setPitch).pitch;
-        }
-        else if (typeof setPitch == "number") {
+    updateOwnAvgPitch(voiceId: number, setPitch?: number): number {
+        if (typeof setPitch == "number") {
             this.usePitch[voiceId] = setPitch;
-        }
-        else if (setPitch instanceof Note) {
-            this.usePitch[voiceId] = setPitch.pitch;
         }
         else if (this.usePitch[voiceId] === undefined) {
             let prevMeasure = this.getPrevMeasure();

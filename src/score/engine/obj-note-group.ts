@@ -80,6 +80,13 @@ export class ObjNoteGroup extends MusicObject {
 
         this.notes = noteStringData.notes;
 
+        this.notes.forEach(note => {
+            let { pitch } = note;
+            let hasStaff = col.row.hasStaff;
+            let staff = col.row.getStaff(pitch);
+            Assert.assert(!hasStaff || staff, "Note pitch is out of staff boundaries!");
+        });
+
         this.minPitch = this.notes[0].pitch;
         this.maxPitch = this.notes[this.notes.length - 1].pitch;
 

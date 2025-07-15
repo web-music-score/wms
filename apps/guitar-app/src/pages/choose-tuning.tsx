@@ -58,8 +58,8 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
 
         let doc = Math.min(...notes.map(n => n.pitch)) < Theory.Note.getNote("C2").pitch
-            ? new Score.MDocument(Score.StaffKind.Grand) // Low notes do not fit into guitar staff (min visible note is C2).
-            : new Score.MDocument(Score.StaffKind.GuitarTreble);
+            ? new Score.MDocument(Score.StaffKind.Grand) // Low notes is not in guitar treble staff (min visible note is C2).
+            : new Score.MDocument(Score.StaffKind.GuitarTreble); 
 
         let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
 
@@ -69,7 +69,6 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         });
 
         m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
-
 
         const openStringNoteName = (stringId: number) => {
             return guitarCtx.getStringTuning(stringId).format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);

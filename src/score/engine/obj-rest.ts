@@ -1,5 +1,5 @@
 import { Assert } from "@tspro/ts-utils-lib";
-import { NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { DivRect, MRest, RestOptions, Stem } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
@@ -28,7 +28,19 @@ export class ObjRest extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, noteLength: NoteLength, options?: RestOptions) {
         super(col);
 
-        this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, options?.pitch);
+        let pitch = options?.pitch instanceof Note
+            ? options.pitch.pitch
+            : typeof options?.pitch === "string"
+                ? Note.getNote(options.pitch).pitch
+                : options?.pitch;
+
+        if (pitch !== undefined) {
+            let hasStaff = col.row.hasStaff;
+            let staff = col.row.getStaff(pitch);
+            Assert.assert(!hasStaff || staff, "Rest pitch is out of staff boundaries!");
+        }
+
+        this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, pitch);
         this.ownStemDir = this.measure.updateOwnStemDir(this/*, options?.stem*/);
 
         this.color = options?.color ?? "black";
