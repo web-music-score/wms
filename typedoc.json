@@ -1,7 +1,9 @@
 {
     "tsconfig": "./tsconfig.json",
     "entryPoints": [
-        "./src/index.full.ts"
+        "./src/core/index.ts",
+        "./src/react-ui/index.ts",
+        "./src/pieces/index.ts"
     ],
     "out": "docs/",
     "readme": "README.md",
