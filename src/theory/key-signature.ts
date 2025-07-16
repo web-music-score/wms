@@ -129,8 +129,8 @@ export class KeySignature {
             : new Note(note.pitchMod7, note.accidental + acc);
     }
 
-    equals(o: KeySignature): boolean {
-        return this === o || this.keyNote === o.keyNote && this.mode == o.mode;
+    static equals(a: KeySignature, b: KeySignature): boolean {
+        return a === b || a.keyNote === b.keyNote && a.mode == b.mode;
     }
 
 }

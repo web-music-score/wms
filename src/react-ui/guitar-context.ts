@@ -116,7 +116,7 @@ export class GuitarContext {
     }
 
     alterScale(scale: Scale) {
-        return scale.equals(this.scale)
+        return Scale.equals(scale, this.scale)
             ? this
             : new GuitarContext(this.tuningName, scale, this.handedness, this.pitchNotation, this.guitarNoteLabel);
 

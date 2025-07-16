@@ -100,8 +100,8 @@ export class Note {
         return this.pitchMod7 + Note.validateOctave(octave) * 7;
     }
 
-    equals(note: Note) {
-        return this.pitch === note.pitch && this.accidental === note.accidental;
+    static equals(a: Note, b: Note): boolean {
+        return a === b || a.pitch === b.pitch && a.accidental === b.accidental;
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
@@ -228,7 +228,7 @@ export class Note {
         let uniqueSet: Note[] = [];
 
         notes.forEach(note => {
-            if (uniqueSet.find(n => note.equals(n)) === undefined) {
+            if (uniqueSet.find(n => Note.equals(note, n)) === undefined) {
                 uniqueSet.push(note);
             }
         });

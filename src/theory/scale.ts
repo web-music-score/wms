@@ -37,6 +37,28 @@ class PreferredChromaticNote {
     constructor(readonly note: Note, readonly isScaleNote: boolean, readonly isScaleRootNote: boolean) { }
 }
 
+function getMode(scaleType: ScaleType) {
+    switch (scaleType) {
+        case ScaleType.Major: return 1;
+        case ScaleType.NaturalMinor: return 6;
+        case ScaleType.HarmonicMinor: return 6;
+        case ScaleType.Ionian: return 1;
+        case ScaleType.Dorian: return 2;
+        case ScaleType.Phrygian: return 3;
+        case ScaleType.Lydian: return 4;
+        case ScaleType.Mixolydian: return 5;
+        case ScaleType.Aeolian: return 6;
+        case ScaleType.Locrian: return 7;
+        case ScaleType.MajorPentatonic: return 1;
+        case ScaleType.MinorPentatonic: return 6;
+        case ScaleType.MajorHexatonicBlues: return 1;
+        case ScaleType.MinorHexatonicBlues: return 6;
+        case ScaleType.HeptatonicBlues: return 1;
+        default:
+            Assert.interrupt("Invalid scaleType: " + scaleType);
+    }
+}
+
 /** @public */
 export class Scale {
     private readonly keySignature: KeySignature;
@@ -44,27 +66,7 @@ export class Scale {
     private readonly accidentalNotes: ReadonlyArray<Note>;
 
     constructor(readonly keyNote: string, readonly scaleType: ScaleType) {
-        let mode: number;
-
-        switch (scaleType) {
-            case ScaleType.Major: mode = 1; break;
-            case ScaleType.NaturalMinor: mode = 6; break;
-            case ScaleType.HarmonicMinor: mode = 6; break;
-            case ScaleType.Ionian: mode = 1; break;
-            case ScaleType.Dorian: mode = 2; break;
-            case ScaleType.Phrygian: mode = 3; break;
-            case ScaleType.Lydian: mode = 4; break;
-            case ScaleType.Mixolydian: mode = 5; break;
-            case ScaleType.Aeolian: mode = 6; break;
-            case ScaleType.Locrian: mode = 7; break;
-            case ScaleType.MajorPentatonic: mode = 1; break;
-            case ScaleType.MinorPentatonic: mode = 6; break;
-            case ScaleType.MajorHexatonicBlues: mode = 1; break;
-            case ScaleType.MinorHexatonicBlues: mode = 6; break;
-            case ScaleType.HeptatonicBlues: mode = 1; break;
-        }
-
-        this.keySignature = KeySignature.getKeySignature(keyNote, mode);
+        this.keySignature = KeySignature.getKeySignature(keyNote, getMode(scaleType));
 
         switch (scaleType) {
             case ScaleType.HarmonicMinor:
@@ -101,8 +103,8 @@ export class Scale {
         this.accidentalNotes = this.scaleDegrees.map(d => this.getKeySignature().getScaleNote(d));
     }
 
-    equals(o: Scale) {
-        return this.getScaleName() === o.getScaleName();
+    static equals(a: Scale, b: Scale): boolean {
+        return a === b || a.getScaleName() === b.getScaleName();
     }
 
     getScaleName(symbolSet?: SymbolSet) {
@@ -164,12 +166,12 @@ export class Scale {
 
     isScaleNote(note: Note): boolean {
         let n = this.getPreferredChromaticNote(note.noteId);
-        return n.note.equals(note) && n.isScaleNote;
+        return Note.equals(n.note, note) && n.isScaleNote;
     }
 
     isScaleRootNote(note: Note): boolean {
         let n = this.getPreferredChromaticNote(note.noteId);
-        return n.note.equals(note) && n.isScaleRootNote;
+        return Note.equals(n.note, note) && n.isScaleRootNote;
     }
 
     getIntervalFromRootNote(note: Note): Interval {

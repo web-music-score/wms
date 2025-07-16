@@ -1,5 +1,5 @@
 import { Assert } from "@tspro/ts-utils-lib";
-import { Accidental, Note, getTempoString } from "@tspro/web-music-score/theory";
+import { Accidental, Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
 import { DivRect, MSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
@@ -73,7 +73,7 @@ export class ObjSignature extends MusicObject {
             this.ksNewAccidentals = [];
 
             // If key signatue changes then neutralize previous key signature
-            if (prevKeySignature && !newKeySignature.equals(prevKeySignature)) {
+            if (prevKeySignature && !KeySignature.equals(newKeySignature, prevKeySignature)) {
                 prevKeySignature.getOrderedAccidentalNotes().forEach(acc => {
                     // Neutral accidental
                     this.ksNeutralizeAccidentals.push(this.accPitch(0, this.getAccidentalPitch(acc)));

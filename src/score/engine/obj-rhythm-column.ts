@@ -259,7 +259,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getNoteHeadDisplacement(noteGroup: ObjNoteGroup, note: Note): -1 | 0 | 1 {
-        let data = this.noteHeadDisplacements.find(d => d.noteGroup === noteGroup && d.note.equals(note));
+        let data = this.noteHeadDisplacements.find(d => d.noteGroup === noteGroup && Note.equals(d.note, note));
 
         if (data?.displacement !== undefined) {
             return data.displacement;

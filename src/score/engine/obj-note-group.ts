@@ -17,7 +17,7 @@ function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber |
     let noteStringData = notes.map((note, i) => { return { note, string: stringArr[i] } });
 
     noteStringData = Utils.Arr
-        .removeDuplicatesCmp(noteStringData, (a, b) => a.note.equals(b.note))
+        .removeDuplicatesCmp(noteStringData, (a, b) => Note.equals(a.note, b.note))
         .sort((a, b) => Note.compareFunc(a.note, b.note));
 
     return {
@@ -191,7 +191,7 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getArcAnchorPoint(note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } {
-        let noteId = this.notes.findIndex(note2 => note2.equals(note));
+        let noteId = this.notes.findIndex(note2 => Note.equals(note2, note));
 
         if (!this.staffObjs || noteId < 0 || noteId >= this.staffObjs.noteHeadRects.length) {
             let r = this.getRect();
@@ -394,13 +394,13 @@ export class ObjNoteGroup extends MusicObject {
 
             let prev: ObjNoteGroup | undefined = tieNoteGroups[j - 1];
 
-            if (prev && prev.notes.some(n => n.equals(note))) {
+            if (prev && prev.notes.some(n => Note.equals(n, note))) {
                 return 0;
             }
 
             tieNoteGroups = tieNoteGroups.slice(j);
 
-            j = tieNoteGroups.findIndex(ng => ng.notes.every(n => !n.equals(note)));
+            j = tieNoteGroups.findIndex(ng => ng.notes.every(n => !Note.equals(n, note)));
 
             if (j >= 0) {
                 tieNoteGroups = tieNoteGroups.slice(0, j);

@@ -103,7 +103,7 @@ export class ArcProps {
                     let rightNoteGroup = this.noteGroups[i + 1];
 
                     leftNoteGroup.notes.forEach(leftNote => {
-                        let rightNote = rightNoteGroup.notes.find(rightNote => rightNote.equals(leftNote));
+                        let rightNote = rightNoteGroup.notes.find(rightNote => Note.equals(rightNote, leftNote));
                         if (rightNote) {
                             this.createObjArc(leftNoteGroup, leftNote, rightNoteGroup, leftNote);
                         }

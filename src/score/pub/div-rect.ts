@@ -183,21 +183,21 @@ export class DivRect {
 
     /**
      * Check if this Rect equals with given Rect.
-     * @param o -
+     * @param b -
      * @returns 
      */
-    equals(o: DivRect) {
-        return this.left === o.left && this.centerX === o.centerX && this.right === o.right && this.top === o.top && this.centerY === o.centerY && this.bottom === o.bottom;
+    static equals(a: DivRect, b: DivRect) {
+        return a === b || a.left === b.left && a.centerX === b.centerX && a.right === b.right && a.top === b.top && a.centerY === b.centerY && a.bottom === b.bottom;
     }
 
     /**
      * Check if frame (ignoring centerX/Y) of this Rect equals with given Rect, ignoring centerX and centerY.
      * 
-     * @param o -
+     * @param b -
      * @returns 
      */
-    equalsFrame(o: DivRect) {
-        return this.left === o.left && this.right === o.right && this.top === o.top && this.bottom === o.bottom;
+    static equalsFrame(a: DivRect, b: DivRect) {
+        return a === b || a.left === b.left && a.right === b.right && a.top === b.top && a.bottom === b.bottom;
     }
 
     /**
