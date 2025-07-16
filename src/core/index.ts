@@ -1,7 +1,7 @@
+export * from "./error";
+
 import { Assert } from "@tspro/ts-utils-lib";
 import { MusicError } from "./error";
-
-export * from "./error";
 
 declare const __LIB_INFO__: string;
 
