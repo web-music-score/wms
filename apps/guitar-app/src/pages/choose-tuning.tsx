@@ -57,18 +57,40 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
 
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
 
-        let doc = Math.min(...notes.map(n => n.pitch)) < Theory.Note.getNote("C2").pitch
-            ? new Score.MDocument(Score.StaffKind.Grand) // Low notes is not in guitar treble staff (min visible note is C2).
-            : new Score.MDocument(Score.StaffKind.GuitarTreble); 
+        let staffKinds = [
+            Score.StaffKind.GuitarTreble,
+            Score.StaffKind.Treble,
+            Score.StaffKind.Bass,
+            Score.StaffKind.Grand
+        ];
 
-        let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
+        let doc: Score.MDocument | undefined;
 
-        notes.forEach(note => {
-            m.addNote(0, note, Theory.NoteLength.Quarter);
-            m.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
-        });
+        for (let i = 0; i < staffKinds.length; i++) {
+            try {
+                doc = new Score.MDocument(staffKinds[i]);
 
-        m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
+                let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
+
+                notes.forEach(note => {
+                    m.addNote(0, note, Theory.NoteLength.Quarter);
+                    m.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
+                });
+
+                m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
+
+                // Ok.
+                break;
+            }
+            catch (err) {
+                // All notes did not fit into staff.
+                continue;
+            }
+        }
+
+        if (!doc) {
+            return <div>Error.</div>;
+        }
 
         const openStringNoteName = (stringId: number) => {
             return guitarCtx.getStringTuning(stringId).format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
