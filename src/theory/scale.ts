@@ -346,24 +346,8 @@ const ScaleFactoryList: ReadonlyArray<ScaleFactory | string> = [
 ];
 
 /** @public */
-export function getScaleFactoryList(filter?: (scaleType: ScaleType) => boolean): ReadonlyArray<ScaleFactory | string> {
-    if (!filter) {
-        return ScaleFactoryList;
-    }
-
-    let factoryList = ScaleFactoryList.filter(factory => typeof factory === "string" || filter(factory.getType()));
-
-    // Remove strings that are not followed by ScaleFactory.
-    for (let i = 0; i < factoryList.length;) {
-        if (typeof factoryList[i] === "string" && !(factoryList[i + 1] instanceof ScaleFactory)) {
-            factoryList.splice(i, 1);
-        }
-        else {
-            i++;
-        }
-    }
-
-    return factoryList;
+export function getScaleFactoryList(): ReadonlyArray<ScaleFactory | string> {
+    return ScaleFactoryList;
 }
 
 const ScaleFactoryMap = new Map<ScaleType, ScaleFactory>();
@@ -390,12 +374,9 @@ export function getScale(keyNote: string, scaleType: ScaleType): Scale {
     return getScaleFactory(scaleType).getScale(keyNote);
 }
 
-let defaultScale: Scale | undefined;
+const DefaultScale = getScale("C", ScaleType.Major);
 
 /** @public */
 export function getDefaultScale() {
-    if (!defaultScale) {
-        defaultScale = getScale("C", ScaleType.Major);
-    }
-    return defaultScale;
+    return DefaultScale;
 }
