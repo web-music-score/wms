@@ -71,6 +71,16 @@
         }
     },
     "unpkg": "./dist/iife/index.global.js",
+    "files": [
+        "CHANGELOG.md",
+        "LICENSE",
+        "README.md",
+        "dist/**/*.js",
+        "dist/**/*.mjs",
+        "dist/**/*.d.ts",
+        "dist/**/*.d.mts",
+        "package.json"
+    ],
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.1.0",
         "tone": "^15.1.22"
