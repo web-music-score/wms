@@ -25,7 +25,7 @@ export enum Stem { Auto, Up, Down }
 export enum Arpeggio { Up, Down }
 
 /** @public */
-export enum TieLength { Short = "Short", ToMeasureEnd = "ToMeasureEnd" }
+export enum Tie { Short = -1, MeasureEnd = -2 }
 
 /** @public */
 export enum ArcPos { Auto, Above, Middle, Below, StemTip }
@@ -41,7 +41,7 @@ export type NoteOptions = {
     arpeggio?: Arpeggio | boolean,
     staccato?: boolean,
     diamond?: boolean,
-    tieSpan?: number | TieLength,
+    tieSpan?: number | Tie,
     tiePos?: ArcPos,
     slurSpan?: number,
     slurPos?: ArcPos,

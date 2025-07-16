@@ -5,7 +5,7 @@ import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ArcProps } from "./arc-props";
 import { ObjMeasure } from "./obj-measure";
-import { MArc, DivRect, TieLength } from "../pub";
+import { MArc, DivRect, Tie } from "../pub";
 import { DocumentSettings } from "./settings";
 
 export class ObjArc extends MusicObject {
@@ -24,13 +24,13 @@ export class ObjArc extends MusicObject {
     private readonly leftNote: Note;
     private readonly rightNoteGroup?: ObjNoteGroup;
     private readonly rightNote?: Note;
-    private readonly tieLength?: TieLength;
+    private readonly tie?: Tie;
 
 
     readonly mi: MArc;
 
     constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
-    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tieLength: TieLength);
+    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: Tie);
     constructor(readonly arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
         super(measure);
 
@@ -42,12 +42,12 @@ export class ObjArc extends MusicObject {
         if (args[0] instanceof ObjNoteGroup && args[1] instanceof Note) {
             this.rightNoteGroup = args[0];
             this.rightNote = args[1];
-            this.tieLength = undefined;
+            this.tie = undefined;
         }
-        else if (args[0] === TieLength.Short || args[0] === TieLength.ToMeasureEnd) {
+        else if (args[0] === Tie.Short || args[0] === Tie.MeasureEnd) {
             this.rightNoteGroup = undefined;
             this.rightNote = undefined;
-            this.tieLength = args[0];
+            this.tie = args[0];
         }
 
         this.mi = new MArc(this);
@@ -90,7 +90,7 @@ export class ObjArc extends MusicObject {
 
         let rightPos = rightNoteGroup !== undefined && rightNote !== undefined
             ? rightNoteGroup.getArcAnchorPoint(rightNote, arcPos, "right")
-            : this.tieLength === TieLength.ToMeasureEnd
+            : this.tie === Tie.MeasureEnd
                 ? { x: measure.getColumnsContentRect().right, y: leftPos.y }
                 : { x: leftPos.x + unitSize * DocumentSettings.ShortTieLength, y: leftPos.y };
 
@@ -100,7 +100,7 @@ export class ObjArc extends MusicObject {
             ry: number;
 
         if (rightNoteGroup === undefined) {
-            // TieLength.Short | TieLength.ToMeasureEnd
+            // Tie.Short | Tie.MeasureEnd
             lx = leftPos.x;
             ly = leftPos.y;
             rx = rightPos.x;
