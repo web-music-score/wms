@@ -11,9 +11,6 @@ This project has been developed gradually over several years. Although it’s be
 
 ```sh
 npm i @tspro/web-music-score
-
-# React is required for react-ui module.
-npm i react
 ```
 
 ## Usage
@@ -36,6 +33,7 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 // Import react-ui module, it contains all react components.
+// React is peer dependency "^18.0.0 || ^19.0.0".
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 // Import pieces module, it contains demo songs.
