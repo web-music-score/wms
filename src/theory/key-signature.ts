@@ -1,4 +1,4 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Assert, LRUCache } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 
 /** @public */
@@ -10,11 +10,26 @@ export class KeySignature {
     private readonly accidentalNotesByPitch: Note[];
     private readonly orderedAccidentalNotes: Note[];
 
+    private static ksCache = new LRUCache<string, KeySignature>(250);
+
+    static getKeySignature(keyNote: string, mode: number) {
+        const ksKey = keyNote + "_" + mode;
+
+        let ks = this.ksCache.get(ksKey);
+
+        if (!ks) {
+            ks = new KeySignature(keyNote, mode);
+            this.ksCache.set(ksKey, ks);
+        }
+
+        return ks;
+    }
+
     /**
      * @param keyNote - Key note.
      * @param mode - [1..7], 1 = Ionian/Major, 2 = Dorian, ..., 7 = Locrian
      */
-    constructor(keyNote: string, mode: number) {
+    private constructor(private readonly keyNote: string, private readonly mode: number) {
         Assert.int_between(mode, 1, 7, "Invalid mode: " + mode);
 
         function getAccidental(noteId: number, pitch: number): Accidental {
@@ -89,7 +104,7 @@ export class KeySignature {
         return this.orderedAccidentalNotes;
     }
 
-    static parseDegree(degree: number | string): { deg: number, acc: number } {
+    private static parseDegree(degree: number | string): { deg: number, acc: number } {
         const DegreeRule = /^(bb?|b?|#?|x?)([0-9]*)$/;
         let m = Assert.require(DegreeRule.exec("" + degree), "Invalid degree: " + degree);
         let acc = Note.getAccidental(m[1] ?? "") ?? 0;
@@ -115,17 +130,12 @@ export class KeySignature {
     }
 
     equals(o: KeySignature): boolean {
-        return this === o ||
-            this.getType() !== o.getType() &&
-            this.getNumAccidentals() === o.getNumAccidentals() &&
-            this.getOrderedAccidentalNotes().every((accNote, i) => accNote.equals(o.getOrderedAccidentalNotes()[i]));
+        return this === o || this.keyNote === o.keyNote && this.mode == o.mode;
     }
 
 }
 
-const defaultKeySignaturte = new KeySignature("C", 1); // keyNote = "C", mode = 1 (Ionian/Major)
-
 /** @public */
 export function getDefaultKeySignature(): KeySignature {
-    return defaultKeySignaturte;
+    return KeySignature.getKeySignature("C", 1); // keyNote = "C", mode = 1 (Ionian/Major)
 }

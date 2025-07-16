@@ -64,7 +64,7 @@ export class Scale {
             case ScaleType.HeptatonicBlues: mode = 1; break;
         }
 
-        this.keySignature = new KeySignature(keyNote, mode);
+        this.keySignature = KeySignature.getKeySignature(keyNote, mode);
 
         switch (scaleType) {
             case ScaleType.HarmonicMinor:

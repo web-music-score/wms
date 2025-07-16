@@ -42,17 +42,10 @@ function getOkayRootNote(wantedRootNote: Note): Note {
     return rootNote;
 }
 
-const ksCache = new Map<string, KeySignature>();
-
 function getChordNoteByDegree(chordRootNote: Note, degree: Degree) {
     let chordRootNoteStr = chordRootNote.formatOmitOctave(SymbolSet.Ascii);
 
-    let ks = ksCache.get(chordRootNoteStr);
-
-    if (!ks) {
-        ks = new KeySignature(chordRootNoteStr, 1); // Major scale key signature
-        ksCache.set(chordRootNoteStr, ks);
-    }
+    let ks = KeySignature.getKeySignature(chordRootNoteStr, 1); // Major scale key signature
 
     return ks.getScaleNote(degree);
 }
