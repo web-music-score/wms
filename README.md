@@ -13,73 +13,91 @@ public release — though please note that there may still be bugs or unexpected
 ```sh
 npm i @tspro/web-music-score
 
-# React is required, it is peer dependency
+# React is required for react-ui module.
 npm i react
 ```
 
-## Usage And API Documentation
+## Usage
 
-### Usage
+### Import
 
-#### Import
+Version 2 brough subpath module exports. There is no main export.
+
 ```js
-// Import core
-import * as Score from "@tspro/web-music-score";
+// Import core module. This does not contain much.
+import * as Core from "@tspro/web-music-score/core";
 
-// Import react ui components
+// Import audio module.
+import * as Audio from "@tspro/web-music-score/audio";
+
+// Import module that contains all music theory stuff.
+import * as Theory from "@tspro/web-music-score/theory";
+
+// Import music score module.
+import * as Score from "@tspro/web-music-score/score";
+
+// Import module for react components.
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
-// Import demo pieces
+// Import demo songs.
 import * as Pieces from "@tspro/web-music-score/pieces";
 
-// you can also use require
-const Score = require("@tspro/web-music-score");
+// You can also use require
+const Core = require("@tspro/web-music-score/core");
 
-// ...
+// etc.
 ```
 
-#### Browser Script (experimantal)
-Use in browser via unpkg CDN.
-Browser version is core module, without /react-ui or /pieces subpaths.
+### Browser Script
+
+This is an experimental module that can be used via unpkg CDN. It declares global variable `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, and `Pieces`. All modules except react-ui.
 
 ```html
-<script src="https://unpkg.com/@tspro/web-music-score@2"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@2.0.0"></script>
+
+<!-- It is recommended to use version number (e.g. @2 or even exact @2.0.0) -->
 
 <script>
-    const Score = window.WebMusicScore;
+    const { Core, Audio, Theory, Score, Pieces } = window.WebMusicScore;
     // ...
 </script>
 ```
 
+## API
+
 ### Create Document
 
 ```js
-let doc = new Score.MDocument(Score.StaffKind.Treble, { measuresPerRow: 4 });
+let doc = new Score.MDocument(staffKind: Score.StaffKind, options: Score.DocumentOptions);
 ```
-
-First argument is `StaffKind`:
-* `Treble`: Staff with treble (G-) clef.
-* `Bass`: Staff with bass (F-) clef.
-* `Grand`: Both treble and bas staves.
-* `GuitarTreble`: `Treble` but one octave lower.
-* `GuitarTab`: Guitar tab only.
-* `GuitarTrebleAndTab`: Treble and tab for guitar.
+`staffKind` is  can be:
+* `Score.StaffKind.Treble`: Staff with treble (G-) clef.
+* `Score.StaffKind.Bass`: Staff with bass (F-) clef.
+* `Score.StaffKind.Grand`: Both treble and bas staves.
+* `Score.StaffKind.GuitarTreble`: `Treble` but one octave lower.
+* `Score.StaffKind.GuitarTab`: Guitar tab only.
+* `Score.StaffKind.GuitarTrebleAndTab`: Treble and tab for guitar.
 
 Second argument is optional `DocumentOptions`:
 ```ts
 DocumentOptions = { measuresPerRow?: number, tuning?: string }
 ```
 
-Default tuning is `"Standard"`. `TuningNameList` is array of available tuning names.
+Default tuning is `"Standard"`. `Theory.TuningNameList` is array of available tuning names.
+
+```js
+// Example
+let doc = new Score.MDocument(Score.StaffKind.GuitarTrebleAndTab, { tuning: "Drop D" });
+```
 
 ### Set Header
 
 ```js
-doc.setHeader("Title", "Composer", "Arranger");
-doc.setHeader("Title");
-```
+doc.setHeader(title?: string, composer?: string, arranger?: string);
 
-Any of `title`, `composer` and `arranger` can be omitted/set undefined.
+// Example
+doc.setHeader("Demo Song");
+```
 
 ### Add Measure
 
@@ -93,204 +111,225 @@ let m = doc.addMeasure();
 m.endRow();
 ```
 
-Manually induce row change. Next measure will be added to new row.
+Manually induce row change. Next measure that is added will start new row.
 
 ### Set Signature
 
 ```js
-m.setKeySignature("C", Theory.ScaleType.Major);
+m.setKeySignature(keyNote: string, scaleType: Theory.ScaleType);
+
+// Example: Am
+m.setKeySignature("A", Theory.ScaleType.Aeolian);
 ```
 
-Firat argument is scale key note.
+`keyNote` is scale key note, e.g. "C" (in "C Major").
 
-Second argument is `ScaleType`, which can be `Major`, `NaturalMinor`, `HarmonicMinor`, `Ionian`, `Dorian`, `Phrygian`, `Lydian`, `Mixolydian`, 
-`Aeolian`, `Locrian`, `MajorPentatonic`, `MinorPentatonic`, `MajorHexatonicBlues`, `MinorHexatonicBlues` or `HeptatonicBlues`.
+ `scaleType` can be
+ - `Theory.ScaleType.Major`
+ - `Theory.ScaleType.NaturalMinor`
+ - `Theory.ScaleType.HarmonicMinor`
+ - `Theory.ScaleType.Ionian`
+ - `Theory.ScaleType.Dorian`
+ - `Theory.ScaleType.Phrygian`
+ - `Theory.ScaleType.Lydian`
+ - `Theory.ScaleType.Mixolydian`
+ - `Theory.ScaleType.Aeolian`
+ - `Theory.ScaleType.Locrian`
+ - `Theory.ScaleType.MajorPentatonic`
+ - `Theory.ScaleType.MinorPentatonic`
+ - `Theory.ScaleType.MajorHexatonicBlues`
+ - `Theory.ScaleType.MinorHexatonicBlues`
+ - `Theory.ScaleType.HeptatonicBlues`
 
 ```js
-m.setTimeSignature("4/4");
+m.setTimeSignature(timeSignature: string);
+
+// Example
+m.setTimeSignature("3/4");
 ```
 
-Time signature can be `"2/4"`, `"3/4"`, `"4/4"`, `"6/8"` or `"9/8"`.
+timeSignature can be:
+- `"2/4"`
+- `"3/4"`
+- `"4/4"`
+- `"6/8"`
+- `"9/8"`
 
 ```js
-m.setTempo(80, Theory.NoteLength.Quarter, false);
-m.setTempo(80);
+m.setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLength, dotted?: boolean);
+
+// Example
+m.setTempo(100, Theory.NoteLength.Quarter);
 ```
 
-First argument is beats per minute.
+`beatsPerMinute` is self explanatory.
 
-Second argument is beat length. Third argument tells if beat length is dotted. Second and third arguments can be omitted.
+`beatLength` tells  the length of each beat, e.g. Theory.NoteLength.Quarter.
+
+`dotted` tells if `beatLength` is dotted.
 
 ### Add Note Or Chord
 
 ```js
-m.addNote(voiceId, note, noteLength, noteOptions?);
-m.addChord(voiceId, notes, noteLength, noteOptions);
+m.addNote(voiceId: number, note: string, noteLength: Theory.NoteLength, noteOptions?: Score.NoteOptions);
+m.addChord(voiceId: number, notes: string[], noteLength: Theory.NoteLength, noteOptions?: Score.NoteOptions);
+
+// Examples
+m.addNote(0, "C4", Theory.NoteLength.Half, { dotted: true });
+m.addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Down });
 ```
 
-* `voiceId`: Voice track id `0`, `1`, `2` or `3`
-* `note`: note `string | Note` (e.g. `"C3"`)
-* `notes`: array of notes `(string | Note)[]` (e.g. `["C3", "E3"]`)
-* `noteLength`: Note length (e.g. `NoteLength.Half`), see below
-* `noteOptions`: Optional note otions, see below
+`voiceId` can be `0`, `1`, `2` or `3`.
 
-Examples:
-```js
-m.addNote(0, "C3", Theory.NoteLength.Quarter);
-m.addChord(1, ["C3", "E3", "G3", "C4"], Theory.NoteLength.Half, { dotted: true });
-```
+`note` is note name, e.g. `"G#3"`, `"Db3"`.
 
-#### NoteLength
+`notes`: array of notes `string[]` (e.g. `["C3", "E3"]`)
 
-* `NoteLength.Whole`
-* `NoteLength.Half`
-* `NoteLength.Quarter`
-* `NoteLength.Eighth`
-* `NoteLength.Sixteenth`
-* `NoteLength.ThirtySecond`
-* `NoteLength.SixtyFourth`
+`noteLength` can be:
+* `Theory.NoteLength.Whole`
+* `Theory.NoteLength.Half`
+* `Theory.NoteLength.Quarter`
+* `Theory.NoteLength.Eighth`
+* `Theory.NoteLength.Sixteenth`
+* `Theory.NoteLength.ThirtySecond`
+* `Theory.NoteLength.SixtyFourth`
 
-#### NoteOptions
+`noteOptions` is optional object of note options (e.g. `{ dotted: true }`):
 
-Optional object of note options (e.g. `{ stem: Stem.Up }`):
-
-| Note option | Type                    |                    |
-|-------------|-------------------------|--------------------|
-| dotted      | `boolean`               | Create dotted note. |
-| stem        | `Stem`                  | Set stem direction (`Stem.Auto`/`Up`/`Down`) |
-| arpeggio    | `Arpeggio`              | Play column in arpeggio `Arpeggio.Up`/`Down` |
+| Note option | Type                      |                     |
+|-------------|---------------------------|---------------------|
+| dotted      | `boolean`                 | Create dotted note. |
+| stem        | `Score.Stem.Auto/Up/Down` | Set stem direction. |
+| arpeggio    | `Score.Arpeggio.Up/Down` \| `boolean`  | Play column in arpeggio. |
 | staccato    | `boolean`               | Play column in staccato. |
 | diamond     | `boolean`               | Diamond shaped note head. |
-| tieSpan     | `number` \| `TieLength` | How many notes tied, or `TieLength.Short`/`ToMeasureEnd` |
-| tiePos      | `ArcPos`                | Tie attach point: `Arc.Auto`/`Above`/`Middle`/`Below`/`StemTip` |
-| slurSpan    | `number`                | How many notes slurred. |
-| slurPos     | `ArcPos`                | Slur attach point: `Arc.Auto`/`Above`/`Middle`/`Below`/`StemTip` |
-| triplet     | `boolean`               | Make this note part of triplet. |
-| string      | `number` \| `number[]`  | What string does the note fret number belong to in guitar tab. Array of strings for chord. |
+| tieSpan     | `number` \| `TieLength.Short/ToMeasureEnd` | How many notes this tie spans. |
+| tiePos      | `Score.ArcPos.Auto/Above/Middle/Below/StemTip` | Tie attach point. |
+| slurSpan    | `number`                | How many notes this slur spans. |
+| slurPos     | `Score.ArcPos.Auto/Above/Middle/Below/StemTip` | Slur attach point. |
+| triplet     | `boolean`               | Set this note part of triplet. |
+| string      | `number` \| `number[]`  | String number for guitar tab. Array of string numbers for chord. |
 
 ### Add Rest
 
 ```js    
-m.addRest(voideId, restLength, restOptions?);
+m.addRest(voideId: number, restLength: Theory.NoteLength, restOptions?: Score.RestOptions);
+
+// Example
+m.addRest(0, Theory.NoteLength.Sixteenth);
 ```
 
-* `voiceId`: Voice track id `0`, `1`, `2` or `3`.
-* `restLength`: Rest length using `NoteLength` (e.g. `NoteLength.Half`), see above.
-* `restOptions`: Optional rest otions, see below.
+ `voiceId` can be `0`, `1`, `2` or `3`.
 
-Example:
-```js
-m.addRest(0, Theory.NoteLength.Quarter);
-```
+`restLength` is length of rest, similar as noteLength above.
 
-#### RestOptions
+`restOptions` is optional object of rest options (e.g. `{ hide: true }`):
 
-Optional object of rest options (e.g. `{ hide: true }`):
-| Rest option | Type                   |                    |
-|-------------|------------------------|--------------------|
-| dotted      | `boolean`              | Create dotted rest |
-| pitch       | `string` \| `Note`     | Positions rest at level of note (e.g. `"C3"`) |
-| hide        | `boolean`              | Add invisible rest |
-| triplet     | `boolean`              | Make this rest part of triplet |
+| Rest option | Type         |                     |
+|-------------|--------------|---------------------|
+| dotted      | `boolean`    | Create dotted rest. |
+| pitch       | `string`     | Positions this rest at pitch level (e.g. `"C3"`). |
+| hide        | `boolean`    | Add invisible rest. |
+| triplet     | `boolean`    | Set this rest part of triplet. |
 
 ### Add Fermata
 
 ```js
-m.addNote(0, "C3", Theory.NoteLength.Quarter).addFermata(Score.Fermata.AtNote);
-m.addRest(0, Theory.NoteLength.Quarter).addFermata();
-```
+m.addFermata(fermata?: Score.Fermata);
 
-Adds fermata anchored to previously added note or rest.
-
-```js
+// Example
 m.addFermata(Score.Fermata.AtMeasureEnd);
 ```
 
-Adds fermata at measure end.
+`fermata` is typeof `Score.Fermata` and can be:
+- `Score.Fermata.AtNote`: Adds fermata anchored to previously added note, chord or rest.
+- `Score.Fermata.AtMeasureEnd`: Adds fermata at the end of measure.
 
 ### Add Navigation
 
-```js
-m.addNavigation(Score.Navigation.DC_al_Fine);
-```
-
-Adds navigational element to measure.
-
-Available navigations are:
-
-* `Navigation.DC_al_Fine`
-* `Navigation.DC_al_Coda`
-* `Navigation.DS_al_Fine`
-* `Navigation.DS_al_Coda`
-* `Navigation.Coda`
-* `Navigation.toCoda`
-* `Navigation.Segno`
-* `Navigation.Fine`
-* `Navigation.StartRepeat`
-* `Navigation.EndRepeat`
-* `Navigation.Ending`
-
-`Navigation.EndRepeat` Takes optional second argument which is number of repeats. Defaults to 1 if omitted.
+Add navigational element to measure.
 
 ```js
-m.addNavigation(Score.Navigation.EndRepeat, 2);
-```
+m.addNavigation(navigation: Score.Navigation, ...args?);
 
-`Navigation.Ending` takes variable number of arguments, each is a passage number.
-
-```js
+// Examples
+m.addNavigation(Score.Navigation.StartRepeat);
+m.addNavigation(Score.Navigation.EndRepeat, 3);
 m.addNavigation(Score.Navigation.Ending, 1, 2);
-m.addNavigation(Score.Navigation.Ending, 3);
 ```
+
+`navigation` can be:
+* `Score.Navigation.DC_al_Fine`
+* `Score.Navigation.DC_al_Coda`
+* `Score.Navigation.DS_al_Fine`
+* `Score.Navigation.DS_al_Coda`
+* `Score.Navigation.Coda`
+* `Score.Navigation.toCoda`
+* `Score.Navigation.Segno`
+* `Score.Navigation.Fine`
+* `Score.Navigation.StartRepeat`
+* `Score.Navigation.EndRepeat`
+* `Score.Navigation.Ending`
+
+`Score.Navigation.EndRepeat` takes optional second arg which is number of times to repeat (once if omitted).
+
+`Score.Navigation.Ending` takes variable number of number args, each is a passage number.
 
 ### Add Label
 
+Add text label anchored to previously added note, chord or rest.
+
 ```js
-m.addChord(0, ["D3", "F3", "A3"], Theory.NoteLength.Quarter).addLabel(Score.Label.Chord, "Dm");
+m.addLabel(label: Score.Label, text: string);
+
+// Example
+m.addLabel(Score.Label.Chord, "Am);
 ```
 
-Available Label types are:
-
-* `Label.Note` is used to label notes and is positioned below note.
-* `Label.Chord` is used to label chords and is positioned on top.
+`label` can be:
+* `Score.Label.Note`: Used to label notes and is positioned below note.
+* `Score.Label.Chord`: Used to label chords and is positioned on top.
 
 ### Add Annotation
 
+Add annotation text anchored to previously added note, chord or rest.
+
 ```js
-m.addNote(0, "C3", Theory.NoteLength.Quarter).addAnnotation(Score.Annotation.Dynamics, "fff");
+m.addAnnotation(annotation: Score.Annotation, text: string);
+
+// Example
+m.addAnnotation(Score.Annotation.Tempo, "accel.");
 ```
 
-First argument is `Annotation`, second argument is the annotation text.
-
-Available annotations are:
-
-* `Annotation.Dynamics` could be for example `"fff"`, `"cresc."`, `"dim."`, etc.
-* `Annotation.Tempo` could be for example `"accel."`, `"rit."`, `"a tempo"`, etc.
+`annotation` can be:
+* `Score.Annotation.Dynamics`: `text` could be for example `"fff"`, `"cresc."`, `"dim."`, etc.
+* `Score.Annotation.Tempo`: `text` could be for example `"accel."`, `"rit."`, `"a tempo"`, etc.
 
 ### Add Extension
 
+Adds extension line to element, for example to previously added annotation.
+
 ```js
-m.addNote(0, "C3", Theory.NoteLength.Quarter).
-    addAnnotation(Score.Annotation.Tempo, "accel.").
-    addExtension(Theory.NoteLength.Whole * 2, true);
+m.addExtension(extensionLength: number, visible?: boolean);
+
+// Example
+m.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 2, true);
 ```
 
-Adds extension line to element, annotation in this case.
+`extensionLength` is `number` but `Theory.NoteLength` values can be used as number and multiplied to set desired extension length.
 
-First argument is extension length, of type number. `NoteLength` values can be used as number, and `NoteLength` values can be multiplied to set desired extension length.
-
-Second argument is `true`/`false` whether extension line is visible. This argument cvan be omitted, extension line is visible by default.
+`visible` sets visibility of extension line, visible by default (if omitted).
 
 ### Guitar Tab
 
-Has preliminary support for rendering guitar tabs. 
-Create document with `StaffKind.GuitarTab` or `StaffKind.GuitarTrebleAndTab`, and specify tuning (optional, defaults to Standard tuning):
+This library has preliminary guitar tabs rendering. 
+Create document with `Score.StaffKind.GuitarTab` or `Score.StaffKind.GuitarTrebleAndTab`, and specify tuning (defaults to `"Standard"` if omitted).
 
 ```js
 let doc = new Score.MDocument(Score.StaffKind.GuitarTrebleAndTab, { tuning: "Standard" });
 ```
 
-Add notes with `string` option to specify which string the fret number is rendered in tab view.
+Add notes with `{ string: number | number[] }` to specify which string the fret number is rendered in guitar tab.
 
 ```js
 // Single note
@@ -299,7 +338,6 @@ m.addNote(0, "G3", Theory.NoteLength.Eighth, { string: 3 });
 // Multi note
 m.addChord(0, ["E4", "C3"], Theory.NoteLength.Eighth, { string: [1, 5] });
 ```
-
 
 ### Queueing
 
@@ -319,18 +357,18 @@ Beams are detected and added automatically.
 ### Play Document
 
 ```js
-Audio.setInstrument(Audio.Instrument.ClassicalGuitar);
-```
+Audio.setInstrument(instrument: Audio.Instrument);
 
-Sets instrument. Instrument can be ClassicalGuitar or Synth.
-
-```js
+// Simple play
 doc.play();
 ```
 
-Plays the document.
+`instrument` can be:
+- `Audio.Instrument.ClassicalGuitar`
+- `Audio.Instrument.Synth`
 
 ```js
+// More playback options:
 let player = new MPlayer(doc);
 
 player.play();
@@ -340,8 +378,6 @@ player.stop();
 MPlayer.stopAll();
 ```
 
-More playback methods.
-
 ### Viewing Using React JSX/TSX
 
 ```js
@@ -350,11 +386,11 @@ More playback methods.
 
 // Add playback buttons
 <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle}/> // Single Play/Stopo button
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStop}/> // Play and Stop buttons
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayPauseStop}/> // Play, Pause and Stop buttons
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStop}/>       // Play and Stop buttons
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayPauseStop}/>  // Play, Pause and Stop buttons
 ```
 
-Bootstrap is used for better visual appearance but you must load it.
+Bootstrap is used for better visual appearance, but it needs to be installed and loaded.
 
 ### Viewing Using Plain JS/TS
 
@@ -402,20 +438,16 @@ try {
 }
 catch(e) {
     // MusicError is raised on errors.
-    if(e instanceof Score.MusicError) {
-        console.log(e);
+    if(e instanceof Core.MusicError) {
+        console.error(e);
     }
 }
 ```
 
 ## Compatibility
-
-This library is bundled to ESM, CJS and UMD formats.
-
-* CJS and UMD bundles are transpiled with Babel for ES5/IE11 compatibility.
-* ESM bundle targets modern environments (ES6+).
-* Uses ES6 features like Map, etc.
-* No polyfills are included.
+- This library is bundled to ESM, CJS and IIFE formats.
+- Target is to suppor ES6/ES2015.
+- No polyfills are included.
 
 While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
 
