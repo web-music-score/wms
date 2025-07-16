@@ -1,9 +1,9 @@
 {
     "name": "js-react-example",
-    "version": "1.0.0",
+    "version": "2.0.0-pre",
     "private": true,
     "dependencies": {
-        "@tspro/web-music-score": "^1.0.0",
+        "@tspro/web-music-score": ">=2.0.0-pre <2.1.0",
         "core-js": "^3.43.0",
         "react": "^18.0.0",
         "react-dom": "^18.0.0",
