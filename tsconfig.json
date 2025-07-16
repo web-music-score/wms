@@ -14,7 +14,7 @@
         "declaration": false,
         "preserveConstEnums": true,
         "sourceMap": true,
-        "allowJs": true,
+        "allowJs": false,
         "jsx": "react-jsx",
         "resolveJsonModule": true,
         "strict": true,
@@ -50,7 +50,8 @@
         "src/**/*.ts"
     ],
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "dist"
     ],
     "compileOnSave": false
 }
