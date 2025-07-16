@@ -21,25 +21,25 @@ npm i react
 
 ### Import
 
-Version 2 brough subpath module exports. There is no main export.
+**Breaking:** Version 2 introduced subpath module imports, instead of one big main import.
 
 ```js
-// Import core module. This does not contain much.
+// Import core module, it does not contain much.
 import * as Core from "@tspro/web-music-score/core";
 
-// Import audio module.
+// Import audio module, it contains playing notes.
 import * as Audio from "@tspro/web-music-score/audio";
 
-// Import module that contains all music theory stuff.
+// Import theory module, it contains all music theory stuff.
 import * as Theory from "@tspro/web-music-score/theory";
 
-// Import music score module.
+// Import score module, it contains music score stuff.
 import * as Score from "@tspro/web-music-score/score";
 
-// Import module for react components.
+// Import react-ui module, it contains all react components.
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
-// Import demo songs.
+// Import pieces module, it contains demo songs.
 import * as Pieces from "@tspro/web-music-score/pieces";
 
 // You can also use require
