@@ -2,7 +2,6 @@ import * as React from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Menubar, SelectTuningForm } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Audio from "@tspro/web-music-score/audio";
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
@@ -14,6 +13,7 @@ interface ChooseTuningProps {
 
 interface ChooseTuningState {
     guitarCtx: ScoreUI.GuitarContext;
+    score?: Score.MDocument;
 }
 
 export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTuningState> {
@@ -24,15 +24,14 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
 
         let guitarCtx = props.app.getGuitarContext();
 
-        this.state = { guitarCtx }
+        this.state = { guitarCtx, score: this.createScore(guitarCtx) }
     }
 
     onChangeTuning(tuningName: string) {
         try {
             let guitarCtx = this.state.guitarCtx.alterTuningName(Theory.validateTuningName(tuningName));
             if (guitarCtx !== this.state.guitarCtx) {
-                Score.MPlayer.stopAll();
-                this.setState({ guitarCtx });
+                this.setState({ guitarCtx, score: this.createScore(guitarCtx) });
             }
         }
         catch (err) {
@@ -50,11 +49,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         }
     }
 
-    render() {
-        let { app } = this.props;
-        let { guitarCtx } = this.state;
-        let { tuningName } = guitarCtx;
-
+    private createScore(guitarCtx: ScoreUI.GuitarContext): Score.MDocument | undefined {
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
 
         let staffKinds = [
@@ -64,11 +59,9 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
             Score.StaffKind.Grand
         ];
 
-        let doc: Score.MDocument | undefined;
-
         for (let i = 0; i < staffKinds.length; i++) {
             try {
-                doc = new Score.MDocument(staffKinds[i]);
+                let doc = new Score.MDocument(staffKinds[i]);
 
                 let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
 
@@ -79,8 +72,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
 
                 m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
 
-                // Ok.
-                break;
+                return doc;
             }
             catch (err) {
                 // All notes did not fit into staff.
@@ -88,7 +80,15 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
             }
         }
 
-        if (!doc) {
+        return undefined;
+    }
+
+    render() {
+        let { app } = this.props;
+        let { guitarCtx, score } = this.state;
+        let { tuningName } = guitarCtx;
+
+        if (!score) {
             return <div>Error.</div>;
         }
 
@@ -127,11 +127,11 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
                 <br />
                 <Row xs="auto">
                     <Col>
-                        <ScoreUI.MusicScoreView doc={doc} />
+                        <ScoreUI.MusicScoreView doc={score} />
                     </Col>
                 </Row>
                 <Row xs="auto">
-                    <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
+                    <ScoreUI.PlaybackButtons doc={score} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
                 </Row>
 
             </Container>
