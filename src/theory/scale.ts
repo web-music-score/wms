@@ -318,7 +318,8 @@ export class ScaleFactory {
 
     getScale(keyNote: string): Scale {
         let scale = this.scaleMap.get(keyNote);
-        return scale ? scale : Assert.interrupt("Invalid scale: " + keyNote + " " + this.type);
+        Assert.assert(scale, "Invalid scale: " + keyNote + " " + this.type);
+        return scale!;
     }
 
     hasScale(keyNote: string) {
@@ -362,13 +363,13 @@ ScaleFactoryList.forEach(factory => {
 
 /** @public */
 export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
-    return Assert.require(ScaleFactoryMap.get(scaleType));
+    return Assert.require(ScaleFactoryMap.get(scaleType), "Invalid ScaleType: " + scaleType);
 }
 
 /** @public */
-export function validateScaleType(scaleTypeStr: string): ScaleType {
-    let f = ScaleFactoryMap.get(scaleTypeStr as ScaleType);
-    return f ? f.getType() : Assert.interrupt("Invalid scale type: " + scaleTypeStr);
+export function validateScaleType(scaleType: unknown): ScaleType {
+    Assert.assertEnum(scaleType, ScaleType, "ScaleType");
+    return scaleType;
 }
 
 /** @public */

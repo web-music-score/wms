@@ -119,12 +119,12 @@ function getIntervalQuality(diatonicInterval: number, chromaticInterval: number)
 
 /** @public */
 export function validateIntervalQuality(q: string): IntervalQuality {
-    if (q === "Perfect" || q === "Major" || q === "minor" || q === "Augmented" || q === "diminished" || q === "Doubly Augmented" || q === "doubly diminished") {
-        return q;
-    }
-    else {
-        Assert.interrupt("Invalid interval quality: " + q);
-    }
+    Assert.assert(
+        (q === "Perfect" || q === "Major" || q === "minor" || q === "Augmented" || q === "diminished" || q === "Doubly Augmented" || q === "doubly diminished"),
+        "Invalid interval quality: " + q
+    );
+
+    return q as IntervalQuality;
 }
 
 function formatQuantity(q: number) {

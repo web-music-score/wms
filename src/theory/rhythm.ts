@@ -39,8 +39,8 @@ const NoteSymbolMap = new Map<NoteLength, string>([
 
 /** @public */
 export function validateNoteLength(noteLength: unknown): NoteLength {
-    Assert.assert(typeof noteLength === "number" && NoteSymbolMap.has(noteLength));
-    return noteLength as NoteLength;
+    Assert.assertEnum(noteLength, NoteLength, "NoteLength");
+    return noteLength;
 }
 
 /** @public */

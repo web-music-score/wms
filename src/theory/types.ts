@@ -17,12 +17,8 @@ export const DefaultPitchNotation = PitchNotation.Scientific;
 
 /** @public */
 export function validatePitchNotation(pn: string): PitchNotation {
-    if (pn === PitchNotation.Scientific || pn === PitchNotation.Helmholtz) {
-        return pn;
-    }
-    else {
-        return Assert.interrupt("Invalid PitchNotation: " + pn);
-    }
+    Assert.assertEnum(pn, PitchNotation, "PitchNotation");
+    return pn;
 }
 
 /** @public */
@@ -40,10 +36,6 @@ export const GuitarNoteLabelList = Utils.Enum.getEnumValues(GuitarNoteLabel);
 
 /** @public */
 export function validateGuitarNoteLabel(kind: string): GuitarNoteLabel {
-    if (kind === GuitarNoteLabel.Default || kind === GuitarNoteLabel.Interval) {
-        return kind;
-    }
-    else {
-        Assert.interrupt("Invalid GuitarNoteLabel: " + kind);
-    }
+    Assert.assertEnum(kind, GuitarNoteLabel, "GuitarNoteLabel");
+    return kind;
 }

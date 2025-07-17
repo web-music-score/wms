@@ -10,8 +10,8 @@ export const DefaultHandedness = Handedness.RightHanded;
 
 /** @public */
 export function validateHandedness(h: unknown): Handedness {
-    Assert.assert(h === Handedness.RightHanded || h === Handedness.LeftHanded, "Invalid handedness: " + h);
-    return h as Handedness;
+    Assert.assertEnum(h, Handedness, "Handedness");
+    return h;
 }
 
 /*
@@ -30,12 +30,8 @@ export const DefaultTuningName = TuningNameList[0];
 
 /** @public */
 export function validateTuningName(tuningName: string): string {
-    if (TuningNameList.indexOf(tuningName) >= 0) {
-        return tuningName;
-    }
-    else {
-        return Assert.interrupt("Invalid tuning name: " + tuningName);
-    }
+    Assert.assert(TuningNameList.indexOf(tuningName) >= 0, "Invalid tuning name: " + tuningName);
+    return tuningName;
 }
 
 const TuningStringsCache = new LRUCache<string, ReadonlyArray<Note>>(100);
