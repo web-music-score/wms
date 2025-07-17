@@ -3,7 +3,7 @@ import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-musi
 import * as Audio from "@tspro/web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, CursorPositionChangeListener, Navigation, PlayState, PlayStateChangeListener } from "../pub";
+import { DivRect, CursorPositionChangeListener, Navigation, PlayState, PlayStateChangeListener, getVoiceIds } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { isDynamicsLevelText, KnownText } from "./element-data";
@@ -102,7 +102,7 @@ export class PlayerColumnProps {
             return this.measure.getMeasureTicks() / 2;
         }
         else {
-            let symbols = ObjMeasure.VoiceIdList.map(i => col.getVoiceSymbol(i)).filter(s => !!s) as RhythmSymbol[];
+            let symbols = getVoiceIds().map(i => col.getVoiceSymbol(i)).filter(s => !!s) as RhythmSymbol[];
             let symbolsTicks = symbols.map(s => s.rhythmProps.ticks);
 
             if (symbolsTicks.length === 0) {

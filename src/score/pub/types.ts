@@ -1,6 +1,7 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { DivRect } from "./div-rect";
 import { MMeasure, MusicInterface } from "./interface";
+import { Assert } from "@tspro/ts-utils-lib";
 
 /** @public */
 export enum StaffKind {
@@ -16,7 +17,24 @@ export enum StaffKind {
     // /** GuitarTab has tab for guitar. */
     GuitarTab = 8,
     // /** GuitarTrebleAndTab has treble clef and tab for guitar. */
-    GuitarTrebleAndTab = GuitarTab | GuitarTreble}
+    GuitarTrebleAndTab = GuitarTab | GuitarTreble
+}
+
+/** @public */
+export type VoiceId = 0 | 1 | 2 | 3;
+
+/** @public */
+export function getVoiceIds(): ReadonlyArray<VoiceId> {
+    return [0, 1, 2, 3];
+}
+
+/** @public */
+export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
+
+/** @public */
+export function getStringNumbers(): ReadonlyArray<StringNumber> {
+    return [1, 2, 3, 4, 5, 6];
+}
 
 /** @public */
 export enum Stem { Auto, Up, Down }
@@ -29,9 +47,6 @@ export enum Tie { Short = -1, MeasureEnd = -2 }
 
 /** @public */
 export enum ArcPos { Auto, Above, Middle, Below, StemTip }
-
-/** @public */
-export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
 
 /** @public */
 export type NoteOptions = {

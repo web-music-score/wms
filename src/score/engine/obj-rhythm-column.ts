@@ -1,11 +1,11 @@
 import { Assert } from "@tspro/ts-utils-lib";
 import { Note, NoteLength } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, DivRect, Stem, MRhythmColumn } from "../pub";
+import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
-import { ObjMeasure } from "./obj-measure";
+import { ObjMeasure, validateVoiceId } from "./obj-measure";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
@@ -160,7 +160,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     setVoiceSymbol(voiceId: number, symbol: RhythmSymbol) {
-        ObjMeasure.validateVoiceId(voiceId);
+        validateVoiceId(voiceId);
 
         this.voiceSymbol[voiceId] = symbol;
 
@@ -302,7 +302,7 @@ export class ObjRhythmColumn extends MusicObject {
             }
         }
 
-        ObjMeasure.VoiceIdList.forEach(voiceId => {
+        getVoiceIds().forEach(voiceId => {
             const symbol = this.getVoiceSymbol(voiceId);
 
             if (symbol instanceof ObjNoteGroup) {

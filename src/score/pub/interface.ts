@@ -1,5 +1,6 @@
 import * as Audio from "@tspro/web-music-score/audio";
-import { Accidental, Note, NoteLength, RhythmProps, KeySignature, TimeSignature, TimeSignatureString, Scale, ScaleType, SymbolSet } from "@tspro/web-music-score/theory";
+import { Accidental, Note, NoteLength, KeySignature, TimeSignature, TimeSignatureString } from "@tspro/web-music-score/theory";
+import { RhythmProps, Scale, ScaleType, SymbolSet } from "@tspro/web-music-score/theory";
 import { MusicObject } from "../engine/music-object";
 import { ObjAccidental } from "../engine/obj-accidental";
 import { ObjArc } from "../engine/obj-arc";
@@ -24,9 +25,48 @@ import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { ClickObjectListener, ClickObjectSelector, ClickPitchListener, DocumentOptions, PlayStateChangeListener } from "./types";
-import { NoteOptions, RestOptions, StaffKind } from "./types";
-import { Fermata, Navigation, Annotation, Label, PlayState } from "./types";
+import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, Tie, VoiceId, getStringNumbers, getVoiceIds } from "./types";
+import { ArcPos, Arpeggio, ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
+import { NoteOptions, RestOptions, StaffKind, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
+import { isNumber } from "tone";
+
+function isVoiceId(value: unknown): value is VoiceId {
+    return isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
+}
+
+function isStringNumber(value: unknown): value is StringNumber {
+    return isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
+}
+
+function assertNoteOptions(options: NoteOptions) {
+    Assert.assert(Utils.Is.isObject(options), "noteOptions");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.dotted), "noteOptions.dotted");
+    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.stem, Stem), "noteOptions.stem");
+    Assert.assert(Utils.Is.isStringOrUndefined(options.color), "noteOptions.color");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.dotted), "noteOptions.dotted");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.arpeggio) || Utils.Is.isEnumValue(options.arpeggio, Arpeggio), "noteOptions.arpeggio");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.staccato), "noteOptions.staccato");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.diamond), "noteOptions.diamond");
+    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.tieSpan, Tie) || Utils.Is.isIntegerGte(options.tieSpan, 1), "noteOptions.tieSpan");
+    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.tiePos, ArcPos), "noteOptions.tiePos");
+    Assert.assert(Utils.Is.isUndefined(options.slurSpan) || Utils.Is.isIntegerGte(options.slurSpan, 1), "noteOptions.slurSpan");
+    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.slurPos, ArcPos), "noteOptions.slurPos");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.triplet), "noteOptions.triplet");
+    Assert.assert((
+        Utils.Is.isUndefined(options.string) ||
+        isStringNumber(options.string) ||
+        Utils.Is.isArray(options.string) && options.string.length > 0 && options.string.every(string => isStringNumber(string))
+    ), "noteOptions.string");
+}
+
+function assertRestOptions(options: RestOptions) {
+    Assert.assert(Utils.Is.isObject(options), "restOptions");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.dotted), "restOptions.dotted");
+    Assert.assert(Utils.Is.isUndefined(options.pitch) || Utils.Is.isString(options.pitch) || options.pitch instanceof Note, "restOptions.pitch");
+    Assert.assert(Utils.Is.isStringOrUndefined(options.color), "restOptions.color");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide");
+    Assert.assert(Utils.Is.isBooleanOrUndefined(options.triplet), "restOptions.triplet");
+}
 
 /** @public */
 export abstract class MusicInterface {
@@ -114,6 +154,13 @@ export class MDocument extends MusicInterface {
     constructor(staffKind: StaffKind, options?: DocumentOptions) {
         super(MDocument.Name);
 
+        Assert.assert(Utils.Is.isEnumValue(staffKind, StaffKind), "StaffKind");
+        if (options !== undefined) {
+            Assert.assert(Utils.Is.isObject(options), "documentOptions");
+            Assert.assert(Utils.Is.isUndefined(options.measuresPerRow) || Utils.Is.isIntegerGte(options.measuresPerRow, 1), "documentOptions.measuresPerRow");
+            Assert.assert(Utils.Is.isStringOrUndefined(options.tuning), "documentOptions.tuning");
+        }
+
         this.obj = new ObjDocument(this, staffKind, options);
     }
 
@@ -123,6 +170,9 @@ export class MDocument extends MusicInterface {
     }
 
     setHeader(title?: string, composer?: string, arranger?: string): void {
+        Assert.assert(Utils.Is.isStringOrUndefined(title), "title");
+        Assert.assert(Utils.Is.isStringOrUndefined(composer), "composer");
+        Assert.assert(Utils.Is.isStringOrUndefined(arranger), "arranger");
         this.obj.setHeader(title, composer, arranger);
     }
 
@@ -135,14 +185,22 @@ export class MDocument extends MusicInterface {
     }
 
     updateCursorRect(cursorRect?: DivRect) {
+        Assert.assert(cursorRect === undefined || cursorRect instanceof DivRect, "Invalid cursorRect");
+
         this.obj.updateCursorRect(cursorRect);
     }
 
-    play(playStateChangeListener?: PlayStateChangeListener): MPlayer {
-        return new MPlayer(this, playStateChangeListener).play();
+    play(fn?: PlayStateChangeListener): MPlayer {
+        Assert.assert(Utils.Is.isFunctionOrUndefined(fn), "playStateChangeListener");
+        return new MPlayer(this, fn).play();
     }
 
     static createSimpleScaleArpeggio(staffKind: StaffKind, scale: Scale, lowestPitchNote: string, numOctaves: number): MDocument {
+        Assert.assert(Utils.Is.isEnumValue(staffKind, StaffKind), "staffKind");
+        Assert.assert(scale instanceof Scale, "scale");
+        Assert.assert(Utils.Is.isString(lowestPitchNote), "lowestPitchNote");
+        Assert.assert(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves");
+
         let doc = new MDocument(staffKind);
 
         let m = doc.addMeasure().setKeySignature(scale);
@@ -176,6 +234,7 @@ export class MEnding extends MusicInterface {
     }
 
     hasPassage(passage: number): boolean {
+        Assert.assert(Utils.Is.isIntegerGte(passage, 1), "passage");
         return this.obj.hasPassage(passage);
     }
 }
@@ -263,37 +322,69 @@ export class MMeasure extends MusicInterface {
     setKeySignature(keySignature: KeySignature): MMeasure;
     setKeySignature(scale: Scale): MMeasure;
     setKeySignature(...args: unknown[]): MMeasure {
+        Assert.assert((
+            args[0] instanceof Scale ||
+            args[0] instanceof KeySignature ||
+            Utils.Is.isString(args[0]) && Utils.Is.isEnumValue(args[1], ScaleType)
+        ), "keySignature");
         this.obj.setKeySignature(...args);
         return this;
     }
 
     setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): MMeasure {
+        Assert.assert(timeSignature instanceof TimeSignature || Utils.Is.isString(timeSignature), "timeSignature");
         this.obj.setTimeSignature(timeSignature);
         return this;
     }
 
     setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean): MMeasure {
+        Assert.assert(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute");
+        if (beatLength === undefined) {
+            Assert.assert(Utils.Is.isUndefined(dotted), "dotted");
+        }
+        else {
+            Assert.assert(Utils.Is.isEnumValue(beatLength, NoteLength), "beatLength");
+            Assert.assert(Utils.Is.isBooleanOrUndefined(dotted), "dotted");
+        }
         this.obj.setTempo(beatsPerMinute, beatLength, dotted);
         return this;
     }
 
     addNote(voiceId: number, note: Note | string, noteLength: NoteLength, options?: NoteOptions): MMeasure {
+        Assert.assert(isVoiceId(voiceId), "voiceId");
+        Assert.assert(note instanceof Note || Utils.Is.isString(note), "note");
+        Assert.assert(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength");
+        if (options !== undefined) {
+            assertNoteOptions(options);
+        }
         this.obj.addNoteGroup(voiceId, [note], noteLength, options);
         return this;
     }
 
     addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions): MMeasure {
+        Assert.assert(isVoiceId(voiceId), "voiceId");
+        Assert.assert(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes");
+        Assert.assert(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength");
+        if (options !== undefined) {
+            assertNoteOptions(options);
+        }
         this.obj.addNoteGroup(voiceId, notes, noteLength, options);
         return this;
     }
 
     addRest(voiceId: number, restLength: NoteLength, options?: RestOptions): MMeasure {
+        Assert.assert(isVoiceId(voiceId), "voiceId");
+        Assert.assert(Utils.Is.isEnumValue(restLength, NoteLength), "restLength");
+        if (options !== undefined) {
+            assertRestOptions(options);
+        }
         this.obj.addRest(voiceId, restLength, options);
         return this;
     }
 
-    addFermata(fermata: Fermata = Fermata.AtNote): MMeasure {
-        this.obj.addFermata(fermata);
+    addFermata(fermata?: Fermata): MMeasure {
+        Assert.assert(Utils.Is.isEnumValueOrUndefined(fermata, Fermata), "fermata");
+        this.obj.addFermata(fermata ?? Fermata.AtNote);
         return this;
     }
 
@@ -301,21 +392,38 @@ export class MMeasure extends MusicInterface {
     addNavigation(navigation: Navigation.EndRepeat, repeatCount: number): MMeasure;
     addNavigation(navigation: Navigation.Ending, ...passages: number[]): MMeasure;
     addNavigation(navigation: Navigation, ...args: unknown[]): MMeasure {
+        Assert.assert(Utils.Is.isEnumValue(navigation, Navigation), "navigation");
+        if (navigation === Navigation.EndRepeat && args.length > 0) {
+            Assert.assert(Utils.Is.isIntegerGte(args[0], 1), "repeatCount");
+        }
+        else if (navigation === Navigation.Ending && args.length > 0) {
+            Assert.assert(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages");
+        }
         this.obj.addNavigation(navigation, ...args);
         return this;
     }
 
     addLabel(label: Label, text: string): MMeasure {
+        Assert.assert(Utils.Is.isEnumValue(label, Label), "label");
+        Assert.assert(Utils.Is.isString(text), "text");
         this.obj.addLabel(label, text);
         return this;
     }
 
     addAnnotation(annotation: Annotation, text: string): MMeasure {
+        Assert.assert(Utils.Is.isEnumValue(annotation, Annotation), "annotation");
+        Assert.assert(Utils.Is.isString(text), "text");
         this.obj.addAnnotation(annotation, text);
         return this;
     }
 
     addExtension(extensionLength: NoteLength | number, extensionVisible?: boolean): MMeasure {
+        Assert.assert((
+            Utils.Is.isIntegerGte(extensionLength, 0) ||
+            extensionLength === Infinity ||
+            Utils.Is.isEnumValue(extensionLength, NoteLength)
+        ), "extendionLength");
+        Assert.assert(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible");
         this.obj.addExtension(extensionLength, extensionVisible ?? true);
         return this;
     }
@@ -336,6 +444,7 @@ export class MMeasure extends MusicInterface {
     }
 
     completeRests(voiceId?: number): MMeasure {
+        Assert.assert(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId), "voiceId");
         this.obj.completeRests(voiceId);
         return this;
     }
@@ -428,6 +537,8 @@ export class MRhythmColumn extends MusicInterface {
     }
 
     getRhythmSymbol(voiceId: number): MNoteGroup | MRest | undefined {
+        Assert.assert(isVoiceId(voiceId), "voiceId");
+
         return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
     }
 }
@@ -521,7 +632,10 @@ export class MPlayer {
 
     private readonly player: Player;
 
-    constructor(doc: MDocument, playStateChangeListener?: PlayStateChangeListener) {
+    constructor(doc: MDocument, fn?: PlayStateChangeListener) {
+        Assert.assert(doc instanceof MDocument, "doc");
+        Assert.assert(Utils.Is.isFunctionOrUndefined(fn), "playStateChangeListener");
+
         this.player = new Player();
 
         this.player.setDocument(doc.obj);
@@ -532,8 +646,8 @@ export class MPlayer {
 
         this.player.setCursorPositionChangeListener(cursorPositionChnageListener);
 
-        if (playStateChangeListener) {
-            this.player.setPlayStateChnageListener(playStateChangeListener);
+        if (fn) {
+            this.player.setPlayStateChnageListener(fn);
         }
     }
 
@@ -574,6 +688,8 @@ export class MRenderer {
     }
 
     setDocument(doc?: MDocument) {
+        Assert.assert(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc");
+
         this.renderer.setDocument(doc);
         return this;
     }
@@ -587,14 +703,17 @@ export class MRenderer {
     }
 
     setClickPitchListener(fn: ClickPitchListener) {
+        Assert.assert(Utils.Is.isFunctionOrUndefined(fn), "clickPitchListener");
         this.renderer.setClickPitchListener(fn);
     }
 
     setClickObjectSelector(fn?: ClickObjectSelector) {
+        Assert.assert(Utils.Is.isFunctionOrUndefined(fn), "clickObjectSelector");
         this.renderer.setClickObjectSelector(fn);
     }
 
     setClickObjectListener(fn?: ClickObjectListener) {
+        Assert.assert(Utils.Is.isFunctionOrUndefined(fn), "clickObjectListener");
         this.renderer.setClickObjectListener(fn);
     }
 
@@ -638,7 +757,9 @@ export class MPlaybackButtons {
         this.updateButtons();
     }
 
-    setDocument(doc: MDocument | undefined) {
+    setDocument(doc?: MDocument) {
+        Assert.assert(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc");
+
         this.onStop();
 
         if (doc) {
@@ -683,6 +804,8 @@ export class MPlaybackButtons {
     }
 
     setPlayButton(btn: HTMLButtonElement | string, btnLabel?: string) {
+        Assert.assert(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel");
+
         MPlaybackButtons.removeOnClickListeners(this.playButton, this.onPlay);
 
         this.playButton = Assert.require(Utils.Dom.getButton(btn), "Play button required!");
@@ -697,6 +820,8 @@ export class MPlaybackButtons {
     }
 
     setStopButton(btn: HTMLButtonElement | string, btnLabel?: string) {
+        Assert.assert(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel");
+
         MPlaybackButtons.removeOnClickListeners(this.stopButton, this.onStop);
 
         this.stopButton = Assert.require(Utils.Dom.getButton(btn), "Stop button required!");
@@ -711,6 +836,9 @@ export class MPlaybackButtons {
     }
 
     setPlayStopButton(btn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string) {
+        Assert.assert(Utils.Is.isStringOrUndefined(playLabel), "playLabel");
+        Assert.assert(Utils.Is.isStringOrUndefined(stopLabel), "stopLabel");
+
         MPlaybackButtons.removeOnClickListeners(this.playStopButton, this.onPlayStop);
 
         this.playStopButton = Assert.require(Utils.Dom.getButton(btn), "Play/stop button required!");
@@ -726,6 +854,8 @@ export class MPlaybackButtons {
     }
 
     setPauseButton(btn: HTMLButtonElement | string, btnLabel?: string) {
+        Assert.assert(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel");
+
         MPlaybackButtons.removeOnClickListeners(this.pauseButton, this.onPause);
 
         this.pauseButton = Assert.require(Utils.Dom.getButton(btn), "Pause button required!");
@@ -760,6 +890,8 @@ export class MPlaybackButtons {
     }
 
     private static addOnClickListener(btn: HTMLButtonElement, onClick: () => void) {
+        Assert.assert(Utils.Is.isFunction(onClick), "onClick");
+
         btn.addEventListener("click", onClick);
 
         let clickListeners = this.savedOnClickListeners.get(btn) || [];

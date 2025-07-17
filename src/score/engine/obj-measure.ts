@@ -2,7 +2,7 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature } from "@tspro/web-music-score/theory";
 import { AlterTempo, Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjSignature } from "./obj-signature";
@@ -23,9 +23,12 @@ import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 
-export class ObjMeasure extends MusicObject {
-    static readonly VoiceIdList = [0, 1, 2, 3];
+export function validateVoiceId(voiceId: number): VoiceId {
+    Assert.assert((<number[]>getVoiceIds()).indexOf(voiceId) >= 0, "Invalid voiceId: " + voiceId);
+    return voiceId as VoiceId;
+}
 
+export class ObjMeasure extends MusicObject {
     static readonly MinFlexContentWidth = 10;
 
     private prevMeasure: ObjMeasure | undefined;
@@ -689,7 +692,7 @@ export class ObjMeasure extends MusicObject {
         let measureTicks = 0;
 
         this.columns.forEach(col => {
-            ObjMeasure.VoiceIdList.forEach(curVoiceId => {
+            getVoiceIds().forEach(curVoiceId => {
                 let symbol = col.getVoiceSymbol(curVoiceId);
                 if (symbol && (voiceId === undefined || voiceId === curVoiceId)) {
                     measureTicks = Math.max(measureTicks, col.positionTicks + symbol.rhythmProps.ticks);
@@ -830,7 +833,7 @@ export class ObjMeasure extends MusicObject {
         this.beamGroups = [];
 
         // Recreate beams/triplets
-        ObjMeasure.VoiceIdList.forEach(voiceId => {
+        getVoiceIds().forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId);
 
             if (symbols.length <= 2) {
@@ -913,11 +916,6 @@ export class ObjMeasure extends MusicObject {
         ObjBeamGroup.createBeam(beamNotes);
     }
 
-    static validateVoiceId(voiceId: number): number {
-        Assert.in_group(voiceId, ObjMeasure.VoiceIdList, "Invalid voice id: " + voiceId);
-        return voiceId;
-    }
-
     getBarLineLeft() {
         return this.barLineLeft;
     }
@@ -927,7 +925,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     getVoiceSymbols(voiceId: number): ReadonlyArray<RhythmSymbol> {
-        ObjMeasure.validateVoiceId(voiceId);
+        validateVoiceId(voiceId);
 
         if (this.voiceSymbols[voiceId] === undefined) {
             this.voiceSymbols[voiceId] = [];
@@ -943,7 +941,7 @@ export class ObjMeasure extends MusicObject {
                 this.completeRests(0);
             }
             else {
-                ObjMeasure.VoiceIdList.forEach(voiceId => {
+                getVoiceIds().forEach(voiceId => {
                     // Complete rests for voices that are not empty
                     if (this.getConsumedTicks(voiceId) > 0) {
                         this.completeRests(voiceId);
