@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { CAGEDScales, ChooseScale, ChooseScaleCircle, ChooseTuning, DiatonicChords, FrontPage, GuitarScales, Intervals, PlayNotes, WhatChord } from "./pages";
 import { Cookies, Utils } from "@tspro/ts-utils-lib";
 import * as Audio from "@tspro/web-music-score/audio";
+import { registerClassicalGuitar } from "@tspro/web-music-score/audio-cg";
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
@@ -44,7 +45,7 @@ export enum Page {
 interface GuitarAppState {
     windowRect: Score.DivRect;
     currentPage: string;
-    instrument: Audio.Instrument;
+    instrument: string;
     guitarCtx: ScoreUI.GuitarContext;
 }
 
@@ -56,6 +57,8 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
 
     constructor(props: {}) {
         super(props);
+
+        registerClassicalGuitar();
 
         Cookies.setExpireDays(30);
 
@@ -70,7 +73,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         let handedness: Theory.Handedness;
         let tuningName: string;
         let scale: Theory.Scale;
-        let instrument: Audio.Instrument;
+        let instrument: string;
 
         try {
             pitchNotation = Theory.validatePitchNotation(Cookies.read(AppCookies.PitchNotation, Theory.DefaultPitchNotation));
@@ -110,10 +113,10 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
 
         try {
-            instrument = Audio.validateInstrument(Cookies.readInt(AppCookies.Instrument, Audio.Instrument.ClassicalGuitar));
+            instrument = Cookies.read(AppCookies.Instrument, Audio.getCurrentInstrument());
         }
         catch (err) {
-            instrument = Audio.Instrument.ClassicalGuitar;
+            instrument = Audio.getCurrentInstrument();
         }
 
         Audio.setInstrument(instrument);
@@ -197,11 +200,11 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         GuitarApp.back();
     }
 
-    setInstrument(instr: Audio.Instrument) {
-        if (instr !== this.state.instrument) {
-            this.setState({ instrument: instr });
-            Cookies.save(AppCookies.Instrument, instr);
-            Audio.setInstrument(instr);
+    setInstrument(instrument: string) {
+        if (instrument !== this.state.instrument) {
+            this.setState({ instrument });
+            Cookies.save(AppCookies.Instrument, instrument);
+            Audio.setInstrument(instrument);
         }
     }
 

@@ -88,9 +88,9 @@ export class Menubar extends React.Component<MenubarProps, {}> {
                             <Dropdown.Divider />
 
                             <Dropdown.Header>Instrument</Dropdown.Header>
-                            {Audio.InstrumentList.map(instr => (
+                            {Audio.getInstrumentList().map(instr => (
                                 <Dropdown.Item key={instr} onClick={() => app.setInstrument(instr)}>
-                                    {Audio.getInstrumentName(instr)} {app.getInstrument() === instr ? CheckIcon : undefined}
+                                    {instr} {app.getInstrument() === instr ? CheckIcon : undefined}
                                 </Dropdown.Item>
                             ))}
                         </Dropdown.Menu>

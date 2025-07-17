@@ -1,8 +1,8 @@
 import * as Tone from "tone";
-import { InstrumentInterface } from "..";
+import { Instrument } from ".";
 import { Utils } from "@tspro/ts-utils-lib";
 
-class Synth implements InstrumentInterface {
+class Synth implements Instrument {
     private audioSource: Tone.PolySynth | undefined;
 
     constructor() {
@@ -13,6 +13,10 @@ class Synth implements InstrumentInterface {
             this.audioSource = undefined;
             console.error(err);
         }
+    }
+
+    getName(): string {
+        return "Synthesizer";
     }
 
     playNote(note: string, duration?: number, linearVolume?: number) {
@@ -38,4 +42,4 @@ class Synth implements InstrumentInterface {
     }
 }
 
-export const SynthInstrument = new Synth();
+export const Synthesizer = new Synth();

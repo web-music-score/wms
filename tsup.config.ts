@@ -10,6 +10,7 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
+            'audio-cg/index': 'src/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
             'react-ui/index': 'src/react-ui/index.ts',
@@ -36,6 +37,7 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
+            'audio-cg/index': 'src/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
             'react-ui/index': 'src/react-ui/index.ts',

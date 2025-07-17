@@ -29,6 +29,16 @@
                 "default": "./dist/audio/index.mjs"
             }
         },
+        "./audio-cg": {
+            "require": {
+                "types": "./dist/audio-cg/index.d.ts",
+                "default": "./dist/audio-cg/index.js"
+            },
+            "import": {
+                "types": "./dist/audio-cg/index.d.mts",
+                "default": "./dist/audio-cg/index.mjs"
+            }
+        },
         "./theory": {
             "require": {
                 "types": "./dist/theory/index.d.ts",

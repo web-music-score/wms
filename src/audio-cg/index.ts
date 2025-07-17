@@ -1,5 +1,5 @@
 import * as Tone from "tone";
-import { InstrumentInterface } from "..";
+import { Instrument, registerInstrument } from "@tspro/web-music-score/audio";
 import E2_mp3 from "./assets/E2.mp3";
 import A2_mp3 from "./assets/A2.mp3";
 import D3_mp3 from "./assets/D3.mp3";
@@ -11,7 +11,7 @@ import E5_mp3 from "./assets/E5.mp3";
 import A5_mp3 from "./assets/A5.mp3";
 import { Utils } from "@tspro/ts-utils-lib";
 
-class ClassicalGuitar implements InstrumentInterface {
+class ClassicalGuitar implements Instrument {
 
     private audioSource: Tone.Sampler | undefined;
 
@@ -37,6 +37,10 @@ class ClassicalGuitar implements InstrumentInterface {
         }
     }
 
+    getName(): string {
+        return "Classical Guitar";
+    }
+
     playNote(note: string, duration?: number, linearVolume?: number) {
         try {
             if (this.audioSource) {
@@ -60,4 +64,9 @@ class ClassicalGuitar implements InstrumentInterface {
     }
 }
 
-export const ClassicalGuitarInstrument = new ClassicalGuitar();
+const CG = new ClassicalGuitar();
+
+/** @public */
+export function registerClassicalGuitar() {
+    registerInstrument(CG);
+}

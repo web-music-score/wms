@@ -23,7 +23,7 @@ npm i @tspro/web-music-score
 // Import core module, it does not contain much.
 import * as Core from "@tspro/web-music-score/core";
 
-// Import audio module, it contains playing notes.
+// Import audio module, it can play notes.
 import * as Audio from "@tspro/web-music-score/audio";
 
 // Import theory module, it contains all music theory stuff.
@@ -351,20 +351,25 @@ doc.addMeasure()
 
 Beams are detected and added automatically.
 
+### Audio Instrument
+
+Default instrument is `Synthesizer`.
+
+`Classical Guitar` is available via `audio-cg` module.
+It was included as separate module because it contains over 1MB of audio samples bundled in it.
+
+```js
+import { registerClassicalGuitar } from "@tspro/web-music-score/audio-cg";
+
+registerClassicalGuitar();
+```
+
 ### Play Document
 
 ```js
-Audio.setInstrument(instrument: Audio.Instrument);
-
 // Simple play
 doc.play();
-```
 
-`instrument` can be:
-- `Audio.Instrument.ClassicalGuitar`
-- `Audio.Instrument.Synth`
-
-```js
 // More playback options:
 let player = new MPlayer(doc);
 

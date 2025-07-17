@@ -3,6 +3,7 @@
     "entryPoints": [
         "./src/core/index.ts",
         "./src/audio/index.ts",
+        "./src/audio-cg/index.ts",
         "./src/theory/index.ts",
         "./src/score/index.ts",
         "./src/react-ui/index.ts",

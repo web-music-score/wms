@@ -32,6 +32,9 @@
             "@tspro/web-music-score/audio": [
                 "audio"
             ],
+            "@tspro/web-music-score/audio-cg": [
+                "audio-cg"
+            ],
             "@tspro/web-music-score/theory": [
                 "theory"
             ],
