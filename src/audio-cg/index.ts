@@ -45,7 +45,7 @@ class ClassicalGuitar implements Instrument {
         try {
             if (this.audioSource) {
                 if (linearVolume !== undefined) {
-                    this.audioSource.volume.value = Utils.Math.linearToDecibels(linearVolume);
+                    this.audioSource.volume.value = Utils.Math.linearToDecibels(linearVolume * 0.6);
                 }
 
                 this.audioSource.triggerAttackRelease(note, duration ?? "2n");
