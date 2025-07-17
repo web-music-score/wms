@@ -351,7 +351,7 @@ doc.addMeasure()
 
 Beams are detected and added automatically.
 
-### Audio Instrument
+### Classical Guitar Audio Module
 
 Default instrument is `Synthesizer`.
 
