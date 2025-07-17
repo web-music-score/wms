@@ -77,17 +77,17 @@ interface SelectScaleFormProps {
 export function SelectScaleForm(props: SelectScaleFormProps) {
     const ScaleFactoryList = Theory.getScaleFactoryList();
     const CurrentScaleFactory = Theory.getScaleFactory(props.scale.scaleType);
-    const KeyNoteList = CurrentScaleFactory.getKeyNoteList();
+    const ScaleTonicList = CurrentScaleFactory.getTonicList();
 
-    const onSelectionChange = (scaleType: string, scaleKeyNote: string) => {
+    const onSelectionChange = (scaleTonic: string, scaleType: string) => {
         let f = Theory.getScaleFactory(Theory.validateScaleType(scaleType));
 
         let scale: Theory.Scale;
         try {
-            scale = f.getScale(scaleKeyNote);
+            scale = f.getScale(scaleTonic);
         }
         catch (err) {
-            scale = f.getScale(f.getDefaultKeyNote());
+            scale = f.getScale(f.getDefaultTonic());
         }
 
         props.onScaleChange(scale);
@@ -97,16 +97,16 @@ export function SelectScaleForm(props: SelectScaleFormProps) {
         <Form>
             <Row xs="auto">
                 <Col>
-                    <Form.Select name="select" value={props.scale.keyNote} onChange={e => onSelectionChange(props.scale.scaleType, e.target.value)}>
-                        {KeyNoteList.map((keyNote, i) =>
-                            CurrentScaleFactory.hasScale(keyNote)
-                                ? <option key={i} value={keyNote}>{Theory.Note.getScientificNoteName(keyNote, Theory.SymbolSet.Unicode)}</option>
-                                : <option key={i} disabled>{keyNote}</option>
+                    <Form.Select name="select" value={props.scale.tonic} onChange={e => onSelectionChange(e.target.value, props.scale.scaleType)}>
+                        {ScaleTonicList.map((tonic, i) =>
+                            CurrentScaleFactory.hasScale(tonic)
+                                ? <option key={i} value={tonic}>{Theory.Note.getScientificNoteName(tonic, Theory.SymbolSet.Unicode)}</option>
+                                : <option key={i} disabled>{tonic}</option>
                         )}
                     </Form.Select>
                 </Col>
                 <Col>
-                    <Form.Select name="select" value={props.scale.scaleType} onChange={e => onSelectionChange(e.target.value, props.scale.keyNote)}>
+                    <Form.Select name="select" value={props.scale.scaleType} onChange={e => onSelectionChange(props.scale.tonic, e.target.value)}>
                         {ScaleFactoryList.map((factory, i) =>
                             factory instanceof Theory.ScaleFactory
                                 ? <option key={i} value={factory.getType()}>{factory.getType()}</option>

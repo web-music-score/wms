@@ -5,7 +5,7 @@ import { Device, Utils } from "@tspro/ts-utils-lib";
 
 const SelectedColor = "#0A0";
 
-const MajorScaleKeyNotes = [
+const MajorScaleTonics = [
     ["C"],
     ["G"],
     ["D"],
@@ -20,7 +20,7 @@ const MajorScaleKeyNotes = [
     ["F"]
 ];
 
-const MinorScaleKeyNotes = [
+const MinorScaleTonics = [
     ["A"],
     ["E"],
     ["B"],
@@ -48,13 +48,13 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
         super(props);
     }
 
-    onScaleChange(scaleType: ScaleType, keyNote: string) {
+    onScaleChange(tonic: string, scaleType: ScaleType) {
         try {
-            let scale = getScale(keyNote, scaleType);
+            let scale = getScale(tonic, scaleType);
             this.props.onScaleChange(scale);
         }
         catch (err) {
-            console.error("Invalid scale", keyNote, scaleType);
+            console.error("Invalid scale", tonic, scaleType);
         }
     }
 
@@ -73,7 +73,7 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
 
         let lineWidth = Math.max(1, circleRect.width / 100);
         let fontSize = circleRect.width / 15;
-        let keyNoteSize = fontSize * 2;
+        let tonicSize = fontSize * 2;
 
         let components: React.JSX.Element[] = [];
 
@@ -107,32 +107,32 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
                 transform: "rotate(" + rad + "rad)"
             }} />);
 
-            let keyNotes = [
-                MinorScaleKeyNotes[i][1],
-                MinorScaleKeyNotes[i][0],
+            let tonics = [
+                MinorScaleTonics[i][1],
+                MinorScaleTonics[i][0],
                 undefined,
-                MajorScaleKeyNotes[i][0],
-                MajorScaleKeyNotes[i][1],
+                MajorScaleTonics[i][0],
+                MajorScaleTonics[i][1],
             ];
 
             for (let k = -2; k <= 2; k++) {
-                const keyNote = keyNotes[k + 2];
+                const tonic = tonics[k + 2];
 
-                if (keyNote) {
+                if (tonic) {
                     const scaleType = k < 0 ? ScaleType.NaturalMinor : ScaleType.Major;
 
-                    let keyNoteStr = Note.getScientificNoteName(keyNote, SymbolSet.Unicode);
+                    let tonicStr = Note.getScientificNoteName(tonic, SymbolSet.Unicode);
                     if (scaleType === ScaleType.NaturalMinor) {
-                        keyNoteStr += "m";
+                        tonicStr += "m";
                     }
-                    let isSelected = scaleType === scale.scaleType && keyNote === scale.keyNote;
+                    let isSelected = scaleType === scale.scaleType && tonic === scale.tonic;
                     components.push(<div key={"kn_" + i + "_" + (k + 2)} style={{
                         position: "absolute",
                         cursor: "pointer",
-                        left: (x + dx * fontSize * k * 1.5) - keyNoteSize / 2,
-                        top: (y + dy * fontSize * k * 1.5) - keyNoteSize / 2,
-                        width: keyNoteSize,
-                        height: keyNoteSize,
+                        left: (x + dx * fontSize * k * 1.5) - tonicSize / 2,
+                        top: (y + dy * fontSize * k * 1.5) - tonicSize / 2,
+                        width: tonicSize,
+                        height: tonicSize,
                         backgroundColor: isSelected ? SelectedColor : "",
                         borderRadius: isSelected ? "50%" : "",
                         fontSize,
@@ -140,8 +140,8 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
                         display: "flex",
                         justifyContent: "center", // Align horizontal
                         alignItems: "center" // Align vertical
-                    }} onClick={() => this.onScaleChange(scaleType, keyNote)}>
-                        {keyNoteStr}
+                    }} onClick={() => this.onScaleChange(tonic, scaleType)}>
+                        {tonicStr}
                     </div>);
                 }
             }

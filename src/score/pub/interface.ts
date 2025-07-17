@@ -318,7 +318,7 @@ export class MMeasure extends MusicInterface {
         return this.obj.getColumns().map(col => col.getMusicInterface());
     }
 
-    setKeySignature(keyNote: string, scaleType: ScaleType): MMeasure;
+    setKeySignature(tonic: string, scaleType: ScaleType): MMeasure;
     setKeySignature(keySignature: KeySignature): MMeasure;
     setKeySignature(scale: Scale): MMeasure;
     setKeySignature(...args: unknown[]): MMeasure {

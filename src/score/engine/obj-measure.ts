@@ -303,7 +303,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     // See MMeasure interface
-    //setKeySignature(keyNote: string, scaleType: ScaleType): void;
+    //setKeySignature(tonic: string, scaleType: ScaleType): void;
     //setKeySignature(keySignature: KeySignature): void;
     //setKeySignature(scale: Scale): void;
     setKeySignature(...args: unknown[]): void {
@@ -317,9 +317,9 @@ export class ObjMeasure extends MusicObject {
         }
         else {
             try {
-                let keyNote = "" + args[0];
+                let tonic = "" + args[0];
                 let scaleType = validateScaleType("" + args[1]);
-                this.alterKeySignature = getScale(keyNote, scaleType).getKeySignature();
+                this.alterKeySignature = getScale(tonic, scaleType).getKeySignature();
             }
             catch (e) {
                 Assert.interrupt("Cannot set key signature because invalid args: " + args);

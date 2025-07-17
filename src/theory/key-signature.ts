@@ -12,13 +12,13 @@ export class KeySignature {
 
     private static ksCache = new LRUCache<string, KeySignature>(250);
 
-    static getKeySignature(keyNote: string, mode: number) {
-        const ksKey = keyNote + "_" + mode;
+    static getKeySignature(tonic: string, mode: number) {
+        const ksKey = tonic + "_" + mode;
 
         let ks = this.ksCache.get(ksKey);
 
         if (!ks) {
-            ks = new KeySignature(keyNote, mode);
+            ks = new KeySignature(tonic, mode);
             this.ksCache.set(ksKey, ks);
         }
 
@@ -26,10 +26,10 @@ export class KeySignature {
     }
 
     /**
-     * @param keyNote - Key note.
+     * @param tonic - tonic/root note.
      * @param mode - [1..7], 1 = Ionian/Major, 2 = Dorian, ..., 7 = Locrian
      */
-    private constructor(private readonly keyNote: string, private readonly mode: number) {
+    private constructor(private readonly tonic: string, private readonly mode: number) {
         Assert.int_between(mode, 1, 7, "Invalid mode: " + mode);
 
         function getAccidental(noteId: number, pitch: number): Accidental {
@@ -48,8 +48,8 @@ export class KeySignature {
         this.accidentalNotes = [];
         this.accidentalNotesByPitch = [];
 
-        let pitch = Note.getNaturelNotePitch(keyNote[0]);
-        let noteId = Note.getNote(keyNote + "0").noteId;
+        let pitch = Note.getNaturelNotePitch(tonic[0]);
+        let noteId = Note.getNote(tonic + "0").noteId;
 
         for (let id = 0; id < 7; pitch++, noteId += intervals[id], id++) {
             let note = new Note(pitch % 7, getAccidental(noteId, pitch));
@@ -130,12 +130,12 @@ export class KeySignature {
     }
 
     static equals(a: KeySignature, b: KeySignature): boolean {
-        return a === b || a.keyNote === b.keyNote && a.mode == b.mode;
+        return a === b || a.tonic === b.tonic && a.mode == b.mode;
     }
 
 }
 
 /** @public */
 export function getDefaultKeySignature(): KeySignature {
-    return KeySignature.getKeySignature("C", 1); // keyNote = "C", mode = 1 (Ionian/Major)
+    return KeySignature.getKeySignature("C", 1); // tonic = "C", mode = 1 (Ionian/Major)
 }

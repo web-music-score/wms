@@ -14,7 +14,7 @@ const AppCookies = {
     Handedness: "handedness",
     TuningName: "tuningName",
     ScaleType: "scaleType",
-    ScaleKeyNote: "scaleKeyNote",
+    ScaleTonic: "scaleTonic",
     Instrument: "instrument"
 }
 
@@ -104,9 +104,9 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         }
 
         try {
+            let scaleTonic = Cookies.read(AppCookies.ScaleTonic, "");
             let scaleType = Theory.validateScaleType(Cookies.read(AppCookies.ScaleType, ""));
-            let scaleKeyNote = Cookies.read(AppCookies.ScaleKeyNote, "");
-            scale = Theory.getScale(scaleKeyNote, scaleType);
+            scale = Theory.getScale(scaleTonic, scaleType);
         }
         catch (err) {
             scale = Theory.getDefaultScale();
@@ -195,7 +195,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         if (guitarCtx !== this.state.guitarCtx) {
             this.setState({ guitarCtx });
             Cookies.save(AppCookies.ScaleType, scale.scaleType);
-            Cookies.save(AppCookies.ScaleKeyNote, scale.keyNote);
+            Cookies.save(AppCookies.ScaleTonic, scale.tonic);
         }
         GuitarApp.back();
     }

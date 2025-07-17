@@ -4,7 +4,7 @@ import { SymbolSet } from "./types";
 import { KeySignature } from "./key-signature";
 import { Interval } from "./interval";
 
-const FullKeyNoteList: ReadonlyArray<string> = [
+const FullTonicList: ReadonlyArray<string> = [
     "Cb", "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#"
 ];
 
@@ -65,8 +65,8 @@ export class Scale {
     private readonly scaleDegrees: ReadonlyArray<Degree>;
     private readonly accidentalNotes: ReadonlyArray<Note>;
 
-    constructor(readonly keyNote: string, readonly scaleType: ScaleType) {
-        this.keySignature = KeySignature.getKeySignature(keyNote, getMode(scaleType));
+    constructor(readonly tonic: string, readonly scaleType: ScaleType) {
+        this.keySignature = KeySignature.getKeySignature(tonic, getMode(scaleType));
 
         switch (scaleType) {
             case ScaleType.HarmonicMinor:
@@ -110,9 +110,9 @@ export class Scale {
     getScaleName(symbolSet?: SymbolSet) {
         switch (symbolSet) {
             case SymbolSet.Unicode:
-                return Note.getScientificNoteName(this.keyNote, symbolSet) + " " + this.scaleType;
+                return Note.getScientificNoteName(this.tonic, symbolSet) + " " + this.scaleType;
             default:
-                return this.keyNote + " " + this.scaleType;
+                return this.tonic + " " + this.scaleType;
         }
     }
 
@@ -250,7 +250,7 @@ export class Scale {
 
 /** @public */
 export class ScaleFactory {
-    private keyNoteList: string[] = [];
+    private tonicList: string[] = [];
     private scaleMap: Map<string, Scale> = new Map();
 
     constructor(readonly type: ScaleType) {
@@ -258,16 +258,16 @@ export class ScaleFactory {
         let sharpScales: Scale[] = [];
         let flatScales: Scale[] = [];
 
-        FullKeyNoteList.forEach(keyNote => {
+        FullTonicList.forEach(tonic => {
             try {
-                let scale = new Scale(keyNote, this.type);
+                let scale = new Scale(tonic, this.type);
 
                 switch (scale.getKeySignature().getType()) {
                     case "natural":
                         naturalScales.push(scale);
                         break;
                     case "sharp":
-                        if (keyNote.endsWith("b")) {
+                        if (tonic.endsWith("b")) {
                             return;
                         }
                         else {
@@ -275,7 +275,7 @@ export class ScaleFactory {
                             break;
                         }
                     case "flat":
-                        if (keyNote.endsWith("#")) {
+                        if (tonic.endsWith("#")) {
                             return;
                         }
                         else {
@@ -284,7 +284,7 @@ export class ScaleFactory {
                         }
                 }
 
-                this.scaleMap.set(keyNote, scale);
+                this.scaleMap.set(tonic, scale);
             }
             catch (err) {
                 // Ignore scales with double accidental and other error scales
@@ -295,35 +295,35 @@ export class ScaleFactory {
 
         const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getKeySignature().getNumAccidentals() - b.getKeySignature().getNumAccidentals();
 
-        this.keyNoteList = [
-            ...naturalScales.sort(SortByAccidentalCountFunc).map(scale => scale.keyNote),
+        this.tonicList = [
+            ...naturalScales.sort(SortByAccidentalCountFunc).map(scale => scale.tonic),
             "- Sharps -",
-            ...sharpScales.sort(SortByAccidentalCountFunc).map(scale => scale.keyNote),
+            ...sharpScales.sort(SortByAccidentalCountFunc).map(scale => scale.tonic),
             "- Flats -",
-            ...flatScales.sort(SortByAccidentalCountFunc).map(scale => scale.keyNote),
+            ...flatScales.sort(SortByAccidentalCountFunc).map(scale => scale.tonic),
         ];
     }
 
-    getKeyNoteList(): ReadonlyArray<string> {
-        return this.keyNoteList;
+    getTonicList(): ReadonlyArray<string> {
+        return this.tonicList;
     }
 
-    getDefaultKeyNote(): string {
-        return this.keyNoteList[0];
+    getDefaultTonic(): string {
+        return this.tonicList[0];
     }
 
     getType(): ScaleType {
         return this.type;
     }
 
-    getScale(keyNote: string): Scale {
-        let scale = this.scaleMap.get(keyNote);
-        Assert.assert(scale, "Invalid scale: " + keyNote + " " + this.type);
+    getScale(tonic: string): Scale {
+        let scale = this.scaleMap.get(tonic);
+        Assert.assert(scale, "Invalid scale: " + tonic + " " + this.type);
         return scale!;
     }
 
-    hasScale(keyNote: string) {
-        return this.scaleMap.get(keyNote) !== undefined;
+    hasScale(tonic: string) {
+        return this.scaleMap.get(tonic) !== undefined;
     }
 }
 
@@ -373,8 +373,8 @@ export function validateScaleType(scaleType: unknown): ScaleType {
 }
 
 /** @public */
-export function getScale(keyNote: string, scaleType: ScaleType): Scale {
-    return getScaleFactory(scaleType).getScale(keyNote);
+export function getScale(tonic: string, scaleType: ScaleType): Scale {
+    return getScaleFactory(scaleType).getScale(tonic);
 }
 
 const DefaultScale = getScale("C", ScaleType.Major);

@@ -75,7 +75,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
     componentDidUpdate() {
         let newGuitarCtx = this.props.app.getGuitarContext();
         let guitarCtxChanged = this.state.guitarCtx !== newGuitarCtx;
-        let scaleChanged = this.state.guitarCtx.scale.keyNote !== newGuitarCtx.scale.keyNote;
+        let scaleChanged = this.state.guitarCtx.scale.tonic !== newGuitarCtx.scale.tonic;
 
         if (guitarCtxChanged || scaleChanged) {
             this.setState(this.createStateUpdate(newGuitarCtx, scaleChanged ? "start" : this.state.positionName));
@@ -193,14 +193,14 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
 
         // Create relative modes list
         let relativeModes = ScaleOctave.map((note, i) => {
-            let keyNote = note.formatOmitOctave(Theory.SymbolSet.Unicode);
-            return "" + (i + 1) + ". " + keyNote + [
-                " Ionian / " + keyNote + " Major",
+            let tonic = note.formatOmitOctave(Theory.SymbolSet.Unicode);
+            return "" + (i + 1) + ". " + tonic + [
+                " Ionian / " + tonic + " Major",
                 " Dorian",
                 " Phrygian",
                 " Lydian",
                 " Mixolydian",
-                " Aeolian / " + keyNote + " natural minor",
+                " Aeolian / " + tonic + " natural minor",
                 " Locrian"
             ][i];
         });

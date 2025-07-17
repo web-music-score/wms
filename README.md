@@ -113,13 +113,13 @@ Manually induce row change. Next measure that is added will start new row.
 ### Set Signature
 
 ```js
-m.setKeySignature(keyNote: string, scaleType: Theory.ScaleType);
+m.setKeySignature(tonic: string, scaleType: Theory.ScaleType);
 
 // Example: Am
 m.setKeySignature("A", Theory.ScaleType.Aeolian);
 ```
 
-`keyNote` is scale key note, e.g. "C" (in "C Major").
+`tonic` is scale tonic/root note, e.g. "C" (in "C Major").
 
  `scaleType` can be
  - `Theory.ScaleType.Major`
