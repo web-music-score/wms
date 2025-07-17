@@ -35,7 +35,7 @@ export const DefaultGuitarNoteLabel = GuitarNoteLabel.Default;
 export const GuitarNoteLabelList = Utils.Enum.getEnumValues(GuitarNoteLabel);
 
 /** @public */
-export function validateGuitarNoteLabel(kind: string): GuitarNoteLabel {
-    Assert.assertEnum(kind, GuitarNoteLabel, "GuitarNoteLabel");
-    return kind;
+export function validateGuitarNoteLabel(value: string): GuitarNoteLabel {
+    Assert.assertEnum(value, GuitarNoteLabel, "GuitarNoteLabel");
+    return value;
 }

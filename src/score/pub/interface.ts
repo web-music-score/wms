@@ -27,7 +27,7 @@ import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, Tie, VoiceId, getStringNumbers, getVoiceIds } from "./types";
 import { ArcPos, Arpeggio, ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
-import { NoteOptions, RestOptions, StaffKind, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
+import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
 import { isNumber } from "tone";
 
 function isVoiceId(value: unknown): value is VoiceId {
@@ -151,17 +151,17 @@ export class MDocument extends MusicInterface {
     /** @internal */
     readonly obj: ObjDocument;
 
-    constructor(staffKind: StaffKind, options?: DocumentOptions) {
+    constructor(staffPreset: StaffPreset, options?: DocumentOptions) {
         super(MDocument.Name);
 
-        Assert.assert(Utils.Is.isEnumValue(staffKind, StaffKind), "StaffKind");
+        Assert.assert(Utils.Is.isEnumValue(staffPreset, StaffPreset), "staffPreset");
         if (options !== undefined) {
             Assert.assert(Utils.Is.isObject(options), "documentOptions");
             Assert.assert(Utils.Is.isUndefined(options.measuresPerRow) || Utils.Is.isIntegerGte(options.measuresPerRow, 1), "documentOptions.measuresPerRow");
             Assert.assert(Utils.Is.isStringOrUndefined(options.tuning), "documentOptions.tuning");
         }
 
-        this.obj = new ObjDocument(this, staffKind, options);
+        this.obj = new ObjDocument(this, staffPreset, options);
     }
 
     /** @internal */
@@ -195,13 +195,13 @@ export class MDocument extends MusicInterface {
         return new MPlayer(this, fn).play();
     }
 
-    static createSimpleScaleArpeggio(staffKind: StaffKind, scale: Scale, lowestPitchNote: string, numOctaves: number): MDocument {
-        Assert.assert(Utils.Is.isEnumValue(staffKind, StaffKind), "staffKind");
+    static createSimpleScaleArpeggio(staffPreset: StaffPreset, scale: Scale, lowestPitchNote: string, numOctaves: number): MDocument {
+        Assert.assert(Utils.Is.isEnumValue(staffPreset, StaffPreset), "staffPreset");
         Assert.assert(scale instanceof Scale, "scale");
         Assert.assert(Utils.Is.isString(lowestPitchNote), "lowestPitchNote");
         Assert.assert(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves");
 
-        let doc = new MDocument(staffKind);
+        let doc = new MDocument(staffPreset);
 
         let m = doc.addMeasure().setKeySignature(scale);
 

@@ -2,7 +2,7 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createDaCapoDemo() {
-    let doc = new Score.MDocument(Score.StaffKind.Treble);
+    let doc = new Score.MDocument(Score.StaffPreset.Treble);
 
     doc.setHeader("Da Capo Navigations");
 

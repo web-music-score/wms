@@ -65,15 +65,15 @@ This is an experimental module that can be used via unpkg CDN. It declares globa
 ### Create Document
 
 ```js
-let doc = new Score.MDocument(staffKind: Score.StaffKind, options: Score.DocumentOptions);
+let doc = new Score.MDocument(staffPreset: Score.StaffPreset, options: Score.DocumentOptions);
 ```
-`staffKind` is  can be:
-* `Score.StaffKind.Treble`: Staff with treble (G-) clef.
-* `Score.StaffKind.Bass`: Staff with bass (F-) clef.
-* `Score.StaffKind.Grand`: Both treble and bas staves.
-* `Score.StaffKind.GuitarTreble`: `Treble` but one octave lower.
-* `Score.StaffKind.GuitarTab`: Guitar tab only.
-* `Score.StaffKind.GuitarTrebleAndTab`: Treble and tab for guitar.
+`staffPreset` can be:
+* `Score.StaffPreset.Treble`: Staff with treble (G-) clef.
+* `Score.StaffPreset.Bass`: Staff with bass (F-) clef.
+* `Score.StaffPreset.Grand`: Both treble and bas staves.
+* `Score.StaffPreset.GuitarTreble`: `Treble` but one octave lower.
+* `Score.StaffPreset.GuitarTab`: Guitar tab only.
+* `Score.StaffPreset.GuitarCombined`: Treble and tab for guitar.
 
 Second argument is optional `DocumentOptions`:
 ```ts
@@ -84,7 +84,7 @@ Default tuning is `"Standard"`. `Theory.TuningNameList` is array of available tu
 
 ```js
 // Example
-let doc = new Score.MDocument(Score.StaffKind.GuitarTrebleAndTab, { tuning: "Drop D" });
+let doc = new Score.MDocument(Score.StaffPreset.GuitarCombined, { tuning: "Drop D" });
 ```
 
 ### Set Header
@@ -320,10 +320,10 @@ m.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength
 ### Guitar Tab
 
 This library has preliminary guitar tabs rendering. 
-Create document with `Score.StaffKind.GuitarTab` or `Score.StaffKind.GuitarTrebleAndTab`, and specify tuning (defaults to `"Standard"` if omitted).
+Create document with `Score.StaffPreset.GuitarTab` or `Score.StaffPreset.GuitarCombined`, and specify tuning (defaults to `"Standard"` if omitted).
 
 ```js
-let doc = new Score.MDocument(Score.StaffKind.GuitarTrebleAndTab, { tuning: "Standard" });
+let doc = new Score.MDocument(Score.StaffPreset.GuitarCombined, { tuning: "Standard" });
 ```
 
 Add notes with `{ string: number | number[] }` to specify which string the fret number is rendered in guitar tab.

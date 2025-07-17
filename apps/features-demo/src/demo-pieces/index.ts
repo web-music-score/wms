@@ -13,7 +13,7 @@ import { createTempoAnnotationDemo } from "./tempo-annotation";
 import { createDynamicsAnnotationDemo } from "./dynamics-annotation";
 import { createCompleteRestsDemo } from "./complete-rests";
 import { createNoteHeadsDemo } from "./note-heads";
-import { createGuitarTrebleAndTabDemo } from "./guitar-treble-and-tab";
+import { createGuitarCombinedDemo } from "./guitar-treble-and-tab";
 import { createGuitarTabDemo } from "./guitar-tab";
 import * as Score from "@tspro/web-music-score/score";
 
@@ -52,7 +52,7 @@ export class DemoPieces {
         demos.push(createDynamicsAnnotationDemo());
         demos.push(createCompleteRestsDemo());
         demos.push(createNoteHeadsDemo());
-        demos.push(createGuitarTrebleAndTabDemo());
+        demos.push(createGuitarCombinedDemo());
         demos.push(createGuitarTabDemo());
 
         // Sort by title

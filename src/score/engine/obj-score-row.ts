@@ -1,7 +1,7 @@
 import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, MScoreRow, StaffKind } from "../pub";
+import { DivRect, MScoreRow, StaffPreset } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
@@ -20,7 +20,7 @@ const createStaff_Grand_Treble = () => new MusicStaff(ClefKind.Treble, p("G4"), 
 const createStaff_Grand_Bass = () => new MusicStaff(ClefKind.Bass, p("F3"), p("D3"), p("C1"), p("C4") - 1);
 
 export class ObjScoreRow extends MusicObject {
-    public readonly staffKind: StaffKind;
+    public readonly staffPreset: StaffPreset;
 
     private prevRow?: ObjScoreRow;
     private nextRow?: ObjScoreRow;
@@ -39,31 +39,31 @@ export class ObjScoreRow extends MusicObject {
     constructor(readonly doc: ObjDocument) {
         super(doc);
 
-        this.staffKind = doc.staffKind;
+        this.staffPreset = doc.staffPreset;
 
-        switch (this.staffKind) {
-            case StaffKind.Treble:
+        switch (this.staffPreset) {
+            case StaffPreset.Treble:
                 this.staves[0] = createStaff_Treble();
                 break;
-            case StaffKind.Bass:
+            case StaffPreset.Bass:
                 this.staves[0] = createStaff_Bass();
                 break;
-            case StaffKind.Grand:
+            case StaffPreset.Grand:
                 this.staves[0] = createStaff_Grand_Treble();
                 this.staves[1] = createStaff_Grand_Bass();
                 break;
-            case StaffKind.GuitarTreble:
+            case StaffPreset.GuitarTreble:
                 this.staves[0] = createStaff_GuitarTreble();
                 break;
-            case StaffKind.GuitarTab:
+            case StaffPreset.GuitarTab:
                 this.tab = new GuitarTab();
                 break;
-            case StaffKind.GuitarTrebleAndTab:
+            case StaffPreset.GuitarCombined:
                 this.staves[0] = createStaff_GuitarTreble();
                 this.tab = new GuitarTab();
                 break;
             default:
-                Assert.assert("Invalid staffKind = " + this.staffKind);
+                Assert.assert("Invalid staffPreset: " + this.staffPreset);
         }
 
         // Set prevRow

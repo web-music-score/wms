@@ -1,9 +1,9 @@
 import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
-import { MDocument, ArcPos, Navigation, Annotation, StaffKind, Stem } from "@tspro/web-music-score/score";
+import { MDocument, ArcPos, Navigation, Annotation, StaffPreset, Stem } from "@tspro/web-music-score/score";
 
 /** @public */
 export function createAndanteByDiabelli(): MDocument {
-    let doc = new MDocument(StaffKind.GuitarTreble);
+    let doc = new MDocument(StaffPreset.GuitarTreble);
 
     doc.setHeader("Andante", "A. Diabelli");
 

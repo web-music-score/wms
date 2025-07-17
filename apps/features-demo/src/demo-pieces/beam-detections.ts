@@ -2,7 +2,7 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createBeamDetectionDemo() {
-    let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
+    let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
 
     doc.setHeader("Beam Detection");
 

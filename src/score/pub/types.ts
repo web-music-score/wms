@@ -1,10 +1,9 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { DivRect } from "./div-rect";
 import { MMeasure, MusicInterface } from "./interface";
-import { Assert } from "@tspro/ts-utils-lib";
 
 /** @public */
-export enum StaffKind {
+export enum StaffPreset {
     /** Treble staff has treble (G-) clef. */
     Treble = 1,
     /** Bass staff has bass (F-) clef. */
@@ -16,8 +15,8 @@ export enum StaffKind {
     GuitarTreble = 4,
     // /** GuitarTab has tab for guitar. */
     GuitarTab = 8,
-    // /** GuitarTrebleAndTab has treble clef and tab for guitar. */
-    GuitarTrebleAndTab = GuitarTab | GuitarTreble
+    // /** GuitarCombined has treble clef and tab for guitar. */
+    GuitarCombined = GuitarTab | GuitarTreble
 }
 
 /** @public */

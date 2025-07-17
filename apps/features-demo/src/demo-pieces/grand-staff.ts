@@ -3,7 +3,7 @@ import * as Score from "@tspro/web-music-score/score";
 
 export function createGrandStaffDemo() {
     let doc = Score.MDocument.createSimpleScaleArpeggio(
-        Score.StaffKind.Grand,
+        Score.StaffPreset.Grand,
         Theory.getScale("Cb", Theory.ScaleType.Major),
         "C2", 4);
 

@@ -1,10 +1,10 @@
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
-export function createGuitarTrebleAndTabDemo() {
-    let doc = new Score.MDocument(Score.StaffKind.GuitarTrebleAndTab, { tuning: "Drop D" });
+export function createGuitarCombinedDemo() {
+    let doc = new Score.MDocument(Score.StaffPreset.GuitarCombined, { tuning: "Drop D" });
 
-    doc.setHeader("Guitar Treble And Tab");
+    doc.setHeader("Guitar Combined");
 
     doc.addMeasure()
         .setKeySignature("C", Theory.ScaleType.Major)

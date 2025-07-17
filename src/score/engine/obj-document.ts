@@ -5,7 +5,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { DivRect, DocumentOptions, MDocument, PickedPitch, StaffKind } from "../pub";
+import { DivRect, DocumentOptions, MDocument, PickedPitch, StaffPreset } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
@@ -33,7 +33,7 @@ export class ObjDocument extends MusicObject {
 
     private allArcsProps: ArcProps[] = [];
 
-    constructor(readonly mi: MDocument, readonly staffKind: StaffKind, readonly options?: DocumentOptions) {
+    constructor(readonly mi: MDocument, readonly staffPreset: StaffPreset, readonly options?: DocumentOptions) {
         super(undefined);
 
         this.measuresPerRow = options?.measuresPerRow;

@@ -67,7 +67,7 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
         let guitarCtx = app.getGuitarContext();
         let { scale } = guitarCtx;
 
-        let doc = new Score.MDocument(Score.StaffKind.GuitarTreble);
+        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
 
         let m = doc.addMeasure().setKeySignature(scale);
 

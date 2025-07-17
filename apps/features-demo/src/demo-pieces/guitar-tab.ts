@@ -2,7 +2,7 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createGuitarTabDemo() {
-    let doc = new Score.MDocument(Score.StaffKind.GuitarTab);
+    let doc = new Score.MDocument(Score.StaffPreset.GuitarTab);
 
     doc.setHeader("Guitar Tab");
 

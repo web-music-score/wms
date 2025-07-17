@@ -1,4 +1,4 @@
-import { DivRect, MFermata, StaffKind } from "../pub";
+import { DivRect, MFermata, StaffPreset } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
@@ -24,7 +24,7 @@ export class ObjFermata extends MusicObject {
         let { measure } = anchor;
         let { row } = measure;
 
-        if (row.staffKind === StaffKind.Grand) {
+        if (row.staffPreset === StaffPreset.Grand) {
             return [VerticalPos.AboveStaff, VerticalPos.BelowStaff];
         }
         else {

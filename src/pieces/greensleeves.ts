@@ -1,11 +1,11 @@
 import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
-import { MDocument, Arpeggio, Navigation, StaffKind, Stem, Label } from "@tspro/web-music-score/score";
+import { MDocument, Arpeggio, Navigation, StaffPreset, Stem, Label } from "@tspro/web-music-score/score";
 
 // Greensleeves (https://musescore.com/aaron_dc/scores/6167495)
 
 /** @public */
 export function createGreensleeves(): MDocument {
-    let doc = new MDocument(StaffKind.GuitarTreble);
+    let doc = new MDocument(StaffPreset.GuitarTreble);
 
     doc.setHeader("Greensleeves");
 

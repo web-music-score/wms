@@ -1,9 +1,9 @@
 import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
-import { MDocument, StaffKind } from "@tspro/web-music-score/score";
+import { MDocument, StaffPreset } from "@tspro/web-music-score/score";
 
 /** @public */
 export function createFrereJacques(): MDocument {
-    let doc = new MDocument(StaffKind.GuitarTreble);
+    let doc = new MDocument(StaffPreset.GuitarTreble);
 
     doc.setHeader("Frere Jacques");
 

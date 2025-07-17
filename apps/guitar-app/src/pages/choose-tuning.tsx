@@ -52,16 +52,16 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
     private createScore(guitarCtx: ScoreUI.GuitarContext): Score.MDocument | undefined {
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
 
-        let staffKinds = [
-            Score.StaffKind.GuitarTreble,
-            Score.StaffKind.Treble,
-            Score.StaffKind.Bass,
-            Score.StaffKind.Grand
+        let staffPresets = [
+            Score.StaffPreset.GuitarTreble,
+            Score.StaffPreset.Treble,
+            Score.StaffPreset.Bass,
+            Score.StaffPreset.Grand
         ];
 
-        for (let i = 0; i < staffKinds.length; i++) {
+        for (let i = 0; i < staffPresets.length; i++) {
             try {
-                let doc = new Score.MDocument(staffKinds[i]);
+                let doc = new Score.MDocument(staffPresets[i]);
 
                 let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
 
