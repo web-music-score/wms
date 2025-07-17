@@ -7,7 +7,21 @@ class Synth implements Instrument {
 
     constructor() {
         try {
-            this.audioSource = new Tone.PolySynth().toDestination();
+            const reverb = new Tone.Reverb({ decay: 3, wet: 0.4 }).toDestination();
+            const filter = new Tone.Filter(800, "lowpass").connect(reverb);
+
+            this.audioSource = new Tone.PolySynth(Tone.Synth, {
+                oscillator: {
+                    type: "triangle"
+                },
+                envelope: {
+                    attack: 0.001,
+                    decay: 2,
+                    sustain: 0.1,
+                    release: 1.2
+                }
+            }).connect(filter);
+
         }
         catch (err) {
             this.audioSource = undefined;
