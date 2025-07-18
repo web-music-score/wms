@@ -47,12 +47,14 @@ export class Note {
     private static noteByNameCache = new Map<string, Note>();
     private static noteByIdCache = new Map<number, Note>();
 
-    readonly pitch: number;
+    readonly normalizedPitch: number;
     readonly accidental: Accidental;
+    readonly octave: number;
 
     constructor(pitch: number, accidental: number) {
-        this.pitch = Note.validatePitch(pitch);
+        this.normalizedPitch = Note.validateNormalizedPitch(pitch % 7);
         this.accidental = Note.validateAccidental(accidental);
+        this.octave = Note.validateOctave(Math.floor(pitch / 7));
     }
 
     static getNote(noteName: string): Note {
@@ -93,16 +95,12 @@ export class Note {
         }
     }
 
-    get normalizedPitch(): number {
-        return this.pitch % 7;
+    get pitch(): number {
+        return this.normalizedPitch + this.octave * 7;
     }
 
     static getNormalizedPitch(pitch: number) {
         return Note.validatePitch(pitch % 7);
-    }
-
-    get octave(): number {
-        return Math.floor(this.pitch / 7);
     }
 
     get noteId(): number {
@@ -131,8 +129,8 @@ export class Note {
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
-        let naturalNote = NaturalNoteByPitch[this.pitch % 7];
-        let octave = Math.floor(this.pitch / 7);
+        let naturalNote = NaturalNoteByPitch[this.normalizedPitch];
+        let octave = this.octave;
         let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
 
         if (pitchNotation === PitchNotation.Helmholtz) {
@@ -151,8 +149,9 @@ export class Note {
     }
 
     formatOmitOctave(symbolSet: SymbolSet) {
-        // Without octave numer
-        return this.format(PitchNotation.Scientific, symbolSet).replace(/([0-9]+)/, "");
+        let naturalNote = NaturalNoteByPitch[this.normalizedPitch];
+        let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
+        return naturalNote + accidental;
     }
 
     static replaceAccidentalSymbols(str: string, symbolSet: SymbolSet) {
@@ -164,7 +163,7 @@ export class Note {
         }
     }
 
-    static isValidNoteName(noteName: string) {
+    static isValidNoteName(noteName: string): boolean {
         return NoteNameRule.test(noteName);
     }
 
@@ -218,6 +217,10 @@ export class Note {
 
     static validatePitch(pitch: number): number {
         return Assert.int_gte(pitch, 0, "Invalid pitch: " + pitch);
+    }
+
+    static validateNormalizedPitch(normalizedPitch: number): number {
+        return Assert.int_between(normalizedPitch, 0, 6, "Invalid normalizedPitch: " + normalizedPitch);
     }
 
     static validateNoteId(noteId: number): number {
