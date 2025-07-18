@@ -162,8 +162,12 @@ export class KeySignature {
         }
     }
 
-    static equals(a?: KeySignature | null, b?: KeySignature | null): boolean {
-        if (!a || !b) {
+    static equals(a: KeySignature | null | undefined, b: KeySignature | null | undefined): boolean {
+        if (a == null && b == null) {
+            // handles null and undefined
+            return true;
+        }
+        else if (a == null || b == null) {
             return false;
         }
         else {

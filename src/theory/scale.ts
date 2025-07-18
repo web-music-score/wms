@@ -102,8 +102,12 @@ export class Scale extends KeySignature {
         this.scaleNotes = this.scaleDegrees.map(d => this.getNoteByDegree(d));
     }
 
-    static equals(a?: Scale | null, b?: Scale | null): boolean {
-        if (!a || !b) {
+    static equals(a: Scale | null | undefined, b: Scale | null | undefined): boolean {
+        if (a == null && b == null) {
+            // handles null and undefined
+            return true;
+        }
+        else if (a == null || b == null) {
             return false;
         }
         else {
