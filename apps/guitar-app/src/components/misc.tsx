@@ -28,10 +28,10 @@ export function SelectAccidental(props: SelectAccidentalProps) {
 }
 
 export function OrderOfAccidentalsInfo(props: { ks: Theory.KeySignature }) {
-    if (props.ks.getType() === "sharp") {
+    if (props.ks.getAccidentalType() === Theory.AccidentalType.Sharps) {
         return <p>Order of sharps is F-C-G-D-A-E-B (Father Charles Goes Down And Ends Battle).</p>;
     }
-    else if (props.ks.getType() === "flat") {
+    else if (props.ks.getAccidentalType() === Theory.AccidentalType.Flats) {
         return <p>Order of flats is B-E-A-D-G-C-F (Battle Ends And Down Goes Charles' Father).</p>;
     }
     else {

@@ -313,13 +313,13 @@ export class ObjMeasure extends MusicObject {
             this.alterKeySignature = args[0];
         }
         else if (args[0] instanceof Scale) {
-            this.alterKeySignature = args[0].getKeySignature();
+            this.alterKeySignature = args[0];
         }
         else {
             try {
                 let tonic = "" + args[0];
                 let scaleType = validateScaleType("" + args[1]);
-                this.alterKeySignature = getScale(tonic, scaleType).getKeySignature();
+                this.alterKeySignature = getScale(tonic, scaleType);
             }
             catch (e) {
                 Assert.interrupt("Cannot set key signature because invalid args: " + args);

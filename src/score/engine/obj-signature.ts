@@ -74,15 +74,15 @@ export class ObjSignature extends MusicObject {
 
             // If key signatue changes then neutralize previous key signature
             if (prevKeySignature && !KeySignature.equals(newKeySignature, prevKeySignature)) {
-                prevKeySignature.getOrderedAccidentalNotes().forEach(acc => {
+                prevKeySignature.getOrderedAccidentalNotes().forEach(accNote => {
                     // Neutral accidental
-                    this.ksNeutralizeAccidentals.push(this.accPitch(0, this.getAccidentalPitch(acc)));
+                    this.ksNeutralizeAccidentals.push(this.accPitch(0, this.getAccidentalPitch(accNote)));
                 });
             }
 
             // Set new key signature
-            newKeySignature.getOrderedAccidentalNotes().forEach(acc => {
-                this.ksNewAccidentals.push(this.accPitch(acc.accidental, this.getAccidentalPitch(acc)));
+            newKeySignature.getOrderedAccidentalNotes().forEach(accNote => {
+                this.ksNewAccidentals.push(this.accPitch(accNote.accidental, this.getAccidentalPitch(accNote)));
             });
         }
         else {

@@ -74,7 +74,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
             let { note1, note2, accidental } = this.state;
             let { pitch } = pickedPitch;
 
-            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getKeySignature().getAccidental(pitch));
+            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
 
             if (note1 === undefined || note1 !== undefined && note2 !== undefined) {
                 this.setState({ note1: note, note2: undefined });

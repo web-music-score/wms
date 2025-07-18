@@ -1,7 +1,7 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
-import { Accidental, Note } from "./note";
+import { Note } from "./note";
 import { SymbolSet } from "./types";
-import { KeySignature } from "./key-signature";
+import { AccidentalType, KeySignature } from "./key-signature";
 import { Interval } from "./interval";
 
 const FullTonicList: ReadonlyArray<string> = [
@@ -60,13 +60,12 @@ function getMode(scaleType: ScaleType) {
 }
 
 /** @public */
-export class Scale {
-    private readonly keySignature: KeySignature;
+export class Scale extends KeySignature {
     private readonly scaleDegrees: ReadonlyArray<Degree>;
-    private readonly accidentalNotes: ReadonlyArray<Note>;
+    private readonly scaleNotes: ReadonlyArray<Note>;
 
     constructor(readonly tonic: string, readonly scaleType: ScaleType) {
-        this.keySignature = KeySignature.getKeySignature(tonic, getMode(scaleType));
+        super(tonic, getMode(scaleType));
 
         switch (scaleType) {
             case ScaleType.HarmonicMinor:
@@ -100,11 +99,16 @@ export class Scale {
                 break;
         }
 
-        this.accidentalNotes = this.scaleDegrees.map(d => this.getKeySignature().getScaleNote(d));
+        this.scaleNotes = this.scaleDegrees.map(d => this.getNoteByDegree(d));
     }
 
-    static equals(a: Scale, b: Scale): boolean {
-        return a === b || a.getScaleName() === b.getScaleName();
+    static equals(a?: Scale | null, b?: Scale | null): boolean {
+        if (!a || !b) {
+            return false;
+        }
+        else {
+            return a === b || a.getScaleName() === b.getScaleName();
+        }
     }
 
     getScaleName(symbolSet?: SymbolSet) {
@@ -121,15 +125,15 @@ export class Scale {
 
         let lowestPitch = Note.getNote(lowestPitchNote).pitch;
 
-        let accNoteList: Note[] = [];
+        let scaleNoteList: Note[] = [];
 
         for (let o = 1; o <= numOctaves; o++) {
-            accNoteList = [...accNoteList, ...this.accidentalNotes];
+            scaleNoteList = [...scaleNoteList, ...this.scaleNotes];
         }
 
-        accNoteList.push(this.accidentalNotes[0]);
+        scaleNoteList.push(this.scaleNotes[0]);
 
-        return accNoteList.map(accNote => {
+        return scaleNoteList.map(accNote => {
             let pitch = accNote.getPitchInOctave(0);
             while (pitch < lowestPitch) {
                 pitch += 7;
@@ -154,14 +158,6 @@ export class Scale {
 
     getScaleStringSteps(): string[] {
         return this.getScaleSteps().map(step => step === 1 ? "H" : (step === 2 ? "W" : (step.toString() + "H")));
-    }
-
-    getKeySignature(): KeySignature {
-        return this.keySignature;
-    }
-
-    getAccidental(pitch: number): Accidental {
-        return this.getKeySignature().getAccidental(pitch);
     }
 
     isScaleNote(note: Note): boolean {
@@ -204,7 +200,7 @@ export class Scale {
         let octave = Math.floor(noteId / 12);
 
         // Get the note that belongs to scale
-        let scaleNotes = this.accidentalNotes.map(accNote => {
+        let scaleNotes = this.scaleNotes.map(accNote => {
             if (accNote.naturalNote === "C" && accNote.accidental < 0) {
                 return new Note(accNote.getPitchInOctave(octave + 1), accNote.accidental)
             }
@@ -228,7 +224,7 @@ export class Scale {
         let pitchStart = midPitch - 2;
         let pitchEnd = midPitch + 2;
 
-        let preferFlat = this.getKeySignature().getType() === "flat";
+        let preferFlat = this.getAccidentalType() === AccidentalType.Flats;
         let preferredAccs = preferFlat ? [0, -1, 1, -2, 2] : [0, 1, -1, 2, -2];
 
         for (let ai = 0; ai < preferredAccs.length; ai++) {
@@ -262,11 +258,11 @@ export class ScaleFactory {
             try {
                 let scale = new Scale(tonic, this.type);
 
-                switch (scale.getKeySignature().getType()) {
-                    case "natural":
+                switch (scale.getAccidentalType()) {
+                    case AccidentalType.Natural:
                         naturalScales.push(scale);
                         break;
-                    case "sharp":
+                    case AccidentalType.Sharps:
                         if (tonic.endsWith("b")) {
                             return;
                         }
@@ -274,7 +270,7 @@ export class ScaleFactory {
                             sharpScales.push(scale);
                             break;
                         }
-                    case "flat":
+                    case AccidentalType.Flats:
                         if (tonic.endsWith("#")) {
                             return;
                         }
@@ -293,7 +289,7 @@ export class ScaleFactory {
 
         Assert.int_gte(naturalScales.length, 1, "Expected natural scale.");
 
-        const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getKeySignature().getNumAccidentals() - b.getKeySignature().getNumAccidentals();
+        const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getNumAccidentals() - b.getNumAccidentals();
 
         this.tonicList = [
             ...naturalScales.sort(SortByAccidentalCountFunc).map(scale => scale.tonic),

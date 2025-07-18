@@ -61,7 +61,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             let { pitch } = pickedPitch;
             let { accidental } = this.state;
 
-            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getKeySignature().getAccidental(pitch));
+            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
 
             Audio.playNote(note);
 

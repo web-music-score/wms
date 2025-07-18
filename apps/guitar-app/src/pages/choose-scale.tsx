@@ -89,7 +89,7 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
                 </Row>
                 <Row xs="auto">
                     <Col>
-                        <OrderOfAccidentalsInfo ks={scale.getKeySignature()} />
+                        <OrderOfAccidentalsInfo ks={scale} />
                     </Col>
                 </Row>
             </Container>

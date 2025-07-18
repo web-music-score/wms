@@ -1,9 +1,8 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { MusicError } from "@tspro/web-music-score/core";
 import { Note } from "./note";
-import { Degree } from "./scale";
+import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";
-import { KeySignature } from "./key-signature";
 
 const isEqualNote = (n1: Note, n2: Note) => n1.noteId % 12 === n2.noteId % 12;
 
@@ -45,9 +44,9 @@ function getOkayRootNote(wantedRootNote: Note): Note {
 function getChordNoteByDegree(chordRootNote: Note, degree: Degree) {
     let chordRootNoteStr = chordRootNote.formatOmitOctave(SymbolSet.Ascii);
 
-    let ks = KeySignature.getKeySignature(chordRootNoteStr, 1); // Major scale key signature
+    let ks = getScale(chordRootNoteStr, ScaleType.Major);
 
-    return ks.getScaleNote(degree);
+    return ks.getNoteByDegree(degree);
 }
 
 function removeNoteDuplicates(notes: ReadonlyArray<Note>): Note[] {
