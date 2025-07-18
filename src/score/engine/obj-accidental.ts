@@ -6,7 +6,7 @@ import { MusicObject } from "./music-object";
 
 export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
-    constructor(parent: MusicObject, readonly accidental: Accidental, readonly color: string = "black") {
+    constructor(parent: MusicObject, readonly pitch: number, readonly accidental: Accidental, readonly color: string = "black") {
         super(parent);
         this.mi = new MAccidental(this);
     }

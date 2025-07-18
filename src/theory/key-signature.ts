@@ -1,4 +1,4 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 
@@ -10,21 +10,23 @@ function getAccidental(noteId: number, pitch: number): Accidental {
 }
 
 const DegreeRule = /^(bb?|b?|#?|x?)([0-9]*)$/;
-// const DegreeRule = /^(bb|b|x|#|♯|♭)?(\d{1,2})$/; // TODO: ChatGPT improvement 
 
 function parseDegree(degree: number | string): { deg: number, acc: number } {
-    let m = Assert.require(DegreeRule.exec("" + degree), "Invalid degree: " + degree);
+    let m = DegreeRule.exec("" + degree);
+
+    if (!m) {
+        throw new KeySignatureError(`Invalid degree: ${degree}`);
+    }
+
     let acc = Note.getAccidental(m[1] ?? "") ?? 0;
     let deg = +m[2];
 
-    Assert.int_between(acc, -2, 2, "Invalid degree: " + degree);
-    Assert.int_gte(deg, 1, "Invalid degree: " + degree);
-
-    return { deg, acc }
-}
-
-function getNormalizedPitch(pitch: number) {
-    return Note.validatePitch(pitch % 7);
+    if (!Utils.Is.isInteger(acc) || acc < -2 || acc > 2 || !Utils.Is.isInteger(deg) || deg < 1) {
+        throw new KeySignatureError(`Invalid degree: ${degree}`);
+    }
+    else {
+        return { deg, acc }
+    }
 }
 
 /** @public */
@@ -68,7 +70,9 @@ export class KeySignature {
      * @param mode - Mode: Ionian/Major = 1, Dorian = 2, ..., Locrian = 7
      */
     protected constructor(readonly tonic: string, readonly mode: Mode) {
-        Assert.assertEnum(mode, Mode, "Invalid mode: " + mode);
+        if (!Utils.Is.isEnumValue(mode, Mode)) {
+            throw new KeySignatureError(`Invalid mode: ${mode}`);
+        }
 
         let intervals = [2, 2, 1, 2, 2, 2, 1];
 
@@ -83,7 +87,7 @@ export class KeySignature {
         let noteId = Note.getNote(tonic + "0").noteId;
 
         for (let id = 0; id < 7; pitch++, noteId += intervals[id], id++) {
-            let note = new Note(getNormalizedPitch(pitch), getAccidental(noteId, pitch));
+            let note = new Note(Note.getNormalizedPitch(pitch), getAccidental(noteId, pitch));
 
             if (Math.abs(note.accidental) >= 2) {
                 throw new KeySignatureError("Key signature contains double accidental.");
@@ -135,7 +139,7 @@ export class KeySignature {
     }
 
     getAccidental(pitch: number): Accidental {
-        return this.accidentalByPitch[getNormalizedPitch(pitch)] ?? 0;
+        return this.accidentalByPitch[Note.getNormalizedPitch(pitch)] ?? 0;
     }
 
     getNumAccidentals(): number {

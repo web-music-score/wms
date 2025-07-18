@@ -80,8 +80,12 @@ export class Note {
         }
     }
 
-    get pitchMod7(): number {
+    get normalizedPitch(): number {
         return this.pitch % 7;
+    }
+
+    static getNormalizedPitch(pitch: number) {
+        return Note.validatePitch(pitch % 7);
     }
 
     get octave(): number {
@@ -89,19 +93,28 @@ export class Note {
     }
 
     get noteId(): number {
-        return this.octave * 12 + NoteIdByPitch[this.pitchMod7] + this.accidental;
+        return this.octave * 12 + NoteIdByPitch[this.normalizedPitch] + this.accidental;
     }
 
     get naturalNote(): NaturalNote {
-        return NaturalNoteByPitch[this.pitchMod7];
+        return NaturalNoteByPitch[this.normalizedPitch];
     }
 
     getPitchInOctave(octave: number) {
-        return this.pitchMod7 + Note.validateOctave(octave) * 7;
+        return this.normalizedPitch + Note.validateOctave(octave) * 7;
     }
 
-    static equals(a: Note, b: Note): boolean {
-        return a === b || a.pitch === b.pitch && a.accidental === b.accidental;
+    static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
+        if (a == null && b == null) {
+            // Handled both null and udefined
+            return true;
+        }
+        else if (a == null || b == null) {
+            return false;
+        }
+        else {
+            return a === b || a.pitch === b.pitch && a.accidental === b.accidental;
+        }
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {

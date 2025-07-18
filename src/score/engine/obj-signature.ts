@@ -1,5 +1,5 @@
 import { Assert } from "@tspro/ts-utils-lib";
-import { Accidental, Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
+import { Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
 import { DivRect, MSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
@@ -9,14 +9,12 @@ import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 
-type AccPitch = { obj: ObjAccidental, pitch: number }
-
 export class ObjSignature extends MusicObject {
     private clefImage?: ObjImage;
     private eightBelowClef?: ObjText;
     private measureNumber?: ObjText;
-    private ksNeutralizeAccidentals: AccPitch[] = [];
-    private ksNewAccidentals: AccPitch[] = [];
+    private ksNeutralizeAccidentals: ObjAccidental[] = [];
+    private ksNewAccidentals: ObjAccidental[] = [];
     private beatCountText?: ObjText;
     private beatSizeText?: ObjText;
     private tempoText?: ObjText;
@@ -31,10 +29,6 @@ export class ObjSignature extends MusicObject {
 
     getMusicInterface(): MSignature {
         return this.mi;
-    }
-
-    accPitch(accidental: Accidental, pitch: number): AccPitch {
-        return { obj: new ObjAccidental(this, accidental), pitch }
     }
 
     updateClefImage(renderer: Renderer, showClef: boolean) {
@@ -76,13 +70,13 @@ export class ObjSignature extends MusicObject {
             if (prevKeySignature && !KeySignature.equals(newKeySignature, prevKeySignature)) {
                 prevKeySignature.getOrderedAccidentalNotes().forEach(accNote => {
                     // Neutral accidental
-                    this.ksNeutralizeAccidentals.push(this.accPitch(0, this.getAccidentalPitch(accNote)));
+                    this.ksNeutralizeAccidentals.push(new ObjAccidental(this, this.getAccidentalPitch(accNote), 0));
                 });
             }
 
             // Set new key signature
             newKeySignature.getOrderedAccidentalNotes().forEach(accNote => {
-                this.ksNewAccidentals.push(this.accPitch(accNote.accidental, this.getAccidentalPitch(accNote)));
+                this.ksNewAccidentals.push(new ObjAccidental(this, this.getAccidentalPitch(accNote), accNote.accidental));
             });
         }
         else {
@@ -142,7 +136,7 @@ export class ObjSignature extends MusicObject {
             // Calculate lowest pitch that is pitch >= lowestAccidentalPitch.
             let i = Math.floor(lowestAccidentalPitch / 7);
             let r = lowestAccidentalPitch % 7;
-            return i * 7 + accNote.pitchMod7 + (accNote.pitchMod7 < r ? 7 : 0);
+            return i * 7 + accNote.normalizedPitch + (accNote.normalizedPitch < r ? 7 : 0);
         }
         else {
             Assert.interrupt("Cannot get accidental pitch because note has no accidental.")
@@ -169,14 +163,14 @@ export class ObjSignature extends MusicObject {
         }
 
         for (let i = 0; i < this.ksNeutralizeAccidentals.length; i++) {
-            let arr = this.ksNeutralizeAccidentals[i].obj.pick(x, y);
+            let arr = this.ksNeutralizeAccidentals[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
         }
 
         for (let i = 0; i < this.ksNewAccidentals.length; i++) {
-            let arr = this.ksNewAccidentals[i].obj.pick(x, y);
+            let arr = this.ksNewAccidentals[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -243,12 +237,12 @@ export class ObjSignature extends MusicObject {
         if (this.ksNeutralizeAccidentals.length > 0) {
             x += paddingX;
 
-            this.ksNeutralizeAccidentals.forEach(acc => {
-                let accStaff = row.getStaff(acc.pitch);
+            this.ksNeutralizeAccidentals.forEach(objAcc => {
+                let accStaff = row.getStaff(objAcc.pitch);
                 if (accStaff) {
-                    acc.obj.layout(renderer);
-                    acc.obj.offset(x + acc.obj.getRect().leftw, accStaff.getPitchY(acc.pitch));
-                    this.rect.expandInPlace(acc.obj.getRect());
+                    objAcc.layout(renderer);
+                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getPitchY(objAcc.pitch));
+                    this.rect.expandInPlace(objAcc.getRect());
                     x = this.rect.right;
                 }
             });
@@ -257,12 +251,12 @@ export class ObjSignature extends MusicObject {
         if (this.ksNewAccidentals) {
             x += paddingX;
 
-            this.ksNewAccidentals.forEach(acc => {
-                let accStaff = row.getStaff(acc.pitch);
+            this.ksNewAccidentals.forEach(objAcc => {
+                let accStaff = row.getStaff(objAcc.pitch);
                 if (accStaff) {
-                    acc.obj.layout(renderer);
-                    acc.obj.offset(x + acc.obj.getRect().leftw, accStaff.getPitchY(acc.pitch));
-                    this.rect.expandInPlace(acc.obj.getRect());
+                    objAcc.layout(renderer);
+                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getPitchY(objAcc.pitch));
+                    this.rect.expandInPlace(objAcc.getRect());
                     x = this.rect.right;
                 }
             });
@@ -310,8 +304,8 @@ export class ObjSignature extends MusicObject {
             this.measureNumber.offset(dx, dy);
         }
 
-        this.ksNeutralizeAccidentals.forEach(acc => acc.obj.offset(dx, dy));
-        this.ksNewAccidentals.forEach(acc => acc.obj.offset(dx, dy));
+        this.ksNeutralizeAccidentals.forEach(acc => acc.offset(dx, dy));
+        this.ksNewAccidentals.forEach(acc => acc.offset(dx, dy));
 
         if (this.beatCountText) {
             this.beatCountText.offset(dx, dy);
@@ -344,8 +338,8 @@ export class ObjSignature extends MusicObject {
         }
 
         // Draw key signature
-        this.ksNeutralizeAccidentals.forEach(acc => acc.obj.draw(renderer));
-        this.ksNewAccidentals.forEach(acc => acc.obj.draw(renderer));
+        this.ksNeutralizeAccidentals.forEach(acc => acc.draw(renderer));
+        this.ksNewAccidentals.forEach(acc => acc.draw(renderer));
 
         // Draw time signature
         if (this.beatCountText) {

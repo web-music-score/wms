@@ -452,7 +452,7 @@ export class ObjNoteGroup extends MusicObject {
 
                 // Setup accidental
                 if (accState.needAccidental(note)) {
-                    let acc = this.staffObjs.accidentals[noteId] = new ObjAccidental(this, note.accidental, this.color);
+                    let acc = this.staffObjs.accidentals[noteId] = new ObjAccidental(this, note.pitch, note.accidental, this.color);
                     if (acc) {
                         acc.layout(renderer);
                         acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
