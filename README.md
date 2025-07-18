@@ -201,9 +201,9 @@ m.addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Whole, { arpeggio: Score.Arp
 | staccato    | `boolean`               | Play column in staccato. |
 | diamond     | `boolean`               | Diamond shaped note head. |
 | tieSpan     | `number` \| `TieLength.Short/ToMeasureEnd` | How many notes this tie spans. |
-| tiePos      | `Score.ArcPos.Auto/Above/Middle/Below/StemTip` | Tie attach point. |
+| tieAnchor   | `Score.NoteAnchor.Auto/Above/Center/Below/StemTip` | Tie attach point. |
 | slurSpan    | `number`                | How many notes this slur spans. |
-| slurPos     | `Score.ArcPos.Auto/Above/Middle/Below/StemTip` | Slur attach point. |
+| slurAnchor  | `Score.NoteAnchor.Auto/Above/Center/Below/StemTip` | Slur attach point. |
 | triplet     | `boolean`               | Set this note part of triplet. |
 | string      | `number` \| `number[]`  | String number for guitar tab. Array of string numbers for chord. |
 

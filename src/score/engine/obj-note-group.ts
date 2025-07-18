@@ -2,7 +2,7 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
-import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, ArcPos, Tie, StringNumber } from "../pub";
+import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, Tie, StringNumber } from "../pub";
 import { ArcProps } from "./arc-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -101,12 +101,12 @@ export class ObjNoteGroup extends MusicObject {
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
         if (options?.tieSpan !== undefined) {
-            this.startTie = new ArcProps("tie", options.tieSpan, options.tiePos ?? ArcPos.Auto, this);
+            this.startTie = new ArcProps("tie", options.tieSpan, options.tieAnchor ?? NoteAnchor.Auto, this);
             this.doc.addArcProps(this.startTie);
         }
 
         if (options?.slurSpan !== undefined) {
-            this.startSlur = new ArcProps("slur", options.slurSpan, options.slurPos ?? ArcPos.Auto, this);
+            this.startSlur = new ArcProps("slur", options.slurSpan, options.slurAnchor ?? NoteAnchor.Auto, this);
             this.doc.addArcProps(this.startSlur);
         }
 
@@ -190,7 +190,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getArcAnchorPoint(note: Note, arcPos: ArcPos, side: "left" | "right"): { x: number, y: number } {
+    getArcAnchorPoint(note: Note, arcAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
         let noteId = this.notes.findIndex(note2 => Note.equals(note2, note));
 
         if (!this.staffObjs || noteId < 0 || noteId >= this.staffObjs.noteHeadRects.length) {
@@ -212,17 +212,17 @@ export class ObjNoteGroup extends MusicObject {
         let aboveY = noteHeadRect.top - padding;
         let belowY = noteHeadRect.bottom + padding;
 
-        if (arcPos === ArcPos.Auto) {
-            arcPos = ArcPos.Below;
+        if (arcAnchor === NoteAnchor.Auto) {
+            arcAnchor = NoteAnchor.Below;
         }
-        else if (arcPos === ArcPos.StemTip && !hasStem) {
-            arcPos = stemDir === Stem.Up ? ArcPos.Above : ArcPos.Below;
+        else if (arcAnchor === NoteAnchor.StemTip && !hasStem) {
+            arcAnchor = stemDir === Stem.Up ? NoteAnchor.Above : NoteAnchor.Below;
         }
 
-        switch (arcPos) {
-            case ArcPos.Middle:
+        switch (arcAnchor) {
+            case NoteAnchor.Center:
                 return side === "left" ? { x: rightX, y: centerY } : { x: leftX, y: centerY };
-            case ArcPos.Above:
+            case NoteAnchor.Above:
                 if (!hasStem || stemDir === Stem.Down) {
                     return { x: centerX, y: aboveY }
                 }
@@ -232,7 +232,7 @@ export class ObjNoteGroup extends MusicObject {
                         y: aboveY
                     }
                 }
-            case ArcPos.Below:
+            case NoteAnchor.Below:
                 if (!hasStem || stemDir === Stem.Up) {
                     return { x: centerX, y: belowY }
                 }
@@ -242,7 +242,7 @@ export class ObjNoteGroup extends MusicObject {
                         y: belowY
                     }
                 }
-            case ArcPos.StemTip:
+            case NoteAnchor.StemTip:
                 // stemRect is defined.
                 if (stemDir === Stem.Up) {
                     return { x: centerX, y: stemRect!.top - padding }
@@ -251,7 +251,7 @@ export class ObjNoteGroup extends MusicObject {
                     return { x: centerX, y: stemRect!.bottom + padding }
                 }
             default:
-                Assert.interrupt("Invalid arcPos: " + arcPos);
+                Assert.interrupt("Invalid arcAnchor: " + arcAnchor);
         }
     }
 

@@ -45,7 +45,7 @@ export enum Arpeggio { Up, Down }
 export enum Tie { Short = -1, MeasureEnd = -2 }
 
 /** @public */
-export enum ArcPos { Auto, Above, Middle, Below, StemTip }
+export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
 
 /** @public */
 export type NoteOptions = {
@@ -56,9 +56,9 @@ export type NoteOptions = {
     staccato?: boolean,
     diamond?: boolean,
     tieSpan?: number | Tie,
-    tiePos?: ArcPos,
+    tieAnchor?: NoteAnchor,
     slurSpan?: number,
-    slurPos?: ArcPos,
+    slurAnchor?: NoteAnchor,
     triplet?: boolean,
     string?: StringNumber | StringNumber[];
 }

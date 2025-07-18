@@ -84,12 +84,12 @@ export class ObjArc extends MusicObject {
 
         let contentRect = row.getArcsContentRect();
 
-        let { arcPos, arcDir } = this.arcProps;
+        let { arcAnchor, arcDir } = this.arcProps;
 
-        let leftPos = leftNoteGroup.getArcAnchorPoint(leftNote, arcPos, "left");
+        let leftPos = leftNoteGroup.getArcAnchorPoint(leftNote, arcAnchor, "left");
 
         let rightPos = rightNoteGroup !== undefined && rightNote !== undefined
-            ? rightNoteGroup.getArcAnchorPoint(rightNote, arcPos, "right")
+            ? rightNoteGroup.getArcAnchorPoint(rightNote, arcAnchor, "right")
             : this.tie === Tie.MeasureEnd
                 ? { x: measure.getColumnsContentRect().right, y: leftPos.y }
                 : { x: leftPos.x + unitSize * DocumentSettings.ShortTieLength, y: leftPos.y };

@@ -1,5 +1,5 @@
 import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
-import { MDocument, ArcPos, Navigation, Annotation, StaffPreset, Stem } from "@tspro/web-music-score/score";
+import { MDocument, NoteAnchor, Navigation, Annotation, StaffPreset, Stem } from "@tspro/web-music-score/score";
 
 /** @public */
 export function createAndanteByDiabelli(): MDocument {
@@ -13,14 +13,14 @@ export function createAndanteByDiabelli(): MDocument {
         .setTempo(80)
         .addRest(0, NoteLength.Eighth, { pitch: "G4" }).addAnnotation(Annotation.Dynamics, "p")
         .addNote(0, "F#4", NoteLength.Eighth, { stem: Stem.Up })
-        .addNote(0, "G4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "G4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "F#4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth)
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(1, "D3", NoteLength.Half, { dotted: true, stem: Stem.Down });
 
     doc.addMeasure()
-        .addNote(0, "C#4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "C#4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth)
         .addNote(0, "F#4", NoteLength.Eighth)
@@ -30,7 +30,7 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "A3", NoteLength.Eighth)
-        .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "B3", NoteLength.Eighth)
         .addNote(0, "C#4", NoteLength.Eighth)
@@ -48,14 +48,14 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "G4" }).addAnnotation(Annotation.Dynamics, "p")
         .addNote(0, "F#4", NoteLength.Eighth)
-        .addNote(0, "G4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "G4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "F#4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth)
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(1, "D3", NoteLength.Half, { dotted: true });
 
     doc.addMeasure()
-        .addNote(0, "C#4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "C#4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth)
         .addNote(0, "F#4", NoteLength.Eighth)
@@ -66,7 +66,7 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "A3", NoteLength.Eighth)
-        .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "B3", NoteLength.Eighth)
         .addNote(0, "C#4", NoteLength.Eighth)
@@ -83,7 +83,7 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "D4" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "D4", NoteLength.Eighth)
-        .addNote(0, "E4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "E4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(0, "C#4", NoteLength.Eighth)
         .addNote(0, "B3", NoteLength.Eighth)
@@ -91,7 +91,7 @@ export function createAndanteByDiabelli(): MDocument {
         .endRow();
 
     doc.addMeasure()
-        .addNote(0, "C#4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "C#4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth)
         .addNote(0, "F#4", NoteLength.Eighth)
@@ -101,14 +101,14 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "p")
         .addNote(0, "E3", NoteLength.Eighth)
-        .addNote(0, "D#3", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "D#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "E3", NoteLength.Eighth)
         .addNote(0, "F#3", NoteLength.Eighth)
         .addNote(0, "G#3", NoteLength.Eighth)
         .addNote(1, "E2", NoteLength.Half, { dotted: true });
 
     doc.addMeasure()
-        .addNote(0, "A3", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "A3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "G#3", NoteLength.Eighth)
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "B3", NoteLength.Eighth)
@@ -119,7 +119,7 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "G4" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "G4", NoteLength.Eighth)
-        .addNote(0, "A4", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "A4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "G4", NoteLength.Eighth)
         .addNote(0, "F#4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth)
@@ -136,7 +136,7 @@ export function createAndanteByDiabelli(): MDocument {
     doc.addMeasure()
         .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "ff")
         .addNote(0, "A3", NoteLength.Eighth)
-        .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurPos: ArcPos.Below })
+        .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "B3", NoteLength.Eighth)
         .addNote(0, "C#4", NoteLength.Eighth)

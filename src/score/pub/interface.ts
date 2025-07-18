@@ -26,7 +26,7 @@ import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, Tie, VoiceId, getStringNumbers, getVoiceIds } from "./types";
-import { ArcPos, Arpeggio, ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
+import { NoteAnchor, Arpeggio, ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
 import { isNumber } from "tone";
 
@@ -48,9 +48,9 @@ function assertNoteOptions(options: NoteOptions) {
     Assert.assert(Utils.Is.isBooleanOrUndefined(options.staccato), "noteOptions.staccato");
     Assert.assert(Utils.Is.isBooleanOrUndefined(options.diamond), "noteOptions.diamond");
     Assert.assert(Utils.Is.isEnumValueOrUndefined(options.tieSpan, Tie) || Utils.Is.isIntegerGte(options.tieSpan, 1), "noteOptions.tieSpan");
-    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.tiePos, ArcPos), "noteOptions.tiePos");
+    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.tieAnchor, NoteAnchor), "noteOptions.tieAnchor");
     Assert.assert(Utils.Is.isUndefined(options.slurSpan) || Utils.Is.isIntegerGte(options.slurSpan, 1), "noteOptions.slurSpan");
-    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.slurPos, ArcPos), "noteOptions.slurPos");
+    Assert.assert(Utils.Is.isEnumValueOrUndefined(options.slurAnchor, NoteAnchor), "noteOptions.slurAnchor");
     Assert.assert(Utils.Is.isBooleanOrUndefined(options.triplet), "noteOptions.triplet");
     Assert.assert((
         Utils.Is.isUndefined(options.string) ||

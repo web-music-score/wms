@@ -2,13 +2,13 @@ import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjArc } from "./obj-arc";
 import { ObjNoteGroup } from "./obj-note-group";
-import { ArcPos, Stem, Tie } from "../pub/types";
+import { NoteAnchor, Stem, Tie } from "../pub/types";
 
 export class ArcProps {
     noteGroups: ObjNoteGroup[];
     arcDir: "up" | "down" = "down";
 
-    constructor(readonly arcType: "tie" | "slur", readonly arcSpan: number | Tie, public arcPos: ArcPos, startNoteGroup: ObjNoteGroup) {
+    constructor(readonly arcType: "tie" | "slur", readonly arcSpan: number | Tie, public arcAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
         this.noteGroups = [startNoteGroup];
     }
 
@@ -42,23 +42,23 @@ export class ArcProps {
     private computeParams() {
         let stemDir = this.noteGroups[0].stemDir;
 
-        if (this.arcPos === ArcPos.StemTip) {
+        if (this.arcAnchor === NoteAnchor.StemTip) {
             this.arcDir = stemDir === Stem.Up ? "up" : "down";
         }
-        else if (this.arcPos === ArcPos.Auto) {
+        else if (this.arcAnchor === NoteAnchor.Auto) {
             this.arcDir = stemDir === Stem.Up ? "down" : "up";
 
             if (this.noteGroups[0].notes.length > 1) {
-                this.arcPos = ArcPos.Middle;
+                this.arcAnchor = NoteAnchor.Center;
             }
             else if (this.arcDir === "up") {
-                this.arcPos = ArcPos.Above;
+                this.arcAnchor = NoteAnchor.Above;
             }
             else {
-                this.arcPos = ArcPos.Below;
+                this.arcAnchor = NoteAnchor.Below;
             }
         }
-        else if (this.arcPos === ArcPos.Middle) {
+        else if (this.arcAnchor === NoteAnchor.Center) {
             let { row } = this.noteGroups[0].measure;
 
             let notePitch = this.noteGroups[0].ownAvgPitch;
@@ -66,10 +66,10 @@ export class ArcProps {
 
             this.arcDir = !staff || notePitch < staff.middleLinePitch ? "down" : "up";
         }
-        else if (this.arcPos === ArcPos.Above) {
+        else if (this.arcAnchor === NoteAnchor.Above) {
             this.arcDir = "up";
         }
-        else if (this.arcPos === ArcPos.Below) {
+        else if (this.arcAnchor === NoteAnchor.Below) {
             this.arcDir = "down";
         }
     }
