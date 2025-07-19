@@ -1,8 +1,16 @@
-import { Assert, Utils } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
 import { Interval } from "./interval";
+
+/** @public */
+export class ScaleError extends Error {
+    constructor(msg: string) {
+        super(msg);
+        this.name = "SCaleError";
+    }
+}
 
 const FullTonicList: ReadonlyArray<string> = [
     "Cb", "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#"
@@ -55,7 +63,7 @@ function getMode(scaleType: ScaleType) {
         case ScaleType.MinorHexatonicBlues: return 6;
         case ScaleType.HeptatonicBlues: return 1;
         default:
-            Assert.interrupt("Invalid scaleType: " + scaleType);
+            throw new ScaleError(`Invalid scaleType: ${scaleType}`);
     }
 }
 
@@ -125,7 +133,9 @@ export class Scale extends KeySignature {
     }
 
     getScaleNotes(lowestPitchNote: string, numOctaves: number): Note[] {
-        Assert.int_gte(numOctaves, 1, "Invalid numOctaves = " + numOctaves);
+        if (!Utils.Is.isIntegerGte(numOctaves, 1)) {
+            throw new ScaleError(`Invalid numOctaves: ${numOctaves}`);
+        }
 
         let lowestPitch = Note.getNote(lowestPitchNote).pitch;
 
@@ -181,11 +191,18 @@ export class Scale extends KeySignature {
             note = new Note(note.pitch - 7, note.accidental);
         }
 
-        Assert.assert(note.noteId >= rootNote.noteId, "Note cannot be below root note!");
+        if (note.noteId < rootNote.noteId) {
+            throw new ScaleError(`Note is below rootNote.`);
+        }
 
-        let iv = Interval.get(rootNote, note);
+        let interval = Interval.get(rootNote, note);
 
-        return Assert.require(iv, "Scale note interval is required!");
+        if (interval === undefined) {
+            throw new ScaleError(`Interval is undefined.`);
+        }
+        else {
+            return interval;
+        }
     }
 
     getPreferredNote(noteId: number): Note {
@@ -243,7 +260,8 @@ export class Scale extends KeySignature {
             }
         }
 
-        Assert.interrupt("Invalid noteId: " + noteId);
+        // Shoul never get here.
+        return this.preferredChromaticNoteCache[noteId] = new PreferredChromaticNote(Note.getNoteById(noteId), false, false);
     }
 
 }
@@ -291,7 +309,9 @@ export class ScaleFactory {
             }
         });
 
-        Assert.int_gte(naturalScales.length, 1, "Expected natural scale.");
+        if (naturalScales.length === 0) {
+            throw new ScaleError(`Expected natural scale.`);
+        }
 
         const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getNumAccidentals() - b.getNumAccidentals();
 
@@ -318,8 +338,12 @@ export class ScaleFactory {
 
     getScale(tonic: string): Scale {
         let scale = this.scaleMap.get(tonic);
-        Assert.assert(scale, "Invalid scale: " + tonic + " " + this.type);
-        return scale!;
+        if (!scale) {
+            throw new ScaleError(`Invalid scale: ${tonic} ${this.type}`);
+        }
+        else {
+            return scale;
+        }
     }
 
     hasScale(tonic: string) {
@@ -363,13 +387,23 @@ ScaleFactoryList.forEach(factory => {
 
 /** @public */
 export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
-    return Assert.require(ScaleFactoryMap.get(scaleType), "Invalid ScaleType: " + scaleType);
+    let f = ScaleFactoryMap.get(scaleType);
+    if (!f) {
+        throw new ScaleError(`Invalid scaleType: ${scaleType}`);
+    }
+    else {
+        return f;
+    }
 }
 
 /** @public */
 export function validateScaleType(scaleType: unknown): ScaleType {
-    Assert.assertEnum(scaleType, ScaleType, "ScaleType");
-    return scaleType;
+    if (Utils.Is.isEnumValue(scaleType, ScaleType)) {
+        return scaleType;
+    }
+    else {
+        throw new ScaleError(`Invalid scaleType: ${scaleType}`);
+    }
 }
 
 /** @public */
