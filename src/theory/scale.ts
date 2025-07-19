@@ -201,7 +201,7 @@ export class Scale extends KeySignature {
             return this.preferredChromaticNoteCache[noteId];
         }
 
-        let octave = Math.floor(noteId / 12);
+        let octave = Note.getOctaveFromNoteId(noteId);
 
         // Get the note that belongs to scale
         let scaleNotes = this.scaleNotes.map(accNote => {
@@ -216,7 +216,7 @@ export class Scale extends KeySignature {
             }
         });
 
-        let scaleNote = scaleNotes.find(note => noteId % 12 === note.noteId % 12);
+        let scaleNote = scaleNotes.find(note => Note.getNormalizedNoteId(noteId) === note.normalizedNoteId);
         if (scaleNote) {
             let isScaleNote = true;
             let isScaleRootNote = scaleNote === scaleNotes[0];
@@ -224,7 +224,7 @@ export class Scale extends KeySignature {
         }
 
         // Other method
-        let midPitch = Note.getNaturelNotePitch("CCDDEFFGGAAB"[noteId % 12], octave);
+        let midPitch = Note.getNaturelNotePitch("CCDDEFFGGAAB"[Note.getNormalizedNoteId(noteId)], octave);
         let pitchStart = midPitch - 2;
         let pitchEnd = midPitch + 2;
 

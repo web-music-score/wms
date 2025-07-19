@@ -32,6 +32,10 @@ export class GuitarNote {
         this.isScaleRootNote = scale.isScaleRootNote(this.preferredNote);
     }
 
+    get normalizedNoteId() {
+        return Note.getNormalizedNoteId(this.noteId);
+    }
+
     show() {
         this.isVisible = true;
     }

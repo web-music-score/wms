@@ -3,7 +3,7 @@ import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 
 function getAccidental(noteId: number, pitch: number): Accidental {
-    let a = noteId % 12 - new Note(pitch, 0).noteId % 12;
+    let a = Note.getNormalizedNoteId(noteId) - new Note(pitch, 0).normalizedNoteId;
     while (a > 2) { a -= 12; }
     while (a < -2) { a += 12; }
     return Note.validateAccidental(a);

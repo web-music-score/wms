@@ -52,59 +52,22 @@ export class Note {
     readonly octave: number;
 
     constructor(pitch: number, accidental: number) {
-        this.normalizedPitch = Note.validateNormalizedPitch(pitch % 7);
+        Note.validatePitch(pitch);
+        this.normalizedPitch = Note.getNormalizedPitch(pitch);
         this.accidental = Note.validateAccidental(accidental);
-        this.octave = Note.validateOctave(Math.floor(pitch / 7));
-    }
-
-    static getNote(noteName: string): Note {
-        let note = this.noteByNameCache.get(noteName);
-
-        if (note === undefined) {
-            let p = Assert.require(Note.parseNote(noteName), "Invalid note: " + noteName);
-            Assert.require(p.octave, "Octave is required for note!");
-
-            note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
-
-            this.noteByNameCache.set(noteName, note);
-        }
-
-        return note;
-    }
-
-
-    static getNoteById(noteId: number, scale?: Scale): Note {
-        if (scale) {
-            return scale.getPreferredNote(noteId);
-        }
-        else {
-            let note = this.noteByIdCache.get(noteId);
-
-            if (note === undefined) {
-                const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
-                let noteName = NoteNameList[noteId % 12].split("/")[0] + Math.floor(noteId / 12);
-                let p = Assert.require(Note.parseNote(noteName), "Invalid noteName: " + noteName);
-                Assert.require(p.octave, "Octave is required for note!");
-
-                note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
-
-                this.noteByIdCache.set(noteId, note);
-            }
-
-            return note;
-        }
+        this.octave = Note.getOctaveFromPitch(pitch);
     }
 
     get pitch(): number {
-        return this.normalizedPitch + this.octave * 7;
-    }
-
-    static getNormalizedPitch(pitch: number) {
-        return Note.validatePitch(pitch % 7);
+        return Note.getPitchInOctave(this.normalizedPitch, this.octave);
     }
 
     get noteId(): number {
         return this.octave * 12 + NoteIdByPitch[this.normalizedPitch] + this.accidental;
+    }
+
+    get normalizedNoteId(): number {
+        return Note.getNormalizedNoteId(NoteIdByPitch[this.normalizedPitch] + this.accidental + 12);
     }
 
     get naturalNote(): NaturalNote {
@@ -112,20 +75,7 @@ export class Note {
     }
 
     getPitchInOctave(octave: number) {
-        return this.normalizedPitch + Note.validateOctave(octave) * 7;
-    }
-
-    static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
-        if (a == null && b == null) {
-            // Handled both null and udefined
-            return true;
-        }
-        else if (a == null || b == null) {
-            return false;
-        }
-        else {
-            return a === b || a.pitch === b.pitch && a.accidental === b.accidental;
-        }
+        return Note.getPitchInOctave(this.normalizedPitch, octave);
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
@@ -152,6 +102,76 @@ export class Note {
         let naturalNote = NaturalNoteByPitch[this.normalizedPitch];
         let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
         return naturalNote + accidental;
+    }
+
+    static getNote(noteName: string): Note {
+        let note = this.noteByNameCache.get(noteName);
+
+        if (note === undefined) {
+            let p = Assert.require(Note.parseNote(noteName), "Invalid note: " + noteName);
+            Assert.require(p.octave, "Octave is required for note!");
+
+            note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
+
+            this.noteByNameCache.set(noteName, note);
+        }
+
+        return note;
+    }
+
+    static getNoteById(noteId: number, scale?: Scale): Note {
+        if (scale) {
+            return scale.getPreferredNote(noteId);
+        }
+        else {
+            let note = this.noteByIdCache.get(noteId);
+
+            if (note === undefined) {
+                const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
+                let noteName = NoteNameList[Note.getNormalizedNoteId(noteId)].split("/")[0] + Note.getOctaveFromNoteId(noteId);
+                let p = Assert.require(Note.parseNote(noteName), "Invalid noteName: " + noteName);
+                Assert.require(p.octave, "Octave is required for note!");
+
+                note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
+
+                this.noteByIdCache.set(noteId, note);
+            }
+
+            return note;
+        }
+    }
+
+    static getOctaveFromPitch(pitch: number) {
+        return Math.floor(pitch / 7);
+    }
+
+    static getPitchInOctave(pitch: number, octave: number) {
+        return Note.getNormalizedPitch(pitch) + octave * 7;
+    }
+
+    static getNormalizedPitch(pitch: number) {
+        return pitch % 7;
+    }
+
+    static getNormalizedNoteId(noteId: number) {
+        return noteId % 12;
+    }
+
+    static getOctaveFromNoteId(noteId: number) {
+        return Math.floor(noteId / 12);
+    }
+
+    static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
+        if (a == null && b == null) {
+            // Handled both null and udefined
+            return true;
+        }
+        else if (a == null || b == null) {
+            return false;
+        }
+        else {
+            return a === b || a.pitch === b.pitch && a.accidental === b.accidental;
+        }
     }
 
     static replaceAccidentalSymbols(str: string, symbolSet: SymbolSet) {
@@ -206,13 +226,15 @@ export class Note {
     static getNaturelNotePitch(naturalNote: string, octave?: number): number {
         let pitch = NaturalNoteByPitch.indexOf(Note.validateNaturalNote(naturalNote));
         if (octave !== undefined) {
-            pitch += Note.validateOctave(octave) * 7;
+            return Note.getPitchInOctave(pitch, octave);
         }
-        return pitch;
+        else {
+            return pitch;
+        }
     }
 
     static getNaturalNote(pitch: number): NaturalNote {
-        return NaturalNoteByPitch[Note.validatePitch(pitch) % 7];
+        return NaturalNoteByPitch[Note.getNormalizedPitch(pitch)];
     }
 
     static validatePitch(pitch: number): number {

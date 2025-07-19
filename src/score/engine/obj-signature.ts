@@ -134,9 +134,8 @@ export class ObjSignature extends MusicObject {
 
         if (lowestAccidentalPitch !== undefined) {
             // Calculate lowest pitch that is pitch >= lowestAccidentalPitch.
-            let i = Math.floor(lowestAccidentalPitch / 7);
-            let r = lowestAccidentalPitch % 7;
-            return i * 7 + accNote.normalizedPitch + (accNote.normalizedPitch < r ? 7 : 0);
+            let octaveAdd = accNote.normalizedPitch < Note.getNormalizedPitch(lowestAccidentalPitch) ? 1 : 0;
+            return Note.getPitchInOctave(accNote.normalizedPitch, Note.getOctaveFromPitch(lowestAccidentalPitch) + octaveAdd);
         }
         else {
             Assert.interrupt("Cannot get accidental pitch because note has no accidental.")
