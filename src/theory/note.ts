@@ -2,6 +2,10 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Scale } from "./scale";
 import { PitchNotation, SymbolSet } from "./types";
 
+function mod(n: number, m: number): number {
+    return ((n % m) + m) % m;
+}
+
 /** @public */
 export class NoteError extends Error {
     constructor(msg: string) {
@@ -28,9 +32,10 @@ export class NoteError extends Error {
     diatonicId:    0   1   2   3   4   5   6  7  ...
     midiNumber:    0   2   4   5   7   9   11 12 ...
     noteName:     C-1 D-1 E-1 F-1 G-1 A-1 B-1 C0 ...
-
-    Note: octave = -1 not supported!
 */
+
+const C0_noteId = 12;
+const C0_pitch = 7;
 
 /** @public */
 export type Accidental = -2 | -1 | 0 | 1 | 2;
@@ -71,11 +76,11 @@ export class Note {
     }
 
     get noteId(): number {
-        return this.octave * 12 + NoteIdByPitch[this.normalizedPitch] + this.accidental;
+        return Note.getNoteIdInOctave(NoteIdByPitch[this.normalizedPitch] + this.accidental, this.octave);
     }
 
     get normalizedNoteId(): number {
-        return Note.getNormalizedNoteId(NoteIdByPitch[this.normalizedPitch] + this.accidental + 12);
+        return Note.getNormalizedNoteId(NoteIdByPitch[this.normalizedPitch] + this.accidental);
     }
 
     get naturalNote(): NaturalNote {
@@ -161,24 +166,28 @@ export class Note {
         }
     }
 
+    static getNormalizedPitch(pitch: number) {
+        return mod(pitch, 7);
+    }
+
     static getOctaveFromPitch(pitch: number) {
-        return Math.floor(pitch / 7);
+        return Math.floor((pitch - C0_pitch) / 7);
     }
 
     static getPitchInOctave(pitch: number, octave: number) {
-        return Note.getNormalizedPitch(pitch) + octave * 7;
-    }
-
-    static getNormalizedPitch(pitch: number) {
-        return pitch % 7;
+        return Note.getNormalizedPitch(pitch) + octave * 7 + C0_pitch;
     }
 
     static getNormalizedNoteId(noteId: number) {
-        return noteId % 12;
+        return mod(noteId, 12);
     }
 
     static getOctaveFromNoteId(noteId: number) {
-        return Math.floor(noteId / 12);
+        return Math.floor((noteId - C0_noteId) / 12);
+    }
+
+    static getNoteIdInOctave(noteId: number, octave: number) {
+        return Note.getNormalizedNoteId(noteId) + octave * 12 + C0_noteId;
     }
 
     static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
@@ -269,7 +278,7 @@ export class Note {
     }
 
     static validatePitch(pitch: number): number {
-        if (Utils.Is.isIntegerGte(pitch, 0)) {
+        if (Utils.Is.isInteger(pitch)) {
             return pitch;
         }
         else {
@@ -278,7 +287,7 @@ export class Note {
     }
 
     static validateNoteId(noteId: number): number {
-        if (Utils.Is.isIntegerGte(noteId, 0)) {
+        if (Utils.Is.isInteger(noteId)) {
             return noteId;
         }
         else {
@@ -296,7 +305,7 @@ export class Note {
     }
 
     static validateOctave(octave: number): number {
-        if (Utils.Is.isIntegerGte(octave, 0)) {
+        if (Utils.Is.isInteger(octave)) {
             return octave;
         }
         else {
