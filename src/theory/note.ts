@@ -105,10 +105,6 @@ export class Note {
         return NaturalNoteByPitch[this.normalizedPitch];
     }
 
-    getPitchInOctave(octave: number) {
-        return Note.getPitchInOctave(this.normalizedPitch, octave);
-    }
-
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
         let { naturalNote, octave } = this;
         let accidentalSymbol = Note.getAccidentalSymbol(this.accidental, symbolSet);
@@ -285,6 +281,12 @@ export class Note {
 
     static getNaturalNote(pitch: number): NaturalNote {
         return NaturalNoteByPitch[Note.getNormalizedPitch(pitch)];
+    }
+
+    static findNextPitchAbove(pitch: number, bottomPitch: number): number {
+        let normalizedPitch = Note.getNormalizedPitch(pitch);
+        let octaveAdd = normalizedPitch < Note.getNormalizedPitch(bottomPitch) ? 1 : 0;
+        return Note.getPitchInOctave(normalizedPitch, Note.getOctaveFromPitch(bottomPitch) + octaveAdd);
     }
 
     static validatePitch(pitch: number): number {

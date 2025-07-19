@@ -113,29 +113,27 @@ export class ObjSignature extends MusicObject {
     private getAccidentalPitch(accNote: Note): number {
         let clefKind = this.staff.clefKind;
 
-        let lowestAccidentalPitch: number | undefined = undefined;
+        let bottomAccidentalPitch: number | undefined = undefined;
 
         if (clefKind === ClefKind.Treble) {
             if (accNote.accidental > 0) {
-                lowestAccidentalPitch = this.staff.bottomLinePitch + 3;
+                bottomAccidentalPitch = this.staff.bottomLinePitch + 3;
             }
             else if (accNote.accidental < 0) {
-                lowestAccidentalPitch = this.staff.bottomLinePitch + 1;
+                bottomAccidentalPitch = this.staff.bottomLinePitch + 1;
             }
         }
         else if (clefKind === ClefKind.Bass) {
             if (accNote.accidental > 0) {
-                lowestAccidentalPitch = this.staff.bottomLinePitch + 1;
+                bottomAccidentalPitch = this.staff.bottomLinePitch + 1;
             }
             else if (accNote.accidental < 0) {
-                lowestAccidentalPitch = this.staff.bottomLinePitch - 1;
+                bottomAccidentalPitch = this.staff.bottomLinePitch - 1;
             }
         }
 
-        if (lowestAccidentalPitch !== undefined) {
-            // Calculate lowest pitch that is pitch >= lowestAccidentalPitch.
-            let octaveAdd = accNote.normalizedPitch < Note.getNormalizedPitch(lowestAccidentalPitch) ? 1 : 0;
-            return Note.getPitchInOctave(accNote.normalizedPitch, Note.getOctaveFromPitch(lowestAccidentalPitch) + octaveAdd);
+        if (bottomAccidentalPitch !== undefined) {
+            return Note.findNextPitchAbove(accNote.pitch, bottomAccidentalPitch);
         }
         else {
             Assert.interrupt("Cannot get accidental pitch because note has no accidental.")

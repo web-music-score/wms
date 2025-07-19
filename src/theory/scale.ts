@@ -132,12 +132,10 @@ export class Scale extends KeySignature {
         }
     }
 
-    getScaleNotes(lowestPitchNote: string, numOctaves: number): Note[] {
+    getScaleNotes(bottomNote: string, numOctaves: number): Note[] {
         if (!Utils.Is.isIntegerGte(numOctaves, 1)) {
             throw new ScaleError(`Invalid numOctaves: ${numOctaves}`);
         }
-
-        let lowestPitch = Note.getNote(lowestPitchNote).pitch;
 
         let scaleNoteList: Note[] = [];
 
@@ -147,13 +145,11 @@ export class Scale extends KeySignature {
 
         scaleNoteList.push(this.scaleNotes[0]);
 
-        return scaleNoteList.map(accNote => {
-            let pitch = accNote.getPitchInOctave(0);
-            while (pitch < lowestPitch) {
-                pitch += 7;
-            }
-            lowestPitch = pitch;
-            return new Note(pitch, accNote.accidental);
+        let bottomPitch = Note.getNote(bottomNote).pitch;
+
+        return scaleNoteList.map(note => {
+            bottomPitch = Note.findNextPitchAbove(note.pitch, bottomPitch);
+            return new Note(bottomPitch, note.accidental);
         });
     }
 
