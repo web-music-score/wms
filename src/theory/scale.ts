@@ -14,7 +14,7 @@ export class ScaleError extends Error {
 
 function getNaturalPitch(noteId: number): number {
     // NoteId could map to several pitch/accidental combinations.
-    let pitch = Note.getNotePitch("CCDDEFFGGAAB"[Note.getNormalizedNoteId(noteId)]);
+    let pitch = Note.getNoteLetterPitch("CCDDEFFGGAAB"[Note.getNormalizedNoteId(noteId)]);
     let octave = Note.getOctaveFromNoteId(noteId);
     return Note.getPitchInOctave(pitch, octave);
 }
@@ -225,10 +225,10 @@ export class Scale extends KeySignature {
 
         // Get the note that belongs to scale
         let scaleNotes = this.scaleNotes.map(accNote => {
-            if (accNote.naturalNote === "C" && accNote.accidental < 0) {
+            if (accNote.noteLetter === "C" && accNote.accidental < 0) {
                 return new Note(accNote.normalizedPitch, accNote.accidental, octave + 1)
             }
-            else if (accNote.naturalNote === "B" && accNote.accidental > 0) {
+            else if (accNote.noteLetter === "B" && accNote.accidental > 0) {
                 return new Note(accNote.normalizedPitch, accNote.accidental, octave - 1)
             }
             else {

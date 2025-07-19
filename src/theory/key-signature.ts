@@ -83,7 +83,7 @@ export class KeySignature {
         this.naturalScaleNotes = [];
         this.accidentalByPitch = [];
 
-        let pitch = Note.getNotePitch(tonic[0]); // Tonic without # or b, just note letter.
+        let pitch = Note.getNoteLetterPitch(tonic[0]); // Tonic without # or b, just note letter.
         let noteId = Note.getNote(tonic + "0").noteId;
 
         for (let id = 0; id < 7; pitch++, noteId += intervals[id], id++) {
@@ -98,8 +98,8 @@ export class KeySignature {
         }
 
         let sharps = this.naturalScaleNotes.filter(n => n.accidental > 0).sort((a, b) => {
-            let ai = KeySignature.OrderOfSharps.indexOf(a.naturalNote);
-            let bi = KeySignature.OrderOfSharps.indexOf(b.naturalNote);
+            let ai = KeySignature.OrderOfSharps.indexOf(a.noteLetter);
+            let bi = KeySignature.OrderOfSharps.indexOf(b.noteLetter);
             if (ai === -1 || bi === -1) {
                 throw new KeySignatureError("Unexpected note in key signature.");
             }
@@ -107,8 +107,8 @@ export class KeySignature {
         });
 
         let flats = this.naturalScaleNotes.filter(n => n.accidental < 0).sort((a, b) => {
-            let ai = KeySignature.OrderOfFlats.indexOf(a.naturalNote);
-            let bi = KeySignature.OrderOfFlats.indexOf(b.naturalNote);
+            let ai = KeySignature.OrderOfFlats.indexOf(a.noteLetter);
+            let bi = KeySignature.OrderOfFlats.indexOf(b.noteLetter);
             if (ai === -1 || bi === -1) {
                 throw new KeySignatureError("Unexpected note in key signature.");
             }

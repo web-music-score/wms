@@ -41,16 +41,16 @@ const C0_pitch = 7;
 export type Accidental = -2 | -1 | 0 | 1 | 2;
 
 /** @public */
-export type NaturalNote = "C" | "D" | "E" | "F" | "G" | "A" | "B";
+export type NoteLetter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
 /** @public */
-export type ParsedNote = { naturalNote: NaturalNote, accidental: Accidental, octave?: number }
+export type ParsedNote = { noteLetter: NoteLetter, accidental: Accidental, octave?: number }
 
 const AccidentalAsciiSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2, "bb"], [-1, "b"], [0, ""], [1, "#"], [2, "x"]]);
 const AccidentalUnicodeSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2, "𝄫"], [-1, "♭"], [0, ""], [1, "♯"], [2, "𝄪"]]);
 const AccidentalMap: ReadonlyMap<string, Accidental> = new Map([["", 0], ["bb", -2], ["b", -1], ["#", 1], ["x", 2], ["𝄫", -2], ["♭", -1], ["♯", 1], ["𝄪", 2]]);
 
-const NaturalNoteByPitch: ReadonlyArray<NaturalNote> = ["C", "D", "E", "F", "G", "A", "B"];
+const NoteLetters: ReadonlyArray<NoteLetter> = ["C", "D", "E", "F", "G", "A", "B"];
 const NoteIdByPitch: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
 
 const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
@@ -66,26 +66,29 @@ export class Note {
 
     constructor(pitch: number, accidental: number);
     constructor(normalizedPitch: number, accidental: number, octave: number);
-    constructor(naturalNote: string, accidental: number, octave: number);
-    constructor(arg0: number | string, accidental: number, octave?: number) {
-        if (typeof arg0 === "number" && typeof accidental === "number" && octave === undefined) {
-            Note.validatePitch(arg0);
-            this.normalizedPitch = Note.getNormalizedPitch(arg0);
+    constructor(noteLetter: string, accidental: number, octave: number);
+    constructor(arg: number | string, accidental: number, octave?: number) {
+        if (typeof arg === "number" && typeof accidental === "number" && octave === undefined) {
+            // arg is pitch
+            Note.validatePitch(arg);
+            this.normalizedPitch = Note.getNormalizedPitch(arg);
             this.accidental = Note.validateAccidental(accidental);
-            this.octave = Note.getOctaveFromPitch(arg0);
+            this.octave = Note.getOctaveFromPitch(arg);
         }
-        else if (typeof arg0 === "number" && typeof accidental === "number" && typeof octave === "number") {
-            this.normalizedPitch = Note.validateNormalizedPitch(arg0);
+        else if (typeof arg === "number" && typeof accidental === "number" && typeof octave === "number") {
+            // arg is normalizedPitch
+            this.normalizedPitch = Note.validateNormalizedPitch(arg);
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.validateOctave(octave);
         }
-        else if (typeof arg0 === "string" && typeof accidental === "number" && typeof octave === "number") {
-            this.normalizedPitch = Note.getNotePitch(Note.validateNaturalNote(arg0));
+        else if (typeof arg === "string" && typeof accidental === "number" && typeof octave === "number") {
+            // arg is noteLetter
+            this.normalizedPitch = Note.getNoteLetterPitch(arg);
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.validateOctave(octave);
         }
         else {
-            throw new NoteError(`Invalid Note args: ${arg0}, ${accidental}, ${octave}`);
+            throw new NoteError(`Invalid Note args: ${arg}, ${accidental}, ${octave}`);
         }
     }
 
@@ -101,33 +104,33 @@ export class Note {
         return Note.getNormalizedNoteId(NoteIdByPitch[this.normalizedPitch] + this.accidental);
     }
 
-    get naturalNote(): NaturalNote {
-        return NaturalNoteByPitch[this.normalizedPitch];
+    get noteLetter(): NoteLetter {
+        return NoteLetters[this.normalizedPitch];
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
-        let { naturalNote, octave } = this;
+        let { noteLetter, octave } = this;
         let accidentalSymbol = Note.getAccidentalSymbol(this.accidental, symbolSet);
 
         if (pitchNotation === PitchNotation.Helmholtz) {
             if (octave >= 3) {
                 // c - c′ - c′′ - ...
-                return naturalNote.toLowerCase() + accidentalSymbol + "′".repeat(octave - 3);
+                return noteLetter.toLowerCase() + accidentalSymbol + "′".repeat(octave - 3);
             }
             else {
                 // C͵ - C͵͵ - C͵͵͵ - ...
-                return naturalNote.toUpperCase() + accidentalSymbol + "͵".repeat(2 - octave);
+                return noteLetter.toUpperCase() + accidentalSymbol + "͵".repeat(2 - octave);
             }
         }
         else {
-            return naturalNote + accidentalSymbol + octave;
+            return noteLetter + accidentalSymbol + octave;
         }
     }
 
     formatOmitOctave(symbolSet: SymbolSet) {
-        let naturalNote = NaturalNoteByPitch[this.normalizedPitch];
+        let noteLetter = NoteLetters[this.normalizedPitch];
         let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
-        return naturalNote + accidental;
+        return noteLetter + accidental;
     }
 
     static getNote(noteName: string): Note {
@@ -143,7 +146,7 @@ export class Note {
                 throw new NoteError(`Octave is required for note.`);
             }
 
-            note = new Note(p.naturalNote, p.accidental, p.octave);
+            note = new Note(p.noteLetter, p.accidental, p.octave);
 
             this.noteByNameCache.set(noteName, note);
         }
@@ -170,7 +173,7 @@ export class Note {
                     throw new NoteError(`Octave is required for note.`);
                 }
 
-                note = new Note(p.naturalNote, p.accidental, p.octave);
+                note = new Note(p.noteLetter, p.accidental, p.octave);
 
                 this.noteByIdCache.set(noteId, note);
             }
@@ -235,7 +238,7 @@ export class Note {
             return undefined;
         }
 
-        let naturalNote = Note.validateNaturalNote(m[1]);
+        let noteLetter = Note.validateNoteLetter(m[1]);
 
         let accidentalStr = m[2];
         let accidental = Note.validateAccidental(AccidentalMap.get(accidentalStr) ?? 0);
@@ -243,7 +246,7 @@ export class Note {
         let octaveStr = m[3];
         let octave = octaveStr ? Note.validateOctave(+octaveStr) : undefined;
 
-        return { naturalNote, accidental, octave }
+        return { noteLetter: noteLetter, accidental, octave }
     }
 
     static getScientificNoteName(noteName: string, symbolSet: SymbolSet): string {
@@ -251,8 +254,8 @@ export class Note {
         if (!p) {
             throw new NoteError(`Invalid noteName: ${noteName}`);
         }
-        let { naturalNote, accidental, octave } = p;
-        return naturalNote + Note.getAccidentalSymbol(accidental, symbolSet) + (octave ?? "");
+        let { noteLetter, accidental, octave } = p;
+        return noteLetter + Note.getAccidentalSymbol(accidental, symbolSet) + (octave ?? "");
     }
 
     static getAccidentalSymbol(accidental: Accidental, symbolsSet: SymbolSet) {
@@ -269,19 +272,12 @@ export class Note {
         return accidental;
     }
 
-    static getNotePitch(noteName: string): number {
-        if (noteName.length === 1) {
-            // naturalNote
-            return NaturalNoteByPitch.indexOf(Note.validateNaturalNote(noteName));
-        }
-        else {
-            // noteName
-            return Note.getNote(noteName).pitch;
-        }
+    static getNoteLetterPitch(noteLetter: string): number {
+        return NoteLetters.indexOf(Note.validateNoteLetter(noteLetter));
     }
 
-    static getNaturalNote(pitch: number): NaturalNote {
-        return NaturalNoteByPitch[Note.getNormalizedPitch(pitch)];
+    static getNoteLetter(pitch: number): NoteLetter {
+        return NoteLetters[Note.getNormalizedPitch(pitch)];
     }
 
     static findNextPitchAbove(pitch: number, bottomPitch: number, addOctaveIfEqual: boolean): number {
@@ -331,9 +327,9 @@ export class Note {
         }
     }
 
-    static validateNaturalNote(note: string): NaturalNote {
-        if (NaturalNoteByPitch.some(n => n === note)) {
-            return note as NaturalNote;
+    static validateNoteLetter(note: string): NoteLetter {
+        if (NoteLetters.some(n => n === note)) {
+            return note as NoteLetter;
         }
         else {
             throw new NoteError(`Invalid note: ${note}`);
