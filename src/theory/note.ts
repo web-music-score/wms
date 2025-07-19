@@ -283,10 +283,15 @@ export class Note {
         return NaturalNoteByPitch[Note.getNormalizedPitch(pitch)];
     }
 
-    static findNextPitchAbove(pitch: number, bottomPitch: number): number {
+    static findNextPitchAbove(pitch: number, bottomPitch: number, addOctaveIfEqual: boolean): number {
         let normalizedPitch = Note.getNormalizedPitch(pitch);
-        let octaveAdd = normalizedPitch < Note.getNormalizedPitch(bottomPitch) ? 1 : 0;
-        return Note.getPitchInOctave(normalizedPitch, Note.getOctaveFromPitch(bottomPitch) + octaveAdd);
+        let normalizedBottomPitch = Note.getNormalizedPitch(bottomPitch);
+
+        let addOctave = addOctaveIfEqual
+            ? (normalizedPitch <= normalizedBottomPitch ? 1 : 0)
+            : (normalizedPitch < normalizedBottomPitch ? 1 : 0);
+
+        return Note.getPitchInOctave(normalizedPitch, Note.getOctaveFromPitch(bottomPitch) + addOctave);
     }
 
     static validatePitch(pitch: number): number {

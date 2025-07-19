@@ -133,7 +133,7 @@ export class ObjSignature extends MusicObject {
         }
 
         if (bottomAccidentalPitch !== undefined) {
-            return Note.findNextPitchAbove(accNote.pitch, bottomAccidentalPitch);
+            return Note.findNextPitchAbove(accNote.pitch, bottomAccidentalPitch, false);
         }
         else {
             Assert.interrupt("Cannot get accidental pitch because note has no accidental.")

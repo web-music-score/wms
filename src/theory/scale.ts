@@ -148,7 +148,7 @@ export class Scale extends KeySignature {
         let bottomPitch = Note.getNote(bottomNote).pitch;
 
         return scaleNoteList.map(note => {
-            bottomPitch = Note.findNextPitchAbove(note.pitch, bottomPitch);
+            bottomPitch = Note.findNextPitchAbove(note.pitch, bottomPitch, false);
             return new Note(bottomPitch, note.accidental);
         });
     }
