@@ -12,6 +12,13 @@ export class ScaleError extends Error {
     }
 }
 
+function getNaturalPitch(noteId: number): number {
+    // NoteId could map to several pitch/accidental combinations.
+    let pitch = Note.getNotePitch("CCDDEFFGGAAB"[Note.getNormalizedNoteId(noteId)]);
+    let octave = Note.getOctaveFromNoteId(noteId);
+    return Note.getPitchInOctave(pitch, octave);
+}
+
 const FullTonicList: ReadonlyArray<string> = [
     "Cb", "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#"
 ];
@@ -237,7 +244,8 @@ export class Scale extends KeySignature {
         }
 
         // Other method
-        let midPitch = Note.getNaturelNotePitch("CCDDEFFGGAAB"[Note.getNormalizedNoteId(noteId)], octave);
+        // FIXME: simple getPitchByNoteId?
+        let midPitch = getNaturalPitch(noteId);
         let pitchStart = midPitch - 2;
         let pitchEnd = midPitch + 2;
 

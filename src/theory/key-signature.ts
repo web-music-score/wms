@@ -83,7 +83,7 @@ export class KeySignature {
         this.naturalScaleNotes = [];
         this.accidentalByPitch = [];
 
-        let pitch = Note.getNaturelNotePitch(tonic[0]);
+        let pitch = Note.getNotePitch(tonic[0]); // Tonic without # or b, just note letter.
         let noteId = Note.getNote(tonic + "0").noteId;
 
         for (let id = 0; id < 7; pitch++, noteId += intervals[id], id++) {

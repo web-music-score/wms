@@ -80,7 +80,7 @@ export class Note {
             this.octave = Note.validateOctave(octave);
         }
         else if (typeof arg0 === "string" && typeof accidental === "number" && typeof octave === "number") {
-            this.normalizedPitch = Note.getNaturelNotePitch(arg0);
+            this.normalizedPitch = Note.getNotePitch(Note.validateNaturalNote(arg0));
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.validateOctave(octave);
         }
@@ -269,13 +269,14 @@ export class Note {
         return accidental;
     }
 
-    static getNaturelNotePitch(naturalNote: string, octave?: number): number {
-        let pitch = NaturalNoteByPitch.indexOf(Note.validateNaturalNote(naturalNote));
-        if (octave !== undefined) {
-            return Note.getPitchInOctave(pitch, octave);
+    static getNotePitch(noteName: string): number {
+        if (noteName.length === 1) {
+            // naturalNote
+            return NaturalNoteByPitch.indexOf(Note.validateNaturalNote(noteName));
         }
         else {
-            return pitch;
+            // noteName
+            return Note.getNote(noteName).pitch;
         }
     }
 
