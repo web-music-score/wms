@@ -64,11 +64,29 @@ export class Note {
     readonly accidental: Accidental;
     readonly octave: number;
 
-    constructor(pitch: number, accidental: number) {
-        Note.validatePitch(pitch);
-        this.normalizedPitch = Note.getNormalizedPitch(pitch);
-        this.accidental = Note.validateAccidental(accidental);
-        this.octave = Note.getOctaveFromPitch(pitch);
+    constructor(pitch: number, accidental: number);
+    constructor(normalizedPitch: number, accidental: number, octave: number);
+    constructor(naturalNote: string, accidental: number, octave: number);
+    constructor(arg0: number | string, accidental: number, octave?: number) {
+        if (typeof arg0 === "number" && typeof accidental === "number" && octave === undefined) {
+            Note.validatePitch(arg0);
+            this.normalizedPitch = Note.getNormalizedPitch(arg0);
+            this.accidental = Note.validateAccidental(accidental);
+            this.octave = Note.getOctaveFromPitch(arg0);
+        }
+        else if (typeof arg0 === "number" && typeof accidental === "number" && typeof octave === "number") {
+            this.normalizedPitch = Note.validateNormalizedPitch(arg0);
+            this.accidental = Note.validateAccidental(accidental);
+            this.octave = Note.validateOctave(octave);
+        }
+        else if (typeof arg0 === "string" && typeof accidental === "number" && typeof octave === "number") {
+            this.normalizedPitch = Note.getNaturelNotePitch(arg0);
+            this.accidental = Note.validateAccidental(accidental);
+            this.octave = Note.validateOctave(octave);
+        }
+        else {
+            throw new NoteError(`Invalid Note args: ${arg0}, ${accidental}, ${octave}`);
+        }
     }
 
     get pitch(): number {
@@ -130,7 +148,7 @@ export class Note {
                 throw new NoteError(`Octave is required for note.`);
             }
 
-            note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
+            note = new Note(p.naturalNote, p.accidental, p.octave);
 
             this.noteByNameCache.set(noteName, note);
         }
@@ -157,7 +175,7 @@ export class Note {
                     throw new NoteError(`Octave is required for note.`);
                 }
 
-                note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
+                note = new Note(p.naturalNote, p.accidental, p.octave);
 
                 this.noteByIdCache.set(noteId, note);
             }
@@ -286,12 +304,30 @@ export class Note {
         }
     }
 
+    static validateNormalizedPitch(normalizedPitch: number): number {
+        if (Utils.Is.isInteger(normalizedPitch) && normalizedPitch >= 0 && normalizedPitch < 7) {
+            return normalizedPitch;
+        }
+        else {
+            throw new NoteError(`Invalid normalizedPitch: ${normalizedPitch}`);
+        }
+    }
+
     static validateNoteId(noteId: number): number {
         if (Utils.Is.isInteger(noteId)) {
             return noteId;
         }
         else {
             throw new NoteError(`Invalid noteId: ${noteId}`);
+        }
+    }
+
+    static validateNormalizedNoteId(normalizedNoteId: number): number {
+        if (Utils.Is.isInteger(normalizedNoteId) && normalizedNoteId >= 0 && normalizedNoteId < 12) {
+            return normalizedNoteId;
+        }
+        else {
+            throw new NoteError(`Invalid normalizedNoteId: ${normalizedNoteId}`);
         }
     }
 

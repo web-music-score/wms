@@ -188,7 +188,7 @@ export class Scale extends KeySignature {
         let rootNote = this.getScaleNotes("C0", 1)[0];
 
         while (note.noteId >= rootNote.noteId + 12) {
-            note = new Note(note.pitch - 7, note.accidental);
+            note = new Note(note.normalizedPitch, note.accidental, note.octave - 1);
         }
 
         if (note.noteId < rootNote.noteId) {
@@ -223,13 +223,13 @@ export class Scale extends KeySignature {
         // Get the note that belongs to scale
         let scaleNotes = this.scaleNotes.map(accNote => {
             if (accNote.naturalNote === "C" && accNote.accidental < 0) {
-                return new Note(accNote.getPitchInOctave(octave + 1), accNote.accidental)
+                return new Note(accNote.normalizedPitch, accNote.accidental, octave + 1)
             }
             else if (accNote.naturalNote === "B" && accNote.accidental > 0) {
-                return new Note(accNote.getPitchInOctave(octave - 1), accNote.accidental)
+                return new Note(accNote.normalizedPitch, accNote.accidental, octave - 1)
             }
             else {
-                return new Note(accNote.getPitchInOctave(octave), accNote.accidental)
+                return new Note(accNote.normalizedPitch, accNote.accidental, octave)
             }
         });
 
