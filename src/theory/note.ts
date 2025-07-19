@@ -1,6 +1,14 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { Scale } from "./scale";
 import { PitchNotation, SymbolSet } from "./types";
+
+/** @public */
+export class NoteError extends Error {
+    constructor(msg: string) {
+        super(msg);
+        this.name = "NoteError";
+    }
+}
 
 /*
     Refactor:
@@ -108,8 +116,14 @@ export class Note {
         let note = this.noteByNameCache.get(noteName);
 
         if (note === undefined) {
-            let p = Assert.require(Note.parseNote(noteName), "Invalid note: " + noteName);
-            Assert.require(p.octave, "Octave is required for note!");
+            let p = Note.parseNote(noteName);
+
+            if (!p) {
+                throw new NoteError(`Invalid noteName: ${noteName}`);
+            }
+            if (p.octave === undefined) {
+                throw new NoteError(`Octave is required for note.`);
+            }
 
             note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
 
@@ -129,8 +143,14 @@ export class Note {
             if (note === undefined) {
                 const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
                 let noteName = NoteNameList[Note.getNormalizedNoteId(noteId)].split("/")[0] + Note.getOctaveFromNoteId(noteId);
-                let p = Assert.require(Note.parseNote(noteName), "Invalid noteName: " + noteName);
-                Assert.require(p.octave, "Octave is required for note!");
+                let p = Note.parseNote(noteName);
+
+                if (!p) {
+                    throw new NoteError(`Invalid noteName: ${noteName}`);
+                }
+                if (p.octave === undefined) {
+                    throw new NoteError(`Octave is required for note.`);
+                }
 
                 note = new Note(Note.getNaturelNotePitch(p.naturalNote, p.octave), p.accidental);
 
@@ -197,7 +217,10 @@ export class Note {
         let accidentalStr = m[2];
         let octaveStr = m[3];
 
-        let accidental = Assert.require(AccidentalMap.get(accidentalStr), "Invalid accidental: " + accidentalStr);
+        let accidental = AccidentalMap.get(accidentalStr);
+        if (accidental === undefined) {
+            throw new NoteError(`Invalid accidental: ${accidentalStr}`);
+        }
 
         let octave = octaveStr && octaveStr.length > 0 ? Number(octaveStr) : undefined;
 
@@ -209,7 +232,11 @@ export class Note {
     }
 
     static getScientificNoteName(noteName: string, symbolSet: SymbolSet): string {
-        let { naturalNote, accidental, octave } = Assert.require(Note.parseNote(noteName), "Invalid note: " + noteName);
+        let p = Note.parseNote(noteName);
+        if (!p) {
+            throw new NoteError(`Invalid noteName: ${noteName}`);
+        }
+        let { naturalNote, accidental, octave } = p;
         return naturalNote + Note.getAccidentalSymbol(accidental, symbolSet) + (octave ?? "");
     }
 
@@ -219,8 +246,12 @@ export class Note {
             : AccidentalAsciiSymbolMap.get(accidental);
     }
 
-    static getAccidental(accidentalSymbol: string) {
-        return Assert.require(AccidentalMap.get(accidentalSymbol), "Invalid accidental symbol: " + accidentalSymbol);
+    static getAccidental(accidentalSymbol: string): Accidental {
+        let accidental = AccidentalMap.get(accidentalSymbol);
+        if (accidental === undefined) {
+            throw new NoteError(`Invalid accidental: ${accidentalSymbol}`);
+        }
+        return accidental;
     }
 
     static getNaturelNotePitch(naturalNote: string, octave?: number): number {
@@ -238,27 +269,48 @@ export class Note {
     }
 
     static validatePitch(pitch: number): number {
-        return Assert.int_gte(pitch, 0, "Invalid pitch: " + pitch);
-    }
-
-    static validateNormalizedPitch(normalizedPitch: number): number {
-        return Assert.int_between(normalizedPitch, 0, 6, "Invalid normalizedPitch: " + normalizedPitch);
+        if (Utils.Is.isIntegerGte(pitch, 0)) {
+            return pitch;
+        }
+        else {
+            throw new NoteError(`Invalid pitch: ${pitch}`);
+        }
     }
 
     static validateNoteId(noteId: number): number {
-        return Assert.int_gte(noteId, 0, "Invalid noteId: " + noteId);
+        if (Utils.Is.isIntegerGte(noteId, 0)) {
+            return noteId;
+        }
+        else {
+            throw new NoteError(`Invalid noteId: ${noteId}`);
+        }
     }
 
     static validateNaturalNote(note: string): NaturalNote {
-        return Assert.in_group(note, NaturalNoteByPitch, "Invalid natural note: " + note) as NaturalNote;
+        if (NaturalNoteByPitch.some(n => n === note)) {
+            return note as NaturalNote;
+        }
+        else {
+            throw new NoteError(`Invalid note: ${note}`);
+        }
     }
 
     static validateOctave(octave: number): number {
-        return Assert.int_gte(octave, 0, "Invalid octave " + octave);
+        if (Utils.Is.isIntegerGte(octave, 0)) {
+            return octave;
+        }
+        else {
+            throw new NoteError(`Invalid octave: ${octave}`);
+        }
     }
 
     static validateAccidental(acc: number): Accidental {
-        return Assert.int_between(acc, -2, 2, "Invalid accidental: " + acc) as Accidental;
+        if (Utils.Is.isInteger(acc) && acc >= -2 && acc <= 2) {
+            return acc as Accidental;
+        }
+        else {
+            throw new NoteError(`Invalid accidental: ${acc}`);
+        }
     }
 
     /**
