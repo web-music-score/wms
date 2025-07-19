@@ -53,7 +53,7 @@ const AccidentalMap: ReadonlyMap<string, Accidental> = new Map([["", 0], ["bb", 
 const NaturalNoteByPitch: ReadonlyArray<NaturalNote> = ["C", "D", "E", "F", "G", "A", "B"];
 const NoteIdByPitch: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
 
-const NoteNameRule = /^([CDEFGAB])(bb?|b?|#?|x?|𝄫?|♭?|♯?|𝄪?)([0-9]*)$/;
+const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 
 /** @public */
 export class Note {
@@ -110,22 +110,21 @@ export class Note {
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
-        let naturalNote = NaturalNoteByPitch[this.normalizedPitch];
-        let octave = this.octave;
-        let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
+        let { naturalNote, octave } = this;
+        let accidentalSymbol = Note.getAccidentalSymbol(this.accidental, symbolSet);
 
         if (pitchNotation === PitchNotation.Helmholtz) {
             if (octave >= 3) {
                 // c - c′ - c′′ - ...
-                return naturalNote.toLowerCase() + accidental + "′".repeat(octave - 3);
+                return naturalNote.toLowerCase() + accidentalSymbol + "′".repeat(octave - 3);
             }
             else {
                 // C͵ - C͵͵ - C͵͵͵ - ...
-                return naturalNote.toUpperCase() + accidental + "͵".repeat(2 - octave);
+                return naturalNote.toUpperCase() + accidentalSymbol + "͵".repeat(2 - octave);
             }
         }
         else {
-            return naturalNote + accidental + octave;
+            return naturalNote + accidentalSymbol + octave;
         }
     }
 
@@ -231,31 +230,24 @@ export class Note {
     }
 
     static isValidNoteName(noteName: string): boolean {
-        return NoteNameRule.test(noteName);
+        return NoteNameRegex.test(noteName);
     }
 
     static parseNote(noteName: string): Readonly<ParsedNote> | undefined {
-        let m = NoteNameRule.exec(noteName);
+        let m = NoteNameRegex.exec(noteName);
         if (!m) {
             return undefined;
         }
 
-        let naturalNote = m[1];
+        let naturalNote = Note.validateNaturalNote(m[1]);
+
         let accidentalStr = m[2];
+        let accidental = Note.validateAccidental(AccidentalMap.get(accidentalStr) ?? 0);
+
         let octaveStr = m[3];
+        let octave = octaveStr ? Note.validateOctave(+octaveStr) : undefined;
 
-        let accidental = AccidentalMap.get(accidentalStr);
-        if (accidental === undefined) {
-            throw new NoteError(`Invalid accidental: ${accidentalStr}`);
-        }
-
-        let octave = octaveStr && octaveStr.length > 0 ? Number(octaveStr) : undefined;
-
-        return {
-            naturalNote: Note.validateNaturalNote(naturalNote),
-            accidental: Note.validateAccidental(accidental),
-            octave: octave !== undefined ? Note.validateOctave(octave) : undefined
-        }
+        return { naturalNote, accidental, octave }
     }
 
     static getScientificNoteName(noteName: string, symbolSet: SymbolSet): string {
