@@ -81,14 +81,14 @@ export class ObjNoteGroup extends MusicObject {
         this.notes = noteStringData.notes;
 
         this.notes.forEach(note => {
-            let { pitch } = note;
+            let { diatonicId } = note;
             let hasStaff = col.row.hasStaff;
-            let staff = col.row.getStaff(pitch);
+            let staff = col.row.getStaff(diatonicId);
             Assert.assert(!hasStaff || staff, "Note pitch is out of staff boundaries!");
         });
 
-        this.minPitch = this.notes[0].pitch;
-        this.maxPitch = this.notes[this.notes.length - 1].pitch;
+        this.minPitch = this.notes[0].diatonicId;
+        this.maxPitch = this.notes[this.notes.length - 1].diatonicId;
 
         this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, Math.round((this.minPitch + this.maxPitch) / 2));
         this.ownStemDir = this.measure.updateOwnStemDir(this, options?.stem);
@@ -442,17 +442,17 @@ export class ObjNoteGroup extends MusicObject {
         let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;
 
         this.notes.forEach((note, noteIndex) => {
-            let staff = row.getStaff(note.pitch);
+            let staff = row.getStaff(note.diatonicId);
             if (this.staffObjs && staff) {
                 let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                let noteY = staff.getPitchY(note.pitch);
+                let noteY = staff.getPitchY(note.diatonicId);
 
                 // Setup note head
                 let noteHeadRect = this.staffObjs.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
                 // Setup accidental
                 if (accState.needAccidental(note)) {
-                    let acc = this.staffObjs.accidentals[noteIndex] = new ObjAccidental(this, note.pitch, note.accidental, this.color);
+                    let acc = this.staffObjs.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
                     if (acc) {
                         acc.layout(renderer);
                         acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
@@ -462,7 +462,7 @@ export class ObjNoteGroup extends MusicObject {
                 // Setup dot
                 if (dotted) {
                     let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
-                    let dotY = noteY + this.getDotVerticalDisplacement(note.pitch, stemDir) * unitSize;
+                    let dotY = noteY + this.getDotVerticalDisplacement(note.diatonicId, stemDir) * unitSize;
 
                     this.staffObjs.dotRects[noteIndex] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                 }
@@ -474,7 +474,7 @@ export class ObjNoteGroup extends MusicObject {
             let dotX = this.staffObjs.noteHeadRects[0].centerX;
 
             if (stemDir === Stem.Up) {
-                let pitch = this.getBottomNote().pitch;
+                let pitch = this.getBottomNote().diatonicId;
                 let staff = row.getStaff(pitch);
                 if (staff) {
                     let dotY = staff.getPitchY(pitch) + unitSize * (staff.isPitchLine(pitch) ? 3 : 2);
@@ -482,7 +482,7 @@ export class ObjNoteGroup extends MusicObject {
                 }
             }
             else {
-                let pitch = this.getTopNote().pitch;
+                let pitch = this.getTopNote().diatonicId;
                 let staff = row.getStaff(pitch);
                 if (staff) {
                     let dotY = staff.getPitchY(pitch) - unitSize * (staff.isPitchLine(pitch) ? 3 : 2);
@@ -493,8 +493,8 @@ export class ObjNoteGroup extends MusicObject {
 
         if (this.staffObjs) {
             // Calculate stem
-            let bottomNoteY = row.getStaff(this.getBottomNote().pitch)?.getPitchY(this.getBottomNote().pitch);
-            let topNoteY = row.getStaff(this.getTopNote().pitch)?.getPitchY(this.getTopNote().pitch);
+            let bottomNoteY = row.getStaff(this.getBottomNote().diatonicId)?.getPitchY(this.getBottomNote().diatonicId);
+            let topNoteY = row.getStaff(this.getTopNote().diatonicId)?.getPitchY(this.getTopNote().diatonicId);
 
             if (bottomNoteY === undefined || topNoteY === undefined) {
                 Assert.interrupt("bottomNoteY or topNoteY is undefined!");
@@ -833,7 +833,7 @@ export class ObjNoteGroup extends MusicObject {
         for (let i = 0; i < ng1.notes.length; i++) {
             let note1 = ng1.notes[i];
             let note2 = ng2.notes[i];
-            if (note1.pitch !== note2.pitch || note1.accidental !== note2.accidental) {
+            if (note1.diatonicId !== note2.diatonicId || note1.accidental !== note2.accidental) {
                 return false;
             }
         }

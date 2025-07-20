@@ -29,9 +29,9 @@ export class ObjRest extends MusicObject {
         super(col);
 
         let pitch = options?.pitch instanceof Note
-            ? options.pitch.pitch
+            ? options.pitch.diatonicId
             : typeof options?.pitch === "string"
-                ? Note.getNote(options.pitch).pitch
+                ? Note.getNote(options.pitch).diatonicId
                 : options?.pitch;
 
         if (pitch !== undefined) {

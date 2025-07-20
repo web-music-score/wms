@@ -19,7 +19,7 @@ export class MusicStaff {
         this.clefImageAsset = clefKind === ClefKind.Treble ? ImageAsset.TrebleClefPng : ImageAsset.BassClefPng;
         this.topLinePitch = this.middleLinePitch + 4;
         this.bottomLinePitch = this.middleLinePitch - 4;
-        this.octaveLower = this.clefLinePitch === Note.getNote("G3").pitch; // Guitar is played octave lower
+        this.octaveLower = this.clefLinePitch === Note.getNote("G3").diatonicId; // Guitar is played octave lower
     }
 
     topLineY: number = 0;
@@ -43,7 +43,7 @@ export class MusicStaff {
     }
 
     containsPitch(pitch: number): boolean {
-        Note.validatePitch(pitch);
+        Note.validateDiatonicId(pitch);
 
         return pitch >= this.minPitch && pitch <= this.maxPitch;
     }

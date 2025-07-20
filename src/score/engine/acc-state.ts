@@ -13,11 +13,11 @@ export class AccidentalState {
     }
 
     setAccidental(note: Note) {
-        this.accidentalByPitch[note.pitch] = note.accidental;
+        this.accidentalByPitch[note.diatonicId] = note.accidental;
     }
 
     needAccidental(note: Note) {
-        let currentAccidental = this.accidentalByPitch[note.pitch] ?? this.getAccidentalFromKeySignature(note.pitch) ?? 0;
+        let currentAccidental = this.accidentalByPitch[note.diatonicId] ?? this.getAccidentalFromKeySignature(note.diatonicId) ?? 0;
 
         return note.accidental !== currentAccidental;
     }

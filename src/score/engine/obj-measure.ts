@@ -152,11 +152,11 @@ export class ObjMeasure extends MusicObject {
                 pitch = this.row.getTopStaff().middleLinePitch;
             }
             else {
-                pitch = Note.getNote("C4").pitch;
+                pitch = Note.getNote("C4").diatonicId;
             }
         }
 
-        return this.usePitch[voiceId] = Note.validatePitch(pitch);
+        return this.usePitch[voiceId] = Note.validateDiatonicId(pitch);
     }
 
     updateOwnStemDir(symbol: RhythmSymbol, setStemDir?: Stem): Stem.Up | Stem.Down {

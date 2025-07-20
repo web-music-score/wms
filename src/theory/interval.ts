@@ -146,14 +146,14 @@ export class Interval {
     readonly quality: IntervalQuality;
 
     private constructor(readonly note1: Note, readonly note2: Note) {
-        if (note2.pitch >= note1.pitch) {
-            this.direction = note2.pitch === note1.pitch ? "Unison" : "Ascending";
-            this.quantity = note2.pitch - note1.pitch + 1;
+        if (note2.diatonicId >= note1.diatonicId) {
+            this.direction = note2.diatonicId === note1.diatonicId ? "Unison" : "Ascending";
+            this.quantity = note2.diatonicId - note1.diatonicId + 1;
             this.semitones = note2.chromaticId - note1.chromaticId;
         }
         else {
             this.direction = "Descending";
-            this.quantity = note1.pitch - note2.pitch + 1;
+            this.quantity = note1.diatonicId - note2.diatonicId + 1;
             this.semitones = note1.chromaticId - note2.chromaticId;
         }
 

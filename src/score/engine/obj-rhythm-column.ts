@@ -178,12 +178,12 @@ export class ObjRhythmColumn extends MusicObject {
         else if (symbol instanceof ObjNoteGroup) {
             // notes are sorted.
             this.minPitch = this.minPitch === undefined
-                ? symbol.notes[0].pitch
-                : Math.min(this.minPitch, symbol.notes[0].pitch);
+                ? symbol.notes[0].diatonicId
+                : Math.min(this.minPitch, symbol.notes[0].diatonicId);
 
             this.maxPitch = this.maxPitch === undefined
-                ? symbol.notes[symbol.notes.length - 1].pitch
-                : Math.max(this.maxPitch, symbol.notes[symbol.notes.length - 1].pitch);
+                ? symbol.notes[symbol.notes.length - 1].diatonicId
+                : Math.max(this.maxPitch, symbol.notes[symbol.notes.length - 1].diatonicId);
 
             if (symbol.arpeggio !== undefined) {
                 this.arpeggioDir = symbol.arpeggio;
@@ -233,7 +233,7 @@ export class ObjRhythmColumn extends MusicObject {
             let cur = this.noteHeadDisplacements[i];
             let next = this.noteHeadDisplacements[i + 1];
 
-            if (next && cur.note.pitch === next.note.pitch) {
+            if (next && cur.note.diatonicId === next.note.diatonicId) {
                 cur.displacement = next.displacement = 0;
             }
         }
@@ -249,10 +249,10 @@ export class ObjRhythmColumn extends MusicObject {
 
             let d: -1 | 1 = cur.noteGroup.stemDir === Stem.Down ? -1 : 1;
 
-            if (prev && cur.note.pitch - prev.note.pitch <= 1) {
+            if (prev && cur.note.diatonicId - prev.note.diatonicId <= 1) {
                 cur.displacement = prev.displacement === 0 ? d : 0;
             }
-            else if (next && next.note.pitch - cur.note.pitch <= 1) {
+            else if (next && next.note.diatonicId - cur.note.diatonicId <= 1) {
                 cur.displacement = next.displacement === 0 ? d : 0;
             }
         }
@@ -272,7 +272,7 @@ export class ObjRhythmColumn extends MusicObject {
     getLowestNotePitch(pitch: number): number {
         return Math.min(pitch, ...this.voiceSymbol.map(s => {
             return s instanceof ObjNoteGroup
-                ? Math.min(...s.notes.map(n => n.pitch))
+                ? Math.min(...s.notes.map(n => n.diatonicId))
                 : s.ownAvgPitch;
         }));
     }
@@ -286,7 +286,7 @@ export class ObjRhythmColumn extends MusicObject {
             }
 
             let hasSamePitch = playerNotes.some(n => {
-                if (note.pitch === n.note.pitch && note.accidental === n.note.accidental) {
+                if (note.diatonicId === n.note.diatonicId && note.accidental === n.note.accidental) {
                     // If note with same pitch already in list then set note length to max.
                     n.ticks = Math.max(n.ticks, ticks);
                     return true;

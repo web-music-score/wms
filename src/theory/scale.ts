@@ -12,11 +12,11 @@ export class ScaleError extends Error {
     }
 }
 
-function getNaturalPitch(chromaticId: number): number {
-    // ChromaticId could map to several pitch/accidental combinations.
-    let pitch = Note.getNoteLetterPitch("CCDDEFFGGAAB"[Note.getChromaticClass(chromaticId)]);
+function getNaturalDiatonicId(chromaticId: number): number {
+    // ChromaticId could map to several diatonicId/accidental combinations.
+    let diatonicClass = Note.getDiatonicClass("CCDDEFFGGAAB"[Note.getChromaticClass(chromaticId)]);
     let octave = Note.getOctaveFromChromaticId(chromaticId);
-    return Note.getPitchInOctave(pitch, octave);
+    return Note.getDiatonicIdInOctave(diatonicClass, octave);
 }
 
 const FullTonicList: ReadonlyArray<string> = [
@@ -152,11 +152,11 @@ export class Scale extends KeySignature {
 
         scaleNoteList.push(this.scaleNotes[0]);
 
-        let bottomPitch = Note.getNote(bottomNote).pitch;
+        let diatonicId = Note.getNote(bottomNote).diatonicId;
 
         return scaleNoteList.map(note => {
-            bottomPitch = Note.findNextPitchAbove(note.pitch, bottomPitch, false);
-            return new Note(bottomPitch, note.accidental);
+            diatonicId = Note.findNextDiatonicIdAbove(note.diatonicId, diatonicId, false);
+            return new Note(diatonicId, note.accidental);
         });
     }
 
@@ -244,17 +244,17 @@ export class Scale extends KeySignature {
         }
 
         // Other method
-        let midPitch = getNaturalPitch(chromaticId);
-        let pitchStart = midPitch - 2;
-        let pitchEnd = midPitch + 2;
+        let diatonicIdMid = getNaturalDiatonicId(chromaticId);
+        let diatonicIdStart = diatonicIdMid - 2;
+        let diatonicIdEnd = diatonicIdMid + 2;
 
         let preferFlat = this.getAccidentalType() === AccidentalType.Flats;
         let preferredAccs = preferFlat ? [0, -1, 1, -2, 2] : [0, 1, -1, 2, -2];
 
         for (let ai = 0; ai < preferredAccs.length; ai++) {
             let acc = preferredAccs[ai];
-            for (let pitch = Math.max(0, pitchStart); pitch <= pitchEnd; pitch++) {
-                let note = new Note(pitch, acc);
+            for (let diatonicId = Math.max(0, diatonicIdStart); diatonicId <= diatonicIdEnd; diatonicId++) {
+                let note = new Note(diatonicId, acc);
                 if (chromaticId === note.chromaticId) {
                     let isScaleNote = false;
                     let isScaleRootNote = false;

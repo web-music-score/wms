@@ -15,9 +15,6 @@ export class NoteError extends Error {
 }
 
 /*
-    Refactor:
-    pitch  => diatonicId
-
     C-1: chromaticId = 0,  diatonicId = 0
     C0:  chromaticId = 12, diatonicId = 7
     C1:  chromaticId = 24, diatonicId = 14
@@ -31,7 +28,7 @@ export class NoteError extends Error {
 */
 
 const C0_chromaticId = 12;
-const C0_pitch = 7;
+const C0_diatonicId = 7;
 
 /** @public */
 export type Accidental = -2 | -1 | 0 | 1 | 2;
@@ -60,16 +57,16 @@ export class Note {
     readonly accidental: Accidental;
     readonly octave: number;
 
-    constructor(pitch: number, accidental: number);
+    constructor(diatonicId: number, accidental: number);
     constructor(diatonicClass: number, accidental: number, octave: number);
     constructor(noteLetter: string, accidental: number, octave: number);
     constructor(arg: number | string, accidental: number, octave?: number) {
         if (typeof arg === "number" && typeof accidental === "number" && octave === undefined) {
-            // arg is pitch
-            Note.validatePitch(arg);
+            // arg is diatonicId
+            Note.validateDiatonicId(arg);
             this.diatonicClass = Note.getDiatonicClass(arg);
             this.accidental = Note.validateAccidental(accidental);
-            this.octave = Note.getOctaveFromPitch(arg);
+            this.octave = Note.getOctaveFromDiatonicId(arg);
         }
         else if (typeof arg === "number" && typeof accidental === "number" && typeof octave === "number") {
             // arg is diatonicClass
@@ -79,7 +76,7 @@ export class Note {
         }
         else if (typeof arg === "string" && typeof accidental === "number" && typeof octave === "number") {
             // arg is noteLetter
-            this.diatonicClass = Note.getNoteLetterPitch(arg);
+            this.diatonicClass = Note.getDiatonicClass(arg);
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.validateOctave(octave);
         }
@@ -88,8 +85,8 @@ export class Note {
         }
     }
 
-    get pitch(): number {
-        return Note.getPitchInOctave(this.diatonicClass, this.octave);
+    get diatonicId(): number {
+        return Note.getDiatonicIdInOctave(this.diatonicClass, this.octave);
     }
 
     get chromaticId(): number {
@@ -182,16 +179,28 @@ export class Note {
         }
     }
 
-    static getDiatonicClass(pitch: number) {
-        return mod(pitch, 7);
+    static getDiatonicClass(diatonicId: number): number;
+    static getDiatonicClass(noteLetter: string): number;
+    static getDiatonicClass(arg: number | string): number {
+        if (typeof arg === "number") {
+            // arg is diatonicId
+            return mod(arg, 7);
+        }
+        else if (typeof arg === "string") {
+            // arg is noteLetter
+            return NoteLetters.indexOf(Note.validateNoteLetter(arg));
+        }
+        else {
+            throw new NoteError(`Invalid getDiatonicClass arg: ${arg}`);
+        }
     }
 
-    static getOctaveFromPitch(pitch: number) {
-        return Math.floor((pitch - C0_pitch) / 7);
+    static getOctaveFromDiatonicId(diatonicId: number) {
+        return Math.floor((diatonicId - C0_diatonicId) / 7);
     }
 
-    static getPitchInOctave(pitch: number, octave: number) {
-        return Note.getDiatonicClass(pitch) + octave * 7 + C0_pitch;
+    static getDiatonicIdInOctave(diatonicId: number, octave: number) {
+        return Note.getDiatonicClass(diatonicId) + octave * 7 + C0_diatonicId;
     }
 
     static getChromaticClass(chromaticId: number) {
@@ -215,7 +224,7 @@ export class Note {
             return false;
         }
         else {
-            return a === b || a.pitch === b.pitch && a.accidental === b.accidental;
+            return a === b || a.diatonicId === b.diatonicId && a.accidental === b.accidental;
         }
     }
 
@@ -272,31 +281,27 @@ export class Note {
         return accidental;
     }
 
-    static getNoteLetterPitch(noteLetter: string): number {
-        return NoteLetters.indexOf(Note.validateNoteLetter(noteLetter));
+    static getNoteLetter(diatonicId: number): NoteLetter {
+        return NoteLetters[Note.getDiatonicClass(diatonicId)];
     }
 
-    static getNoteLetter(pitch: number): NoteLetter {
-        return NoteLetters[Note.getDiatonicClass(pitch)];
-    }
-
-    static findNextPitchAbove(pitch: number, bottomPitch: number, addOctaveIfEqual: boolean): number {
-        let diatonicClass = Note.getDiatonicClass(pitch);
-        let bottomDiatonicClass = Note.getDiatonicClass(bottomPitch);
+    static findNextDiatonicIdAbove(diatonicId: number, bottomDiatonicId: number, addOctaveIfEqual: boolean): number {
+        let diatonicClass = Note.getDiatonicClass(diatonicId);
+        let bottomDiatonicClass = Note.getDiatonicClass(bottomDiatonicId);
 
         let addOctave = addOctaveIfEqual
             ? (diatonicClass <= bottomDiatonicClass ? 1 : 0)
             : (diatonicClass < bottomDiatonicClass ? 1 : 0);
 
-        return Note.getPitchInOctave(diatonicClass, Note.getOctaveFromPitch(bottomPitch) + addOctave);
+        return Note.getDiatonicIdInOctave(diatonicClass, Note.getOctaveFromDiatonicId(bottomDiatonicId) + addOctave);
     }
 
-    static validatePitch(pitch: number): number {
-        if (Utils.Is.isInteger(pitch)) {
-            return pitch;
+    static validateDiatonicId(diatonicId: number): number {
+        if (Utils.Is.isInteger(diatonicId)) {
+            return diatonicId;
         }
         else {
-            throw new NoteError(`Invalid pitch: ${pitch}`);
+            throw new NoteError(`Invalid diatonicId: ${diatonicId}`);
         }
     }
 
@@ -355,7 +360,7 @@ export class Note {
     }
 
     /**
-     * Sort notes by pitch in ascending order.
+     * Sort notes by diatonicId in ascending order.
      * @param notes - Array of notes.
      * @returns Sorted array of notes.
      */
@@ -381,10 +386,10 @@ export class Note {
     }
 
     static compareFunc(a: Note, b: Note) {
-        if (a.pitch < b.pitch) {
+        if (a.diatonicId < b.diatonicId) {
             return -1;
         }
-        else if (a.pitch > b.pitch) {
+        else if (a.diatonicId > b.diatonicId) {
             return 1;
         }
         else {

@@ -11,7 +11,7 @@ import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { DocumentSettings } from "./settings";
 
-const p = (noteName: string) => Note.getNote(noteName).pitch;
+const p = (noteName: string) => Note.getNote(noteName).diatonicId;
 
 const createStaff_Treble = () => new MusicStaff(ClefKind.Treble, p("G4"), p("B4"), p("C3"), p("C7"));
 const createStaff_GuitarTreble = () => new MusicStaff(ClefKind.Treble, p("G3"), p("B3"), p("C2"), p("C6"));
@@ -106,7 +106,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     getStaff(pitch: number): MusicStaff | undefined {
-        Note.validatePitch(pitch);
+        Note.validateDiatonicId(pitch);
 
         for (let i = 0; i < this.staves.length; i++) {
             let staff = this.staves[i];

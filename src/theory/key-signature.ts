@@ -2,8 +2,8 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 
-function getAccidental(chromaticId: number, pitch: number): Accidental {
-    let a = Note.getChromaticClass(chromaticId) - new Note(pitch, 0).chromaticClass;
+function getAccidental(chromaticId: number, diatonicId: number): Accidental {
+    let a = Note.getChromaticClass(chromaticId) - new Note(diatonicId, 0).chromaticClass;
     while (a > 2) { a -= 12; }
     while (a < -2) { a += 12; }
     return Note.validateAccidental(a);
@@ -62,7 +62,7 @@ export class KeySignature {
     private static readonly OrderOfFlats = "BEADGCF";
 
     private readonly naturalScaleNotes: Note[];
-    private readonly accidentalByPitch: Accidental[];
+    private readonly accidentalByDiatonicClass: Accidental[];
     private readonly orderedAccidentedNotes: Note[];
 
     /**
@@ -81,20 +81,20 @@ export class KeySignature {
         }
 
         this.naturalScaleNotes = [];
-        this.accidentalByPitch = [];
+        this.accidentalByDiatonicClass = [];
 
-        let pitch = Note.getNoteLetterPitch(tonic[0]); // Tonic without # or b, just note letter.
+        let diatonicId = Note.getDiatonicClass(tonic[0]); // Tonic without #, b, etc., just note letter.
         let chromaticId = Note.getNote(tonic + "0").chromaticId;
 
-        for (let id = 0; id < 7; pitch++, chromaticId += intervals[id], id++) {
-            let note = new Note(Note.getDiatonicClass(pitch), getAccidental(chromaticId, pitch));
+        for (let id = 0; id < 7; diatonicId++, chromaticId += intervals[id], id++) {
+            let note = new Note(Note.getDiatonicClass(diatonicId), getAccidental(chromaticId, diatonicId));
 
             if (Math.abs(note.accidental) >= 2) {
                 throw new KeySignatureError("Key signature contains double accidental.");
             }
 
             this.naturalScaleNotes[id] = note;
-            this.accidentalByPitch[note.pitch] = note.accidental;
+            this.accidentalByDiatonicClass[note.diatonicClass] = note.accidental;
         }
 
         let sharps = this.naturalScaleNotes.filter(n => n.accidental > 0).sort((a, b) => {
@@ -138,8 +138,8 @@ export class KeySignature {
         return this.naturalScaleNotes;
     }
 
-    getAccidental(pitch: number): Accidental {
-        return this.accidentalByPitch[Note.getDiatonicClass(pitch)] ?? 0;
+    getAccidental(diatonicId: number): Accidental {
+        return this.accidentalByDiatonicClass[Note.getDiatonicClass(diatonicId)] ?? 0;
     }
 
     getNumAccidentals(): number {
@@ -162,7 +162,7 @@ export class KeySignature {
         }
         else {
             let note = this.naturalScaleNotes[(deg - 1) % 7];
-            return new Note(note.pitch, note.accidental + acc);
+            return new Note(note.diatonicId, note.accidental + acc);
         }
     }
 

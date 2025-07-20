@@ -78,7 +78,7 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
 
             scaleNotes.forEach((rootNote, rootNoteIndex) => {
                 const addChord = (...degrees: number[]) => {
-                    let notes = degrees.map(d => new Theory.Note(rootNote.pitch + d - 1, scaleNotes[(rootNoteIndex + d - 1) % 7].accidental));
+                    let notes = degrees.map(d => new Theory.Note(rootNote.diatonicId + d - 1, scaleNotes[(rootNoteIndex + d - 1) % 7].accidental));
                     let chordName = (Theory.Chord.getChords(notes)[0] ?? "?").toString();
                     let chordOrder = Utils.Math.romanize(rootNoteIndex % 7 + 1);
                     m.addChord(0, notes, Theory.NoteLength.Quarter);

@@ -161,7 +161,7 @@ export class Chord {
                 throw new InvalidChordException("Missing chord note!");
             }
 
-            // Make sure bassNote has same pitch and accidental as equal degreeNote
+            // Make sure bassNote has same diatonicId/accidental as equal degreeNote
             if (isEqualNote(bassNote, degreeNote)) {
                 bassNote = degreeNote;
             }
