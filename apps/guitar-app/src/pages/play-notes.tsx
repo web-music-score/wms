@@ -57,14 +57,16 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             }
         }
 
-        const onClickPitch = (pickedPitch: Score.PickedPitch) => {
-            let { pitch } = pickedPitch;
+        const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
+            let pitch = event.diatonicId;
+
+            if(event.eventType !== "click" || pitch === undefined) {
+                return;
+            }
+
             let { accidental } = this.state;
-
             let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
-
             Audio.playNote(note);
-
             this.setState({ selectedNote: note });
         }
 
@@ -96,7 +98,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
 
                 <Row xs="auto">
                     <Col>
-                        <ScoreUI.MusicScoreView doc={doc} onClickPitch={onClickPitch} />
+                        <ScoreUI.MusicScoreView doc={doc} onScoreEvent={onScoreEvent} />
                     </Col>
                 </Row>
             </Container>

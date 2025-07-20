@@ -70,9 +70,13 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
             intervalAbbr = iv ? iv.toAbbrString() : "?";
         }
 
-        const onClickPitch = (pickedPitch: Score.PickedPitch) => {
+        const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
             let { note1, note2, accidental } = this.state;
-            let { pitch } = pickedPitch;
+            let pitch = event.diatonicId;
+
+            if (event.eventType !== "click" || pitch === undefined) {
+                return;
+            }
 
             let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
 
@@ -111,7 +115,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
                 <Row xs="auto">
                     <Col>
-                        <ScoreUI.MusicScoreView doc={doc} onClickPitch={onClickPitch} />
+                        <ScoreUI.MusicScoreView doc={doc} onScoreEvent={onScoreEvent} />
                     </Col>
                 </Row>
 

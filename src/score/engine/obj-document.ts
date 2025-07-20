@@ -5,7 +5,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { DivRect, DocumentOptions, MDocument, PickedPitch, StaffPreset } from "../pub";
+import { DivRect, DocumentOptions, MDocument, StaffPreset } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
@@ -292,7 +292,7 @@ export class ObjDocument extends MusicObject {
         }
     }
 
-    pickPitch(x: number, y: number): PickedPitch | undefined {
+    pickPitch(x: number, y: number): number | undefined {
         if (!this.rect.contains(x, y)) {
             return undefined;
         }
@@ -311,7 +311,7 @@ export class ObjDocument extends MusicObject {
             let pitch = row.getPitchAt(y);
 
             if (pitch !== undefined) {
-                return { scoreRow: row.getMusicInterface(), pitch };
+                return pitch;
             }
         }
 

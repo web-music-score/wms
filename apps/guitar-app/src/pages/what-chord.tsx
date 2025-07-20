@@ -107,7 +107,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             this.setState({ stringFrettingPos: newStringFrettingPos, selectedNote: newSelectedNote });
         }
 
-        const onScoreSelectObject = (arr: Score.MusicInterface[]) => {
+        const selectObject = (arr: Score.MusicInterface[]) => {
             for (let i = 0; i < arr.length; i++) {
                 if (arr[i] instanceof Score.MNoteGroup) {
                     return arr[i];
@@ -116,7 +116,13 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             return undefined;
         }
 
-        const onScoreClickObject = (obj: Score.MusicInterface) => {
+        const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
+            if (event.eventType !== "click") {
+                return;
+            }
+
+            let obj = selectObject(event.objectStack);
+
             if (obj instanceof Score.MNoteGroup && obj.getNotes().length === 1) {
                 let note = obj.getNotes()[0];
                 Audio.playNote(note);
@@ -167,7 +173,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             <Container>
                 <Row xs="auto">
                     <Col>
-                        <ScoreUI.MusicScoreView doc={doc} onSelectObject={onScoreSelectObject} onClickObject={onScoreClickObject} />
+                        <ScoreUI.MusicScoreView doc={doc} onScoreEvent={onScoreEvent} />
                     </Col>
                 </Row>
                 <Row xs="auto">

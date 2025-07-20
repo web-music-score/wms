@@ -80,16 +80,16 @@ export type DocumentOptions = {
 }
 
 /** @public */
-export type PickedPitch = { pitch: number, scoreRow: MScoreRow }
+export interface ScoreEvent {
+    eventType: "click" | "hover";
+    objectStack: MusicInterface[];
+    selectedObject?: MusicInterface;
+    scoreRow?: MScoreRow;
+    diatonicId?: number;
+}
 
 /** @public */
-export type ClickPitchListener = (pickedPitch: PickedPitch) => void;
-
-/** @public */
-export type ClickObjectSelector = (arr: MusicInterface[]) => MusicInterface | undefined;
-
-/** @public */
-export type ClickObjectListener = (obj: MusicInterface) => void;
+export type ScoreEventListener = (event: ScoreEvent) => void;
 
 /** @public */
 export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;

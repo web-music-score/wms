@@ -46,8 +46,8 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             this.setState({ instrument });
         }
 
-        const onSelectObject = (arr: Score.MusicInterface[]) => {
-            let selObj = arr[arr.length - 1];
+        const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
+            let selObj = event.selectedObject;
             if (selObj) {
                 this.setState({ hoverText: selObj.name + " Object" });
             }
@@ -83,7 +83,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             <br />
             {hoverText}
             <br />
-            <ScoreUI.MusicScoreView doc={doc} onClickObject={() => { }} onSelectObject={onSelectObject} />
+            <ScoreUI.MusicScoreView doc={doc} onScoreEvent={onScoreEvent} />
         </div >
     }
 }

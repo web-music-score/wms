@@ -1,12 +1,10 @@
 import * as React from "react";
-import { MDocument, MRenderer, ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "@tspro/web-music-score/score";
+import { MDocument, MRenderer, ScoreEventListener } from "@tspro/web-music-score/score";
 
 /** @public */
 export interface MusicScoreViewProps {
     doc: MDocument;
-    onClickPitch?: ClickPitchListener;
-    onSelectObject?: ClickObjectSelector;
-    onClickObject?: ClickObjectListener;
+    onScoreEvent?: ScoreEventListener;
 }
 
 /**
@@ -29,16 +27,8 @@ export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
 
         this.renderer.setDocument(props.doc);
 
-        if (props.onClickPitch) {
-            this.renderer.setClickPitchListener(props.onClickPitch);
-        }
-
-        if (props.onSelectObject) {
-            this.renderer.setClickObjectSelector(props.onSelectObject);
-        }
-
-        if (props.onClickObject) {
-            this.renderer.setClickObjectListener(props.onClickObject);
+        if (props.onScoreEvent) {
+            this.renderer.setScoreEventListener(props.onScoreEvent);
         }
     }
 

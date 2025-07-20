@@ -26,7 +26,7 @@ import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, Tie, VoiceId, getStringNumbers, getVoiceIds } from "./types";
-import { NoteAnchor, Arpeggio, ClickObjectListener, ClickObjectSelector, ClickPitchListener } from "./types";
+import { NoteAnchor, Arpeggio, ScoreEventListener } from "./types";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
 import { isNumber } from "tone";
 
@@ -719,19 +719,9 @@ export class MRenderer {
         return this;
     }
 
-    setClickPitchListener(fn: ClickPitchListener) {
-        assert_t(Utils.Is.isFunctionOrUndefined(fn), "clickPitchListener");
-        this.renderer.setClickPitchListener(fn);
-    }
-
-    setClickObjectSelector(fn?: ClickObjectSelector) {
-        assert_t(Utils.Is.isFunctionOrUndefined(fn), "clickObjectSelector");
-        this.renderer.setClickObjectSelector(fn);
-    }
-
-    setClickObjectListener(fn?: ClickObjectListener) {
-        assert_t(Utils.Is.isFunctionOrUndefined(fn), "clickObjectListener");
-        this.renderer.setClickObjectListener(fn);
+    setScoreEventListener(fn: ScoreEventListener) {
+        assert_t(Utils.Is.isFunctionOrUndefined(fn), "scoreEventListener");
+        this.renderer.setScoreEventListener(fn);
     }
 
     draw() {

@@ -1,6 +1,6 @@
 import { Utils, Vec2, Device, Assert } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MusicInterface, MDocument, DivRect, ClickObjectListener, ClickObjectSelector, ClickPitchListener, PickedPitch } from "../pub";
+import { MusicInterface, MDocument, DivRect, ScoreEventListener, MScoreRow } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 
@@ -33,10 +33,7 @@ export class Renderer {
     readonly lineWidth: number;
     readonly beamThickness: number;
 
-    private clickPitchListener?: ClickPitchListener;
-
-    private clickObjectSelector?: ClickObjectSelector;
-    private clickObjectListener?: ClickObjectListener;
+    private scoreEventListener?: ScoreEventListener;
 
     private canvas?: HTMLCanvasElement;
     private ctx?: CanvasRenderingContext2D;
@@ -45,7 +42,8 @@ export class Renderer {
 
     private cursorRect?: DivRect;
     private mousePos?: Vec2; // Mouse coord in document space
-    private hilightPitch?: PickedPitch;
+    private hilightPitch?: number;
+    private hilightPitchRow?: ObjScoreRow;
     private hilightObj?: MusicInterface;
     private usingTouch = false;
 
@@ -141,27 +139,19 @@ export class Renderer {
         this.ctx = this.canvas?.getContext("2d") ?? undefined;
     }
 
-    setClickPitchListener(fn: ClickPitchListener) {
-        this.clickPitchListener = fn;
+    setScoreEventListener(fn: ScoreEventListener) {
+        this.scoreEventListener = fn;
         if (this.doc) {
             // Request layout to full pitch range
             this.doc.requestFullLayout();
         }
     }
 
-    setClickObjectSelector(fn?: ClickObjectSelector) {
-        this.clickObjectSelector = fn;
+    needMouseInput(): boolean {
+        return this.scoreEventListener !== undefined;
     }
 
-    setClickObjectListener(fn?: ClickObjectListener) {
-        this.clickObjectListener = fn;
-    }
-
-    needMouseInput() {
-        return this.clickPitchListener || this.clickObjectListener;
-    }
-
-    getMousePos(e: MouseEvent) {
+    getMousePos(e: MouseEvent): Vec2 {
         return new Vec2(e.offsetX, e.offsetY);
     }
 
@@ -174,23 +164,22 @@ export class Renderer {
 
         this.mousePos = this.txFromScreenCoord(this.getMousePos(e));
 
-        if (this.clickPitchListener) {
-            let pickedPitch = doc.pickPitch(this.mousePos.x, this.mousePos.y);
-            if (pickedPitch !== undefined) {
-                this.clickPitchListener(pickedPitch);
-                this.draw();
-            }
-        }
-
-        if (this.clickObjectListener) {
+        if (this.scoreEventListener) {
             let arr = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-            if (arr.length > 0) {
-                let selObj = this.clickObjectSelector ? this.clickObjectSelector(arr) : arr[arr.length - 1];
-                if (selObj) {
-                    this.clickObjectListener(selObj);
-                }
-                this.draw();
-            }
+            let selObj = arr.length > 0 ? arr[arr.length - 1] : undefined;
+
+            let scoreRow = arr.find(o => o instanceof MScoreRow);
+            let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
+
+            this.scoreEventListener({
+                eventType: "click",
+                objectStack: arr,
+                selectedObject: selObj,
+                scoreRow,
+                diatonicId
+            });
+
+            this.draw();
         }
     }
 
@@ -204,27 +193,26 @@ export class Renderer {
         this.mousePos = this.txFromScreenCoord(this.getMousePos(e));
 
         if (!this.usingTouch) {
-            if (this.clickPitchListener) {
-                let oldHilightPitch = this.hilightPitch;
-                this.hilightPitch = doc.pickPitch(this.mousePos.x, this.mousePos.y);
-
-                if (this.hilightPitch?.scoreRow !== oldHilightPitch?.scoreRow || this.hilightPitch?.pitch !== oldHilightPitch?.pitch) {
-                    this.draw();
-                }
-            }
-
-            if (this.clickObjectListener) {
-                let oldHilightObj = this.hilightObj;
+            if (this.scoreEventListener) {
                 let arr = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-                if (arr.length > 0) {
-                    let selObj = this.clickObjectSelector ? this.clickObjectSelector(arr) : arr[arr.length - 1];
-                    this.hilightObj = selObj;
-                }
-                else {
-                    this.hilightObj = undefined;
-                }
+                let selObj = arr.length > 0 ? arr[arr.length - 1] : undefined;
 
-                if (this.hilightObj !== oldHilightObj) {
+                let scoreRow = arr.find(o => o instanceof MScoreRow);
+                let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
+
+                if (selObj !== this.hilightObj || scoreRow !== this.hilightPitchRow || diatonicId !== this.hilightPitch) {
+                    this.scoreEventListener({
+                        eventType: "hover",
+                        objectStack: arr,
+                        selectedObject: selObj,
+                        scoreRow,
+                        diatonicId
+                    });
+
+                    this.hilightPitch = diatonicId;
+                    this.hilightPitchRow = scoreRow?.getMusicObject();
+                    this.hilightObj = selObj;
+
                     this.draw();
                 }
             }
@@ -298,25 +286,24 @@ export class Renderer {
 
     drawHilightPitchRect() {
         let ctx = this.getCanvasContext();
-        let { mousePos, hilightPitch, unitSize } = this;
+        let { mousePos, hilightPitch, hilightPitchRow, unitSize } = this;
 
-        if (!ctx || hilightPitch === undefined) {
+        if (!ctx || hilightPitch === undefined || hilightPitchRow === undefined) {
             return;
         }
 
-        let { scoreRow, pitch } = hilightPitch;
-        let row = scoreRow.getMusicObject();
-        let staff = row.getStaff(pitch);
+        let row = hilightPitchRow;
+        let staff = row.getStaff(hilightPitch);
 
         if (!staff) {
             return;
         }
 
         ctx.fillStyle = HilightPitchRectColor;
-        ctx.fillRect(0, staff.getPitchY(pitch) - unitSize, ctx.canvas.width, 2 * unitSize);
+        ctx.fillRect(0, staff.getPitchY(hilightPitch) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
-            this.drawLedgerLines(row, pitch, mousePos.x);
+            this.drawLedgerLines(row, hilightPitch, mousePos.x);
         }
     }
 

@@ -173,7 +173,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => selectNote(guitarNote);
 
-        const onScoreSelectObject = (arr: Score.MusicInterface[]) => {
+        const selectObject = (arr: Score.MusicInterface[]) => {
             for (let i = 0; i < arr.length; i++) {
                 if (arr[i] instanceof Score.MNoteGroup) {
                     return arr[i];
@@ -182,7 +182,13 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
             return undefined;
         }
 
-        const onScoreClickObject = (obj: Score.MusicInterface) => {
+        const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
+            if (event.eventType !== "click") {
+                return;
+            }
+
+            let obj = selectObject(event.objectStack);
+
             if (obj instanceof Score.MNoteGroup) {
                 let note = obj.getNotes()[0];
                 let scaleNote = variant?.notes.find(n => n.chromaticId === note.chromaticId);
@@ -229,7 +235,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                 </Row>
                 <Row xs="auto">
                     <Col>
-                        <ScoreUI.MusicScoreView doc={doc} onSelectObject={onScoreSelectObject} onClickObject={onScoreClickObject} />
+                        <ScoreUI.MusicScoreView doc={doc} onScoreEvent={onScoreEvent} />
                     </Col>
                 </Row>
 
