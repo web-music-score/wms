@@ -58,16 +58,19 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
         }
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            if (event.type !== "click" || !(event instanceof Score.ScoreStaffPosEvent)) {
+            if (!(event instanceof Score.ScoreStaffPosEvent)) {
                 return;
             }
 
-            let pitch = event.diatonicId;
+            event.renderer.hilightStaffPos(event.row, event.diatonicId);
 
-            let { accidental } = this.state;
-            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
-            Audio.playNote(note);
-            this.setState({ selectedNote: note });
+            if (event.type === "click") {
+                let { diatonicId } = event;
+                let { accidental } = this.state;
+                let note = new Theory.Note(diatonicId, accidental ?? guitarCtx.scale.getAccidental(diatonicId));
+                Audio.playNote(note);
+                this.setState({ selectedNote: note });
+            }
         }
 
         const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {

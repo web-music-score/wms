@@ -71,24 +71,29 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
         }
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            if (event.type !== "click" || !(event instanceof Score.ScoreStaffPosEvent)) {
+            if (!(event instanceof Score.ScoreStaffPosEvent)) {
                 return;
             }
 
-            let { note1, note2, accidental } = this.state;
-            let pitch = event.diatonicId;
+            let { row, diatonicId } = event;
 
-            let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
+            event.renderer.hilightStaffPos(row, diatonicId);
 
-            if (note1 === undefined || note1 !== undefined && note2 !== undefined) {
-                this.setState({ note1: note, note2: undefined });
+            if (event.type === "click") {
+                let { note1, note2, accidental } = this.state;
+
+                let note = new Theory.Note(diatonicId, accidental ?? guitarCtx.scale.getAccidental(diatonicId));
+
+                if (note1 === undefined || note1 !== undefined && note2 !== undefined) {
+                    this.setState({ note1: note, note2: undefined });
+                }
+                else if (note1 !== undefined && note2 === undefined) {
+                    [note1, note2] = [note1, note];
+                    this.setState({ note1, note2 });
+                }
+
+                Audio.playNote(note);
             }
-            else if (note1 !== undefined && note2 === undefined) {
-                [note1, note2] = [note1, note];
-                this.setState({ note1, note2 });
-            }
-
-            Audio.playNote(note);
         }
 
         const onChangeAccidental = (accidental: Theory.Accidental | undefined) => {

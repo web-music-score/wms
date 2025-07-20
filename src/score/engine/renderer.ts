@@ -1,11 +1,12 @@
 import { Utils, Vec2, Device, Assert } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MusicInterface, MDocument, DivRect, ScoreEventListener, MScoreRow, ScoreStaffPosEvent, ScoreObjectEvent } from "../pub";
+import { MDocument, DivRect, ScoreEventListener, MScoreRow, ScoreStaffPosEvent, ScoreObjectEvent, MRenderer } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 
 import TrebleClefPng from "./assets/treble-clef.png";
 import BassClefPng from "./assets/bass-clef.png";
+import { MusicObject } from "./music-object";
 
 export enum ImageAsset { TrebleClefPng, BassClefPng }
 
@@ -42,9 +43,13 @@ export class Renderer {
 
     private cursorRect?: DivRect;
     private mousePos?: Vec2; // Mouse coord in document space
-    private hilightPitch?: number;
-    private hilightPitchRow?: ObjScoreRow;
-    private hilightObj?: MusicInterface;
+
+    private hoverPitch?: { row: ObjScoreRow, diatonicId: number };
+    private hoverObj?: MusicObject;
+
+    private hilightPitch?: { row: ObjScoreRow, diatonicId: number };
+    private hilightObj?: MusicObject;
+
     private usingTouch = false;
 
     private onClickFn: (e: MouseEvent) => void;
@@ -52,7 +57,7 @@ export class Renderer {
     private onMouseLeaveFn: (e: MouseEvent) => void;
     private onTouchEndFn: (e: TouchEvent) => void;
 
-    constructor() {
+    constructor(private readonly mi: MRenderer) {
         this.devicePixelRatio = window.devicePixelRatio;
         this.fontSize = Device.FontSize * DocumentSettings.DocumentScale * this.devicePixelRatio;
         this.unitSize = this.fontSize * 0.3;
@@ -79,6 +84,10 @@ export class Renderer {
         this.onMouseMoveFn = this.onMouseMove.bind(this);
         this.onMouseLeaveFn = this.onMouseLeave.bind(this);
         this.onTouchEndFn = this.onTouchEnd.bind(this);
+    }
+
+    getMusicInterface(): MRenderer {
+        return this.mi;
     }
 
     get doc(): ObjDocument | undefined {
@@ -166,16 +175,15 @@ export class Renderer {
 
         if (this.scoreEventListener) {
             let arr = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-            let selObj = arr.length > 0 ? arr[arr.length - 1] : undefined;
 
             let scoreRow = arr.find(o => o instanceof MScoreRow);
             let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
 
             if (scoreRow !== undefined && diatonicId !== undefined) {
-                this.scoreEventListener(new ScoreStaffPosEvent("click", scoreRow, diatonicId));
+                this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), scoreRow, diatonicId));
             }
             if (arr.length > 0) {
-                this.scoreEventListener(new ScoreObjectEvent("click", arr));
+                this.scoreEventListener(new ScoreObjectEvent("click", this.getMusicInterface(), arr));
             }
 
             this.draw();
@@ -194,22 +202,21 @@ export class Renderer {
         if (!this.usingTouch) {
             if (this.scoreEventListener) {
                 let arr = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-                let selObj = arr.length > 0 ? arr[arr.length - 1] : undefined;
+                let curObj = arr.length > 0 ? arr[arr.length - 1] : undefined;
 
                 let scoreRow = arr.find(o => o instanceof MScoreRow);
                 let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
 
-                if (selObj !== this.hilightObj || scoreRow !== this.hilightPitchRow || diatonicId !== this.hilightPitch) {
+                if (curObj !== this.hoverObj || scoreRow !== this.hoverPitch?.row || diatonicId !== this.hoverPitch?.diatonicId) {
                     if (scoreRow !== undefined && diatonicId !== undefined) {
-                        this.scoreEventListener(new ScoreStaffPosEvent("hover", scoreRow, diatonicId));
+                        this.scoreEventListener(new ScoreStaffPosEvent("hover", this.getMusicInterface(), scoreRow, diatonicId));
                     }
                     if (arr.length > 0) {
-                        this.scoreEventListener(new ScoreObjectEvent("hover", arr));
+                        this.scoreEventListener(new ScoreObjectEvent("hover", this.getMusicInterface(), arr));
                     }
 
-                    this.hilightPitch = diatonicId;
-                    this.hilightPitchRow = scoreRow?.getMusicObject();
-                    this.hilightObj = selObj;
+                    this.hoverPitch = scoreRow && diatonicId !== undefined ? { row: scoreRow.getMusicObject(), diatonicId } : undefined
+                    this.hoverObj = curObj?.getMusicObject();
 
                     this.draw();
                 }
@@ -223,8 +230,8 @@ export class Renderer {
         }
 
         this.mousePos = undefined;
-        this.hilightPitch = undefined;
-        this.hilightObj = undefined;
+        this.hoverObj = undefined;
+        this.hoverPitch = undefined;
 
         this.draw();
     }
@@ -238,6 +245,14 @@ export class Renderer {
             this.doc.requestFullLayout();
             this.draw();
         }
+    }
+
+    hilightObject(obj?: MusicObject) {
+        this.hilightObj = obj;
+    }
+
+    hilightStaffPos(row?: ObjScoreRow, diatonicId?: number) {
+        this.hilightPitch = row && diatonicId !== undefined ? { row, diatonicId } : undefined;
     }
 
     updateCursorRect(cursorRect: DivRect | undefined) {
@@ -284,24 +299,24 @@ export class Renderer {
 
     drawHilightPitchRect() {
         let ctx = this.getCanvasContext();
-        let { mousePos, hilightPitch, hilightPitchRow, unitSize } = this;
+        let { mousePos, hilightPitch, unitSize } = this;
 
-        if (!ctx || hilightPitch === undefined || hilightPitchRow === undefined) {
+        if (!ctx || hilightPitch === undefined) {
             return;
         }
 
-        let row = hilightPitchRow;
-        let staff = row.getStaff(hilightPitch);
+        let { row, diatonicId } = hilightPitch;
+        let staff = row.getStaff(diatonicId);
 
         if (!staff) {
             return;
         }
 
         ctx.fillStyle = HilightPitchRectColor;
-        ctx.fillRect(0, staff.getPitchY(hilightPitch) - unitSize, ctx.canvas.width, 2 * unitSize);
+        ctx.fillRect(0, staff.getPitchY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
-            this.drawLedgerLines(row, hilightPitch, mousePos.x);
+            this.drawLedgerLines(row, diatonicId, mousePos.x);
         }
     }
 
@@ -313,7 +328,7 @@ export class Renderer {
             return;
         }
 
-        let rect = hilightObj.getMusicObject().getRect();
+        let rect = hilightObj.getRect();
 
         ctx.strokeStyle = HilightObjectRectColor;
         ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);

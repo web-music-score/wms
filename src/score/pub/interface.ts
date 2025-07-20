@@ -701,7 +701,7 @@ export class MRenderer {
     private readonly renderer: Renderer;
 
     constructor() {
-        this.renderer = new Renderer();
+        this.renderer = new Renderer(this);
     }
 
     setDocument(doc?: MDocument) {
@@ -723,6 +723,14 @@ export class MRenderer {
     setScoreEventListener(fn: ScoreEventListener) {
         assert_t(Utils.Is.isFunctionOrUndefined(fn), "scoreEventListener");
         this.renderer.setScoreEventListener(fn);
+    }
+
+    hilightObject(obj?: MusicInterface) {
+        this.renderer.hilightObject(obj?.getMusicObject());
+    }
+
+    hilightStaffPos(row?: MScoreRow, diatonicId?: number) {
+        this.renderer.hilightStaffPos(row?.getMusicObject(), diatonicId);
     }
 
     draw() {

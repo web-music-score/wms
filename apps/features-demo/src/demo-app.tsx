@@ -48,7 +48,9 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
             if (event instanceof Score.ScoreObjectEvent) {
-                this.setState({ hoverText: event.top.name + " Object" });
+                let hoverObj = event.top;
+                event.renderer.hilightObject(hoverObj);
+                this.setState({ hoverText: hoverObj.name + " Object" });
             }
         }
 

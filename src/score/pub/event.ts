@@ -1,6 +1,6 @@
 import { Assert } from "@tspro/ts-utils-lib";
 import { DivRect } from "./div-rect";
-import { MScoreRow, MusicInterface } from "./interface";
+import { MRenderer, MScoreRow, MusicInterface } from "./interface";
 
 /** @public */
 export type ScoreEventType = "click" | "hover";
@@ -12,14 +12,14 @@ export abstract class ScoreEvent {
 
 /** @public */
 export class ScoreStaffPosEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly row: MScoreRow, readonly diatonicId: number) {
+    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly row: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
 }
 
 /** @public */
 export class ScoreObjectEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly arr: MusicInterface[]) {
+    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly arr: MusicInterface[]) {
         super(type);
         Assert.assert(arguments.length > 0, "Score object event empty array!");
     }

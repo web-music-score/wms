@@ -108,19 +108,23 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
         }
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            if (event.type !== "click" || !(event instanceof Score.ScoreObjectEvent)) {
+            if (!(event instanceof Score.ScoreObjectEvent)) {
                 return;
             }
 
             let obj = event.find(obj => obj instanceof Score.MNoteGroup);
 
-            if (obj instanceof Score.MNoteGroup && obj.getNotes().length === 1) {
-                let note = obj.getNotes()[0];
-                Audio.playNote(note);
-                this.setState({ selectedNote: note });
-            }
-            else {
-                this.setState({ selectedNote: undefined });
+            event.renderer.hilightObject(obj);
+
+            if (event.type === "click") {
+                if (obj instanceof Score.MNoteGroup && obj.getNotes().length === 1) {
+                    let note = obj.getNotes()[0];
+                    Audio.playNote(note);
+                    this.setState({ selectedNote: note });
+                }
+                else {
+                    this.setState({ selectedNote: undefined });
+                }
             }
         }
 

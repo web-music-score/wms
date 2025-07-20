@@ -174,21 +174,25 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => selectNote(guitarNote);
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            if (event.type !== "click" || !(event instanceof Score.ScoreObjectEvent)) {
+            if (!(event instanceof Score.ScoreObjectEvent)) {
                 return;
             }
 
             let obj = event.find(obj => obj instanceof Score.MNoteGroup);
 
-            if (obj instanceof Score.MNoteGroup) {
-                let note = obj.getNotes()[0];
-                let scaleNote = variant?.notes.find(n => n.chromaticId === note.chromaticId);
-                if (scaleNote) {
-                    selectNote(scaleNote);
+            event.renderer.hilightObject(obj);
+
+            if (event.type === "click") {
+                if (obj instanceof Score.MNoteGroup) {
+                    let note = obj.getNotes()[0];
+                    let scaleNote = variant?.notes.find(n => n.chromaticId === note.chromaticId);
+                    if (scaleNote) {
+                        selectNote(scaleNote);
+                    }
                 }
-            }
-            else {
-                this.setState({ selectedNote: undefined });
+                else {
+                    this.setState({ selectedNote: undefined });
+                }
             }
         }
 
