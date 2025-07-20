@@ -66,7 +66,7 @@ export type NoteOptions = {
 /** @public */
 export type RestOptions = {
     dotted?: boolean,
-    pitch?: string | Note,
+    staffPos?: Note | string | number, // Note, "C3", or midiNumber
     color?: string,
     hide?: boolean,
     triplet?: boolean

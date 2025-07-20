@@ -44,10 +44,10 @@ class NoteTabObjects {
 }
 
 export class ObjNoteGroup extends MusicObject {
-    readonly minPitch: number;
-    readonly maxPitch: number;
+    readonly minDiantoicId: number;
+    readonly maxDiatnoicId: number;
 
-    readonly ownAvgPitch: number;
+    readonly ownDiatonicId: number; // Average diatonicId of notes.
     readonly ownStemDir: Stem.Up | Stem.Down;
     readonly ownString: StringNumber[];
 
@@ -87,10 +87,10 @@ export class ObjNoteGroup extends MusicObject {
             Assert.assert(!hasStaff || staff, "Note pitch is out of staff boundaries!");
         });
 
-        this.minPitch = this.notes[0].diatonicId;
-        this.maxPitch = this.notes[this.notes.length - 1].diatonicId;
+        this.minDiantoicId = this.notes[0].diatonicId;
+        this.maxDiatnoicId = this.notes[this.notes.length - 1].diatonicId;
 
-        this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, Math.round((this.minPitch + this.maxPitch) / 2));
+        this.ownDiatonicId = this.measure.updateOwnDiatonicId(voiceId, Math.round((this.minDiantoicId + this.maxDiatnoicId) / 2));
         this.ownStemDir = this.measure.updateOwnStemDir(this, options?.stem);
         this.ownString = this.measure.updateOwnString(this, noteStringData.strings);
 

@@ -166,13 +166,8 @@ export class ObjRhythmColumn extends MusicObject {
 
         if (symbol instanceof ObjRest) {
             if (!symbol.hide && symbol.noteLength >= NoteLength.Half) {
-                this.minPitch = this.minPitch === undefined
-                    ? symbol.ownAvgPitch
-                    : Math.min(this.minPitch, symbol.ownAvgPitch);
-
-                this.maxPitch = this.maxPitch === undefined
-                    ? symbol.ownAvgPitch
-                    : Math.max(this.maxPitch, symbol.ownAvgPitch);
+                this.minPitch = this.minPitch === undefined ? symbol.ownDiatonicId : Math.min(this.minPitch, symbol.ownDiatonicId);
+                this.maxPitch = this.maxPitch === undefined ? symbol.ownDiatonicId : Math.max(this.maxPitch, symbol.ownDiatonicId);
             }
         }
         else if (symbol instanceof ObjNoteGroup) {
@@ -273,7 +268,7 @@ export class ObjRhythmColumn extends MusicObject {
         return Math.min(pitch, ...this.voiceSymbol.map(s => {
             return s instanceof ObjNoteGroup
                 ? Math.min(...s.notes.map(n => n.diatonicId))
-                : s.ownAvgPitch;
+                : s.ownDiatonicId;
         }));
     }
 

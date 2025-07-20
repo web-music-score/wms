@@ -36,13 +36,13 @@ export function createTiesAndSlursDemo() {
         .setKeySignature("D", Theory.ScaleType.Major)
         .setTimeSignature("3/4")
         .addNote(1, "G3", Theory.NoteLength.Half, { dotted: true, stem: Score.Stem.Down })
-        .addRest(0, Theory.NoteLength.Quarter, { pitch: "D5" })
+        .addRest(0, Theory.NoteLength.Quarter, { staffPos: "D5" })
         .addChord(0, ["A4", "B4"], Theory.NoteLength.Quarter, { stem: Score.Stem.Up, tieSpan: 2 })
         .addChord(0, ["G4", "B4"], Theory.NoteLength.Quarter);
 
     doc.addMeasure()
         .addNote(1, "D4", Theory.NoteLength.Half, { dotted: true, tieSpan: 2, tieAnchor: Score.NoteAnchor.Below, stem: Score.Stem.Down })
-        .addRest(0, Theory.NoteLength.Half, { pitch: "D5" })
+        .addRest(0, Theory.NoteLength.Half, { staffPos: "D5" })
         .addChord(0, ["A4", "C#5", "F#5"], Theory.NoteLength.Quarter, { tieSpan: 2, stem: Score.Stem.Up });
 
     doc.addMeasure()

@@ -38,10 +38,10 @@ export function createNoteHeadsDemo() {
         .setKeySignature("D", Theory.ScaleType.Major)
         .setTimeSignature("3/4")
         .addNote(0, "D4", Theory.NoteLength.Quarter, { stem: Score.Stem.Up })
-        .addRest(1, Theory.NoteLength.Quarter, { pitch: "D3" })
+        .addRest(1, Theory.NoteLength.Quarter, { staffPos: "D3" })
         .addNote(0, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Up }) // Stem up... 
         .addNote(1, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Down }) // ...and down
-        .addRest(1, Theory.NoteLength.Quarter, { pitch: "B3" });
+        .addRest(1, Theory.NoteLength.Quarter, { staffPos: "B3" });
 
     doc.addMeasure()
         .setKeySignature("G", Theory.ScaleType.Major)

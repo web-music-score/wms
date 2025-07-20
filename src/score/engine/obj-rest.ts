@@ -8,6 +8,22 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 
+function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
+    if (typeof staffPos === "number") {
+        // staffPos is midiNumber/chromaticId
+        return Note.getChromaticNote(staffPos).diatonicId;
+    }
+    else if (typeof staffPos === "string") {
+        return Note.getNote(staffPos).diatonicId;
+    }
+    else if (staffPos instanceof Note) {
+        return staffPos.diatonicId;
+    }
+    else {
+        return undefined;
+    }
+}
+
 class RestStaffObjects {
     public dotRect = new DivRect();
     public beamGroup?: ObjBeamGroup;
@@ -15,7 +31,7 @@ class RestStaffObjects {
 
 export class ObjRest extends MusicObject {
     readonly ownStemDir: Stem.Up | Stem.Down;
-    readonly ownAvgPitch: number;
+    readonly ownDiatonicId: number;
 
     readonly color: string;
     readonly hide: boolean;
@@ -28,20 +44,22 @@ export class ObjRest extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, noteLength: NoteLength, options?: RestOptions) {
         super(col);
 
-        let pitch = options?.pitch instanceof Note
-            ? options.pitch.diatonicId
-            : typeof options?.pitch === "string"
-                ? Note.getNote(options.pitch).diatonicId
-                : options?.pitch;
+        let diatonicId = getDiatonicIdFromStaffPos(options?.staffPos);
 
-        if (pitch !== undefined) {
+        if (diatonicId !== undefined) {
+            let staff = this.row.getStaff(diatonicId);
             let hasStaff = col.row.hasStaff;
-            let staff = col.row.getStaff(pitch);
-            Assert.assert(!hasStaff || staff, "Rest pitch is out of staff boundaries!");
+            Assert.assert(!hasStaff || staff, "Rest staffPos is out of staff boundaries!");
         }
 
-        this.ownAvgPitch = this.measure.updateOwnAvgPitch(voiceId, pitch);
+        this.ownDiatonicId = this.measure.updateOwnDiatonicId(voiceId, diatonicId);
         this.ownStemDir = this.measure.updateOwnStemDir(this/*, options?.stem*/);
+
+        // Make sure ownDiatonicId is line, not space
+        let staff = this.row.getStaff(this.ownDiatonicId);
+        if (staff && staff.isPitchSpace(this.ownDiatonicId)) {
+            this.ownDiatonicId += this.ownDiatonicId >= staff.middleLinePitch ? 1 : -1;
+        }
 
         this.color = options?.color ?? "black";
         this.hide = options?.hide ?? false;
@@ -141,7 +159,7 @@ export class ObjRest extends MusicObject {
         }
 
         let { unitSize } = renderer;
-        let { ownAvgPitch } = this;
+        let { ownDiatonicId } = this;
         let { noteLength, dotted, flagCount } = this.rhythmProps;
 
         let leftw = 0;
@@ -190,13 +208,9 @@ export class ObjRest extends MusicObject {
 
         this.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
-        let restPitch = ownAvgPitch;
-
-        // Make sure restPitch is line, not space
-        let staff = this.row.getStaff(restPitch);
-        if (staff && staff.isPitchSpace(restPitch)) {
-            restPitch += restPitch >= staff.middleLinePitch ? 1 : -1;
-            this.offset(0, staff.getPitchY(restPitch));
+        let staff = this.row.getStaff(ownDiatonicId);
+        if (staff) {
+            this.offset(0, staff.getPitchY(ownDiatonicId));
         }
     }
 

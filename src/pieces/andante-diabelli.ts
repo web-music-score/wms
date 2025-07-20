@@ -11,7 +11,7 @@ export function createAndanteByDiabelli(): MDocument {
         .setKeySignature("D", ScaleType.Major)
         .setTimeSignature("3/4")
         .setTempo(80)
-        .addRest(0, NoteLength.Eighth, { pitch: "G4" }).addAnnotation(Annotation.Dynamics, "p")
+        .addRest(0, NoteLength.Eighth, { staffPos: "G4" }).addAnnotation(Annotation.Dynamics, "p")
         .addNote(0, "F#4", NoteLength.Eighth, { stem: Stem.Up })
         .addNote(0, "G4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "F#4", NoteLength.Eighth)
@@ -28,7 +28,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "A2", NoteLength.Half, { dotted: true });
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "f")
+        .addRest(0, NoteLength.Eighth, { staffPos: "B3" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "A3", NoteLength.Eighth)
@@ -46,7 +46,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "D3", NoteLength.Half, { dotted: true });
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "G4" }).addAnnotation(Annotation.Dynamics, "p")
+        .addRest(0, NoteLength.Eighth, { staffPos: "G4" }).addAnnotation(Annotation.Dynamics, "p")
         .addNote(0, "F#4", NoteLength.Eighth)
         .addNote(0, "G4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "F#4", NoteLength.Eighth)
@@ -64,7 +64,7 @@ export function createAndanteByDiabelli(): MDocument {
         .endRow();
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "f")
+        .addRest(0, NoteLength.Eighth, { staffPos: "B3" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "A3", NoteLength.Eighth)
@@ -74,14 +74,14 @@ export function createAndanteByDiabelli(): MDocument {
 
     doc.addMeasure()
         .addNote(0, "D4", NoteLength.Quarter)
-        .addRest(1, NoteLength.Quarter, { pitch: "D3" })
+        .addRest(1, NoteLength.Quarter, { staffPos: "D3" })
         .addNote(0, "D3", NoteLength.Quarter) // Stem up...
         .addNote(1, "D3", NoteLength.Quarter) // ...and down
-        .addRest(1, NoteLength.Quarter, { pitch: "B3" })
+        .addRest(1, NoteLength.Quarter, { staffPos: "B3" })
         .addNavigation(Navigation.EndRepeat);
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "D4" }).addAnnotation(Annotation.Dynamics, "f")
+        .addRest(0, NoteLength.Eighth, { staffPos: "D4" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "D4", NoteLength.Eighth)
         .addNote(0, "E4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "D4", NoteLength.Eighth)
@@ -99,7 +99,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "A2", NoteLength.Half, { dotted: true });
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "p")
+        .addRest(0, NoteLength.Eighth, { staffPos: "B3" }).addAnnotation(Annotation.Dynamics, "p")
         .addNote(0, "E3", NoteLength.Eighth)
         .addNote(0, "D#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "E3", NoteLength.Eighth)
@@ -117,7 +117,7 @@ export function createAndanteByDiabelli(): MDocument {
         .endRow();
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "G4" }).addAnnotation(Annotation.Dynamics, "f")
+        .addRest(0, NoteLength.Eighth, { staffPos: "G4" }).addAnnotation(Annotation.Dynamics, "f")
         .addNote(0, "G4", NoteLength.Eighth)
         .addNote(0, "A4", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "G4", NoteLength.Eighth)
@@ -134,7 +134,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "D3", NoteLength.Half, { dotted: true });
 
     doc.addMeasure()
-        .addRest(0, NoteLength.Eighth, { pitch: "B3" }).addAnnotation(Annotation.Dynamics, "ff")
+        .addRest(0, NoteLength.Eighth, { staffPos: "B3" }).addAnnotation(Annotation.Dynamics, "ff")
         .addNote(0, "A3", NoteLength.Eighth)
         .addNote(0, "G#3", NoteLength.Eighth, { slurSpan: 2, slurAnchor: NoteAnchor.Below })
         .addNote(0, "A3", NoteLength.Eighth)
@@ -144,10 +144,10 @@ export function createAndanteByDiabelli(): MDocument {
 
     doc.addMeasure()
         .addNote(0, "D4", NoteLength.Quarter)
-        .addRest(1, NoteLength.Quarter, { pitch: "D3" })
+        .addRest(1, NoteLength.Quarter, { staffPos: "D3" })
         .addNote(0, "D3", NoteLength.Quarter) // Stem up... 
         .addNote(1, "D3", NoteLength.Quarter) // ...and down
-        .addRest(1, NoteLength.Quarter, { pitch: "B3" })
+        .addRest(1, NoteLength.Quarter, { staffPos: "B3" })
         .endSong();
 
     return doc;

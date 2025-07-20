@@ -225,7 +225,7 @@ m.addRest(0, Theory.NoteLength.Sixteenth);
 | Rest option | Type         |                     |
 |-------------|--------------|---------------------|
 | dotted      | `boolean`    | Create dotted rest. |
-| pitch       | `string`     | Positions this rest at pitch level (e.g. `"C3"`). |
+| staffPos    | `string`     | Staff positions (e.g. `"C3"`). |
 | hide        | `boolean`    | Add invisible rest. |
 | triplet     | `boolean`    | Set this rest part of triplet. |
 

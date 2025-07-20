@@ -57,7 +57,7 @@ export class ObjMeasure extends MusicObject {
     private minColumnsAreaWidth = 0;
     private rightSolidAreaWidth = 0;
 
-    private usePitch: (number | undefined)[/* voiceId */] = [];
+    private useDiatnoicId: (number | undefined)[/* voiceId */] = [];
     private useStemDir: (Stem | undefined)[/* voiceId */] = [];
     private useString: (StringNumber[] | undefined)[/* voiceId */] = [];
 
@@ -133,19 +133,19 @@ export class ObjMeasure extends MusicObject {
         return this.passCount;
     }
 
-    updateOwnAvgPitch(voiceId: number, setPitch?: number): number {
+    updateOwnDiatonicId(voiceId: number, setPitch?: number): number {
         if (typeof setPitch == "number") {
-            this.usePitch[voiceId] = setPitch;
+            this.useDiatnoicId[voiceId] = setPitch;
         }
-        else if (this.usePitch[voiceId] === undefined) {
+        else if (this.useDiatnoicId[voiceId] === undefined) {
             let prevMeasure = this.getPrevMeasure();
 
-            if (prevMeasure && prevMeasure.usePitch[voiceId] !== undefined) {
-                this.usePitch[voiceId] = prevMeasure.usePitch[voiceId];
+            if (prevMeasure && prevMeasure.useDiatnoicId[voiceId] !== undefined) {
+                this.useDiatnoicId[voiceId] = prevMeasure.useDiatnoicId[voiceId];
             }
         }
 
-        let pitch = this.usePitch[voiceId];
+        let pitch = this.useDiatnoicId[voiceId];
 
         if (pitch === undefined) {
             if (this.row.hasStaff) {
@@ -156,7 +156,7 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        return this.usePitch[voiceId] = Note.validateDiatonicId(pitch);
+        return this.useDiatnoicId[voiceId] = Note.validateDiatonicId(pitch);
     }
 
     updateOwnStemDir(symbol: RhythmSymbol, setStemDir?: Stem): Stem.Up | Stem.Down {
@@ -172,9 +172,9 @@ export class ObjMeasure extends MusicObject {
         let stemDir = this.useStemDir[voiceId];
 
         if (stemDir === Stem.Auto || stemDir === undefined) {
-            let staff = this.row.getStaff(symbol.ownAvgPitch);
+            let staff = this.row.getStaff(symbol.ownDiatonicId);
             if (staff) {
-                return symbol.ownAvgPitch > staff.middleLinePitch ? Stem.Down : Stem.Up;
+                return symbol.ownDiatonicId > staff.middleLinePitch ? Stem.Down : Stem.Up;
             }
             else {
                 return Stem.Up;

@@ -77,7 +77,7 @@ function assertNoteOptions(options: NoteOptions) {
 function assertRestOptions(options: RestOptions) {
     assert_t(Utils.Is.isObject(options), "restOptions");
     assert_t(Utils.Is.isBooleanOrUndefined(options.dotted), "restOptions.dotted");
-    assert_t(Utils.Is.isUndefined(options.pitch) || Utils.Is.isString(options.pitch) || options.pitch instanceof Note, "restOptions.pitch");
+    assert_t(Utils.Is.isStringOrUndefined(options.staffPos) || Utils.Is.isInteger(options.staffPos) || options.staffPos instanceof Note, "restOptions.staffPos");
     assert_t(Utils.Is.isStringOrUndefined(options.color), "restOptions.color");
     assert_t(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide");
     assert_t(Utils.Is.isBooleanOrUndefined(options.triplet), "restOptions.triplet");

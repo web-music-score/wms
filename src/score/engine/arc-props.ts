@@ -61,7 +61,7 @@ export class ArcProps {
         else if (this.arcAnchor === NoteAnchor.Center) {
             let { row } = this.noteGroups[0].measure;
 
-            let notePitch = this.noteGroups[0].ownAvgPitch;
+            let notePitch = this.noteGroups[0].ownDiatonicId;
             let staff = row.getStaff(notePitch);
 
             this.arcDir = !staff || notePitch < staff.middleLinePitch ? "down" : "up";
