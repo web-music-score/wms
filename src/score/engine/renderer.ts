@@ -44,10 +44,10 @@ export class Renderer {
     private cursorRect?: DivRect;
     private mousePos?: Vec2; // Mouse coord in document space
 
-    private hoverPitch?: { row: ObjScoreRow, diatonicId: number };
+    private hoverPitch?: { scoreRow: ObjScoreRow, diatonicId: number };
     private hoverObj?: MusicObject;
 
-    private hilightedStaffPos?: { row: ObjScoreRow, diatonicId: number };
+    private hilightedStaffPos?: { scoreRow: ObjScoreRow, diatonicId: number };
     private hilightedObj?: MusicObject;
 
     private usingTouch = false;
@@ -207,7 +207,7 @@ export class Renderer {
                 let scoreRow = arr.find(o => o instanceof MScoreRow);
                 let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
 
-                if (curObj !== this.hoverObj || scoreRow !== this.hoverPitch?.row || diatonicId !== this.hoverPitch?.diatonicId) {
+                if (curObj !== this.hoverObj || scoreRow !== this.hoverPitch?.scoreRow || diatonicId !== this.hoverPitch?.diatonicId) {
                     if (scoreRow !== undefined && diatonicId !== undefined) {
                         this.scoreEventListener(new ScoreStaffPosEvent("hover", this.getMusicInterface(), scoreRow, diatonicId));
                     }
@@ -215,7 +215,7 @@ export class Renderer {
                         this.scoreEventListener(new ScoreObjectEvent("hover", this.getMusicInterface(), arr));
                     }
 
-                    this.hoverPitch = scoreRow && diatonicId !== undefined ? { row: scoreRow.getMusicObject(), diatonicId } : undefined
+                    this.hoverPitch = scoreRow && diatonicId !== undefined ? { scoreRow: scoreRow.getMusicObject(), diatonicId } : undefined
                     this.hoverObj = curObj?.getMusicObject();
 
                     this.draw();
@@ -251,7 +251,7 @@ export class Renderer {
         this.hilightedObj = obj;
     }
 
-    hilightStaffPos(staffPos?: { row: ObjScoreRow, diatonicId: number }) {
+    hilightStaffPos(staffPos?: { scoreRow: ObjScoreRow, diatonicId: number }) {
         this.hilightedStaffPos = staffPos;
     }
 
@@ -305,8 +305,8 @@ export class Renderer {
             return;
         }
 
-        let { row, diatonicId } = hilightedStaffPos;
-        let staff = row.getStaff(diatonicId);
+        let { scoreRow, diatonicId } = hilightedStaffPos;
+        let staff = scoreRow.getStaff(diatonicId);
 
         if (!staff) {
             return;
@@ -316,7 +316,7 @@ export class Renderer {
         ctx.fillRect(0, staff.getPitchY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
-            this.drawLedgerLines(row, diatonicId, mousePos.x);
+            this.drawLedgerLines(scoreRow, diatonicId, mousePos.x);
         }
     }
 

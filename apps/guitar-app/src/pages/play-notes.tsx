@@ -62,7 +62,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
                 return;
             }
 
-            event.renderer.hilightStaffPos(event); // event contains { row, diatonicId }
+            event.renderer.hilightStaffPos(event); // event contains { scoreRow, diatonicId }
 
             if (event.type === "click") {
                 let { diatonicId } = event;

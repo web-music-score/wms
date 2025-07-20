@@ -729,9 +729,9 @@ export class MRenderer {
         this.renderer.hilightObject(obj?.getMusicObject());
     }
 
-    hilightStaffPos(staffPos?: { row: MScoreRow, diatonicId: number }) {
+    hilightStaffPos(staffPos?: { scoreRow: MScoreRow, diatonicId: number }) {
         this.renderer.hilightStaffPos(staffPos ? {
-            row: staffPos.row.getMusicObject(),
+            scoreRow: staffPos.scoreRow.getMusicObject(),
             diatonicId: staffPos.diatonicId
         } : undefined);
     }

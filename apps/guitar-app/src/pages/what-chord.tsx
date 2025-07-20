@@ -112,7 +112,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
                 return;
             }
 
-            let obj = event.find(obj => obj instanceof Score.MNoteGroup);
+            let obj = event.findObject(obj => obj instanceof Score.MNoteGroup);
 
             event.renderer.hilightObject(obj);
 

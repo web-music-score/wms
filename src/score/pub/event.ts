@@ -12,22 +12,24 @@ export abstract class ScoreEvent {
 
 /** @public */
 export class ScoreStaffPosEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly row: MScoreRow, readonly diatonicId: number) {
+    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
 }
 
 /** @public */
 export class ScoreObjectEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly arr: MusicInterface[]) {
+    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly objects: MusicInterface[]) {
         super(type);
         Assert.assert(arguments.length > 0, "Score object event empty array!");
     }
-    get top(): MusicInterface {
-        return this.arr[this.arr.length - 1];
+    
+    get topObject(): MusicInterface {
+        return this.objects[this.objects.length - 1];
     }
-    find(fn: (obj: MusicInterface) => boolean): MusicInterface |undefined {
-        return this.arr.find(obj => fn(obj));
+    
+    findObject(fn: (obj: MusicInterface) => boolean): MusicInterface |undefined {
+        return this.objects.find(obj => fn(obj));
     }
 }
 
