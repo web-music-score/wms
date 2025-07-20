@@ -12,10 +12,10 @@ export class ScaleError extends Error {
     }
 }
 
-function getNaturalPitch(noteId: number): number {
-    // NoteId could map to several pitch/accidental combinations.
-    let pitch = Note.getNoteLetterPitch("CCDDEFFGGAAB"[Note.getChromaticClass(noteId)]);
-    let octave = Note.getOctaveFromNoteId(noteId);
+function getNaturalPitch(chromaticId: number): number {
+    // ChromaticId could map to several pitch/accidental combinations.
+    let pitch = Note.getNoteLetterPitch("CCDDEFFGGAAB"[Note.getChromaticClass(chromaticId)]);
+    let octave = Note.getOctaveFromChromaticId(chromaticId);
     return Note.getPitchInOctave(pitch, octave);
 }
 
@@ -165,10 +165,10 @@ export class Scale extends KeySignature {
     }
 
     getScaleSteps(): number[] {
-        let noteIds = this.getScaleNotes("C4", 1).map(note => note.noteId);
+        let chromaticIds = this.getScaleNotes("C4", 1).map(note => note.chromaticId);
         let steps: number[] = [];
-        for (let i = 0; i < noteIds.length - 1; i++) {
-            steps.push(Utils.Math.mod(noteIds[i + 1] - noteIds[i], 12));
+        for (let i = 0; i < chromaticIds.length - 1; i++) {
+            steps.push(Utils.Math.mod(chromaticIds[i + 1] - chromaticIds[i], 12));
         }
         return steps;
     }
@@ -178,23 +178,23 @@ export class Scale extends KeySignature {
     }
 
     isScaleNote(note: Note): boolean {
-        let n = this.getPreferredChromaticNote(note.noteId);
+        let n = this.getPreferredChromaticNote(note.chromaticId);
         return Note.equals(n.note, note) && n.isScaleNote;
     }
 
     isScaleRootNote(note: Note): boolean {
-        let n = this.getPreferredChromaticNote(note.noteId);
+        let n = this.getPreferredChromaticNote(note.chromaticId);
         return Note.equals(n.note, note) && n.isScaleRootNote;
     }
 
     getIntervalFromRootNote(note: Note): Interval {
         let rootNote = this.getScaleNotes("C0", 1)[0];
 
-        while (note.noteId >= rootNote.noteId + 12) {
+        while (note.chromaticId >= rootNote.chromaticId + 12) {
             note = new Note(note.diatonicClass, note.accidental, note.octave - 1);
         }
 
-        if (note.noteId < rootNote.noteId) {
+        if (note.chromaticId < rootNote.chromaticId) {
             throw new ScaleError(`Note is below rootNote.`);
         }
 
@@ -208,20 +208,20 @@ export class Scale extends KeySignature {
         }
     }
 
-    getPreferredNote(noteId: number): Note {
-        return this.getPreferredChromaticNote(noteId).note;
+    getPreferredNote(chromaticId: number): Note {
+        return this.getPreferredChromaticNote(chromaticId).note;
     }
 
     private preferredChromaticNoteCache: PreferredChromaticNote[] = [];
 
-    private getPreferredChromaticNote(noteId: number): PreferredChromaticNote {
-        Note.validateNoteId(noteId);
+    private getPreferredChromaticNote(chromaticId: number): PreferredChromaticNote {
+        Note.validateChromaticId(chromaticId);
 
-        if (this.preferredChromaticNoteCache[noteId]) {
-            return this.preferredChromaticNoteCache[noteId];
+        if (this.preferredChromaticNoteCache[chromaticId]) {
+            return this.preferredChromaticNoteCache[chromaticId];
         }
 
-        let octave = Note.getOctaveFromNoteId(noteId);
+        let octave = Note.getOctaveFromChromaticId(chromaticId);
 
         // Get the note that belongs to scale
         let scaleNotes = this.scaleNotes.map(accNote => {
@@ -236,16 +236,15 @@ export class Scale extends KeySignature {
             }
         });
 
-        let scaleNote = scaleNotes.find(note => Note.getChromaticClass(noteId) === note.chromaticClass);
+        let scaleNote = scaleNotes.find(note => Note.getChromaticClass(chromaticId) === note.chromaticClass);
         if (scaleNote) {
             let isScaleNote = true;
             let isScaleRootNote = scaleNote === scaleNotes[0];
-            return this.preferredChromaticNoteCache[noteId] = new PreferredChromaticNote(scaleNote, isScaleNote, isScaleRootNote);
+            return this.preferredChromaticNoteCache[chromaticId] = new PreferredChromaticNote(scaleNote, isScaleNote, isScaleRootNote);
         }
 
         // Other method
-        // FIXME: simple getPitchByNoteId?
-        let midPitch = getNaturalPitch(noteId);
+        let midPitch = getNaturalPitch(chromaticId);
         let pitchStart = midPitch - 2;
         let pitchEnd = midPitch + 2;
 
@@ -256,16 +255,16 @@ export class Scale extends KeySignature {
             let acc = preferredAccs[ai];
             for (let pitch = Math.max(0, pitchStart); pitch <= pitchEnd; pitch++) {
                 let note = new Note(pitch, acc);
-                if (noteId === note.noteId) {
+                if (chromaticId === note.chromaticId) {
                     let isScaleNote = false;
                     let isScaleRootNote = false;
-                    return this.preferredChromaticNoteCache[noteId] = new PreferredChromaticNote(note, isScaleNote, isScaleRootNote);
+                    return this.preferredChromaticNoteCache[chromaticId] = new PreferredChromaticNote(note, isScaleNote, isScaleRootNote);
                 }
             }
         }
 
         // Shoul never get here.
-        return this.preferredChromaticNoteCache[noteId] = new PreferredChromaticNote(Note.getNoteById(noteId), false, false);
+        return this.preferredChromaticNoteCache[chromaticId] = new PreferredChromaticNote(Note.getChromaticNote(chromaticId), false, false);
     }
 
 }

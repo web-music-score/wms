@@ -64,7 +64,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
     }
 
     createVariants(guitarCtx: ScoreUI.GuitarContext, variantName: string) {
-        let openStringNoteId = [0, 1, 2, 3, 4, 5].map(stringId => guitarCtx.getStringTuning(stringId).noteId);
+        let openStringChromaticId = [0, 1, 2, 3, 4, 5].map(stringId => guitarCtx.getStringTuning(stringId).chromaticId);
 
         let variants = new Map<string, ScaleVariant>();
 
@@ -80,14 +80,14 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let highFret = stringId === 0
                         ? (position + 4)
-                        : (position + openStringNoteId[stringId - 1] - openStringNoteId[stringId] - 1);
+                        : (position + openStringChromaticId[stringId - 1] - openStringChromaticId[stringId] - 1);
 
                     let minScaleFretId = highFret;
                     let maxScaleFretId = position;
 
                     for (let fretId = highFret; fretId >= position; fretId--) {
 
-                        let note = Theory.Note.getNoteById(openStringNoteId[stringId] + fretId);
+                        let note = Theory.Note.getChromaticNote(openStringChromaticId[stringId] + fretId);
 
                         if (guitarCtx.scale.isScaleNote(note)) {
                             if (fretId > guitarCtx.maxFretId) {
@@ -95,7 +95,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                             }
                             else {
                                 let note = guitarCtx.getGuitarNote(stringId, fretId);
-                                if (!notes.some(n => n.noteId === note.noteId)) {
+                                if (!notes.some(n => n.chromaticId === note.chromaticId)) {
                                     notes.push(note);
 
                                     minScaleFretId = Math.min(minScaleFretId, fretId);
@@ -185,7 +185,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         const onScoreClickObject = (obj: Score.MusicInterface) => {
             if (obj instanceof Score.MNoteGroup) {
                 let note = obj.getNotes()[0];
-                let scaleNote = variant?.notes.find(n => n.noteId === note.noteId);
+                let scaleNote = variant?.notes.find(n => n.chromaticId === note.chromaticId);
                 if (scaleNote) {
                     selectNote(scaleNote);
                 }
@@ -208,7 +208,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         if (variant) {
             variant.notes.forEach(note => {
                 let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-                let color = selectedNote?.noteId === note.noteId ? "green" : "black";
+                let color = selectedNote?.chromaticId === note.chromaticId ? "green" : "black";
                 m.addNote(0, note.preferredNote, Theory.NoteLength.Quarter, { color });
                 m.addLabel(Score.Label.Note, noteName);
             });

@@ -2,8 +2,8 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 
-function getAccidental(noteId: number, pitch: number): Accidental {
-    let a = Note.getChromaticClass(noteId) - new Note(pitch, 0).chromaticClass;
+function getAccidental(chromaticId: number, pitch: number): Accidental {
+    let a = Note.getChromaticClass(chromaticId) - new Note(pitch, 0).chromaticClass;
     while (a > 2) { a -= 12; }
     while (a < -2) { a += 12; }
     return Note.validateAccidental(a);
@@ -84,10 +84,10 @@ export class KeySignature {
         this.accidentalByPitch = [];
 
         let pitch = Note.getNoteLetterPitch(tonic[0]); // Tonic without # or b, just note letter.
-        let noteId = Note.getNote(tonic + "0").noteId;
+        let chromaticId = Note.getNote(tonic + "0").chromaticId;
 
-        for (let id = 0; id < 7; pitch++, noteId += intervals[id], id++) {
-            let note = new Note(Note.getDiatonicClass(pitch), getAccidental(noteId, pitch));
+        for (let id = 0; id < 7; pitch++, chromaticId += intervals[id], id++) {
+            let note = new Note(Note.getDiatonicClass(pitch), getAccidental(chromaticId, pitch));
 
             if (Math.abs(note.accidental) >= 2) {
                 throw new KeySignatureError("Key signature contains double accidental.");

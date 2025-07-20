@@ -64,7 +64,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             });
 
             if (frettingPos !== undefined) {
-                let selected = selectedNote && guitarNote.noteId === selectedNote.noteId;
+                let selected = selectedNote && guitarNote.chromaticId === selectedNote.chromaticId;
                 guitarNote.setDefaultBorderColor(selected);
 
                 if (frettingPos === "mute") {
@@ -95,7 +95,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             let newStringFrettingPos = stringFrettingPos.slice();
             let newSelectedNote: Theory.Note | undefined;
 
-            if (selectedNote?.noteId === guitarNote.noteId) {
+            if (selectedNote?.chromaticId === guitarNote.chromaticId) {
                 newStringFrettingPos[guitarNote.stringId] = "mute";
                 newSelectedNote = undefined;
             }
@@ -133,7 +133,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
 
         frettedGuitarNotes.forEach(note => {
             let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-            let color = selectedNote?.noteId === note.noteId ? "green" : "black";
+            let color = selectedNote?.chromaticId === note.chromaticId ? "green" : "black";
             m.addNote(0, note.preferredNote, Theory.NoteLength.Quarter, { color });
             m.addLabel(Score.Label.Note, noteName);
         });

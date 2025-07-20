@@ -46,7 +46,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
         }
 
         const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
-            if (selectedNote && selectedNote.noteId === guitarNote.noteId) {
+            if (selectedNote && selectedNote.chromaticId === guitarNote.chromaticId) {
                 guitarNote.setDefaultBorderColor(true);
                 guitarNote.setDefaultFillColor();
                 guitarNote.setDefaultText();

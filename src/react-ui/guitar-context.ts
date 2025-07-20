@@ -24,16 +24,16 @@ export class GuitarNote {
     borderColor: string | undefined;
     isBarre: boolean = false;
 
-    constructor(readonly guitarCtx: GuitarContext, readonly stringId: number, readonly fretId: number, readonly noteId: number) {
+    constructor(readonly guitarCtx: GuitarContext, readonly stringId: number, readonly fretId: number, readonly chromaticId: number) {
         let { scale } = guitarCtx;
 
-        this.preferredNote = scale.getPreferredNote(noteId);
+        this.preferredNote = scale.getPreferredNote(chromaticId);
         this.isScaleNote = scale.isScaleNote(this.preferredNote);
         this.isScaleRootNote = scale.isScaleRootNote(this.preferredNote);
     }
 
     get chromaticClass() {
-        return Note.getChromaticClass(this.noteId);
+        return Note.getChromaticClass(this.chromaticId);
     }
 
     show() {
@@ -89,11 +89,11 @@ export class GuitarContext {
         this.guitarNoteTable = [[], [], [], [], [], []];
 
         for (let stringId = 0; stringId < 6; stringId++) {
-            let openStringNoteId = this.tuningStrings[stringId].noteId;
+            let openStringChromaticId = this.tuningStrings[stringId].chromaticId;
 
             for (let fretId = 0; fretId <= this.maxFretId; fretId++) {
-                let noteId = openStringNoteId + fretId;
-                this.guitarNoteTable[stringId][fretId] = new GuitarNote(this, stringId, fretId, noteId);
+                let chromaticId = openStringChromaticId + fretId;
+                this.guitarNoteTable[stringId][fretId] = new GuitarNote(this, stringId, fretId, chromaticId);
             }
         }
     }

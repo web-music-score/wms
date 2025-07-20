@@ -191,14 +191,14 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getArcAnchorPoint(note: Note, arcAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
-        let noteId = this.notes.findIndex(note2 => Note.equals(note2, note));
+        let noteIndex = this.notes.findIndex(note2 => Note.equals(note2, note));
 
-        if (!this.staffObjs || noteId < 0 || noteId >= this.staffObjs.noteHeadRects.length) {
+        if (!this.staffObjs || noteIndex < 0 || noteIndex >= this.staffObjs.noteHeadRects.length) {
             let r = this.getRect();
             return { x: r.centerX, y: r.bottom }
         }
 
-        let noteHeadRect = this.staffObjs.noteHeadRects[noteId];
+        let noteHeadRect = this.staffObjs.noteHeadRects[noteIndex];
         let stemRect = this.staffObjs.stemRect;
         let stemDir = this.stemDir;
         let hasStem = stemRect !== undefined;
@@ -441,18 +441,18 @@ export class ObjNoteGroup extends MusicObject {
         let noteHeadWidth = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadWidth) * unitSize;
         let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;
 
-        this.notes.forEach((note, noteId) => {
+        this.notes.forEach((note, noteIndex) => {
             let staff = row.getStaff(note.pitch);
             if (this.staffObjs && staff) {
                 let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
                 let noteY = staff.getPitchY(note.pitch);
 
                 // Setup note head
-                let noteHeadRect = this.staffObjs.noteHeadRects[noteId] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
+                let noteHeadRect = this.staffObjs.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
                 // Setup accidental
                 if (accState.needAccidental(note)) {
-                    let acc = this.staffObjs.accidentals[noteId] = new ObjAccidental(this, note.pitch, note.accidental, this.color);
+                    let acc = this.staffObjs.accidentals[noteIndex] = new ObjAccidental(this, note.pitch, note.accidental, this.color);
                     if (acc) {
                         acc.layout(renderer);
                         acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
@@ -464,7 +464,7 @@ export class ObjNoteGroup extends MusicObject {
                     let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
                     let dotY = noteY + this.getDotVerticalDisplacement(note.pitch, stemDir) * unitSize;
 
-                    this.staffObjs.dotRects[noteId] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                    this.staffObjs.dotRects[noteIndex] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                 }
             }
         });
@@ -535,11 +535,11 @@ export class ObjNoteGroup extends MusicObject {
 
         let tab = row.getTab();
 
-        this.notes.forEach((note, noteId) => {
+        this.notes.forEach((note, noteIndex) => {
             // Add tab fret numbers
-            if (tab && this.tabObjs && this.ownString[noteId] !== undefined) {
-                let stringId = this.ownString[noteId] - 1;
-                let fretId = note.noteId - this.doc.tuningStrings[stringId].noteId;
+            if (tab && this.tabObjs && this.ownString[noteIndex] !== undefined) {
+                let stringId = this.ownString[noteIndex] - 1;
+                let fretId = note.chromaticId - this.doc.tuningStrings[stringId].chromaticId;
                 let color = fretId < 0 ? "red" : "black";
 
                 let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);

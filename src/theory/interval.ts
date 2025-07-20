@@ -149,12 +149,12 @@ export class Interval {
         if (note2.pitch >= note1.pitch) {
             this.direction = note2.pitch === note1.pitch ? "Unison" : "Ascending";
             this.quantity = note2.pitch - note1.pitch + 1;
-            this.semitones = note2.noteId - note1.noteId;
+            this.semitones = note2.chromaticId - note1.chromaticId;
         }
         else {
             this.direction = "Descending";
             this.quantity = note1.pitch - note2.pitch + 1;
-            this.semitones = note1.noteId - note2.noteId;
+            this.semitones = note1.chromaticId - note2.chromaticId;
         }
 
         let quality = getIntervalQuality(this.quantity, this.semitones);

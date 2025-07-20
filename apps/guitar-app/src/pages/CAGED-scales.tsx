@@ -149,7 +149,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
 
                 for (let fretId = Math.min(endFret, maxFretId); fretId >= startFret; fretId--) {
                     let note = guitarCtx.getGuitarNote(stringId, fretId);
-                    if (note.isScaleNote && !notes.some(n => n.noteId === note.noteId)) {
+                    if (note.isScaleNote && !notes.some(n => n.chromaticId === note.chromaticId)) {
                         notes.push(note);
                     }
                 }

@@ -17,21 +17,20 @@ export class NoteError extends Error {
 /*
     Refactor:
     pitch  => diatonicId
-    noteId => midiNumber
 
-    C-1: midiNumber = 0, diatonicId = 0
-    C0:  midiNumber = 12, diatonicId = 7
-    C1:  midiNumber = 24, diatonicId = 14
+    C-1: chromaticId = 0,  diatonicId = 0
+    C0:  chromaticId = 12, diatonicId = 7
+    C1:  chromaticId = 24, diatonicId = 14
 
-    midiNumber:   0      1        2       3        4         5          6       7     8        9      10       11        12   ...
+    chromaticId:   0      1        2       3        4         5          6       7     8        9      10       11        12   ...
     noteName:     C-1 C-1#/D-1b  D-1  D-1#/E-1b E-1/F-1b  F-1/E-1#  F-1#/G-1b  G-1 G-1#/A-1b  A-1  A-1#/B-1b B-1/C0b  B-1#/C0 ...
 
     diatonicId:    0   1   2   3   4   5   6  7  ...
-    midiNumber:    0   2   4   5   7   9   11 12 ...
+    chromaticId:   0   2   4   5   7   9   11 12 ...
     noteName:     C-1 D-1 E-1 F-1 G-1 A-1 B-1 C0 ...
 */
 
-const C0_noteId = 12;
+const C0_chromaticId = 12;
 const C0_pitch = 7;
 
 /** @public */
@@ -55,7 +54,7 @@ const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 /** @public */
 export class Note {
     private static noteByNameCache = new Map<string, Note>();
-    private static noteByIdCache = new Map<number, Note>();
+    private static chromaticNoteCache = new Map<number, Note>();
 
     readonly diatonicClass: number;
     readonly accidental: Accidental;
@@ -93,8 +92,12 @@ export class Note {
         return Note.getPitchInOctave(this.diatonicClass, this.octave);
     }
 
-    get noteId(): number {
-        return Note.getNoteIdInOctave(DiatonicToChromaticMap[this.diatonicClass] + this.accidental, this.octave);
+    get chromaticId(): number {
+        return Note.getChromaticIdInOctave(DiatonicToChromaticMap[this.diatonicClass] + this.accidental, this.octave);
+    }
+
+    get midiNumber(): number {
+        return this.chromaticId;
     }
 
     get chromaticClass(): number {
@@ -151,16 +154,16 @@ export class Note {
         return note;
     }
 
-    static getNoteById(noteId: number, scale?: Scale): Note {
+    static getChromaticNote(chromaticId: number, scale?: Scale): Note {
         if (scale) {
-            return scale.getPreferredNote(noteId);
+            return scale.getPreferredNote(chromaticId);
         }
         else {
-            let note = this.noteByIdCache.get(noteId);
+            let note = this.chromaticNoteCache.get(chromaticId);
 
             if (note === undefined) {
                 const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
-                let noteName = NoteNameList[Note.getChromaticClass(noteId)].split("/")[0] + Note.getOctaveFromNoteId(noteId);
+                let noteName = NoteNameList[Note.getChromaticClass(chromaticId)].split("/")[0] + Note.getOctaveFromChromaticId(chromaticId);
                 let p = Note.parseNote(noteName);
 
                 if (!p) {
@@ -172,7 +175,7 @@ export class Note {
 
                 note = new Note(p.noteLetter, p.accidental, p.octave);
 
-                this.noteByIdCache.set(noteId, note);
+                this.chromaticNoteCache.set(chromaticId, note);
             }
 
             return note;
@@ -191,16 +194,16 @@ export class Note {
         return Note.getDiatonicClass(pitch) + octave * 7 + C0_pitch;
     }
 
-    static getChromaticClass(noteId: number) {
-        return mod(noteId, 12);
+    static getChromaticClass(chromaticId: number) {
+        return mod(chromaticId, 12);
     }
 
-    static getOctaveFromNoteId(noteId: number) {
-        return Math.floor((noteId - C0_noteId) / 12);
+    static getOctaveFromChromaticId(chromaticId: number) {
+        return Math.floor((chromaticId - C0_chromaticId) / 12);
     }
 
-    static getNoteIdInOctave(noteId: number, octave: number) {
-        return Note.getChromaticClass(noteId) + octave * 12 + C0_noteId;
+    static getChromaticIdInOctave(chromaticId: number, octave: number) {
+        return Note.getChromaticClass(chromaticId) + octave * 12 + C0_chromaticId;
     }
 
     static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
@@ -306,12 +309,12 @@ export class Note {
         }
     }
 
-    static validateNoteId(noteId: number): number {
-        if (Utils.Is.isInteger(noteId)) {
-            return noteId;
+    static validateChromaticId(chromaticId: number): number {
+        if (Utils.Is.isInteger(chromaticId)) {
+            return chromaticId;
         }
         else {
-            throw new NoteError(`Invalid noteId: ${noteId}`);
+            throw new NoteError(`Invalid chromaticId: ${chromaticId}`);
         }
     }
 

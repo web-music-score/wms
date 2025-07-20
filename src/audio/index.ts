@@ -9,7 +9,7 @@ function getNoteName(note: Note | number | string) {
         return note;
     }
     else if (typeof note === "number") {
-        note = Note.getNoteById(note);
+        note = Note.getChromaticNote(note);
     }
     return note.format(PitchNotation.Scientific, SymbolSet.Ascii);
 }
