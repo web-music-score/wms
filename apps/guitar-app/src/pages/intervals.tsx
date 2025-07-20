@@ -75,12 +75,12 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
                 return;
             }
 
-            let { row, diatonicId } = event;
 
-            event.renderer.hilightStaffPos(row, diatonicId);
+            event.renderer.hilightStaffPos(event); // event contains { row, diatonicId }
 
             if (event.type === "click") {
                 let { note1, note2, accidental } = this.state;
+                let { diatonicId } = event;
 
                 let note = new Theory.Note(diatonicId, accidental ?? guitarCtx.scale.getAccidental(diatonicId));
 

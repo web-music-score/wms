@@ -47,8 +47,8 @@ export class Renderer {
     private hoverPitch?: { row: ObjScoreRow, diatonicId: number };
     private hoverObj?: MusicObject;
 
-    private hilightPitch?: { row: ObjScoreRow, diatonicId: number };
-    private hilightObj?: MusicObject;
+    private hilightedStaffPos?: { row: ObjScoreRow, diatonicId: number };
+    private hilightedObj?: MusicObject;
 
     private usingTouch = false;
 
@@ -248,11 +248,11 @@ export class Renderer {
     }
 
     hilightObject(obj?: MusicObject) {
-        this.hilightObj = obj;
+        this.hilightedObj = obj;
     }
 
-    hilightStaffPos(row?: ObjScoreRow, diatonicId?: number) {
-        this.hilightPitch = row && diatonicId !== undefined ? { row, diatonicId } : undefined;
+    hilightStaffPos(staffPos?: { row: ObjScoreRow, diatonicId: number }) {
+        this.hilightedStaffPos = staffPos;
     }
 
     updateCursorRect(cursorRect: DivRect | undefined) {
@@ -299,13 +299,13 @@ export class Renderer {
 
     drawHilightPitchRect() {
         let ctx = this.getCanvasContext();
-        let { mousePos, hilightPitch, unitSize } = this;
+        let { mousePos, hilightedStaffPos, unitSize } = this;
 
-        if (!ctx || hilightPitch === undefined) {
+        if (!ctx || !hilightedStaffPos) {
             return;
         }
 
-        let { row, diatonicId } = hilightPitch;
+        let { row, diatonicId } = hilightedStaffPos;
         let staff = row.getStaff(diatonicId);
 
         if (!staff) {
@@ -322,13 +322,13 @@ export class Renderer {
 
     drawHilightObjectRect() {
         let ctx = this.getCanvasContext();
-        let { hilightObj } = this;
+        let { hilightedObj } = this;
 
-        if (!ctx || !hilightObj) {
+        if (!ctx || !hilightedObj) {
             return;
         }
 
-        let rect = hilightObj.getRect();
+        let rect = hilightedObj.getRect();
 
         ctx.strokeStyle = HilightObjectRectColor;
         ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
