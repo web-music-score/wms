@@ -174,6 +174,7 @@ export class MDocument extends MusicInterface {
             assert_t(Utils.Is.isObject(options), "documentOptions");
             assert_t(Utils.Is.isUndefined(options.measuresPerRow) || Utils.Is.isIntegerGte(options.measuresPerRow, 1), "documentOptions.measuresPerRow");
             assert_t(Utils.Is.isStringOrUndefined(options.tuning), "documentOptions.tuning");
+            assert_t(Utils.Is.isBooleanOrUndefined(options.maxPitchRange), "documentOptions.maxPitchRange");
         }
 
         this.obj = new ObjDocument(this, staffPreset, options);

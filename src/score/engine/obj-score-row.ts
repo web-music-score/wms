@@ -122,7 +122,7 @@ export class ObjScoreRow extends MusicObject {
         if (!this.hasStaff) {
             return undefined;
         }
-        else if (this.doc.needFullPitchRange()) {
+        else if (this.doc.maxPitchRange) {
             return this.getBottomStaff().minPitch;
         }
         else {
@@ -239,7 +239,7 @@ export class ObjScoreRow extends MusicObject {
 
         this.staves.forEach(staff => rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY)));
 
-        if (this.hasStaff && this.doc.needFullPitchRange()) {
+        if (this.hasStaff && this.doc.maxPitchRange) {
             this.staves.forEach(staff => {
                 let top = staff.getPitchY(staff.maxPitch) - staff.getLineSpacing();
                 let bottom = staff.getPitchY(staff.minPitch) + staff.getLineSpacing();

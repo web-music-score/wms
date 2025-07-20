@@ -75,7 +75,8 @@ export type RestOptions = {
 /** @public */
 export type DocumentOptions = {
     measuresPerRow?: number,
-    tuning?: string
+    tuning?: string,
+    maxPitchRange?: boolean
 }
 
 /** @public */

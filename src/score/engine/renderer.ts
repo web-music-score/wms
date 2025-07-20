@@ -157,10 +157,6 @@ export class Renderer {
         this.clickObjectListener = fn;
     }
 
-    needFullPitchRange() {
-        return this.clickPitchListener !== undefined;
-    }
-
     needMouseInput() {
         return this.clickPitchListener || this.clickObjectListener;
     }

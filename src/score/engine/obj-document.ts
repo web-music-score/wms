@@ -24,6 +24,7 @@ export class ObjDocument extends MusicObject {
     public readonly tuningName: string;
     public readonly tuningStrings: ReadonlyArray<Note>;
     public readonly tuningLabel: string;
+    public readonly maxPitchRange: boolean;
 
     private header?: ObjHeader;
 
@@ -40,6 +41,7 @@ export class ObjDocument extends MusicObject {
         this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
         this.tuningStrings = getTuningStrings(this.tuningName);
         this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join("-");
+        this.maxPitchRange = options?.maxPitchRange === true;
 
         // There is always row
         this.rows.push(new ObjScoreRow(this));
@@ -90,10 +92,6 @@ export class ObjDocument extends MusicObject {
 
     getTitle(): string | undefined {
         return this.header?.title;
-    }
-
-    needFullPitchRange(): boolean {
-        return this.renderer ? this.renderer.needFullPitchRange() : false;
     }
 
     hasSingleMeasure(): boolean {

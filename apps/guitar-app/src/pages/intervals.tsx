@@ -43,7 +43,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { maxPitchRange: true });
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
@@ -99,7 +99,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
                 <Row xs="auto">
                     <Col>
-                        <TuningScaleInfo app={app} omitTuningInfo/>
+                        <TuningScaleInfo app={app} omitTuningInfo />
                     </Col>
                 </Row>
 
