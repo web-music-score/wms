@@ -58,11 +58,11 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
         }
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            let pitch = event.diatonicId;
-
-            if(event.eventType !== "click" || pitch === undefined) {
+            if (event.type !== "click" || !(event instanceof Score.ScoreStaffPosEvent)) {
                 return;
             }
+
+            let pitch = event.diatonicId;
 
             let { accidental } = this.state;
             let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));

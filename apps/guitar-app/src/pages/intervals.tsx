@@ -71,12 +71,12 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
         }
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            let { note1, note2, accidental } = this.state;
-            let pitch = event.diatonicId;
-
-            if (event.eventType !== "click" || pitch === undefined) {
+            if (event.type !== "click" || !(event instanceof Score.ScoreStaffPosEvent)) {
                 return;
             }
+
+            let { note1, note2, accidental } = this.state;
+            let pitch = event.diatonicId;
 
             let note = new Theory.Note(pitch, accidental ?? guitarCtx.scale.getAccidental(pitch));
 

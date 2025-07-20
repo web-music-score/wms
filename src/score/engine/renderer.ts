@@ -1,6 +1,6 @@
 import { Utils, Vec2, Device, Assert } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MusicInterface, MDocument, DivRect, ScoreEventListener, MScoreRow } from "../pub";
+import { MusicInterface, MDocument, DivRect, ScoreEventListener, MScoreRow, ScoreStaffPosEvent, ScoreObjectEvent } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 
@@ -171,13 +171,12 @@ export class Renderer {
             let scoreRow = arr.find(o => o instanceof MScoreRow);
             let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
 
-            this.scoreEventListener({
-                eventType: "click",
-                objectStack: arr,
-                selectedObject: selObj,
-                scoreRow,
-                diatonicId
-            });
+            if (scoreRow !== undefined && diatonicId !== undefined) {
+                this.scoreEventListener(new ScoreStaffPosEvent("click", scoreRow, diatonicId));
+            }
+            if (arr.length > 0) {
+                this.scoreEventListener(new ScoreObjectEvent("click", arr));
+            }
 
             this.draw();
         }
@@ -201,13 +200,12 @@ export class Renderer {
                 let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
 
                 if (selObj !== this.hilightObj || scoreRow !== this.hilightPitchRow || diatonicId !== this.hilightPitch) {
-                    this.scoreEventListener({
-                        eventType: "hover",
-                        objectStack: arr,
-                        selectedObject: selObj,
-                        scoreRow,
-                        diatonicId
-                    });
+                    if (scoreRow !== undefined && diatonicId !== undefined) {
+                        this.scoreEventListener(new ScoreStaffPosEvent("hover", scoreRow, diatonicId));
+                    }
+                    if (arr.length > 0) {
+                        this.scoreEventListener(new ScoreObjectEvent("hover", arr));
+                    }
 
                     this.hilightPitch = diatonicId;
                     this.hilightPitchRow = scoreRow?.getMusicObject();

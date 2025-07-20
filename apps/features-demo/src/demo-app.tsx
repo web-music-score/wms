@@ -47,11 +47,9 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
         }
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
-            let selObj = event.selectedObject;
-            if (selObj) {
-                this.setState({ hoverText: selObj.name + " Object" });
+            if (event instanceof Score.ScoreObjectEvent) {
+                this.setState({ hoverText: event.top.name + " Object" });
             }
-            return selObj;
         }
 
         return <div className="container">

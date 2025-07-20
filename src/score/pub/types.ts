@@ -80,21 +80,6 @@ export type DocumentOptions = {
 }
 
 /** @public */
-export interface ScoreEvent {
-    eventType: "click" | "hover";
-    objectStack: MusicInterface[];
-    selectedObject?: MusicInterface;
-    scoreRow?: MScoreRow;
-    diatonicId?: number;
-}
-
-/** @public */
-export type ScoreEventListener = (event: ScoreEvent) => void;
-
-/** @public */
-export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
-
-/** @public */
 export enum PlayState { Playing, Paused, Stopped }
 
 /** @public */
