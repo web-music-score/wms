@@ -4,7 +4,7 @@ import { Note } from "./note";
 import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";
 
-const isEqualNote = (n1: Note, n2: Note) => n1.normalizedNoteId === n2.normalizedNoteId;
+const isEqualNote = (n1: Note, n2: Note) => n1.chromaticClass === n2.chromaticClass;
 
 // From circle of 5ths
 const OkayRootNoteList: ReadonlyArray<Note> = [
@@ -25,7 +25,7 @@ const OkayRootNoteList: ReadonlyArray<Note> = [
 const okayRootNoteCache = new Map<number, Note>();
 
 function getOkayRootNote(wantedRootNote: Note): Note {
-    let cacheKey = wantedRootNote.normalizedNoteId;
+    let cacheKey = wantedRootNote.chromaticClass;
 
     let rootNote = okayRootNoteCache.get(cacheKey);
 

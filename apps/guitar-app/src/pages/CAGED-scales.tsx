@@ -22,7 +22,7 @@ class GuitarChord {
     }
 
     consistsOfTriad(triadNotes: Theory.Note[]) {
-        return this.guitarNotes.every(n1 => triadNotes.some(n2 => n2.normalizedNoteId === n1.normalizedNoteId));
+        return this.guitarNotes.every(n1 => triadNotes.some(n2 => n2.chromaticClass === n1.chromaticClass));
     }
 
     hasGuitarNote(guitarNote: ScoreUI.GuitarNote) {

@@ -8,7 +8,7 @@ export class AccidentalState {
 
     getAccidentalFromKeySignature(pitch: number) {
         let ks = this.measure.getKeySignature();
-        let accNote = ks.getOrderedAccidentalNotes().find(accNote => accNote.normalizedPitch === Note.getNormalizedPitch(pitch));
+        let accNote = ks.getOrderedAccidentalNotes().find(accNote => accNote.diatonicClass === Note.getDiatonicClass(pitch));
         return accNote ? accNote.accidental : undefined;
     }
 

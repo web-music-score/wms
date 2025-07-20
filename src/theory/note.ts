@@ -16,11 +16,8 @@ export class NoteError extends Error {
 
 /*
     Refactor:
-    pitch             => diatonicId
-    neutralizedPitch  => diatonicClass
-
-    noteId            => midiNumber
-    neutralizedNoteId => pitchClass
+    pitch  => diatonicId
+    noteId => midiNumber
 
     C-1: midiNumber = 0, diatonicId = 0
     C0:  midiNumber = 12, diatonicId = 7
@@ -51,7 +48,7 @@ const AccidentalUnicodeSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2
 const AccidentalMap: ReadonlyMap<string, Accidental> = new Map([["", 0], ["bb", -2], ["b", -1], ["#", 1], ["x", 2], ["𝄫", -2], ["♭", -1], ["♯", 1], ["𝄪", 2]]);
 
 const NoteLetters: ReadonlyArray<NoteLetter> = ["C", "D", "E", "F", "G", "A", "B"];
-const NoteIdByPitch: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
+const DiatonicToChromaticMap: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
 
 const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 
@@ -60,30 +57,30 @@ export class Note {
     private static noteByNameCache = new Map<string, Note>();
     private static noteByIdCache = new Map<number, Note>();
 
-    readonly normalizedPitch: number;
+    readonly diatonicClass: number;
     readonly accidental: Accidental;
     readonly octave: number;
 
     constructor(pitch: number, accidental: number);
-    constructor(normalizedPitch: number, accidental: number, octave: number);
+    constructor(diatonicClass: number, accidental: number, octave: number);
     constructor(noteLetter: string, accidental: number, octave: number);
     constructor(arg: number | string, accidental: number, octave?: number) {
         if (typeof arg === "number" && typeof accidental === "number" && octave === undefined) {
             // arg is pitch
             Note.validatePitch(arg);
-            this.normalizedPitch = Note.getNormalizedPitch(arg);
+            this.diatonicClass = Note.getDiatonicClass(arg);
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.getOctaveFromPitch(arg);
         }
         else if (typeof arg === "number" && typeof accidental === "number" && typeof octave === "number") {
-            // arg is normalizedPitch
-            this.normalizedPitch = Note.validateNormalizedPitch(arg);
+            // arg is diatonicClass
+            this.diatonicClass = Note.validateDiatonicClass(arg);
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.validateOctave(octave);
         }
         else if (typeof arg === "string" && typeof accidental === "number" && typeof octave === "number") {
             // arg is noteLetter
-            this.normalizedPitch = Note.getNoteLetterPitch(arg);
+            this.diatonicClass = Note.getNoteLetterPitch(arg);
             this.accidental = Note.validateAccidental(accidental);
             this.octave = Note.validateOctave(octave);
         }
@@ -93,19 +90,19 @@ export class Note {
     }
 
     get pitch(): number {
-        return Note.getPitchInOctave(this.normalizedPitch, this.octave);
+        return Note.getPitchInOctave(this.diatonicClass, this.octave);
     }
 
     get noteId(): number {
-        return Note.getNoteIdInOctave(NoteIdByPitch[this.normalizedPitch] + this.accidental, this.octave);
+        return Note.getNoteIdInOctave(DiatonicToChromaticMap[this.diatonicClass] + this.accidental, this.octave);
     }
 
-    get normalizedNoteId(): number {
-        return Note.getNormalizedNoteId(NoteIdByPitch[this.normalizedPitch] + this.accidental);
+    get chromaticClass(): number {
+        return Note.getChromaticClass(DiatonicToChromaticMap[this.diatonicClass] + this.accidental);
     }
 
     get noteLetter(): NoteLetter {
-        return NoteLetters[this.normalizedPitch];
+        return NoteLetters[this.diatonicClass];
     }
 
     format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
@@ -128,7 +125,7 @@ export class Note {
     }
 
     formatOmitOctave(symbolSet: SymbolSet) {
-        let noteLetter = NoteLetters[this.normalizedPitch];
+        let noteLetter = NoteLetters[this.diatonicClass];
         let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
         return noteLetter + accidental;
     }
@@ -163,7 +160,7 @@ export class Note {
 
             if (note === undefined) {
                 const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
-                let noteName = NoteNameList[Note.getNormalizedNoteId(noteId)].split("/")[0] + Note.getOctaveFromNoteId(noteId);
+                let noteName = NoteNameList[Note.getChromaticClass(noteId)].split("/")[0] + Note.getOctaveFromNoteId(noteId);
                 let p = Note.parseNote(noteName);
 
                 if (!p) {
@@ -182,7 +179,7 @@ export class Note {
         }
     }
 
-    static getNormalizedPitch(pitch: number) {
+    static getDiatonicClass(pitch: number) {
         return mod(pitch, 7);
     }
 
@@ -191,10 +188,10 @@ export class Note {
     }
 
     static getPitchInOctave(pitch: number, octave: number) {
-        return Note.getNormalizedPitch(pitch) + octave * 7 + C0_pitch;
+        return Note.getDiatonicClass(pitch) + octave * 7 + C0_pitch;
     }
 
-    static getNormalizedNoteId(noteId: number) {
+    static getChromaticClass(noteId: number) {
         return mod(noteId, 12);
     }
 
@@ -203,7 +200,7 @@ export class Note {
     }
 
     static getNoteIdInOctave(noteId: number, octave: number) {
-        return Note.getNormalizedNoteId(noteId) + octave * 12 + C0_noteId;
+        return Note.getChromaticClass(noteId) + octave * 12 + C0_noteId;
     }
 
     static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
@@ -277,18 +274,18 @@ export class Note {
     }
 
     static getNoteLetter(pitch: number): NoteLetter {
-        return NoteLetters[Note.getNormalizedPitch(pitch)];
+        return NoteLetters[Note.getDiatonicClass(pitch)];
     }
 
     static findNextPitchAbove(pitch: number, bottomPitch: number, addOctaveIfEqual: boolean): number {
-        let normalizedPitch = Note.getNormalizedPitch(pitch);
-        let normalizedBottomPitch = Note.getNormalizedPitch(bottomPitch);
+        let diatonicClass = Note.getDiatonicClass(pitch);
+        let bottomDiatonicClass = Note.getDiatonicClass(bottomPitch);
 
         let addOctave = addOctaveIfEqual
-            ? (normalizedPitch <= normalizedBottomPitch ? 1 : 0)
-            : (normalizedPitch < normalizedBottomPitch ? 1 : 0);
+            ? (diatonicClass <= bottomDiatonicClass ? 1 : 0)
+            : (diatonicClass < bottomDiatonicClass ? 1 : 0);
 
-        return Note.getPitchInOctave(normalizedPitch, Note.getOctaveFromPitch(bottomPitch) + addOctave);
+        return Note.getPitchInOctave(diatonicClass, Note.getOctaveFromPitch(bottomPitch) + addOctave);
     }
 
     static validatePitch(pitch: number): number {
@@ -300,12 +297,12 @@ export class Note {
         }
     }
 
-    static validateNormalizedPitch(normalizedPitch: number): number {
-        if (Utils.Is.isInteger(normalizedPitch) && normalizedPitch >= 0 && normalizedPitch < 7) {
-            return normalizedPitch;
+    static validateDiatonicClass(diatonicClass: number): number {
+        if (Utils.Is.isInteger(diatonicClass) && diatonicClass >= 0 && diatonicClass < 7) {
+            return diatonicClass;
         }
         else {
-            throw new NoteError(`Invalid normalizedPitch: ${normalizedPitch}`);
+            throw new NoteError(`Invalid diatonicClass: ${diatonicClass}`);
         }
     }
 
@@ -318,12 +315,12 @@ export class Note {
         }
     }
 
-    static validateNormalizedNoteId(normalizedNoteId: number): number {
-        if (Utils.Is.isInteger(normalizedNoteId) && normalizedNoteId >= 0 && normalizedNoteId < 12) {
-            return normalizedNoteId;
+    static validatechromaticClass(chromaticClass: number): number {
+        if (Utils.Is.isInteger(chromaticClass) && chromaticClass >= 0 && chromaticClass < 12) {
+            return chromaticClass;
         }
         else {
-            throw new NoteError(`Invalid normalizedNoteId: ${normalizedNoteId}`);
+            throw new NoteError(`Invalid chromaticClass: ${chromaticClass}`);
         }
     }
 

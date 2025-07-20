@@ -32,8 +32,8 @@ export class GuitarNote {
         this.isScaleRootNote = scale.isScaleRootNote(this.preferredNote);
     }
 
-    get normalizedNoteId() {
-        return Note.getNormalizedNoteId(this.noteId);
+    get chromaticClass() {
+        return Note.getChromaticClass(this.noteId);
     }
 
     show() {

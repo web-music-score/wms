@@ -14,7 +14,7 @@ export class ScaleError extends Error {
 
 function getNaturalPitch(noteId: number): number {
     // NoteId could map to several pitch/accidental combinations.
-    let pitch = Note.getNoteLetterPitch("CCDDEFFGGAAB"[Note.getNormalizedNoteId(noteId)]);
+    let pitch = Note.getNoteLetterPitch("CCDDEFFGGAAB"[Note.getChromaticClass(noteId)]);
     let octave = Note.getOctaveFromNoteId(noteId);
     return Note.getPitchInOctave(pitch, octave);
 }
@@ -191,7 +191,7 @@ export class Scale extends KeySignature {
         let rootNote = this.getScaleNotes("C0", 1)[0];
 
         while (note.noteId >= rootNote.noteId + 12) {
-            note = new Note(note.normalizedPitch, note.accidental, note.octave - 1);
+            note = new Note(note.diatonicClass, note.accidental, note.octave - 1);
         }
 
         if (note.noteId < rootNote.noteId) {
@@ -226,17 +226,17 @@ export class Scale extends KeySignature {
         // Get the note that belongs to scale
         let scaleNotes = this.scaleNotes.map(accNote => {
             if (accNote.noteLetter === "C" && accNote.accidental < 0) {
-                return new Note(accNote.normalizedPitch, accNote.accidental, octave + 1)
+                return new Note(accNote.diatonicClass, accNote.accidental, octave + 1)
             }
             else if (accNote.noteLetter === "B" && accNote.accidental > 0) {
-                return new Note(accNote.normalizedPitch, accNote.accidental, octave - 1)
+                return new Note(accNote.diatonicClass, accNote.accidental, octave - 1)
             }
             else {
-                return new Note(accNote.normalizedPitch, accNote.accidental, octave)
+                return new Note(accNote.diatonicClass, accNote.accidental, octave)
             }
         });
 
-        let scaleNote = scaleNotes.find(note => Note.getNormalizedNoteId(noteId) === note.normalizedNoteId);
+        let scaleNote = scaleNotes.find(note => Note.getChromaticClass(noteId) === note.chromaticClass);
         if (scaleNote) {
             let isScaleNote = true;
             let isScaleRootNote = scaleNote === scaleNotes[0];

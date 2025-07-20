@@ -3,7 +3,7 @@ import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 
 function getAccidental(noteId: number, pitch: number): Accidental {
-    let a = Note.getNormalizedNoteId(noteId) - new Note(pitch, 0).normalizedNoteId;
+    let a = Note.getChromaticClass(noteId) - new Note(pitch, 0).chromaticClass;
     while (a > 2) { a -= 12; }
     while (a < -2) { a += 12; }
     return Note.validateAccidental(a);
@@ -87,7 +87,7 @@ export class KeySignature {
         let noteId = Note.getNote(tonic + "0").noteId;
 
         for (let id = 0; id < 7; pitch++, noteId += intervals[id], id++) {
-            let note = new Note(Note.getNormalizedPitch(pitch), getAccidental(noteId, pitch));
+            let note = new Note(Note.getDiatonicClass(pitch), getAccidental(noteId, pitch));
 
             if (Math.abs(note.accidental) >= 2) {
                 throw new KeySignatureError("Key signature contains double accidental.");
@@ -139,7 +139,7 @@ export class KeySignature {
     }
 
     getAccidental(pitch: number): Accidental {
-        return this.accidentalByPitch[Note.getNormalizedPitch(pitch)] ?? 0;
+        return this.accidentalByPitch[Note.getDiatonicClass(pitch)] ?? 0;
     }
 
     getNumAccidentals(): number {
