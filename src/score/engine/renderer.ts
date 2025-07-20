@@ -212,7 +212,7 @@ export class Renderer {
                 let oldHilightPitch = this.hilightPitch;
                 this.hilightPitch = doc.pickPitch(this.mousePos.x, this.mousePos.y);
 
-                if (this.hilightPitch?.measure !== oldHilightPitch?.measure || this.hilightPitch?.pitch !== oldHilightPitch?.pitch) {
+                if (this.hilightPitch?.scoreRow !== oldHilightPitch?.scoreRow || this.hilightPitch?.pitch !== oldHilightPitch?.pitch) {
                     this.draw();
                 }
             }
@@ -308,8 +308,8 @@ export class Renderer {
             return;
         }
 
-        let { measure, pitch } = hilightPitch;
-        let { row } = measure.getMusicObject();
+        let { scoreRow, pitch } = hilightPitch;
+        let row = scoreRow.getMusicObject();
         let staff = row.getStaff(pitch);
 
         if (!staff) {

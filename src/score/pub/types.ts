@@ -1,6 +1,6 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { DivRect } from "./div-rect";
-import { MMeasure, MusicInterface } from "./interface";
+import { MScoreRow, MusicInterface } from "./interface";
 
 /** @public */
 export enum StaffPreset {
@@ -79,7 +79,7 @@ export type DocumentOptions = {
 }
 
 /** @public */
-export type PickedPitch = { pitch: number, measure: MMeasure }
+export type PickedPitch = { pitch: number, scoreRow: MScoreRow }
 
 /** @public */
 export type ClickPitchListener = (pickedPitch: PickedPitch) => void;

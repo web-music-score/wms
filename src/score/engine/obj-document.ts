@@ -306,23 +306,14 @@ export class ObjDocument extends MusicObject {
                 continue;
             }
 
-            let minPitch = row.getBottomStaff().minPitch;
-            let maxPitch = row.getTopStaff().maxPitch;
-
             if (!row.getRect().contains(x, y)) {
                 continue;
             }
 
-            for (let mi = 0; mi < row.getMeasures().length; mi++) {
-                let measure = row.getMeasures()[mi].getMusicInterface();
-                let rect = measure.getMusicObject().getRect();
+            let pitch = row.getPitchAt(y);
 
-                if (x >= rect.left && x <= rect.right) {
-                    let pitch = row.getPitchAt(y);
-                    if (pitch !== undefined && pitch >= minPitch && pitch <= maxPitch) {
-                        return { measure, pitch };
-                    }
-                }
+            if (pitch !== undefined) {
+                return { scoreRow: row.getMusicInterface(), pitch };
             }
         }
 
