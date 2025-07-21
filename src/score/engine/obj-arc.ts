@@ -5,7 +5,7 @@ import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ArcProps } from "./arc-props";
 import { ObjMeasure } from "./obj-measure";
-import { MArc, DivRect, Tie } from "../pub";
+import { MArc, DivRect, TieType } from "../pub";
 import { DocumentSettings } from "./settings";
 
 export class ObjArc extends MusicObject {
@@ -24,13 +24,13 @@ export class ObjArc extends MusicObject {
     private readonly leftNote: Note;
     private readonly rightNoteGroup?: ObjNoteGroup;
     private readonly rightNote?: Note;
-    private readonly tie?: Tie;
+    private readonly tieType?: TieType;
 
 
     readonly mi: MArc;
 
     constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
-    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: Tie);
+    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: TieType);
     constructor(readonly arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
         super(measure);
 
@@ -42,12 +42,12 @@ export class ObjArc extends MusicObject {
         if (args[0] instanceof ObjNoteGroup && args[1] instanceof Note) {
             this.rightNoteGroup = args[0];
             this.rightNote = args[1];
-            this.tie = undefined;
+            this.tieType = undefined;
         }
-        else if (args[0] === Tie.Short || args[0] === Tie.MeasureEnd) {
+        else if (Utils.Is.isEnumValue(args[0], TieType)) {
             this.rightNoteGroup = undefined;
             this.rightNote = undefined;
-            this.tie = args[0];
+            this.tieType = args[0];
         }
 
         this.mi = new MArc(this);
@@ -90,7 +90,7 @@ export class ObjArc extends MusicObject {
 
         let rightPos = rightNoteGroup !== undefined && rightNote !== undefined
             ? rightNoteGroup.getArcAnchorPoint(rightNote, arcAnchor, "right")
-            : this.tie === Tie.MeasureEnd
+            : this.tieType === TieType.ToMeasureEnd
                 ? { x: measure.getColumnsContentRect().right, y: leftPos.y }
                 : { x: leftPos.x + unitSize * DocumentSettings.ShortTieLength, y: leftPos.y };
 

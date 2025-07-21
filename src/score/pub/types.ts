@@ -42,7 +42,13 @@ export enum Stem { Auto, Up, Down }
 export enum Arpeggio { Up, Down }
 
 /** @public */
-export enum Tie { Short = -1, MeasureEnd = -2 }
+export enum TieType { Stub = -1, ToMeasureEnd = -2 }
+
+/** @public */
+export type TieSpan = number | TieType;
+
+/** @public */
+export type SlurSpan = number;
 
 /** @public */
 export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
@@ -55,9 +61,9 @@ export type NoteOptions = {
     arpeggio?: Arpeggio | boolean,
     staccato?: boolean,
     diamond?: boolean,
-    tieSpan?: number | Tie,
+    tieSpan?: TieSpan,
     tieAnchor?: NoteAnchor,
-    slurSpan?: number,
+    slurSpan?: SlurSpan,
     slurAnchor?: NoteAnchor,
     triplet?: boolean,
     string?: StringNumber | StringNumber[];

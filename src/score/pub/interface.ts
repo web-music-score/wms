@@ -25,7 +25,7 @@ import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, Tie, VoiceId, getStringNumbers, getVoiceIds } from "./types";
+import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
 import { NoteAnchor, Arpeggio } from "./types";
 import { ScoreEventListener } from "./event";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
@@ -63,7 +63,7 @@ function assertNoteOptions(options: NoteOptions) {
     assert_t(Utils.Is.isBooleanOrUndefined(options.arpeggio) || Utils.Is.isEnumValue(options.arpeggio, Arpeggio), "noteOptions.arpeggio");
     assert_t(Utils.Is.isBooleanOrUndefined(options.staccato), "noteOptions.staccato");
     assert_t(Utils.Is.isBooleanOrUndefined(options.diamond), "noteOptions.diamond");
-    assert_t(Utils.Is.isEnumValueOrUndefined(options.tieSpan, Tie) || Utils.Is.isIntegerGte(options.tieSpan, 1), "noteOptions.tieSpan");
+    assert_t(Utils.Is.isEnumValueOrUndefined(options.tieSpan, TieType) || Utils.Is.isIntegerGte(options.tieSpan, 1), "noteOptions.tieSpan");
     assert_t(Utils.Is.isEnumValueOrUndefined(options.tieAnchor, NoteAnchor), "noteOptions.tieAnchor");
     assert_t(Utils.Is.isUndefined(options.slurSpan) || Utils.Is.isIntegerGte(options.slurSpan, 1), "noteOptions.slurSpan");
     assert_t(Utils.Is.isEnumValueOrUndefined(options.slurAnchor, NoteAnchor), "noteOptions.slurAnchor");

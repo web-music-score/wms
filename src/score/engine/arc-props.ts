@@ -2,13 +2,13 @@ import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjArc } from "./obj-arc";
 import { ObjNoteGroup } from "./obj-note-group";
-import { NoteAnchor, Stem, Tie } from "../pub/types";
+import { NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
 
 export class ArcProps {
     noteGroups: ObjNoteGroup[];
     arcDir: "up" | "down" = "down";
 
-    constructor(readonly arcType: "tie" | "slur", readonly arcSpan: number | Tie, public arcAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
+    constructor(readonly arcType: "tie" | "slur", readonly arcSpan: TieSpan | SlurSpan, public arcAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
         this.noteGroups = [startNoteGroup];
     }
 
@@ -26,7 +26,7 @@ export class ArcProps {
      * @returns true if noteGroup was added, false if not.
      */
     addNoteGroup(noteGroup: ObjNoteGroup) {
-        if (this.arcSpan === Tie.Short || this.arcSpan === Tie.MeasureEnd) {
+        if (this.arcSpan === TieType.Stub || this.arcSpan === TieType.ToMeasureEnd) {
             // Contains already 1 NoteGroup
             return false;
         }
@@ -91,10 +91,10 @@ export class ArcProps {
         let { arcSpan, arcType } = this;
 
         if (arcType === "tie") {
-            if (arcSpan === Tie.Short || arcSpan === Tie.MeasureEnd) {
+            if (arcSpan === TieType.Stub || arcSpan === TieType.ToMeasureEnd) {
                 let leftNoteGroup = this.noteGroups[0];
                 leftNoteGroup.notes.forEach(note => {
-                    this.createObjArcWithTieEnum(leftNoteGroup, note, arcSpan);
+                    this.createObjArcWithTieType(leftNoteGroup, note, arcSpan);
                 });
             }
             else if (this.noteGroups.length >= 2) {
@@ -124,8 +124,8 @@ export class ArcProps {
         }
     }
 
-    private createObjArcWithTieEnum(leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: Tie) {
-        new ObjArc(this, leftNoteGroup.measure, leftNoteGroup, leftNote, tie);
+    private createObjArcWithTieType(leftNoteGroup: ObjNoteGroup, leftNote: Note, tieType: TieType) {
+        new ObjArc(this, leftNoteGroup.measure, leftNoteGroup, leftNote, tieType);
     }
 
     private createObjArc(leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note) {

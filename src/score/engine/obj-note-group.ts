@@ -2,7 +2,7 @@ import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
-import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, Tie, StringNumber } from "../pub";
+import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber } from "../pub";
 import { ArcProps } from "./arc-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -388,7 +388,7 @@ export class ObjNoteGroup extends MusicObject {
                 return 0;
             }
 
-            if (tie.arcSpan === Tie.Short || tie.arcSpan === Tie.MeasureEnd) {
+            if (tie.arcSpan === TieType.Stub || tie.arcSpan === TieType.ToMeasureEnd) {
                 return Math.max(this.rhythmProps.ticks, this.measure.getMeasureTicks() - this.col.positionTicks);
             }
 
