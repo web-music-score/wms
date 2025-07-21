@@ -292,7 +292,7 @@ export class ObjDocument extends MusicObject {
         }
     }
 
-    pickPitch(x: number, y: number): number | undefined {
+    pickStaffPosAt(x: number, y: number): { scoreRow: ObjScoreRow, diatonicId: number } | undefined {
         if (!this.rect.contains(x, y)) {
             return undefined;
         }
@@ -308,10 +308,10 @@ export class ObjDocument extends MusicObject {
                 continue;
             }
 
-            let pitch = row.getPitchAt(y);
+            let diatonicId = row.getDiatonicIdAt(y);
 
-            if (pitch !== undefined) {
-                return pitch;
+            if (diatonicId !== undefined) {
+                return { scoreRow: row, diatonicId };
             }
         }
 

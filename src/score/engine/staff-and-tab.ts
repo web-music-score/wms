@@ -54,7 +54,7 @@ export class MusicStaff {
         return this.bottomLineY + (this.bottomLinePitch - pitch) * this.getPitchSpacing();
     }
 
-    getPitchAt(y: number): number | undefined {
+    getDiatonicIdAt(y: number): number | undefined {
         let pitch = Math.round(this.bottomLinePitch - (y - this.bottomLineY) / this.getPitchSpacing());
 
         return this.containsPitch(pitch) ? pitch : undefined;

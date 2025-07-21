@@ -155,12 +155,12 @@ export class ObjScoreRow extends MusicObject {
         return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.centerY, r.bottom);
     }
 
-    getPitchAt(y: number): number | undefined {
+    getDiatonicIdAt(y: number): number | undefined {
         for (let i = 0; i < this.staves.length; i++) {
-            let pitch = this.staves[i].getPitchAt(y);
+            let diatonicId = this.staves[i].getDiatonicIdAt(y);
 
-            if (pitch !== undefined) {
-                return pitch;
+            if (diatonicId !== undefined) {
+                return diatonicId;
             }
         }
 

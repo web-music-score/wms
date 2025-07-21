@@ -10,7 +10,7 @@ import { MusicObject } from "./music-object";
 
 export enum ImageAsset { TrebleClefPng, BassClefPng }
 
-const HilightPitchRectColor = "#55cc55";
+const HilightStaffPosRectColor = "#55cc55";
 const HilightObjectRectColor = "#55cc55";
 const PlayPosIndicatorColor = "#44aa44";
 
@@ -44,7 +44,7 @@ export class Renderer {
     private cursorRect?: DivRect;
     private mousePos?: Vec2; // Mouse coord in document space
 
-    private hoverPitch?: { scoreRow: ObjScoreRow, diatonicId: number };
+    private hoverStaffPos?: { scoreRow: ObjScoreRow, diatonicId: number };
     private hoverObj?: MusicObject;
 
     private hilightedStaffPos?: { scoreRow: ObjScoreRow, diatonicId: number };
@@ -150,10 +150,6 @@ export class Renderer {
 
     setScoreEventListener(fn: ScoreEventListener) {
         this.scoreEventListener = fn;
-        if (this.doc) {
-            // Request layout to full pitch range
-            this.doc.requestFullLayout();
-        }
     }
 
     needMouseInput(): boolean {
@@ -174,16 +170,16 @@ export class Renderer {
         this.mousePos = this.txFromScreenCoord(this.getMousePos(e));
 
         if (this.scoreEventListener) {
-            let arr = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
+            let objects = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
 
-            let scoreRow = arr.find(o => o instanceof MScoreRow);
-            let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
+            let staffPos = doc.pickStaffPosAt(this.mousePos.x, this.mousePos.y);
 
-            if (scoreRow !== undefined && diatonicId !== undefined) {
-                this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), scoreRow, diatonicId));
+            if (staffPos !== undefined) {
+                let { scoreRow, diatonicId } = staffPos;
+                this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
             }
-            if (arr.length > 0) {
-                this.scoreEventListener(new ScoreObjectEvent("click", this.getMusicInterface(), arr));
+            if (objects.length > 0) {
+                this.scoreEventListener(new ScoreObjectEvent("click", this.getMusicInterface(), objects));
             }
 
             this.draw();
@@ -201,22 +197,22 @@ export class Renderer {
 
         if (!this.usingTouch) {
             if (this.scoreEventListener) {
-                let arr = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-                let curObj = arr.length > 0 ? arr[arr.length - 1] : undefined;
+                let objects = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
+                let hoverObj = objects.length > 0 ? objects[objects.length - 1] : undefined;
 
-                let scoreRow = arr.find(o => o instanceof MScoreRow);
-                let diatonicId = scoreRow ? doc.pickPitch(this.mousePos.x, this.mousePos.y) : undefined;
+                let staffPos = doc.pickStaffPosAt(this.mousePos.x, this.mousePos.y);
 
-                if (curObj !== this.hoverObj || scoreRow !== this.hoverPitch?.scoreRow || diatonicId !== this.hoverPitch?.diatonicId) {
-                    if (scoreRow !== undefined && diatonicId !== undefined) {
-                        this.scoreEventListener(new ScoreStaffPosEvent("hover", this.getMusicInterface(), scoreRow, diatonicId));
+                if (hoverObj !== this.hoverObj || staffPos?.scoreRow !== this.hoverStaffPos?.scoreRow || staffPos?.diatonicId !== this.hoverStaffPos?.diatonicId) {
+                    if (staffPos !== undefined) {
+                        let { scoreRow, diatonicId } = staffPos;
+                        this.scoreEventListener(new ScoreStaffPosEvent("hover", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
                     }
-                    if (arr.length > 0) {
-                        this.scoreEventListener(new ScoreObjectEvent("hover", this.getMusicInterface(), arr));
+                    if (objects.length > 0) {
+                        this.scoreEventListener(new ScoreObjectEvent("hover", this.getMusicInterface(), objects));
                     }
 
-                    this.hoverPitch = scoreRow && diatonicId !== undefined ? { scoreRow: scoreRow.getMusicObject(), diatonicId } : undefined
-                    this.hoverObj = curObj?.getMusicObject();
+                    this.hoverStaffPos = staffPos ? { scoreRow: staffPos.scoreRow, diatonicId: staffPos.diatonicId } : undefined
+                    this.hoverObj = hoverObj?.getMusicObject();
 
                     this.draw();
                 }
@@ -231,7 +227,7 @@ export class Renderer {
 
         this.mousePos = undefined;
         this.hoverObj = undefined;
-        this.hoverPitch = undefined;
+        this.hoverStaffPos = undefined;
 
         this.draw();
     }
@@ -290,14 +286,14 @@ export class Renderer {
         this.updateCanvasSize();
         this.clearCanvas();
 
-        this.drawHilightPitchRect();
+        this.drawHilightStaffPosRect();
         this.drawHilightObjectRect();
         this.drawPlayCursor();
 
         doc.drawContent();
     }
 
-    drawHilightPitchRect() {
+    drawHilightStaffPosRect() {
         let ctx = this.getCanvasContext();
         let { mousePos, hilightedStaffPos, unitSize } = this;
 
@@ -312,7 +308,7 @@ export class Renderer {
             return;
         }
 
-        ctx.fillStyle = HilightPitchRectColor;
+        ctx.fillStyle = HilightStaffPosRectColor;
         ctx.fillRect(0, staff.getPitchY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
@@ -439,8 +435,8 @@ export class Renderer {
         }
     }
 
-    drawLedgerLines(row: ObjScoreRow, pitch: number, x: number) {
-        let staff = row.getStaff(pitch);
+    drawLedgerLines(row: ObjScoreRow, diatonicId: number, x: number) {
+        let staff = row.getStaff(diatonicId);
 
         if (!staff) {
             return;
@@ -450,16 +446,16 @@ export class Renderer {
 
         let ledgerLineWidth = unitSize * DocumentSettings.LedgerLineWidth;
 
-        if (pitch >= staff.topLinePitch + 2) {
-            for (let linePitch = staff.topLinePitch + 2; linePitch <= pitch; linePitch += 2) {
+        if (diatonicId >= staff.topLinePitch + 2) {
+            for (let linePitch = staff.topLinePitch + 2; linePitch <= diatonicId; linePitch += 2) {
                 if (staff.containsPitch(linePitch)) {
                     let y = staff.getPitchY(linePitch);
                     this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
                 }
             }
         }
-        else if (pitch <= staff.bottomLinePitch - 2) {
-            for (let linePitch = staff.bottomLinePitch - 2; linePitch >= pitch; linePitch -= 2) {
+        else if (diatonicId <= staff.bottomLinePitch - 2) {
+            for (let linePitch = staff.bottomLinePitch - 2; linePitch >= diatonicId; linePitch -= 2) {
                 if (staff.containsPitch(linePitch)) {
                     let y = staff.getPitchY(linePitch);
                     this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
