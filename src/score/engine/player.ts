@@ -3,11 +3,13 @@ import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-musi
 import * as Audio from "@tspro/web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, CursorPositionChangeListener, Navigation, PlayState, PlayStateChangeListener, getVoiceIds } from "../pub";
+import { DivRect, Navigation, PlayState, PlayStateChangeListener, getVoiceIds } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { isDynamicsLevelText, KnownText } from "./element-data";
 import { Extension } from "./extension";
+
+export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
 
 const AccelerandoSpeedMul = 2;
 const RitardandoSpeedDiv = 2;

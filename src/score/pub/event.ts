@@ -35,6 +35,3 @@ export class ScoreObjectEvent extends ScoreEvent {
 
 /** @public */
 export type ScoreEventListener = (event: ScoreEvent) => void;
-
-/** @public */
-export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;

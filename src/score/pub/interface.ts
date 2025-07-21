@@ -201,12 +201,6 @@ export class MDocument extends MusicInterface {
         return this.obj.addMeasure().mi;
     }
 
-    updateCursorRect(cursorRect?: DivRect) {
-        assert_t(cursorRect === undefined || cursorRect instanceof DivRect, "Invalid cursorRect");
-
-        this.obj.updateCursorRect(cursorRect);
-    }
-
     play(fn?: PlayStateChangeListener): MPlayer {
         assert_t(Utils.Is.isFunctionOrUndefined(fn), "playStateChangeListener");
         return new MPlayer(this, fn).play();
@@ -656,12 +650,7 @@ export class MPlayer {
         this.player = new Player();
 
         this.player.setDocument(doc.obj);
-
-        let cursorPositionChnageListener = (cursorRect?: DivRect) => {
-            doc.updateCursorRect(cursorRect);
-        }
-
-        this.player.setCursorPositionChangeListener(cursorPositionChnageListener);
+        this.player.setCursorPositionChangeListener((cursorRect?: DivRect) =>  doc.obj.updateCursorRect(cursorRect));
 
         if (fn) {
             this.player.setPlayStateChnageListener(fn);
