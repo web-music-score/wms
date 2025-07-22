@@ -43,7 +43,7 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { maxPitchRange: true });
+        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { fullDiatonicRange: true });
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 

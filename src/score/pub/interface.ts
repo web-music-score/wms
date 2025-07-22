@@ -175,7 +175,7 @@ export class MDocument extends MusicInterface {
             assert_t(Utils.Is.isObject(options), "documentOptions");
             assert_t(Utils.Is.isUndefined(options.measuresPerRow) || Utils.Is.isIntegerGte(options.measuresPerRow, 1), "documentOptions.measuresPerRow");
             assert_t(Utils.Is.isStringOrUndefined(options.tuning), "documentOptions.tuning");
-            assert_t(Utils.Is.isBooleanOrUndefined(options.maxPitchRange), "documentOptions.maxPitchRange");
+            assert_t(Utils.Is.isBooleanOrUndefined(options.fullDiatonicRange), "documentOptions.fullDiatonicRange");
         }
 
         this.obj = new ObjDocument(this, staffPreset, options);
@@ -206,17 +206,17 @@ export class MDocument extends MusicInterface {
         return new MPlayer(this, fn).play();
     }
 
-    static createSimpleScaleArpeggio(staffPreset: StaffPreset, scale: Scale, lowestPitchNote: string, numOctaves: number): MDocument {
+    static createSimpleScaleArpeggio(staffPreset: StaffPreset, scale: Scale, bottomNote: string, numOctaves: number): MDocument {
         assert_t(Utils.Is.isEnumValue(staffPreset, StaffPreset), "staffPreset");
         assert_t(scale instanceof Scale, "scale");
-        assert_t(Utils.Is.isString(lowestPitchNote), "lowestPitchNote");
+        assert_t(Utils.Is.isString(bottomNote), "bottomNote");
         assert_t(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves");
 
         let doc = new MDocument(staffPreset);
 
         let m = doc.addMeasure().setKeySignature(scale);
 
-        scale.getScaleNotes(lowestPitchNote, numOctaves).forEach(note => {
+        scale.getScaleNotes(bottomNote, numOctaves).forEach(note => {
             let noteName = note.formatOmitOctave(SymbolSet.Unicode);
             m.addNote(0, note, NoteLength.Quarter);
             m.addLabel(Label.Note, noteName);

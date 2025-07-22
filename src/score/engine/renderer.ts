@@ -309,7 +309,7 @@ export class Renderer {
         }
 
         ctx.fillStyle = HilightStaffPosRectColor;
-        ctx.fillRect(0, staff.getPitchY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
+        ctx.fillRect(0, staff.getDiatonicIdY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
             this.drawLedgerLines(scoreRow, diatonicId, mousePos.x);
@@ -446,18 +446,18 @@ export class Renderer {
 
         let ledgerLineWidth = unitSize * DocumentSettings.LedgerLineWidth;
 
-        if (diatonicId >= staff.topLinePitch + 2) {
-            for (let linePitch = staff.topLinePitch + 2; linePitch <= diatonicId; linePitch += 2) {
-                if (staff.containsPitch(linePitch)) {
-                    let y = staff.getPitchY(linePitch);
+        if (diatonicId >= staff.topLineDiatonicId + 2) {
+            for (let lineDiatonicId = staff.topLineDiatonicId + 2; lineDiatonicId <= diatonicId; lineDiatonicId += 2) {
+                if (staff.containsDiatonicId(lineDiatonicId)) {
+                    let y = staff.getDiatonicIdY(lineDiatonicId);
                     this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
                 }
             }
         }
-        else if (diatonicId <= staff.bottomLinePitch - 2) {
-            for (let linePitch = staff.bottomLinePitch - 2; linePitch >= diatonicId; linePitch -= 2) {
-                if (staff.containsPitch(linePitch)) {
-                    let y = staff.getPitchY(linePitch);
+        else if (diatonicId <= staff.bottomLineDiatonicId - 2) {
+            for (let lineDiatonicId = staff.bottomLineDiatonicId - 2; lineDiatonicId >= diatonicId; lineDiatonicId -= 2) {
+                if (staff.containsDiatonicId(lineDiatonicId)) {
+                    let y = staff.getDiatonicIdY(lineDiatonicId);
                     this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
                 }
             }

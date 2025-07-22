@@ -61,10 +61,10 @@ export class ArcProps {
         else if (this.arcAnchor === NoteAnchor.Center) {
             let { row } = this.noteGroups[0].measure;
 
-            let notePitch = this.noteGroups[0].ownDiatonicId;
-            let staff = row.getStaff(notePitch);
+            let diatonicId = this.noteGroups[0].ownDiatonicId;
+            let staff = row.getStaff(diatonicId);
 
-            this.arcDir = !staff || notePitch < staff.middleLinePitch ? "down" : "up";
+            this.arcDir = !staff || diatonicId < staff.middleLineDiatonicId ? "down" : "up";
         }
         else if (this.arcAnchor === NoteAnchor.Above) {
             this.arcDir = "up";

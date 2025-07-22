@@ -82,7 +82,7 @@ export type RestOptions = {
 export type DocumentOptions = {
     measuresPerRow?: number,
     tuning?: string,
-    maxPitchRange?: boolean
+    fullDiatonicRange?: boolean
 }
 
 /** @public */

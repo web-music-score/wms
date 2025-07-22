@@ -113,7 +113,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
                 <br />
                 <table style={{ textAlign: "center" }}>
                     <thead>
-                        <tr><td>String</td><td></td><td>Pitch</td></tr>
+                        <tr><td>String</td><td></td><td>Note</td></tr>
                     </thead>
                     <tbody>
                         <tr><td>6th</td><td>⎯⎯⎯⎯⎯</td><td>{openStringNoteName(5)}</td></tr>

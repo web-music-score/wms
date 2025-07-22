@@ -57,8 +57,8 @@ export class ObjRest extends MusicObject {
 
         // Make sure ownDiatonicId is line, not space
         let staff = this.row.getStaff(this.ownDiatonicId);
-        if (staff && staff.isPitchSpace(this.ownDiatonicId)) {
-            this.ownDiatonicId += this.ownDiatonicId >= staff.middleLinePitch ? 1 : -1;
+        if (staff && staff.isSpace(this.ownDiatonicId)) {
+            this.ownDiatonicId += this.ownDiatonicId >= staff.middleLineDiatonicId ? 1 : -1;
         }
 
         this.color = options?.color ?? "black";
@@ -210,7 +210,7 @@ export class ObjRest extends MusicObject {
 
         let staff = this.row.getStaff(ownDiatonicId);
         if (staff) {
-            this.offset(0, staff.getPitchY(ownDiatonicId));
+            this.offset(0, staff.getDiatonicIdY(ownDiatonicId));
         }
     }
 

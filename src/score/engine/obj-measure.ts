@@ -57,7 +57,7 @@ export class ObjMeasure extends MusicObject {
     private minColumnsAreaWidth = 0;
     private rightSolidAreaWidth = 0;
 
-    private useDiatnoicId: (number | undefined)[/* voiceId */] = [];
+    private useDiatonicId: (number | undefined)[/* voiceId */] = [];
     private useStemDir: (Stem | undefined)[/* voiceId */] = [];
     private useString: (StringNumber[] | undefined)[/* voiceId */] = [];
 
@@ -133,30 +133,30 @@ export class ObjMeasure extends MusicObject {
         return this.passCount;
     }
 
-    updateOwnDiatonicId(voiceId: number, setPitch?: number): number {
-        if (typeof setPitch == "number") {
-            this.useDiatnoicId[voiceId] = setPitch;
+    updateOwnDiatonicId(voiceId: number, setDiatonicId?: number): number {
+        if (typeof setDiatonicId == "number") {
+            this.useDiatonicId[voiceId] = setDiatonicId;
         }
-        else if (this.useDiatnoicId[voiceId] === undefined) {
+        else if (this.useDiatonicId[voiceId] === undefined) {
             let prevMeasure = this.getPrevMeasure();
 
-            if (prevMeasure && prevMeasure.useDiatnoicId[voiceId] !== undefined) {
-                this.useDiatnoicId[voiceId] = prevMeasure.useDiatnoicId[voiceId];
+            if (prevMeasure && prevMeasure.useDiatonicId[voiceId] !== undefined) {
+                this.useDiatonicId[voiceId] = prevMeasure.useDiatonicId[voiceId];
             }
         }
 
-        let pitch = this.useDiatnoicId[voiceId];
+        let diatonicId = this.useDiatonicId[voiceId];
 
-        if (pitch === undefined) {
+        if (diatonicId === undefined) {
             if (this.row.hasStaff) {
-                pitch = this.row.getTopStaff().middleLinePitch;
+                diatonicId = this.row.getTopStaff().middleLineDiatonicId;
             }
             else {
-                pitch = Note.getNote("C4").diatonicId;
+                diatonicId = Note.getNote("C4").diatonicId;
             }
         }
 
-        return this.useDiatnoicId[voiceId] = Note.validateDiatonicId(pitch);
+        return this.useDiatonicId[voiceId] = Note.validateDiatonicId(diatonicId);
     }
 
     updateOwnStemDir(symbol: RhythmSymbol, setStemDir?: Stem): Stem.Up | Stem.Down {
@@ -174,7 +174,7 @@ export class ObjMeasure extends MusicObject {
         if (stemDir === Stem.Auto || stemDir === undefined) {
             let staff = this.row.getStaff(symbol.ownDiatonicId);
             if (staff) {
-                return symbol.ownDiatonicId > staff.middleLinePitch ? Stem.Down : Stem.Up;
+                return symbol.ownDiatonicId > staff.middleLineDiatonicId ? Stem.Down : Stem.Up;
             }
             else {
                 return Stem.Up;
@@ -982,8 +982,8 @@ export class ObjMeasure extends MusicObject {
         rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotted }));
     }
 
-    getLowestNotePitch(pitch: number): number {
-        return Math.min(pitch, ...this.columns.map(c => c.getLowestNotePitch(pitch)));
+    getLowestDiatonicId(initialLowestDiatonicId: number): number {
+        return Math.min(initialLowestDiatonicId, ...this.columns.map(c => c.getLowestDiatonicId(initialLowestDiatonicId)));
     }
 
     requestLayout() {
@@ -1207,8 +1207,8 @@ export class ObjMeasure extends MusicObject {
         let { row } = this;
 
         row.getStaves().forEach(staff => {
-            for (let p = staff.bottomLinePitch; p <= staff.topLinePitch; p += 2) {
-                drawLine(staff.getPitchY(p));
+            for (let p = staff.bottomLineDiatonicId; p <= staff.topLineDiatonicId; p += 2) {
+                drawLine(staff.getDiatonicIdY(p));
             }
         });
 

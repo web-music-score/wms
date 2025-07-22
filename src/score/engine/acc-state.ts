@@ -2,22 +2,22 @@ import { Accidental, Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
 
 export class AccidentalState {
-    private readonly accidentalByPitch: Accidental[] = [];
+    private readonly accidentalByDiatonicId: Accidental[] = [];
 
     constructor(readonly measure: ObjMeasure) { }
 
-    getAccidentalFromKeySignature(pitch: number) {
+    getAccidentalFromKeySignature(diatonicId: number) {
         let ks = this.measure.getKeySignature();
-        let accNote = ks.getOrderedAccidentalNotes().find(accNote => accNote.diatonicClass === Note.getDiatonicClass(pitch));
+        let accNote = ks.getOrderedAccidentalNotes().find(accNote => accNote.diatonicClass === Note.getDiatonicClass(diatonicId));
         return accNote ? accNote.accidental : undefined;
     }
 
     setAccidental(note: Note) {
-        this.accidentalByPitch[note.diatonicId] = note.accidental;
+        this.accidentalByDiatonicId[note.diatonicId] = note.accidental;
     }
 
     needAccidental(note: Note) {
-        let currentAccidental = this.accidentalByPitch[note.diatonicId] ?? this.getAccidentalFromKeySignature(note.diatonicId) ?? 0;
+        let currentAccidental = this.accidentalByDiatonicId[note.diatonicId] ?? this.getAccidentalFromKeySignature(note.diatonicId) ?? 0;
 
         return note.accidental !== currentAccidental;
     }

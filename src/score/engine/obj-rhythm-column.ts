@@ -43,8 +43,8 @@ export type RhythmSymbol = ObjNoteGroup | ObjRest;
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
 
-    private minPitch?: number;
-    private maxPitch?: number;
+    private minDiatonicId?: number;
+    private maxDiatonicId?: number;
 
     private arpeggioDir: Arpeggio | undefined;
     private arpeggios: ObjArpeggio[] = [];
@@ -166,19 +166,19 @@ export class ObjRhythmColumn extends MusicObject {
 
         if (symbol instanceof ObjRest) {
             if (!symbol.hide && symbol.noteLength >= NoteLength.Half) {
-                this.minPitch = this.minPitch === undefined ? symbol.ownDiatonicId : Math.min(this.minPitch, symbol.ownDiatonicId);
-                this.maxPitch = this.maxPitch === undefined ? symbol.ownDiatonicId : Math.max(this.maxPitch, symbol.ownDiatonicId);
+                this.minDiatonicId = this.minDiatonicId === undefined ? symbol.ownDiatonicId : Math.min(this.minDiatonicId, symbol.ownDiatonicId);
+                this.maxDiatonicId = this.maxDiatonicId === undefined ? symbol.ownDiatonicId : Math.max(this.maxDiatonicId, symbol.ownDiatonicId);
             }
         }
         else if (symbol instanceof ObjNoteGroup) {
             // notes are sorted.
-            this.minPitch = this.minPitch === undefined
+            this.minDiatonicId = this.minDiatonicId === undefined
                 ? symbol.notes[0].diatonicId
-                : Math.min(this.minPitch, symbol.notes[0].diatonicId);
+                : Math.min(this.minDiatonicId, symbol.notes[0].diatonicId);
 
-            this.maxPitch = this.maxPitch === undefined
+            this.maxDiatonicId = this.maxDiatonicId === undefined
                 ? symbol.notes[symbol.notes.length - 1].diatonicId
-                : Math.max(this.maxPitch, symbol.notes[symbol.notes.length - 1].diatonicId);
+                : Math.max(this.maxDiatonicId, symbol.notes[symbol.notes.length - 1].diatonicId);
 
             if (symbol.arpeggio !== undefined) {
                 this.arpeggioDir = symbol.arpeggio;
@@ -264,8 +264,8 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    getLowestNotePitch(pitch: number): number {
-        return Math.min(pitch, ...this.voiceSymbol.map(s => {
+    getLowestDiatonicId(initialLowestDiatonicId: number): number {
+        return Math.min(initialLowestDiatonicId, ...this.voiceSymbol.map(s => {
             return s instanceof ObjNoteGroup
                 ? Math.min(...s.notes.map(n => n.diatonicId))
                 : s.ownDiatonicId;
@@ -280,9 +280,9 @@ export class ObjRhythmColumn extends MusicObject {
                 return;
             }
 
-            let hasSamePitch = playerNotes.some(n => {
+            let hasSameDiatonicId = playerNotes.some(n => {
                 if (note.diatonicId === n.note.diatonicId && note.accidental === n.note.accidental) {
-                    // If note with same pitch already in list then set note length to max.
+                    // If note with same diatonicId already in list then set note length to max.
                     n.ticks = Math.max(n.ticks, ticks);
                     return true;
                 }
@@ -291,7 +291,7 @@ export class ObjRhythmColumn extends MusicObject {
                 }
             });
 
-            if (!hasSamePitch) {
+            if (!hasSameDiatonicId) {
                 // Add note to list
                 playerNotes.push({ note, ticks, staccato, slur });
             }
@@ -421,12 +421,12 @@ export class ObjRhythmColumn extends MusicObject {
 
     draw(renderer: Renderer) {
         // Draw ledger lines
-        if (this.minPitch !== undefined) {
-            renderer.drawLedgerLines(this.row, this.minPitch, this.rect.centerX);
+        if (this.minDiatonicId !== undefined) {
+            renderer.drawLedgerLines(this.row, this.minDiatonicId, this.rect.centerX);
         }
 
-        if (this.maxPitch !== undefined) {
-            renderer.drawLedgerLines(this.row, this.maxPitch, this.rect.centerX);
+        if (this.maxDiatonicId !== undefined) {
+            renderer.drawLedgerLines(this.row, this.maxDiatonicId, this.rect.centerX);
         }
 
         // Draw symbols

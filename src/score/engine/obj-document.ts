@@ -24,7 +24,7 @@ export class ObjDocument extends MusicObject {
     public readonly tuningName: string;
     public readonly tuningStrings: ReadonlyArray<Note>;
     public readonly tuningLabel: string;
-    public readonly maxPitchRange: boolean;
+    public readonly fullDiatonicRange: boolean;
 
     private header?: ObjHeader;
 
@@ -41,7 +41,7 @@ export class ObjDocument extends MusicObject {
         this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
         this.tuningStrings = getTuningStrings(this.tuningName);
         this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join("-");
-        this.maxPitchRange = options?.maxPitchRange === true;
+        this.fullDiatonicRange = options?.fullDiatonicRange === true;
 
         // There is always row
         this.rows.push(new ObjScoreRow(this));

@@ -70,13 +70,13 @@ export class ObjSignature extends MusicObject {
             if (prevKeySignature && !KeySignature.equals(newKeySignature, prevKeySignature)) {
                 prevKeySignature.getOrderedAccidentalNotes().forEach(accNote => {
                     // Neutral accidental
-                    this.ksNeutralizeAccidentals.push(new ObjAccidental(this, this.getAccidentalPitch(accNote), 0));
+                    this.ksNeutralizeAccidentals.push(new ObjAccidental(this, this.getAccidentalDiatonicId(accNote), 0));
                 });
             }
 
             // Set new key signature
             newKeySignature.getOrderedAccidentalNotes().forEach(accNote => {
-                this.ksNewAccidentals.push(new ObjAccidental(this, this.getAccidentalPitch(accNote), accNote.accidental));
+                this.ksNewAccidentals.push(new ObjAccidental(this, this.getAccidentalDiatonicId(accNote), accNote.accidental));
             });
         }
         else {
@@ -110,33 +110,33 @@ export class ObjSignature extends MusicObject {
         }
     }
 
-    private getAccidentalPitch(accNote: Note): number {
+    private getAccidentalDiatonicId(accNote: Note): number {
         let clefKind = this.staff.clefKind;
 
-        let bottomAccidentalPitch: number | undefined = undefined;
+        let bottomAccidentalDiatonicId: number | undefined = undefined;
 
         if (clefKind === ClefKind.Treble) {
             if (accNote.accidental > 0) {
-                bottomAccidentalPitch = this.staff.bottomLinePitch + 3;
+                bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 3;
             }
             else if (accNote.accidental < 0) {
-                bottomAccidentalPitch = this.staff.bottomLinePitch + 1;
+                bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 1;
             }
         }
         else if (clefKind === ClefKind.Bass) {
             if (accNote.accidental > 0) {
-                bottomAccidentalPitch = this.staff.bottomLinePitch + 1;
+                bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 1;
             }
             else if (accNote.accidental < 0) {
-                bottomAccidentalPitch = this.staff.bottomLinePitch - 1;
+                bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId - 1;
             }
         }
 
-        if (bottomAccidentalPitch !== undefined) {
-            return Note.findNextDiatonicIdAbove(accNote.diatonicId, bottomAccidentalPitch, false);
+        if (bottomAccidentalDiatonicId !== undefined) {
+            return Note.findNextDiatonicIdAbove(accNote.diatonicId, bottomAccidentalDiatonicId, false);
         }
         else {
-            Assert.interrupt("Cannot get accidental pitch because note has no accidental.")
+            Assert.interrupt("Cannot get accidental diatonicId because note has no accidental.")
         }
     }
 
@@ -211,7 +211,7 @@ export class ObjSignature extends MusicObject {
         if (this.clefImage) {
             x += paddingX;
             this.clefImage.layout(renderer);
-            this.clefImage.offset(x, staff.getPitchY(staff.clefLinePitch));
+            this.clefImage.offset(x, staff.getDiatonicIdY(staff.clefLineDiatonicId));
             this.rect.expandInPlace(this.clefImage.getRect());
             x = this.rect.right;
 
@@ -235,10 +235,10 @@ export class ObjSignature extends MusicObject {
             x += paddingX;
 
             this.ksNeutralizeAccidentals.forEach(objAcc => {
-                let accStaff = row.getStaff(objAcc.pitch);
+                let accStaff = row.getStaff(objAcc.diatonicId);
                 if (accStaff) {
                     objAcc.layout(renderer);
-                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getPitchY(objAcc.pitch));
+                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getDiatonicIdY(objAcc.diatonicId));
                     this.rect.expandInPlace(objAcc.getRect());
                     x = this.rect.right;
                 }
@@ -249,10 +249,10 @@ export class ObjSignature extends MusicObject {
             x += paddingX;
 
             this.ksNewAccidentals.forEach(objAcc => {
-                let accStaff = row.getStaff(objAcc.pitch);
+                let accStaff = row.getStaff(objAcc.diatonicId);
                 if (accStaff) {
                     objAcc.layout(renderer);
-                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getPitchY(objAcc.pitch));
+                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getDiatonicIdY(objAcc.diatonicId));
                     this.rect.expandInPlace(objAcc.getRect());
                     x = this.rect.right;
                 }
@@ -263,14 +263,14 @@ export class ObjSignature extends MusicObject {
 
         if (this.beatCountText) {
             this.beatCountText.layout(renderer);
-            this.beatCountText.offset(x + paddingX, staff.getPitchY(staff.middleLinePitch + 2));
+            this.beatCountText.offset(x + paddingX, staff.getDiatonicIdY(staff.middleLineDiatonicId + 2));
             this.rect.expandInPlace(this.beatCountText.getRect());
             right = Math.max(right, this.rect.right);
         }
 
         if (this.beatSizeText) {
             this.beatSizeText.layout(renderer);
-            this.beatSizeText.offset(x + paddingX, staff.getPitchY(staff.bottomLinePitch + 2));
+            this.beatSizeText.offset(x + paddingX, staff.getDiatonicIdY(staff.bottomLineDiatonicId + 2));
             this.rect.expandInPlace(this.beatSizeText.getRect());
             right = Math.max(right, this.rect.right);
         }

@@ -105,12 +105,12 @@ export class ObjScoreRow extends MusicObject {
         return Assert.require(this.staves[this.staves.length - 1], "Bottom staff line is required!");
     }
 
-    getStaff(pitch: number): MusicStaff | undefined {
-        Note.validateDiatonicId(pitch);
+    getStaff(diatonicId: number): MusicStaff | undefined {
+        Note.validateDiatonicId(diatonicId);
 
         for (let i = 0; i < this.staves.length; i++) {
             let staff = this.staves[i];
-            if (staff.containsPitch(pitch)) {
+            if (staff.containsDiatonicId(diatonicId)) {
                 return staff;
             }
         }
@@ -118,16 +118,16 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    getLowestNotePitch(): number | undefined {
+    getLowestDiatonicId(): number | undefined {
         if (!this.hasStaff) {
             return undefined;
         }
-        else if (this.doc.maxPitchRange) {
-            return this.getBottomStaff().minPitch;
+        else if (this.doc.fullDiatonicRange) {
+            return this.getBottomStaff().minDiatonicId;
         }
         else {
-            let pitch = this.getBottomStaff().bottomLinePitch;
-            return Math.min(pitch, ...this.measures.map(m => m.getLowestNotePitch(pitch)));
+            let diatonicId = this.getBottomStaff().bottomLineDiatonicId;
+            return Math.min(diatonicId, ...this.measures.map(m => m.getLowestDiatonicId(diatonicId)));
         }
     }
 
@@ -239,17 +239,17 @@ export class ObjScoreRow extends MusicObject {
 
         this.staves.forEach(staff => rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY)));
 
-        if (this.hasStaff && this.doc.maxPitchRange) {
+        if (this.hasStaff && this.doc.fullDiatonicRange) {
             this.staves.forEach(staff => {
-                let top = staff.getPitchY(staff.maxPitch) - staff.getLineSpacing();
-                let bottom = staff.getPitchY(staff.minPitch) + staff.getLineSpacing();
+                let top = staff.getDiatonicIdY(staff.maxDiatonicId) - staff.getLineSpacing();
+                let bottom = staff.getDiatonicIdY(staff.minDiatonicId) + staff.getLineSpacing();
                 rect.expandInPlace(new DivRect(0, 0, top, bottom));
             });
         }
 
         if (this.tab) {
-            let lowestPitch = this.getLowestNotePitch();
-            let lowestY = lowestPitch !== undefined ? this.getStaff(lowestPitch)?.getPitchY(lowestPitch) : undefined;
+            let lowestDiatonicId = this.getLowestDiatonicId();
+            let lowestY = lowestDiatonicId !== undefined ? this.getStaff(lowestDiatonicId)?.getDiatonicIdY(lowestDiatonicId) : undefined;
             this.tab.top = lowestY !== undefined ? lowestY + unitSize * 8 : 0;
             this.tab.bottom = this.tab.top + unitSize * DocumentSettings.GuitarTabHeight;
             rect.expandInPlace(new DivRect(0, 0, this.tab.top, this.tab.bottom));

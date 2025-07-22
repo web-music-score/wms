@@ -37,7 +37,7 @@ abstract class ObjBarLine extends MusicObject {
         let dotRadius = dotW / 2;
 
         let lineCenterYs = row.getStaves().map(staff => staff.middleLineY);
-        let lineDotOffs = row.getStaves().map(staff => staff.getPitchSpacing());
+        let lineDotOffs = row.getStaves().map(staff => staff.getDiatonicSpacing());
 
         let tab = row.getTab();
 

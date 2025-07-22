@@ -6,20 +6,20 @@ export enum ClefKind { Treble, Bass }
 
 export class MusicStaff {
     readonly clefImageAsset: ImageAsset;
-    readonly topLinePitch: number;
-    readonly bottomLinePitch: number;
+    readonly topLineDiatonicId: number;
+    readonly bottomLineDiatonicId: number;
     readonly octaveLower: boolean;
 
     constructor(
         readonly clefKind: ClefKind,
-        readonly clefLinePitch: number,
-        readonly middleLinePitch: number,
-        readonly minPitch: number,
-        readonly maxPitch: number) {
+        readonly clefLineDiatonicId: number,
+        readonly middleLineDiatonicId: number,
+        readonly minDiatonicId: number,
+        readonly maxDiatonicId: number) {
         this.clefImageAsset = clefKind === ClefKind.Treble ? ImageAsset.TrebleClefPng : ImageAsset.BassClefPng;
-        this.topLinePitch = this.middleLinePitch + 4;
-        this.bottomLinePitch = this.middleLinePitch - 4;
-        this.octaveLower = this.clefLinePitch === Note.getNote("G3").diatonicId; // Guitar is played octave lower
+        this.topLineDiatonicId = this.middleLineDiatonicId + 4;
+        this.bottomLineDiatonicId = this.middleLineDiatonicId - 4;
+        this.octaveLower = this.clefLineDiatonicId === Note.getNote("G3").diatonicId; // Guitar is played octave lower
     }
 
     topLineY: number = 0;
@@ -38,34 +38,34 @@ export class MusicStaff {
         return (this.bottomLineY - this.topLineY) / 4;
     }
 
-    getPitchSpacing(): number {
+    getDiatonicSpacing(): number {
         return this.getLineSpacing() / 2;
     }
 
-    containsPitch(pitch: number): boolean {
-        Note.validateDiatonicId(pitch);
+    containsDiatonicId(diatonicId: number): boolean {
+        Note.validateDiatonicId(diatonicId);
 
-        return pitch >= this.minPitch && pitch <= this.maxPitch;
+        return diatonicId >= this.minDiatonicId && diatonicId <= this.maxDiatonicId;
     }
 
-    getPitchY(pitch: number): number {
-        Assert.assert(this.containsPitch(pitch), "getPitchY: staff does not contain pitch " + pitch);
+    getDiatonicIdY(diatonicId: number): number {
+        Assert.assert(this.containsDiatonicId(diatonicId), "Staff does not contain diatonicId " + diatonicId);
 
-        return this.bottomLineY + (this.bottomLinePitch - pitch) * this.getPitchSpacing();
+        return this.bottomLineY + (this.bottomLineDiatonicId - diatonicId) * this.getDiatonicSpacing();
     }
 
     getDiatonicIdAt(y: number): number | undefined {
-        let pitch = Math.round(this.bottomLinePitch - (y - this.bottomLineY) / this.getPitchSpacing());
+        let diatonicId = Math.round(this.bottomLineDiatonicId - (y - this.bottomLineY) / this.getDiatonicSpacing());
 
-        return this.containsPitch(pitch) ? pitch : undefined;
+        return this.containsDiatonicId(diatonicId) ? diatonicId : undefined;
     }
 
-    isPitchLine(pitch: number) {
-        return pitch % 2 === this.middleLinePitch % 2;
+    isLine(diatonicId: number) {
+        return diatonicId % 2 === this.middleLineDiatonicId % 2;
     }
 
-    isPitchSpace(pitch: number) {
-        return pitch % 2 !== this.middleLinePitch % 2;
+    isSpace(diatonicId: number) {
+        return diatonicId % 2 !== this.middleLineDiatonicId % 2;
     }
 }
 

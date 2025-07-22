@@ -35,7 +35,7 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { maxPitchRange: true });
+        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { fullDiatonicRange: true });
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
