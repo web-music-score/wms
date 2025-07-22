@@ -27,7 +27,7 @@ export class GuitarNote {
     constructor(readonly guitarCtx: GuitarContext, readonly stringId: number, readonly fretId: number, readonly chromaticId: number) {
         let { scale } = guitarCtx;
 
-        this.preferredNote = scale.getPreferredNote(chromaticId);
+        this.preferredNote = scale.getPreferredChromaticNote(chromaticId);
         this.isScaleNote = scale.isScaleNote(this.preferredNote);
         this.isScaleRootNote = scale.isScaleRootNote(this.preferredNote);
     }

@@ -153,7 +153,7 @@ export class Note {
 
     static getChromaticNote(chromaticId: number, scale?: Scale): Note {
         if (scale) {
-            return scale.getPreferredNote(chromaticId);
+            return scale.getPreferredChromaticNote(chromaticId);
         }
         else {
             let note = this.chromaticNoteCache.get(chromaticId);

@@ -48,10 +48,6 @@ export enum ScaleType {
     HeptatonicBlues = "Heptatonic Blues",
 }
 
-class PreferredChromaticNote {
-    constructor(readonly note: Note, readonly isScaleNote: boolean, readonly isScaleRootNote: boolean) { }
-}
-
 function getMode(scaleType: ScaleType) {
     switch (scaleType) {
         case ScaleType.Major: return 1;
@@ -78,6 +74,7 @@ function getMode(scaleType: ScaleType) {
 export class Scale extends KeySignature {
     private readonly scaleDegrees: ReadonlyArray<Degree>;
     private readonly scaleNotes: ReadonlyArray<Note>;
+    private readonly chromaticClassDegree: ReadonlyArray<Degree | undefined>;
 
     constructor(readonly tonic: string, readonly scaleType: ScaleType) {
         super(tonic, getMode(scaleType));
@@ -115,6 +112,11 @@ export class Scale extends KeySignature {
         }
 
         this.scaleNotes = this.scaleDegrees.map(d => this.getNoteByDegree(d));
+
+        this.chromaticClassDegree = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(chromaticClass => {
+            let id = this.scaleNotes.findIndex(scaleNote => scaleNote.chromaticClass === chromaticClass);
+            return id >= 0 ? this.scaleDegrees[id] : undefined;
+        });
     }
 
     static equals(a: Scale | null | undefined, b: Scale | null | undefined): boolean {
@@ -178,13 +180,11 @@ export class Scale extends KeySignature {
     }
 
     isScaleNote(note: Note): boolean {
-        let n = this.getPreferredChromaticNote(note.chromaticId);
-        return Note.equals(n.note, note) && n.isScaleNote;
+        return this.chromaticClassDegree[note.chromaticClass] !== undefined;
     }
 
     isScaleRootNote(note: Note): boolean {
-        let n = this.getPreferredChromaticNote(note.chromaticId);
-        return Note.equals(n.note, note) && n.isScaleRootNote;
+        return String(this.chromaticClassDegree[note.chromaticClass]) === "1";
     }
 
     getIntervalFromRootNote(note: Note): Interval {
@@ -208,17 +208,14 @@ export class Scale extends KeySignature {
         }
     }
 
-    getPreferredNote(chromaticId: number): Note {
-        return this.getPreferredChromaticNote(chromaticId).note;
-    }
+    private preferredChromaticNoteCache = new Map<number, Note>();
 
-    private preferredChromaticNoteCache: PreferredChromaticNote[] = [];
-
-    private getPreferredChromaticNote(chromaticId: number): PreferredChromaticNote {
+    getPreferredChromaticNote(chromaticId: number): Note {
         Note.validateChromaticId(chromaticId);
 
-        if (this.preferredChromaticNoteCache[chromaticId]) {
-            return this.preferredChromaticNoteCache[chromaticId];
+        let note = this.preferredChromaticNoteCache.get(chromaticId);
+        if (note) {
+            return note;
         }
 
         let octave = Note.getOctaveFromChromaticId(chromaticId);
@@ -236,11 +233,10 @@ export class Scale extends KeySignature {
             }
         });
 
-        let scaleNote = scaleNotes.find(note => Note.getChromaticClass(chromaticId) === note.chromaticClass);
-        if (scaleNote) {
-            let isScaleNote = true;
-            let isScaleRootNote = scaleNote === scaleNotes[0];
-            return this.preferredChromaticNoteCache[chromaticId] = new PreferredChromaticNote(scaleNote, isScaleNote, isScaleRootNote);
+        note = scaleNotes.find(note2 => Note.getChromaticClass(chromaticId) === note2.chromaticClass);
+        if (note) {
+            this.preferredChromaticNoteCache.set(chromaticId, note);
+            return note;
         }
 
         // Other method
@@ -254,19 +250,19 @@ export class Scale extends KeySignature {
         for (let ai = 0; ai < preferredAccs.length; ai++) {
             let acc = preferredAccs[ai];
             for (let diatonicId = Math.max(0, diatonicIdStart); diatonicId <= diatonicIdEnd; diatonicId++) {
-                let note = new Note(diatonicId, acc);
+                note = new Note(diatonicId, acc);
                 if (chromaticId === note.chromaticId) {
-                    let isScaleNote = false;
-                    let isScaleRootNote = false;
-                    return this.preferredChromaticNoteCache[chromaticId] = new PreferredChromaticNote(note, isScaleNote, isScaleRootNote);
+                    this.preferredChromaticNoteCache.set(chromaticId, note);
+                    return note;
                 }
             }
         }
 
-        // Shoul never get here.
-        return this.preferredChromaticNoteCache[chromaticId] = new PreferredChromaticNote(Note.getChromaticNote(chromaticId), false, false);
+        // Final method (if ever occurs).
+        note = Note.getChromaticNote(chromaticId); // Without scale!
+        this.preferredChromaticNoteCache.set(chromaticId, note);
+        return note;
     }
-
 }
 
 /** @public */
