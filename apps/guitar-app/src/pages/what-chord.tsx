@@ -58,50 +58,50 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
         let { app, windowRect } = this.props;
         let { guitarCtx, stringFrettingPos, selectedNote } = this.state;
 
-        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
+        let frettedPositions = stringFrettingPos.map((fingerPos, stringId) => {
+            return fingerPos === "mute"
+                ? undefined
+                : guitarCtx.getFretPosition(stringId, fingerPos);
+        }).reverse().filter(fretPos => fretPos !== undefined) as ScoreUI.FretPosition[];
+
+        const onUpdateFretPosition: ScoreUI.UpdateFretPositionFunc = (fretPosition) => {
             let frettingPos = stringFrettingPos.find((fingerPos, stringId) => {
-                return stringId === guitarNote.stringId && (fingerPos === guitarNote.fretId || fingerPos === "mute" && guitarNote.fretId === 0);
+                return stringId === fretPosition.stringId && (fingerPos === fretPosition.fretId || fingerPos === "mute" && fretPosition.fretId === 0);
             });
 
             if (frettingPos !== undefined) {
-                let selected = selectedNote && guitarNote.chromaticId === selectedNote.chromaticId;
-                guitarNote.setDefaultBorderColor(selected);
+                let selected = selectedNote && fretPosition.chromaticId === selectedNote.chromaticId;
+                fretPosition.setDefaultBorderColor(selected);
 
                 if (frettingPos === "mute") {
-                    guitarNote.fillColor = "black";
-                    guitarNote.text = "X";
+                    fretPosition.fillColor = "black";
+                    fretPosition.text = "X";
                 }
                 else {
-                    guitarNote.setDefaultFillColor();
-                    guitarNote.setDefaultText();
+                    fretPosition.setDefaultFillColor();
+                    fretPosition.setDefaultText();
                 }
 
-                guitarNote.show();
+                fretPosition.show();
             }
             else {
-                guitarNote.hide();
+                fretPosition.hide();
             }
         }
 
-        let frettedGuitarNotes = stringFrettingPos.map((fingerPos, stringId) => {
-            return fingerPos === "mute"
-                ? undefined
-                : guitarCtx.getGuitarNote(stringId, fingerPos);
-        }).reverse().filter(note => note !== undefined) as ScoreUI.GuitarNote[];
-
-        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {
-            Audio.playNote(guitarNote.preferredNote);
+        const onClickFretPosition: ScoreUI.ClickFretPositionFunc = (fretPosition) => {
+            Audio.playNote(fretPosition.note);
 
             let newStringFrettingPos = stringFrettingPos.slice();
             let newSelectedNote: Theory.Note | undefined;
 
-            if (selectedNote?.chromaticId === guitarNote.chromaticId) {
-                newStringFrettingPos[guitarNote.stringId] = "mute";
+            if (selectedNote?.chromaticId === fretPosition.chromaticId) {
+                newStringFrettingPos[fretPosition.stringId] = "mute";
                 newSelectedNote = undefined;
             }
             else {
-                newStringFrettingPos[guitarNote.stringId] = guitarNote.fretId;
-                newSelectedNote = guitarNote.preferredNote;
+                newStringFrettingPos[fretPosition.stringId] = fretPosition.fretId;
+                newSelectedNote = fretPosition.note;
             }
 
             this.setState({ stringFrettingPos: newStringFrettingPos, selectedNote: newSelectedNote });
@@ -132,19 +132,19 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
 
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
-        frettedGuitarNotes.forEach(note => {
-            let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-            let color = selectedNote?.chromaticId === note.chromaticId ? "green" : "black";
-            m.addNote(0, note.preferredNote, Theory.NoteLength.Quarter, { color });
+        frettedPositions.forEach(frettedPosition => {
+            let noteName = frettedPosition.note.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
+            let color = selectedNote?.chromaticId === frettedPosition.chromaticId ? "green" : "black";
+            m.addNote(0, frettedPosition.note, Theory.NoteLength.Quarter, { color });
             m.addLabel(Score.Label.Note, noteName);
         });
 
-        if (frettedGuitarNotes.length >= 2) {
-            let chordNotes = frettedGuitarNotes.map(note => note.preferredNote)
+        if (frettedPositions.length >= 2) {
+            let chordNotes = frettedPositions.map(fretPos => fretPos.note)
             m.addChord(0, chordNotes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
         }
 
-        let chordNotes = frettedGuitarNotes.map(gn => gn.preferredNote);
+        let chordNotes = frettedPositions.map(fretPos => fretPos.note);
         let chordCandidates = Theory.Chord.getChords(chordNotes);
 
         return (<>
@@ -162,8 +162,8 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
-                updateGuitarNote={updateGuitarNote}
-                onClickNote={onClickGuitar} />
+                onUpdateFretPosition={onUpdateFretPosition}
+                onClickFretPosition={onClickFretPosition} />
 
             <Container>
                 <Row xs="auto">

@@ -12,11 +12,11 @@ class ScaleVariant {
     readonly name: string;
     readonly fretExtentByString: number[];
 
-    constructor(readonly position: number, readonly notes: ReadonlyArray<ScoreUI.GuitarNote>) {
+    constructor(readonly position: number, readonly fretPositions: ReadonlyArray<ScoreUI.FretPosition>) {
         this.name = position === 0 ? "Open" : Utils.Math.toOrdinalNumber(position) + " position";
         this.fretExtentByString = [0, 1, 2, 3, 4, 5].map(stringId => {
-            let max = Math.max(...notes.filter(note => note.stringId === stringId).map(note => note.fretId));
-            let min = Math.min(...notes.filter(note => note.stringId === stringId).map(note => note.fretId));
+            let max = Math.max(...fretPositions.filter(fretPos => fretPos.stringId === stringId).map(fretPos => fretPos.fretId));
+            let min = Math.min(...fretPositions.filter(fretPos => fretPos.stringId === stringId).map(fretPos => fretPos.fretId));
             return max - min + 1;
         });
     }
@@ -29,7 +29,7 @@ interface GuitarScalesProps {
 
 interface GuitarScalesState {
     guitarCtx: ScoreUI.GuitarContext;
-    selectedNote?: ScoreUI.GuitarNote;
+    selectedFretPos?: ScoreUI.FretPosition;
     variants: Map<string, ScaleVariant>;
     variantName: string;
 }
@@ -37,7 +37,7 @@ interface GuitarScalesState {
 export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScalesState> {
     state: GuitarScalesState
 
-    private selectedNoteTimer: number | undefined = undefined
+    private selectedTimer: number | undefined = undefined
 
     constructor(props: GuitarScalesProps) {
         super(props);
@@ -48,7 +48,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         this.state = {
             guitarCtx,
-            selectedNote: undefined,
+            selectedFretPos: undefined,
             variants,
             variantName
         }
@@ -68,14 +68,14 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         let variants = new Map<string, ScaleVariant>();
 
-        function saveVariant(position: number, notes: ScoreUI.GuitarNote[]) {
-            let v = new ScaleVariant(position, notes);
+        function saveVariant(position: number, fretPositions: ScoreUI.FretPosition[]) {
+            let v = new ScaleVariant(position, fretPositions);
             variants.set(v.name, v);
         }
 
         for (let position = 0; position < guitarCtx.maxFretId; position++) {
             try {
-                let notes: ScoreUI.GuitarNote[] = [];
+                let fretPositions: ScoreUI.FretPosition[] = [];
 
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let highFret = stringId === 0
@@ -94,9 +94,9 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                                 throw "Missed scale note!";
                             }
                             else {
-                                let note = guitarCtx.getGuitarNote(stringId, fretId);
-                                if (!notes.some(n => n.chromaticId === note.chromaticId)) {
-                                    notes.push(note);
+                                let fretPos = guitarCtx.getFretPosition(stringId, fretId);
+                                if (!fretPositions.some(fretPos2 => fretPos2.chromaticId === fretPos.chromaticId)) {
+                                    fretPositions.push(fretPos);
 
                                     minScaleFretId = Math.min(minScaleFretId, fretId);
                                     maxScaleFretId = Math.max(maxScaleFretId, fretId);
@@ -115,13 +115,13 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
                     }
                 }
 
-                let positionOk = notes.some(note => note.fretId === position);
+                let positionOk = fretPositions.some(fretPos => fretPos.fretId === position);
 
                 if (positionOk) {
                     // Set position to the position of first note on 6th string
-                    let alteredPosition = Math.min(...notes.filter(n => n.stringId === 5).map(n => n.fretId));
+                    let alteredPosition = Math.min(...fretPositions.filter(n => n.stringId === 5).map(n => n.fretId));
 
-                    saveVariant(alteredPosition, notes.reverse());
+                    saveVariant(alteredPosition, fretPositions.reverse());
                 }
             }
             catch (err) { }
@@ -136,42 +136,42 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
     render() {
         let { app, windowRect } = this.props;
-        let { guitarCtx, variantName, variants, selectedNote } = this.state;
+        let { guitarCtx, variantName, variants, selectedFretPos: selectedFretPosition } = this.state;
 
         let variant = variants.get(variantName);
 
-        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
-            let scaleNote = variant?.notes.find(note => note === guitarNote);
+        const onUpdateFretPosition: ScoreUI.UpdateFretPositionFunc = (fretPosition) => {
+            let fretPos = variant?.fretPositions.find(fretPos2 => fretPos2 === fretPosition);
 
-            if (scaleNote || selectedNote === guitarNote) {
-                guitarNote.setDefaultBorderColor(selectedNote === guitarNote);
-                guitarNote.setDefaultFillColor();
-                guitarNote.setDefaultText();
-                guitarNote.show();
+            if (fretPos || selectedFretPosition === fretPosition) {
+                fretPosition.setDefaultBorderColor(selectedFretPosition === fretPosition);
+                fretPosition.setDefaultFillColor();
+                fretPosition.setDefaultText();
+                fretPosition.show();
             }
             else {
-                guitarNote.hide();
+                fretPosition.hide();
             }
         }
 
-        const selectNote = (guitarNote: ScoreUI.GuitarNote) => {
-            Audio.playNote(guitarNote.preferredNote);
-            this.setState({ selectedNote: guitarNote });
+        const selectFretPosition = (fretPosition: ScoreUI.FretPosition) => {
+            Audio.playNote(fretPosition.note);
+            this.setState({ selectedFretPos: fretPosition });
 
-            if (this.selectedNoteTimer) {
-                window.clearTimeout(this.selectedNoteTimer);
-                this.selectedNoteTimer = undefined;
+            if (this.selectedTimer) {
+                window.clearTimeout(this.selectedTimer);
+                this.selectedTimer = undefined;
             }
 
-            if (!variant || variant.notes.indexOf(guitarNote) < 0) {
-                this.selectedNoteTimer = window.setTimeout(() => {
-                    this.selectedNoteTimer = undefined;
-                    this.setState({ selectedNote: undefined })
+            if (!variant || variant.fretPositions.indexOf(fretPosition) < 0) {
+                this.selectedTimer = window.setTimeout(() => {
+                    this.selectedTimer = undefined;
+                    this.setState({ selectedFretPos: undefined })
                 }, 1000);
             }
         }
 
-        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => selectNote(guitarNote);
+        const onClickFretPosition: ScoreUI.ClickFretPositionFunc = (fretPos) => selectFretPosition(fretPos);
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
             if (!(event instanceof Score.ScoreObjectEvent)) {
@@ -185,19 +185,19 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
             if (event.type === "click") {
                 if (obj instanceof Score.MNoteGroup) {
                     let note = obj.getNotes()[0];
-                    let scaleNote = variant?.notes.find(n => n.chromaticId === note.chromaticId);
-                    if (scaleNote) {
-                        selectNote(scaleNote);
+                    let scaleFretPos = variant?.fretPositions.find(fretPos => fretPos.chromaticId === note.chromaticId);
+                    if (scaleFretPos) {
+                        selectFretPosition(scaleFretPos);
                     }
                 }
                 else {
-                    this.setState({ selectedNote: undefined });
+                    this.setState({ selectedFretPos: undefined });
                 }
             }
         }
 
         const onChangeVariant = (variantName: string) => {
-            this.setState({ variantName, selectedNote: undefined });
+            this.setState({ variantName, selectedFretPos: undefined });
         }
 
         let variantNames = Utils.Map.getMapKeys(variants);
@@ -207,10 +207,10 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
 
         if (variant) {
-            variant.notes.forEach(note => {
-                let noteName = note.preferredNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-                let color = selectedNote?.chromaticId === note.chromaticId ? "green" : "black";
-                m.addNote(0, note.preferredNote, Theory.NoteLength.Quarter, { color });
+            variant.fretPositions.forEach(fretPos => {
+                let noteName = fretPos.note.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
+                let color = selectedFretPosition?.chromaticId === fretPos.chromaticId ? "green" : "black";
+                m.addNote(0, fretPos.note, Theory.NoteLength.Quarter, { color });
                 m.addLabel(Score.Label.Note, noteName);
             });
         }
@@ -248,8 +248,8 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
             <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
-                updateGuitarNote={updateGuitarNote}
-                onClickNote={onClickGuitar} />
+                onUpdateFretPosition={onUpdateFretPosition}
+                onClickFretPosition={onClickFretPosition} />
 
             <br />
         </>);

@@ -12,8 +12,8 @@ const DefaultColors = {
 }
 
 /** @public */
-export class GuitarNote {
-    readonly preferredNote: Note;
+export class FretPosition {
+    readonly note: Note;
     readonly isScaleNote: boolean;
     readonly isScaleRootNote: boolean;
 
@@ -27,9 +27,9 @@ export class GuitarNote {
     constructor(readonly guitarCtx: GuitarContext, readonly stringId: number, readonly fretId: number, readonly chromaticId: number) {
         let { scale } = guitarCtx;
 
-        this.preferredNote = scale.getPreferredChromaticNote(chromaticId);
-        this.isScaleNote = scale.isScaleNote(this.preferredNote);
-        this.isScaleRootNote = scale.isScaleRootNote(this.preferredNote);
+        this.note = scale.getPreferredChromaticNote(chromaticId);
+        this.isScaleNote = scale.isScaleNote(this.note);
+        this.isScaleRootNote = scale.isScaleRootNote(this.note);
     }
 
     get chromaticClass() {
@@ -49,13 +49,13 @@ export class GuitarNote {
 
         switch (guitarNoteLabel) {
             case GuitarNoteLabel.OmitOctave:
-                this.text = this.preferredNote.formatOmitOctave(SymbolSet.Unicode);
+                this.text = this.note.formatOmitOctave(SymbolSet.Unicode);
                 break;
             case GuitarNoteLabel.Interval:
-                this.text = scale.getIntervalFromRootNote(this.preferredNote).toAbbrString().replace("P1", "R");
+                this.text = scale.getIntervalFromRootNote(this.note).toAbbrString().replace("P1", "R");
                 break;
             default:
-                this.text = this.preferredNote.format(pitchNotation, SymbolSet.Unicode);
+                this.text = this.note.format(pitchNotation, SymbolSet.Unicode);
                 break;
         }
     }
@@ -77,7 +77,7 @@ export class GuitarNote {
 export class GuitarContext {
     readonly maxFretId: number;
 
-    private readonly guitarNoteTable: Readonly<GuitarNote>[][];
+    private readonly fretPositionTable: Readonly<FretPosition>[][];
     private readonly tuningStrings: ReadonlyArray<Note>;
 
     constructor(readonly tuningName: string, readonly scale: Scale, readonly handedness: Handedness, readonly pitchNotation: PitchNotation, readonly guitarNoteLabel: GuitarNoteLabel) {
@@ -86,22 +86,22 @@ export class GuitarContext {
 
         this.tuningStrings = getTuningStrings(tuningName);
 
-        this.guitarNoteTable = [[], [], [], [], [], []];
+        this.fretPositionTable = [[], [], [], [], [], []];
 
         for (let stringId = 0; stringId < 6; stringId++) {
             let openStringChromaticId = this.tuningStrings[stringId].chromaticId;
 
             for (let fretId = 0; fretId <= this.maxFretId; fretId++) {
                 let chromaticId = openStringChromaticId + fretId;
-                this.guitarNoteTable[stringId][fretId] = new GuitarNote(this, stringId, fretId, chromaticId);
+                this.fretPositionTable[stringId][fretId] = new FretPosition(this, stringId, fretId, chromaticId);
             }
         }
     }
 
-    getGuitarNote(stringId: number, fretId: number): Readonly<GuitarNote> {
+    getFretPosition(stringId: number, fretId: number): Readonly<FretPosition> {
         Assert.int_between(stringId, 0, 5, "stringId");
         Assert.int_between(fretId, 0, this.maxFretId, "fretId");
-        return this.guitarNoteTable[stringId][fretId];
+        return this.fretPositionTable[stringId][fretId];
     }
 
     getStringTuning(stringId: number) {

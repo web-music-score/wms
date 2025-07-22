@@ -15,18 +15,18 @@ class GuitarChord {
     readonly maxFretId: number;
     readonly minScaleFretId: number;
 
-    constructor(readonly positionName: PositionName, readonly guitarNotes: ScoreUI.GuitarNote[]) {
-        this.minFretId = Math.min(...guitarNotes.map(n => n.fretId));
-        this.maxFretId = Math.max(...guitarNotes.map(n => n.fretId));
+    constructor(readonly positionName: PositionName, readonly fretPositions: ScoreUI.FretPosition[]) {
+        this.minFretId = Math.min(...fretPositions.map(n => n.fretId));
+        this.maxFretId = Math.max(...fretPositions.map(n => n.fretId));
         this.minScaleFretId = Math.max(0, this.minFretId - (positionName === PositionName.C ? 0 : 1));
     }
 
     consistsOfTriad(triadNotes: Theory.Note[]) {
-        return this.guitarNotes.every(n1 => triadNotes.some(n2 => n2.chromaticClass === n1.chromaticClass));
+        return this.fretPositions.every(n1 => triadNotes.some(n2 => n2.chromaticClass === n1.chromaticClass));
     }
 
-    hasGuitarNote(guitarNote: ScoreUI.GuitarNote) {
-        return this.guitarNotes.some(n => n === guitarNote);
+    hasFretPosition(fretPosition: ScoreUI.FretPosition) {
+        return this.fretPositions.some(fretPos => fretPos === fretPosition);
     }
 }
 
@@ -48,27 +48,28 @@ interface CAGEDScalesState {
     positionNameList: PositionName[];
     positionName: PositionName;
     positionChords: GuitarChord[];
-    scaleNotes: ScoreUI.GuitarNote[];
-    selectedNote?: ScoreUI.GuitarNote;
+    scaleFretPositions: ScoreUI.FretPosition[];
+    selectedFretPosition?: ScoreUI.FretPosition;
 }
 
 export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesState> {
     state: CAGEDScalesState
 
-    private selectedNoteTimer: number | undefined = undefined;
+    private selectedTimer: number | undefined = undefined;
 
     constructor(props: CAGEDScalesProps) {
         super(props);
 
-        let { guitarCtx, positionNameList, positionName, positionChords, scaleNotes } = this.createStateUpdate(props.app.getGuitarContext(), "start");
+        let { guitarCtx, positionNameList, positionName, positionChords, scaleFretPositions } =
+            this.createStateUpdate(props.app.getGuitarContext(), "start");
 
         this.state = {
             guitarCtx,
             positionNameList,
             positionName,
             positionChords,
-            scaleNotes,
-            selectedNote: undefined,
+            scaleFretPositions,
+            selectedFretPosition: undefined,
         }
     }
 
@@ -87,7 +88,7 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
         positionNameList: PositionName[],
         positionName: PositionName,
         positionChords: GuitarChord[],
-        scaleNotes: ScoreUI.GuitarNote[]
+        scaleFretPositions: ScoreUI.FretPosition[]
     } {
 
         if (guitarCtx.tuningName !== Theory.DefaultTuningName || guitarCtx.scale.scaleType !== Theory.ScaleType.Major) {
@@ -96,14 +97,14 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
                 positionNameList: [],
                 positionName: PositionName.C,
                 positionChords: [],
-                scaleNotes: []
+                scaleFretPositions: []
             }
         }
 
         const ScaleOctave = guitarCtx.scale.getScaleNotes(LowestNote, 1);
         const MajorTriadNotes = [ScaleOctave[0], ScaleOctave[2], ScaleOctave[4]];
 
-        const mapChord = (...fretIdArr: number[]) => fretIdArr.map((fretId, stringId) => guitarCtx.getGuitarNote(stringId, fretId));
+        const mapChord = (...fretIdArr: number[]) => fretIdArr.map((fretId, stringId) => guitarCtx.getFretPosition(stringId, fretId));
 
         // Get position chords
         let positionChords: GuitarChord[] = [];
@@ -138,24 +139,24 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
         positionChords = positionChords.filter(c => c.positionName === positionName);
 
         // Create scales
-        let scaleNotes: ScoreUI.GuitarNote[] = [];
+        let scaleFretPositions: ScoreUI.FretPosition[] = [];
 
         positionChords.forEach(chord => {
-            let notes: ScoreUI.GuitarNote[] = [];
+            let fretPositions: ScoreUI.FretPosition[] = [];
 
             for (let stringId = 0; stringId <= 5; stringId++) {
                 let startFret = chord.minScaleFretId;
                 let endFret = startFret + (stringId === 0 ? 4 : 5);
 
                 for (let fretId = Math.min(endFret, maxFretId); fretId >= startFret; fretId--) {
-                    let note = guitarCtx.getGuitarNote(stringId, fretId);
-                    if (note.isScaleNote && !notes.some(n => n.chromaticId === note.chromaticId)) {
-                        notes.push(note);
+                    let fretPos = guitarCtx.getFretPosition(stringId, fretId);
+                    if (fretPos.isScaleNote && !fretPositions.some(fretPos2 => fretPos2.chromaticId === fretPos.chromaticId)) {
+                        fretPositions.push(fretPos);
                     }
                 }
             }
 
-            scaleNotes = [...scaleNotes, ...notes];
+            scaleFretPositions = [...scaleFretPositions, ...fretPositions];
         });
 
         // Create position name list
@@ -168,13 +169,13 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
             positionNameList,
             positionName,
             positionChords,
-            scaleNotes
+            scaleFretPositions
         }
     }
 
     render() {
         let { app, windowRect } = this.props;
-        let { guitarCtx, positionNameList, positionName, positionChords, scaleNotes, selectedNote } = this.state;
+        let { guitarCtx, positionNameList, positionName, positionChords, scaleFretPositions, selectedFretPosition } = this.state;
         let { scale } = guitarCtx;
 
         let errorMsgs: string[] = [];
@@ -205,46 +206,46 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
             ][i];
         });
 
-        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
-            let scaleNote = scaleNotes.find(note => note === guitarNote);
+        const onUpdateFretPosition: ScoreUI.UpdateFretPositionFunc = (fretPosition) => {
+            let scaleFretPos = scaleFretPositions.find(fretPos => fretPos === fretPosition);
 
-            if (scaleNote || selectedNote === guitarNote) {
-                guitarNote.setDefaultFillColor();
-                guitarNote.setDefaultText();
+            if (scaleFretPos || selectedFretPosition === fretPosition) {
+                fretPosition.setDefaultFillColor();
+                fretPosition.setDefaultText();
 
-                if (selectedNote === guitarNote) {
-                    guitarNote.setDefaultBorderColor(true);
+                if (selectedFretPosition === fretPosition) {
+                    fretPosition.setDefaultBorderColor(true);
                 }
-                else if (positionChords.some(c => c.hasGuitarNote(guitarNote))) {
-                    guitarNote.borderColor = "yellow";
+                else if (positionChords.some(c => c.hasFretPosition(fretPosition))) {
+                    fretPosition.borderColor = "yellow";
                 }
                 else {
-                    guitarNote.setDefaultBorderColor(false);
+                    fretPosition.setDefaultBorderColor(false);
                 }
 
-                guitarNote.show();
+                fretPosition.show();
             }
             else {
-                guitarNote.hide();
+                fretPosition.hide();
             }
         }
 
-        const selectNote = (guitarNote: ScoreUI.GuitarNote) => {
-            Audio.playNote(guitarNote.preferredNote);
-            this.setState({ selectedNote: guitarNote });
+        const selectFretPos = (fretPosition: ScoreUI.FretPosition) => {
+            Audio.playNote(fretPosition.note);
+            this.setState({ selectedFretPosition: fretPosition });
 
-            if (this.selectedNoteTimer) {
-                window.clearTimeout(this.selectedNoteTimer);
-                this.selectedNoteTimer = undefined;
+            if (this.selectedTimer) {
+                window.clearTimeout(this.selectedTimer);
+                this.selectedTimer = undefined;
             }
 
-            this.selectedNoteTimer = window.setTimeout(() => {
-                this.selectedNoteTimer = undefined;
-                this.setState({ selectedNote: undefined })
+            this.selectedTimer = window.setTimeout(() => {
+                this.selectedTimer = undefined;
+                this.setState({ selectedFretPosition: undefined })
             }, 1000);
         }
 
-        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => selectNote(guitarNote);
+        const onClickFretPosition: ScoreUI.ClickFretPositionFunc = (fretPos) => selectFretPos(fretPos);
 
         const onSetPositionName = (positionName: string) => {
             this.setState(this.createStateUpdate(guitarCtx, positionName as PositionName));
@@ -289,8 +290,8 @@ export class CAGEDScales extends React.Component<CAGEDScalesProps, CAGEDScalesSt
             <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
-                updateGuitarNote={updateGuitarNote}
-                onClickNote={onClickGuitar} />
+                onUpdateFretPosition={onUpdateFretPosition}
+                onClickFretPosition={onClickFretPosition} />
 
             <br />
         </>);

@@ -45,18 +45,6 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             m.addLabel(Score.Label.Note, noteName);
         }
 
-        const updateGuitarNote: ScoreUI.UpdateGuitarNoteFunc = (guitarNote) => {
-            if (selectedNote && selectedNote.chromaticId === guitarNote.chromaticId) {
-                guitarNote.setDefaultBorderColor(true);
-                guitarNote.setDefaultFillColor();
-                guitarNote.setDefaultText();
-                guitarNote.show();
-            }
-            else {
-                guitarNote.hide();
-            }
-        }
-
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
             if (!(event instanceof Score.ScoreStaffPosEvent)) {
                 return;
@@ -73,9 +61,21 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             }
         }
 
-        const onClickGuitar = (guitarNote: ScoreUI.GuitarNote) => {
-            Audio.playNote(guitarNote.preferredNote);
-            this.setState({ selectedNote: guitarNote.preferredNote });
+        const onClickFretPosition: ScoreUI.ClickFretPositionFunc = (fretPosition) => {
+            Audio.playNote(fretPosition.note);
+            this.setState({ selectedNote: fretPosition.note });
+        }
+
+        const onUpdateFretPosition: ScoreUI.UpdateFretPositionFunc = (fretPosition) => {
+            if (selectedNote && selectedNote.chromaticId === fretPosition.chromaticId) {
+                fretPosition.setDefaultBorderColor(true);
+                fretPosition.setDefaultFillColor();
+                fretPosition.setDefaultText();
+                fretPosition.show();
+            }
+            else {
+                fretPosition.hide();
+            }
         }
 
         const onChangeAccidental = (accidental: Theory.Accidental | undefined) => {
@@ -109,8 +109,8 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
             <ScoreUI.GuitarView
                 style={{ position: "relative", width: windowRect.width }}
                 guitarContext={guitarCtx}
-                updateGuitarNote={updateGuitarNote}
-                onClickNote={onClickGuitar} />
+                onUpdateFretPosition={onUpdateFretPosition}
+                onClickFretPosition={onClickFretPosition} />
 
             <br />
         </>

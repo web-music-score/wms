@@ -2,7 +2,7 @@ import * as React from "react";
 import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "@tspro/web-music-score/score";
 import { Handedness } from "@tspro/web-music-score/theory";
-import { GuitarContext, GuitarNote, } from "./guitar-context";
+import { GuitarContext, FretPosition } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
 import GuitarImg from "./assets/guitar.png";
 
@@ -40,26 +40,29 @@ class Fret {
 }
 
 /** @public */
-export type UpdateGuitarNoteFunc = (guitarNote: GuitarNote) => void;
-
-/** @public */
-export class CellData {
-    constructor(readonly guitarNote: Readonly<GuitarNote>, readonly cellRect: DivRect, readonly noteRect: DivRect) { }
+export class FretPositionData {
+    constructor(readonly fretPosition: Readonly<FretPosition>, readonly cellRect: DivRect, readonly noteRect: DivRect) { }
 }
+
+/** @public  */
+export type UpdateFretPositionFunc = (fretPosition: FretPosition) => void;
+
+/** @public  */
+export type ClickFretPositionFunc = (fretPosition: FretPosition) => void;
 
 /** @public */
 export interface GuitarViewProps {
     style?: React.CSSProperties;
     guitarContext: GuitarContext;
-    updateGuitarNote?: UpdateGuitarNoteFunc;
-    onClickNote?: (guitarNote: GuitarNote) => void;
+    onUpdateFretPosition?: UpdateFretPositionFunc;
+    onClickFretPosition?: ClickFretPositionFunc;
 }
 
 /** @public */
 export interface GuitarViewState {
     width: number;
     height: number;
-    table: CellData[][];
+    table: FretPositionData[][];
 }
 
 /** @public */
@@ -101,7 +104,7 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
 
         let noteWidth = Math.round(frets[frets.length - 2].x - frets[frets.length - 1].x);
 
-        let table: CellData[][] = [[], [], [], [], [], []];
+        let table: FretPositionData[][] = [[], [], [], [], [], []];
 
         for (let stringId = 0; stringId < 6; stringId++) {
 
@@ -127,27 +130,27 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
                     noteWidth,
                     cellRect.height).scaleCopy(0.75, 0.95);
 
-                let guitarNote = guitarCtx.getGuitarNote(stringId, fretId);
+                let fretPosition = guitarCtx.getFretPosition(stringId, fretId);
 
-                table[stringId][fretId] = new CellData(guitarNote, cellRect, noteRect);
+                table[stringId][fretId] = new FretPositionData(fretPosition, cellRect, noteRect);
             }
         }
 
         return { table, width, height }
     }
 
-    onHover(cell?: CellData) { }
+    onHover(fretPositionData?: FretPositionData) { }
 
-    onClick(cell?: CellData) {
-        let { onClickNote } = this.props;
-        if (cell && onClickNote) {
-            onClickNote(cell.guitarNote);
+    onClick(fretPositionData?: FretPositionData) {
+        let { onClickFretPosition: onClicFretPosition } = this.props;
+        if (fretPositionData && onClicFretPosition) {
+            onClicFretPosition(fretPositionData.fretPosition);
         }
     }
 
     render() {
         let { width, height, table } = this.state;
-        let { guitarContext: guitarCtx, updateGuitarNote, style } = this.props;
+        let { guitarContext: guitarCtx, onUpdateFretPosition, style } = this.props;
 
         style = Object.assign({}, style, { width, height });
 
@@ -162,27 +165,27 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
         );
 
         /* Add visible notes */
-        table.forEach(frets => frets.forEach(cell => {
-            let { guitarNote, noteRect } = cell;
+        table.forEach(frets => frets.forEach(fretPositionData => {
+            let { fretPosition, noteRect } = fretPositionData;
 
-            if (updateGuitarNote) {
-                updateGuitarNote(guitarNote);
+            if (onUpdateFretPosition) {
+                onUpdateFretPosition(fretPosition);
             }
 
-            if (guitarNote.isVisible) {
+            if (fretPosition.isVisible) {
                 // Create border with box-shadow
-                let border = guitarNote.borderColor !== undefined ? Math.round(noteRect.width / 10) : 0;
-                let boxShadow = "0 0 0 " + border + "px " + (guitarNote.borderColor ?? "black");
+                let border = fretPosition.borderColor !== undefined ? Math.round(noteRect.width / 10) : 0;
+                let boxShadow = "0 0 0 " + border + "px " + (fretPosition.borderColor ?? "black");
 
                 components.push(<span
-                    key={"sel_" + guitarNote.stringId + "_" + guitarNote.fretId}
+                    key={"sel_" + fretPosition.stringId + "_" + fretPosition.fretId}
                     style={{
                         position: "absolute",
-                        zIndex: guitarNote.borderColor !== undefined ? 2 : 1,
+                        zIndex: fretPosition.borderColor !== undefined ? 2 : 1,
                         cursor: "pointer",
-                        borderRadius: guitarNote.fretId > 0 ? "50%" : "",
-                        color: guitarNote.textColor,
-                        background: guitarNote.fillColor,
+                        borderRadius: fretPosition.fretId > 0 ? "50%" : "",
+                        color: fretPosition.textColor,
+                        background: fretPosition.fillColor,
                         boxShadow, WebkitBoxShadow: boxShadow, MozBoxShadow: boxShadow,
                         left: noteRect.left,
                         top: noteRect.top,
@@ -193,7 +196,7 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
                         display: "flex",
                         justifyContent: "center", // Align horizontal
                         alignItems: "center" // Align vertical
-                    }}>{guitarNote.text}</span>);
+                    }}>{fretPosition.text}</span>);
             }
         }));
 
