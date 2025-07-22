@@ -7,17 +7,22 @@ later taking lessons in classical guitar. I've also studied music theory indepen
 
 This project has been developed gradually over several years. Although it’s beginning to take shape, it remains a work in progress — expect occasional changes, bugs, or unexpected behavior.
 
+## Version 2 Update
+
+**Breaking:** Version 2 is major update and brought many changes.
+
+* Introduced subpath modules instead of one big main module. Import each separately.
+* Theory module had big refactor. Renamed all musical terms that were wrong (e.g. pitch => diatonicId, noteId => chromaticId).
+* Score module stayed mostly same. Some changes (e.g. enum names) but nothing major.
+* Classical guitar audio is separate module (audio-cg) because bundles over 1MB of audio samples. Also improved default synth audio.
+
 ## Installation
 
 ```sh
 npm i @tspro/web-music-score
 ```
 
-## Usage
-
-### Import
-
-**Breaking:** Version 2 introduced subpath module imports, instead of one big main import.
+## Import
 
 ```js
 // Import core module, it does not contain much.
@@ -45,7 +50,7 @@ const Core = require("@tspro/web-music-score/core");
 // etc.
 ```
 
-### Browser Script
+## Browser Script
 
 This is an experimental module that can be used via unpkg CDN. It declares global variable `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, and `Pieces`. All modules except react-ui.
 
@@ -200,7 +205,7 @@ m.addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Whole, { arpeggio: Score.Arp
 | arpeggio    | `Score.Arpeggio.Up/Down` \| `boolean`  | Play column in arpeggio. |
 | staccato    | `boolean`               | Play column in staccato. |
 | diamond     | `boolean`               | Diamond shaped note head. |
-| tieSpan     | `number` \| `TieLength.Short/ToMeasureEnd` | How many notes this tie spans. |
+| tieSpan     | `number` \| `TieType.Stub/ToMeasureEnd` | How many notes this tie spans. |
 | tieAnchor   | `Score.NoteAnchor.Auto/Above/Center/Below/StemTip` | Tie attach point. |
 | slurSpan    | `number`                | How many notes this slur spans. |
 | slurAnchor  | `Score.NoteAnchor.Auto/Above/Center/Below/StemTip` | Slur attach point. |
@@ -431,24 +436,9 @@ p.setPlayStopButton("playStopButtonId")
 p.setPlayButton(playButtonElement)
 ```
 
-### Error Handling
-
-```js
-try {
-    // Invalid note "C" without octave.
-    m.addNote(0, "C", Theory.NoteLength.Quarter);        
-}
-catch(e) {
-    // MusicError is raised on errors.
-    if(e instanceof Core.MusicError) {
-        console.error(e);
-    }
-}
-```
-
 ## Compatibility
 - This library is bundled to ESM, CJS and IIFE formats.
-- Target is to suppor ES6/ES2015.
+- Target is to support ES6/ES2015.
 - No polyfills are included.
 
 While designed for compatibility in mind, the library has not been explicitly tested against specific Node.js or browser versions.
