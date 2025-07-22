@@ -180,15 +180,15 @@ export class Note {
     }
 
     static getDiatonicClass(diatonicId: number): number;
-    static getDiatonicClass(noteLetter: string): number;
+    static getDiatonicClass(noteName: string): number;
     static getDiatonicClass(arg: number | string): number {
         if (typeof arg === "number") {
             // arg is diatonicId
             return mod(arg, 7);
         }
-        else if (typeof arg === "string") {
-            // arg is noteLetter
-            return NoteLetters.indexOf(Note.validateNoteLetter(arg));
+        else if (typeof arg === "string" && arg.length > 0) {
+            // arg is noteName => arg[0] is noteLetter
+            return NoteLetters.indexOf(Note.validateNoteLetter(arg[0]));
         }
         else {
             throw new NoteError(`Invalid getDiatonicClass arg: ${arg}`);
