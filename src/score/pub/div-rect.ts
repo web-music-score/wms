@@ -186,8 +186,17 @@ export class DivRect {
      * @param b -
      * @returns 
      */
-    static equals(a: DivRect, b: DivRect) {
-        return a === b || a.left === b.left && a.centerX === b.centerX && a.right === b.right && a.top === b.top && a.centerY === b.centerY && a.bottom === b.bottom;
+    static equals(a: DivRect | null | undefined, b: DivRect | null | undefined) {
+        if (a == null && b == null) {
+            // handles null and undefined
+            return true;
+        }
+        else if (a == null || b == null) {
+            return false;
+        }
+        else {
+            return a === b || a.left === b.left && a.centerX === b.centerX && a.right === b.right && a.top === b.top && a.centerY === b.centerY && a.bottom === b.bottom;
+        }
     }
 
     /**
@@ -196,8 +205,17 @@ export class DivRect {
      * @param b -
      * @returns 
      */
-    static equalsFrame(a: DivRect, b: DivRect) {
-        return a === b || a.left === b.left && a.right === b.right && a.top === b.top && a.bottom === b.bottom;
+    static equalsFrame(a: DivRect | null | undefined, b: DivRect | null | undefined) {
+        if (a == null && b == null) {
+            // handles null and undefined
+            return true;
+        }
+        else if (a == null || b == null) {
+            return false;
+        }
+        else {
+            return a === b || a.left === b.left && a.right === b.right && a.top === b.top && a.bottom === b.bottom;
+        }
     }
 
     /**
