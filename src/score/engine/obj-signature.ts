@@ -4,7 +4,7 @@ import { DivRect, MSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjImage } from "./obj-image";
-import { ClefKind, MusicStaff } from "./staff-and-tab";
+import { Clef, MusicStaff } from "./staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
@@ -111,11 +111,11 @@ export class ObjSignature extends MusicObject {
     }
 
     private getAccidentalDiatonicId(accNote: Note): number {
-        let clefKind = this.staff.clefKind;
+        let { clef } = this.staff;
 
         let bottomAccidentalDiatonicId: number | undefined = undefined;
 
-        if (clefKind === ClefKind.Treble) {
+        if (clef === Clef.Treble) {
             if (accNote.accidental > 0) {
                 bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 3;
             }
@@ -123,7 +123,7 @@ export class ObjSignature extends MusicObject {
                 bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 1;
             }
         }
-        else if (clefKind === ClefKind.Bass) {
+        else if (clef === Clef.Bass) {
             if (accNote.accidental > 0) {
                 bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 1;
             }

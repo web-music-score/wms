@@ -5,7 +5,7 @@ import { DivRect, MScoreRow, StaffPreset } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
-import { ClefKind, GuitarTab, MusicStaff } from "./staff-and-tab";
+import { Clef, GuitarTab, MusicStaff } from "./staff-and-tab";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -13,11 +13,11 @@ import { DocumentSettings } from "./settings";
 
 const p = (noteName: string) => Note.getNote(noteName).diatonicId;
 
-const createStaff_Treble = () => new MusicStaff(ClefKind.Treble, p("G4"), p("B4"), p("C3"), p("C7"));
-const createStaff_GuitarTreble = () => new MusicStaff(ClefKind.Treble, p("G3"), p("B3"), p("C2"), p("C6"));
-const createStaff_Bass = () => new MusicStaff(ClefKind.Bass, p("F3"), p("D3"), p("C1"), p("C5"));
-const createStaff_Grand_Treble = () => new MusicStaff(ClefKind.Treble, p("G4"), p("B4"), p("C4"), p("C7"));
-const createStaff_Grand_Bass = () => new MusicStaff(ClefKind.Bass, p("F3"), p("D3"), p("C1"), p("C4") - 1);
+const createStaff_Treble = () => new MusicStaff(Clef.Treble, p("G4"), p("B4"), p("C3"), p("C7"));
+const createStaff_GuitarTreble = () => new MusicStaff(Clef.Treble, p("G3"), p("B3"), p("C2"), p("C6"));
+const createStaff_Bass = () => new MusicStaff(Clef.Bass, p("F3"), p("D3"), p("C1"), p("C5"));
+const createStaff_Grand_Treble = () => new MusicStaff(Clef.Treble, p("G4"), p("B4"), p("C4"), p("C7"));
+const createStaff_Grand_Bass = () => new MusicStaff(Clef.Bass, p("F3"), p("D3"), p("C1"), p("C4") - 1);
 
 export class ObjScoreRow extends MusicObject {
     public readonly staffPreset: StaffPreset;

@@ -2,7 +2,7 @@ import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ImageAsset } from "./renderer";
 
-export enum ClefKind { Treble, Bass }
+export enum Clef { Treble, Bass }
 
 export class MusicStaff {
     readonly clefImageAsset: ImageAsset;
@@ -11,12 +11,12 @@ export class MusicStaff {
     readonly octaveLower: boolean;
 
     constructor(
-        readonly clefKind: ClefKind,
+        readonly clef: Clef,
         readonly clefLineDiatonicId: number,
         readonly middleLineDiatonicId: number,
         readonly minDiatonicId: number,
         readonly maxDiatonicId: number) {
-        this.clefImageAsset = clefKind === ClefKind.Treble ? ImageAsset.TrebleClefPng : ImageAsset.BassClefPng;
+        this.clefImageAsset = clef === Clef.Treble ? ImageAsset.TrebleClefPng : ImageAsset.BassClefPng;
         this.topLineDiatonicId = this.middleLineDiatonicId + 4;
         this.bottomLineDiatonicId = this.middleLineDiatonicId - 4;
         this.octaveLower = this.clefLineDiatonicId === Note.getNote("G3").diatonicId; // Guitar is played octave lower
