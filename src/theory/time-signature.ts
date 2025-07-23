@@ -54,8 +54,7 @@ export class TimeSignature {
             this.beamGroupCount = this.beatCount / 3;
         }
         else {
-            console.warn("Unhandled time signature " + this.toString());
-            console.warn("Setting beamGroupCount to 1");
+            console.warn("Not necessarily an error, but unsupported time signature: " + this.toString());
             this.beamGroupCount = 1;
         }
 
