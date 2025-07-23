@@ -9,15 +9,6 @@ export type Tempo = {
     }
 }
 
-/** @public */
-export type AlterTempo = {
-    beatsPerMinute: number,
-    options?: {
-        beatLength: NoteLength,
-        dotted?: boolean
-    }
-}
-
 let defaultTempo: Tempo | undefined;
 
 /** @public */

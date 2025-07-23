@@ -1,6 +1,6 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature } from "@tspro/web-music-score/theory";
-import { AlterTempo, Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
+import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId } from "../pub";
 import { Renderer } from "./renderer";
@@ -22,6 +22,14 @@ import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos 
 import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
+
+type AlterTempo = {
+    beatsPerMinute: number,
+    options?: {
+        beatLength: NoteLength,
+        dotted?: boolean
+    }
+}
 
 export function validateVoiceId(voiceId: number): VoiceId {
     Assert.assert((<number[]>getVoiceIds()).indexOf(voiceId) >= 0, "Invalid voiceId: " + voiceId);
