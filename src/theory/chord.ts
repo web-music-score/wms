@@ -1,5 +1,4 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
-import { MusicError } from "@tspro/web-music-score/core";
 import { Note } from "./note";
 import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";

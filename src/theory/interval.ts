@@ -1,5 +1,4 @@
 import { Assert, Utils } from "@tspro/ts-utils-lib";
-import { MusicError } from "@tspro/web-music-score/core";
 import { Note } from "./note";
 
 /** @public */
@@ -132,9 +131,10 @@ function formatQuantity(q: number) {
     return Utils.Math.toOrdinalNumber(q);
 }
 
-class InvalidInterval extends MusicError {
+class InvalidInterval extends Error {
     constructor(readonly msg: string) {
         super(msg);
+        this.name = "InvalidInterval";
     }
 }
 
