@@ -115,9 +115,10 @@ function canOmitDegree(chordInfo: ChordInfo, degree: Degree) {
 }
 
 /** @public */
-export class InvalidChordException extends MusicError {
+export class InvalidChordException extends Error {
     constructor(readonly msg: string) {
         super(msg);
+        this.name = "InvalidChordException";
     }
 }
 
