@@ -29,6 +29,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
 
     onChangeTuning(tuningName: string) {
         try {
+            Score.MPlayer.stopAll();
             let guitarCtx = this.state.guitarCtx.alterTuningName(Theory.validateTuningName(tuningName));
             if (guitarCtx !== this.state.guitarCtx) {
                 this.setState({ guitarCtx, score: this.createScore(guitarCtx) });

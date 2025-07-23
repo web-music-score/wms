@@ -113,6 +113,8 @@ export class Renderer {
             return;
         }
 
+        this.updateCursorRect(undefined);
+
         let prevMDoc = this.mdoc;
 
         this.mdoc = mdoc;
@@ -278,8 +280,9 @@ export class Renderer {
     draw() {
         let { ctx, doc } = this;
 
-        doc = Assert.require(doc, "Renderer draw failed because document is undefined.");
-        ctx = Assert.require(ctx, "Renderer draw failed because canvas context is undefined.");
+        if (!ctx || !doc) {
+            return;
+        }
 
         doc.layout();
 
