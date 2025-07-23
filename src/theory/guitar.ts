@@ -50,7 +50,6 @@ export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {
         Assert.int_eq(tuningStrings.length, 6, "Tuning should have 6 strings but has " + tuningStrings.length + " strings.");
 
         TuningStringsCache.set(tuningName, tuningStrings);
-
     }
 
     return tuningStrings;
