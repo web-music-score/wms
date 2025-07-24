@@ -1,17 +1,14 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { Scale } from "./scale";
 import { PitchNotation, SymbolSet } from "./types";
+import { MusicError } from "@tspro/web-music-score/core";
+
+function getNoteError(msg: string) {
+    return new MusicError("NoteError: " + msg);
+}
 
 function mod(n: number, m: number): number {
     return ((n % m) + m) % m;
-}
-
-/** @public */
-export class NoteError extends Error {
-    constructor(msg: string) {
-        super(msg);
-        this.name = "NoteError";
-    }
 }
 
 /*
@@ -81,7 +78,7 @@ export class Note {
             this.octave = Note.validateOctave(octave);
         }
         else {
-            throw new NoteError(`Invalid Note args: ${arg}, ${accidental}, ${octave}`);
+            throw getNoteError(`Invalid args: ${arg}, ${accidental}, ${octave}`);
         }
     }
 
@@ -137,10 +134,10 @@ export class Note {
             let p = Note.parseNote(noteName);
 
             if (!p) {
-                throw new NoteError(`Invalid noteName: ${noteName}`);
+                throw getNoteError(`Invalid noteName: ${noteName}`);
             }
             if (p.octave === undefined) {
-                throw new NoteError(`Octave is required for note.`);
+                throw getNoteError(`Octave is required for note.`);
             }
 
             note = new Note(p.noteLetter, p.accidental, p.octave);
@@ -160,10 +157,10 @@ export class Note {
             let p = Note.parseNote(noteName);
 
             if (!p) {
-                throw new NoteError(`Invalid noteName: ${noteName}`);
+                throw getNoteError(`Invalid noteName: ${noteName}`);
             }
             if (p.octave === undefined) {
-                throw new NoteError(`Octave is required for note.`);
+                throw getNoteError(`Octave is required for note.`);
             }
 
             note = new Note(p.noteLetter, p.accidental, p.octave);
@@ -186,7 +183,7 @@ export class Note {
             return NoteLetters.indexOf(Note.validateNoteLetter(arg[0]));
         }
         else {
-            throw new NoteError(`Invalid getDiatonicClass arg: ${arg}`);
+            throw getNoteError(`Invalid getDiatonicClass arg: ${arg}`);
         }
     }
 
@@ -256,7 +253,7 @@ export class Note {
     static getScientificNoteName(noteName: string, symbolSet: SymbolSet): string {
         let p = Note.parseNote(noteName);
         if (!p) {
-            throw new NoteError(`Invalid noteName: ${noteName}`);
+            throw getNoteError(`Invalid noteName: ${noteName}`);
         }
         let { noteLetter, accidental, octave } = p;
         return noteLetter + Note.getAccidentalSymbol(accidental, symbolSet) + (octave ?? "");
@@ -271,7 +268,7 @@ export class Note {
     static getAccidental(accidentalSymbol: string): Accidental {
         let accidental = AccidentalMap.get(accidentalSymbol);
         if (accidental === undefined) {
-            throw new NoteError(`Invalid accidental: ${accidentalSymbol}`);
+            throw getNoteError(`Invalid accidental: ${accidentalSymbol}`);
         }
         return accidental;
     }
@@ -296,7 +293,7 @@ export class Note {
             return diatonicId;
         }
         else {
-            throw new NoteError(`Invalid diatonicId: ${diatonicId}`);
+            throw getNoteError(`Invalid diatonicId: ${diatonicId}`);
         }
     }
 
@@ -305,7 +302,7 @@ export class Note {
             return diatonicClass;
         }
         else {
-            throw new NoteError(`Invalid diatonicClass: ${diatonicClass}`);
+            throw getNoteError(`Invalid diatonicClass: ${diatonicClass}`);
         }
     }
 
@@ -314,7 +311,7 @@ export class Note {
             return chromaticId;
         }
         else {
-            throw new NoteError(`Invalid chromaticId: ${chromaticId}`);
+            throw getNoteError(`Invalid chromaticId: ${chromaticId}`);
         }
     }
 
@@ -323,7 +320,7 @@ export class Note {
             return chromaticClass;
         }
         else {
-            throw new NoteError(`Invalid chromaticClass: ${chromaticClass}`);
+            throw getNoteError(`Invalid chromaticClass: ${chromaticClass}`);
         }
     }
 
@@ -332,7 +329,7 @@ export class Note {
             return note as NoteLetter;
         }
         else {
-            throw new NoteError(`Invalid note: ${note}`);
+            throw getNoteError(`Invalid note: ${note}`);
         }
     }
 
@@ -341,7 +338,7 @@ export class Note {
             return octave;
         }
         else {
-            throw new NoteError(`Invalid octave: ${octave}`);
+            throw getNoteError(`Invalid octave: ${octave}`);
         }
     }
 
@@ -350,7 +347,7 @@ export class Note {
             return acc as Accidental;
         }
         else {
-            throw new NoteError(`Invalid accidental: ${acc}`);
+            throw getNoteError(`Invalid accidental: ${acc}`);
         }
     }
 

@@ -131,7 +131,8 @@ function formatQuantity(q: number) {
     return Utils.Math.toOrdinalNumber(q);
 }
 
-class InvalidInterval extends Error {
+// Used only internally
+class InvalidIntervalException extends Error {
     constructor(readonly msg: string) {
         super(msg);
         this.name = "InvalidInterval";
@@ -163,7 +164,7 @@ export class Interval {
             this.quality = quality;
         }
         else {
-            throw new InvalidInterval("Unknown interval quality");
+            throw new InvalidIntervalException("Unknown interval quality");
         }
     }
 
@@ -172,7 +173,7 @@ export class Interval {
             return new Interval(note1, note2);
         }
         catch (err) {
-            if (err instanceof InvalidInterval) {
+            if (err instanceof InvalidIntervalException) {
                 return undefined;
             }
             else {
