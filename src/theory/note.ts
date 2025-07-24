@@ -151,32 +151,27 @@ export class Note {
         return note;
     }
 
-    static getChromaticNote(chromaticId: number, scale?: Scale): Note {
-        if (scale) {
-            return scale.getPreferredChromaticNote(chromaticId);
-        }
-        else {
-            let note = this.chromaticNoteCache.get(chromaticId);
+    static getChromaticNote(chromaticId: number): Note {
+        let note = this.chromaticNoteCache.get(chromaticId);
 
-            if (note === undefined) {
-                const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
-                let noteName = NoteNameList[Note.getChromaticClass(chromaticId)].split("/")[0] + Note.getOctaveFromChromaticId(chromaticId);
-                let p = Note.parseNote(noteName);
+        if (note === undefined) {
+            const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
+            let noteName = NoteNameList[Note.getChromaticClass(chromaticId)].split("/")[0] + Note.getOctaveFromChromaticId(chromaticId);
+            let p = Note.parseNote(noteName);
 
-                if (!p) {
-                    throw new NoteError(`Invalid noteName: ${noteName}`);
-                }
-                if (p.octave === undefined) {
-                    throw new NoteError(`Octave is required for note.`);
-                }
-
-                note = new Note(p.noteLetter, p.accidental, p.octave);
-
-                this.chromaticNoteCache.set(chromaticId, note);
+            if (!p) {
+                throw new NoteError(`Invalid noteName: ${noteName}`);
+            }
+            if (p.octave === undefined) {
+                throw new NoteError(`Octave is required for note.`);
             }
 
-            return note;
+            note = new Note(p.noteLetter, p.accidental, p.octave);
+
+            this.chromaticNoteCache.set(chromaticId, note);
         }
+
+        return note;
     }
 
     static getDiatonicClass(diatonicId: number): number;

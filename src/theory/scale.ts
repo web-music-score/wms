@@ -259,7 +259,7 @@ export class Scale extends KeySignature {
         }
 
         // Final method (if ever occurs).
-        note = Note.getChromaticNote(chromaticId); // Without scale!
+        note = Note.getChromaticNote(chromaticId);
         this.preferredChromaticNoteCache.set(chromaticId, note);
         return note;
     }
