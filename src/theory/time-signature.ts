@@ -1,5 +1,10 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { RhythmProps, NoteLength } from "./rhythm";
+import { MusicError } from "@tspro/web-music-score/core";
+
+function getTimeSignatureError(msg: string) {
+    return new MusicError("TimeSignature Error: " + msg)
+}
 
 /** @public */
 export type TimeSignatureString = "2/4" | "3/4" | "4/4" | "6/8" | "9/8";
@@ -27,20 +32,24 @@ export class TimeSignature {
     constructor(beatCount: number, beatSize: number);
     constructor(...args: unknown[]) {
         if (args.length === 1 && typeof args[0] === "string") {
-            let i = Assert.int_gte(args[0].indexOf("/"), 0, "Invalid TimeSignatureString: " + args[0]);
-            this.beatCount = Number(args[0].substring(0, i));
-            this.beatSize = Number(args[0].substring(i + 1));
+            let parts = args[0].split("/");
+            this.beatCount = +parts[0];
+            this.beatSize = +parts[1];
         }
         else if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
             this.beatCount = args[0];
             this.beatSize = args[1];
         }
         else {
-            Assert.interrupt("Invalid TimeSignature args: " + args);
+            throw getTimeSignatureError("Invalid args: " + args);
         }
 
-        Assert.int_gte(this.beatCount, 1, "TimeSignature: Invalid beatCount " + this.beatCount);
-        Assert.int_gte(this.beatSize, 1, "TimeSignature: Invalid beatSize " + this.beatCount);
+        if (!Utils.Is.isIntegerGte(this.beatCount, 1)) {
+            throw getTimeSignatureError("Invalid beatCount: " + this.beatCount);
+        }
+        else if (!Utils.Is.isIntegerGte(this.beatSize, 1)) {
+            throw getTimeSignatureError("Invalid beatSize: " + this.beatSize);
+        }
 
         let beatLengthValue = RhythmProps.createFromNoteSize(this.beatSize);
 
@@ -60,7 +69,9 @@ export class TimeSignature {
 
         this.beamGroupLength = this.measureTicks / this.beamGroupCount;
 
-        Assert.int_gte(this.beamGroupLength, 1, "Invalid beamGroupLength value " + this.beamGroupLength);
+        if (!Utils.Is.isIntegerGte(this.beamGroupLength, 1)) {
+            throw getTimeSignatureError("Invalid beamGroupLength: " + this.beamGroupLength);
+        }
     }
 
     is(beatCount: number, beatSize: number) {

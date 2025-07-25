@@ -1,4 +1,9 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
+import { MusicError } from "@tspro/web-music-score/core";
+
+function getRhythmError(msg: string) {
+    return new MusicError("Rhythm Error: " + msg);
+}
 
 /** @public */
 export enum NoteLength {
@@ -39,8 +44,12 @@ const NoteSymbolMap = new Map<NoteLength, string>([
 
 /** @public */
 export function validateNoteLength(noteLength: unknown): NoteLength {
-    Assert.assertEnum(noteLength, NoteLength, "NoteLength");
-    return noteLength;
+    if (!Utils.Is.isEnumValue(noteLength, NoteLength)) {
+        throw getRhythmError("Invalid noteLength: " + noteLength)
+    }
+    else {
+        return noteLength;
+    }
 }
 
 /** @public */
@@ -52,15 +61,19 @@ export class RhythmProps {
     readonly flagCount: number;
 
     constructor(noteLength: NoteLength, dotted?: boolean, triplet?: boolean) {
-        this.noteLength = noteLength;
+        this.noteLength = validateNoteLength(noteLength);
         this.dotted = dotted === true;
         this.triplet = triplet === true;
         this.ticks = this.noteLength;
         this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
 
-        Assert.assert(NoteLength[this.noteLength], "Invalid noteLength = " + this.noteLength);
-        Assert.assert(!(this.dotted && this.triplet), "Note cannot be both dotted and triplet!");
-        Assert.assert(!(this.dotted && this.noteLength === MinNoteLength), "Shortest note cannot be dotted!");
+        if (this.dotted && this.triplet) {
+            throw getRhythmError("Note cannot be both dotted and triplet!");
+        }
+        else if (this.dotted && this.noteLength === MinNoteLength) {
+            throw getRhythmError("Shortest note cannot be dotted!");
+        }
+
 
         if (this.dotted) {
             this.ticks += this.noteLength / 2;
