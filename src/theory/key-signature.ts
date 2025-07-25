@@ -3,8 +3,8 @@ import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 import { MusicError } from "@tspro/web-music-score/core";
 
-function getKeySignatureError(msg: string) {
-    return new MusicError("KeySignatureError: " + msg);
+function throwKeySignatureError(msg: string): never {
+    throw new MusicError("KeySignatureError: " + msg);
 }
 
 function getAccidental(chromaticId: number, diatonicId: number): Accidental {
@@ -20,14 +20,14 @@ function parseDegree(degree: number | string): { deg: number, acc: number } {
     let m = DegreeRule.exec("" + degree);
 
     if (!m) {
-        throw getKeySignatureError(`Invalid degree: ${degree}`);
+        throwKeySignatureError(`Invalid degree: ${degree}`);
     }
 
     let acc = Note.getAccidental(m[1] ?? "") ?? 0;
     let deg = +m[2];
 
     if (!Utils.Is.isInteger(acc) || acc < -2 || acc > 2 || !Utils.Is.isInteger(deg) || deg < 1) {
-        throw getKeySignatureError(`Invalid degree: ${degree}`);
+        throwKeySignatureError(`Invalid degree: ${degree}`);
     }
     else {
         return { deg, acc }
@@ -68,7 +68,7 @@ export class KeySignature {
      */
     protected constructor(readonly tonic: string, readonly mode: Mode) {
         if (!Utils.Is.isEnumValue(mode, Mode)) {
-            throw getKeySignatureError(`Invalid mode: ${mode}`);
+            throwKeySignatureError(`Invalid mode: ${mode}`);
         }
 
         let intervals = [2, 2, 1, 2, 2, 2, 1];
@@ -87,7 +87,7 @@ export class KeySignature {
             let note = new Note(Note.getDiatonicClass(diatonicId), getAccidental(chromaticId, diatonicId));
 
             if (Math.abs(note.accidental) >= 2) {
-                throw getKeySignatureError("Key signature contains double accidental.");
+                throwKeySignatureError("Key signature contains double accidental.");
             }
 
             this.naturalScaleNotes[id] = note;
@@ -98,7 +98,7 @@ export class KeySignature {
             let ai = KeySignature.OrderOfSharps.indexOf(a.noteLetter);
             let bi = KeySignature.OrderOfSharps.indexOf(b.noteLetter);
             if (ai === -1 || bi === -1) {
-                throw getKeySignatureError("Unexpected note in key signature.");
+                throwKeySignatureError("Unexpected note in key signature.");
             }
             return ai - bi;
         });
@@ -107,13 +107,13 @@ export class KeySignature {
             let ai = KeySignature.OrderOfFlats.indexOf(a.noteLetter);
             let bi = KeySignature.OrderOfFlats.indexOf(b.noteLetter);
             if (ai === -1 || bi === -1) {
-                throw getKeySignatureError("Unexpected note in key signature.");
+                throwKeySignatureError("Unexpected note in key signature.");
             }
             return ai - bi;
         });
 
         if (sharps.length !== 0 && flats.length !== 0) {
-            throw getKeySignatureError("Key Signature has both sharps and flats.");
+            throwKeySignatureError("Key Signature has both sharps and flats.");
         }
 
         this.orderedAccidentedNotes = flats.length > 0 ? flats : sharps;

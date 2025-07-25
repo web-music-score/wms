@@ -2,7 +2,7 @@ import { Note } from "@tspro/web-music-score/theory";
 import { ObjArc } from "./obj-arc";
 import { ObjNoteGroup } from "./obj-note-group";
 import { NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 export class ArcProps {
     noteGroups: ObjNoteGroup[];
@@ -137,7 +137,7 @@ export class ArcProps {
             new ObjArc(this, rightNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
         }
         else {
-            throw getScoreError("Cannot create arc because arc is jumping measures.");
+            throwScoreError("Cannot create arc because arc is jumping measures.");
         }
     }
 }

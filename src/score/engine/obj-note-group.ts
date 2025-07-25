@@ -10,7 +10,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
     let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
@@ -76,7 +76,7 @@ export class ObjNoteGroup extends MusicObject {
         super(col);
 
         if (!Utils.Is.isIntegerGte(notes.length, 1)) {
-            throw getScoreError("Cannot create note group object because notes array is empty.");
+            throwScoreError("Cannot create note group object because notes array is empty.");
         }
 
         let noteStringData = sortNoteStringData(notes, options?.string);
@@ -88,7 +88,7 @@ export class ObjNoteGroup extends MusicObject {
             let hasStaff = col.row.hasStaff;
             let staff = col.row.getStaff(diatonicId);
             if (hasStaff && !staff) {
-                throw getScoreError("Note diatonicId is out of staff boundaries!");
+                throwScoreError("Note diatonicId is out of staff boundaries!");
             }
         });
 
@@ -116,10 +116,10 @@ export class ObjNoteGroup extends MusicObject {
         }
 
         if (!this.row.hasStaff && this.startTie !== undefined) {
-            throw getScoreError("Ties not implemented for guitar tabs alone, staff is required!");
+            throwScoreError("Ties not implemented for guitar tabs alone, staff is required!");
         }
         else if (!this.row.hasStaff && this.startSlur !== undefined) {
-            throw getScoreError("Slurs not implemented for guitar tabs alone, staff is required!");
+            throwScoreError("Slurs not implemented for guitar tabs alone, staff is required!");
         }
 
         this.staffObjs = this.row.hasStaff ? new NoteStaffObjects() : undefined;
@@ -258,7 +258,7 @@ export class ObjNoteGroup extends MusicObject {
                     return { x: centerX, y: stemRect!.bottom + padding }
                 }
             default:
-                throw getScoreError("Invalid arcAnchor: " + arcAnchor);
+                throwScoreError("Invalid arcAnchor: " + arcAnchor);
         }
     }
 
@@ -353,7 +353,7 @@ export class ObjNoteGroup extends MusicObject {
     getBeamX() {
         let stemRect = this.staffObjs?.stemRect;
         if (!stemRect) {
-            throw getScoreError("Cannot get beam x-coordinate because this note group has no stem.");
+            throwScoreError("Cannot get beam x-coordinate because this note group has no stem.");
         }
         return stemRect.centerX;
     }
@@ -361,7 +361,7 @@ export class ObjNoteGroup extends MusicObject {
     getBeamY() {
         let stemRect = this.staffObjs?.stemRect;
         if (!stemRect) {
-            throw getScoreError("Cannot get beam y-coordinate because this note group has no stem.");
+            throwScoreError("Cannot get beam y-coordinate because this note group has no stem.");
         }
         return this.stemDir === Stem.Up ? stemRect.top : stemRect.bottom;
     }
@@ -510,7 +510,7 @@ export class ObjNoteGroup extends MusicObject {
             let topNoteY = row.getStaff(this.getTopNote().diatonicId)?.getDiatonicIdY(this.getTopNote().diatonicId);
 
             if (bottomNoteY === undefined || topNoteY === undefined) {
-                throw getScoreError("bottomNoteY or topNoteY is undefined!");
+                throwScoreError("bottomNoteY or topNoteY is undefined!");
             }
 
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
@@ -825,7 +825,7 @@ export class ObjNoteGroup extends MusicObject {
             });
         }
         else {
-            throw getScoreError("Cannot set triplet beam count because triplet beam group type is invalid.");
+            throwScoreError("Cannot set triplet beam count because triplet beam group type is invalid.");
         }
     }
 

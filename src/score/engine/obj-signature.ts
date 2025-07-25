@@ -7,7 +7,7 @@ import { Clef, MusicStaff } from "./staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 export class ObjSignature extends MusicObject {
     private clefImage?: ObjImage;
@@ -136,7 +136,7 @@ export class ObjSignature extends MusicObject {
             return Note.findNextDiatonicIdAbove(accNote.diatonicId, bottomAccidentalDiatonicId, false);
         }
         else {
-            throw getScoreError("Cannot get accidental diatonicId because note has no accidental.")
+            throwScoreError("Cannot get accidental diatonicId because note has no accidental.")
         }
     }
 

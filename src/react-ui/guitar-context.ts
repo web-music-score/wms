@@ -1,7 +1,12 @@
 import { GuitarNoteLabel, Handedness, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { getTuningStrings, Note, Scale } from "@tspro/web-music-score/theory";
-import { Assert } from "@tspro/ts-utils-lib";
 import GuitarData from "./assets/guitar.json";
+import { MusicError } from "@tspro/web-music-score/core";
+import { Utils } from "@tspro/ts-utils-lib";
+
+function throwGuitarContextError(msg: string): never {
+    throw new MusicError("GuitarContext Error: " + msg);
+}
 
 const DefaultColors = {
     ScaleNoteColor: "#0A0",
@@ -99,9 +104,15 @@ export class GuitarContext {
     }
 
     getFretPosition(stringId: number, fretId: number): Readonly<FretPosition> {
-        Assert.int_between(stringId, 0, 5, "stringId");
-        Assert.int_between(fretId, 0, this.maxFretId, "fretId");
-        return this.fretPositionTable[stringId][fretId];
+        if (!Utils.Is.isInteger(stringId) || stringId < 0 || stringId > 5) {
+            throwGuitarContextError("Invalid stringId: " + stringId);
+        }
+        else if (!Utils.Is.isInteger(fretId) || fretId < 0 || fretId > this.maxFretId) {
+            throwGuitarContextError("Invalid fretId: " + fretId);
+        }
+        else {
+            return this.fretPositionTable[stringId][fretId];
+        }
     }
 
     getStringTuning(stringId: number) {

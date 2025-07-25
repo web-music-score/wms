@@ -1,10 +1,15 @@
 import * as React from "react";
-import { Assert, Utils } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "@tspro/web-music-score/score";
 import { Handedness } from "@tspro/web-music-score/theory";
 import { GuitarContext, FretPosition } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
 import GuitarImg from "./assets/guitar.png";
+import { MusicError } from "@tspro/web-music-score/core";
+
+function throwGuitarViewError(msg: string): never {
+    throw new MusicError("GuitarView Error: " + msg);
+}
 
 /**
  * Calculated fret positions for 24 frets here (scale length = 1):
@@ -15,9 +20,13 @@ const t_table = [0, /* nut */
     0.528, 0.555, 0.58, 0.603, 0.625, 0.646, 0.666, 0.685, 0.703, 0.719, 0.735, 0.75
 ];
 
-function fret_t(fret: number) {
-    Assert.int_between(fret, 0, t_table.length - 1, "Invalid fret: " + fret);
-    return t_table[fret] * 2;
+function fret_t(fretId: number) {
+    if (!Utils.Is.isInteger(fretId) || fretId < 0 || fretId > t_table.length - 1) {
+        throwGuitarViewError("Invalid fretId: " + fretId);
+    }
+    else {
+        return t_table[fretId] * 2;
+    }
 }
 
 class Fret {

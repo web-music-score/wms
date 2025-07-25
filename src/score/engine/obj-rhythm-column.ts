@@ -9,7 +9,7 @@ import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -87,7 +87,7 @@ export class ObjRhythmColumn extends MusicObject {
             return this.measure.getColumn(colId + 1);
         }
         else {
-            throw getScoreError("Cannot get next column in measure because current column's id in mesure is invalid.");
+            throwScoreError("Cannot get next column in measure because current column's id in mesure is invalid.");
         }
     }
 

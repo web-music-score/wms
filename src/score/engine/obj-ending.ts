@@ -4,7 +4,7 @@ import { Renderer } from "./renderer";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { DivRect, MEnding, Navigation } from "../pub";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 export class ObjEnding extends MusicObject {
     private endingText: ObjText;
@@ -18,10 +18,10 @@ export class ObjEnding extends MusicObject {
         this.mi = new MEnding(this);
 
         if (!Utils.Is.isIntegerGte(passages.length, 1)) {
-            throw getScoreError("Passages is empty.");
+            throwScoreError("Passages is empty.");
         }
         else if (!this.passages.every(p => Utils.Is.isIntegerGte(p, 1))) {
-            throw getScoreError("Invalid passages: " + this.passages);
+            throwScoreError("Invalid passages: " + this.passages);
         }
 
         // Sort ascending

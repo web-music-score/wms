@@ -2,8 +2,8 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { RhythmProps, NoteLength } from "./rhythm";
 import { MusicError } from "@tspro/web-music-score/core";
 
-function getTimeSignatureError(msg: string) {
-    return new MusicError("TimeSignature Error: " + msg)
+function throwTimeSignatureError(msg: string): never {
+    throw new MusicError("TimeSignature Error: " + msg)
 }
 
 /** @public */
@@ -41,14 +41,14 @@ export class TimeSignature {
             this.beatSize = args[1];
         }
         else {
-            throw getTimeSignatureError("Invalid args: " + args);
+            throwTimeSignatureError("Invalid args: " + args);
         }
 
         if (!Utils.Is.isIntegerGte(this.beatCount, 1)) {
-            throw getTimeSignatureError("Invalid beatCount: " + this.beatCount);
+            throwTimeSignatureError("Invalid beatCount: " + this.beatCount);
         }
         else if (!Utils.Is.isIntegerGte(this.beatSize, 1)) {
-            throw getTimeSignatureError("Invalid beatSize: " + this.beatSize);
+            throwTimeSignatureError("Invalid beatSize: " + this.beatSize);
         }
 
         let beatLengthValue = RhythmProps.createFromNoteSize(this.beatSize);
@@ -70,7 +70,7 @@ export class TimeSignature {
         this.beamGroupLength = this.measureTicks / this.beamGroupCount;
 
         if (!Utils.Is.isIntegerGte(this.beamGroupLength, 1)) {
-            throw getTimeSignatureError("Invalid beamGroupLength: " + this.beamGroupLength);
+            throwTimeSignatureError("Invalid beamGroupLength: " + this.beamGroupLength);
         }
     }
 

@@ -7,7 +7,7 @@ import { ArcProps } from "./arc-props";
 import { ObjMeasure } from "./obj-measure";
 import { MArc, DivRect, TieType } from "../pub";
 import { DocumentSettings } from "./settings";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 export class ObjArc extends MusicObject {
     private lx = 0;
@@ -134,7 +134,7 @@ export class ObjArc extends MusicObject {
             ry = leftPos.y + (rightPos.y - leftPos.y) * tLeft / (tLeft + tRight);
         }
         else {
-            throw getScoreError("Cannot layout arc object because no valid left and right note groups.");
+            throwScoreError("Cannot layout arc object because no valid left and right note groups.");
         }
 
         let spanDy = arcDir === "up" ? -1 : 1;

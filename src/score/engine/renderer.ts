@@ -7,7 +7,7 @@ import { DebugSettings, DocumentSettings } from "./settings";
 import TrebleClefPng from "./assets/treble-clef.png";
 import BassClefPng from "./assets/bass-clef.png";
 import { MusicObject } from "./music-object";
-import { getScoreError } from "./misc";
+import { throwScoreError } from "./misc";
 
 export enum ImageAsset { TrebleClefPng, BassClefPng }
 
@@ -76,7 +76,7 @@ export class Renderer {
                 }
                 img.onerror = () => {
                     this.finishImageAsset(asset);
-                    throw getScoreError("Failed to load image: " + asset.src);
+                    throwScoreError("Failed to load image: " + asset.src);
                 }
             }
         });
