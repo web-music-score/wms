@@ -1,9 +1,10 @@
-import { Assert } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { DivRect, MEnding, Navigation } from "../pub";
+import { getScoreError } from "./misc";
 
 export class ObjEnding extends MusicObject {
     private endingText: ObjText;
@@ -16,9 +17,12 @@ export class ObjEnding extends MusicObject {
 
         this.mi = new MEnding(this);
 
-        Assert.int_gte(passages.length, 1, "Cannot create ending object because ending passages is empty.");
-
-        this.passages = passages.map(p => Assert.int_gte(p, 1, "Cannot create ending object because passage number " + p + " is invalid."));
+        if (!Utils.Is.isIntegerGte(passages.length, 1)) {
+            throw getScoreError("Passages is empty.");
+        }
+        else if (!this.passages.every(p => Utils.Is.isIntegerGte(p, 1))) {
+            throw getScoreError("Invalid passages: " + this.passages);
+        }
 
         // Sort ascending
         this.passages.sort((a, b) => a - b);

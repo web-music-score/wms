@@ -1,8 +1,8 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Accidental } from "@tspro/web-music-score/theory";
 import { DivRect, MAccidental } from "../pub";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
+import { getScoreError } from "./misc";
 
 export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
@@ -39,7 +39,7 @@ export class ObjAccidental extends MusicObject {
                 this.rect = DivRect.createSections(unitSize * 1, unitSize * 1, unitSize * 1, unitSize * 1);
                 break;
             default:
-                Assert.interrupt("Invalid accidental value: " + this.accidental);
+                throw getScoreError("Invalid accidental value: " + this.accidental);
         }
     }
 

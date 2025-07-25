@@ -1,4 +1,3 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { DivRect, MRest, RestOptions, Stem } from "../pub";
 import { MusicObject } from "./music-object";
@@ -7,6 +6,7 @@ import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
+import { getScoreError } from "./misc";
 
 function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
     if (typeof staffPos === "number") {
@@ -47,9 +47,11 @@ export class ObjRest extends MusicObject {
         let diatonicId = getDiatonicIdFromStaffPos(options?.staffPos);
 
         if (diatonicId !== undefined) {
+            let hasStaff = this.row.hasStaff;
             let staff = this.row.getStaff(diatonicId);
-            let hasStaff = col.row.hasStaff;
-            Assert.assert(!hasStaff || staff, "Rest staffPos is out of staff boundaries!");
+            if (hasStaff && !staff) {
+                throw getScoreError("Rest staffPos is out of staff boundaries!");
+            }
         }
 
         this.ownDiatonicId = this.measure.updateOwnDiatonicId(voiceId, diatonicId);
@@ -136,7 +138,7 @@ export class ObjRest extends MusicObject {
         return this.stemDir === Stem.Up ? this.rect.top : this.rect.bottom;
     }
 
-    private getRestDotVerticalDisplacement(noteLength: NoteLength) {
+    private getRestDotVerticalDisplacement(noteLength: NoteLength): number {
         switch (noteLength) {
             case NoteLength.Whole: return 1;
             case NoteLength.Half: return -1;
@@ -146,7 +148,7 @@ export class ObjRest extends MusicObject {
             case NoteLength.ThirtySecond: return -3;
             case NoteLength.SixtyFourth: return -3;
             default:
-                Assert.interrupt("Cannot get rest dot vertical displacement because note length is invalid.")
+                throw getScoreError("Cannot get rest dot vertical displacement because note length is invalid.");
         }
     }
 

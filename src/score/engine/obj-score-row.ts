@@ -1,4 +1,3 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
 import { DivRect, MScoreRow, StaffPreset } from "../pub";
@@ -10,6 +9,7 @@ import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { DocumentSettings } from "./settings";
+import { getScoreError } from "./misc";
 
 const p = (noteName: string) => Note.getNote(noteName).diatonicId;
 
@@ -63,7 +63,7 @@ export class ObjScoreRow extends MusicObject {
                 this.tab = new GuitarTab();
                 break;
             default:
-                Assert.assert("Invalid staffPreset: " + this.staffPreset);
+                throw getScoreError("Invalid staffPreset: " + this.staffPreset);
         }
 
         // Set prevRow
@@ -98,11 +98,23 @@ export class ObjScoreRow extends MusicObject {
     }
 
     getTopStaff(): MusicStaff {
-        return Assert.require(this.staves[0], "Top staff line is required!");
+        let staff = this.staves[0];
+        if (!staff) {
+            throw getScoreError("Top staff is required!");
+        }
+        else {
+            return staff;
+        }
     }
 
     getBottomStaff(): MusicStaff {
-        return Assert.require(this.staves[this.staves.length - 1], "Bottom staff line is required!");
+        let staff = this.staves[this.staves.length - 1];
+        if (!staff) {
+            throw getScoreError("Bottom staff is required!");
+        }
+        else {
+            return staff;
+        }
     }
 
     getStaff(diatonicId: number): MusicStaff | undefined {

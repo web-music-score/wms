@@ -1,4 +1,3 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Note, NoteLength } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds } from "../pub";
@@ -10,6 +9,7 @@ import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
+import { getScoreError } from "./misc";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -82,11 +82,13 @@ export class ObjRhythmColumn extends MusicObject {
     getNextColumnInMeasure(): ObjRhythmColumn | undefined {
         let colId = this.measure.getColumns().indexOf(this);
 
-        Assert.assert(colId >= 0 && colId < this.measure.getColumnCount(),
-            "Cannot get next column in measure because current column's id in mesure is invalid.");
-
-        // Next column in measure or undefined
-        return this.measure.getColumn(colId + 1);
+        if (colId >= 0 && colId < this.measure.getColumnCount()) {
+            // Next column in measure or undefined
+            return this.measure.getColumn(colId + 1);
+        }
+        else {
+            throw getScoreError("Cannot get next column in measure because current column's id in mesure is invalid.");
+        }
     }
 
     /**

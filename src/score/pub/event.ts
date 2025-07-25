@@ -1,5 +1,4 @@
-import { Assert } from "@tspro/ts-utils-lib";
-import { DivRect } from "./div-rect";
+import { getScoreError } from "score/engine/misc";
 import { MRenderer, MScoreRow, MusicInterface } from "./interface";
 
 /** @public */
@@ -7,7 +6,7 @@ export type ScoreEventType = "click" | "hover";
 
 /** @public */
 export abstract class ScoreEvent {
-    constructor(readonly type: ScoreEventType) {}
+    constructor(readonly type: ScoreEventType) { }
 }
 
 /** @public */
@@ -21,14 +20,16 @@ export class ScoreStaffPosEvent extends ScoreEvent {
 export class ScoreObjectEvent extends ScoreEvent {
     constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly objects: MusicInterface[]) {
         super(type);
-        Assert.assert(arguments.length > 0, "Score object event empty array!");
+        if (arguments.length === 0) {
+            throw getScoreError("Empty array in score object event!");
+        }
     }
-    
+
     get topObject(): MusicInterface {
         return this.objects[this.objects.length - 1];
     }
-    
-    findObject(fn: (obj: MusicInterface) => boolean): MusicInterface |undefined {
+
+    findObject(fn: (obj: MusicInterface) => boolean): MusicInterface | undefined {
         return this.objects.find(obj => fn(obj));
     }
 }

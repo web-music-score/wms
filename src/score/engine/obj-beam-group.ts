@@ -1,4 +1,4 @@
-import { Assert, Utils } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { MinNoteLength, NoteLength } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
@@ -7,6 +7,7 @@ import { ObjText } from "./obj-text";
 import { DivRect, Stem, MBeamGroup } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
+import { getScoreError } from "./misc";
 
 export enum BeamGroupType {
     RegularBeam,
@@ -42,11 +43,17 @@ export class ObjBeamGroup extends MusicObject {
 
         this.mi = new MBeamGroup(this);
 
-        Assert.assert(symbols.every(s => s.measure === symbols[0].measure), "All beam group symbols are not in same measure.");
-        Assert.assert(symbols.length >= 2, "Beam group need minimum 2 symbols, but " + symbols.length + " given.");
+        if (!symbols.every(s => s.measure === symbols[0].measure)) {
+            throw getScoreError("All beam group symbols are not in same measure.");
+        }
+        else if (symbols.length < 2) {
+            throw getScoreError("Beam group need minimum 2 symbols, but " + symbols.length + " given.");
+        }
 
         if (triplet) {
-            Assert.assert(symbols.every(s => s.triplet), "Create tripled failed: not every symbol's triplet property is true.");
+            if (!symbols.every(s => s.triplet)) {
+                throw getScoreError("Not every symbol's triplet property is true.");
+            }
 
             let isGroup =
                 symbols.length < 3 ||
@@ -80,7 +87,7 @@ export class ObjBeamGroup extends MusicObject {
             symbols[0].measure.addBeamGroup(this);
         }
         else {
-            Assert.interrupt("Cannot add beam group because some symbol already has one.");
+            throw getScoreError("Cannot add beam group because some symbol already has one.");
         }
     }
 

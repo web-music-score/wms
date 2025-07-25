@@ -1,4 +1,9 @@
-import { Assert, Utils } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
+import { MusicError } from "@tspro/web-music-score/core";
+
+function getDivRectError(msg: string) {
+    return new MusicError("DivRect Error: " + msg);
+}
 
 /**
  * @public
@@ -63,7 +68,7 @@ export class DivRect {
             this.top = this.centerY = this.bottom = 0;
         }
         else {
-            Assert.interrupt("Cannot create DivRect because invalid constructor arguments: " + args);
+            throw getDivRectError("Cannot create DivRect because invalid constructor arguments: " + args);
         }
     }
 

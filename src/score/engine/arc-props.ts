@@ -1,8 +1,8 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjArc } from "./obj-arc";
 import { ObjNoteGroup } from "./obj-note-group";
 import { NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
+import { getScoreError } from "./misc";
 
 export class ArcProps {
     noteGroups: ObjNoteGroup[];
@@ -137,7 +137,7 @@ export class ArcProps {
             new ObjArc(this, rightNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
         }
         else {
-            Assert.interrupt("Cannot create arc because arc is jumping measures.");
+            throw getScoreError("Cannot create arc because arc is jumping measures.");
         }
     }
 }

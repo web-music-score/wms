@@ -1,4 +1,3 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
 import { DivRect, MSignature } from "../pub";
 import { MusicObject } from "./music-object";
@@ -8,6 +7,7 @@ import { Clef, MusicStaff } from "./staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
+import { getScoreError } from "./misc";
 
 export class ObjSignature extends MusicObject {
     private clefImage?: ObjImage;
@@ -136,7 +136,7 @@ export class ObjSignature extends MusicObject {
             return Note.findNextDiatonicIdAbove(accNote.diatonicId, bottomAccidentalDiatonicId, false);
         }
         else {
-            Assert.interrupt("Cannot get accidental diatonicId because note has no accidental.")
+            throw getScoreError("Cannot get accidental diatonicId because note has no accidental.")
         }
     }
 

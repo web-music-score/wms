@@ -1,4 +1,4 @@
-import { Assert, Utils } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -22,6 +22,7 @@ import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos 
 import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
+import { getScoreError } from "./misc";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -32,8 +33,12 @@ type AlterTempo = {
 }
 
 export function validateVoiceId(voiceId: number): VoiceId {
-    Assert.assert((<number[]>getVoiceIds()).indexOf(voiceId) >= 0, "Invalid voiceId: " + voiceId);
-    return voiceId as VoiceId;
+    if ((<number[]>getVoiceIds()).indexOf(voiceId) < 0) {
+        throw getScoreError("Invalid voiceId: " + voiceId);
+    }
+    else {
+        return voiceId as VoiceId;
+    }
 }
 
 export class ObjMeasure extends MusicObject {
@@ -330,7 +335,7 @@ export class ObjMeasure extends MusicObject {
                 this.alterKeySignature = getScale(tonic, scaleType);
             }
             catch (e) {
-                Assert.interrupt("Cannot set key signature because invalid args: " + args);
+                throw getScoreError("Cannot set key signature because invalid args: " + args);
             }
         }
 
@@ -440,8 +445,11 @@ export class ObjMeasure extends MusicObject {
     }
 
     addFermata(fermata: Fermata) {
-        let anchor = Assert.require(fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn,
-            "Cannot add Fermata because anchor is undefined.");
+        let anchor = fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn;
+
+        if (!anchor) {
+            throw getScoreError("Cannot add Fermata because anchor is undefined.");
+        }
 
         let fermataObjArr = anchor.getAnchoredLayoutObjects().
             map(layoutObj => layoutObj.musicObj).
@@ -470,10 +478,11 @@ export class ObjMeasure extends MusicObject {
     addNavigation(navigation: Navigation, ...args: unknown[]) {
         switch (navigation) {
             case Navigation.Ending:
+                if (this.navigationSet.has(navigation)) {
+                    throw getScoreError("Cannot add ending beasure measure already has one.");
+                }
                 let anchor = this;
-                let passages = args.map(a => Assert.int_gte(a, 1, "Cannot add ending because invalid passage arg: " + a));
-                Assert.int_gte(passages.length, 1, "Cannot add ending bacause no passages given.");
-                Assert.assert(!this.navigationSet.has(navigation), "Cannot add ending beasure measure already has one.");
+                let passages = args as number[];
                 this.addLayoutObject(new ObjEnding(anchor, passages), LayoutGroupId.Ending, VerticalPos.AboveStaff);
                 break;
             case Navigation.DC_al_Coda:
@@ -509,7 +518,9 @@ export class ObjMeasure extends MusicObject {
             case Navigation.EndRepeat:
                 this.endRepeatCount = Math.floor(typeof args[0] === "number" ? args[0] : 1);
 
-                Assert.int_gte(this.endRepeatCount, 1, "Cannot add end repeat because invalid end repeat count: " + this.endRepeatCount);
+                if (!Utils.Is.isIntegerGte(this.endRepeatCount, 1)) {
+                    throw getScoreError("Cannot add end repeat because invalid end repeat count: " + this.endRepeatCount);
+                }
 
                 if (this.endRepeatCount > 1) {
                     let textProps: TextProps = {
@@ -538,9 +549,15 @@ export class ObjMeasure extends MusicObject {
     }
 
     addLabel(label: Label, text: string) {
-        let anchor = Assert.require(this.lastAddedRhythmColumn, "Cannot add label because anchor is undefined.");
+        let anchor = this.lastAddedRhythmColumn;
 
-        Assert.assert(text.length > 0, "Cannot add label because label text is empty.");
+        if (!anchor) {
+            throw getScoreError("Cannot add label because anchor is undefined.");
+        }
+        else if (text.length === 0) {
+            throw getScoreError("Cannot add label because label text is empty.");
+        }
+
         let textProps: TextProps = { text }
 
         let layoutGroupId: LayoutGroupId;
@@ -558,9 +575,15 @@ export class ObjMeasure extends MusicObject {
     }
 
     addAnnotation(annotation: Annotation, text: string) {
-        let anchor = Assert.require(this.lastAddedRhythmColumn, "Cannot add annotation because anchor is undefined.");
+        let anchor = this.lastAddedRhythmColumn;
 
-        Assert.assert(text.length > 0, "Cannot add annotation because annotation text is empty.");
+        if (!anchor) {
+            throw getScoreError("Cannot add annotation because anchor is undefined.");
+        }
+        else if (text.length === 0) {
+            throw getScoreError("Cannot add annotation because annotation text is empty.");
+        }
+
         let textProps: TextProps = { text }
 
         let layoutGroupId: LayoutGroupId;
@@ -625,10 +648,10 @@ export class ObjMeasure extends MusicObject {
             this.requestLayout();
         }
         else if (musicObj === undefined) {
-            Assert.interrupt("Cannot add extension because music object to attach it to is undefined.");
+            throw getScoreError("Cannot add extension because music object to attach it to is undefined.");
         }
         else {
-            Assert.interrupt("Cannot add extension becaue no compatible music object to attach it to.");
+            throw getScoreError("Cannot add extension becaue no compatible music object to attach it to.");
         }
     }
 
@@ -689,7 +712,7 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        Assert.interrupt("Error in rhythm column. Should never get here.");
+        throw getScoreError("Error in rhythm column. Should never get here.");
     }
 
     getMeasureTicks() {

@@ -1,4 +1,3 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { DivRect } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjEnding } from "./obj-ending";
@@ -9,6 +8,7 @@ import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { Renderer } from "./renderer";
 import { ObjExtensionLine } from "./obj-extension-line";
+import { getScoreError } from "./misc";
 
 export enum LayoutGroupId {
     Fermata,
@@ -32,7 +32,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
         p = p.getParent();
     }
 
-    Assert.interrupt("Parent measure is required but not found!");
+    throw getScoreError("Parent measure is required but not found!");
 }
 
 export enum VerticalPos { AboveStaff, BelowStaff }
@@ -51,7 +51,14 @@ export class LayoutObjectWrapper {
         this.measure = requireParentMeasure(musicObj);
         this.row = this.measure.row;
 
-        this.anchor = Assert.require(this.musicObj.getParent(), "Parent music object is required as an anchor.");
+        let anchor = this.musicObj.getParent();
+
+        if (!anchor) {
+            throw getScoreError("Parent music object is required as an anchor.");
+        }
+
+        this.anchor = anchor;
+
         this.anchor.addAnchoredLayoutObject(this);
 
         this.layoutGroup = this.measure.doc.getLayoutGroup(layoutGroupId);

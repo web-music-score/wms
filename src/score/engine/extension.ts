@@ -1,6 +1,6 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Navigation } from "../pub";
 import { isDynamicsText, isTempoText } from "./element-data";
+import { getScoreError } from "./misc";
 import { MusicObject, MusicObjectLink } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjText } from "./obj-text";
@@ -66,7 +66,7 @@ export class Extension extends MusicObjectLink {
             head.updateAnchorY(getTextAnchorY(linePos));
         }
         else {
-            Assert.interrupt("Update anchor's y-coordinate is only implemented for text objects.");
+            throw getScoreError("Update anchor's y-coordinate is only implemented for text objects.");
         }
     }
 

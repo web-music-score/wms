@@ -1,4 +1,3 @@
-import { Assert, Utils } from "@tspro/ts-utils-lib";
 import { DefaultTuningName, getTuningStrings, Note, SymbolSet, validateTuningName } from "@tspro/web-music-score/theory";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -10,6 +9,7 @@ import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { ArcProps } from "./arc-props";
+import { getScoreError } from "./misc";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -134,7 +134,11 @@ export class ObjDocument extends MusicObject {
             this.newRowRequested = false;
         }
 
-        let lastRow = Assert.require(this.getLastRow(), "Cannot add measure because last row is undefined.");
+        let lastRow = this.getLastRow();
+
+        if (!lastRow) {
+            throw getScoreError("Cannot add measure because last row is undefined.");
+        }
 
         let measure = new ObjMeasure(lastRow);
 

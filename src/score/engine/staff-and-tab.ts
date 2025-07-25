@@ -1,6 +1,6 @@
-import { Assert } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
 import { ImageAsset } from "./renderer";
+import { getScoreError } from "./misc";
 
 export enum Clef { Treble, Bass }
 
@@ -49,9 +49,12 @@ export class MusicStaff {
     }
 
     getDiatonicIdY(diatonicId: number): number {
-        Assert.assert(this.containsDiatonicId(diatonicId), "Staff does not contain diatonicId " + diatonicId);
-
-        return this.bottomLineY + (this.bottomLineDiatonicId - diatonicId) * this.getDiatonicSpacing();
+        if (!this.containsDiatonicId(diatonicId)) {
+            throw getScoreError("Staff does not contain diatonicId " + diatonicId);
+        }
+        else {
+            return this.bottomLineY + (this.bottomLineDiatonicId - diatonicId) * this.getDiatonicSpacing();
+        }
     }
 
     getDiatonicIdAt(y: number): number | undefined {

@@ -1,4 +1,4 @@
-import { Assert, Utils } from "@tspro/ts-utils-lib";
+import { Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
@@ -10,6 +10,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
+import { getScoreError } from "./misc";
 
 function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
     let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
@@ -74,7 +75,9 @@ export class ObjNoteGroup extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength, options?: NoteOptions) {
         super(col);
 
-        Assert.int_gte(notes.length, 1, "Cannot create note group object because notes array is empty.");
+        if (!Utils.Is.isIntegerGte(notes.length, 1)) {
+            throw getScoreError("Cannot create note group object because notes array is empty.");
+        }
 
         let noteStringData = sortNoteStringData(notes, options?.string);
 
@@ -84,7 +87,9 @@ export class ObjNoteGroup extends MusicObject {
             let { diatonicId } = note;
             let hasStaff = col.row.hasStaff;
             let staff = col.row.getStaff(diatonicId);
-            Assert.assert(!hasStaff || staff, "Note diatonicId is out of staff boundaries!");
+            if (hasStaff && !staff) {
+                throw getScoreError("Note diatonicId is out of staff boundaries!");
+            }
         });
 
         this.minDiatonicId = this.notes[0].diatonicId;
@@ -110,9 +115,11 @@ export class ObjNoteGroup extends MusicObject {
             this.doc.addArcProps(this.startSlur);
         }
 
-        if (!this.row.hasStaff) {
-            Assert.assert(this.startTie === undefined, "Ties not implemented for guitar tabs alone, staff is required!");
-            Assert.assert(this.startSlur === undefined, "Slurs not implemented for guitar tabs alone, staff is required!");
+        if (!this.row.hasStaff && this.startTie !== undefined) {
+            throw getScoreError("Ties not implemented for guitar tabs alone, staff is required!");
+        }
+        else if (!this.row.hasStaff && this.startSlur !== undefined) {
+            throw getScoreError("Slurs not implemented for guitar tabs alone, staff is required!");
         }
 
         this.staffObjs = this.row.hasStaff ? new NoteStaffObjects() : undefined;
@@ -251,7 +258,7 @@ export class ObjNoteGroup extends MusicObject {
                     return { x: centerX, y: stemRect!.bottom + padding }
                 }
             default:
-                Assert.interrupt("Invalid arcAnchor: " + arcAnchor);
+                throw getScoreError("Invalid arcAnchor: " + arcAnchor);
         }
     }
 
@@ -344,12 +351,18 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getBeamX() {
-        let stemRect = Assert.require(this.staffObjs?.stemRect, "Cannot get beam x-coordinate because this note group has no stem.");
+        let stemRect = this.staffObjs?.stemRect;
+        if (!stemRect) {
+            throw getScoreError("Cannot get beam x-coordinate because this note group has no stem.");
+        }
         return stemRect.centerX;
     }
 
     getBeamY() {
-        let stemRect = Assert.require(this.staffObjs?.stemRect, "Cannot get beam y-coordinate because this note group has no stem.");
+        let stemRect = this.staffObjs?.stemRect;
+        if (!stemRect) {
+            throw getScoreError("Cannot get beam y-coordinate because this note group has no stem.");
+        }
         return this.stemDir === Stem.Up ? stemRect.top : stemRect.bottom;
     }
 
@@ -497,7 +510,7 @@ export class ObjNoteGroup extends MusicObject {
             let topNoteY = row.getStaff(this.getTopNote().diatonicId)?.getDiatonicIdY(this.getTopNote().diatonicId);
 
             if (bottomNoteY === undefined || topNoteY === undefined) {
-                Assert.interrupt("bottomNoteY or topNoteY is undefined!");
+                throw getScoreError("bottomNoteY or topNoteY is undefined!");
             }
 
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
@@ -812,7 +825,7 @@ export class ObjNoteGroup extends MusicObject {
             });
         }
         else {
-            Assert.interrupt("Cannot set triplet beam count because triplet beam group type is invalid.");
+            throw getScoreError("Cannot set triplet beam count because triplet beam group type is invalid.");
         }
     }
 
