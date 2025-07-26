@@ -2,19 +2,21 @@
 
 This library allows you to view and play music scores (notation) in the browser.
 
-Note: I'm not a professional musician. I began learning classical guitar on my own, 
+I'm not a professional musician. I began learning classical guitar on my own, 
 later taking lessons in classical guitar. I've also studied music theory independently.
 
-This project has been developed gradually over several years. Although it’s beginning to take shape, it remains a work in progress — expect occasional changes, bugs, or unexpected behavior.
+This project has been developed gradually over several years. Although it’s beginning to take shape, it remains a work in progress — expect changes, bugs, or unexpected behavior.
 
 ## Version 2 Update
 
 **Breaking:** Version 2 is major update and brought many changes.
 
-* Introduced subpath modules instead of one big main module. Import each separately.
+* Introduced subpath modules instead of one big main module. Import each module separately.
 * Theory module had big refactor. Renamed all musical terms that were wrong (e.g. pitch => diatonicId, noteId => chromaticId).
 * Score module stayed mostly same. Some changes (e.g. enum names) but nothing major.
-* Classical guitar audio is separate module (audio-cg) because bundles over 1MB of audio samples. Also improved default synth audio.
+* Classical guitar audio was made separate module (audio-cg) because it bundles over 1MB of audio samples. Also improved default synthesizer audio.
+
+Version 2 is a big update and this project is still evolving. But enough changes for now, until next major version 3.
 
 ## Installation
 
@@ -52,12 +54,18 @@ const Core = require("@tspro/web-music-score/core");
 
 ## Browser Script
 
-This is an experimental module that can be used via unpkg CDN. It declares global variable `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, and `Pieces`. All modules except react-ui.
+This is an experimental module that can be used in html page via unpkg CDN.
+It declares global variable `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, 
+and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-cg`).
 
 ```html
 <script src="https://unpkg.com/@tspro/web-music-score@2.0.0"></script>
 
-<!-- It is recommended to use version number (e.g. @2 or even exact @2.0.0) -->
+<!--
+    It is recommended to use version number, e.g. at least @2 or better @2.0.0, so
+    if there comes breaking change your code does not stop working.
+    TODO: Add direct link to bundle.
+-->
 
 <script>
     const { Core, Audio, Theory, Score, Pieces } = window.WebMusicScore;
@@ -66,6 +74,11 @@ This is an experimental module that can be used via unpkg CDN. It declares globa
 ```
 
 ## API
+
+Typedoc API documentation is available [here](https://pahkasoft.github.io).
+It has no comments but is mostly self explanatory and gives idea of full API interface.
+
+Following is the main interface explained.
 
 ### Create Document
 
