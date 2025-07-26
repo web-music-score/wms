@@ -8,7 +8,7 @@ import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { Renderer } from "./renderer";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export enum LayoutGroupId {
     Fermata,
@@ -32,7 +32,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
         p = p.getParent();
     }
 
-    throwScoreError("Parent measure is required but not found!");
+    throw new MusicError(MusicErrorType.Score, "Parent measure is required but not found!");
 }
 
 export enum VerticalPos { AboveStaff, BelowStaff }
@@ -54,7 +54,7 @@ export class LayoutObjectWrapper {
         let anchor = this.musicObj.getParent();
 
         if (!anchor) {
-            throwScoreError("Parent music object is required as an anchor.");
+            throw new MusicError(MusicErrorType.Score, "Parent music object is required as an anchor.");
         }
 
         this.anchor = anchor;

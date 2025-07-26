@@ -2,7 +2,7 @@ import { Accidental } from "@tspro/web-music-score/theory";
 import { DivRect, MAccidental } from "../pub";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
@@ -39,7 +39,7 @@ export class ObjAccidental extends MusicObject {
                 this.rect = DivRect.createSections(unitSize * 1, unitSize * 1, unitSize * 1, unitSize * 1);
                 break;
             default:
-                throwScoreError("Invalid accidental value: " + this.accidental);
+                throw new MusicError(MusicErrorType.Score, "Invalid accidental value: " + this.accidental);
         }
     }
 

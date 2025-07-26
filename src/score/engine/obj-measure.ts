@@ -22,7 +22,7 @@ import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos 
 import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -34,7 +34,7 @@ type AlterTempo = {
 
 export function validateVoiceId(voiceId: number): VoiceId {
     if ((<number[]>getVoiceIds()).indexOf(voiceId) < 0) {
-        throwScoreError("Invalid voiceId: " + voiceId);
+        throw new MusicError(MusicErrorType.Score, "Invalid voiceId: " + voiceId);
     }
     else {
         return voiceId as VoiceId;
@@ -335,7 +335,7 @@ export class ObjMeasure extends MusicObject {
                 this.alterKeySignature = getScale(tonic, scaleType);
             }
             catch (e) {
-                throwScoreError("Cannot set key signature because invalid args: " + args);
+                throw new MusicError(MusicErrorType.Score, "Cannot set key signature because invalid args: " + args);
             }
         }
 
@@ -448,7 +448,7 @@ export class ObjMeasure extends MusicObject {
         let anchor = fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn;
 
         if (!anchor) {
-            throwScoreError("Cannot add Fermata because anchor is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add Fermata because anchor is undefined.");
         }
 
         let fermataObjArr = anchor.getAnchoredLayoutObjects().
@@ -479,7 +479,7 @@ export class ObjMeasure extends MusicObject {
         switch (navigation) {
             case Navigation.Ending:
                 if (this.navigationSet.has(navigation)) {
-                    throwScoreError("Cannot add ending beasure measure already has one.");
+                    throw new MusicError(MusicErrorType.Score, "Cannot add ending beasure measure already has one.");
                 }
                 let anchor = this;
                 let passages = args as number[];
@@ -519,7 +519,7 @@ export class ObjMeasure extends MusicObject {
                 this.endRepeatCount = Math.floor(typeof args[0] === "number" ? args[0] : 1);
 
                 if (!Utils.Is.isIntegerGte(this.endRepeatCount, 1)) {
-                    throwScoreError("Cannot add end repeat because invalid end repeat count: " + this.endRepeatCount);
+                    throw new MusicError(MusicErrorType.Score, "Cannot add end repeat because invalid end repeat count: " + this.endRepeatCount);
                 }
 
                 if (this.endRepeatCount > 1) {
@@ -552,10 +552,10 @@ export class ObjMeasure extends MusicObject {
         let anchor = this.lastAddedRhythmColumn;
 
         if (!anchor) {
-            throwScoreError("Cannot add label because anchor is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add label because anchor is undefined.");
         }
         else if (text.length === 0) {
-            throwScoreError("Cannot add label because label text is empty.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
         }
 
         let textProps: TextProps = { text }
@@ -578,10 +578,10 @@ export class ObjMeasure extends MusicObject {
         let anchor = this.lastAddedRhythmColumn;
 
         if (!anchor) {
-            throwScoreError("Cannot add annotation because anchor is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because anchor is undefined.");
         }
         else if (text.length === 0) {
-            throwScoreError("Cannot add annotation because annotation text is empty.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
         }
 
         let textProps: TextProps = { text }
@@ -648,10 +648,10 @@ export class ObjMeasure extends MusicObject {
             this.requestLayout();
         }
         else if (musicObj === undefined) {
-            throwScoreError("Cannot add extension because music object to attach it to is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
         }
         else {
-            throwScoreError("Cannot add extension becaue no compatible music object to attach it to.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add extension becaue no compatible music object to attach it to.");
         }
     }
 
@@ -712,7 +712,7 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        throwScoreError("Error in rhythm column. Should never get here.");
+        throw new MusicError(MusicErrorType.Score, "Error in rhythm column. Should never get here.");
     }
 
     getMeasureTicks() {

@@ -1,6 +1,6 @@
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Navigation } from "../pub";
 import { isDynamicsText, isTempoText } from "./element-data";
-import { throwScoreError } from "./misc";
 import { MusicObject, MusicObjectLink } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjText } from "./obj-text";
@@ -66,7 +66,7 @@ export class Extension extends MusicObjectLink {
             head.updateAnchorY(getTextAnchorY(linePos));
         }
         else {
-            throwScoreError("Update anchor's y-coordinate is only implemented for text objects.");
+            throw new MusicError( MusicErrorType.Score, "Update anchor's y-coordinate is only implemented for text objects.");
         }
     }
 

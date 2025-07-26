@@ -1,4 +1,4 @@
-import { throwScoreError } from "score/engine/misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { MRenderer, MScoreRow, MusicInterface } from "./interface";
 
 /** @public */
@@ -21,7 +21,7 @@ export class ScoreObjectEvent extends ScoreEvent {
     constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly objects: MusicInterface[]) {
         super(type);
         if (arguments.length === 0) {
-            throwScoreError("Empty array in score object event!");
+            throw new MusicError(MusicErrorType.Score, "Empty array in score object event!");
         }
     }
 

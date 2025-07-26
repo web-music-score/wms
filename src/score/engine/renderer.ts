@@ -3,11 +3,10 @@ import { ObjDocument } from "./obj-document";
 import { MDocument, DivRect, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderer } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
-
+import { MusicObject } from "./music-object";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import TrebleClefPng from "./assets/treble-clef.png";
 import BassClefPng from "./assets/bass-clef.png";
-import { MusicObject } from "./music-object";
-import { throwScoreError } from "./misc";
 
 export enum ImageAsset { TrebleClefPng, BassClefPng }
 
@@ -76,7 +75,7 @@ export class Renderer {
                 }
                 img.onerror = () => {
                     this.finishImageAsset(asset);
-                    throwScoreError("Failed to load image: " + asset.src);
+                    throw new MusicError(MusicErrorType.Score, "Failed to load image: " + asset.src);
                 }
             }
         });

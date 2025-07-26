@@ -9,7 +9,7 @@ import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { ArcProps } from "./arc-props";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -137,7 +137,7 @@ export class ObjDocument extends MusicObject {
         let lastRow = this.getLastRow();
 
         if (!lastRow) {
-            throwScoreError("Cannot add measure because last row is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add measure because last row is undefined.");
         }
 
         let measure = new ObjMeasure(lastRow);

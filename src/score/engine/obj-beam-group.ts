@@ -7,7 +7,7 @@ import { ObjText } from "./obj-text";
 import { DivRect, Stem, MBeamGroup } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export enum BeamGroupType {
     RegularBeam,
@@ -44,15 +44,15 @@ export class ObjBeamGroup extends MusicObject {
         this.mi = new MBeamGroup(this);
 
         if (!symbols.every(s => s.measure === symbols[0].measure)) {
-            throwScoreError("All beam group symbols are not in same measure.");
+            throw new MusicError(MusicErrorType.Score, "All beam group symbols are not in same measure.");
         }
         else if (symbols.length < 2) {
-            throwScoreError("Beam group need minimum 2 symbols, but " + symbols.length + " given.");
+            throw new MusicError(MusicErrorType.Score, "Beam group need minimum 2 symbols, but " + symbols.length + " given.");
         }
 
         if (triplet) {
             if (!symbols.every(s => s.triplet)) {
-                throwScoreError("Not every symbol's triplet property is true.");
+                throw new MusicError(MusicErrorType.Score, "Not every symbol's triplet property is true.");
             }
 
             let isGroup =
@@ -87,7 +87,7 @@ export class ObjBeamGroup extends MusicObject {
             symbols[0].measure.addBeamGroup(this);
         }
         else {
-            throwScoreError("Cannot add beam group because some symbol already has one.");
+            throw new MusicError(MusicErrorType.Score, "Cannot add beam group because some symbol already has one.");
         }
     }
 

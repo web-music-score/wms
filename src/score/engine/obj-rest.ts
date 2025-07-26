@@ -6,7 +6,7 @@ import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
     if (typeof staffPos === "number") {
@@ -50,7 +50,7 @@ export class ObjRest extends MusicObject {
             let hasStaff = this.row.hasStaff;
             let staff = this.row.getStaff(diatonicId);
             if (hasStaff && !staff) {
-                throwScoreError("Rest staffPos is out of staff boundaries!");
+                throw new MusicError(MusicErrorType.Score, "Rest staffPos is out of staff boundaries!");
             }
         }
 
@@ -148,7 +148,7 @@ export class ObjRest extends MusicObject {
             case NoteLength.ThirtySecond: return -3;
             case NoteLength.SixtyFourth: return -3;
             default:
-                throwScoreError("Cannot get rest dot vertical displacement because note length is invalid.");
+                throw new MusicError(MusicErrorType.Score, "Cannot get rest dot vertical displacement because note length is invalid.");
         }
     }
 

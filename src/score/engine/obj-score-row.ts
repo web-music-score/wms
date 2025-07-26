@@ -9,7 +9,7 @@ import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { DocumentSettings } from "./settings";
-import { throwScoreError } from "./misc";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 const p = (noteName: string) => Note.getNote(noteName).diatonicId;
 
@@ -63,7 +63,7 @@ export class ObjScoreRow extends MusicObject {
                 this.tab = new GuitarTab();
                 break;
             default:
-                throwScoreError("Invalid staffPreset: " + this.staffPreset);
+                throw new MusicError(MusicErrorType.Score, "Invalid staffPreset: " + this.staffPreset);
         }
 
         // Set prevRow
@@ -100,7 +100,7 @@ export class ObjScoreRow extends MusicObject {
     getTopStaff(): MusicStaff {
         let staff = this.staves[0];
         if (!staff) {
-            throwScoreError("Top staff is required!");
+            throw new MusicError(MusicErrorType.Score, "Top staff is required!");
         }
         else {
             return staff;
@@ -110,7 +110,7 @@ export class ObjScoreRow extends MusicObject {
     getBottomStaff(): MusicStaff {
         let staff = this.staves[this.staves.length - 1];
         if (!staff) {
-            throwScoreError("Bottom staff is required!");
+            throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
         }
         else {
             return staff;
