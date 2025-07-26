@@ -28,14 +28,10 @@ export class MusicError extends Error {
             ? [MusicErrorType.Unknown, args[0]]
             : args as [MusicErrorType, string];
 
-        super(msg);
+        super(formatType(type) + msg);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
 
         this.name = "MusicError";
         this.type = type;
-    }
-
-    toString() {
-        return `${formatType(this.type)}${this.message}`;
     }
 }
