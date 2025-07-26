@@ -75,8 +75,8 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 
 ## API
 
-Typedoc API documentation is available [here](https://pahkasoft.github.io).
-It has no comments but is mostly self explanatory and gives idea of full API interface.
+Typedoc API reference is available [here](https://pahkasoft.github.io). It has no comments but
+is mostly self explanatory and gives idea of full API.
 
 Following is the main interface explained.
 
