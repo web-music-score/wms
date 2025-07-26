@@ -1,8 +1,5 @@
 export * from "./error";
 
-import { Assert } from "@tspro/ts-utils-lib";
-import { MusicError } from "./error";
-
 declare const __LIB_INFO__: string;
 
 let initialized = false;
@@ -14,8 +11,6 @@ export function init(): void {
     }
     
     initialized = true;
-
-    Assert.setErrorClass(MusicError);
 
     console.log("%c" + __LIB_INFO__ + " initialized.", "background: black; color: white; padding: 2px;");
 }

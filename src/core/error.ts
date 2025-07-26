@@ -9,9 +9,12 @@ export enum MusicErrorType {
     Timesignature,
     Score
 }
+function isType(type: unknown): type is MusicErrorType {
+    return typeof type === "number" && type in MusicErrorType;
+}
 
-function formatType(type: MusicErrorType | undefined) {
-    return type === undefined ? "" : "[" + MusicErrorType[type] + "] ";
+function formatType(type: MusicErrorType | undefined): string {
+    return type === undefined ? "" : `[${MusicErrorType[type]}] `;
 }
 
 /** @public */
@@ -20,19 +23,19 @@ export class MusicError extends Error {
 
     constructor(message: string);
     constructor(type: MusicErrorType, message: string);
-    constructor(...args: unknown[]) {
-        if (args.length === 1 && typeof args[0] === "string") {
-            super(args[0]);
-            this.type = MusicErrorType.Unknown;
-        }
-        else if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "string") {
-            super(formatType(args[0]) + args[1]);
-            this.type = args[0];
-        }
-        else {
-            super("Unknown error!");
-            this.type = MusicErrorType.Unknown;
-        }
+    constructor(...args: [string] | [MusicErrorType, string]) {
+        const [type, msg] = args.length === 1
+            ? [MusicErrorType.Unknown, args[0]]
+            : args as [MusicErrorType, string];
+
+        super(msg);
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+
         this.name = "MusicError";
+        this.type = type;
+    }
+
+    toString() {
+        return `${formatType(this.type)}${this.message}`;
     }
 }
