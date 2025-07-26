@@ -1,9 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwMiscError(msg: string): never {
-    throw new MusicError("Misc Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /** @public */
 export enum SymbolSet { Ascii, Unicode }
@@ -20,7 +16,7 @@ export const DefaultPitchNotation = PitchNotation.Scientific;
 /** @public */
 export function validatePitchNotation(pn: unknown): PitchNotation {
     if (!Utils.Is.isEnumValue(pn, PitchNotation)) {
-        throwMiscError("Invalid pitchNotation: " + pn);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid pitchNotation: ${pn}`);
     }
     else {
         return pn;
@@ -48,7 +44,7 @@ export const GuitarNoteLabelList = Utils.Enum.getEnumValues(GuitarNoteLabel);
 /** @public */
 export function validateGuitarNoteLabel(label: string): GuitarNoteLabel {
     if (!Utils.Is.isEnumValue(label, GuitarNoteLabel)) {
-        throwMiscError("Invalid guitarNoteLabel: " + label);
+        throw new MusicError(MusicErrorType.Timesignature, `Invalid guitarNoteLabel: ${label}`);
     }
     else {
         return label;

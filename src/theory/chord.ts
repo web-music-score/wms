@@ -2,11 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwChordError(msg: string): never {
-    throw new MusicError("Chord Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 const isEqualNote = (n1: Note, n2: Note) => n1.chromaticClass === n2.chromaticClass;
 
@@ -37,7 +33,7 @@ function getOkayRootNote(wantedRootNote: Note): Note {
         rootNote = OkayRootNoteList.find(note => isEqualNote(note, wantedRootNote));
 
         if (!rootNote) {
-            throwChordError("Invalid root note: " + wantedRootNote.formatOmitOctave(SymbolSet.Unicode));
+            throw new MusicError(MusicErrorType.InvalidArg, `Invalid chord root note: ${wantedRootNote.formatOmitOctave(SymbolSet.Unicode)}`);
         }
 
         okayRootNoteCache.set(cacheKey, rootNote);

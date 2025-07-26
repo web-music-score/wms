@@ -2,9 +2,11 @@
 /** @public */
 export enum MusicErrorType {
     Unknown,
+    InvalidArg,
     Note,
     Scale,
     KeySignature,
+    Timesignature,
     Score
 }
 

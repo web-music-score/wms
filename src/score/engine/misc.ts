@@ -1,5 +1,5 @@
-import { MusicError } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-export function throwScoreError(msg: string): never {
-    throw new MusicError("Score Error: " + msg);
+export function throwScoreError(message: string): never {
+    throw new MusicError(MusicErrorType.Score, message);
 }

@@ -1,11 +1,7 @@
 import { Utils, LRUCache } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwGuitarError(msg: string): never {
-    throw new MusicError("Guitar Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /** @public */
 export enum Handedness { RightHanded, LeftHanded }
@@ -16,7 +12,7 @@ export const DefaultHandedness = Handedness.RightHanded;
 /** @public */
 export function validateHandedness(h: unknown): Handedness {
     if (!Utils.Is.isEnumValue(h, Handedness)) {
-        throwGuitarError("Invalid handedness: " + Handedness);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid handedness: ${h}`);
     }
     else {
         return h;
@@ -40,7 +36,7 @@ export const DefaultTuningName = TuningNameList[0];
 /** @public */
 export function validateTuningName(tuningName: string): string {
     if (TuningNameList.indexOf(tuningName) < 0) {
-        throwGuitarError("Invalid tuning name: " + tuningName);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name: ${tuningName}`);
     }
     else {
         return tuningName;
@@ -60,13 +56,13 @@ export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {
         let tuningData = TuningData.list.find(data => data.name === tuningName);
 
         if (!tuningData) {
-            throwGuitarError("Invalid tuningName: " + tuningName);
+            throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuningName: ${tuningName}`);
         }
 
         tuningStrings = tuningData.strings.slice().reverse().map(noteName => Note.getNote(noteName));
 
         if (!Utils.Is.isIntegerEq(tuningStrings.length, 6)) {
-            throwGuitarError("Tuning should have 6 strings but has " + tuningStrings.length + " strings.");
+            throw new MusicError(MusicErrorType.Unknown, `Tuning has ${tuningStrings.length} strings.`);
         }
 
         TuningStringsCache.set(tuningName, tuningStrings);

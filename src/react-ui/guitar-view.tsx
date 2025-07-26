@@ -5,11 +5,7 @@ import { Handedness } from "@tspro/web-music-score/theory";
 import { GuitarContext, FretPosition } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
 import GuitarImg from "./assets/guitar.png";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwGuitarViewError(msg: string): never {
-    throw new MusicError("GuitarView Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /**
  * Calculated fret positions for 24 frets here (scale length = 1):
@@ -22,7 +18,7 @@ const t_table = [0, /* nut */
 
 function fret_t(fretId: number) {
     if (!Utils.Is.isInteger(fretId) || fretId < 0 || fretId > t_table.length - 1) {
-        throwGuitarViewError("Invalid fretId: " + fretId);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid fretId: ${fretId}`);
     }
     else {
         return t_table[fretId] * 2;

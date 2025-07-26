@@ -1,9 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwRhythmError(msg: string): never {
-    throw new MusicError("Rhythm Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /** @public */
 export enum NoteLength {
@@ -45,7 +41,7 @@ const NoteSymbolMap = new Map<NoteLength, string>([
 /** @public */
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (!Utils.Is.isEnumValue(noteLength, NoteLength)) {
-        throwRhythmError("Invalid noteLength: " + noteLength)
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
     }
     else {
         return noteLength;
@@ -68,10 +64,10 @@ export class RhythmProps {
         this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
 
         if (this.dotted && this.triplet) {
-            throwRhythmError("Note cannot be both dotted and triplet!");
+            throw new MusicError(MusicErrorType.Note, "Note cannot be both dotted and triplet!");
         }
         else if (this.dotted && this.noteLength === MinNoteLength) {
-            throwRhythmError("Shortest note cannot be dotted!");
+            throw new MusicError(MusicErrorType.Note, "Shortest note cannot be dotted!");
         }
 
 

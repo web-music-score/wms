@@ -1,9 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwDivRectError(msg: string): never {
-    throw new MusicError("DivRect Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /**
  * @public
@@ -68,7 +64,7 @@ export class DivRect {
             this.top = this.centerY = this.bottom = 0;
         }
         else {
-            throwDivRectError("Cannot create DivRect because invalid constructor arguments: " + args);
+            throw new MusicError(MusicErrorType.InvalidArg, `Invalid DivRect args: ${args}`);
         }
     }
 

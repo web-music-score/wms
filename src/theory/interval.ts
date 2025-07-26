@@ -1,10 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwIntervalError(msg: string): never {
-    throw new MusicError("Interval Error: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /** @public */
 export type IntervalDirection = "Unison" | "Ascending" | "Descending";
@@ -124,7 +120,7 @@ function getIntervalQuality(diatonicInterval: number, chromaticInterval: number)
 /** @public */
 export function validateIntervalQuality(q: string): IntervalQuality {
     if (!(q === "Perfect" || q === "Major" || q === "minor" || q === "Augmented" || q === "diminished" || q === "Doubly Augmented" || q === "doubly diminished")) {
-        throwIntervalError("Invalid interval quality: " + q);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quality: ${q}`);
     }
     else {
         return q as IntervalQuality;
@@ -133,7 +129,7 @@ export function validateIntervalQuality(q: string): IntervalQuality {
 
 function formatQuantity(q: number) {
     if (!Utils.Is.isIntegerGte(q, 1)) {
-        throwIntervalError("Invalid interval quantity: " + q);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quantity: ${q}`);
     }
     else {
         return Utils.Math.toOrdinalNumber(q);
