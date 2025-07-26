@@ -3,11 +3,7 @@ import { Note } from "./note";
 import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
 import { Interval } from "./interval";
-import { MusicError } from "@tspro/web-music-score/core";
-
-function throwScaleError(msg: string): never {
-    throw new MusicError("ScaleError: " + msg);
-}
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 function getNaturalDiatonicId(chromaticId: number): number {
     // ChromaticId could map to several diatonicId/accidental combinations.
@@ -63,7 +59,7 @@ function getMode(scaleType: ScaleType) {
         case ScaleType.MinorHexatonicBlues: return 6;
         case ScaleType.HeptatonicBlues: return 1;
         default:
-            throwScaleError(`Invalid scaleType: ${scaleType}`);
+            throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
     }
 }
 
@@ -140,7 +136,7 @@ export class Scale extends KeySignature {
 
     getScaleNotes(bottomNote: string, numOctaves: number): Note[] {
         if (!Utils.Is.isIntegerGte(numOctaves, 1)) {
-            throwScaleError(`Invalid numOctaves: ${numOctaves}`);
+            throw new MusicError(MusicErrorType.Scale, `Invalid numOctaves: ${numOctaves}`);
         }
 
         let scaleNoteList: Note[] = [];
@@ -192,13 +188,13 @@ export class Scale extends KeySignature {
         }
 
         if (note.chromaticId < rootNote.chromaticId) {
-            throwScaleError(`Note is below rootNote.`);
+            throw new MusicError(MusicErrorType.Scale, `Note is below rootNote.`);
         }
 
         let interval = Interval.get(rootNote, note);
 
         if (interval === undefined) {
-            throwScaleError(`Interval is undefined.`);
+            throw new MusicError(MusicErrorType.Scale, `Interval is undefined.`);
         }
         else {
             return interval;
@@ -306,7 +302,7 @@ export class ScaleFactory {
         });
 
         if (naturalScales.length === 0) {
-            throwScaleError(`Expected natural scale.`);
+            throw new MusicError(MusicErrorType.Scale, `Expected natural scale.`);
         }
 
         const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getNumAccidentals() - b.getNumAccidentals();
@@ -335,7 +331,7 @@ export class ScaleFactory {
     getScale(tonic: string): Scale {
         let scale = this.scaleMap.get(tonic);
         if (!scale) {
-            throwScaleError(`Invalid scale: ${tonic} ${this.type}`);
+            throw new MusicError(MusicErrorType.Scale, `Invalid scale: ${tonic} ${this.type}`);
         }
         else {
             return scale;
@@ -385,7 +381,7 @@ ScaleFactoryList.forEach(factory => {
 export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
     let f = ScaleFactoryMap.get(scaleType);
     if (!f) {
-        throwScaleError(`Invalid scaleType: ${scaleType}`);
+        throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
     }
     else {
         return f;
@@ -398,7 +394,7 @@ export function validateScaleType(scaleType: unknown): ScaleType {
         return scaleType;
     }
     else {
-        throwScaleError(`Invalid scaleType: ${scaleType}`);
+        throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
     }
 }
 
