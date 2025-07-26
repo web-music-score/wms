@@ -25,6 +25,20 @@ const ImageAssets = new Map<ImageAsset, ImageAssetData>([
     [ImageAsset.BassClefPng, { src: BassClefPng }]
 ]);
 
+type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
+
+function staffPosEquals(a: StaffPos | undefined, b: StaffPos | undefined): boolean {
+    if (!a && !b) return true;
+    else if (!a || !b) return false;
+    else return a.scoreRow === b.scoreRow && a.diatonicId === b.diatonicId;
+}
+
+function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefined): boolean {
+    if (!a && !b) return true;
+    else if (!a || !b) return false;
+    else return a.length === b.length && a.every((a2, i) => a2 === b[i]);
+}
+
 export class Renderer {
     readonly devicePixelRatio: number;
 
@@ -44,10 +58,10 @@ export class Renderer {
     private cursorRect?: DivRect;
     private mousePos?: Vec2; // Mouse coord in document space
 
-    private hoverStaffPos?: { scoreRow: ObjScoreRow, diatonicId: number };
-    private hoverObj?: MusicObject;
+    private curStaffPos?: StaffPos;
+    private curObjects?: MusicObject[];
 
-    private hilightedStaffPos?: { scoreRow: ObjScoreRow, diatonicId: number };
+    private hilightedStaffPos?: StaffPos;
     private hilightedObj?: MusicObject;
 
     private usingTouch = false;
@@ -162,6 +176,49 @@ export class Renderer {
         return new Vec2(e.offsetX, e.offsetY);
     }
 
+    private updateCurStaffPos(staffPos: StaffPos | undefined, click: boolean): boolean {
+        let changed = !staffPosEquals(staffPos, this.curStaffPos);
+
+        if (changed && this.curStaffPos && this.scoreEventListener) {
+            let { scoreRow, diatonicId } = this.curStaffPos;
+            this.scoreEventListener(new ScoreStaffPosEvent("leave", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
+        }
+
+        if (changed && staffPos && this.scoreEventListener) {
+            let { scoreRow, diatonicId } = staffPos;
+            this.scoreEventListener(new ScoreStaffPosEvent("enter", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
+        }
+
+        if (click && staffPos && this.scoreEventListener) {
+            let { scoreRow, diatonicId } = staffPos;
+            this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
+        }
+
+        this.curStaffPos = staffPos;
+
+        return changed;
+    }
+
+    private updateCurObjects(objects: MusicObject[] | undefined, click: boolean): boolean {
+        let changed = !objectsEquals(objects, this.curObjects);
+
+        if (changed && this.curObjects && this.curObjects.length > 0 && this.scoreEventListener) {
+            this.scoreEventListener(new ScoreObjectEvent("leave", this.getMusicInterface(), this.curObjects.map(o => o.getMusicInterface())));
+        }
+
+        if (changed && objects && objects.length > 0 && this.scoreEventListener) {
+            this.scoreEventListener(new ScoreObjectEvent("enter", this.getMusicInterface(), objects.map(o => o.getMusicInterface())));
+        }
+
+        if (click && objects && objects.length > 0 && this.scoreEventListener) {
+            this.scoreEventListener(new ScoreObjectEvent("click", this.getMusicInterface(), objects.map(o => o.getMusicInterface())));
+        }
+
+        this.curObjects = objects;
+
+        return changed;
+    }
+
     onClick(e: MouseEvent) {
         let { doc } = this;
 
@@ -172,19 +229,15 @@ export class Renderer {
         this.mousePos = this.txFromScreenCoord(this.getMousePos(e));
 
         if (this.scoreEventListener) {
-            let objects = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-
+            let objects = doc.pick(this.mousePos.x, this.mousePos.y);
             let staffPos = doc.pickStaffPosAt(this.mousePos.x, this.mousePos.y);
 
-            if (staffPos !== undefined) {
-                let { scoreRow, diatonicId } = staffPos;
-                this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
-            }
-            if (objects.length > 0) {
-                this.scoreEventListener(new ScoreObjectEvent("click", this.getMusicInterface(), objects));
-            }
+            let staffPosChanged = this.updateCurStaffPos(staffPos, true);
+            let objectsChanged = this.updateCurObjects(objects, true);
 
-            this.draw();
+            if (staffPosChanged || objectsChanged) {
+                this.draw();
+            }
         }
     }
 
@@ -198,26 +251,14 @@ export class Renderer {
         this.mousePos = this.txFromScreenCoord(this.getMousePos(e));
 
         if (!this.usingTouch) {
-            if (this.scoreEventListener) {
-                let objects = doc.pick(this.mousePos.x, this.mousePos.y).map(obj => obj.getMusicInterface());
-                let hoverObj = objects.length > 0 ? objects[objects.length - 1] : undefined;
+            let objects = doc.pick(this.mousePos.x, this.mousePos.y);
+            let staffPos = doc.pickStaffPosAt(this.mousePos.x, this.mousePos.y);
 
-                let staffPos = doc.pickStaffPosAt(this.mousePos.x, this.mousePos.y);
+            let staffPosChanged = this.updateCurStaffPos(staffPos, false);
+            let objectsChanged = this.updateCurObjects(objects, false);
 
-                if (hoverObj !== this.hoverObj || staffPos?.scoreRow !== this.hoverStaffPos?.scoreRow || staffPos?.diatonicId !== this.hoverStaffPos?.diatonicId) {
-                    if (staffPos !== undefined) {
-                        let { scoreRow, diatonicId } = staffPos;
-                        this.scoreEventListener(new ScoreStaffPosEvent("hover", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
-                    }
-                    if (objects.length > 0) {
-                        this.scoreEventListener(new ScoreObjectEvent("hover", this.getMusicInterface(), objects));
-                    }
-
-                    this.hoverStaffPos = staffPos ? { scoreRow: staffPos.scoreRow, diatonicId: staffPos.diatonicId } : undefined
-                    this.hoverObj = hoverObj?.getMusicObject();
-
-                    this.draw();
-                }
+            if (staffPosChanged || objectsChanged) {
+                this.draw();
             }
         }
     }
@@ -228,10 +269,13 @@ export class Renderer {
         }
 
         this.mousePos = undefined;
-        this.hoverObj = undefined;
-        this.hoverStaffPos = undefined;
 
-        this.draw();
+        let staffPosChanged = this.updateCurStaffPos(undefined, false);
+        let objectsChanged = this.updateCurObjects(undefined, false);
+
+        if (staffPosChanged || objectsChanged) {
+            this.draw();
+        }
     }
 
     onTouchEnd(e: TouchEvent) {

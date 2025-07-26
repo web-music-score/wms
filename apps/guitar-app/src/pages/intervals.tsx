@@ -75,8 +75,12 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
                 return;
             }
 
-
-            event.renderer.hilightStaffPos(event); // event contains { scoreRow, diatonicId }
+            if (event.type === "leave") {
+                event.renderer.hilightStaffPos(undefined);
+            }
+            else {
+                event.renderer.hilightStaffPos(event); // event contains { scoreRow, diatonicId }
+            }
 
             if (event.type === "click") {
                 let { note1, note2, accidental } = this.state;

@@ -2,7 +2,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { MRenderer, MScoreRow, MusicInterface } from "./interface";
 
 /** @public */
-export type ScoreEventType = "click" | "hover";
+export type ScoreEventType = "enter" | "leave" | "click";
 
 /** @public */
 export abstract class ScoreEvent {

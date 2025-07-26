@@ -50,8 +50,12 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
                 return;
             }
 
-            event.renderer.hilightStaffPos(event); // event contains { scoreRow, diatonicId }
-
+            if (event.type === "leave") {
+                event.renderer.hilightStaffPos(undefined);
+            }
+            else {
+                event.renderer.hilightStaffPos(event); // event contains { scoreRow, diatonicId }
+            }
             if (event.type === "click") {
                 let { diatonicId } = event;
                 let { accidental } = this.state;
