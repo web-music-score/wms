@@ -9,10 +9,7 @@ function throwMiscError(msg: string): never {
 export enum SymbolSet { Ascii, Unicode }
 
 /** @public */
-export enum PitchNotation {
-    Scientific = "Scientific",
-    Helmholtz = "Helmholtz"
-}
+export enum PitchNotation { Scientific, Helmholtz }
 
 /** @public */
 export const PitchNotationList = Utils.Enum.getEnumValues(PitchNotation);
@@ -21,13 +18,18 @@ export const PitchNotationList = Utils.Enum.getEnumValues(PitchNotation);
 export const DefaultPitchNotation = PitchNotation.Scientific;
 
 /** @public */
-export function validatePitchNotation(pn: string): PitchNotation {
+export function validatePitchNotation(pn: unknown): PitchNotation {
     if (!Utils.Is.isEnumValue(pn, PitchNotation)) {
         throwMiscError("Invalid pitchNotation: " + pn);
     }
     else {
         return pn;
     }
+}
+
+/** @public */
+export function getPitchNotationName(pn: PitchNotation) {
+    return PitchNotation[validatePitchNotation(pn)];
 }
 
 /** @public */

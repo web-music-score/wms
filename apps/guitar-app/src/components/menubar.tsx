@@ -79,9 +79,9 @@ export class Menubar extends React.Component<MenubarProps, {}> {
                         <Dropdown.Toggle id="dropdown-settings">Settings</Dropdown.Toggle>
                         <Dropdown.Menu>
                             <Dropdown.Header>Pitch Notation</Dropdown.Header>
-                            {Theory.PitchNotationList.map(pitchNotation => (
-                                <Dropdown.Item key={pitchNotation} onClick={() => app.setPitchNotation(pitchNotation)}>
-                                    {pitchNotation.toString()} {guitarCtx.pitchNotation === pitchNotation ? CheckIcon : undefined}
+                            {Theory.PitchNotationList.map(pn => (
+                                <Dropdown.Item key={pn} onClick={() => app.setPitchNotation(pn)}>
+                                    {Theory.getPitchNotationName(pn)} {guitarCtx.pitchNotation === pn ? CheckIcon : undefined}
                                 </Dropdown.Item>
                             ))}
 

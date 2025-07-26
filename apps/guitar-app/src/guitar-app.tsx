@@ -76,7 +76,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         let instrument: string;
 
         try {
-            pitchNotation = Theory.validatePitchNotation(Cookies.read(AppCookies.PitchNotation, Theory.DefaultPitchNotation));
+            pitchNotation = Theory.validatePitchNotation(Cookies.readInt(AppCookies.PitchNotation, Theory.DefaultPitchNotation));
         }
         catch (err) {
             pitchNotation = Theory.DefaultPitchNotation;
