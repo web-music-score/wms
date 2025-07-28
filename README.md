@@ -17,6 +17,7 @@ This is a work in progress project. Expect changes, bugs, or unexpected behavior
 * Score module stayed mostly same. Some changes (e.g. enum StaffKind => StaffPreset) but nothing major.
 * Classical guitar audio was put into separate module (audio-cg) because it bundles over 1MB of audio
   samples. Also improved default synthesizer audio.
+* Numerous small changes/improvements.
 
 Enough changes until next major update!
 
