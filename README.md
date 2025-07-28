@@ -452,6 +452,18 @@ p.setPlayStopButton("playStopButtonId")
 p.setPlayButton(playButtonElement)
 ```
 
+### MusicError
+```js
+try {
+    // Do your music stuff
+}
+catch (e) {
+    if(e instanceof Core.MusicError) {
+        // There was music error.
+    }
+}
+```
+
 ## Compatibility
 - This library is bundled to ESM, CJS and IIFE formats.
 - Target is to support ES6/ES2015.
