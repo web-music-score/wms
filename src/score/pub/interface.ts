@@ -400,12 +400,12 @@ export class MMeasure extends MusicInterface {
     }
 
     addNavigation(navigation: Navigation): MMeasure;
-    addNavigation(navigation: Navigation.EndRepeat, repeatCount: number): MMeasure;
+    addNavigation(navigation: Navigation.EndRepeat, playCount: number): MMeasure;
     addNavigation(navigation: Navigation.Ending, ...passages: number[]): MMeasure;
     addNavigation(navigation: Navigation, ...args: unknown[]): MMeasure {
         assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
         if (navigation === Navigation.EndRepeat && args.length > 0) {
-            assertArg(Utils.Is.isIntegerGte(args[0], 1), "repeatCount", args[0]);
+            assertArg(Utils.Is.isIntegerGte(args[0], 1), "playCount", args[0]);
         }
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);

@@ -241,7 +241,7 @@ export class Player {
             }
             else if (curMeasure.hasNavigation(Navigation.EndRepeat)) {
                 let passage = curMeasure.getPassCount();
-                let repeatCount = curMeasure?.getEndRepeatCount() - 1;
+                let repeatCount = curMeasure.getEndRepeatPlayCount() - 1;
 
                 let cannotPassThrough = curMeasure.getNextMeasure()?.hasNavigation(Navigation.Ending) === true;
 

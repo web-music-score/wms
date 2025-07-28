@@ -90,8 +90,8 @@ export class ObjMeasure extends MusicObject {
     private navigationSet = new Set<Navigation>();
     private isEndSong: boolean = false;
     private isEndSection: boolean = false;
-    private endRepeatCount: number = 1;
-    private endRepeatCountText?: ObjText;
+    private endRepeatPlayCount: number = 2; // play twice.
+    private endRepeatPlayCountText?: ObjText;
 
     readonly mi: MMeasure;
 
@@ -244,8 +244,8 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        if (this.endRepeatCountText) {
-            let arr = this.endRepeatCountText.pick(x, y);
+        if (this.endRepeatPlayCountText) {
+            let arr = this.endRepeatPlayCountText.pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -516,18 +516,22 @@ export class ObjMeasure extends MusicObject {
                 break;
             }
             case Navigation.EndRepeat:
-                this.endRepeatCount = Math.floor(typeof args[0] === "number" ? args[0] : 1);
-
-                if (!Utils.Is.isIntegerGte(this.endRepeatCount, 1)) {
-                    throw new MusicError(MusicErrorType.Score, "Cannot add end repeat because invalid end repeat count: " + this.endRepeatCount);
+                if (args.length === 0) {
+                    this.endRepeatPlayCount = 2;
+                }
+                else if (Utils.Is.isIntegerGte(args[0], 2)) {
+                    this.endRepeatPlayCount = args[0];
+                }
+                else {
+                    throw new MusicError(MusicErrorType.Score, "Invalid end repeat play count (should be 2 or greater integer): " + args[0]);
                 }
 
-                if (this.endRepeatCount > 1) {
+                if (this.endRepeatPlayCount !== 2) {
                     let textProps: TextProps = {
-                        text: "" + this.endRepeatCount + "x",
+                        text: "" + this.endRepeatPlayCount + "x",
                         scale: 0.8
                     }
-                    this.endRepeatCountText = new ObjText(this, textProps, 0.5, 1);
+                    this.endRepeatPlayCountText = new ObjText(this, textProps, 0.5, 1);
                 }
                 break;
         }
@@ -544,8 +548,8 @@ export class ObjMeasure extends MusicObject {
         return this.layoutObjects.map(layoutObj => layoutObj.musicObj).find(musicObj => musicObj instanceof ObjEnding);
     }
 
-    getEndRepeatCount() {
-        return this.endRepeatCount;
+    getEndRepeatPlayCount() {
+        return this.endRepeatPlayCount;
     }
 
     addLabel(label: Label, text: string) {
@@ -1073,8 +1077,8 @@ export class ObjMeasure extends MusicObject {
         // Layout measure end object
         this.barLineRight.layout(renderer);
 
-        if (this.endRepeatCountText) {
-            this.endRepeatCountText.layout(renderer);
+        if (this.endRepeatPlayCountText) {
+            this.endRepeatPlayCountText.layout(renderer);
         }
 
         // Calc top and bottom
@@ -1143,8 +1147,8 @@ export class ObjMeasure extends MusicObject {
         rect = this.barLineRight.getRect();
         this.barLineRight.offset(this.rect.right - rect.right, -rect.centerY);
 
-        if (this.endRepeatCountText) {
-            this.endRepeatCountText.offset(this.barLineRight.getRect().left, this.barLineRight.getRect().top);
+        if (this.endRepeatPlayCountText) {
+            this.endRepeatPlayCountText.offset(this.barLineRight.getRect().left, this.barLineRight.getRect().top);
         }
 
         let columnsAreaLeft = this.rect.left + this.leftSolidAreaWidth;
@@ -1213,8 +1217,8 @@ export class ObjMeasure extends MusicObject {
 
         this.barLineRight.offset(dx, dy);
 
-        if (this.endRepeatCountText) {
-            this.endRepeatCountText.offset(dx, dy);
+        if (this.endRepeatPlayCountText) {
+            this.endRepeatPlayCountText.offset(dx, dy);
         }
 
         this.arcs.forEach(arc => arc.offset(dx, dy));
@@ -1258,8 +1262,8 @@ export class ObjMeasure extends MusicObject {
 
         this.barLineRight.draw(renderer);
 
-        if (this.endRepeatCountText) {
-            this.endRepeatCountText.draw(renderer);
+        if (this.endRepeatPlayCountText) {
+            this.endRepeatPlayCountText.draw(renderer);
         }
 
         this.arcs.forEach(arc => arc.draw(renderer));
