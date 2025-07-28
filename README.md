@@ -5,18 +5,20 @@ This library allows you to view and play music scores (notation) in the browser.
 I'm not a professional musician. I began learning classical guitar on my own, 
 later taking lessons in classical guitar. I've also studied music theory independently.
 
-This project has been developed gradually over several years. Although it’s beginning to take shape, it remains a work in progress — expect changes, bugs, or unexpected behavior.
+This is a work in progress project. Expect changes, bugs, or unexpected behavior.
 
 ## Version 2 Update
 
 **Breaking:** Version 2 is major update and brought many changes.
 
-* Introduced subpath modules instead of one big main module. Import each module separately.
-* Theory module had big refactor. Renamed all musical terms that were wrong (e.g. pitch => diatonicId, noteId => chromaticId).
-* Score module stayed mostly same. Some changes (e.g. enum names) but nothing major.
-* Classical guitar audio was made separate module (audio-cg) because it bundles over 1MB of audio samples. Also improved default synthesizer audio.
+* Introduced subpath modules instead of one big main module. There is no main export.
+* Theory module had big refactor that affected whole library. Renamed all musical terms that
+  were wrong (e.g. pitch => diatonicId, noteId => chromaticId).
+* Score module stayed mostly same. Some changes (e.g. enum StaffKind => StaffPreset) but nothing major.
+* Classical guitar audio was put into separate module (audio-cg) because it bundles over 1MB of audio
+  samples. Also improved default synthesizer audio.
 
-Version 2 is a big update and this project is still evolving. But enough changes for now, until next major version 3.
+Enough changes until next major update!
 
 ## Installation
 
@@ -62,8 +64,9 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 <script src="https://unpkg.com/@tspro/web-music-score@2.0.0"></script>
 
 <!--
-    It is recommended to use version number, e.g. at least @2 or better @2.0.0, so
-    if there comes breaking change your code does not stop working.
+    It is recommended to use version number (e.g. @2.0.0, at least use @2). This way
+    if there is breaking change between versions your code does not stop working.
+
     TODO: Add direct link to bundle.
 -->
 
