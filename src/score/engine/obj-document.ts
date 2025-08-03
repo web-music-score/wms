@@ -8,7 +8,7 @@ import { DivRect, DocumentOptions, MDocument, StaffPreset } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
-import { ArcProps } from "./arc-props";
+import { ConnectiveProps } from "./connective-props";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjDocument extends MusicObject {
@@ -32,7 +32,7 @@ export class ObjDocument extends MusicObject {
 
     private newRowRequested: boolean = false;
 
-    private allArcsProps: ArcProps[] = [];
+    private allConnectiveProps: ConnectiveProps[] = [];
 
     constructor(readonly mi: MDocument, readonly staffPreset: StaffPreset, readonly options?: DocumentOptions) {
         super(undefined);
@@ -51,8 +51,8 @@ export class ObjDocument extends MusicObject {
         return this.mi;
     }
 
-    addArcProps(arc: ArcProps) {
-        this.allArcsProps.push(arc);
+    addConnectiveProps(connectiveProps: ConnectiveProps) {
+        this.allConnectiveProps.push(connectiveProps);
     }
 
     getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
@@ -173,9 +173,9 @@ export class ObjDocument extends MusicObject {
         // Update extensions.
         this.forEachMeasure(m => m.updateExtensions());
 
-        // Update arcs.
-        this.allArcsProps.forEach(arc => arc.removeArcs());
-        this.allArcsProps.forEach(arc => arc.createArcs());
+        // Update connectives.
+        this.allConnectiveProps.forEach(props => props.removeConnectives());
+        this.allConnectiveProps.forEach(props => props.createConnectives());
 
         this.needUpdate = false;
     }
@@ -246,8 +246,8 @@ export class ObjDocument extends MusicObject {
         // Stretch row to desired width
         this.rows.forEach(row => row.layoutWidth(renderer, rowWidth));
 
-        // Layout arcs and beams
-        this.rows.forEach(row => row.layoutArcsAndBeams(renderer));
+        // Layout connectives and beams
+        this.rows.forEach(row => row.layoutConnectivesAndBeams(renderer));
 
         // Layout layout groups
         layoutGroups.forEach(layoutGroup => {

@@ -2,8 +2,8 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
-import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber } from "../pub";
-import { ArcProps } from "./arc-props";
+import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective } from "../pub";
+import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
@@ -58,11 +58,10 @@ export class ObjNoteGroup extends MusicObject {
     readonly arpeggio: Arpeggio | undefined;
     readonly rhythmProps: RhythmProps;
 
-    private startTie?: ArcProps;
-    private startSlur?: ArcProps;
+    private startConnnectives: ConnectiveProps[] = [];
 
-    private tieProps: ArcProps[] = [];
-    private slurProps: ArcProps[] = [];
+    private tieProps: ConnectiveProps[] = [];
+    private slurProps: ConnectiveProps[] = [];
 
     private leftBeamCount = 0;
     private rightBeamCount = 0;
@@ -106,20 +105,10 @@ export class ObjNoteGroup extends MusicObject {
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
         if (options?.tieSpan !== undefined) {
-            this.startTie = new ArcProps("tie", options.tieSpan, options.tieAnchor ?? NoteAnchor.Auto, this);
-            this.doc.addArcProps(this.startTie);
+            this.startConnective(new ConnectiveProps(Connective.Tie, options.tieSpan, options.tieAnchor ?? NoteAnchor.Auto, this));
         }
-
         if (options?.slurSpan !== undefined) {
-            this.startSlur = new ArcProps("slur", options.slurSpan, options.slurAnchor ?? NoteAnchor.Auto, this);
-            this.doc.addArcProps(this.startSlur);
-        }
-
-        if (!this.row.hasStaff && this.startTie !== undefined) {
-            throw new MusicError(MusicErrorType.Score, "Ties not implemented for guitar tabs alone, staff is required!");
-        }
-        else if (!this.row.hasStaff && this.startSlur !== undefined) {
-            throw new MusicError(MusicErrorType.Score, "Slurs not implemented for guitar tabs alone, staff is required!");
+            this.startConnective(new ConnectiveProps(Connective.Slur, options.slurSpan, options.slurAnchor ?? NoteAnchor.Auto, this));
         }
 
         this.staffObjs = this.row.hasStaff ? new NoteStaffObjects() : undefined;
@@ -155,6 +144,18 @@ export class ObjNoteGroup extends MusicObject {
 
     get triplet() {
         return this.rhythmProps.triplet;
+    }
+
+    startConnective(connectiveProps: ConnectiveProps) {
+        if (!this.row.hasStaff && connectiveProps.connective === Connective.Tie) {
+            throw new MusicError(MusicErrorType.Score, "Ties not implemented for guitar tabs alone, staff is required!");
+        }
+        else if (!this.row.hasStaff && connectiveProps.connective === Connective.Slur) {
+            throw new MusicError(MusicErrorType.Score, "Slurs not implemented for guitar tabs alone, staff is required!");
+        }
+
+        this.startConnnectives.push(connectiveProps);
+        this.doc.addConnectiveProps(connectiveProps);
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -197,7 +198,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getArcAnchorPoint(note: Note, arcAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
+    getNoteAnchorPoint(note: Note, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
         let noteIndex = this.notes.findIndex(note2 => Note.equals(note2, note));
 
         if (!this.staffObjs || noteIndex < 0 || noteIndex >= this.staffObjs.noteHeadRects.length) {
@@ -219,14 +220,14 @@ export class ObjNoteGroup extends MusicObject {
         let aboveY = noteHeadRect.top - padding;
         let belowY = noteHeadRect.bottom + padding;
 
-        if (arcAnchor === NoteAnchor.Auto) {
-            arcAnchor = NoteAnchor.Below;
+        if (noteAnchor === NoteAnchor.Auto) {
+            noteAnchor = NoteAnchor.Below;
         }
-        else if (arcAnchor === NoteAnchor.StemTip && !hasStem) {
-            arcAnchor = stemDir === Stem.Up ? NoteAnchor.Above : NoteAnchor.Below;
+        else if (noteAnchor === NoteAnchor.StemTip && !hasStem) {
+            noteAnchor = stemDir === Stem.Up ? NoteAnchor.Above : NoteAnchor.Below;
         }
 
-        switch (arcAnchor) {
+        switch (noteAnchor) {
             case NoteAnchor.Center:
                 return side === "left" ? { x: rightX, y: centerY } : { x: leftX, y: centerY };
             case NoteAnchor.Above:
@@ -258,7 +259,7 @@ export class ObjNoteGroup extends MusicObject {
                     return { x: centerX, y: stemRect!.bottom + padding }
                 }
             default:
-                throw new MusicError(MusicErrorType.Score, "Invalid arcAnchor: " + arcAnchor);
+                throw new MusicError(MusicErrorType.Score, "Invalid noteAnchor: " + noteAnchor);
         }
     }
 
@@ -288,33 +289,36 @@ export class ObjNoteGroup extends MusicObject {
         return undefined;
     }
 
-    collectArcProps() {
-        if (this.startTie) {
-            this.tieProps.push(this.startTie);
+    collectConnectiveProps() {
+        let startTie = this.startConnnectives.find(c => c.connective === Connective.Tie);
+        let startSlur = this.startConnnectives.find(c => c.connective === Connective.Slur);
+
+        if (startTie) {
+            this.tieProps.push(startTie);
 
             let next = this.getNextNoteGroup();
 
-            while (next && this.startTie.addNoteGroup(next)) {
-                next.tieProps.push(this.startTie);
+            while (next && startTie.addNoteGroup(next)) {
+                next.tieProps.push(startTie);
 
                 next = next.getNextNoteGroup();
             }
         }
 
-        if (this.startSlur) {
-            this.slurProps.push(this.startSlur);
+        if (startSlur) {
+            this.slurProps.push(startSlur);
 
             let next = this.getNextNoteGroup();
 
-            while (next && this.startSlur.addNoteGroup(next)) {
-                next.slurProps.push(this.startSlur);
+            while (next && startSlur.addNoteGroup(next)) {
+                next.slurProps.push(startSlur);
 
                 next = next.getNextNoteGroup();
             }
         }
     }
 
-    removeArcProps() {
+    removeConnectiveProps() {
         this.tieProps = [];
         this.slurProps = [];
     }
@@ -401,7 +405,7 @@ export class ObjNoteGroup extends MusicObject {
                 return 0;
             }
 
-            if (tie.arcSpan === TieType.Stub || tie.arcSpan === TieType.ToMeasureEnd) {
+            if (tie.span === TieType.Stub || tie.span === TieType.ToMeasureEnd) {
                 return Math.max(this.rhythmProps.ticks, this.measure.getMeasureTicks() - this.col.positionTicks);
             }
 

@@ -1,14 +1,14 @@
 import { Note } from "@tspro/web-music-score/theory";
-import { ObjArc } from "./obj-arc";
+import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
-import { NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
+import { Connective, ConnectiveSpan, NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-export class ArcProps {
+export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
     arcDir: "up" | "down" = "down";
 
-    constructor(readonly arcType: "tie" | "slur", readonly arcSpan: TieSpan | SlurSpan, public arcAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
+    constructor(readonly connective: Connective, readonly span: ConnectiveSpan, public noteAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
         this.noteGroups = [startNoteGroup];
     }
 
@@ -26,11 +26,11 @@ export class ArcProps {
      * @returns true if noteGroup was added, false if not.
      */
     addNoteGroup(noteGroup: ObjNoteGroup) {
-        if (this.arcSpan === TieType.Stub || this.arcSpan === TieType.ToMeasureEnd) {
+        if (this.span === TieType.Stub || this.span === TieType.ToMeasureEnd) {
             // Contains already 1 NoteGroup
             return false;
         }
-        else if (this.arcSpan > this.noteGroups.length) {
+        else if (this.span > this.noteGroups.length) {
             this.noteGroups.push(noteGroup);
             return true;
         }
@@ -42,23 +42,23 @@ export class ArcProps {
     private computeParams() {
         let stemDir = this.noteGroups[0].stemDir;
 
-        if (this.arcAnchor === NoteAnchor.StemTip) {
+        if (this.noteAnchor === NoteAnchor.StemTip) {
             this.arcDir = stemDir === Stem.Up ? "up" : "down";
         }
-        else if (this.arcAnchor === NoteAnchor.Auto) {
+        else if (this.noteAnchor === NoteAnchor.Auto) {
             this.arcDir = stemDir === Stem.Up ? "down" : "up";
 
             if (this.noteGroups[0].notes.length > 1) {
-                this.arcAnchor = NoteAnchor.Center;
+                this.noteAnchor = NoteAnchor.Center;
             }
             else if (this.arcDir === "up") {
-                this.arcAnchor = NoteAnchor.Above;
+                this.noteAnchor = NoteAnchor.Above;
             }
             else {
-                this.arcAnchor = NoteAnchor.Below;
+                this.noteAnchor = NoteAnchor.Below;
             }
         }
-        else if (this.arcAnchor === NoteAnchor.Center) {
+        else if (this.noteAnchor === NoteAnchor.Center) {
             let { row } = this.noteGroups[0].measure;
 
             let diatonicId = this.noteGroups[0].ownDiatonicId;
@@ -66,35 +66,35 @@ export class ArcProps {
 
             this.arcDir = !staff || diatonicId < staff.middleLineDiatonicId ? "down" : "up";
         }
-        else if (this.arcAnchor === NoteAnchor.Above) {
+        else if (this.noteAnchor === NoteAnchor.Above) {
             this.arcDir = "up";
         }
-        else if (this.arcAnchor === NoteAnchor.Below) {
+        else if (this.noteAnchor === NoteAnchor.Below) {
             this.arcDir = "down";
         }
     }
 
-    removeArcs() {
+    removeConnectives() {
         this.noteGroups.forEach(n => {
-            n.measure.removeArcObjects();
-            n.removeArcProps();
+            n.measure.removeConnectiveObjects();
+            n.removeConnectiveProps();
         });
 
         this.noteGroups.length = 1;
     }
 
-    createArcs() {
-        this.getStartNoteGroup().collectArcProps();
+    createConnectives() {
+        this.getStartNoteGroup().collectConnectiveProps();
 
         this.computeParams();
 
-        let { arcSpan, arcType } = this;
+        let { connective, span } = this;
 
-        if (arcType === "tie") {
-            if (arcSpan === TieType.Stub || arcSpan === TieType.ToMeasureEnd) {
+        if (connective === Connective.Tie) {
+            if (span === TieType.Stub || span === TieType.ToMeasureEnd) {
                 let leftNoteGroup = this.noteGroups[0];
                 leftNoteGroup.notes.forEach(note => {
-                    this.createObjArcWithTieType(leftNoteGroup, note, arcSpan);
+                    this.createObjConnectiveWithTieType(leftNoteGroup, note, span);
                 });
             }
             else if (this.noteGroups.length >= 2) {
@@ -105,39 +105,39 @@ export class ArcProps {
                     leftNoteGroup.notes.forEach(leftNote => {
                         let rightNote = rightNoteGroup.notes.find(rightNote => Note.equals(rightNote, leftNote));
                         if (rightNote) {
-                            this.createObjArc(leftNoteGroup, leftNote, rightNoteGroup, leftNote);
+                            this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, leftNote);
                         }
                     });
                 }
             }
         }
-        else if (arcType === "slur") {
-            if (typeof arcSpan === "number" && arcSpan >= 2 && this.noteGroups.length === arcSpan) {
+        else if (connective ===Connective.Slur) {
+            if (typeof span === "number" && span >= 2 && this.noteGroups.length === span) {
                 let leftNoteGroup = this.noteGroups[0];
                 let rightNoteGroup = this.noteGroups[this.noteGroups.length - 1];
 
                 let leftNote = leftNoteGroup.notes[0];
                 let rightNote = rightNoteGroup.notes[0];
 
-                this.createObjArc(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+                this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
             }
         }
     }
 
-    private createObjArcWithTieType(leftNoteGroup: ObjNoteGroup, leftNote: Note, tieType: TieType) {
-        new ObjArc(this, leftNoteGroup.measure, leftNoteGroup, leftNote, tieType);
+    private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNote: Note, tieType: TieType) {
+        new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNote, tieType);
     }
 
-    private createObjArc(leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note) {
+    private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note) {
         if (leftNoteGroup.measure === rightNoteGroup.measure) {
-            new ObjArc(this, leftNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
         }
         else if (leftNoteGroup.measure.getNextMeasure() === rightNoteGroup.measure) {
-            new ObjArc(this, leftNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
-            new ObjArc(this, rightNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+            new ObjConnective(this, rightNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot create arc because arc is jumping measures.");
+            throw new MusicError(MusicErrorType.Score, "Cannot create connective because it is jumping measures.");
         }
     }
 }

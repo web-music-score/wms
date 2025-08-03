@@ -3,7 +3,7 @@ import { Accidental, Note, NoteLength, KeySignature, TimeSignature, TimeSignatur
 import { RhythmProps, Scale, ScaleType, SymbolSet } from "@tspro/web-music-score/theory";
 import { MusicObject } from "../engine/music-object";
 import { ObjAccidental } from "../engine/obj-accidental";
-import { ObjArc } from "../engine/obj-arc";
+import { ObjConnective } from "../engine/obj-connective";
 import { ObjArpeggio } from "../engine/obj-arpeggio";
 import { ObjDocument } from "../engine/obj-document";
 import { ObjEnding } from "../engine/obj-ending";
@@ -116,16 +116,16 @@ export class MAccidental extends MusicInterface {
 }
 
 /** @public */
-export class MArc extends MusicInterface {
-    static readonly Name = "Arc";
+export class MConnective extends MusicInterface {
+    static readonly Name = "Connective";
 
     /** @internal */
-    constructor(private readonly obj: ObjArc) {
-        super(MArc.Name);
+    constructor(private readonly obj: ObjConnective) {
+        super(MConnective.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjArc {
+    getMusicObject(): ObjConnective {
         return this.obj;
     }
 }

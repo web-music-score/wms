@@ -158,7 +158,7 @@ export class ObjScoreRow extends MusicObject {
         return [this];
     }
 
-    getArcsContentRect(): DivRect {
+    getConnectivesContentRect(): DivRect {
         let r = this.rect;
 
         let firstMeasure = this.getFirstMeasure();
@@ -315,14 +315,14 @@ export class ObjScoreRow extends MusicObject {
         });
     }
 
-    layoutArcsAndBeams(renderer: Renderer) {
+    layoutConnectivesAndBeams(renderer: Renderer) {
         if (!this.needLayout) {
             return;
         }
 
-        // Layout arcs
+        // Layout connectives
         this.measures.forEach(m => {
-            m.layoutArcs(renderer);
+            m.layoutConnectives(renderer);
             this.rect.expandInPlace(m.getRect());
         });
 

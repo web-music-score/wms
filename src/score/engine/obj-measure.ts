@@ -2,14 +2,14 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjEnding } from "./obj-ending";
-import { ObjArc } from "./obj-arc";
+import { ObjConnective } from "./obj-connective";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
@@ -23,6 +23,7 @@ import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { ConnectiveProps } from "./connective-props";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -59,7 +60,7 @@ export class ObjMeasure extends MusicObject {
     private barLineLeft: ObjBarLineLeft;
     private columns: ObjRhythmColumn[] = [];
     private barLineRight: ObjBarLineRight;
-    private arcs: ObjArc[] = [];
+    private connectives: ObjConnective[] = [];
     private beamGroups: ObjBeamGroup[] = [];
 
     private measureId: number;
@@ -77,6 +78,7 @@ export class ObjMeasure extends MusicObject {
     private voiceSymbols: RhythmSymbol[/* voiceId */][] = [];
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
+    private lastAddedRhythmSymbol?: RhythmSymbol;
     private addExtensionToMusicObject?: MusicObject;
 
     private layoutObjects: LayoutObjectWrapper[] = [];
@@ -251,8 +253,8 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        for (let i = 0; i < this.arcs.length; i++) {
-            let arr = this.arcs[i].pick(x, y);
+        for (let i = 0; i < this.connectives.length; i++) {
+            let arr = this.connectives[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -552,6 +554,35 @@ export class ObjMeasure extends MusicObject {
         return this.endRepeatPlayCount;
     }
 
+    addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): void;
+    addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): void;
+    addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): void;
+    addConnective(connective: Connective, ...args: unknown[]): void {
+        let anchor = this.lastAddedRhythmSymbol;
+
+        if(!(anchor instanceof ObjNoteGroup)) {
+            throw new MusicError(MusicErrorType.Score, "Connective can be added to note group only.");
+        }
+
+        if (connective === Connective.Tie) {
+            let tieSpan = Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType) ? args[0] : 2;
+            let noteAnchor = Utils.Is.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
+            anchor.startConnective(new ConnectiveProps(Connective.Tie, tieSpan, noteAnchor ?? NoteAnchor.Auto, anchor));
+        }
+        else if (connective === Connective.Slur) {
+            let slurSpan = Utils.Is.isInteger(args[0]) ? args[0] : 2;
+            let noteAnchor = Utils.Is.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
+            anchor.startConnective(new ConnectiveProps(Connective.Tie, slurSpan, noteAnchor ?? NoteAnchor.Auto, anchor));
+        }
+        else if (connective === Connective.Slide) {
+            let noteAnchor = Utils.Is.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
+            throw new MusicError(MusicErrorType.Score, "Slide not implemented!");
+        }
+        else {
+            throw new MusicError(MusicErrorType.Score, "Invalid connective: " + connective);
+        }
+    }
+
     addLabel(label: Label, text: string) {
         let anchor = this.lastAddedRhythmColumn;
 
@@ -670,6 +701,7 @@ export class ObjMeasure extends MusicObject {
         this.requestBeamsUpdate();
 
         this.lastAddedRhythmColumn = col;
+        this.lastAddedRhythmSymbol = symbol;
     }
 
     addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions) {
@@ -810,14 +842,14 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    addArcObject(arc: ObjArc) {
-        this.arcs.push(arc);
+    addConnectiveObject(connective: ObjConnective) {
+        this.connectives.push(connective);
         this.requestLayout();
     }
 
-    removeArcObjects() {
-        if (this.arcs.length > 0) {
-            this.arcs = [];
+    removeConnectiveObjects() {
+        if (this.connectives.length > 0) {
+            this.connectives = [];
             this.requestLayout();
         }
     }
@@ -1169,16 +1201,16 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    layoutArcs(renderer: Renderer) {
+    layoutConnectives(renderer: Renderer) {
         if (!this.needLayout) {
             return;
         }
 
-        // Layout arcs
-        this.arcs.forEach(arc => {
-            arc.layout(renderer);
-            // Arcs enter neighbors, only expand height for now.
-            let r = arc.getRect();
+        // Layout connectives
+        this.connectives.forEach(connective => {
+            connective.layout(renderer);
+            // Connectives enter neighbors, only expand height for now.
+            let r = connective.getRect();
 
             this.rect = new DivRect(
                 this.rect.left,
@@ -1221,7 +1253,7 @@ export class ObjMeasure extends MusicObject {
             this.endRepeatPlayCountText.offset(dx, dy);
         }
 
-        this.arcs.forEach(arc => arc.offset(dx, dy));
+        this.connectives.forEach(connective => connective.offset(dx, dy));
 
         this.beamGroups.forEach(beam => beam.offset(dx, dy));
 
@@ -1266,7 +1298,7 @@ export class ObjMeasure extends MusicObject {
             this.endRepeatPlayCountText.draw(renderer);
         }
 
-        this.arcs.forEach(arc => arc.draw(renderer));
+        this.connectives.forEach(connective => connective.draw(renderer));
 
         this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(renderer));
 

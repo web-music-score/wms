@@ -3,13 +3,13 @@ import { Note } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
-import { ArcProps } from "./arc-props";
+import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
-import { MArc, DivRect, TieType } from "../pub";
+import { MConnective, DivRect, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-export class ObjArc extends MusicObject {
+export class ObjConnective extends MusicObject {
     private lx = 0;
     private ly = 0;
     private rx = 0;
@@ -28,11 +28,11 @@ export class ObjArc extends MusicObject {
     private readonly tieType?: TieType;
 
 
-    readonly mi: MArc;
+    readonly mi: MConnective;
 
-    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
-    constructor(arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: TieType);
-    constructor(readonly arcProps: ArcProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
+    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
+    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: TieType);
+    constructor(readonly connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
         super(measure);
 
         this.measure = measure;
@@ -51,21 +51,21 @@ export class ObjArc extends MusicObject {
             this.tieType = args[0];
         }
 
-        this.mi = new MArc(this);
+        this.mi = new MConnective(this);
 
-        this.measure.addArcObject(this);
+        this.measure.addConnectiveObject(this);
     }
 
-    getMusicInterface(): MArc {
+    getMusicInterface(): MConnective {
         return this.mi;
     }
 
     isTie() {
-        return this.arcProps.arcType === "tie";
+        return this.connectiveProps.connective === Connective.Tie;
     }
 
     isSlur() {
-        return this.arcProps.arcType === "slur";
+        return this.connectiveProps.connective === Connective.Slur;
     }
 
     isInsideMeasure() {
@@ -83,14 +83,14 @@ export class ObjArc extends MusicObject {
         let prevRow = row.getPrevRow();
         let nextRow = row.getNextRow();
 
-        let contentRect = row.getArcsContentRect();
+        let contentRect = row.getConnectivesContentRect();
 
-        let { arcAnchor, arcDir } = this.arcProps;
+        let { noteAnchor, arcDir } = this.connectiveProps;
 
-        let leftPos = leftNoteGroup.getArcAnchorPoint(leftNote, arcAnchor, "left");
+        let leftPos = leftNoteGroup.getNoteAnchorPoint(leftNote, noteAnchor, "left");
 
         let rightPos = rightNoteGroup !== undefined && rightNote !== undefined
-            ? rightNoteGroup.getArcAnchorPoint(rightNote, arcAnchor, "right")
+            ? rightNoteGroup.getNoteAnchorPoint(rightNote, noteAnchor, "right")
             : this.tieType === TieType.ToMeasureEnd
                 ? { x: measure.getColumnsContentRect().right, y: leftPos.y }
                 : { x: leftPos.x + unitSize * DocumentSettings.ShortTieLength, y: leftPos.y };
@@ -115,7 +115,7 @@ export class ObjArc extends MusicObject {
         }
         else if (leftNoteGroup.row === prevRow && rightNoteGroup.row === row) {
             // left is on previous row, right is on current row
-            let prevRowContentRect = prevRow.getArcsContentRect();
+            let prevRowContentRect = prevRow.getConnectivesContentRect();
             let tLeft = prevRowContentRect.right - leftPos.x;
             let tRight = rightPos.x - contentRect.left;
             lx = contentRect.left;
@@ -125,7 +125,7 @@ export class ObjArc extends MusicObject {
         }
         else if (leftNoteGroup.row === row && rightNoteGroup.row === nextRow) {
             // left is on current row, right is on next row
-            let nextRowContentRect = nextRow.getArcsContentRect();
+            let nextRowContentRect = nextRow.getConnectivesContentRect();
             let tLeft = contentRect.right - leftPos.x;
             let tRight = rightPos.x - nextRowContentRect.left;
             lx = leftPos.x;

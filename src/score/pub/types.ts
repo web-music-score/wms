@@ -44,14 +44,20 @@ export enum Arpeggio { Up, Down }
 /** @public */
 export enum TieType { Stub = -1, ToMeasureEnd = -2 }
 
-/** @public */
+/** @deprecated */
 export type TieSpan = number | TieType;
 
-/** @public */
+/** @deprecated */
 export type SlurSpan = number;
 
 /** @public */
 export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
+
+/** @public */
+export enum Connective { Tie, Slur, Slide }
+
+/** @public */
+export type ConnectiveSpan = number | TieType;
 
 /** @public */
 export type NoteOptions = {
@@ -61,9 +67,13 @@ export type NoteOptions = {
     arpeggio?: Arpeggio | boolean,
     staccato?: boolean,
     diamond?: boolean,
+    /** @deprecated */
     tieSpan?: TieSpan,
+    /** @deprecated */
     tieAnchor?: NoteAnchor,
+    /** @deprecated */
     slurSpan?: SlurSpan,
+    /** @deprecated */
     slurAnchor?: NoteAnchor,
     triplet?: boolean,
     string?: StringNumber | StringNumber[];
