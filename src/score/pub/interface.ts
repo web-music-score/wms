@@ -25,7 +25,7 @@ import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { DocumentOptions, PlayStateChangeListener, Stem, StringNumber, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
+import { Connective, ConnectiveSpan, DocumentOptions, PlayStateChangeListener, Stem, StringNumber, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
 import { NoteAnchor, Arpeggio } from "./types";
 import { ScoreEventListener } from "./event";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
@@ -411,6 +411,35 @@ export class MMeasure extends MusicInterface {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
         this.obj.addNavigation(navigation, ...args);
+        return this;
+    }
+
+    addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): MMeasure;
+    addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): MMeasure;
+    addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): MMeasure;
+    addConnective(connective: Connective, ...args: unknown[]): MMeasure {
+        assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
+
+        if (connective === Connective.Tie) {
+            assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType), "tieSpan", args[0]);
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
+            let tieSpan = args[0] as ConnectiveSpan | undefined;
+            let noteAnchor = args[1] as NoteAnchor | undefined;
+            this.obj.addConnective(connective, tieSpan, noteAnchor);
+        }
+        else if (connective === Connective.Slur) {
+            assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]), "slurSpan", args[0]);
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
+            let slurSpan = args[0] as ConnectiveSpan | undefined;
+            let noteAnchor = args[1] as NoteAnchor | undefined;
+            this.obj.addConnective(connective, slurSpan, noteAnchor);
+        }
+        else if (connective === Connective.Slide) {
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[0]);
+            let noteAnchor = args[0] as NoteAnchor | undefined;
+            this.obj.addConnective(connective, noteAnchor);
+        }
+
         return this;
     }
 

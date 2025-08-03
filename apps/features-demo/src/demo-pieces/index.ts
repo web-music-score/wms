@@ -3,7 +3,7 @@ import { createRepeatsAndEndingsDemo } from "demo-pieces/repeats-endings";
 import { createDaCapoDemo } from "demo-pieces/da-capo";
 import { createDalSegnoDemo } from "demo-pieces/dal-segno";
 import { createBeamDetectionDemo } from "demo-pieces/beam-detections";
-import { createTiesAndSlursDemo } from "demo-pieces/ties-slurs";
+import { createConnectivesDemo } from "demo-pieces/connectives";
 import { createFermataDemo } from "demo-pieces/fermata";
 import { createStaccatoDemo } from "demo-pieces/staccato";
 import { createSignatureChangeDemo } from "demo-pieces/signature-change";
@@ -43,7 +43,7 @@ export class DemoPieces {
         demos.push(createDalSegnoDemo());
         demos.push(createBeamDetectionDemo());
         demos.push(createTripletsDemo());
-        demos.push(createTiesAndSlursDemo());
+        demos.push(createConnectivesDemo());
         demos.push(createFermataDemo());
         demos.push(createStaccatoDemo());
         demos.push(createSignatureChangeDemo());

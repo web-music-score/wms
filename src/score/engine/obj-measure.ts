@@ -567,19 +567,16 @@ export class ObjMeasure extends MusicObject {
         if (connective === Connective.Tie) {
             let tieSpan = Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType) ? args[0] : 2;
             let noteAnchor = Utils.Is.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Connective.Tie, tieSpan, noteAnchor ?? NoteAnchor.Auto, anchor));
+            anchor.startConnective(new ConnectiveProps(Connective.Tie, tieSpan, noteAnchor, anchor));
         }
         else if (connective === Connective.Slur) {
             let slurSpan = Utils.Is.isInteger(args[0]) ? args[0] : 2;
             let noteAnchor = Utils.Is.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Connective.Tie, slurSpan, noteAnchor ?? NoteAnchor.Auto, anchor));
+            anchor.startConnective(new ConnectiveProps(Connective.Slur, slurSpan, noteAnchor, anchor));
         }
         else if (connective === Connective.Slide) {
             let noteAnchor = Utils.Is.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
             throw new MusicError(MusicErrorType.Score, "Slide not implemented!");
-        }
-        else {
-            throw new MusicError(MusicErrorType.Score, "Invalid connective: " + connective);
         }
     }
 
