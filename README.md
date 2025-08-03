@@ -222,10 +222,6 @@ m.addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Whole, { arpeggio: Score.Arp
 | arpeggio    | `Score.Arpeggio.Up/Down` \| `boolean`  | Play column in arpeggio. |
 | staccato    | `boolean`               | Play column in staccato. |
 | diamond     | `boolean`               | Diamond shaped note head. |
-| tieSpan     | `number` \| `TieType.Stub/ToMeasureEnd` | How many notes this tie spans. |
-| tieAnchor   | `Score.NoteAnchor.Auto/Above/Center/Below/StemTip` | Tie attach point. |
-| slurSpan    | `number`                | How many notes this slur spans. |
-| slurAnchor  | `Score.NoteAnchor.Auto/Above/Center/Below/StemTip` | Slur attach point. |
 | triplet     | `boolean`               | Set this note part of triplet. |
 | string      | `number` \| `number[]`  | String number for guitar tab. Array of string numbers for chord. |
 
@@ -263,6 +259,23 @@ m.addFermata(Score.Fermata.AtMeasureEnd);
 `fermata` is typeof `Score.Fermata` and can be:
 - `Score.Fermata.AtNote`: Adds fermata anchored to previously added note, chord or rest.
 - `Score.Fermata.AtMeasureEnd`: Adds fermata at the end of measure.
+
+### Add Connective (tie, slur)
+
+```js
+// Add tie
+m.addConnective(connective: Score.Connetive.Tie, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
+
+// Add slur
+m.addConnective(connective: Score.Connetive.Slur, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
+```
+
+- `span` describes how many notes the connective is across.
+  It is integer >= 2 (for tie it can be also `Score.TieType.Stub|ToMeasureEnd`).
+  Default value is 2.
+- `noteAnchor` describes the attach point of connective to note.
+  It can be `Score.NoteAnchor.Auto|Above|Center|Below|StemTip`.
+  Default value is `Score.NoteAnchor.Auto`.
 
 ### Add Navigation
 
