@@ -576,7 +576,7 @@ export class ObjMeasure extends MusicObject {
         }
         else if (connective === Connective.Slide) {
             let noteAnchor = Utils.Is.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
-            throw new MusicError(MusicErrorType.Score, "Slide not implemented!");
+            anchor.startConnective(new ConnectiveProps(Connective.Slide, 2, noteAnchor, anchor));
         }
     }
 

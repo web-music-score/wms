@@ -103,6 +103,19 @@ export function createConnectivesDemo() {
     doc.addMeasure()
         .addNote(0, "A4", Theory.NoteLength.Half, { dotted: true })
         .addNote(1, "A3", Theory.NoteLength.Half, { dotted: true })
+        .endRow();
+
+    doc.addMeasure()
+        .addNote(0, "F4", Theory.NoteLength.Quarter, { stem: Score.Stem.Up }).addConnective(Score.Connective.Slide, Score.NoteAnchor.Center)
+        .addNote(0, "A4", Theory.NoteLength.Quarter, { stem: Score.Stem.Up })
+        .addNote(0, "F4", Theory.NoteLength.Quarter, { stem: Score.Stem.Down }).addConnective(Score.Connective.Slide, Score.NoteAnchor.Center)
+        .addNote(0, "A4", Theory.NoteLength.Quarter, { stem: Score.Stem.Down });
+
+    doc.addMeasure()
+        .addNote(0, "F4", Theory.NoteLength.Quarter, { stem: Score.Stem.Up }).addConnective(Score.Connective.Slide, Score.NoteAnchor.Below)
+        .addNote(0, "A4", Theory.NoteLength.Quarter, { stem: Score.Stem.Up })
+        .addNote(0, "F4", Theory.NoteLength.Quarter, { stem: Score.Stem.Down }).addConnective(Score.Connective.Slide, Score.NoteAnchor.Above)
+        .addNote(0, "A4", Theory.NoteLength.Quarter, { stem: Score.Stem.Down });
 
     return doc;
 }

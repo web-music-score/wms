@@ -268,6 +268,9 @@ m.addConnective(connective: Score.Connetive.Tie, span?: Score.ConnectiveSpan, no
 
 // Add slur
 m.addConnective(connective: Score.Connetive.Slur, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
+
+// Add slide
+m.addConnective(connective: Score.Connetive.Slide, noteAnchor?: Score.NoteAnchor);
 ```
 
 - `span` describes how many notes the connective is across.

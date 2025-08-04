@@ -105,13 +105,13 @@ export class ConnectiveProps {
                     leftNoteGroup.notes.forEach(leftNote => {
                         let rightNote = rightNoteGroup.notes.find(rightNote => Note.equals(rightNote, leftNote));
                         if (rightNote) {
-                            this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, leftNote);
+                            this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
                         }
                     });
                 }
             }
         }
-        else if (connective ===Connective.Slur) {
+        else if (connective === Connective.Slur) {
             if (typeof span === "number" && span >= 2 && this.noteGroups.length === span) {
                 let leftNoteGroup = this.noteGroups[0];
                 let rightNoteGroup = this.noteGroups[this.noteGroups.length - 1];
@@ -120,6 +120,21 @@ export class ConnectiveProps {
                 let rightNote = rightNoteGroup.notes[0];
 
                 this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+            }
+        }
+        else if (connective === Connective.Slide) {
+            if (this.noteGroups.length >= 2) {
+                for (let i = 0; i < this.noteGroups.length - 1; i++) {
+                    let leftNoteGroup = this.noteGroups[i];
+                    let rightNoteGroup = this.noteGroups[i + 1];
+
+                    let leftNote = leftNoteGroup.notes[0];
+                    let rightNote = rightNoteGroup.notes[0];
+
+                    if (leftNote && rightNote) {
+                        this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+                    }
+                }
             }
         }
     }

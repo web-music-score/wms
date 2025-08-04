@@ -59,9 +59,7 @@ export class ObjNoteGroup extends MusicObject {
     readonly rhythmProps: RhythmProps;
 
     private startConnnectives: ConnectiveProps[] = [];
-
-    private tieProps: ConnectiveProps[] = [];
-    private slurProps: ConnectiveProps[] = [];
+    private runningConnectives: ConnectiveProps[] = [];
 
     private leftBeamCount = 0;
     private rightBeamCount = 0;
@@ -290,41 +288,26 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     collectConnectiveProps() {
-        let startTie = this.startConnnectives.find(c => c.connective === Connective.Tie);
-        let startSlur = this.startConnnectives.find(c => c.connective === Connective.Slur);
-
-        if (startTie) {
-            this.tieProps.push(startTie);
+        this.startConnnectives.forEach(connective => {
+            this.runningConnectives.push(connective);
 
             let next = this.getNextNoteGroup();
 
-            while (next && startTie.addNoteGroup(next)) {
-                next.tieProps.push(startTie);
-
+            while (next && connective.addNoteGroup(next)) {
+                next.runningConnectives.push(connective);
                 next = next.getNextNoteGroup();
             }
-        }
-
-        if (startSlur) {
-            this.slurProps.push(startSlur);
-
-            let next = this.getNextNoteGroup();
-
-            while (next && startSlur.addNoteGroup(next)) {
-                next.slurProps.push(startSlur);
-
-                next = next.getNextNoteGroup();
-            }
-        }
+        });
     }
 
     removeConnectiveProps() {
-        this.tieProps = [];
-        this.slurProps = [];
+        this.runningConnectives = [];
     }
 
     getPlaySlur(): "first" | "slurred" | undefined {
-        let slurs = this.slurProps.map(slur => slur.startsWith(this) ? "first" : "slurred");
+        let slurs = this.runningConnectives
+            .filter(c => c.connective === Connective.Slur)
+            .map(c => c.startsWith(this) ? "first" : "slurred");
 
         if (slurs.indexOf("first") >= 0) {
             return "first";
@@ -396,35 +379,37 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getPlayTicks(note: Note) {
-        let tiedTicks = this.tieProps.map(tie => {
-            let tieNoteGroups = tie.noteGroups;
+        let tiedTicks = this.runningConnectives
+            .filter(c => c.connective === Connective.Tie)
+            .map(tie => {
+                let tieNoteGroups = tie.noteGroups;
 
-            let j = tieNoteGroups.indexOf(this);
+                let j = tieNoteGroups.indexOf(this);
 
-            if (j < 0) {
-                return 0;
-            }
+                if (j < 0) {
+                    return 0;
+                }
 
-            if (tie.span === TieType.Stub || tie.span === TieType.ToMeasureEnd) {
-                return Math.max(this.rhythmProps.ticks, this.measure.getMeasureTicks() - this.col.positionTicks);
-            }
+                if (tie.span === TieType.Stub || tie.span === TieType.ToMeasureEnd) {
+                    return Math.max(this.rhythmProps.ticks, this.measure.getMeasureTicks() - this.col.positionTicks);
+                }
 
-            let prev: ObjNoteGroup | undefined = tieNoteGroups[j - 1];
+                let prev: ObjNoteGroup | undefined = tieNoteGroups[j - 1];
 
-            if (prev && prev.notes.some(n => Note.equals(n, note))) {
-                return 0;
-            }
+                if (prev && prev.notes.some(n => Note.equals(n, note))) {
+                    return 0;
+                }
 
-            tieNoteGroups = tieNoteGroups.slice(j);
+                tieNoteGroups = tieNoteGroups.slice(j);
 
-            j = tieNoteGroups.findIndex(ng => ng.notes.every(n => !Note.equals(n, note)));
+                j = tieNoteGroups.findIndex(ng => ng.notes.every(n => !Note.equals(n, note)));
 
-            if (j >= 0) {
-                tieNoteGroups = tieNoteGroups.slice(0, j);
-            }
+                if (j >= 0) {
+                    tieNoteGroups = tieNoteGroups.slice(0, j);
+                }
 
-            return Utils.Math.sum(tieNoteGroups.map(ng => ng.rhythmProps.ticks));
-        });
+                return Utils.Math.sum(tieNoteGroups.map(ng => ng.rhythmProps.ticks));
+            });
 
         return tiedTicks.length === 0 ? this.rhythmProps.ticks : Math.max(...tiedTicks);
     }

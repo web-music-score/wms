@@ -435,7 +435,7 @@ export class MMeasure extends MusicInterface {
             this.obj.addConnective(connective, slurSpan, noteAnchor);
         }
         else if (connective === Connective.Slide) {
-            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[0]);
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[0], NoteAnchor), "noteAnchor", args[0]);
             let noteAnchor = args[0] as NoteAnchor | undefined;
             this.obj.addConnective(connective, noteAnchor);
         }

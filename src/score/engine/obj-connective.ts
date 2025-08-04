@@ -60,14 +60,6 @@ export class ObjConnective extends MusicObject {
         return this.mi;
     }
 
-    isTie() {
-        return this.connectiveProps.connective === Connective.Tie;
-    }
-
-    isSlur() {
-        return this.connectiveProps.connective === Connective.Slur;
-    }
-
     isInsideMeasure() {
         return this.rightNoteGroup === undefined || this.leftNoteGroup.measure === this.rightNoteGroup.measure;
     }
@@ -134,7 +126,7 @@ export class ObjConnective extends MusicObject {
             ry = leftPos.y + (rightPos.y - leftPos.y) * tLeft / (tLeft + tRight);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot layout arc object because no valid left and right note groups.");
+            throw new MusicError(MusicErrorType.Score, "Cannot layout connective object because no valid left and right note groups.");
         }
 
         let spanDy = arcDir === "up" ? -1 : 1;
@@ -144,7 +136,7 @@ export class ObjConnective extends MusicObject {
         this.ly = ly;
         this.rx = rx;
         this.ry = ry;
-        this.arcHeight = arcHeight;
+        this.arcHeight = this.connectiveProps.connective === Connective.Slide ? 0 : arcHeight;
 
         let { nx, ny } = Utils.Math.calcNormal(lx, ly, rx, ry);
 
@@ -195,11 +187,20 @@ export class ObjConnective extends MusicObject {
 
         ctx.strokeStyle = ctx.fillStyle = "black";
         ctx.lineWidth = lineWidth;
-        ctx.beginPath();
-        ctx.moveTo(this.lx, this.ly - s);
-        ctx.bezierCurveTo(this.cp1x, this.cp1y - t, this.cp2x, this.cp2y - t, this.rx, this.ry - s);
-        ctx.lineTo(this.rx, this.ry + s);
-        ctx.bezierCurveTo(this.cp2x, this.cp2y + t, this.cp1x, this.cp1y + t, this.lx, this.ly + s);
-        ctx.fill();
+
+        if (this.arcHeight === 0) {
+            ctx.beginPath();
+            ctx.moveTo(this.lx, this.ly);
+            ctx.lineTo(this.rx, this.ry);
+            ctx.stroke();
+        }
+        else {
+            ctx.beginPath();
+            ctx.moveTo(this.lx, this.ly - s);
+            ctx.bezierCurveTo(this.cp1x, this.cp1y - t, this.cp2x, this.cp2y - t, this.rx, this.ry - s);
+            ctx.lineTo(this.rx, this.ry + s);
+            ctx.bezierCurveTo(this.cp2x, this.cp2y + t, this.cp1x, this.cp1y + t, this.lx, this.ly + s);
+            ctx.fill();
+        }
     }
 }
