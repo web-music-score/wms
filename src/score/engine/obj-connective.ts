@@ -20,7 +20,6 @@ export class ObjConnective extends MusicObject {
     private cp2y = 0;
     private arcHeight = 0;
 
-    private readonly measure: ObjMeasure;
     private readonly leftNoteGroup: ObjNoteGroup;
     private readonly leftNote: Note;
     private readonly rightNoteGroup?: ObjNoteGroup;
@@ -32,10 +31,8 @@ export class ObjConnective extends MusicObject {
 
     constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
     constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
+    constructor(readonly connectiveProps: ConnectiveProps, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
         super(measure);
-
-        this.measure = measure;
 
         this.leftNoteGroup = leftNoteGroup;
         this.leftNote = leftNote;
