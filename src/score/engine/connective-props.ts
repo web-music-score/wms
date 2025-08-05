@@ -3,6 +3,7 @@ import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, ConnectiveSpan, NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { ObjMeasure } from "./obj-measure";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
@@ -136,16 +137,28 @@ export class ConnectiveProps {
     }
 
     private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNoteId: number, tieType: TieType) {
-        new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+        new ObjConnective(this, "staff", leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+
+        if (leftNoteGroup.row.hasTab && leftNoteGroup.getFretNumberString(leftNoteId) !== undefined) {
+            new ObjConnective(this, "tab", leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+        }
     }
 
     private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) {
+        const addConnective = (measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) => {
+            new ObjConnective(this, "staff", measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+
+            if (leftNoteGroup.row.hasTab && leftNoteGroup.getFretNumberString(leftNoteId) !== undefined && leftNoteGroup.getFretNumberString(leftNoteId) === rightNoteGroup.getFretNumberString(rightNoteId)) {
+                new ObjConnective(this, "tab", measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            }
+        }
+
         if (leftNoteGroup.measure === rightNoteGroup.measure) {
-            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            addConnective(leftNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
         }
         else if (leftNoteGroup.measure.getNextMeasure() === rightNoteGroup.measure) {
-            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
-            new ObjConnective(this, rightNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            addConnective(leftNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            addConnective(rightNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
         }
         else {
             throw new MusicError(MusicErrorType.Score, "Cannot create connective because it is jumping measures.");

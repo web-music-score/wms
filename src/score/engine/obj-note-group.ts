@@ -196,8 +196,10 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getNoteAnchorPoint(note: Note, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
-        let noteIndex = this.notes.findIndex(note2 => Note.equals(note2, note));
+    getNoteAnchorPoint(noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
+        if (noteIndex < 0 || noteIndex >= this.notes.length) {
+            throw new MusicError(MusicErrorType.Score, "Invalid noteIndex: " + noteIndex);
+        }
 
         if (!this.staffObjs || noteIndex < 0 || noteIndex >= this.staffObjs.noteHeadRects.length) {
             let r = this.getRect();
@@ -260,6 +262,46 @@ export class ObjNoteGroup extends MusicObject {
             default:
                 throw new MusicError(MusicErrorType.Score, "Invalid noteAnchor: " + noteAnchor);
         }
+    }
+
+    getFretAnchorPoint(noteIndex: number, connectiveProps: ConnectiveProps, side: "left" | "right"): { x: number, y: number } {
+        let fretNumber = this.tabObjs?.fretNumbers[noteIndex];
+
+        let r = fretNumber?.getRect();
+
+        if (!r) {
+            return { x: 0, y: 0 }
+        }
+
+        let x = side === "right" ? r.left : r.right;
+        let y: number;
+            let s = 0.9;
+
+        if (connectiveProps.connective === Connective.Slide) {
+            let leftFretNumber = connectiveProps.noteGroups[0].getFretNumber(0);
+            let rightFretNumber = connectiveProps.noteGroups[1].getFretNumber(0);
+            let slideUp = leftFretNumber === undefined || rightFretNumber === undefined || leftFretNumber <= rightFretNumber;
+
+            if (side === "left") {
+                y = slideUp ? r.centerY + r.bottomh * s : r.centerY - r.toph * s;
+            }
+            else {
+                y = slideUp ? r.centerY - r.toph * s : r.centerY + r.bottomh * s;
+            }
+        }
+        else {
+            y = r.centerY + r.bottomh * s;
+        }
+        return { x, y }
+    }
+
+    getFretNumberString(noteIndex: number): number | undefined {
+        return this.ownString[noteIndex];
+    }
+
+    getFretNumber(noteIndex: number): number | undefined {
+        let fretNumber = this.tabObjs?.fretNumbers[noteIndex];
+        return fretNumber === undefined ? undefined : +fretNumber.getText();
     }
 
     private getNextNoteGroup(): ObjNoteGroup | undefined {

@@ -21,32 +21,30 @@ export class ObjConnective extends MusicObject {
     private arcHeight = 0;
 
     private readonly leftNoteGroup: ObjNoteGroup;
-    private readonly leftNote: Note;
+    private readonly leftNoteId: number;
     private readonly rightNoteGroup?: ObjNoteGroup;
-    private readonly rightNote?: Note;
+    private readonly rightNoteId?: number;
     private readonly tieType?: TieType;
 
 
     readonly mi: MConnective;
 
-    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
-    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
+    constructor(connectiveProps: ConnectiveProps, loc: "staff" | "tab", measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
+    constructor(connectiveProps: ConnectiveProps, loc: "staff" | "tab", measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
+    constructor(readonly connectiveProps: ConnectiveProps, readonly loc: "staff" | "tab", readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
 
         this.leftNoteGroup = leftNoteGroup;
-        this.leftNote = leftNoteGroup.notes[leftNoteId];
+        this.leftNoteId = leftNoteId;
 
         if (args[0] instanceof ObjNoteGroup && typeof args[1] === "number") {
-            let rightNoteGroup = args[0];
-            let rightNoteId = args[1];
-            this.rightNoteGroup = rightNoteGroup;
-            this.rightNote = rightNoteGroup.notes[rightNoteId];
+            this.rightNoteGroup = args[0];
+            this.rightNoteId = args[1];
             this.tieType = undefined;
         }
         else if (Utils.Is.isEnumValue(args[0], TieType)) {
             this.rightNoteGroup = undefined;
-            this.rightNote = undefined;
+            this.rightNoteId = undefined;
             this.tieType = args[0];
         }
 
@@ -69,22 +67,32 @@ export class ObjConnective extends MusicObject {
 
     layout(renderer: Renderer) {
         let { unitSize } = renderer;
-        let { measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote } = this;
+        let { measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId, loc, connectiveProps } = this;
+        let { noteAnchor, arcDir } = connectiveProps;
         let { row } = measure;
         let prevRow = row.getPrevRow();
         let nextRow = row.getNextRow();
 
         let contentRect = row.getConnectivesContentRect();
 
-        let { noteAnchor, arcDir } = this.connectiveProps;
 
-        let leftPos = leftNoteGroup.getNoteAnchorPoint(leftNote, noteAnchor, "left");
+        let leftPos: { x: number, y: number }
+        let rightPos: { x: number, y: number }
 
-        let rightPos = rightNoteGroup !== undefined && rightNote !== undefined
-            ? rightNoteGroup.getNoteAnchorPoint(rightNote, noteAnchor, "right")
-            : this.tieType === TieType.ToMeasureEnd
+        leftPos = loc === "tab"
+            ? leftNoteGroup.getFretAnchorPoint(leftNoteId, connectiveProps, "left")
+            : leftNoteGroup.getNoteAnchorPoint(leftNoteId, noteAnchor, "left");
+
+        if (rightNoteGroup !== undefined && rightNoteId !== undefined) {
+            rightPos = loc === "tab"
+                ? rightNoteGroup.getFretAnchorPoint(rightNoteId, connectiveProps, "right")
+                : rightNoteGroup.getNoteAnchorPoint(rightNoteId, noteAnchor, "right");
+        }
+        else {
+            rightPos = this.tieType === TieType.ToMeasureEnd
                 ? { x: measure.getColumnsContentRect().right, y: leftPos.y }
                 : { x: leftPos.x + unitSize * DocumentSettings.ShortTieLength, y: leftPos.y };
+        }
 
         let lx: number,
             ly: number,

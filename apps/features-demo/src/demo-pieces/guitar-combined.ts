@@ -41,14 +41,25 @@ export function createGuitarCombinedDemo() {
         .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 })
 
     doc.addMeasure()
-        .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 }).addConnective(Score.Connective.Slur)
-        .addNote(0, "A3", Theory.NoteLength.Half, { string: 4 })
+        .addNote(0, "F3", Theory.NoteLength.Quarter, { string: 4 }).addConnective(Score.Connective.Slur)
+        .addNote(0, "A3", Theory.NoteLength.Quarter, { string: 4 })
+        .addNote(0, "A3", Theory.NoteLength.Quarter, { string: 4 }).addConnective(Score.Connective.Slur)
+        .addNote(0, "F3", Theory.NoteLength.Quarter, { string: 4 })
 
     doc.addMeasure()
         .addNote(0, "F3", Theory.NoteLength.Quarter, { string: 4 }).addConnective(Score.Connective.Slide)
         .addNote(0, "A3", Theory.NoteLength.Quarter, { string: 4 })
         .addNote(0, "A3", Theory.NoteLength.Quarter, { string: 4 }).addConnective(Score.Connective.Slide)
         .addNote(0, "F3", Theory.NoteLength.Quarter, { string: 4 })
+        .endRow();
+
+    doc.addMeasure()
+        .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 }).addConnective(Score.Connective.Tie, Score.TieType.Stub)
+        .addNote(0, "A3", Theory.NoteLength.Half, { string: 4 }).addConnective(Score.Connective.Tie)
+
+    doc.addMeasure()
+        .addNote(0, "A3", Theory.NoteLength.Half, { string: 4 })
+        .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 }).addConnective(Score.Connective.Tie, Score.TieType.ToMeasureEnd)
 
     return doc;
 }
