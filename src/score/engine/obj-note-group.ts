@@ -219,6 +219,7 @@ export class ObjNoteGroup extends MusicObject {
         let belowY = noteHeadRect.bottom + padding;
 
         if (noteAnchor === NoteAnchor.Auto) {
+            // Auto is solved in CopnnectivePorps, but this is just in case.
             noteAnchor = NoteAnchor.Below;
         }
         else if (noteAnchor === NoteAnchor.StemTip && !hasStem) {

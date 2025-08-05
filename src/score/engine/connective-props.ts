@@ -41,14 +41,18 @@ export class ConnectiveProps {
 
     private computeParams() {
         let stemDir = this.noteGroups[0].stemDir;
+        let hasStem = this.noteGroups[0].rhythmProps.hasStem;
 
         if (this.noteAnchor === NoteAnchor.StemTip) {
             this.arcDir = stemDir === Stem.Up ? "up" : "down";
         }
         else if (this.noteAnchor === NoteAnchor.Auto) {
-            this.arcDir = stemDir === Stem.Up ? "down" : "up";
+            this.arcDir = stemDir === Stem.Up || !hasStem ? "down" : "up";
 
             if (this.noteGroups[0].notes.length > 1) {
+                this.noteAnchor = NoteAnchor.Center;
+            }
+            else if (this.connective === Connective.Slide) {
                 this.noteAnchor = NoteAnchor.Center;
             }
             else if (this.arcDir === "up") {
