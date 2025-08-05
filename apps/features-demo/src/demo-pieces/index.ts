@@ -13,7 +13,7 @@ import { createTempoAnnotationDemo } from "./tempo-annotation";
 import { createDynamicsAnnotationDemo } from "./dynamics-annotation";
 import { createCompleteRestsDemo } from "./complete-rests";
 import { createNoteHeadsDemo } from "./note-heads";
-import { createGuitarCombinedDemo } from "./guitar-treble-and-tab";
+import { createGuitarCombinedDemo } from "./guitar-combined";
 import { createGuitarTabDemo } from "./guitar-tab";
 import * as Score from "@tspro/web-music-score/score";
 

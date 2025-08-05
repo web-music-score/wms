@@ -34,6 +34,21 @@ export function createGuitarCombinedDemo() {
         .addNote(0, "C4", Theory.NoteLength.Eighth, { string: 2 })
         .addChord(0, ["C4", "G3"], Theory.NoteLength.Eighth, { string: [2, 3] })
         .addNote(0, "E4", Theory.NoteLength.Eighth, { string: 1 })
+        .endRow();
+
+    doc.addMeasure()
+        .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 }).addConnective(Score.Connective.Tie)
+        .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 })
+
+    doc.addMeasure()
+        .addNote(0, "F3", Theory.NoteLength.Half, { string: 4 }).addConnective(Score.Connective.Slur)
+        .addNote(0, "A3", Theory.NoteLength.Half, { string: 4 })
+
+    doc.addMeasure()
+        .addNote(0, "F3", Theory.NoteLength.Quarter, { string: 4 }).addConnective(Score.Connective.Slide)
+        .addNote(0, "A3", Theory.NoteLength.Quarter, { string: 4 })
+        .addNote(0, "A3", Theory.NoteLength.Quarter, { string: 4 }).addConnective(Score.Connective.Slide)
+        .addNote(0, "F3", Theory.NoteLength.Quarter, { string: 4 })
 
     return doc;
 }
