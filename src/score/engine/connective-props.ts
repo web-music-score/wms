@@ -97,19 +97,19 @@ export class ConnectiveProps {
         if (connective === Connective.Tie) {
             if (span === TieType.Stub || span === TieType.ToMeasureEnd) {
                 let leftNoteGroup = this.noteGroups[0];
-                leftNoteGroup.notes.forEach(note => {
-                    this.createObjConnectiveWithTieType(leftNoteGroup, note, span);
-                });
+                for (let noteId = 0; noteId < leftNoteGroup.notes.length; noteId++) {
+                    this.createObjConnectiveWithTieType(leftNoteGroup, noteId, span);
+                }
             }
             else if (this.noteGroups.length >= 2) {
                 for (let i = 0; i < this.noteGroups.length - 1; i++) {
                     let leftNoteGroup = this.noteGroups[i];
                     let rightNoteGroup = this.noteGroups[i + 1];
 
-                    leftNoteGroup.notes.forEach(leftNote => {
-                        let rightNote = rightNoteGroup.notes.find(rightNote => Note.equals(rightNote, leftNote));
-                        if (rightNote) {
-                            this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+                    leftNoteGroup.notes.forEach((leftNote, leftNoteId) => {
+                        let rightNoteId = rightNoteGroup.notes.findIndex(rightNote => Note.equals(rightNote, leftNote));
+                        if (rightNoteId >= 0) {
+                            this.createObjConnective(leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
                         }
                     });
                 }
@@ -120,10 +120,7 @@ export class ConnectiveProps {
                 let leftNoteGroup = this.noteGroups[0];
                 let rightNoteGroup = this.noteGroups[this.noteGroups.length - 1];
 
-                let leftNote = leftNoteGroup.notes[0];
-                let rightNote = rightNoteGroup.notes[0];
-
-                this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+                this.createObjConnective(leftNoteGroup, 0, rightNoteGroup, 0);
             }
         }
         else if (connective === Connective.Slide) {
@@ -132,28 +129,23 @@ export class ConnectiveProps {
                     let leftNoteGroup = this.noteGroups[i];
                     let rightNoteGroup = this.noteGroups[i + 1];
 
-                    let leftNote = leftNoteGroup.notes[0];
-                    let rightNote = rightNoteGroup.notes[0];
-
-                    if (leftNote && rightNote) {
-                        this.createObjConnective(leftNoteGroup, leftNote, rightNoteGroup, rightNote);
-                    }
+                    this.createObjConnective(leftNoteGroup, 0, rightNoteGroup, 0);
                 }
             }
         }
     }
 
-    private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNote: Note, tieType: TieType) {
-        new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNote, tieType);
+    private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNoteId: number, tieType: TieType) {
+        new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
     }
 
-    private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note) {
+    private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) {
         if (leftNoteGroup.measure === rightNoteGroup.measure) {
-            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
         }
         else if (leftNoteGroup.measure.getNextMeasure() === rightNoteGroup.measure) {
-            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
-            new ObjConnective(this, rightNoteGroup.measure, leftNoteGroup, leftNote, rightNoteGroup, rightNote);
+            new ObjConnective(this, leftNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            new ObjConnective(this, rightNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
         }
         else {
             throw new MusicError(MusicErrorType.Score, "Cannot create connective because it is jumping measures.");

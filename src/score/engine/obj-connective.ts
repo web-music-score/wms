@@ -29,17 +29,19 @@ export class ObjConnective extends MusicObject {
 
     readonly mi: MConnective;
 
-    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, rightNoteGroup: ObjNoteGroup, rightNote: Note);
-    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNote: Note, ...args: unknown[]) {
+    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
+    constructor(connectiveProps: ConnectiveProps, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
+    constructor(readonly connectiveProps: ConnectiveProps, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
 
         this.leftNoteGroup = leftNoteGroup;
-        this.leftNote = leftNote;
+        this.leftNote = leftNoteGroup.notes[leftNoteId];
 
-        if (args[0] instanceof ObjNoteGroup && args[1] instanceof Note) {
-            this.rightNoteGroup = args[0];
-            this.rightNote = args[1];
+        if (args[0] instanceof ObjNoteGroup && typeof args[1] === "number") {
+            let rightNoteGroup = args[0];
+            let rightNoteId = args[1];
+            this.rightNoteGroup = rightNoteGroup;
+            this.rightNote = rightNoteGroup.notes[rightNoteId];
             this.tieType = undefined;
         }
         else if (Utils.Is.isEnumValue(args[0], TieType)) {
