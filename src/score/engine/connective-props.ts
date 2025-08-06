@@ -139,7 +139,9 @@ export class ConnectiveProps {
     private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNoteId: number, tieType: TieType) {
         new ObjConnective(this, "staff", leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
 
-        if (leftNoteGroup.row.hasTab && leftNoteGroup.getFretNumberString(leftNoteId) !== undefined) {
+        let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
+
+        if (leftNoteGroup.row.hasTab && leftString !== undefined) {
             new ObjConnective(this, "tab", leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
         }
     }
