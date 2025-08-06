@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0] - 2025
+## Changed
+- Renamed Arc (tie, slur) to Connective.
+
+### Added
+- Connective.Slide
+- Draw connectives to tabs.
+
 ## [2.0.0] - 2025-07-28
 Major update and brought many changes.
 ### ** Breaking Changes **
