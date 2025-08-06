@@ -275,7 +275,7 @@ export class ObjNoteGroup extends MusicObject {
 
         let x = side === "right" ? r.left : r.right;
         let y: number;
-            let s = 0.9;
+        let s = 0.9;
 
         if (connectiveProps.connective === Connective.Slide) {
             let leftFretNumber = connectiveProps.noteGroups[0].getFretNumber(0);
@@ -292,6 +292,7 @@ export class ObjNoteGroup extends MusicObject {
         else {
             y = r.centerY + r.bottomh * s;
         }
+
         return { x, y }
     }
 

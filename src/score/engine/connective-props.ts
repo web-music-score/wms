@@ -148,7 +148,11 @@ export class ConnectiveProps {
         const addConnective = (measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) => {
             new ObjConnective(this, "staff", measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
 
-            if (leftNoteGroup.row.hasTab && leftNoteGroup.getFretNumberString(leftNoteId) !== undefined && leftNoteGroup.getFretNumberString(leftNoteId) === rightNoteGroup.getFretNumberString(rightNoteId)) {
+            let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
+            let rightString = rightNoteGroup.getFretNumberString(rightNoteId);
+
+            if (leftNoteGroup.row.hasTab && leftString !== undefined && rightString !== undefined &&
+                (leftString === rightString || this.connective === Connective.Slur)) {
                 new ObjConnective(this, "tab", measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
             }
         }
