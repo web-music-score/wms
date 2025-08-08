@@ -24,13 +24,12 @@ export class ObjFermata extends MusicObject {
         let { measure } = anchor;
         let { row } = measure;
 
-        // FIXME
-        //if (row.staffPreset === StaffPreset.Grand) {
-        //    return [VerticalPos.AboveStaff, VerticalPos.BelowStaff];
-        //}
-        //else {
+        if (row.getTopStaff() !== row.getBottomStaff()) {
+            return [VerticalPos.AboveStaff, VerticalPos.BelowStaff];
+        }
+        else {
             return [VerticalPos.AboveStaff];
-        //}
+        }
     }
 
     pick(x: number, y: number): MusicObject[] {

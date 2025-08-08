@@ -11,16 +11,6 @@ import { ObjExtensionLine } from "./obj-extension-line";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-/*
-const p = (noteName: string) => Note.getNote(noteName).diatonicId;
-
-const createStaff_Treble = () => new MusicStaff(Clef.G, p("G4"), p("B4"), p("C3"), p("C7"));
-const createStaff_GuitarTreble = () => new MusicStaff(Clef.G, p("G3"), p("B3"), p("C2"), p("C6"));
-const createStaff_Bass = () => new MusicStaff(Clef.F, p("F3"), p("D3"), p("C1"), p("C5"));
-const createStaff_Grand_Treble = () => new MusicStaff(Clef.G, p("G4"), p("B4"), p("C4"), p("C7"));
-const createStaff_Grand_Bass = () => new MusicStaff(Clef.F, p("F3"), p("D3"), p("C1"), p("C4") - 1);
-*/
-
 export class ObjScoreRow extends MusicObject {
     private prevRow?: ObjScoreRow;
     private nextRow?: ObjScoreRow;
@@ -230,17 +220,19 @@ export class ObjScoreRow extends MusicObject {
         // Compute toph and bottomh
         let rect = new DivRect();
 
-        staves.forEach(staff => rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY)));
+        staves.forEach(staff => {
+            rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY));
 
-        if (this.hasStaff && this.doc.fullDiatonicRange) {
-            /* FIXME
-            this.staves.forEach(staff => {
+            if (staff.maxDiatonicId) {
                 let top = staff.getDiatonicIdY(staff.maxDiatonicId) - staff.getLineSpacing();
+                rect.expandInPlace(new DivRect(0, 0, top, staff.bottomLineY));
+            }
+
+            if (staff.minDiatonicId) {
                 let bottom = staff.getDiatonicIdY(staff.minDiatonicId) + staff.getLineSpacing();
-                rect.expandInPlace(new DivRect(0, 0, top, bottom));
-            });
-            */
-        }
+                rect.expandInPlace(new DivRect(0, 0, staff.topLineY, bottom));
+            }
+        });
 
         let tab = this.getTab();
 

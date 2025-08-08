@@ -110,7 +110,9 @@ export type RestOptions = {
 /** @public */
 export type DocumentOptions = {
     measuresPerRow?: number,
+    /** @deprecated - Use tab config with tuning instead of preset. */
     tuning?: string,
+    /** @deprecated - Use staff config with min/maxNote instead of preset.*/
     fullDiatonicRange?: boolean
 }
 

@@ -50,26 +50,26 @@ export class ObjDocument extends MusicObject {
             switch (config) {
                 default:
                 case StaffPreset.Treble:
-                    this.config = [{ type: "staff", clef: Clef.G }];
+                    this.config = [{ type: "staff", clef: Clef.G, minNote: this.fullDiatonicRange ? "C3" : undefined, maxNote: this.fullDiatonicRange ? "C7" : undefined }];
                     break;
                 case StaffPreset.Bass:
-                    this.config = [{ type: "staff", clef: Clef.F }];
+                    this.config = [{ type: "staff", clef: Clef.F, minNote: this.fullDiatonicRange ? "C1" : undefined, maxNote: this.fullDiatonicRange ? "C5" : undefined }];
                     break;
                 case StaffPreset.Grand:
                     this.config = [
-                        { type: "staff", clef: Clef.G, minNote: "C4" },
-                        { type: "staff", clef: Clef.F, maxNote: "B3" }
+                        { type: "staff", clef: Clef.G, minNote: "C4", maxNote: this.fullDiatonicRange ? "C7" : undefined },
+                        { type: "staff", clef: Clef.F, maxNote: "B3", minNote: this.fullDiatonicRange ? "C1" : undefined }
                     ];
                     break;
                 case StaffPreset.GuitarTreble:
-                    this.config = [{ type: "staff", clef: Clef.G, isOctaveDown: true }];
+                    this.config = [{ type: "staff", clef: Clef.G, isOctaveDown: true, minNote: this.fullDiatonicRange ? "C2" : undefined, maxNote: this.fullDiatonicRange ? "C6" : undefined }];
                     break;
                 case StaffPreset.GuitarTab:
                     this.config = [{ type: "tab", tuning: this.tuningName }];
                     break;
                 case StaffPreset.GuitarCombined:
                     this.config = [
-                        { type: "staff", clef: Clef.G, isOctaveDown: true },
+                        { type: "staff", clef: Clef.G, isOctaveDown: true, minNote: this.fullDiatonicRange ? "C2" : undefined, maxNote: this.fullDiatonicRange ? "C6" : undefined },
                         { type: "tab", tuning: this.tuningName }
                     ];
                     break;

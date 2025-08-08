@@ -13,24 +13,24 @@ export class MusicStaff {
     readonly maxDiatonicId?: number;
 
     constructor(readonly staffConfig: StaffConfig) {
-        const getDiatonicId = (noteName: string) => Note.getNote(noteName).diatonicId - (staffConfig.isOctaveDown === true ? 7 : 0);
+        const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
 
         if (staffConfig.clef === Clef.G) {
             this.clefImageAsset = ImageAsset.TrebleClefPng;
-            this.clefLineDiatonicId = getDiatonicId("G4");
+            this.clefLineDiatonicId = getDiatonicId("G4", staffConfig.isOctaveDown === true);
             this.middleLineDiatonicId = this.clefLineDiatonicId + 2;
         }
         else {
             this.clefImageAsset = ImageAsset.BassClefPng;
-            this.clefLineDiatonicId = getDiatonicId("F3");
+            this.clefLineDiatonicId = getDiatonicId("F3", staffConfig.isOctaveDown === true);
             this.middleLineDiatonicId = this.clefLineDiatonicId - 2;
         }
 
         this.topLineDiatonicId = this.middleLineDiatonicId + 4;
         this.bottomLineDiatonicId = this.middleLineDiatonicId - 4;
 
-        this.minDiatonicId = staffConfig.minNote !== undefined ? getDiatonicId(staffConfig.minNote) : undefined;
-        this.maxDiatonicId = staffConfig.maxNote !== undefined ? getDiatonicId(staffConfig.maxNote) : undefined;
+        this.minDiatonicId = staffConfig.minNote !== undefined ? Math.min(getDiatonicId(staffConfig.minNote, false), this.bottomLineDiatonicId) : undefined;
+        this.maxDiatonicId = staffConfig.maxNote !== undefined ? Math.max(getDiatonicId(staffConfig.maxNote, false), this.topLineDiatonicId) : undefined;
     }
 
     topLineY: number = 0;
