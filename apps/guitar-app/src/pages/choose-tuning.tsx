@@ -50,38 +50,21 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         }
     }
 
-    private createScore(guitarCtx: ScoreUI.GuitarContext): Score.MDocument | undefined {
+    private createScore(guitarCtx: ScoreUI.GuitarContext): Score.MDocument {
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
 
-        let staffPresets = [
-            Score.StaffPreset.GuitarTreble,
-            Score.StaffPreset.Treble,
-            Score.StaffPreset.Bass,
-            Score.StaffPreset.Grand
-        ];
+        let doc = new Score.MDocument({ type: "staff", clef: Score.Clef.G, isOctaveDown: true });
 
-        for (let i = 0; i < staffPresets.length; i++) {
-            try {
-                let doc = new Score.MDocument(staffPresets[i]);
+        let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
 
-                let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
+        notes.forEach(note => {
+            m.addNote(0, note, Theory.NoteLength.Quarter);
+            m.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
+        });
 
-                notes.forEach(note => {
-                    m.addNote(0, note, Theory.NoteLength.Quarter);
-                    m.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
-                });
+        m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
 
-                m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
-
-                return doc;
-            }
-            catch (err) {
-                // All notes did not fit into staff.
-                continue;
-            }
-        }
-
-        return undefined;
+        return doc;
     }
 
     render() {
