@@ -1,5 +1,5 @@
 import * as Audio from "@tspro/web-music-score/audio";
-import { Accidental, Note, NoteLength, KeySignature, TimeSignature, TimeSignatureString } from "@tspro/web-music-score/theory";
+import { Accidental, Note, NoteLength, KeySignature, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
 import { RhythmProps, Scale, ScaleType, SymbolSet } from "@tspro/web-music-score/theory";
 import { MusicObject } from "../engine/music-object";
 import { ObjAccidental } from "../engine/obj-accidental";
@@ -25,11 +25,10 @@ import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { Connective, ConnectiveSpan, DocumentOptions, PlayStateChangeListener, Stem, StringNumber, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
+import { Clef, Connective, ConnectiveSpan, DocumentOptions, PlayStateChangeListener, StaffConfig, Stem, StringNumber, TabConfig, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
 import { NoteAnchor, Arpeggio } from "./types";
 import { ScoreEventListener } from "./event";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
-import { isNumber } from "tone";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
@@ -48,11 +47,11 @@ function require_t<T>(t: T | undefined | null, message?: string): T {
 }
 
 function isVoiceId(value: unknown): value is VoiceId {
-    return isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
+    return Utils.Is.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
 }
 
 function isStringNumber(value: unknown): value is StringNumber {
-    return isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
+    return Utils.Is.isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
 }
 
 function assertNoteOptions(options: NoteOptions) {
@@ -82,6 +81,36 @@ function assertRestOptions(options: RestOptions) {
     assertArg(Utils.Is.isStringOrUndefined(options.color), "restOptions.color", options.color);
     assertArg(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide", options.hide);
     assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "restOptions.triplet", options.triplet);
+}
+
+function isNote(note: string): boolean {
+    if (typeof note !== "string") {
+        return false;
+    }
+    else {
+        let p = Note.parseNote(note);
+        return p !== undefined && p.octave !== undefined;
+    }
+}
+
+function assertStaffConfig(staffConfig: StaffConfig) {
+    assertArg(Utils.Is.isObject(staffConfig), "staffConfig", staffConfig);
+    assertArg(staffConfig.type === "staff", "staffConfig.type", staffConfig.type);
+    assertArg(Utils.Is.isEnumValue(staffConfig.clef, Clef), "staffConfig.clef", staffConfig.clef);
+    assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
+    assertArg(Utils.Is.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
+    assertArg(Utils.Is.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
+}
+
+function assertTabConfig(tabConfig: TabConfig) {
+    assertArg(Utils.Is.isObject(tabConfig), "tabConfig", tabConfig);
+    assertArg(tabConfig.type === "tab", "tabConfig.type", tabConfig.type);
+    if (typeof tabConfig.tuning === "string") {
+        assertArg(TuningNameList.includes(tabConfig.tuning), "tabConfig.tuning", tabConfig.tuning);
+    }
+    else if (Utils.Is.isArray(tabConfig.tuning)) {
+        assertArg(tabConfig.tuning.length === 6 && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
+    }
 }
 
 /** @public */
@@ -167,10 +196,38 @@ export class MDocument extends MusicInterface {
     /** @internal */
     readonly obj: ObjDocument;
 
-    constructor(staffPreset: StaffPreset, options?: DocumentOptions) {
+    constructor(staffPreset: StaffPreset, options?: DocumentOptions);
+    constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions);
+    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions) {
         super(MDocument.Name);
 
-        assertArg(Utils.Is.isEnumValue(staffPreset, StaffPreset), "staffPreset", staffPreset);
+        if (Utils.Is.isEnumValue(config, StaffPreset)) {
+            // Ok
+        }
+        else if (Utils.Is.isObject(config) && config.type === "staff") {
+            assertStaffConfig(config);
+        }
+        else if (Utils.Is.isObject(config) && config.type === "tab") {
+            assertTabConfig(config);
+        }
+        else if (Utils.Is.isArray(config)) {
+            assertArg(config.length > 0, "config", config);
+            config.forEach(c => {
+                if (Utils.Is.isObject(c) && c.type === "staff") {
+                    assertStaffConfig(c);
+                }
+                else if (Utils.Is.isObject(c) && c.type === "tab") {
+                    assertTabConfig(c);
+                }
+                else {
+                    assertArg(false, "config", config);
+                }
+            });
+        }
+        else {
+            assertArg(false, "config", config);
+        }
+
         if (options !== undefined) {
             assertArg(Utils.Is.isObject(options), "documentOptions", options);
             assertArg(Utils.Is.isUndefined(options.measuresPerRow) || Utils.Is.isIntegerGte(options.measuresPerRow, 1), "documentOptions.measuresPerRow", options.measuresPerRow);
@@ -178,7 +235,7 @@ export class MDocument extends MusicInterface {
             assertArg(Utils.Is.isBooleanOrUndefined(options.fullDiatonicRange), "documentOptions.fullDiatonicRange", options.fullDiatonicRange);
         }
 
-        this.obj = new ObjDocument(this, staffPreset, options);
+        this.obj = new ObjDocument(this, config, options);
     }
 
     /** @internal */

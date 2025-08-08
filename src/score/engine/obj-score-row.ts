@@ -1,34 +1,33 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, MScoreRow, StaffPreset } from "../pub";
+import { Clef, DivRect, MScoreRow, StaffPreset } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
-import { Clef, GuitarTab, MusicStaff } from "./staff-and-tab";
+import { GuitarTab, MusicStaff } from "./staff-and-tab";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
+/*
 const p = (noteName: string) => Note.getNote(noteName).diatonicId;
 
-const createStaff_Treble = () => new MusicStaff(Clef.Treble, p("G4"), p("B4"), p("C3"), p("C7"));
-const createStaff_GuitarTreble = () => new MusicStaff(Clef.Treble, p("G3"), p("B3"), p("C2"), p("C6"));
-const createStaff_Bass = () => new MusicStaff(Clef.Bass, p("F3"), p("D3"), p("C1"), p("C5"));
-const createStaff_Grand_Treble = () => new MusicStaff(Clef.Treble, p("G4"), p("B4"), p("C4"), p("C7"));
-const createStaff_Grand_Bass = () => new MusicStaff(Clef.Bass, p("F3"), p("D3"), p("C1"), p("C4") - 1);
+const createStaff_Treble = () => new MusicStaff(Clef.G, p("G4"), p("B4"), p("C3"), p("C7"));
+const createStaff_GuitarTreble = () => new MusicStaff(Clef.G, p("G3"), p("B3"), p("C2"), p("C6"));
+const createStaff_Bass = () => new MusicStaff(Clef.F, p("F3"), p("D3"), p("C1"), p("C5"));
+const createStaff_Grand_Treble = () => new MusicStaff(Clef.G, p("G4"), p("B4"), p("C4"), p("C7"));
+const createStaff_Grand_Bass = () => new MusicStaff(Clef.F, p("F3"), p("D3"), p("C1"), p("C4") - 1);
+*/
 
 export class ObjScoreRow extends MusicObject {
-    public readonly staffPreset: StaffPreset;
-
     private prevRow?: ObjScoreRow;
     private nextRow?: ObjScoreRow;
 
     private minWidth = 0;
 
-    private readonly staves: MusicStaff[] = [];
-    private tab?: GuitarTab;
+    private readonly notationLines: (MusicStaff | GuitarTab)[] = [];
 
     private readonly measures: ObjMeasure[] = [];
 
@@ -39,32 +38,7 @@ export class ObjScoreRow extends MusicObject {
     constructor(readonly doc: ObjDocument) {
         super(doc);
 
-        this.staffPreset = doc.staffPreset;
-
-        switch (this.staffPreset) {
-            case StaffPreset.Treble:
-                this.staves[0] = createStaff_Treble();
-                break;
-            case StaffPreset.Bass:
-                this.staves[0] = createStaff_Bass();
-                break;
-            case StaffPreset.Grand:
-                this.staves[0] = createStaff_Grand_Treble();
-                this.staves[1] = createStaff_Grand_Bass();
-                break;
-            case StaffPreset.GuitarTreble:
-                this.staves[0] = createStaff_GuitarTreble();
-                break;
-            case StaffPreset.GuitarTab:
-                this.tab = new GuitarTab();
-                break;
-            case StaffPreset.GuitarCombined:
-                this.staves[0] = createStaff_GuitarTreble();
-                this.tab = new GuitarTab();
-                break;
-            default:
-                throw new MusicError(MusicErrorType.Score, "Invalid staffPreset: " + this.staffPreset);
-        }
+        this.notationLines = doc.config.map(config => config.type === "staff" ? new MusicStaff(config) : new GuitarTab(config));
 
         // Set prevRow
         this.prevRow = doc.getLastRow();
@@ -81,49 +55,55 @@ export class ObjScoreRow extends MusicObject {
         return this.mi;
     }
 
+    getNotationLines(): ReadonlyArray<MusicStaff | GuitarTab> {
+        return this.notationLines;
+    }
+
     get hasStaff(): boolean {
-        return this.staves[0] !== undefined;
+        return this.notationLines.some(line => line instanceof MusicStaff);
     }
 
     get hasTab(): boolean {
-        return this.tab !== undefined;
+        return this.notationLines.some(line => line instanceof GuitarTab);
     }
 
     getTab(): GuitarTab | undefined {
-        return this.tab;
+        return this.notationLines.find(line => line instanceof GuitarTab);
     }
 
     getStaves(): ReadonlyArray<MusicStaff> {
-        return this.staves;
+        return this.notationLines.filter(line => line instanceof MusicStaff);
     }
 
     getTopStaff(): MusicStaff {
-        let staff = this.staves[0];
-        if (!staff) {
-            throw new MusicError(MusicErrorType.Score, "Top staff is required!");
+        for (let i = 0; i < this.notationLines.length; i++) {
+            let line = this.notationLines[i];
+            if (line instanceof MusicStaff) {
+                return line;
+            }
         }
-        else {
-            return staff;
-        }
+
+        throw new MusicError(MusicErrorType.Score, "Top staff is required!");
     }
 
     getBottomStaff(): MusicStaff {
-        let staff = this.staves[this.staves.length - 1];
-        if (!staff) {
-            throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
+        for (let i = this.notationLines.length - 1; i >= 0; i--) {
+            let line = this.notationLines[i];
+            if (line instanceof MusicStaff) {
+                return line;
+            }
         }
-        else {
-            return staff;
-        }
+
+        throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
     }
 
     getStaff(diatonicId: number): MusicStaff | undefined {
         Note.validateDiatonicId(diatonicId);
 
-        for (let i = 0; i < this.staves.length; i++) {
-            let staff = this.staves[i];
-            if (staff.containsDiatonicId(diatonicId)) {
-                return staff;
+        for (let i = 0; i < this.notationLines.length; i++) {
+            let line = this.notationLines[i];
+            if (line instanceof MusicStaff && line.containsDiatonicId(diatonicId)) {
+                return line;
             }
         }
 
@@ -168,8 +148,9 @@ export class ObjScoreRow extends MusicObject {
     }
 
     getDiatonicIdAt(y: number): number | undefined {
-        for (let i = 0; i < this.staves.length; i++) {
-            let diatonicId = this.staves[i].getDiatonicIdAt(y);
+        for (let i = 0; i < this.notationLines.length; i++) {
+            let line = this.notationLines[i];
+            let diatonicId = line instanceof MusicStaff ? line.getDiatonicIdAt(y) : undefined;
 
             if (diatonicId !== undefined) {
                 return diatonicId;
@@ -233,38 +214,42 @@ export class ObjScoreRow extends MusicObject {
 
         let lineSpacing = unitSize * 2;
 
+        let staves = this.notationLines.filter(l => l instanceof MusicStaff);
+
         // Compute staff top/bottom line y
-        this.staves.forEach(staff => {
+        staves.forEach(staff => {
             staff.topLineY = -lineSpacing * 2;
             staff.bottomLineY = lineSpacing * 2;
         });
 
-        if (this.staves.length === 2) {
-            this.staves[0].topLineY -= lineSpacing * 4;
-            this.staves[0].bottomLineY -= lineSpacing * 4;
-            this.staves[1].topLineY += lineSpacing * 4;
-            this.staves[1].bottomLineY += lineSpacing * 4;
+        for (let i = 1; i < staves.length; i++) {
+            staves[i].topLineY += i * lineSpacing * 8;
+            staves[i].bottomLineY += i * lineSpacing * 8;
         }
 
         // Compute toph and bottomh
         let rect = new DivRect();
 
-        this.staves.forEach(staff => rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY)));
+        staves.forEach(staff => rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY)));
 
         if (this.hasStaff && this.doc.fullDiatonicRange) {
+            /* FIXME
             this.staves.forEach(staff => {
                 let top = staff.getDiatonicIdY(staff.maxDiatonicId) - staff.getLineSpacing();
                 let bottom = staff.getDiatonicIdY(staff.minDiatonicId) + staff.getLineSpacing();
                 rect.expandInPlace(new DivRect(0, 0, top, bottom));
             });
+            */
         }
 
-        if (this.tab) {
+        let tab = this.getTab();
+
+        if (tab) {
             let lowestDiatonicId = this.getLowestDiatonicId();
             let lowestY = lowestDiatonicId !== undefined ? this.getStaff(lowestDiatonicId)?.getDiatonicIdY(lowestDiatonicId) : undefined;
-            this.tab.top = lowestY !== undefined ? lowestY + unitSize * 8 : 0;
-            this.tab.bottom = this.tab.top + unitSize * DocumentSettings.GuitarTabHeight;
-            rect.expandInPlace(new DivRect(0, 0, this.tab.top, this.tab.bottom));
+            tab.top = lowestY !== undefined ? lowestY + unitSize * 8 : 0;
+            tab.bottom = tab.top + unitSize * DocumentSettings.GuitarTabHeight;
+            rect.expandInPlace(new DivRect(0, 0, tab.top, tab.bottom));
         }
 
         // Calc min width
@@ -422,10 +407,7 @@ export class ObjScoreRow extends MusicObject {
     offset(dx: number, dy: number) {
         this.measures.forEach(m => m.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
-        this.staves.forEach(s => s.offset(dx, dy));
-        if (this.tab) {
-            this.tab.offset(dx, dy);
-        }
+        this.notationLines.forEach(l => l.offset(dx, dy));
     }
 
     draw(renderer: Renderer) {
@@ -443,18 +425,19 @@ export class ObjScoreRow extends MusicObject {
         ctx.clip();
 
         // For multiple staff lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && (this.staves.length > 1 || this.tab)) {
-            let left = this.getFirstMeasure()!.getStaffLineLeft();
+        if (this.getFirstMeasure() && (this.notationLines.length > 1)) {
+            let tab = this.getTab();
 
+            let left = this.getFirstMeasure()!.getStaffLineLeft();
             let top: number, bottom: number;
 
             if (this.hasStaff) {
                 top = this.getTopStaff().topLineY;
-                bottom = this.tab ? this.tab.getStringY(5) : this.getBottomStaff().bottomLineY;
+                bottom = tab ? tab.getStringY(5) : this.getBottomStaff().bottomLineY;
             }
-            else if (this.tab) {
-                top = this.tab.getStringY(0);
-                bottom = this.tab.getStringY(5);
+            else if (tab) {
+                top = tab.getStringY(0);
+                bottom = tab.getStringY(5);
             }
             else {
                 top = bottom = 0;

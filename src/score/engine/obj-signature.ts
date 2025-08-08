@@ -1,9 +1,9 @@
 import { Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
-import { DivRect, MSignature } from "../pub";
+import { Clef, DivRect, MSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjImage } from "./obj-image";
-import { Clef, MusicStaff } from "./staff-and-tab";
+import { MusicStaff } from "./staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
@@ -111,11 +111,11 @@ export class ObjSignature extends MusicObject {
     }
 
     private getAccidentalDiatonicId(accNote: Note): number {
-        let { clef } = this.staff;
+        let { clef } = this.staff.staffConfig;
 
         let bottomAccidentalDiatonicId: number | undefined = undefined;
 
-        if (clef === Clef.Treble) {
+        if (clef === Clef.G) {
             if (accNote.accidental > 0) {
                 bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 3;
             }
@@ -123,7 +123,7 @@ export class ObjSignature extends MusicObject {
                 bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 1;
             }
         }
-        else if (clef === Clef.Bass) {
+        else if (clef === Clef.F) {
             if (accNote.accidental > 0) {
                 bottomAccidentalDiatonicId = this.staff.bottomLineDiatonicId + 1;
             }

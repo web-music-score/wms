@@ -1,25 +1,36 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ImageAsset } from "./renderer";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-
-export enum Clef { Treble, Bass }
+import { Clef, StaffConfig, TabConfig } from "../pub";
 
 export class MusicStaff {
     readonly clefImageAsset: ImageAsset;
+    readonly clefLineDiatonicId: number;
     readonly topLineDiatonicId: number;
+    readonly middleLineDiatonicId: number;
     readonly bottomLineDiatonicId: number;
-    readonly octaveLower: boolean;
+    readonly minDiatonicId?: number;
+    readonly maxDiatonicId?: number;
 
-    constructor(
-        readonly clef: Clef,
-        readonly clefLineDiatonicId: number,
-        readonly middleLineDiatonicId: number,
-        readonly minDiatonicId: number,
-        readonly maxDiatonicId: number) {
-        this.clefImageAsset = clef === Clef.Treble ? ImageAsset.TrebleClefPng : ImageAsset.BassClefPng;
+    constructor(readonly staffConfig: StaffConfig) {
+        const getDiatonicId = (noteName: string) => Note.getNote(noteName).diatonicId - (staffConfig.isOctaveDown === true ? 7 : 0);
+
+        if (staffConfig.clef === Clef.G) {
+            this.clefImageAsset = ImageAsset.TrebleClefPng;
+            this.clefLineDiatonicId = getDiatonicId("G4");
+            this.middleLineDiatonicId = this.clefLineDiatonicId + 2;
+        }
+        else {
+            this.clefImageAsset = ImageAsset.BassClefPng;
+            this.clefLineDiatonicId = getDiatonicId("F3");
+            this.middleLineDiatonicId = this.clefLineDiatonicId - 2;
+        }
+
         this.topLineDiatonicId = this.middleLineDiatonicId + 4;
         this.bottomLineDiatonicId = this.middleLineDiatonicId - 4;
-        this.octaveLower = this.clefLineDiatonicId === Note.getNote("G3").diatonicId; // Guitar is played octave lower
+
+        this.minDiatonicId = staffConfig.minNote !== undefined ? getDiatonicId(staffConfig.minNote) : undefined;
+        this.maxDiatonicId = staffConfig.maxNote !== undefined ? getDiatonicId(staffConfig.maxNote) : undefined;
     }
 
     topLineY: number = 0;
@@ -27,6 +38,10 @@ export class MusicStaff {
 
     get middleLineY(): number {
         return (this.topLineY + this.bottomLineY) / 2;
+    }
+
+    get octaveLower(): boolean {
+        return this.staffConfig.isOctaveDown === true;
     }
 
     offset(dx: number, dy: number) {
@@ -45,7 +60,8 @@ export class MusicStaff {
     containsDiatonicId(diatonicId: number): boolean {
         Note.validateDiatonicId(diatonicId);
 
-        return diatonicId >= this.minDiatonicId && diatonicId <= this.maxDiatonicId;
+        return (this.minDiatonicId === undefined || diatonicId >= this.minDiatonicId) &&
+            (this.maxDiatonicId === undefined || diatonicId <= this.maxDiatonicId);
     }
 
     getDiatonicIdY(diatonicId: number): number {
@@ -75,6 +91,8 @@ export class MusicStaff {
 export class GuitarTab {
     top: number = 0;
     bottom: number = 0;
+
+    constructor(readonly tabConfig: TabConfig) { }
 
     /** Return Y coordinate of string. */
     getStringY(stringId: number): number {

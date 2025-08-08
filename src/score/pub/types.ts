@@ -1,6 +1,4 @@
 import { Note } from "@tspro/web-music-score/theory";
-import { DivRect } from "./div-rect";
-import { MScoreRow, MusicInterface } from "./interface";
 
 /** @public */
 export enum StaffPreset {
@@ -18,6 +16,27 @@ export enum StaffPreset {
     // /** GuitarCombined has treble clef and tab for guitar. */
     GuitarCombined = GuitarTab | GuitarTreble
 }
+
+/** @public */
+export enum Clef { G, F }
+
+/** @public */
+export type StaffConfig = {
+    type: "staff",
+    clef: Clef,
+    isOctaveDown?: boolean,
+    minNote?: string,
+    maxNote?: string,
+}
+
+/** @public */
+export type TabConfig = {
+    type: "tab",
+    tuning?: string | string[];
+}
+
+/** @public */
+export type DocumentConfig = StaffConfig | TabConfig | (StaffConfig | TabConfig)[];
 
 /** @public */
 export type VoiceId = 0 | 1 | 2 | 3;

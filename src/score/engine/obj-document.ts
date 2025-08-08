@@ -4,12 +4,13 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { DivRect, DocumentOptions, MDocument, StaffPreset } from "../pub";
+import { Clef, DivRect, DocumentOptions, MDocument, StaffConfig, StaffPreset, TabConfig } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { ConnectiveProps } from "./connective-props";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { Utils } from "@tspro/ts-utils-lib";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -26,6 +27,8 @@ export class ObjDocument extends MusicObject {
     public readonly tuningLabel: string;
     public readonly fullDiatonicRange: boolean;
 
+    public readonly config: (StaffConfig | TabConfig)[] = [];
+
     private header?: ObjHeader;
 
     private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
@@ -34,7 +37,7 @@ export class ObjDocument extends MusicObject {
 
     private allConnectiveProps: ConnectiveProps[] = [];
 
-    constructor(readonly mi: MDocument, readonly staffPreset: StaffPreset, readonly options?: DocumentOptions) {
+    constructor(readonly mi: MDocument, config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], readonly options?: DocumentOptions) {
         super(undefined);
 
         this.measuresPerRow = options?.measuresPerRow;
@@ -42,6 +45,42 @@ export class ObjDocument extends MusicObject {
         this.tuningStrings = getTuningStrings(this.tuningName);
         this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join("-");
         this.fullDiatonicRange = options?.fullDiatonicRange === true;
+
+        if (Utils.Is.isEnumValue(config, StaffPreset)) {
+            switch (config) {
+                default:
+                case StaffPreset.Treble:
+                    this.config = [{ type: "staff", clef: Clef.G }];
+                    break;
+                case StaffPreset.Bass:
+                    this.config = [{ type: "staff", clef: Clef.F }];
+                    break;
+                case StaffPreset.Grand:
+                    this.config = [
+                        { type: "staff", clef: Clef.G, minNote: "C4" },
+                        { type: "staff", clef: Clef.F, maxNote: "B3" }
+                    ];
+                    break;
+                case StaffPreset.GuitarTreble:
+                    this.config = [{ type: "staff", clef: Clef.G, isOctaveDown: true }];
+                    break;
+                case StaffPreset.GuitarTab:
+                    this.config = [{ type: "tab", tuning: this.tuningName }];
+                    break;
+                case StaffPreset.GuitarCombined:
+                    this.config = [
+                        { type: "staff", clef: Clef.G, isOctaveDown: true },
+                        { type: "tab", tuning: this.tuningName }
+                    ];
+                    break;
+            }
+        }
+        else if (Utils.Is.isArray(config)) {
+            this.config = config;
+        }
+        else {
+            this.config = [config];
+        }
 
         // There is always row
         this.rows.push(new ObjScoreRow(this));
