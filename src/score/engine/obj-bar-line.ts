@@ -59,7 +59,7 @@ abstract class ObjBarLine extends MusicObject {
         });
 
         let top = Math.min(...tops);
-        let bottom = Math.min(...bottoms);
+        let bottom = Math.max(...bottoms);
 
         this.lineRects = [];
         this.dotRects = [];

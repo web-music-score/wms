@@ -57,14 +57,6 @@ export class ObjScoreRow extends MusicObject {
         return this.notationLines.some(line => line instanceof GuitarTab);
     }
 
-    getTab(): GuitarTab | undefined {
-        return this.notationLines.find(line => line instanceof GuitarTab);
-    }
-
-    getStaves(): ReadonlyArray<MusicStaff> {
-        return this.notationLines.filter(line => line instanceof MusicStaff);
-    }
-
     getTopStaff(): MusicStaff {
         for (let i = 0; i < this.notationLines.length; i++) {
             let line = this.notationLines[i];
@@ -413,24 +405,26 @@ export class ObjScoreRow extends MusicObject {
         ctx.rect(this.rect.left, this.rect.top, this.rect.width, this.rect.height);
         ctx.clip();
 
-        // For multiple staff lines draw vertical start line (which is not drawn by measures)
+        // For multiple notation lines draw vertical start line (which is not drawn by measures)
         if (this.getFirstMeasure() && this.notationLines.length > 1 || this.notationLines.length === 1 && this.notationLines[0] instanceof GuitarTab) {
-            let tab = this.getTab();
-
             let left = this.getFirstMeasure()!.getStaffLineLeft();
-            let top: number, bottom: number;
 
-            if (this.hasStaff) {
-                top = this.getTopStaff().topLineY;
-                bottom = tab ? tab.getStringY(5) : this.getBottomStaff().bottomLineY;
-            }
-            else if (tab) {
-                top = tab.getStringY(0);
-                bottom = tab.getStringY(5);
-            }
-            else {
-                top = bottom = 0;
-            }
+            let tops: number[] = [];
+            let bottoms: number[] = [];
+
+            this.notationLines.forEach(line => {
+                if (line instanceof MusicStaff) {
+                    tops.push(line.topLineY);
+                    bottoms.push(line.bottomLineY);
+                }
+                else {
+                    tops.push(line.getStringY(0));
+                    bottoms.push(line.getStringY(5));
+                }
+            });
+
+            let top = Math.min(...tops);
+            let bottom = Math.max(...bottoms);
 
             renderer.drawLine(left, top, left, bottom);
         }

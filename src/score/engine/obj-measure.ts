@@ -1088,7 +1088,7 @@ export class ObjMeasure extends MusicObject {
         let showTempo = !!this.alterTempo;
 
         if (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo) {
-            this.signatures = this.row.getStaves().map((staff, staffId) => {
+            this.signatures = this.row.getNotationLines().filter(line => line instanceof MusicStaff).map((staff, staffId) => {
                 let signature = this.signatures[staffId] ?? new ObjSignature(this, staff);
 
                 signature.updateClefImage(renderer, showClef);

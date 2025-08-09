@@ -375,7 +375,7 @@ export class ObjRhythmColumn extends MusicObject {
         }
 
         if (this.arpeggioDir !== undefined) {
-            this.arpeggios = row.getStaves().map(staff => {
+            this.arpeggios = row.getNotationLines().filter(line => line instanceof MusicStaff).map(staff => {
                 let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
                 arpeggio.layout(renderer);
                 arpeggio.offset(this.rect.left - arpeggio.getRect().width, staff.middleLineY - arpeggio.getRect().centerY);
