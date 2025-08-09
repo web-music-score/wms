@@ -581,26 +581,28 @@ export class ObjNoteGroup extends MusicObject {
         }
 
         row.getNotationLines().filter(line => line instanceof GuitarTab).forEach(tab => {
-            this.notes.forEach((note, noteIndex) => {
-                // Add tab fret numbers
-                if (this.ownString[noteIndex] !== undefined) {
-                    let stringId = this.ownString[noteIndex] - 1;
-                    let fretId = note.chromaticId - this.doc.tuningStrings[stringId].chromaticId;
-                    let color = fretId < 0 ? "red" : "black";
+            if (tab.containsVoiceId(this.voiceId)) {
+                this.notes.forEach((note, noteIndex) => {
+                    // Add tab fret numbers
+                    if (this.ownString[noteIndex] !== undefined) {
+                        let stringId = this.ownString[noteIndex] - 1;
+                        let fretId = note.chromaticId - this.doc.tuningStrings[stringId].chromaticId;
+                        let color = fretId < 0 ? "red" : "black";
 
-                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
-                    this.tabObjs?.fretNumbers.push(fretNumber);
+                        let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
+                        this.tabObjs?.fretNumbers.push(fretNumber);
 
-                    fretNumber.layout(renderer);
+                        fretNumber.layout(renderer);
 
-                    let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                    let stemX = this.staffObjs?.stemRect ? this.staffObjs.stemRect.centerX : undefined;
+                        let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
+                        let stemX = this.staffObjs?.stemRect ? this.staffObjs.stemRect.centerX : undefined;
 
-                    let x = stemX ?? noteX;
-                    let y = tab.getStringY(stringId);
-                    fretNumber.offset(x, y);
-                }
-            });
+                        let x = stemX ?? noteX;
+                        let y = tab.getStringY(stringId);
+                        fretNumber.offset(x, y);
+                    }
+                });
+            }
         });
 
         this.updateRect();

@@ -27,12 +27,14 @@ export type StaffConfig = {
     isOctaveDown?: boolean,
     minNote?: string,
     maxNote?: string,
+    voiceIds?: number[]
 }
 
 /** @public */
 export type TabConfig = {
     type: "tab",
-    tuning?: string | string[];
+    tuning?: string | string[],
+    voiceIds?: number[]
 }
 
 /** @public */

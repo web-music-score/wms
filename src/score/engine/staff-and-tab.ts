@@ -88,7 +88,7 @@ export class MusicStaff {
     }
 
     containsVoiceId(voiceId: number) {
-        return true;
+        return !this.staffConfig.voiceIds || this.staffConfig.voiceIds.includes(voiceId);
     }
 }
 
@@ -109,6 +109,6 @@ export class GuitarTab {
     }
 
     containsVoiceId(voiceId: number) {
-        return true;
+        return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
     }
 }

@@ -100,6 +100,7 @@ function assertStaffConfig(staffConfig: StaffConfig) {
     assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
     assertArg(Utils.Is.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
     assertArg(Utils.Is.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
+    assertArg(Utils.Is.isUndefined(staffConfig.voiceIds) || Utils.Is.isArray(staffConfig.voiceIds) && staffConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "staffConfig.voiceIds", staffConfig.voiceIds);
 }
 
 function assertTabConfig(tabConfig: TabConfig) {
@@ -111,6 +112,7 @@ function assertTabConfig(tabConfig: TabConfig) {
     else if (Utils.Is.isArray(tabConfig.tuning)) {
         assertArg(tabConfig.tuning.length === 6 && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
     }
+    assertArg(Utils.Is.isUndefined(tabConfig.voiceIds) || Utils.Is.isArray(tabConfig.voiceIds) && tabConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "tabConfig.voiceIds", tabConfig.voiceIds);
 }
 
 /** @public */
