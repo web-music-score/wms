@@ -57,8 +57,8 @@ export class ObjDocument extends MusicObject {
                     break;
                 case StaffPreset.Grand:
                     this.config = [
-                        { type: "staff", clef: Clef.G, minNote: "C4", maxNote: this.fullDiatonicRange ? "C7" : undefined },
-                        { type: "staff", clef: Clef.F, maxNote: "B3", minNote: this.fullDiatonicRange ? "C1" : undefined }
+                        { type: "staff", clef: Clef.G, minNote: undefined, maxNote: this.fullDiatonicRange ? "C7" : undefined },
+                        { type: "staff", clef: Clef.F, maxNote: undefined, minNote: this.fullDiatonicRange ? "C1" : undefined }
                     ];
                     break;
                 case StaffPreset.GuitarTreble:
@@ -80,6 +80,16 @@ export class ObjDocument extends MusicObject {
         }
         else {
             this.config = [config];
+        }
+
+        // Set min/max note for grand staff.
+        for (let i = 0; i < this.config.length - 1; i++) {
+            let treble = this.config[i];
+            let bass = this.config[i + 1];
+            if (treble.type === "staff" && treble.clef === Clef.G && bass.type === "staff" && bass.clef === Clef.F && !treble.minNote && !bass.maxNote) {
+                treble.minNote = "C4";
+                bass.maxNote = "B3";
+            }
         }
 
         // There is always row
