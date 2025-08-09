@@ -204,34 +204,24 @@ export class ObjScoreRow extends MusicObject {
 
         let lineSpacing = unitSize * 2;
 
-        let staves = this.notationLines.filter(l => l instanceof MusicStaff);
-
-        // Compute staff top/bottom line y
-        staves.forEach(staff => {
-            staff.topLineY = -lineSpacing * 2;
-            staff.bottomLineY = lineSpacing * 2;
-        });
-
-        for (let i = 1; i < staves.length; i++) {
-            staves[i].topLineY += i * lineSpacing * 8;
-            staves[i].bottomLineY += i * lineSpacing * 8;
-        }
+        let staves = this.getStaves();
 
         // Compute toph and bottomh
         let rect = new DivRect();
 
-        staves.forEach(staff => {
-            rect.expandInPlace(new DivRect(0, 0, staff.topLineY, staff.bottomLineY));
+        staves.forEach((staff, i) => {
+            let top = staff.topLineY = -lineSpacing * 2 + i * lineSpacing * 8;
+            let bottom = staff.bottomLineY = lineSpacing * 2 + i * lineSpacing * 8;
 
             if (staff.maxDiatonicId) {
-                let top = staff.getDiatonicIdY(staff.maxDiatonicId) - staff.getLineSpacing();
-                rect.expandInPlace(new DivRect(0, 0, top, staff.bottomLineY));
+                top = Math.min(top, staff.getDiatonicIdY(staff.maxDiatonicId) - staff.getLineSpacing());
             }
 
-            if (staff.minDiatonicId) {
-                let bottom = staff.getDiatonicIdY(staff.minDiatonicId) + staff.getLineSpacing();
-                rect.expandInPlace(new DivRect(0, 0, staff.topLineY, bottom));
+            if (staff.minDiatonicId) { 
+                bottom = Math.max(bottom, staff.getDiatonicIdY(staff.minDiatonicId) + staff.getLineSpacing());
             }
+
+            rect.expandInPlace(new DivRect(0, 0, top, bottom));
         });
 
         let tab = this.getTab();
