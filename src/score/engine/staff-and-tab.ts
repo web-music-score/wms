@@ -86,6 +86,10 @@ export class MusicStaff {
     isSpace(diatonicId: number) {
         return diatonicId % 2 !== this.middleLineDiatonicId % 2;
     }
+
+    containsVoiceId(voiceId: number) {
+        return true;
+    }
 }
 
 export class GuitarTab {
@@ -102,5 +106,9 @@ export class GuitarTab {
     offset(dx: number, dy: number) {
         this.top += dy;
         this.bottom += dy;
+    }
+
+    containsVoiceId(voiceId: number) {
+        return true;
     }
 }

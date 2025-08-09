@@ -24,6 +24,7 @@ import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
+import { GuitarTab, MusicStaff } from "./staff-and-tab";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -560,7 +561,7 @@ export class ObjMeasure extends MusicObject {
     addConnective(connective: Connective, ...args: unknown[]): void {
         let anchor = this.lastAddedRhythmSymbol;
 
-        if(!(anchor instanceof ObjNoteGroup)) {
+        if (!(anchor instanceof ObjNoteGroup)) {
             throw new MusicError(MusicErrorType.Score, "Connective can be added to note group only.");
         }
 
@@ -1046,8 +1047,17 @@ export class ObjMeasure extends MusicObject {
         rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotted }));
     }
 
-    getLowestDiatonicId(initialLowestDiatonicId: number): number {
-        return Math.min(initialLowestDiatonicId, ...this.columns.map(c => c.getLowestDiatonicId(initialLowestDiatonicId)));
+    getDiatonicIdRange(staff: MusicStaff): { min: number, max: number } {
+        let min = staff.bottomLineDiatonicId;
+        let max = staff.topLineDiatonicId;
+
+        this.columns.forEach(c => {
+            let range = c.getDiatonicIdRange(staff);
+            min = Math.min(min, range.min);
+            max = Math.max(max, range.max);
+        });
+
+        return { min, max }
     }
 
     requestLayout() {
@@ -1125,12 +1135,12 @@ export class ObjMeasure extends MusicObject {
             this.barLineRight.getRect().bottom
         );
 
-        let tab = this.row.getTab();
-
-        if (tab) {
-            top = Math.min(top, tab.top);
-            bottom = Math.max(bottom, tab.bottom);
-        }
+        this.row.getNotationLines().forEach(line => {
+            if (line instanceof GuitarTab) {
+                top = Math.min(top, line.top);
+                bottom = Math.max(bottom, line.bottom);
+            }
+        });
 
         // Set rect toph and bottomh
         this.rect = new DivRect(0, 0, 0, top, 0, bottom);
@@ -1270,18 +1280,18 @@ export class ObjMeasure extends MusicObject {
 
         let { row } = this;
 
-        row.getStaves().forEach(staff => {
-            for (let p = staff.bottomLineDiatonicId; p <= staff.topLineDiatonicId; p += 2) {
-                drawLine(staff.getDiatonicIdY(p));
+        row.getNotationLines().forEach(line => {
+            if (line instanceof MusicStaff) {
+                for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
+                    drawLine(line.getDiatonicIdY(p));
+                }
+            }
+            else {
+                for (let stringId = 0; stringId < 6; stringId++) {
+                    drawLine(line.getStringY(stringId));
+                }
             }
         });
-
-        let tab = row.getTab();
-        if (tab) {
-            for (let stringId = 0; stringId < 6; stringId++) {
-                drawLine(tab.getStringY(stringId));
-            }
-        }
 
         this.signatures.forEach(signature => signature.draw(renderer));
 

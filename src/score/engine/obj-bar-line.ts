@@ -4,6 +4,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, DivRect } from "../pub";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
+import { MusicStaff } from "./staff-and-tab";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
@@ -36,27 +37,29 @@ abstract class ObjBarLine extends MusicObject {
         let dotW = DocumentSettings.DotSize * unitSize;
         let dotRadius = dotW / 2;
 
-        let lineCenterYs = row.getStaves().map(staff => staff.middleLineY);
-        let lineDotOffs = row.getStaves().map(staff => staff.getDiatonicSpacing());
+        let lineCenterYs: number[] = [];
+        let lineDotOffs: number[] = [];
 
-        let tab = row.getTab();
+        let tops: number[] = [];
+        let bottoms: number[] = [];
 
-        if (tab) {
-            lineCenterYs.push((tab.bottom + tab.top) / 2);
-            lineDotOffs.push((tab.bottom - tab.top) / 6);
-        }
+        row.getNotationLines().forEach(line => {
+            if (line instanceof MusicStaff) {
+                lineCenterYs.push(line.middleLineY);
+                lineDotOffs.push(line.getDiatonicSpacing());
+                tops.push(line.topLineY);
+                bottoms.push(line.bottomLineY);
+            }
+            else {
+                lineCenterYs.push((line.bottom + line.top) / 2);
+                lineDotOffs.push((line.bottom - line.top) / 6);
+                tops.push(line.getStringY(0));
+                bottoms.push(line.getStringY(5));
+            }
+        });
 
-        let top: number, bottom: number;
-
-        if (row.hasStaff) {
-            top = row.getTopStaff().topLineY;
-            bottom = tab ? tab.getStringY(5) : row.getBottomStaff().bottomLineY;
-        }
-        else {
-            // hasTab is true
-            top = tab?.getStringY(0) ?? 0;
-            bottom = tab?.getStringY(5) ?? 0;
-        }
+        let top = Math.min(...tops);
+        let bottom = Math.min(...bottoms);
 
         this.lineRects = [];
         this.dotRects = [];

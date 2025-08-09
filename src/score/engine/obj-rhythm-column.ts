@@ -10,6 +10,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicStaff } from "./staff-and-tab";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -266,12 +267,20 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    getLowestDiatonicId(initialLowestDiatonicId: number): number {
-        return Math.min(initialLowestDiatonicId, ...this.voiceSymbol.map(s => {
-            return s instanceof ObjNoteGroup
-                ? Math.min(...s.notes.map(n => n.diatonicId))
-                : s.ownDiatonicId;
-        }));
+    getDiatonicIdRange(staff: MusicStaff): { min: number, max: number } {
+        let min = staff.bottomLineDiatonicId;
+        let max = staff.topLineDiatonicId;
+
+        this.voiceSymbol.forEach(s => {
+            if (staff.containsVoiceId(s.voiceId)) {
+                let ids = (s instanceof ObjNoteGroup ? s.notes.map(n => n.diatonicId) : [s.ownDiatonicId])
+                    .filter(id => staff.containsDiatonicId(id));
+                min = Math.min(min, ...ids);
+                max = Math.max(max, ...ids);
+            }
+        });
+
+        return { min, max }
     }
 
     getPlayerNotes() {

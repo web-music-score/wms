@@ -100,17 +100,25 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    getLowestDiatonicId(): number | undefined {
-        if (!this.hasStaff) {
-            return undefined;
+    getDiatonicIdRange(staff: MusicStaff): { min: number, max: number } {
+        let min = staff.bottomLineDiatonicId;
+        let max = staff.topLineDiatonicId;
+
+        if (staff.minDiatonicId !== undefined) {
+            min = Math.min(min, staff.minDiatonicId);
         }
-        else if (this.doc.fullDiatonicRange) {
-            return this.getBottomStaff().minDiatonicId;
+
+        if (staff.maxDiatonicId !== undefined) {
+            max = Math.max(max, staff.maxDiatonicId);
         }
-        else {
-            let diatonicId = this.getBottomStaff().bottomLineDiatonicId;
-            return Math.min(diatonicId, ...this.measures.map(m => m.getLowestDiatonicId(diatonicId)));
-        }
+
+        this.measures.forEach(m => {
+            let range = m.getDiatonicIdRange(staff);
+            min = Math.min(min, range.min);
+            max = Math.max(max, range.max);
+        });
+
+        return { min, max }
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -200,39 +208,38 @@ export class ObjScoreRow extends MusicObject {
 
         let { unitSize } = renderer;
 
-        this.rect = new DivRect();
-
         let lineSpacing = unitSize * 2;
 
-        let staves = this.getStaves();
+        let y = 0;
+        let top = 0;
+        let bottom = 0;
 
-        // Compute toph and bottomh
-        let rect = new DivRect();
+        this.notationLines.forEach(line => {
+            if (line instanceof MusicStaff) {
+                let staff = line;
 
-        staves.forEach((staff, i) => {
-            let top = staff.topLineY = -lineSpacing * 2 + i * lineSpacing * 8;
-            let bottom = staff.bottomLineY = lineSpacing * 2 + i * lineSpacing * 8;
+                let diatonicIdRange = this.getDiatonicIdRange(staff);
 
-            if (staff.maxDiatonicId) {
-                top = Math.min(top, staff.getDiatonicIdY(staff.maxDiatonicId) - staff.getLineSpacing());
+                staff.topLineY = y;
+                staff.bottomLineY = y + lineSpacing * 4;
+
+                top = Math.min(top, staff.getDiatonicIdY(diatonicIdRange.max));
+                bottom = Math.max(bottom, staff.getDiatonicIdY(diatonicIdRange.min));
+            }
+            else {
+                let tab = line;
+
+                tab.top = y;
+                tab.bottom = tab.top + unitSize * DocumentSettings.GuitarTabHeight;
+
+                top = Math.min(top, tab.top);
+                bottom = Math.max(bottom, tab.bottom);
             }
 
-            if (staff.minDiatonicId) { 
-                bottom = Math.max(bottom, staff.getDiatonicIdY(staff.minDiatonicId) + staff.getLineSpacing());
-            }
-
-            rect.expandInPlace(new DivRect(0, 0, top, bottom));
+            y = bottom + lineSpacing * 4;
         });
 
-        let tab = this.getTab();
-
-        if (tab) {
-            let lowestDiatonicId = this.getLowestDiatonicId();
-            let lowestY = lowestDiatonicId !== undefined ? this.getStaff(lowestDiatonicId)?.getDiatonicIdY(lowestDiatonicId) : undefined;
-            tab.top = lowestY !== undefined ? lowestY + unitSize * 8 : 0;
-            tab.bottom = tab.top + unitSize * DocumentSettings.GuitarTabHeight;
-            rect.expandInPlace(new DivRect(0, 0, tab.top, tab.bottom));
-        }
+        let rect = new DivRect(0, 0, top, bottom);
 
         // Calc min width
         this.minWidth = 0;
@@ -407,7 +414,7 @@ export class ObjScoreRow extends MusicObject {
         ctx.clip();
 
         // For multiple staff lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && (this.notationLines.length > 1)) {
+        if (this.getFirstMeasure() && this.notationLines.length > 1 || this.notationLines.length === 1 && this.notationLines[0] instanceof GuitarTab) {
             let tab = this.getTab();
 
             let left = this.getFirstMeasure()!.getStaffLineLeft();
