@@ -13,7 +13,7 @@ interface ChooseTuningProps {
 
 interface ChooseTuningState {
     guitarCtx: ScoreUI.GuitarContext;
-    score?: Score.MDocument;
+    score: Score.MDocument;
 }
 
 export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTuningState> {
@@ -71,10 +71,6 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
         let { app } = this.props;
         let { guitarCtx, score } = this.state;
         let { tuningName } = guitarCtx;
-
-        if (!score) {
-            return <div>Error.</div>;
-        }
 
         const openStringNoteName = (stringId: number) => {
             return guitarCtx.getStringTuning(stringId).format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
