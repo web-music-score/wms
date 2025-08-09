@@ -86,7 +86,10 @@ export class ObjDocument extends MusicObject {
         for (let i = 0; i < this.config.length - 1; i++) {
             let treble = this.config[i];
             let bass = this.config[i + 1];
-            if (treble.type === "staff" && treble.clef === Clef.G && bass.type === "staff" && bass.clef === Clef.F && !treble.minNote && !bass.maxNote) {
+            if (
+                treble.type === "staff" && treble.clef === Clef.G && !treble.isOctaveDown && !treble.minNote &&
+                bass.type === "staff" && bass.clef === Clef.F && !bass.isOctaveDown && !bass.maxNote
+            ) {
                 treble.minNote = "C4";
                 bass.maxNote = "B3";
             }
