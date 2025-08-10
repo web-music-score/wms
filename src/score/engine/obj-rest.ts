@@ -25,7 +25,7 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
     }
 }
 
-class RestStaffObjects {
+class RestStaffVisual {
     constructor(readonly staff: MusicStaff) { }
     public rect = new DivRect();
     public dotRect?: DivRect;
@@ -46,7 +46,7 @@ export class ObjRest extends MusicObject {
 
     private beamGroup?: ObjBeamGroup;
 
-    readonly staffObjs: RestStaffObjects[] = [];
+    readonly staffVisuals: RestStaffVisual[] = [];
 
     readonly mi: MRest;
 
@@ -129,12 +129,12 @@ export class ObjRest extends MusicObject {
     }
 
     getBeamX(staff: MusicStaff): number {
-        let rect = this.staffObjs.find(s => s.staff === staff)?.rect ?? this.rect;
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.rect ?? this.rect;
         return rect.centerX;
     }
 
     getBeamY(staff: MusicStaff): number {
-        let rect = this.staffObjs.find(s => s.staff === staff)?.rect ?? this.rect;
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.rect ?? this.rect;
         return this.stemDir === Stem.Up ? rect.top : rect.bottom;
     }
 
@@ -157,7 +157,7 @@ export class ObjRest extends MusicObject {
     layout(renderer: Renderer, accState: AccidentalState) {
         this.rect = new DivRect();
 
-        this.staffObjs.length = 0;
+        this.staffVisuals.length = 0;
 
         if (this.hide) {
             return;
@@ -203,9 +203,9 @@ export class ObjRest extends MusicObject {
                 return;
             }
 
-            let staffObjs = new RestStaffObjects(staff);
+            let visual = new RestStaffVisual(staff);
 
-            staffObjs.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+            visual.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
             if (dotted) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
@@ -213,28 +213,29 @@ export class ObjRest extends MusicObject {
                 let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize / 2) * unitSize;
                 let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
-                staffObjs.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
-                staffObjs.rect.expandInPlace(staffObjs.dotRect);
+                visual.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                visual.rect.expandInPlace(visual.dotRect);
             }
 
-            staffObjs.offset(0, staff.getDiatonicIdY(ownDiatonicId));
+            visual.offset(0, staff.getDiatonicIdY(ownDiatonicId));
 
-            this.rect = staffObjs.rect.copy();
-            this.staffObjs.push(staffObjs);
+            this.rect = visual.rect.copy();
+
+            this.staffVisuals.push(visual);
         });
 
-        this.staffObjs.forEach(staffObjs => this.rect.expandInPlace(staffObjs.rect));
+        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.rect));
     }
 
     offset(dx: number, dy: number) {
-        this.staffObjs.forEach(s => s.offset(dx, dy));
+        this.staffVisuals.forEach(s => s.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) {
         let ctx = renderer.getCanvasContext();
 
-        if (!ctx || this.staffObjs.length === 0) {
+        if (!ctx || this.staffVisuals.length === 0) {
             return;
         }
 
@@ -247,8 +248,8 @@ export class ObjRest extends MusicObject {
         ctx.strokeStyle = ctx.fillStyle = color;
         ctx.lineWidth = lineWidth;
 
-        this.staffObjs.forEach(staffObjs => {
-            let { rect, dotRect } = staffObjs;
+        this.staffVisuals.forEach(visual => {
+            let { rect, dotRect } = visual;
 
             let x = rect.centerX;
             let y = rect.centerY;

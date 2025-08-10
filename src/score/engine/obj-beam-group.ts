@@ -29,7 +29,7 @@ const adjustBeamAngle = (dx: number, dy: number) => {
     }
 }
 
-class BeamStaffObjects {
+class BeamStaffVisual {
     constructor(readonly staff: MusicStaff) { }
     public rect = new DivRect();
     public tripletNumber?: ObjText;
@@ -55,7 +55,7 @@ export class ObjBeamGroup extends MusicObject {
 
     private readonly type: BeamGroupType;
 
-    private readonly staffObjs: BeamStaffObjects[] = [];
+    private readonly staffVisuals: BeamStaffVisual[] = [];
 
     private constructor(private readonly symbols: RhythmSymbol[], triplet: boolean) {
         super(symbols[0].measure);
@@ -180,7 +180,7 @@ export class ObjBeamGroup extends MusicObject {
     layout(renderer: Renderer) {
         this.rect = new DivRect();
 
-        this.staffObjs.length = 0;
+        this.staffVisuals.length = 0;
 
         let symbols = this.getSymbols();
 
@@ -192,7 +192,7 @@ export class ObjBeamGroup extends MusicObject {
         let { stemDir } = this;
 
         symbols[0].row.getNotationLines().filter(line => line instanceof MusicStaff).forEach(staff => {
-            let staffObjs = new BeamStaffObjects(staff);
+            let visual = new BeamStaffVisual(staff);
 
             let leftX = symbols[0].getBeamX(staff);
             let leftY = symbols[0].getBeamY(staff);
@@ -231,14 +231,14 @@ export class ObjBeamGroup extends MusicObject {
 
                 let ef = unitSize / (rightX - leftX);
 
-                staffObjs.groupLineLeft = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
-                staffObjs.groupLineRight = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
+                visual.groupLineLeft = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
+                visual.groupLineRight = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
 
-                staffObjs.rect = new DivRect(
-                    staffObjs.groupLineLeft.x,
-                    staffObjs.groupLineRight.x,
-                    Math.min(staffObjs.groupLineLeft.y, staffObjs.groupLineRight.y),
-                    Math.max(staffObjs.groupLineLeft.y, staffObjs.groupLineRight.y)
+                visual.rect = new DivRect(
+                    visual.groupLineLeft.x,
+                    visual.groupLineRight.x,
+                    Math.min(visual.groupLineLeft.y, visual.groupLineRight.y),
+                    Math.max(visual.groupLineLeft.y, visual.groupLineRight.y)
                 );
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
@@ -252,7 +252,7 @@ export class ObjBeamGroup extends MusicObject {
                     }
                 });
 
-                staffObjs.rect = new DivRect(
+                visual.rect = new DivRect(
                     leftX,
                     rightX,
                     Math.min(leftY, rightY) - beamThickness / 2,
@@ -261,24 +261,24 @@ export class ObjBeamGroup extends MusicObject {
             }
 
             if (this.isTriplet()) {
-                staffObjs.tripletNumber = new ObjText(this, "3", 0.5, 0.5);
+                visual.tripletNumber = new ObjText(this, "3", 0.5, 0.5);
 
-                staffObjs.tripletNumber.layout(renderer);
-                staffObjs.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + groupLineDy);
+                visual.tripletNumber.layout(renderer);
+                visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + groupLineDy);
 
-                staffObjs.rect.expandInPlace(staffObjs.tripletNumber.getRect());
+                visual.rect.expandInPlace(visual.tripletNumber.getRect());
             }
 
-            this.rect = staffObjs.rect;
+            this.rect = visual.rect;
 
-            this.staffObjs.push(staffObjs);
+            this.staffVisuals.push(visual);
         });
 
-        this.staffObjs.forEach(s => this.rect.expandInPlace(s.rect));
+        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.rect));
     }
 
     offset(dx: number, dy: number) {
-        this.staffObjs.forEach(s => s.offset(dx, dy));
+        this.staffVisuals.forEach(s => s.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
     }
 
@@ -288,13 +288,13 @@ export class ObjBeamGroup extends MusicObject {
 
         let symbols = this.getSymbols();
 
-        this.staffObjs.forEach(staffObjs => {
+        this.staffVisuals.forEach(visual => {
             if (this.type === BeamGroupType.TripletGroup) {
-                if (staffObjs.groupLineLeft && staffObjs.groupLineRight) {
-                    let l = staffObjs.groupLineLeft;
-                    let r = staffObjs.groupLineRight;
+                if (visual.groupLineLeft && visual.groupLineRight) {
+                    let l = visual.groupLineLeft;
+                    let r = visual.groupLineRight;
 
-                    let tf = staffObjs.tripletNumber ? (staffObjs.tripletNumber.getRect().width / (r.x - l.x) * 1.2) : 0;
+                    let tf = visual.tripletNumber ? (visual.tripletNumber.getRect().width / (r.x - l.x) * 1.2) : 0;
 
                     let lc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 - tf / 2);
                     let rc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 + tf / 2);
@@ -317,11 +317,11 @@ export class ObjBeamGroup extends MusicObject {
                     let left = noteGroups[i];
                     let right = noteGroups[i + 1];
 
-                    let leftX = left.getBeamX(staffObjs.staff);
-                    let leftY = left.getBeamY(staffObjs.staff);
+                    let leftX = left.getBeamX(visual.staff);
+                    let leftY = left.getBeamY(visual.staff);
 
-                    let rightX = right.getBeamX(staffObjs.staff);
-                    let rightY = right.getBeamY(staffObjs.staff);
+                    let rightX = right.getBeamX(visual.staff);
+                    let rightY = right.getBeamY(visual.staff);
 
                     let leftBeamCount = left.getRightBeamCount();
                     let rightBeamCount = right.getLeftBeamCount();
@@ -344,8 +344,8 @@ export class ObjBeamGroup extends MusicObject {
                 }
             }
 
-            if (staffObjs.tripletNumber) {
-                staffObjs.tripletNumber.draw(renderer);
+            if (visual.tripletNumber) {
+                visual.tripletNumber.draw(renderer);
             }
         });
     }
