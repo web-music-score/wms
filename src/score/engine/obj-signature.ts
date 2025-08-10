@@ -235,13 +235,10 @@ export class ObjSignature extends MusicObject {
             x += paddingX;
 
             this.ksNeutralizeAccidentals.forEach(objAcc => {
-                let accStaff = row.getStaff(objAcc.diatonicId);
-                if (accStaff) {
-                    objAcc.layout(renderer);
-                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getDiatonicIdY(objAcc.diatonicId));
-                    this.rect.expandInPlace(objAcc.getRect());
-                    x = this.rect.right;
-                }
+                objAcc.layout(renderer);
+                objAcc.offset(x + objAcc.getRect().leftw, staff.getDiatonicIdY(objAcc.diatonicId));
+                this.rect.expandInPlace(objAcc.getRect());
+                x = this.rect.right;
             });
         }
 
@@ -249,13 +246,10 @@ export class ObjSignature extends MusicObject {
             x += paddingX;
 
             this.ksNewAccidentals.forEach(objAcc => {
-                let accStaff = row.getStaff(objAcc.diatonicId);
-                if (accStaff) {
-                    objAcc.layout(renderer);
-                    objAcc.offset(x + objAcc.getRect().leftw, accStaff.getDiatonicIdY(objAcc.diatonicId));
-                    this.rect.expandInPlace(objAcc.getRect());
-                    x = this.rect.right;
-                }
+                objAcc.layout(renderer);
+                objAcc.offset(x + objAcc.getRect().leftw, staff.getDiatonicIdY(objAcc.diatonicId));
+                this.rect.expandInPlace(objAcc.getRect());
+                x = this.rect.right;
             });
         }
 

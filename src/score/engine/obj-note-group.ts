@@ -95,15 +95,6 @@ export class ObjNoteGroup extends MusicObject {
 
         this.notes = noteStringData.notes;
 
-        this.notes.forEach(note => {
-            let { diatonicId } = note;
-            let hasStaff = col.row.hasStaff;
-            let staff = col.row.getStaff(diatonicId);
-            if (hasStaff && !staff) {
-                throw new MusicError(MusicErrorType.Score, "Note diatonicId is out of staff boundaries!");
-            }
-        });
-
         this.minDiatonicId = this.notes[0].diatonicId;
         this.maxDiatonicId = this.notes[this.notes.length - 1].diatonicId;
 
@@ -401,17 +392,18 @@ export class ObjNoteGroup extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX() {
-        return this.staffObjs[0]?.stemRect?.centerX ?? 0;
+    getBeamX(staff: MusicStaff) {
+        let rect = this.staffObjs.find(s => s.staff === staff)?.stemRect;
+        return rect?.centerX ?? this.rect.centerX;
     }
 
-    getBeamY() {
-        let stemRect = this.staffObjs[0]?.stemRect;
-        if (!stemRect) {
-            return 0;
+    getBeamY(staff: MusicStaff) {
+        let rect = this.staffObjs.find(s => s.staff === staff)?.stemRect;
+        if (rect) {
+            return this.stemDir === Stem.Up ? rect.top : rect.bottom;
         }
         else {
-            return this.stemDir === Stem.Up ? stemRect.top : stemRect.bottom;
+            return this.rect.centerY;
         }
     }
 
@@ -504,30 +496,27 @@ export class ObjNoteGroup extends MusicObject {
             let staffObjs = new NoteStaffObjects(staff);
 
             this.notes.forEach((note, noteIndex) => {
-                let staff = row.getStaff(note.diatonicId);
-                if (staff) {
-                    let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                    let noteY = staff.getDiatonicIdY(note.diatonicId);
+                let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
+                let noteY = staff.getDiatonicIdY(note.diatonicId);
 
-                    // Setup note head
-                    let noteHeadRect = staffObjs.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
+                // Setup note head
+                let noteHeadRect = staffObjs.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
-                    // Setup accidental
-                    if (accState.needAccidental(note)) {
-                        let acc = staffObjs.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
-                        if (acc) {
-                            acc.layout(renderer);
-                            acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
-                        }
+                // Setup accidental
+                if (accState.needAccidental(note)) {
+                    let acc = staffObjs.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
+                    if (acc) {
+                        acc.layout(renderer);
+                        acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
                     }
+                }
 
-                    // Setup dot
-                    if (dotted) {
-                        let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
-                        let dotY = noteY + this.getDotVerticalDisplacement(note.diatonicId, stemDir) * unitSize;
+                // Setup dot
+                if (dotted) {
+                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
+                    let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
 
-                        staffObjs.dotRects[noteIndex] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
-                    }
+                    staffObjs.dotRects[noteIndex] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                 }
             });
 
@@ -537,25 +526,19 @@ export class ObjNoteGroup extends MusicObject {
 
                 if (stemDir === Stem.Up) {
                     let diatonicId = this.getBottomNote().diatonicId;
-                    let staff = row.getStaff(diatonicId);
-                    if (staff) {
-                        let dotY = staff.getDiatonicIdY(diatonicId) + unitSize * (staff.isLine(diatonicId) ? 3 : 2);
-                        staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
-                    }
+                    let dotY = staff.getDiatonicIdY(diatonicId) + unitSize * (staff.isLine(diatonicId) ? 3 : 2);
+                    staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
                 }
                 else {
                     let diatonicId = this.getTopNote().diatonicId;
-                    let staff = row.getStaff(diatonicId);
-                    if (staff) {
-                        let dotY = staff.getDiatonicIdY(diatonicId) - unitSize * (staff.isLine(diatonicId) ? 3 : 2);
-                        staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
-                    }
+                    let dotY = staff.getDiatonicIdY(diatonicId) - unitSize * (staff.isLine(diatonicId) ? 3 : 2);
+                    staffObjs.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
                 }
             }
 
             // Calculate stem
-            let bottomNoteY = row.getStaff(this.getBottomNote().diatonicId)?.getDiatonicIdY(this.getBottomNote().diatonicId);
-            let topNoteY = row.getStaff(this.getTopNote().diatonicId)?.getDiatonicIdY(this.getTopNote().diatonicId);
+            let bottomNoteY = staff.getDiatonicIdY(this.getBottomNote().diatonicId);
+            let topNoteY = staff.getDiatonicIdY(this.getTopNote().diatonicId);
 
             if (bottomNoteY === undefined || topNoteY === undefined) {
                 throw new MusicError(MusicErrorType.Score, "bottomNoteY or topNoteY is undefined!");
@@ -663,25 +646,25 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
-    setStemTipY(stemTipY: number) {
-        this.staffObjs.forEach(staffObjs => {
-            if (!staffObjs.stemRect) {
-                return;
-            }
+    setStemTipY(staff: MusicStaff, stemTipY: number) {
+        let staffObjs = this.staffObjs.find(s => s.staff === staff);
 
-            let oldStemTipY = this.stemDir === Stem.Up ? staffObjs.stemRect.top : staffObjs.stemRect.bottom;
+        if (!staffObjs?.stemRect) {
+            return;
+        }
 
-            if (stemTipY === oldStemTipY) {
-                return;
-            }
+        let oldStemTipY = this.stemDir === Stem.Up ? staffObjs.stemRect.top : staffObjs.stemRect.bottom;
 
-            let r = staffObjs.stemRect;
+        if (stemTipY === oldStemTipY) {
+            return;
+        }
 
-            let top = this.stemDir === Stem.Up ? stemTipY : r.top;
-            let bottom = this.stemDir === Stem.Up ? r.bottom : stemTipY;
+        let r = staffObjs.stemRect;
 
-            staffObjs.stemRect = new DivRect(r.left, r.right, top, bottom);
-        });
+        let top = this.stemDir === Stem.Up ? stemTipY : r.top;
+        let bottom = this.stemDir === Stem.Up ? r.bottom : stemTipY;
+
+        staffObjs.stemRect = new DivRect(r.left, r.right, top, bottom);
 
         this.updateRect();
     }
@@ -884,9 +867,8 @@ export class ObjNoteGroup extends MusicObject {
         }
     }
 
-    getDotVerticalDisplacement(diatonicId: number, stemDir: Stem) {
-        let staff = this.row.getStaff(diatonicId);
-        if (staff && staff.isLine(diatonicId)) {
+    getDotVerticalDisplacement(staff: MusicStaff, diatonicId: number, stemDir: Stem) {
+        if (staff.isLine(diatonicId)) {
             return stemDir === Stem.Up ? -1 : 1;
         }
         else {
