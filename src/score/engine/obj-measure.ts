@@ -1234,16 +1234,14 @@ export class ObjMeasure extends MusicObject {
         }
 
         // Layout Beams
-        this.beamGroups.forEach(beam => {
-            beam.layout(renderer);
-
-            this.rect.expandInPlace(beam.getRect());
+        this.beamGroups.forEach(beamGroup => {
+            beamGroup.layout(renderer);
+            this.rect.expandInPlace(beamGroup.getRect());
         });
     }
 
     layoutDone() {
         this.columns.forEach(col => col.layoutDone());
-
         this.needLayout = false;
     }
 
@@ -1310,6 +1308,5 @@ export class ObjMeasure extends MusicObject {
         this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(renderer));
 
         this.beamGroups.forEach(beam => beam.draw(renderer));
-
     }
 }

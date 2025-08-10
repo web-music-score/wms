@@ -31,11 +31,13 @@ const adjustBeamAngle = (dx: number, dy: number) => {
 
 class BeamStaffObjects {
     constructor(readonly staff: MusicStaff) { }
+    public rect = new DivRect();
     public tripletNumber?: ObjText;
     public groupLineLeft?: { x: number, y: number };
     public groupLineRight?: { x: number, y: number };
 
     offset(dx: number, dy: number) {
+        this.rect.offsetInPlace(dx, dy);
         this.tripletNumber?.offset(dx, dy);
         if (this.groupLineLeft) {
             this.groupLineLeft.x += dx;
@@ -176,6 +178,8 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     layout(renderer: Renderer) {
+        this.rect = new DivRect();
+
         this.staffObjs.length = 0;
 
         let symbols = this.getSymbols();
@@ -230,7 +234,7 @@ export class ObjBeamGroup extends MusicObject {
                 staffObjs.groupLineLeft = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
                 staffObjs.groupLineRight = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
 
-                this.rect = new DivRect(
+                staffObjs.rect = new DivRect(
                     staffObjs.groupLineLeft.x,
                     staffObjs.groupLineRight.x,
                     Math.min(staffObjs.groupLineLeft.y, staffObjs.groupLineRight.y),
@@ -248,7 +252,12 @@ export class ObjBeamGroup extends MusicObject {
                     }
                 });
 
-                this.rect = new DivRect(leftX, rightX, Math.min(leftY, rightY) - beamThickness / 2, Math.max(leftY, rightY) + beamThickness / 2);
+                staffObjs.rect = new DivRect(
+                    leftX,
+                    rightX,
+                    Math.min(leftY, rightY) - beamThickness / 2,
+                    Math.max(leftY, rightY) + beamThickness / 2
+                );
             }
 
             if (this.isTriplet()) {
@@ -257,11 +266,15 @@ export class ObjBeamGroup extends MusicObject {
                 staffObjs.tripletNumber.layout(renderer);
                 staffObjs.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + groupLineDy);
 
-                this.rect.expandInPlace(staffObjs.tripletNumber.getRect());
+                staffObjs.rect.expandInPlace(staffObjs.tripletNumber.getRect());
             }
+
+            this.rect = staffObjs.rect;
 
             this.staffObjs.push(staffObjs);
         });
+
+        this.staffObjs.forEach(s => this.rect.expandInPlace(s.rect));
     }
 
     offset(dx: number, dy: number) {

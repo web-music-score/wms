@@ -287,16 +287,12 @@ export class ObjScoreRow extends MusicObject {
         }
 
         // Layout connectives
-        this.measures.forEach(m => {
-            m.layoutConnectives(renderer);
-            this.rect.expandInPlace(m.getRect());
-        });
+        this.measures.forEach(m => m.layoutConnectives(renderer));
 
         // Layout beams
-        this.measures.forEach(m => {
-            m.layoutBeams(renderer);
-            this.rect.expandInPlace(m.getRect());
-        });
+        this.measures.forEach(m => m.layoutBeams(renderer));
+
+        this.measures.forEach(m => this.rect.expandInPlace(m.getRect()));
     }
 
     private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
