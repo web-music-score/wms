@@ -8,6 +8,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MConnective, DivRect, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { GuitarTab, MusicStaff } from "./staff-and-tab";
 
 export class ObjConnective extends MusicObject {
     private lx = 0;
@@ -29,9 +30,9 @@ export class ObjConnective extends MusicObject {
 
     readonly mi: MConnective;
 
-    constructor(connectiveProps: ConnectiveProps, loc: "staff" | "tab", measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
-    constructor(connectiveProps: ConnectiveProps, loc: "staff" | "tab", measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, readonly loc: "staff" | "tab", readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
+    constructor(connectiveProps: ConnectiveProps, line: MusicStaff | GuitarTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
+    constructor(connectiveProps: ConnectiveProps, line: MusicStaff | GuitarTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
+    constructor(readonly connectiveProps: ConnectiveProps, readonly line: MusicStaff | GuitarTab, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
 
         this.leftNoteGroup = leftNoteGroup;
@@ -67,7 +68,7 @@ export class ObjConnective extends MusicObject {
 
     layout(renderer: Renderer) {
         let { unitSize } = renderer;
-        let { measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId, loc, connectiveProps } = this;
+        let { measure, line, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId, connectiveProps } = this;
         let { noteAnchor, arcDir } = connectiveProps;
         let { row } = measure;
         let prevRow = row.getPrevRow();
@@ -79,14 +80,10 @@ export class ObjConnective extends MusicObject {
         let leftPos: { x: number, y: number }
         let rightPos: { x: number, y: number }
 
-        leftPos = loc === "tab"
-            ? leftNoteGroup.getFretAnchorPoint(leftNoteId, connectiveProps, "left")
-            : leftNoteGroup.getNoteAnchorPoint(leftNoteId, noteAnchor, "left");
+        leftPos = leftNoteGroup.getConnectiveAnchorPoint(connectiveProps, line, leftNoteId, noteAnchor, "left");
 
         if (rightNoteGroup !== undefined && rightNoteId !== undefined) {
-            rightPos = loc === "tab"
-                ? rightNoteGroup.getFretAnchorPoint(rightNoteId, connectiveProps, "right")
-                : rightNoteGroup.getNoteAnchorPoint(rightNoteId, noteAnchor, "right");
+            rightPos = rightNoteGroup.getConnectiveAnchorPoint(connectiveProps, line, rightNoteId, noteAnchor, "right");
         }
         else {
             rightPos = this.tieType === TieType.ToMeasureEnd

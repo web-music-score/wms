@@ -4,6 +4,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, ConnectiveSpan, NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
+import { GuitarTab, MusicStaff } from "./staff-and-tab";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
@@ -137,26 +138,40 @@ export class ConnectiveProps {
     }
 
     private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNoteId: number, tieType: TieType) {
-        new ObjConnective(this, "staff", leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+        leftNoteGroup.row.getNotationLines()
+            .filter(line => leftNoteGroup.enableConnective(line))
+            .forEach(line => {
+                if (line instanceof MusicStaff) {
+                    new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+                }
+                else {
+                    let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
 
-        let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
-
-        if (leftNoteGroup.row.hasTab && leftString !== undefined) {
-            new ObjConnective(this, "tab", leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
-        }
+                    if (leftString !== undefined) {
+                        new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+                    }
+                }
+            });
     }
 
     private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) {
         const addConnective = (measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) => {
-            new ObjConnective(this, "staff", measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            leftNoteGroup.row.getNotationLines()
+                .filter(line => leftNoteGroup.enableConnective(line) && rightNoteGroup.enableConnective(line))
+                .forEach(line => {
+                    if (line instanceof MusicStaff) {
+                        new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+                    }
+                    else {
+                        let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
+                        let rightString = rightNoteGroup.getFretNumberString(rightNoteId);
 
-            let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
-            let rightString = rightNoteGroup.getFretNumberString(rightNoteId);
-
-            if (leftNoteGroup.row.hasTab && leftString !== undefined && rightString !== undefined &&
-                (leftString === rightString || this.connective === Connective.Slur)) {
-                new ObjConnective(this, "tab", measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
-            }
+                        if (leftString !== undefined && rightString !== undefined &&
+                            (leftString === rightString || this.connective === Connective.Slur)) {
+                            new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+                        }
+                    }
+                });
         }
 
         if (leftNoteGroup.measure === rightNoteGroup.measure) {

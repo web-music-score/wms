@@ -7,6 +7,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicStaff } from "./staff-and-tab";
 
 function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
     if (typeof staffPos === "number") {
@@ -25,8 +26,14 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
 }
 
 class RestStaffObjects {
-    public dotRect = new DivRect();
-    public beamGroup?: ObjBeamGroup;
+    constructor(readonly staff: MusicStaff) { }
+    public rect = new DivRect();
+    public dotRect?: DivRect;
+
+    offset(dx: number, dy: number) {
+        this.rect.offsetInPlace(dx, dy);
+        this.dotRect?.offsetInPlace(dx, dy);
+    }
 }
 
 export class ObjRest extends MusicObject {
@@ -37,7 +44,9 @@ export class ObjRest extends MusicObject {
     readonly hide: boolean;
     readonly rhythmProps: RhythmProps;
 
-    readonly staffObjs?: RestStaffObjects;
+    private beamGroup?: ObjBeamGroup;
+
+    readonly staffObjs: RestStaffObjects[] = [];
 
     readonly mi: MRest;
 
@@ -67,8 +76,6 @@ export class ObjRest extends MusicObject {
         this.hide = options?.hide ?? false;
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
-        this.staffObjs = this.row.hasStaff ? new RestStaffObjects() : undefined;
-
         this.mi = new MRest(this);
     }
 
@@ -97,12 +104,7 @@ export class ObjRest extends MusicObject {
     }
 
     get stemDir(): Stem.Up | Stem.Down {
-        if (this.staffObjs) {
-            return this.staffObjs.beamGroup ? this.staffObjs.beamGroup.stemDir : this.ownStemDir;
-        }
-        else {
-            return Stem.Up;
-        }
+        return this.beamGroup ? this.beamGroup.stemDir : this.ownStemDir;
     }
 
     get triplet() {
@@ -115,19 +117,15 @@ export class ObjRest extends MusicObject {
 
 
     getBeamGroup(): ObjBeamGroup | undefined {
-        return this.staffObjs?.beamGroup;
+        return this.beamGroup;
     }
 
     setBeamGroup(beam: ObjBeamGroup) {
-        if (this.staffObjs) {
-            this.staffObjs.beamGroup = beam;
-        }
+        this.beamGroup = beam;
     }
 
     resetBeamGroup() {
-        if (this.staffObjs) {
-            this.staffObjs.beamGroup = undefined;
-        }
+        this.beamGroup = undefined;
     }
 
     getBeamX() {
@@ -155,8 +153,11 @@ export class ObjRest extends MusicObject {
     updateAccidentalState(accState: AccidentalState) { }
 
     layout(renderer: Renderer, accState: AccidentalState) {
-        if (this.hide || !this.staffObjs) {
-            this.rect = new DivRect();
+        this.rect = new DivRect();
+
+        this.staffObjs.length = 0;
+
+        if (this.hide) {
             return;
         }
 
@@ -195,115 +196,122 @@ export class ObjRest extends MusicObject {
             bottomh = unitSize * (1 + flagCount + adj);
         }
 
-        if (dotted) {
-            let dotWidth = DocumentSettings.DotSize * unitSize;
+        this.row.getNotationLines().filter(line => line instanceof MusicStaff).forEach(staff => {
+            if (!staff.containsDiatonicId(ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
+                return;
+            }
 
-            let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize / 2) * unitSize;
-            let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
+            let staffObjs = new RestStaffObjects(staff);
 
-            this.staffObjs.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+            staffObjs.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
-            toph = Math.max(toph, this.staffObjs.dotRect.toph);
-            bottomh = Math.max(bottomh, this.staffObjs.dotRect.bottomh);
-            rightw += (DocumentSettings.RestDotSpace + DocumentSettings.DotSize) * unitSize;
-        }
+            if (dotted) {
+                let dotWidth = DocumentSettings.DotSize * unitSize;
 
-        this.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+                let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize / 2) * unitSize;
+                let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
-        let staff = this.row.getStaff(ownDiatonicId);
-        if (staff) {
-            this.offset(0, staff.getDiatonicIdY(ownDiatonicId));
-        }
+                staffObjs.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                staffObjs.rect.expandInPlace(staffObjs.dotRect);
+            }
+
+            staffObjs.offset(0, staff.getDiatonicIdY(ownDiatonicId));
+
+            this.rect = staffObjs.rect.copy();
+            this.staffObjs.push(staffObjs);
+        });
+
+        this.staffObjs.forEach(staffObjs => this.rect.expandInPlace(staffObjs.rect));
     }
 
     offset(dx: number, dy: number) {
-        if (this.staffObjs) {
-            this.staffObjs.dotRect.offsetInPlace(dx, dy);
-        }
-
+        this.staffObjs.forEach(s => s.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) {
         let ctx = renderer.getCanvasContext();
 
-        if (!ctx || this.hide || !this.staffObjs) {
+        if (!ctx || this.staffObjs.length === 0) {
             return;
         }
 
         renderer.drawDebugRect(this.rect);
 
         let { unitSize, lineWidth } = renderer;
-        let { color, rect } = this;
-        let { noteLength, dotted, flagCount } = this.rhythmProps;
-
-        let x = rect.centerX;
-        let y = rect.centerY;
+        let { color } = this;
+        let { noteLength, flagCount } = this.rhythmProps;
 
         ctx.strokeStyle = ctx.fillStyle = color;
         ctx.lineWidth = lineWidth;
 
-        if (noteLength === NoteLength.Whole) {
-            ctx.fillRect(x - unitSize, y, unitSize * 2, unitSize);
-        }
-        else if (noteLength === NoteLength.Half) {
-            ctx.fillRect(x - unitSize, y - unitSize, unitSize * 2, unitSize);
-        }
-        else if (noteLength === NoteLength.Quarter) {
-            ctx.beginPath();
-            // Upper part
-            ctx.moveTo(x - unitSize * 0.6, y - unitSize * 3.2);
-            ctx.lineTo(x + unitSize * 0.7, y - unitSize * 1.5);
-            ctx.quadraticCurveTo(
-                x - unitSize * 0.8, y - unitSize * 0.5,
-                x + unitSize * 1, y + unitSize * 1.5
-            );
-            ctx.lineTo(x - unitSize * 1, y - unitSize * 0.75);
-            ctx.quadraticCurveTo(
-                x + unitSize * 0.2, y - unitSize * 1.5,
-                x - unitSize * 0.6, y - unitSize * 3.2
-            );
-            // Lower part
-            ctx.moveTo(x + unitSize * 1, y + unitSize * 1.5);
-            ctx.quadraticCurveTo(
-                x - unitSize * 0.8, y + unitSize * 1,
-                x - unitSize * 0.2, y + unitSize * 2.8
-            );
-            ctx.bezierCurveTo(
-                x - unitSize * 1.8, y + unitSize * 1.5,
-                x - unitSize * 0.6, y - unitSize * 0.2,
-                x + unitSize * 0.9, y + unitSize * 1.5
-            );
-            ctx.fill();
-            ctx.stroke();
-        }
-        else if (flagCount > 0) {
-            let adj = 1 - flagCount % 2;
-            let fx = (p: number) => x + (-p * 0.25 + 0.5) * unitSize;
-            let fy = (p: number) => y + (p + adj) * unitSize;
+        this.staffObjs.forEach(staffObjs => {
+            let { rect, dotRect } = staffObjs;
 
-            ctx.beginPath();
-            ctx.moveTo(fx(1 + flagCount), fy(1 + flagCount));
-            ctx.lineTo(fx(-0.5 - flagCount), fy(-0.5 - flagCount));
-            ctx.stroke();
+            let x = rect.centerX;
+            let y = rect.centerY;
 
-            for (let i = 0; i < flagCount; i++) {
-                let t = flagCount - i * 2;
-                ctx.beginPath();
-                ctx.moveTo(fx(t - 2.5), fy(t - 2.5));
-                ctx.quadraticCurveTo(
-                    fx(t - 0.5) + unitSize * 0.25, fy(t - 1.5),
-                    fx(t - 1.5) - unitSize * 1.5, fy(t - 1.5));
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(fx(t - 2) - unitSize * 1.5, fy(t - 2), unitSize * 0.5, 0, Math.PI * 2);
-                ctx.fill();
+            if (noteLength === NoteLength.Whole) {
+                ctx.fillRect(x - unitSize, y, unitSize * 2, unitSize);
             }
-        }
+            else if (noteLength === NoteLength.Half) {
+                ctx.fillRect(x - unitSize, y - unitSize, unitSize * 2, unitSize);
+            }
+            else if (noteLength === NoteLength.Quarter) {
+                ctx.beginPath();
+                // Upper part
+                ctx.moveTo(x - unitSize * 0.6, y - unitSize * 3.2);
+                ctx.lineTo(x + unitSize * 0.7, y - unitSize * 1.5);
+                ctx.quadraticCurveTo(
+                    x - unitSize * 0.8, y - unitSize * 0.5,
+                    x + unitSize * 1, y + unitSize * 1.5
+                );
+                ctx.lineTo(x - unitSize * 1, y - unitSize * 0.75);
+                ctx.quadraticCurveTo(
+                    x + unitSize * 0.2, y - unitSize * 1.5,
+                    x - unitSize * 0.6, y - unitSize * 3.2
+                );
+                // Lower part
+                ctx.moveTo(x + unitSize * 1, y + unitSize * 1.5);
+                ctx.quadraticCurveTo(
+                    x - unitSize * 0.8, y + unitSize * 1,
+                    x - unitSize * 0.2, y + unitSize * 2.8
+                );
+                ctx.bezierCurveTo(
+                    x - unitSize * 1.8, y + unitSize * 1.5,
+                    x - unitSize * 0.6, y - unitSize * 0.2,
+                    x + unitSize * 0.9, y + unitSize * 1.5
+                );
+                ctx.fill();
+                ctx.stroke();
+            }
+            else if (flagCount > 0) {
+                let adj = 1 - flagCount % 2;
+                let fx = (p: number) => x + (-p * 0.25 + 0.5) * unitSize;
+                let fy = (p: number) => y + (p + adj) * unitSize;
 
-        if (dotted) {
-            let r = this.staffObjs.dotRect;
-            renderer.fillCircle(r.centerX, r.centerY, r.width / 2);
-        }
+                ctx.beginPath();
+                ctx.moveTo(fx(1 + flagCount), fy(1 + flagCount));
+                ctx.lineTo(fx(-0.5 - flagCount), fy(-0.5 - flagCount));
+                ctx.stroke();
+
+                for (let i = 0; i < flagCount; i++) {
+                    let t = flagCount - i * 2;
+                    ctx.beginPath();
+                    ctx.moveTo(fx(t - 2.5), fy(t - 2.5));
+                    ctx.quadraticCurveTo(
+                        fx(t - 0.5) + unitSize * 0.25, fy(t - 1.5),
+                        fx(t - 1.5) - unitSize * 1.5, fy(t - 1.5));
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.arc(fx(t - 2) - unitSize * 1.5, fy(t - 2), unitSize * 0.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            if (dotRect) {
+                renderer.fillCircle(dotRect.centerX, dotRect.centerY, dotRect.width / 2);
+            }
+        });
     }
 }
