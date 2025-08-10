@@ -129,18 +129,13 @@ export class ObjRest extends MusicObject {
     }
 
     getBeamX(staff: MusicStaff): number {
-        let rect = this.staffObjs.find(s => s.staff === staff)?.rect;
-        return rect?.centerX ?? this.rect.centerX;
+        let rect = this.staffObjs.find(s => s.staff === staff)?.rect ?? this.rect;
+        return rect.centerX;
     }
 
     getBeamY(staff: MusicStaff): number {
-        let rect = this.staffObjs.find(s => s.staff === staff)?.rect;
-        if (rect) {
-            return this.stemDir === Stem.Up ? rect.top : rect.bottom;
-        }
-        else {
-            return this.rect.centerY;
-        }
+        let rect = this.staffObjs.find(s => s.staff === staff)?.rect ?? this.rect;
+        return this.stemDir === Stem.Up ? rect.top : rect.bottom;
     }
 
     private getRestDotVerticalDisplacement(noteLength: NoteLength): number {
