@@ -27,7 +27,8 @@ export type StaffConfig = {
     isOctaveDown?: boolean,
     minNote?: string,
     maxNote?: string,
-    voiceIds?: number[]
+    voiceIds?: number[],
+    isGrand?: boolean
 }
 
 /** @public */
