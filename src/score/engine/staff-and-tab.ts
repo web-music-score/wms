@@ -12,6 +12,8 @@ export class MusicStaff {
     readonly minDiatonicId?: number;
     readonly maxDiatonicId?: number;
 
+    private joinedGrandStaff?: MusicStaff;
+
     constructor(readonly staffConfig: StaffConfig) {
         const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
 
@@ -44,6 +46,12 @@ export class MusicStaff {
         return this.staffConfig.isOctaveDown === true;
     }
 
+    joinGrandStaff(staff: MusicStaff) {
+        if (staff !== this) {
+            this.joinedGrandStaff = staff;
+        }
+    }
+
     offset(dx: number, dy: number) {
         this.topLineY += dy;
         this.bottomLineY += dy;
@@ -65,11 +73,14 @@ export class MusicStaff {
     }
 
     getDiatonicIdY(diatonicId: number): number {
-        if (!this.containsDiatonicId(diatonicId)) {
-            throw new MusicError(MusicErrorType.Score, "Staff does not contain diatonicId " + diatonicId);
+        if (this.containsDiatonicId(diatonicId)) {
+            return this.bottomLineY + (this.bottomLineDiatonicId - diatonicId) * this.getDiatonicSpacing();
+        }
+        else if (this.joinedGrandStaff && this.joinedGrandStaff.containsDiatonicId(diatonicId)) {
+            return this.joinedGrandStaff.getDiatonicIdY(diatonicId);
         }
         else {
-            return this.bottomLineY + (this.bottomLineDiatonicId - diatonicId) * this.getDiatonicSpacing();
+            throw new MusicError(MusicErrorType.Score, "Staff does not contain diatonicId " + diatonicId);
         }
     }
 
@@ -79,16 +90,20 @@ export class MusicStaff {
         return this.containsDiatonicId(diatonicId) ? diatonicId : undefined;
     }
 
-    isLine(diatonicId: number) {
+    isLine(diatonicId: number): boolean {
         return diatonicId % 2 === this.middleLineDiatonicId % 2;
     }
 
-    isSpace(diatonicId: number) {
+    isSpace(diatonicId: number): boolean {
         return diatonicId % 2 !== this.middleLineDiatonicId % 2;
     }
 
-    containsVoiceId(voiceId: number) {
+    containsVoiceId(voiceId: number): boolean {
         return !this.staffConfig.voiceIds || this.staffConfig.voiceIds.includes(voiceId);
+    }
+
+    isGrand(): boolean {
+        return this.staffConfig.isGrand === true;
     }
 }
 

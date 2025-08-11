@@ -1,6 +1,6 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { Clef, DivRect, MScoreRow, StaffPreset } from "../pub";
+import { DivRect, MScoreRow } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
@@ -28,7 +28,7 @@ export class ObjScoreRow extends MusicObject {
     constructor(readonly doc: ObjDocument) {
         super(doc);
 
-        this.notationLines = doc.config.map(config => config.type === "staff" ? new MusicStaff(config) : new GuitarTab(config));
+        this.notationLines = doc.createNotationLines();
 
         // Set prevRow
         this.prevRow = doc.getLastRow();
