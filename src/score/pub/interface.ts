@@ -256,6 +256,10 @@ export class MDocument extends MusicInterface {
         return this.obj.getTitle();
     }
 
+    endRow(): void {
+        this.obj.getLastMeasure()?.endRow();
+    }
+
     addMeasure(): MMeasure {
         return this.obj.addMeasure().mi;
     }
