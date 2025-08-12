@@ -39,6 +39,7 @@ class NoteStaffVisual {
     public accidentals: ObjAccidental[] = [];
     public stemRect: DivRect | undefined;
     public flagRects: DivRect[] = [];
+    public rect = new DivRect();
 
     offset(dx: number, dy: number) {
         this.noteHeadRects.forEach(n => n.offsetInPlace(dx, dy));
@@ -46,15 +47,18 @@ class NoteStaffVisual {
         this.accidentals.forEach(n => n.offset(dx, dy));
         this.stemRect?.offsetInPlace(dx, dy);
         this.flagRects.forEach(n => n.offsetInPlace(dx, dy));
+        this.rect.offsetInPlace(dx, dy);
     }
 }
 
 class NoteTabVisual {
     constructor(readonly tab: ObjTab) { }
     public fretNumbers: ObjText[] = [];
+    public rect = new DivRect();
 
     offset(dx: number, dy: number) {
         this.fretNumbers.forEach(f => f.offset(dx, dy));
+        this.rect.offsetInPlace(dx, dy);
     }
 }
 
@@ -621,23 +625,29 @@ export class ObjNoteGroup extends MusicObject {
         }
         else {
             this.rect = new DivRect();
-            return
+            return;
         }
 
         this.staffVisuals.forEach(visual => {
-            visual.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
+            visual.rect = visual.noteHeadRects[0].copy();
+            visual.noteHeadRects.forEach(r => visual.rect.expandInPlace(r));
 
             if (visual.stemRect) {
-                this.rect.expandInPlace(visual.stemRect);
+                visual.rect.expandInPlace(visual.stemRect);
             }
 
-            visual.dotRects.forEach(r => this.rect.expandInPlace(r));
-            visual.flagRects.forEach(r => this.rect.expandInPlace(r));
-            visual.accidentals.forEach(a => this.rect.expandInPlace(a.getRect()));
+            visual.dotRects.forEach(r => visual.rect.expandInPlace(r));
+            visual.flagRects.forEach(r => visual.rect.expandInPlace(r));
+            visual.accidentals.forEach(a => visual.rect.expandInPlace(a.getRect()));
+
+            this.rect.expandInPlace(visual.rect);
         });
 
         this.tabVsuals.forEach(visual => {
-            visual.fretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
+            visual.rect = visual.fretNumbers.length > 0 ? visual.fretNumbers[0].getRect().copy() : new DivRect();
+            visual.fretNumbers.forEach(fn => visual.rect.expandInPlace(fn.getRect()));
+
+            this.rect.expandInPlace(visual.rect);
         });
     }
 
