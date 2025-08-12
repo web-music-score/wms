@@ -11,7 +11,6 @@ import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { ConnectiveProps } from "./connective-props";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Utils } from "@tspro/ts-utils-lib";
-import { GuitarTab, MusicStaff } from "./staff-and-tab";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -111,22 +110,6 @@ export class ObjDocument extends MusicObject {
 
     getMusicInterface(): MDocument {
         return this.mi;
-    }
-
-    createNotationLines(): (MusicStaff | GuitarTab)[] {
-        let notationLines = this.config.map(cfg => cfg.type === "staff" ? new MusicStaff(cfg) : new GuitarTab(cfg));
-
-        for (let i = 0; i < notationLines.length - 1; i++) {
-            let treble = notationLines[i];
-            let bass = notationLines[i + 1];
-            if (treble instanceof MusicStaff && treble.isGrand() && treble.staffConfig.clef === Clef.G &&
-                bass instanceof MusicStaff && bass.isGrand() && bass.staffConfig.clef === Clef.F) {
-                treble.joinGrandStaff(bass);
-                bass.joinGrandStaff(treble);
-            }
-        }
-
-        return notationLines;
     }
 
     addConnectiveProps(connectiveProps: ConnectiveProps) {

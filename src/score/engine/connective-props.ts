@@ -4,7 +4,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, ConnectiveSpan, NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
-import { GuitarTab, MusicStaff } from "./staff-and-tab";
+import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
@@ -141,7 +141,7 @@ export class ConnectiveProps {
         leftNoteGroup.row.getNotationLines()
             .filter(line => leftNoteGroup.enableConnective(line))
             .forEach(line => {
-                if (line instanceof MusicStaff) {
+                if (line instanceof ObjStaff) {
                     new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
                 }
                 else {
@@ -159,7 +159,7 @@ export class ConnectiveProps {
             leftNoteGroup.row.getNotationLines()
                 .filter(line => leftNoteGroup.enableConnective(line) && rightNoteGroup.enableConnective(line))
                 .forEach(line => {
-                    if (line instanceof MusicStaff) {
+                    if (line instanceof ObjStaff) {
                         new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
                     }
                     else {

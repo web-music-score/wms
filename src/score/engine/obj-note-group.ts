@@ -11,7 +11,7 @@ import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { GuitarTab, MusicStaff } from "./staff-and-tab";
+import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
 
 function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
     let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
@@ -33,7 +33,7 @@ function solveArpeggio(a: Arpeggio | boolean | undefined): Arpeggio | undefined 
 }
 
 class NoteStaffVisual {
-    constructor(readonly staff: MusicStaff) { }
+    constructor(readonly staff: ObjStaff) { }
     public noteHeadRects: DivRect[] = [];
     public dotRects: DivRect[] = [];
     public accidentals: ObjAccidental[] = [];
@@ -50,7 +50,7 @@ class NoteStaffVisual {
 }
 
 class NoteTabVisual {
-    constructor(readonly tab: GuitarTab) { }
+    constructor(readonly tab: ObjTab) { }
     public fretNumbers: ObjText[] = [];
 
     offset(dx: number, dy: number) {
@@ -142,8 +142,8 @@ export class ObjNoteGroup extends MusicObject {
         return this.rhythmProps.triplet;
     }
 
-    enableConnective(line: MusicStaff | GuitarTab): boolean {
-        return line.containsVoiceId(this.voiceId) && (line instanceof GuitarTab || line.containsDiatonicId(this.ownDiatonicId));
+    enableConnective(line: ObjStaff | ObjTab): boolean {
+        return line.containsVoiceId(this.voiceId) && (line instanceof ObjTab || line.containsDiatonicId(this.ownDiatonicId));
     }
 
     startConnective(connectiveProps: ConnectiveProps) {
@@ -201,8 +201,8 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getConnectiveAnchorPoint(connectiveProps: ConnectiveProps, line: MusicStaff | GuitarTab, noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
-        if (line instanceof MusicStaff) {
+    getConnectiveAnchorPoint(connectiveProps: ConnectiveProps, line: ObjStaff | ObjTab, noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
+        if (line instanceof ObjStaff) {
             let staff = line;
 
             if (noteIndex < 0 || noteIndex >= this.notes.length) {
@@ -392,12 +392,12 @@ export class ObjNoteGroup extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX(staff: MusicStaff): number {
+    getBeamX(staff: ObjStaff): number {
         let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemRect ?? this.rect;
         return rect.centerX;
     }
 
-    getBeamY(staff: MusicStaff): number {
+    getBeamY(staff: ObjStaff): number {
         let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemRect ?? this.rect;
         return this.stemDir === Stem.Up ? rect.top : rect.bottom;
     }
@@ -483,7 +483,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.staffVisuals.length = 0;
 
-        row.getNotationLines().filter(line => line instanceof MusicStaff).forEach(staff => {
+        row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
             if (!staff.containsDiatonicId(this.ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
                 return;
             }
@@ -576,7 +576,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.tabVsuals.length = 0;
 
-        row.getNotationLines().filter(line => line instanceof GuitarTab).forEach(tab => {
+        row.getNotationLines().filter(line => line instanceof ObjTab).forEach(tab => {
             if (!tab.containsVoiceId(this.voiceId)) {
                 return;
             }
@@ -641,7 +641,7 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
-    setStemTipY(staff: MusicStaff, stemTipY: number) {
+    setStemTipY(staff: ObjStaff, stemTipY: number) {
         let visual = this.staffVisuals.find(visual => visual.staff === staff);
 
         if (!visual?.stemRect) {
@@ -862,7 +862,7 @@ export class ObjNoteGroup extends MusicObject {
         }
     }
 
-    getDotVerticalDisplacement(staff: MusicStaff, diatonicId: number, stemDir: Stem) {
+    getDotVerticalDisplacement(staff: ObjStaff, diatonicId: number, stemDir: Stem) {
         if (staff.isLine(diatonicId)) {
             return stemDir === Stem.Up ? -1 : 1;
         }

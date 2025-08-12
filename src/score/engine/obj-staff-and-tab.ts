@@ -1,9 +1,11 @@
 import { Note } from "@tspro/web-music-score/theory";
-import { ImageAsset } from "./renderer";
+import { ImageAsset, Renderer } from "./renderer";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Clef, StaffConfig, TabConfig } from "../pub";
+import { Clef, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
+import { MusicObject } from "./music-object";
+import { ObjScoreRow } from "./obj-score-row";
 
-export class MusicStaff {
+export class ObjStaff extends MusicObject {
     readonly clefImageAsset: ImageAsset;
     readonly clefLineDiatonicId: number;
     readonly topLineDiatonicId: number;
@@ -12,9 +14,16 @@ export class MusicStaff {
     readonly minDiatonicId?: number;
     readonly maxDiatonicId?: number;
 
-    private joinedGrandStaff?: MusicStaff;
+    private joinedGrandStaff?: ObjStaff;
 
-    constructor(readonly staffConfig: StaffConfig) {
+    topLineY: number = 0;
+    bottomLineY: number = 0;
+
+    readonly mi: MStaff;
+
+    constructor(readonly row: ObjScoreRow, readonly staffConfig: StaffConfig) {
+        super(row);
+
         const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
 
         if (staffConfig.clef === Clef.G) {
@@ -33,10 +42,13 @@ export class MusicStaff {
 
         this.minDiatonicId = staffConfig.minNote !== undefined ? Math.min(getDiatonicId(staffConfig.minNote, false), this.bottomLineDiatonicId) : undefined;
         this.maxDiatonicId = staffConfig.maxNote !== undefined ? Math.max(getDiatonicId(staffConfig.maxNote, false), this.topLineDiatonicId) : undefined;
+
+        this.mi = new MStaff(this);
     }
 
-    topLineY: number = 0;
-    bottomLineY: number = 0;
+    getMusicInterface(): MStaff {
+        return this.mi;
+    }
 
     get middleLineY(): number {
         return (this.topLineY + this.bottomLineY) / 2;
@@ -46,15 +58,10 @@ export class MusicStaff {
         return this.staffConfig.isOctaveDown === true;
     }
 
-    joinGrandStaff(staff: MusicStaff) {
+    joinGrandStaff(staff: ObjStaff) {
         if (staff !== this) {
             this.joinedGrandStaff = staff;
         }
-    }
-
-    offset(dx: number, dy: number) {
-        this.topLineY += dy;
-        this.bottomLineY += dy;
     }
 
     getLineSpacing(): number {
@@ -105,17 +112,46 @@ export class MusicStaff {
     isGrand(): boolean {
         return this.staffConfig.isGrand === true;
     }
+
+    pick(x: number, y: number): MusicObject[] {
+        return [this];
+    }
+
+    offset(dx: number, dy: number) {
+        this.topLineY += dy;
+        this.bottomLineY += dy;
+    }
+
+    draw(renderer: Renderer) { }
 }
 
-export class GuitarTab {
+export class ObjTab extends MusicObject {
     top: number = 0;
     bottom: number = 0;
 
-    constructor(readonly tabConfig: TabConfig) { }
+    readonly mi: MTab;
+
+    constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig) {
+        super(row);
+
+        this.mi = new MTab(this);
+    }
+
+    getMusicInterface(): MTab {
+        return this.mi;
+    }
 
     /** Return Y coordinate of string. */
     getStringY(stringId: number): number {
         return this.top + (this.bottom - this.top) / 6 * (stringId + 0.5);
+    }
+
+    containsVoiceId(voiceId: number) {
+        return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
+    }
+
+    pick(x: number, y: number): MusicObject[] {
+        return [this];
     }
 
     offset(dx: number, dy: number) {
@@ -123,7 +159,5 @@ export class GuitarTab {
         this.bottom += dy;
     }
 
-    containsVoiceId(voiceId: number) {
-        return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
-    }
+    draw(renderer: Renderer) { }
 }

@@ -24,7 +24,7 @@ import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
-import { GuitarTab, MusicStaff } from "./staff-and-tab";
+import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -1047,7 +1047,7 @@ export class ObjMeasure extends MusicObject {
         rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotted }));
     }
 
-    getDiatonicIdRange(staff: MusicStaff): { min: number, max: number } {
+    getDiatonicIdRange(staff: ObjStaff): { min: number, max: number } {
         let min = staff.bottomLineDiatonicId;
         let max = staff.topLineDiatonicId;
 
@@ -1088,7 +1088,7 @@ export class ObjMeasure extends MusicObject {
         let showTempo = !!this.alterTempo;
 
         if (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo) {
-            this.signatures = this.row.getNotationLines().filter(line => line instanceof MusicStaff).map((staff, staffId) => {
+            this.signatures = this.row.getNotationLines().filter(line => line instanceof ObjStaff).map((staff, staffId) => {
                 let signature = this.signatures[staffId] ?? new ObjSignature(this, staff);
 
                 signature.updateClefImage(renderer, showClef);
@@ -1136,7 +1136,7 @@ export class ObjMeasure extends MusicObject {
         );
 
         this.row.getNotationLines().forEach(line => {
-            if (line instanceof GuitarTab) {
+            if (line instanceof ObjTab) {
                 top = Math.min(top, line.top);
                 bottom = Math.max(bottom, line.bottom);
             }
@@ -1279,7 +1279,7 @@ export class ObjMeasure extends MusicObject {
         let { row } = this;
 
         row.getNotationLines().forEach(line => {
-            if (line instanceof MusicStaff) {
+            if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
                     drawLine(line.getDiatonicIdY(p));
                 }

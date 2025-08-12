@@ -30,6 +30,7 @@ import { NoteAnchor, Arpeggio } from "./types";
 import { ScoreEventListener } from "./event";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -663,6 +664,36 @@ export class MScoreRow extends MusicInterface {
 
     getMeasures(): ReadonlyArray<MMeasure> {
         return this.obj.getMeasures().map(m => m.getMusicInterface());
+    }
+}
+
+/** @public */
+export class MStaff extends MusicInterface {
+    static readonly Name = "Staff";
+
+    /** @internal */
+    constructor(private readonly obj: ObjStaff) {
+        super(MStaff.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjStaff {
+        return this.obj;
+    }
+}
+
+/** @public */
+export class MTab extends MusicInterface {
+    static readonly Name = "Tab";
+
+    /** @internal */
+    constructor(private readonly obj: ObjTab) {
+        super(MTab.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjTab {
+        return this.obj;
     }
 }
 

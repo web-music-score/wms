@@ -4,7 +4,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, DivRect } from "../pub";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
-import { MusicStaff } from "./staff-and-tab";
+import { ObjStaff } from "./obj-staff-and-tab";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
@@ -44,7 +44,7 @@ abstract class ObjBarLine extends MusicObject {
         let bottoms: number[] = [];
 
         row.getNotationLines().forEach(line => {
-            if (line instanceof MusicStaff) {
+            if (line instanceof ObjStaff) {
                 lineCenterYs.push(line.middleLineY);
                 lineDotOffs.push(line.getDiatonicSpacing());
                 tops.push(line.topLineY);

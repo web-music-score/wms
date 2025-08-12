@@ -10,7 +10,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { MusicStaff } from "./staff-and-tab";
+import { ObjStaff } from "./obj-staff-and-tab";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -267,7 +267,7 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    getDiatonicIdRange(staff: MusicStaff): { min: number, max: number } {
+    getDiatonicIdRange(staff: ObjStaff): { min: number, max: number } {
         let min = staff.bottomLineDiatonicId;
         let max = staff.topLineDiatonicId;
 
@@ -375,7 +375,7 @@ export class ObjRhythmColumn extends MusicObject {
         }
 
         if (this.arpeggioDir !== undefined) {
-            this.arpeggios = row.getNotationLines().filter(line => line instanceof MusicStaff).map(staff => {
+            this.arpeggios = row.getNotationLines().filter(line => line instanceof ObjStaff).map(staff => {
                 let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
                 arpeggio.layout(renderer);
                 arpeggio.offset(this.rect.left - arpeggio.getRect().width, staff.middleLineY - arpeggio.getRect().centerY);

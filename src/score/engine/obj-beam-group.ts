@@ -8,7 +8,7 @@ import { DivRect, Stem, MBeamGroup } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { MusicStaff } from "./staff-and-tab";
+import { ObjStaff } from "./obj-staff-and-tab";
 
 export enum BeamGroupType {
     RegularBeam,
@@ -30,7 +30,7 @@ const adjustBeamAngle = (dx: number, dy: number) => {
 }
 
 class BeamStaffVisual {
-    constructor(readonly staff: MusicStaff) { }
+    constructor(readonly staff: ObjStaff) { }
     public rect = new DivRect();
     public tripletNumber?: ObjText;
     public groupLineLeft?: { x: number, y: number };
@@ -191,7 +191,7 @@ export class ObjBeamGroup extends MusicObject {
         let { unitSize, beamThickness } = renderer;
         let { stemDir } = this;
 
-        symbols[0].row.getNotationLines().filter(line => line instanceof MusicStaff).forEach(staff => {
+        symbols[0].row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
             let visual = new BeamStaffVisual(staff);
 
             let leftX = symbols[0].getBeamX(staff);

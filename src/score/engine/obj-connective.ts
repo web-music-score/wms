@@ -8,7 +8,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MConnective, DivRect, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { GuitarTab, MusicStaff } from "./staff-and-tab";
+import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
 
 export class ObjConnective extends MusicObject {
     private lx = 0;
@@ -30,9 +30,9 @@ export class ObjConnective extends MusicObject {
 
     readonly mi: MConnective;
 
-    constructor(connectiveProps: ConnectiveProps, line: MusicStaff | GuitarTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
-    constructor(connectiveProps: ConnectiveProps, line: MusicStaff | GuitarTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, readonly line: MusicStaff | GuitarTab, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
+    constructor(connectiveProps: ConnectiveProps, line: ObjStaff | ObjTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
+    constructor(connectiveProps: ConnectiveProps, line: ObjStaff | ObjTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
+    constructor(readonly connectiveProps: ConnectiveProps, readonly line: ObjStaff | ObjTab, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
 
         this.leftNoteGroup = leftNoteGroup;

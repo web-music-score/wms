@@ -7,7 +7,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { MusicStaff } from "./staff-and-tab";
+import { ObjStaff } from "./obj-staff-and-tab";
 
 function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
     if (typeof staffPos === "number") {
@@ -26,7 +26,7 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
 }
 
 class RestStaffVisual {
-    constructor(readonly staff: MusicStaff) { }
+    constructor(readonly staff: ObjStaff) { }
     public rect = new DivRect();
     public dotRect?: DivRect;
 
@@ -128,12 +128,12 @@ export class ObjRest extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX(staff: MusicStaff): number {
+    getBeamX(staff: ObjStaff): number {
         let rect = this.staffVisuals.find(visual => visual.staff === staff)?.rect ?? this.rect;
         return rect.centerX;
     }
 
-    getBeamY(staff: MusicStaff): number {
+    getBeamY(staff: ObjStaff): number {
         let rect = this.staffVisuals.find(visual => visual.staff === staff)?.rect ?? this.rect;
         return this.stemDir === Stem.Up ? rect.top : rect.bottom;
     }
@@ -198,7 +198,7 @@ export class ObjRest extends MusicObject {
             bottomh = unitSize * (1 + flagCount + adj);
         }
 
-        this.row.getNotationLines().filter(line => line instanceof MusicStaff).forEach(staff => {
+        this.row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
             if (!staff.containsDiatonicId(ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
                 return;
             }

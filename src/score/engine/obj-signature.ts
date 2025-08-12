@@ -3,7 +3,7 @@ import { Clef, DivRect, MSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjImage } from "./obj-image";
-import { MusicStaff } from "./staff-and-tab";
+import { ObjStaff } from "./obj-staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
@@ -21,7 +21,7 @@ export class ObjSignature extends MusicObject {
 
     readonly mi: MSignature;
 
-    constructor(readonly measure: ObjMeasure, readonly staff: MusicStaff) {
+    constructor(readonly measure: ObjMeasure, readonly staff: ObjStaff) {
         super(measure);
 
         this.mi = new MSignature(this);

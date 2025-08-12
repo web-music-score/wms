@@ -1,10 +1,10 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, MScoreRow } from "../pub";
+import { Clef, DivRect, MScoreRow } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
-import { GuitarTab, MusicStaff } from "./staff-and-tab";
+import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -17,7 +17,7 @@ export class ObjScoreRow extends MusicObject {
 
     private minWidth = 0;
 
-    private readonly notationLines: (MusicStaff | GuitarTab)[] = [];
+    private readonly notationLines: (ObjStaff | ObjTab)[] = [];
 
     private readonly measures: ObjMeasure[] = [];
 
@@ -28,7 +28,7 @@ export class ObjScoreRow extends MusicObject {
     constructor(readonly doc: ObjDocument) {
         super(doc);
 
-        this.notationLines = doc.createNotationLines();
+        this.notationLines = this.createNotationLines();
 
         // Set prevRow
         this.prevRow = doc.getLastRow();
@@ -45,22 +45,38 @@ export class ObjScoreRow extends MusicObject {
         return this.mi;
     }
 
-    getNotationLines(): ReadonlyArray<MusicStaff | GuitarTab> {
+    private createNotationLines(): (ObjStaff | ObjTab)[] {
+        let notationLines = this.doc.config.map(cfg => cfg.type === "staff" ? new ObjStaff(this, cfg) : new ObjTab(this, cfg));
+
+        for (let i = 0; i < notationLines.length - 1; i++) {
+            let treble = notationLines[i];
+            let bass = notationLines[i + 1];
+            if (treble instanceof ObjStaff && treble.isGrand() && treble.staffConfig.clef === Clef.G &&
+                bass instanceof ObjStaff && bass.isGrand() && bass.staffConfig.clef === Clef.F) {
+                treble.joinGrandStaff(bass);
+                bass.joinGrandStaff(treble);
+            }
+        }
+
+        return notationLines;
+    }
+
+    getNotationLines(): ReadonlyArray<ObjStaff | ObjTab> {
         return this.notationLines;
     }
 
     get hasStaff(): boolean {
-        return this.notationLines.some(line => line instanceof MusicStaff);
+        return this.notationLines.some(line => line instanceof ObjStaff);
     }
 
     get hasTab(): boolean {
-        return this.notationLines.some(line => line instanceof GuitarTab);
+        return this.notationLines.some(line => line instanceof ObjTab);
     }
 
-    getTopStaff(): MusicStaff {
+    getTopStaff(): ObjStaff {
         for (let i = 0; i < this.notationLines.length; i++) {
             let line = this.notationLines[i];
-            if (line instanceof MusicStaff) {
+            if (line instanceof ObjStaff) {
                 return line;
             }
         }
@@ -68,10 +84,10 @@ export class ObjScoreRow extends MusicObject {
         throw new MusicError(MusicErrorType.Score, "Top staff is required!");
     }
 
-    getBottomStaff(): MusicStaff {
+    getBottomStaff(): ObjStaff {
         for (let i = this.notationLines.length - 1; i >= 0; i--) {
             let line = this.notationLines[i];
-            if (line instanceof MusicStaff) {
+            if (line instanceof ObjStaff) {
                 return line;
             }
         }
@@ -79,12 +95,12 @@ export class ObjScoreRow extends MusicObject {
         throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
     }
 
-    getStaff(diatonicId: number): MusicStaff | undefined {
+    getStaff(diatonicId: number): ObjStaff | undefined {
         Note.validateDiatonicId(diatonicId);
 
         for (let i = 0; i < this.notationLines.length; i++) {
             let line = this.notationLines[i];
-            if (line instanceof MusicStaff && line.containsDiatonicId(diatonicId)) {
+            if (line instanceof ObjStaff && line.containsDiatonicId(diatonicId)) {
                 return line;
             }
         }
@@ -92,7 +108,7 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    getDiatonicIdRange(staff: MusicStaff): { min: number, max: number } {
+    getDiatonicIdRange(staff: ObjStaff): { min: number, max: number } {
         let min = staff.bottomLineDiatonicId;
         let max = staff.topLineDiatonicId;
 
@@ -125,6 +141,13 @@ export class ObjScoreRow extends MusicObject {
             }
         }
 
+        for (let i = 0; i < this.notationLines.length; i++) {
+            let arr = this.notationLines[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
         return [this];
     }
 
@@ -140,7 +163,7 @@ export class ObjScoreRow extends MusicObject {
     getDiatonicIdAt(y: number): number | undefined {
         for (let i = 0; i < this.notationLines.length; i++) {
             let line = this.notationLines[i];
-            let diatonicId = line instanceof MusicStaff ? line.getDiatonicIdAt(y) : undefined;
+            let diatonicId = line instanceof ObjStaff ? line.getDiatonicIdAt(y) : undefined;
 
             if (diatonicId !== undefined) {
                 return diatonicId;
@@ -207,7 +230,7 @@ export class ObjScoreRow extends MusicObject {
         let bottom = 0;
 
         this.notationLines.forEach(line => {
-            if (line instanceof MusicStaff) {
+            if (line instanceof ObjStaff) {
                 let staff = line;
 
                 let diatonicIdRange = this.getDiatonicIdRange(staff);
@@ -402,14 +425,14 @@ export class ObjScoreRow extends MusicObject {
         ctx.clip();
 
         // For multiple notation lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && this.notationLines.length > 1 || this.notationLines.length === 1 && this.notationLines[0] instanceof GuitarTab) {
+        if (this.getFirstMeasure() && this.notationLines.length > 1 || this.notationLines.length === 1 && this.notationLines[0] instanceof ObjTab) {
             let left = this.getFirstMeasure()!.getStaffLineLeft();
 
             let tops: number[] = [];
             let bottoms: number[] = [];
 
             this.notationLines.forEach(line => {
-                if (line instanceof MusicStaff) {
+                if (line instanceof ObjStaff) {
                     tops.push(line.topLineY);
                     bottoms.push(line.bottomLineY);
                 }
@@ -427,6 +450,9 @@ export class ObjScoreRow extends MusicObject {
 
         // Draw measures
         this.measures.forEach(m => m.draw(renderer));
+
+        // Draw notation lines
+        this.notationLines.forEach(m => m.draw(renderer));
 
         ctx.restore();
     }
