@@ -4,6 +4,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
+import { DocumentSettings } from "./settings";
 
 export class ObjStaff extends MusicObject {
     readonly clefImageAsset: ImageAsset;
@@ -125,11 +126,20 @@ export class ObjStaff extends MusicObject {
         return [this];
     }
 
-    layoutHeight(h: number) {
+    layoutHeight(renderer: Renderer) {
+        let { unitSize } = renderer;
+
+        let h = unitSize * DocumentSettings.StaffHeight;
+
         this.topLineY = -h / 2;
         this.bottomLineY = h / 2;
 
         this.rect = new DivRect(0, 0, this.topLineY, this.bottomLineY);
+    }
+
+    layoutWidth(renderer: Renderer) {
+        this.rect.left = this.row.getRect().left;
+        this.rect.right = this.row.getRect().right;
     }
 
     offset(dx: number, dy: number) {
@@ -186,11 +196,20 @@ export class ObjTab extends MusicObject {
         return [this];
     }
 
-    layoutHeight(h: number) {
+    layoutHeight(renderer: Renderer) {
+        let { unitSize } = renderer;
+
+        let h = unitSize * DocumentSettings.TabHeight;
+
         this.top = -h / 2;
         this.bottom = h / 2;
 
         this.rect = new DivRect(0, 0, this.top, this.bottom);
+    }
+
+    layoutWidth(renderer: Renderer) {
+        this.rect.left = this.row.getRect().left;
+        this.rect.right = this.row.getRect().right;
     }
 
     offset(dx: number, dy: number) {

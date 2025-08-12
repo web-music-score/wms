@@ -8,7 +8,6 @@ import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjScoreRow extends MusicObject {
@@ -233,7 +232,7 @@ export class ObjScoreRow extends MusicObject {
             if (line instanceof ObjStaff) {
                 let staff = line;
 
-                staff.layoutHeight(lineSpacing * 4);
+                staff.layoutHeight(renderer);
                 staff.offset(0, y - staff.getTopLineY());
 
                 let diatonicIdRange = this.getDiatonicIdRange(staff);
@@ -246,7 +245,7 @@ export class ObjScoreRow extends MusicObject {
             else {
                 let tab = line;
 
-                tab.layoutHeight(unitSize * DocumentSettings.GuitarTabHeight);
+                tab.layoutHeight(renderer);
                 tab.offset(0, y - tab.getTop());
 
                 top = Math.min(top, tab.getTop());
@@ -282,6 +281,8 @@ export class ObjScoreRow extends MusicObject {
         this.rect = new DivRect(
             this.rect.left, this.rect.left + rowWidth / 2, this.rect.left + rowWidth,
             this.rect.top, this.rect.centerY, this.rect.bottom);
+
+        this.notationLines.forEach(line => line.layoutWidth(renderer));
 
         // Layout measures width
         let targetColumnsAreaWidth = rowWidth;

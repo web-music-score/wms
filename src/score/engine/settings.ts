@@ -33,5 +33,6 @@ export const DocumentSettings = {
 
     ShortTieLength: 5,
 
-    GuitarTabHeight: 20
+    StaffHeight: 8,
+    TabHeight: 20
 }
