@@ -41,6 +41,15 @@ class NoteStaffVisual {
     public flagRects: DivRect[] = [];
     public rect = new DivRect();
 
+    updateRect() {
+        this.rect = this.noteHeadRects[0].copy();
+        this.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
+        if (this.stemRect) this.rect.expandInPlace(this.stemRect);
+        this.dotRects.forEach(r => this.rect.expandInPlace(r));
+        this.flagRects.forEach(r => this.rect.expandInPlace(r));
+        this.accidentals.forEach(a => this.rect.expandInPlace(a.getRect()));
+    }
+
     offset(dx: number, dy: number) {
         this.noteHeadRects.forEach(n => n.offsetInPlace(dx, dy));
         this.dotRects.forEach(n => n.offsetInPlace(dx, dy));
@@ -55,6 +64,11 @@ class NoteTabVisual {
     constructor(readonly tab: ObjTab) { }
     public fretNumbers: ObjText[] = [];
     public rect = new DivRect();
+
+    updateRect() {
+        this.rect = this.fretNumbers[0].getRect().copy();
+        this.fretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
+    }
 
     offset(dx: number, dy: number) {
         this.fretNumbers.forEach(f => f.offset(dx, dy));
@@ -629,24 +643,12 @@ export class ObjNoteGroup extends MusicObject {
         }
 
         this.staffVisuals.forEach(visual => {
-            visual.rect = visual.noteHeadRects[0].copy();
-            visual.noteHeadRects.forEach(r => visual.rect.expandInPlace(r));
-
-            if (visual.stemRect) {
-                visual.rect.expandInPlace(visual.stemRect);
-            }
-
-            visual.dotRects.forEach(r => visual.rect.expandInPlace(r));
-            visual.flagRects.forEach(r => visual.rect.expandInPlace(r));
-            visual.accidentals.forEach(a => visual.rect.expandInPlace(a.getRect()));
-
+            visual.updateRect();
             this.rect.expandInPlace(visual.rect);
         });
 
         this.tabVsuals.forEach(visual => {
-            visual.rect = visual.fretNumbers.length > 0 ? visual.fretNumbers[0].getRect().copy() : new DivRect();
-            visual.fretNumbers.forEach(fn => visual.rect.expandInPlace(fn.getRect()));
-
+            visual.updateRect();
             this.rect.expandInPlace(visual.rect);
         });
     }
