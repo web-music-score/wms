@@ -9,5 +9,11 @@ export function createGrandStaffDemo() {
 
     doc.setHeader("Grand Staff");
 
+    doc.endRow();
+
+    doc.addMeasure()
+        .addChord(0, ["Gb3", "Bb3", "Db4"], Theory.NoteLength.Quarter)
+        .addChord(0, ["Ab3", "Cb4", "Eb4"], Theory.NoteLength.Quarter)
+
     return doc;
 }
