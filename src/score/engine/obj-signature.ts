@@ -36,7 +36,7 @@ export class ObjSignature extends MusicObject {
             let img = renderer.getImageAsset(this.staff.clefImageAsset);
             this.clefImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
 
-            this.eightBelowClef = this.clefImage && this.staff.octaveLower
+            this.eightBelowClef = this.clefImage && this.staff.isOctaveDown
                 ? new ObjText(this, "8", 0.5, 0)
                 : undefined;
         }
@@ -218,7 +218,7 @@ export class ObjSignature extends MusicObject {
             if (this.eightBelowClef) {
                 let r = this.clefImage.getRect();
                 this.eightBelowClef.layout(renderer);
-                this.eightBelowClef.offset(r.left + r.width / 2, r.centerY + r.height * 0.3);
+                this.eightBelowClef.offset(r.left + r.width / 2, Math.max(r.centerY + r.height * 0.3, staff.bottomLineY));
                 this.rect.expandInPlace(this.eightBelowClef.getRect());
             }
         }

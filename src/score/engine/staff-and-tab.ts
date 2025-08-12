@@ -42,7 +42,7 @@ export class MusicStaff {
         return (this.topLineY + this.bottomLineY) / 2;
     }
 
-    get octaveLower(): boolean {
+    get isOctaveDown(): boolean {
         return this.staffConfig.isOctaveDown === true;
     }
 
