@@ -45,16 +45,16 @@ abstract class ObjBarLine extends MusicObject {
 
         row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
-                lineCenterYs.push(line.middleLineY);
+                lineCenterYs.push(line.getMiddleLineY());
                 lineDotOffs.push(line.getDiatonicSpacing());
-                tops.push(line.topLineY);
-                bottoms.push(line.bottomLineY);
+                tops.push(line.getTopLineY());
+                bottoms.push(line.getBottomLineY());
             }
             else {
-                lineCenterYs.push((line.bottom + line.top) / 2);
-                lineDotOffs.push((line.bottom - line.top) / 6);
-                tops.push(line.getStringY(0));
-                bottoms.push(line.getStringY(5));
+                lineCenterYs.push((line.getBottom() + line.getTop()) / 2);
+                lineDotOffs.push((line.getBottom() - line.getTop()) / 6);
+                tops.push(line.getTopStringY());
+                bottoms.push(line.getBottomStringY());
             }
         });
 

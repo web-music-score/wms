@@ -218,14 +218,14 @@ export class ObjSignature extends MusicObject {
             if (this.eightBelowClef) {
                 let r = this.clefImage.getRect();
                 this.eightBelowClef.layout(renderer);
-                this.eightBelowClef.offset(r.left + r.width / 2, Math.max(r.centerY + r.height * 0.3, staff.bottomLineY));
+                this.eightBelowClef.offset(r.left + r.width / 2, Math.max(r.centerY + r.height * 0.3, staff.getBottomLineY()));
                 this.rect.expandInPlace(this.eightBelowClef.getRect());
             }
         }
 
         if (this.measureNumber) {
             this.measureNumber.layout(renderer);
-            let y = this.clefImage ? this.clefImage.getRect().top : staff.topLineY;
+            let y = this.clefImage ? this.clefImage.getRect().top : staff.getTopLineY();
             this.measureNumber.offset(0, y);
             this.rect.expandInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
@@ -273,7 +273,7 @@ export class ObjSignature extends MusicObject {
 
         if (this.tempoText) {
             this.tempoText.layout(renderer);
-            this.tempoText.offset(x, Math.min(this.rect.top, staff.topLineY));
+            this.tempoText.offset(x, Math.min(this.rect.top, staff.getTopLineY()));
             this.rect.expandInPlace(this.tempoText.getRect());
         }
 

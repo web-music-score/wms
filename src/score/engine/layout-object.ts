@@ -82,8 +82,8 @@ export class LayoutObjectWrapper {
         let { musicObj, measure, verticalPos } = this;
         let { row } = measure;
 
-        let staffTop = row.hasStaff ? row.getTopStaff().topLineY : row.getRect().centerY;
-        let staffBottom = row.hasStaff ? row.getBottomStaff().bottomLineY : row.getRect().centerY;
+        let staffTop = row.hasStaff ? row.getTopStaff().getTopLineY() : row.getRect().centerY;
+        let staffBottom = row.hasStaff ? row.getBottomStaff().getBottomLineY() : row.getRect().centerY;
         let staffPadding = renderer.unitSize * 2;
 
         let y = verticalPos === VerticalPos.BelowStaff

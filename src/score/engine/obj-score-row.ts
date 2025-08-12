@@ -233,25 +233,27 @@ export class ObjScoreRow extends MusicObject {
             if (line instanceof ObjStaff) {
                 let staff = line;
 
-                let diatonicIdRange = this.getDiatonicIdRange(staff);
+                staff.layoutHeight(lineSpacing * 4);
+                staff.offset(0, y - staff.getTopLineY());
 
-                staff.topLineY = y;
-                staff.bottomLineY = y + lineSpacing * 4;
+                let diatonicIdRange = this.getDiatonicIdRange(staff);
 
                 top = Math.min(top, staff.getDiatonicIdY(diatonicIdRange.max));
                 bottom = Math.max(bottom, staff.getDiatonicIdY(diatonicIdRange.min));
+
+                y = bottom + lineSpacing * 4;
             }
             else {
                 let tab = line;
 
-                tab.top = y;
-                tab.bottom = tab.top + unitSize * DocumentSettings.GuitarTabHeight;
+                tab.layoutHeight(unitSize * DocumentSettings.GuitarTabHeight);
+                tab.offset(0, y - tab.getTop());
 
-                top = Math.min(top, tab.top);
-                bottom = Math.max(bottom, tab.bottom);
+                top = Math.min(top, tab.getTop());
+                bottom = Math.max(bottom, tab.getBottom());
+
+                y = bottom + lineSpacing * 4;
             }
-
-            y = bottom + lineSpacing * 4;
         });
 
         let rect = new DivRect(0, 0, top, bottom);
@@ -433,12 +435,12 @@ export class ObjScoreRow extends MusicObject {
 
             this.notationLines.forEach(line => {
                 if (line instanceof ObjStaff) {
-                    tops.push(line.topLineY);
-                    bottoms.push(line.bottomLineY);
+                    tops.push(line.getTopLineY());
+                    bottoms.push(line.getBottomLineY());
                 }
                 else {
-                    tops.push(line.getStringY(0));
-                    bottoms.push(line.getStringY(5));
+                    tops.push(line.getTopStringY());
+                    bottoms.push(line.getBottomStringY());
                 }
             });
 

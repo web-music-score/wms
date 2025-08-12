@@ -1,7 +1,7 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ImageAsset, Renderer } from "./renderer";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Clef, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
+import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 
@@ -16,8 +16,8 @@ export class ObjStaff extends MusicObject {
 
     private joinedGrandStaff?: ObjStaff;
 
-    topLineY: number = 0;
-    bottomLineY: number = 0;
+    private topLineY: number = 0;
+    private bottomLineY: number = 0;
 
     readonly mi: MStaff;
 
@@ -50,12 +50,20 @@ export class ObjStaff extends MusicObject {
         return this.mi;
     }
 
-    get middleLineY(): number {
+    get isOctaveDown(): boolean {
+        return this.staffConfig.isOctaveDown === true;
+    }
+
+    getTopLineY(): number {
+        return this.topLineY;
+    }
+
+    getMiddleLineY(): number {
         return (this.topLineY + this.bottomLineY) / 2;
     }
 
-    get isOctaveDown(): boolean {
-        return this.staffConfig.isOctaveDown === true;
+    getBottomLineY(): number {
+        return this.bottomLineY;
     }
 
     joinGrandStaff(staff: ObjStaff) {
@@ -117,17 +125,25 @@ export class ObjStaff extends MusicObject {
         return [this];
     }
 
+    layoutHeight(h: number) {
+        this.topLineY = -h / 2;
+        this.bottomLineY = h / 2;
+
+        this.rect = new DivRect(0, 0, this.topLineY, this.bottomLineY);
+    }
+
     offset(dx: number, dy: number) {
         this.topLineY += dy;
         this.bottomLineY += dy;
+        this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) { }
 }
 
 export class ObjTab extends MusicObject {
-    top: number = 0;
-    bottom: number = 0;
+    private top: number = 0;
+    private bottom: number = 0;
 
     readonly mi: MTab;
 
@@ -146,7 +162,23 @@ export class ObjTab extends MusicObject {
         return this.top + (this.bottom - this.top) / 6 * (stringId + 0.5);
     }
 
-    containsVoiceId(voiceId: number) {
+    getTopStringY(): number {
+        return this.getStringY(0);
+    }
+
+    getBottomStringY(): number {
+        return this.getStringY(5);
+    }
+
+    getTop(): number {
+        return this.top;
+    }
+
+    getBottom(): number {
+        return this.bottom;
+    }
+
+    containsVoiceId(voiceId: number): boolean {
         return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
     }
 
@@ -154,9 +186,17 @@ export class ObjTab extends MusicObject {
         return [this];
     }
 
+    layoutHeight(h: number) {
+        this.top = -h / 2;
+        this.bottom = h / 2;
+
+        this.rect = new DivRect(0, 0, this.top, this.bottom);
+    }
+
     offset(dx: number, dy: number) {
         this.top += dy;
         this.bottom += dy;
+        this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) { }

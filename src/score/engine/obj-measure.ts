@@ -1137,8 +1137,8 @@ export class ObjMeasure extends MusicObject {
 
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjTab) {
-                top = Math.min(top, line.top);
-                bottom = Math.max(bottom, line.bottom);
+                top = Math.min(top, line.getTop());
+                bottom = Math.max(bottom, line.getBottom());
             }
         });
 
