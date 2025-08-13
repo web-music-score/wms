@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
-import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective } from "../pub";
+import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MNoteGroupVisual, MNoteGroupTabVisual } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -32,14 +32,28 @@ function solveArpeggio(a: Arpeggio | boolean | undefined): Arpeggio | undefined 
     return a === true || a === Arpeggio.Up ? Arpeggio.Up : (a === Arpeggio.Down ? Arpeggio.Down : undefined);
 }
 
-class NoteStaffVisual {
-    constructor(readonly staff: ObjStaff) { }
+export class ObjNoteGroupVisual extends MusicObject {
     public noteHeadRects: DivRect[] = [];
     public dotRects: DivRect[] = [];
     public accidentals: ObjAccidental[] = [];
     public stemRect: DivRect | undefined;
     public flagRects: DivRect[] = [];
-    public rect = new DivRect();
+
+    readonly mi: MNoteGroupVisual;
+
+    constructor(readonly staff: ObjStaff) {
+        super(staff);
+
+        this.mi = new MNoteGroupVisual(this);
+    }
+
+    getMusicInterface(): MusicInterface {
+        return this.mi;
+    }
+
+    pick(x: number, y: number): MusicObject[] {
+        return this.rect.contains(x, y) ? [this] : [];
+    }
 
     updateRect() {
         this.rect = this.noteHeadRects[0].copy();
@@ -60,10 +74,24 @@ class NoteStaffVisual {
     }
 }
 
-class NoteTabVisual {
-    constructor(readonly tab: ObjTab) { }
+export class ObjNoteGroupTabVisual extends MusicObject {
     public fretNumbers: ObjText[] = [];
-    public rect = new DivRect();
+
+    readonly mi: MNoteGroupTabVisual;
+
+    constructor(readonly tab: ObjTab) {
+        super(tab);
+
+        this.mi = new MNoteGroupTabVisual(this);
+    }
+
+    getMusicInterface(): MusicInterface {
+        return this.mi;
+    }
+
+    pick(x: number, y: number): MusicObject[] {
+        return this.rect.contains(x, y) ? [this] : [];
+    }
 
     updateRect() {
         this.rect = this.fretNumbers[0].getRect().copy();
@@ -97,8 +125,8 @@ export class ObjNoteGroup extends MusicObject {
     private rightBeamCount = 0;
     private beamGroup?: ObjBeamGroup;
 
-    private readonly staffVisuals: NoteStaffVisual[] = [];
-    private readonly tabVsuals: NoteTabVisual[] = [];
+    private readonly staffVisuals: ObjNoteGroupVisual[] = [];
+    private readonly tabVsuals: ObjNoteGroupTabVisual[] = [];
 
     readonly mi: MNoteGroup;
 
@@ -182,29 +210,16 @@ export class ObjNoteGroup extends MusicObject {
         }
 
         for (let j = 0; j < this.staffVisuals.length; j++) {
-            let visual = this.staffVisuals[j];
-            for (let i = 0; i < visual.accidentals.length; i++) {
-                let acc = visual.accidentals[i];
-                if (acc) {
-                    let arr = acc.pick(x, y);
-                    if (arr.length > 0) {
-                        return [this, ...arr];
-                    }
-                }
+            let arr = this.staffVisuals[j].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
             }
         }
 
-
         for (let j = 0; j < this.tabVsuals.length; j++) {
-            let visual = this.tabVsuals[j];
-            for (let i = 0; i < visual.fretNumbers.length; i++) {
-                let fn = visual.fretNumbers[i];
-                if (fn) {
-                    let arr = fn.pick(x, y);
-                    if (arr.length > 0) {
-                        return [this, ...arr];
-                    }
-                }
+            let arr = this.tabVsuals[j].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
             }
         }
 
@@ -333,7 +348,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.ownString[noteIndex];
     }
 
-    getFretNumber(visual: NoteTabVisual, noteIndex: number): number | undefined {
+    getFretNumber(visual: ObjNoteGroupTabVisual, noteIndex: number): number | undefined {
         let fretNumber = visual.fretNumbers[noteIndex];
         return fretNumber === undefined ? undefined : +fretNumber.getText();
     }
@@ -506,7 +521,7 @@ export class ObjNoteGroup extends MusicObject {
                 return;
             }
 
-            let visual = new NoteStaffVisual(staff);
+            let visual = new ObjNoteGroupVisual(staff);
 
             this.notes.forEach((note, noteIndex) => {
                 let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
@@ -599,7 +614,7 @@ export class ObjNoteGroup extends MusicObject {
                 return;
             }
 
-            let visual = new NoteTabVisual(tab);
+            let visual = new ObjNoteGroupTabVisual(tab);
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers
@@ -644,12 +659,12 @@ export class ObjNoteGroup extends MusicObject {
 
         this.staffVisuals.forEach(visual => {
             visual.updateRect();
-            this.rect.expandInPlace(visual.rect);
+            this.rect.expandInPlace(visual.getRect());
         });
 
         this.tabVsuals.forEach(visual => {
             visual.updateRect();
-            this.rect.expandInPlace(visual.rect);
+            this.rect.expandInPlace(visual.getRect());
         });
     }
 

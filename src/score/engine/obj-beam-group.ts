@@ -4,7 +4,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
-import { DivRect, Stem, MBeamGroup } from "../pub";
+import { DivRect, Stem, MBeamGroup, MusicInterface, MBeamGroupVisual } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
@@ -29,16 +29,32 @@ const adjustBeamAngle = (dx: number, dy: number) => {
     }
 }
 
-class BeamStaffVisual {
-    constructor(readonly staff: ObjStaff) { }
-    public rect = new DivRect();
+export class ObjBeamGroupVisual extends MusicObject {
     public tripletNumber?: ObjText;
     public groupLineLeft?: { x: number, y: number };
     public groupLineRight?: { x: number, y: number };
 
+    readonly mi: MBeamGroupVisual;
+
+    constructor(readonly staff: ObjStaff) {
+        super(staff);
+
+        this.mi = new MBeamGroupVisual(this);
+    }
+
+    getMusicInterface(): MusicInterface {
+        return this.mi;
+    }
+
+    pick(x: number, y: number): MusicObject[] {
+        return this.rect.contains(x, y) ? [this] : [];
+    }
+
+    setRect(r: DivRect) {
+        this.rect = r;
+    }
+
     offset(dx: number, dy: number) {
-        this.rect.offsetInPlace(dx, dy);
-        this.tripletNumber?.offset(dx, dy);
         if (this.groupLineLeft) {
             this.groupLineLeft.x += dx;
             this.groupLineLeft.y += dy;
@@ -47,6 +63,8 @@ class BeamStaffVisual {
             this.groupLineRight.x += dx;
             this.groupLineRight.y += dy;
         }
+        this.tripletNumber?.offset(dx, dy);
+        this.rect.offsetInPlace(dx, dy);
     }
 }
 
@@ -55,7 +73,7 @@ export class ObjBeamGroup extends MusicObject {
 
     private readonly type: BeamGroupType;
 
-    private readonly staffVisuals: BeamStaffVisual[] = [];
+    private readonly staffVisuals: ObjBeamGroupVisual[] = [];
 
     private constructor(private readonly symbols: RhythmSymbol[], triplet: boolean) {
         super(symbols[0].measure);
@@ -150,7 +168,18 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        if (!this.rect.contains(x, y)) {
+            return [];
+        }
+
+        for (let i = 0; i < this.staffVisuals.length; i++) {
+            let arr = this.staffVisuals[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        return [this];
     }
 
     getType() {
@@ -192,7 +221,7 @@ export class ObjBeamGroup extends MusicObject {
         let { stemDir } = this;
 
         symbols[0].row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
-            let visual = new BeamStaffVisual(staff);
+            let visual = new ObjBeamGroupVisual(staff);
 
             let leftX = symbols[0].getBeamX(staff);
             let leftY = symbols[0].getBeamY(staff);
@@ -234,12 +263,12 @@ export class ObjBeamGroup extends MusicObject {
                 visual.groupLineLeft = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
                 visual.groupLineRight = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
 
-                visual.rect = new DivRect(
+                visual.setRect(new DivRect(
                     visual.groupLineLeft.x,
                     visual.groupLineRight.x,
                     Math.min(visual.groupLineLeft.y, visual.groupLineRight.y),
                     Math.max(visual.groupLineLeft.y, visual.groupLineRight.y)
-                );
+                ));
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
                 raiseBeamY *= 0.5;
@@ -252,12 +281,12 @@ export class ObjBeamGroup extends MusicObject {
                     }
                 });
 
-                visual.rect = new DivRect(
+                visual.setRect(new DivRect(
                     leftX,
                     rightX,
                     Math.min(leftY, rightY) - beamThickness / 2,
                     Math.max(leftY, rightY) + beamThickness / 2
-                );
+                ));
             }
 
             if (this.isTriplet()) {
@@ -266,19 +295,19 @@ export class ObjBeamGroup extends MusicObject {
                 visual.tripletNumber.layout(renderer);
                 visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + groupLineDy);
 
-                visual.rect.expandInPlace(visual.tripletNumber.getRect());
+                visual.setRect(visual.getRect().expandInPlace(visual.tripletNumber.getRect()));
             }
 
-            this.rect = visual.rect;
+            this.rect = visual.getRect().copy();
 
             this.staffVisuals.push(visual);
         });
 
-        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.rect));
+        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
     }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(s => s.offset(dx, dy));
+        this.staffVisuals.forEach(visual => visual.offset(dx, dy));
         this.rect.offsetInPlace(dx, dy);
     }
 

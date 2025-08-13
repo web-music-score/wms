@@ -1,5 +1,5 @@
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
-import { DivRect, MRest, RestOptions, Stem } from "../pub";
+import { DivRect, MRest, MRestVisual, MusicInterface, RestOptions, Stem } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
@@ -25,10 +25,28 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
     }
 }
 
-class RestStaffVisual {
-    constructor(readonly staff: ObjStaff) { }
-    public rect = new DivRect();
+export class ObjRestVisual extends MusicObject {
     public dotRect?: DivRect;
+
+    readonly mi: MRestVisual;
+
+    constructor(readonly staff: ObjStaff) {
+        super(staff);
+
+        this.mi = new MRestVisual(this);
+    }
+
+    getMusicInterface(): MusicInterface {
+        return this.mi;
+    }
+
+    pick(x: number, y: number): MusicObject[] {
+        return this.rect.contains(x, y) ? [this] : [];
+    }
+
+    setRect(r: DivRect) {
+        this.rect = r;
+    }
 
     offset(dx: number, dy: number) {
         this.rect.offsetInPlace(dx, dy);
@@ -46,7 +64,7 @@ export class ObjRest extends MusicObject {
 
     private beamGroup?: ObjBeamGroup;
 
-    readonly staffVisuals: RestStaffVisual[] = [];
+    readonly staffVisuals: ObjRestVisual[] = [];
 
     readonly mi: MRest;
 
@@ -112,7 +130,18 @@ export class ObjRest extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        if (!this.rect.contains(x, y)) {
+            return [];
+        }
+
+        for (let i = 0; i < this.staffVisuals.length; i++) {
+            let arr = this.staffVisuals[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        return [this];
     }
 
 
@@ -129,12 +158,12 @@ export class ObjRest extends MusicObject {
     }
 
     getBeamX(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.rect ?? this.rect;
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect() ?? this.rect;
         return rect.centerX;
     }
 
     getBeamY(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.rect ?? this.rect;
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect() ?? this.rect;
         return this.stemDir === Stem.Up ? rect.top : rect.bottom;
     }
 
@@ -203,9 +232,9 @@ export class ObjRest extends MusicObject {
                 return;
             }
 
-            let visual = new RestStaffVisual(staff);
+            let visual = new ObjRestVisual(staff);
 
-            visual.rect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+            let r = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
             if (dotted) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
@@ -214,17 +243,19 @@ export class ObjRest extends MusicObject {
                 let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
                 visual.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
-                visual.rect.expandInPlace(visual.dotRect);
+                r.expandInPlace(visual.dotRect);
             }
+
+            visual.setRect(r);
 
             visual.offset(0, staff.getDiatonicIdY(ownDiatonicId));
 
-            this.rect = visual.rect.copy();
+            this.rect = visual.getRect().copy();
 
             this.staffVisuals.push(visual);
         });
 
-        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.rect));
+        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
     }
 
     offset(dx: number, dy: number) {
@@ -249,7 +280,8 @@ export class ObjRest extends MusicObject {
         ctx.lineWidth = lineWidth;
 
         this.staffVisuals.forEach(visual => {
-            let { rect, dotRect } = visual;
+            let { dotRect } = visual;
+            let rect = visual.getRect();
 
             let x = rect.centerX;
             let y = rect.centerY;

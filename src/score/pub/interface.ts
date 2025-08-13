@@ -12,8 +12,8 @@ import { ObjHeader } from "../engine/obj-header";
 import { ObjImage } from "../engine/obj-image";
 import { ObjMeasure } from "../engine/obj-measure";
 import { ObjBarLineRight, ObjBarLineLeft } from "../engine/obj-bar-line";
-import { ObjNoteGroup } from "../engine/obj-note-group";
-import { ObjRest } from "../engine/obj-rest";
+import { ObjNoteGroupTabVisual, ObjNoteGroup, ObjNoteGroupVisual } from "../engine/obj-note-group";
+import { ObjRest, ObjRestVisual } from "../engine/obj-rest";
 import { ObjRhythmColumn } from "../engine/obj-rhythm-column";
 import { ObjScoreRow } from "../engine/obj-score-row";
 import { ObjSignature } from "../engine/obj-signature";
@@ -22,7 +22,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "./div-rect";
 import { Player } from "../engine/player";
 import { Renderer } from "../engine/renderer";
-import { ObjBeamGroup } from "../engine/obj-beam-group";
+import { ObjBeamGroup, ObjBeamGroupVisual } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { Clef, Connective, ConnectiveSpan, DocumentOptions, PlayStateChangeListener, StaffConfig, Stem, StringNumber, TabConfig, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
@@ -189,6 +189,21 @@ export class MBeamGroup extends MusicInterface {
 
     /** @internal */
     getMusicObject(): ObjBeamGroup {
+        return this.obj;
+    }
+}
+
+/** @public */
+export class MBeamGroupVisual extends MusicInterface {
+    static readonly Name = "BeamGroupVisual";
+
+    /** @internal */
+    constructor(private readonly obj: ObjBeamGroupVisual) {
+        super(MBeamGroupVisual.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjBeamGroupVisual {
         return this.obj;
     }
 }
@@ -609,6 +624,36 @@ export class MNoteGroup extends MusicInterface {
 }
 
 /** @public */
+export class MNoteGroupVisual extends MusicInterface {
+    static readonly Name = "NoteGroupVisual";
+
+    /** @internal */
+    constructor(private readonly obj: ObjNoteGroupVisual) {
+        super(MNoteGroupVisual.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjNoteGroupVisual {
+        return this.obj;
+    }
+}
+
+/** @public */
+export class MNoteGroupTabVisual extends MusicInterface {
+    static readonly Name = "NoteGroupTabVisual";
+
+    /** @internal */
+    constructor(private readonly obj: ObjNoteGroupTabVisual) {
+        super(MNoteGroupTabVisual.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjNoteGroupTabVisual {
+        return this.obj;
+    }
+}
+
+/** @public */
 export class MRest extends MusicInterface {
     static readonly Name = "Rest";
 
@@ -624,6 +669,21 @@ export class MRest extends MusicInterface {
 
     getRhythmProps(): RhythmProps {
         return this.obj.rhythmProps;
+    }
+}
+
+/** @public */
+export class MRestVisual extends MusicInterface {
+    static readonly Name = "RestVisual";
+
+    /** @internal */
+    constructor(private readonly obj: ObjRestVisual) {
+        super(MRestVisual.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjRestVisual {
+        return this.obj;
     }
 }
 
