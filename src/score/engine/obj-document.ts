@@ -310,6 +310,9 @@ export class ObjDocument extends MusicObject {
         // Layout connectives and beams
         this.rows.forEach(row => row.layoutConnectivesAndBeams(renderer));
 
+        // Position notation lines
+        this.rows.forEach(row => row.layoutPositionLines(renderer));
+
         // Layout layout groups
         layoutGroups.forEach(layoutGroup => {
             this.rows.forEach(row => {
@@ -334,7 +337,7 @@ export class ObjDocument extends MusicObject {
         // Stack rows on top of each other
         this.rows.forEach(row => {
             row.offset(-this.rect.left, this.rect.bottom + unitSize * 2 - row.getRect().top);
-            this.rect.expandInPlace(row.getRect())
+            this.rect.expandInPlace(row.getRect());
         });
 
         // Done

@@ -107,27 +107,6 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    getDiatonicIdRange(staff: ObjStaff): { min: number, max: number } {
-        let min = staff.bottomLineDiatonicId;
-        let max = staff.topLineDiatonicId;
-
-        if (staff.minDiatonicId !== undefined) {
-            min = Math.min(min, staff.minDiatonicId);
-        }
-
-        if (staff.maxDiatonicId !== undefined) {
-            max = Math.max(max, staff.maxDiatonicId);
-        }
-
-        this.measures.forEach(m => {
-            let range = m.getDiatonicIdRange(staff);
-            min = Math.min(min, range.min);
-            max = Math.max(max, range.max);
-        });
-
-        return { min, max }
-    }
-
     pick(x: number, y: number): MusicObject[] {
         if (!this.rect.contains(x, y)) {
             return [];
@@ -220,42 +199,12 @@ export class ObjScoreRow extends MusicObject {
             return;
         }
 
-        let { unitSize } = renderer;
-
-        let lineSpacing = unitSize * 2;
-
-        let y = 0;
-        let top = 0;
-        let bottom = 0;
-
         this.notationLines.forEach(line => {
-            if (line instanceof ObjStaff) {
-                let staff = line;
-
-                staff.layoutHeight(renderer);
-                staff.offset(0, y - staff.getTopLineY());
-
-                let diatonicIdRange = this.getDiatonicIdRange(staff);
-
-                top = Math.min(top, staff.getDiatonicIdY(diatonicIdRange.max));
-                bottom = Math.max(bottom, staff.getDiatonicIdY(diatonicIdRange.min));
-
-                y = bottom + lineSpacing * 4;
-            }
-            else {
-                let tab = line;
-
-                tab.layoutHeight(renderer);
-                tab.offset(0, y - tab.getTop());
-
-                top = Math.min(top, tab.getTop());
-                bottom = Math.max(bottom, tab.getBottom());
-
-                y = bottom + lineSpacing * 4;
-            }
+            line.removeObjects();
+            line.layoutHeight(renderer);
         });
 
-        let rect = new DivRect(0, 0, top, bottom);
+        let rect = new DivRect(0, 0, 0, 0);
 
         // Calc min width
         this.minWidth = 0;
@@ -319,6 +268,29 @@ export class ObjScoreRow extends MusicObject {
         this.measures.forEach(m => m.layoutBeams(renderer));
 
         this.measures.forEach(m => this.rect.expandInPlace(m.getRect()));
+    }
+
+    layoutPositionLines(renderer: Renderer) {
+        let p = renderer.unitSize * 6;
+
+        for (let i = 1; i < this.notationLines.length; i++) {
+            let prev = this.notationLines[i - 1];
+            let cur = this.notationLines[i];
+
+            cur.offset(0, prev.calcBottom() - cur.calcTop() + p);
+        }
+
+        this.updateVerticalSize();
+    }
+
+    updateVerticalSize() {
+        let top = this.notationLines[0].calcTop();
+        let bottom = this.notationLines[this.notationLines.length - 1].calcBottom();
+
+        this.rect.top = top;
+        this.rect.bottom = bottom;
+
+        this.measures.forEach(m => m.updateVerticalSize(top, bottom));
     }
 
     private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {

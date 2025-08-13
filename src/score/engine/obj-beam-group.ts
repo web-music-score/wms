@@ -171,7 +171,6 @@ export class ObjBeamGroup extends MusicObject {
 
     detach() {
         this.getSymbols().forEach(s => s.resetBeamGroup());
-        this.staffVisuals.forEach(visual => visual.staff.removeObject(visual));
     }
 
     pick(x: number, y: number): MusicObject[] {

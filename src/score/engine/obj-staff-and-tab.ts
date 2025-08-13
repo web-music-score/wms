@@ -8,8 +8,10 @@ import { DocumentSettings } from "./settings";
 import { ObjNoteGroupTabVisual, ObjNoteGroupVisual } from "./obj-note-group";
 import { ObjRestVisual } from "./obj-rest";
 import { ObjBeamGroupVisual } from "./obj-beam-group";
+import { ObjBarLineVisual } from "./obj-bar-line";
+import { ObjConnective } from "./obj-connective";
 
-type NotationLineObject = ObjNoteGroupVisual | ObjNoteGroupTabVisual | ObjRestVisual | ObjBeamGroupVisual;
+type NotationLineObject = ObjNoteGroupVisual | ObjNoteGroupTabVisual | ObjRestVisual | ObjBeamGroupVisual | ObjBarLineVisual | ObjConnective;
 
 export class ObjStaff extends MusicObject {
     readonly clefImageAsset: ImageAsset;
@@ -129,15 +131,24 @@ export class ObjStaff extends MusicObject {
         return this.staffConfig.isGrand === true;
     }
 
+    calcTop(): number {
+        let top = this.topLineY;
+        this.objects.forEach(o => top = Math.min(top, o.getRect().top));
+        return top;
+    }
+
+    calcBottom(): number {
+        let bottom = this.bottomLineY;
+        this.objects.forEach(o => bottom = Math.max(bottom, o.getRect().bottom));
+        return bottom;
+    }
+
     addObject(o: NotationLineObject) {
         this.objects.push(o);
     }
 
-    removeObject(o: NotationLineObject) {
-        let i = this.objects.indexOf(o);
-        if (i >= 0) {
-            this.objects.splice(i, 1);
-        }
+    removeObjects() {
+        this.objects.length = 0;
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -213,15 +224,20 @@ export class ObjTab extends MusicObject {
         return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
     }
 
+    calcTop(): number {
+        return this.top;
+    }
+
+    calcBottom(): number {
+        return this.bottom;
+    }
+
     addObject(o: NotationLineObject) {
         this.objects.push(o);
     }
 
-    removeObject(o: NotationLineObject) {
-        let i = this.objects.indexOf(o);
-        if (i >= 0) {
-            this.objects.splice(i, 1);
-        }
+    removeObjects() {
+        this.objects.length = 0;
     }
 
     pick(x: number, y: number): MusicObject[] {

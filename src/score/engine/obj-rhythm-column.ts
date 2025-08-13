@@ -267,22 +267,6 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    getDiatonicIdRange(staff: ObjStaff): { min: number, max: number } {
-        let min = staff.bottomLineDiatonicId;
-        let max = staff.topLineDiatonicId;
-
-        this.voiceSymbol.forEach(s => {
-            if (staff.containsVoiceId(s.voiceId)) {
-                let ids = (s instanceof ObjNoteGroup ? s.notes.map(n => n.diatonicId) : [s.ownDiatonicId])
-                    .filter(id => staff.containsDiatonicId(id));
-                min = Math.min(min, ...ids);
-                max = Math.max(max, ...ids);
-            }
-        });
-
-        return { min, max }
-    }
-
     getPlayerNotes() {
         let playerNotes: ScorePlayerNote[] = [];
 

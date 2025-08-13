@@ -978,6 +978,11 @@ export class ObjMeasure extends MusicObject {
         ObjBeamGroup.createBeam(beamNotes);
     }
 
+    updateVerticalSize(top: number, bottom: number) {
+        this.rect.top = top;
+        this.rect.bottom = bottom;
+    }
+
     getBarLineLeft() {
         return this.barLineLeft;
     }
@@ -1042,19 +1047,6 @@ export class ObjMeasure extends MusicObject {
         }
 
         rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotted }));
-    }
-
-    getDiatonicIdRange(staff: ObjStaff): { min: number, max: number } {
-        let min = staff.bottomLineDiatonicId;
-        let max = staff.topLineDiatonicId;
-
-        this.columns.forEach(c => {
-            let range = c.getDiatonicIdRange(staff);
-            min = Math.min(min, range.min);
-            max = Math.max(max, range.max);
-        });
-
-        return { min, max }
     }
 
     requestLayout() {

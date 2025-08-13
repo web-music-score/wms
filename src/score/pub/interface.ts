@@ -11,7 +11,7 @@ import { ObjFermata } from "../engine/obj-fermata";
 import { ObjHeader } from "../engine/obj-header";
 import { ObjImage } from "../engine/obj-image";
 import { ObjMeasure } from "../engine/obj-measure";
-import { ObjBarLineRight, ObjBarLineLeft } from "../engine/obj-bar-line";
+import { ObjBarLineRight, ObjBarLineLeft, ObjBarLineVisual } from "../engine/obj-bar-line";
 import { ObjNoteGroupTabVisual, ObjNoteGroup, ObjNoteGroupVisual } from "../engine/obj-note-group";
 import { ObjRest, ObjRestVisual } from "../engine/obj-rest";
 import { ObjRhythmColumn } from "../engine/obj-rhythm-column";
@@ -596,6 +596,21 @@ export class MBarLineLeft extends MusicInterface {
 
     /** @internal */
     getMusicObject(): ObjBarLineLeft {
+        return this.obj;
+    }
+}
+
+/** @public */
+export class MBarLineVisual extends MusicInterface {
+    static readonly Name = "BarLineVisual";
+
+    /** @internal */
+    constructor(private readonly obj: ObjBarLineVisual) {
+        super(MBarLineVisual.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjBarLineVisual {
         return this.obj;
     }
 }

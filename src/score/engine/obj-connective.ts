@@ -49,9 +49,10 @@ export class ObjConnective extends MusicObject {
             this.tieType = args[0];
         }
 
-        this.mi = new MConnective(this);
-
         this.measure.addConnectiveObject(this);
+        //line.addObject(this);
+
+        this.mi = new MConnective(this);
     }
 
     getMusicInterface(): MConnective {
