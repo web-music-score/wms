@@ -891,11 +891,8 @@ export class ObjMeasure extends MusicObject {
         }
 
         // Remove old beams/triplets
-        this.beamGroups.forEach(beamGroup => {
-            beamGroup.getSymbols().forEach(s => s.resetBeamGroup());
-        });
-
-        this.beamGroups = [];
+        this.beamGroups.forEach(beamGroup => beamGroup.detach());
+        this.beamGroups.length = 0;
 
         // Recreate beams/triplets
         getVoiceIds().forEach(voiceId => {

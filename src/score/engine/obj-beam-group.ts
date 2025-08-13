@@ -39,6 +39,8 @@ export class ObjBeamGroupVisual extends MusicObject {
     constructor(readonly staff: ObjStaff) {
         super(staff);
 
+        staff.addObject(this);
+
         this.mi = new MBeamGroupVisual(this);
     }
 
@@ -165,6 +167,11 @@ export class ObjBeamGroup extends MusicObject {
 
     getMusicInterface(): MBeamGroup {
         return this.mi;
+    }
+
+    detach() {
+        this.getSymbols().forEach(s => s.resetBeamGroup());
+        this.staffVisuals.forEach(visual => visual.staff.removeObject(visual));
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -307,7 +314,7 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(visual => visual.offset(dx, dy));
+        this.staffVisuals.forEach(visual => visual.offset(dx, 0)); // dy is offset in notation line
         this.rect.offsetInPlace(dx, dy);
     }
 

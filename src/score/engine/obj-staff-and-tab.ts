@@ -5,6 +5,11 @@ import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
+import { ObjNoteGroupTabVisual, ObjNoteGroupVisual } from "./obj-note-group";
+import { ObjRestVisual } from "./obj-rest";
+import { ObjBeamGroupVisual } from "./obj-beam-group";
+
+type NotationLineObject = ObjNoteGroupVisual | ObjNoteGroupTabVisual | ObjRestVisual | ObjBeamGroupVisual;
 
 export class ObjStaff extends MusicObject {
     readonly clefImageAsset: ImageAsset;
@@ -19,6 +24,8 @@ export class ObjStaff extends MusicObject {
 
     private topLineY: number = 0;
     private bottomLineY: number = 0;
+
+    private readonly objects: NotationLineObject[] = [];
 
     readonly mi: MStaff;
 
@@ -122,6 +129,17 @@ export class ObjStaff extends MusicObject {
         return this.staffConfig.isGrand === true;
     }
 
+    addObject(o: NotationLineObject) {
+        this.objects.push(o);
+    }
+
+    removeObject(o: NotationLineObject) {
+        let i = this.objects.indexOf(o);
+        if (i >= 0) {
+            this.objects.splice(i, 1);
+        }
+    }
+
     pick(x: number, y: number): MusicObject[] {
         return [this];
     }
@@ -145,6 +163,7 @@ export class ObjStaff extends MusicObject {
     offset(dx: number, dy: number) {
         this.topLineY += dy;
         this.bottomLineY += dy;
+        this.objects.forEach(o => o.offset(0, dy)); // only offset dy
         this.rect.offsetInPlace(dx, dy);
     }
 
@@ -154,6 +173,8 @@ export class ObjStaff extends MusicObject {
 export class ObjTab extends MusicObject {
     private top: number = 0;
     private bottom: number = 0;
+
+    private readonly objects: NotationLineObject[] = [];
 
     readonly mi: MTab;
 
@@ -192,6 +213,17 @@ export class ObjTab extends MusicObject {
         return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
     }
 
+    addObject(o: NotationLineObject) {
+        this.objects.push(o);
+    }
+
+    removeObject(o: NotationLineObject) {
+        let i = this.objects.indexOf(o);
+        if (i >= 0) {
+            this.objects.splice(i, 1);
+        }
+    }
+
     pick(x: number, y: number): MusicObject[] {
         return [this];
     }
@@ -215,6 +247,7 @@ export class ObjTab extends MusicObject {
     offset(dx: number, dy: number) {
         this.top += dy;
         this.bottom += dy;
+        this.objects.forEach(o => o.offset(0, dy)); // only offset dy
         this.rect.offsetInPlace(dx, dy);
     }
 

@@ -44,6 +44,8 @@ export class ObjNoteGroupVisual extends MusicObject {
     constructor(readonly staff: ObjStaff) {
         super(staff);
 
+        staff.addObject(this);
+
         this.mi = new MNoteGroupVisual(this);
     }
 
@@ -81,6 +83,8 @@ export class ObjNoteGroupTabVisual extends MusicObject {
 
     constructor(readonly tab: ObjTab) {
         super(tab);
+
+        tab.addObject(this);
 
         this.mi = new MNoteGroupTabVisual(this);
     }
@@ -126,7 +130,7 @@ export class ObjNoteGroup extends MusicObject {
     private beamGroup?: ObjBeamGroup;
 
     private readonly staffVisuals: ObjNoteGroupVisual[] = [];
-    private readonly tabVsuals: ObjNoteGroupTabVisual[] = [];
+    private readonly tabVisuals: ObjNoteGroupTabVisual[] = [];
 
     readonly mi: MNoteGroup;
 
@@ -216,8 +220,8 @@ export class ObjNoteGroup extends MusicObject {
             }
         }
 
-        for (let j = 0; j < this.tabVsuals.length; j++) {
-            let arr = this.tabVsuals[j].pick(x, y);
+        for (let j = 0; j < this.tabVisuals.length; j++) {
+            let arr = this.tabVisuals[j].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -309,7 +313,7 @@ export class ObjNoteGroup extends MusicObject {
         else {
             let tab = line;
 
-            let visual = this.tabVsuals.find(visual => visual.tab === tab);
+            let visual = this.tabVisuals.find(visual => visual.tab === tab);
 
             let fretNumber = visual?.fretNumbers[noteIndex];
 
@@ -607,7 +611,7 @@ export class ObjNoteGroup extends MusicObject {
             }
         });
 
-        this.tabVsuals.length = 0;
+        this.tabVisuals.length = 0;
 
         row.getNotationLines().filter(line => line instanceof ObjTab).forEach(tab => {
             if (!tab.containsVoiceId(this.voiceId)) {
@@ -638,7 +642,7 @@ export class ObjNoteGroup extends MusicObject {
             });
 
             if (visual.fretNumbers.length > 0) {
-                this.tabVsuals.push(visual);
+                this.tabVisuals.push(visual);
             }
         });
 
@@ -649,8 +653,8 @@ export class ObjNoteGroup extends MusicObject {
         if (this.staffVisuals.length > 0) {
             this.rect = this.staffVisuals[0].noteHeadRects[0].copy();
         }
-        else if (this.tabVsuals.length > 0 && this.tabVsuals[0].fretNumbers.length > 0) {
-            this.rect = this.tabVsuals[0].fretNumbers[0].getRect().copy();
+        else if (this.tabVisuals.length > 0 && this.tabVisuals[0].fretNumbers.length > 0) {
+            this.rect = this.tabVisuals[0].fretNumbers[0].getRect().copy();
         }
         else {
             this.rect = new DivRect();
@@ -662,7 +666,7 @@ export class ObjNoteGroup extends MusicObject {
             this.rect.expandInPlace(visual.getRect());
         });
 
-        this.tabVsuals.forEach(visual => {
+        this.tabVisuals.forEach(visual => {
             visual.updateRect();
             this.rect.expandInPlace(visual.getRect());
         });
@@ -692,8 +696,8 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(visual => visual.offset(dx, dy));
-        this.tabVsuals.forEach(visual => visual.offset(dx, dy));
+        this.staffVisuals.forEach(visual => visual.offset(dx, 0)); // dy is offset in notation line
+        this.tabVisuals.forEach(visual => visual.offset(dx, 0));   // dy is offset in notation line
         this.rect.offsetInPlace(dx, dy);
     }
 
@@ -792,7 +796,7 @@ export class ObjNoteGroup extends MusicObject {
         });
 
         // Draw tab fret numbers
-        this.tabVsuals.forEach(visual => {
+        this.tabVisuals.forEach(visual => {
             visual.fretNumbers.forEach(fn => fn.draw(renderer));
         });
     }

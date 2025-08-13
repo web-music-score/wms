@@ -33,6 +33,8 @@ export class ObjRestVisual extends MusicObject {
     constructor(readonly staff: ObjStaff) {
         super(staff);
 
+        staff.addObject(this);
+
         this.mi = new MRestVisual(this);
     }
 
@@ -259,7 +261,7 @@ export class ObjRest extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(s => s.offset(dx, dy));
+        this.staffVisuals.forEach(s => s.offset(dx, 0)); // dy is offset in notation line
         this.rect.offsetInPlace(dx, dy);
     }
 
