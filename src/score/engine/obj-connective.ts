@@ -50,7 +50,6 @@ export class ObjConnective extends MusicObject {
         }
 
         this.measure.addConnectiveObject(this);
-        //line.addObject(this);
 
         this.mi = new MConnective(this);
     }
@@ -77,7 +76,6 @@ export class ObjConnective extends MusicObject {
 
         let contentRect = row.getConnectivesContentRect();
 
-
         let leftPos: { x: number, y: number }
         let rightPos: { x: number, y: number }
 
@@ -89,7 +87,7 @@ export class ObjConnective extends MusicObject {
         else {
             rightPos = this.tieType === TieType.ToMeasureEnd
                 ? { x: measure.getColumnsContentRect().right, y: leftPos.y }
-                : { x: leftPos.x + unitSize * DocumentSettings.ShortTieLength, y: leftPos.y };
+                : { x: leftPos.x + unitSize * DocumentSettings.StubTieLength, y: leftPos.y };
         }
 
         let lx: number,
@@ -155,6 +153,9 @@ export class ObjConnective extends MusicObject {
             Math.max(this.lx, this.cp1x, this.cp2x, this.rx),
             Math.min(this.ly, this.cp1y, this.cp2y, this.ry),
             Math.max(this.ly, this.cp1y, this.cp2y, this.ry));
+
+        // Add connective to staff/tab notation line
+        this.line.addObject(this);
     }
 
     offset(dx: number, dy: number) {

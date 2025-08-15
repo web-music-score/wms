@@ -1080,12 +1080,9 @@ export class ObjMeasure extends MusicObject {
             this.signatures = this.row.getNotationLines().filter(line => line instanceof ObjStaff).map((staff, staffId) => {
                 let oldSignature = this.signatures.find(s => s.staff === staff);
 
-                if (oldSignature) {
-                    // Re add
-                    oldSignature.staff.addObject(oldSignature);
-                }
-
                 let signature = oldSignature ?? new ObjSignature(this, staff);
+
+                signature.staff.addObject(signature);
 
                 signature.updateClefImage(renderer, showClef);
                 signature.updateMeasureNumber(showMeasureNumber && staffId === 0);
@@ -1213,6 +1210,7 @@ export class ObjMeasure extends MusicObject {
         // Layout connectives
         this.connectives.forEach(connective => {
             connective.layout(renderer);
+
             // Connectives enter neighbors, only expand height for now.
             let r = connective.getRect();
 
@@ -1255,7 +1253,7 @@ export class ObjMeasure extends MusicObject {
             this.endRepeatPlayCountText.offset(dx, dy);
         }
 
-        this.connectives.forEach(connective => connective.offset(dx, dy));
+        this.connectives.forEach(connective => connective.offset(dx, 0));
 
         this.beamGroups.forEach(beam => beam.offset(dx, dy));
 

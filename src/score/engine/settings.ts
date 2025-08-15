@@ -31,7 +31,7 @@ export const DocumentSettings = {
 
     LedgerLineWidth: 3.6,
 
-    ShortTieLength: 5,
+    StubTieLength: 5,
 
     StaffHeight: 8,
     TabHeight: 20

@@ -24,8 +24,6 @@ export class ObjSignature extends MusicObject {
     constructor(readonly measure: ObjMeasure, readonly staff: ObjStaff) {
         super(measure);
 
-        staff.addObject(this);
-
         this.mi = new MSignature(this);
     }
 
@@ -191,6 +189,13 @@ export class ObjSignature extends MusicObject {
 
         if (this.tempoText) {
             let arr = this.tempoText.pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        if (this.measureNumber) {
+            let arr = this.measureNumber.pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
