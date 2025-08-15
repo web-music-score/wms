@@ -852,7 +852,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    updateExtensions() {
+    createExtensions() {
         this.layoutObjects.forEach(layoutObj => {
             if (layoutObj.musicObj.getLink() instanceof Extension) {
                 let extension = layoutObj.musicObj.getLink() as Extension;
@@ -885,7 +885,7 @@ export class ObjMeasure extends MusicObject {
         this.needBeamsUpdate = true;
     }
 
-    updateBeams() {
+    createBeams() {
         if (!this.needBeamsUpdate || !this.row.hasStaff) {
             return;
         }

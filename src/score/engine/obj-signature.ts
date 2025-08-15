@@ -277,9 +277,7 @@ export class ObjSignature extends MusicObject {
             this.rect.expandInPlace(this.tempoText.getRect());
         }
 
-        this.rect.expandInPlace(new DivRect(
-            this.rect.left, this.rect.right + paddingX, this.rect.centerY, this.rect.centerY
-        ));
+        this.rect.right += paddingX;
     }
 
     offset(dx: number, dy: number) {

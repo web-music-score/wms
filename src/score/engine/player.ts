@@ -137,8 +137,6 @@ export class Player {
     setDocument(doc: ObjDocument) {
         this.doc = doc;
 
-        this.doc.update();
-
         this.doc.resetMeasures();
 
         this.playerColumnSequence = this.collectPlayerColumnSequence();

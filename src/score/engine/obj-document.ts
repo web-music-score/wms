@@ -14,7 +14,6 @@ import { Utils } from "@tspro/ts-utils-lib";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
-    private needUpdate: boolean = true;
 
     private renderer?: Renderer;
 
@@ -223,24 +222,6 @@ export class ObjDocument extends MusicObject {
         this.forEachMeasure(m => m.removeLayoutObjects(musicObj));
     }
 
-    update() {
-        if (!this.needUpdate) {
-            return;
-        }
-
-        // Update beams.
-        this.forEachMeasure(m => m.updateBeams());
-
-        // Update extensions.
-        this.forEachMeasure(m => m.updateExtensions());
-
-        // Update connectives.
-        this.allConnectiveProps.forEach(props => props.removeConnectives());
-        this.allConnectiveProps.forEach(props => props.createConnectives());
-
-        this.needUpdate = false;
-    }
-
     private forEachMeasure(func: (m: ObjMeasure) => void) {
         let m = this.getFirstMeasure();
         while (m) {
@@ -261,7 +242,6 @@ export class ObjDocument extends MusicObject {
 
     requestLayout() {
         this.needLayout = true;
-        this.needUpdate = true;
     }
 
     requestFullLayout() {
@@ -280,8 +260,6 @@ export class ObjDocument extends MusicObject {
             return;
         }
 
-        this.update();
-
         const { renderer } = this;
 
         if (!renderer) {
@@ -289,6 +267,16 @@ export class ObjDocument extends MusicObject {
         }
 
         let { unitSize } = renderer;
+
+        // Recreate beams.
+        this.forEachMeasure(m => m.createBeams());
+
+        // Recreate extensions.
+        this.forEachMeasure(m => m.createExtensions());
+
+        // Create connectives.
+        this.allConnectiveProps.forEach(props => props.removeConnectives());
+        this.allConnectiveProps.forEach(props => props.createConnectives());
 
         let layoutGroups = this.layoutGroups.filter(layoutGroup => !!layoutGroup);
 
