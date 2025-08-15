@@ -1078,7 +1078,14 @@ export class ObjMeasure extends MusicObject {
 
         if (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo) {
             this.signatures = this.row.getNotationLines().filter(line => line instanceof ObjStaff).map((staff, staffId) => {
-                let signature = this.signatures[staffId] ?? new ObjSignature(this, staff);
+                let oldSignature = this.signatures.find(s => s.staff === staff);
+
+                if (oldSignature) {
+                    // Re add
+                    oldSignature.staff.addObject(oldSignature);
+                }
+
+                let signature = oldSignature ?? new ObjSignature(this, staff);
 
                 signature.updateClefImage(renderer, showClef);
                 signature.updateMeasureNumber(showMeasureNumber && staffId === 0);
@@ -1086,14 +1093,15 @@ export class ObjMeasure extends MusicObject {
                 signature.updateTimeSignature(showTimeSignature);
                 signature.updateTempo(showTempo && staffId === 0);
 
-                signature.layout(renderer);
-
                 return signature;
             });
         }
         else {
             this.signatures = [];
         }
+
+        // Layout signatures
+        this.signatures.forEach(signature => signature.layout(renderer));
 
         // Layout measure start object
         this.barLineLeft.layout(renderer);
@@ -1235,7 +1243,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.signatures.forEach(signature => signature.offset(dx, dy));
+        this.signatures.forEach(signature => signature.offset(dx, 0));
 
         this.barLineLeft.offset(dx, dy);
 

@@ -10,8 +10,9 @@ import { ObjRestVisual } from "./obj-rest";
 import { ObjBeamGroupVisual } from "./obj-beam-group";
 import { ObjBarLineVisual } from "./obj-bar-line";
 import { ObjConnective } from "./obj-connective";
+import { ObjSignature } from "./obj-signature";
 
-type NotationLineObject = ObjNoteGroupVisual | ObjNoteGroupTabVisual | ObjRestVisual | ObjBeamGroupVisual | ObjBarLineVisual | ObjConnective;
+type NotationLineObject = ObjNoteGroupVisual | ObjNoteGroupTabVisual | ObjRestVisual | ObjBeamGroupVisual | ObjBarLineVisual | ObjConnective | ObjSignature;
 
 export class ObjStaff extends MusicObject {
     readonly clefImageAsset: ImageAsset;

@@ -24,6 +24,8 @@ export class ObjSignature extends MusicObject {
     constructor(readonly measure: ObjMeasure, readonly staff: ObjStaff) {
         super(measure);
 
+        staff.addObject(this);
+
         this.mi = new MSignature(this);
     }
 
@@ -199,8 +201,7 @@ export class ObjSignature extends MusicObject {
 
     layout(renderer: Renderer) {
         let { unitSize } = renderer;
-        let { measure, staff } = this;
-        let { row } = measure;
+        let { staff } = this;
 
         let paddingX = unitSize;
 
