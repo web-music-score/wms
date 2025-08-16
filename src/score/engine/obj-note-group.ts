@@ -530,11 +530,12 @@ export class ObjNoteGroup extends MusicObject {
             this.notes.forEach((note, noteIndex) => {
                 let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
                 let noteY = staff.getDiatonicIdY(note.diatonicId);
+                let isNoteOnLine = staff.isLine(note.diatonicId);
 
-                // Setup note head
+                // Add note head
                 let noteHeadRect = visual.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
 
-                // Setup accidental
+                // Add accidental
                 if (accState.needAccidental(note)) {
                     let acc = visual.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
                     if (acc) {
@@ -543,38 +544,32 @@ export class ObjNoteGroup extends MusicObject {
                     }
                 }
 
-                // Setup dot
+                // Add dot
                 if (dotted) {
                     let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
                     let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
 
-                    visual.dotRects[noteIndex] = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                    visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                }
+
+                // Add staccato dot
+                if (this.staccato) {
+                    if (stemDir === Stem.Up && noteIndex === 0) {
+                        let dotX = noteX;
+                        let dotY = noteY + unitSize * (isNoteOnLine ? 3 : 2);
+                        visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                    }
+                    else if (stemDir === Stem.Down && noteIndex === this.notes.length - 1) {
+                        let dotX = noteX;
+                        let dotY = noteY - unitSize * (isNoteOnLine ? 3 : 2);
+                        visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                    }
                 }
             });
 
-            // Add staccato dot
-            if (this.staccato) {
-                let dotX = visual.noteHeadRects[0].centerX;
-
-                if (stemDir === Stem.Up) {
-                    let diatonicId = this.getBottomNote().diatonicId;
-                    let dotY = staff.getDiatonicIdY(diatonicId) + unitSize * (staff.isLine(diatonicId) ? 3 : 2);
-                    visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
-                }
-                else {
-                    let diatonicId = this.getTopNote().diatonicId;
-                    let dotY = staff.getDiatonicIdY(diatonicId) - unitSize * (staff.isLine(diatonicId) ? 3 : 2);
-                    visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
-                }
-            }
-
             // Calculate stem
-            let bottomNoteY = staff.getDiatonicIdY(this.getBottomNote().diatonicId);
-            let topNoteY = staff.getDiatonicIdY(this.getTopNote().diatonicId);
-
-            if (bottomNoteY === undefined || topNoteY === undefined) {
-                throw new MusicError(MusicErrorType.Score, "bottomNoteY or topNoteY is undefined!");
-            }
+            let bottomNoteY = visual.noteHeadRects[0].centerY;
+            let topNoteY = visual.noteHeadRects[visual.noteHeadRects.length - 1].centerY;
 
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
 
@@ -592,7 +587,7 @@ export class ObjNoteGroup extends MusicObject {
                 visual.stemRect = new DivRect(stemX, stemX, Math.min(stemBaseY, stemTipY), Math.max(stemBaseY, stemTipY));
             }
 
-            // Setup flag rects
+            // Add flag rects
             if (!this.hasBeamCount()) {
                 let flagWidth = flagCount === 0 ? 0 : DocumentSettings.FlagWidth * unitSize;
                 let flagHeight = flagCount === 0 ? 0 : DocumentSettings.FlagHeight * unitSize;
