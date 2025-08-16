@@ -17,10 +17,10 @@ export function createStaccatoDemo() {
         .addNote(0, "D5", Theory.NoteLength.Quarter, { staccato: true });
 
     doc.addMeasure()
-        .addNote(0, "E4", Theory.NoteLength.Eighth)
+        .addNote(0, "E4", Theory.NoteLength.Eighth, { stem: Score.Stem.Up })
         .addNote(0, "F#4", Theory.NoteLength.Eighth)
         .addNote(0, "G4", Theory.NoteLength.Quarter)
-        .addNote(0, "B4", Theory.NoteLength.Eighth)
+        .addNote(0, "B4", Theory.NoteLength.Eighth, { stem: Score.Stem.Down })
         .addNote(0, "C5", Theory.NoteLength.Eighth)
         .addNote(0, "D5", Theory.NoteLength.Quarter);
 
