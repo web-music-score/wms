@@ -260,6 +260,8 @@ export class ObjRest extends MusicObject {
         this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
     }
 
+    updateRect() { }
+
     offset(dx: number, dy: number) {
         this.staffVisuals.forEach(s => s.offset(dx, 0)); // dy is offset in notation line
         this.rect.offsetInPlace(dx, dy);

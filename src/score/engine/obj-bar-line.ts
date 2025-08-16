@@ -162,6 +162,19 @@ abstract class ObjBarLine extends MusicObject {
         }
     }
 
+    updateRectHeight() {
+        let tops = this.staffTabVisuals.map(visual => visual.getRect().top);
+        let bottoms = this.staffTabVisuals.map(visual => visual.getRect().bottom);
+
+        if (tops.length === 0 || bottoms.length === 0) {
+            this.rect.top = this.rect.bottom = 0;
+        }
+        else {
+            this.rect.top = Math.min(...tops);
+            this.rect.bottom = Math.max(...bottoms);
+        }
+    }
+
     offset(dx: number, dy: number) {
         this.rect.offsetInPlace(dx, dy);
         this.staffTabVisuals.forEach(visual => visual.offset(dx, 0));

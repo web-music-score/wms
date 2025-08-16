@@ -329,13 +329,16 @@ export class ObjRhythmColumn extends MusicObject {
             return;
         }
 
+        this.rect = new DivRect();
+
         let { row } = this;
         let { unitSize } = renderer;
 
         // Set initially column's min width
         let halfMinWidth = this.getMinWidth() * unitSize / 2;
 
-        let initRect = true;
+        let leftw = halfMinWidth;
+        let rightw = halfMinWidth;
 
         // Layout voice symbols
         this.voiceSymbol.forEach(symbol => {
@@ -343,30 +346,21 @@ export class ObjRhythmColumn extends MusicObject {
 
             let r = symbol.getRect();
 
-            if (initRect) {
-                this.rect = new DivRect(-halfMinWidth, 0, halfMinWidth, r.centerY, 0, r.centerY);
-                initRect = false;
-            }
-
-            this.rect.expandInPlace(r);
+            leftw = Math.max(leftw, r.leftw);
+            rightw = Math.max(rightw, r.rightw);
         });
 
-        if (initRect) {
-            let staffTop = row.hasStaff ? row.getTopStaff().getTopLineY() : 0;
-            let staffBottom = row.hasStaff ? row.getBottomStaff().getBottomLineY() : 0;
-
-            this.rect = new DivRect(-halfMinWidth, 0, halfMinWidth, (staffTop + staffBottom) / 2, 0, (staffTop + staffBottom) / 2);
-        }
-
         if (this.arpeggioDir !== undefined) {
+            let arpeggioWidth = 0;
             this.arpeggios = row.getNotationLines().filter(line => line instanceof ObjStaff).map(staff => {
                 let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
                 arpeggio.layout(renderer);
-                arpeggio.offset(this.rect.left - arpeggio.getRect().right, staff.getMiddleLineY() - arpeggio.getRect().centerY);
+                arpeggio.offset(-leftw - arpeggio.getRect().right, staff.getMiddleLineY() - arpeggio.getRect().centerY);
+                arpeggioWidth = Math.max(arpeggioWidth, arpeggio.getRect().width);
                 staff.addObject(arpeggio);
                 return arpeggio;
             });
-            this.arpeggios.forEach(arpeggio => this.rect.expandInPlace(arpeggio.getRect()));
+            leftw += arpeggioWidth;
         }
         else {
             this.arpeggios = [];
@@ -376,31 +370,37 @@ export class ObjRhythmColumn extends MusicObject {
         let widenColumnObjs = this.getAnchoredLayoutObjects().filter(layoutObj => layoutObj.layoutGroup.widensColumn);
 
         if (widenColumnObjs.length > 0) {
-            let leftw = this.rect.leftw, rightw = this.rect.rightw;
-
             widenColumnObjs.forEach(layoutObj => {
                 leftw = Math.max(leftw, layoutObj.musicObj.getRect().leftw);
                 rightw = Math.max(rightw, layoutObj.musicObj.getRect().rightw);
             });
-
-            this.rect = new DivRect(
-                this.rect.centerX - leftw, this.rect.centerX, this.rect.centerX + rightw,
-                this.rect.top, this.rect.centerY, this.rect.bottom
-            );
         }
 
         // Update accidental states
         this.voiceSymbol.forEach(symbol => symbol.updateAccidentalState(accState));
 
-        // Set shape rects
-        this.shapeRects = [
-            ...this.voiceSymbol.filter(s => !!s).map(s => s.getRect().copy()),
-            ...this.arpeggios.map(a => a.getRect().copy())
-        ];
+        this.rect.left = -leftw;
+        this.rect.centerX = 0;
+        this.rect.right = rightw;
+
+        this.updateRectHeight();
     }
 
     layoutDone() {
         this.needLayout = false;
+    }
+
+    updateRectHeight() {
+        this.voiceSymbol.filter(s => s !== undefined).forEach(s => s.updateRect());
+
+        this.shapeRects = [
+            ...this.voiceSymbol.filter(s => s !== undefined).map(s => s.getRect().copy()),
+            ...this.arpeggios.map(a => a.getRect().copy())
+        ];
+
+        this.rect.top = Math.min(...this.shapeRects.map(r => r.top));
+        this.rect.bottom = Math.max(...this.shapeRects.map(r => r.bottom));
+        this.rect.centerY = (this.rect.top + this.rect.bottom) / 2;
     }
 
     offset(dx: number, dy: number) {

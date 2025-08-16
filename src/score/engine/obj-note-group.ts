@@ -671,11 +671,9 @@ export class ObjNoteGroup extends MusicObject {
                 this.tabVisuals.push(visual);
             }
         });
-
-        this.updateRect();
     }
 
-    private updateRect() {
+    updateRect() {
         if (this.staffVisuals.length > 0) {
             this.rect = this.staffVisuals[0].noteHeadRects[0].copy();
         }

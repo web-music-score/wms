@@ -290,17 +290,16 @@ export class ObjScoreRow extends MusicObject {
             cur.offset(0, prev.calcBottom() - cur.calcTop() + p);
         }
 
-        this.updateVerticalSize();
+        this.updateRectHeight();
     }
 
-    updateVerticalSize() {
-        let top = this.notationLines[0].calcTop();
-        let bottom = this.notationLines[this.notationLines.length - 1].calcBottom();
+    updateRectHeight() {
+        let lines = this.getNotationLines();
 
-        this.rect.top = top;
-        this.rect.bottom = bottom;
+        this.rect.top = lines[0].calcTop();
+        this.rect.bottom = lines[lines.length - 1].calcBottom();
 
-        this.measures.forEach(m => m.updateVerticalSize(top, bottom));
+        this.measures.forEach(m => m.updateRectHeight());
     }
 
     private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
