@@ -36,8 +36,12 @@ export class ObjNoteGroupVisual extends MusicObject {
     public noteHeadRects: DivRect[] = [];
     public dotRects: DivRect[] = [];
     public accidentals: ObjAccidental[] = [];
-    public stemRect: DivRect | undefined;
+    public stemTip?: DivRect;
+    public stemBase?: DivRect;
     public flagRects: DivRect[] = [];
+
+    private prevTopNoteY = 0;
+    private prevBottomNoteY = 0;
 
     readonly mi: MNoteGroupVisual;
 
@@ -60,17 +64,32 @@ export class ObjNoteGroupVisual extends MusicObject {
     updateRect() {
         this.rect = this.noteHeadRects[0].copy();
         this.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
-        if (this.stemRect) this.rect.expandInPlace(this.stemRect);
+        if (this.stemTip) this.rect.expandInPlace(this.stemTip);
+        if (this.stemBase) this.rect.expandInPlace(this.stemBase);
         this.dotRects.forEach(r => this.rect.expandInPlace(r));
         this.flagRects.forEach(r => this.rect.expandInPlace(r));
         this.accidentals.forEach(a => this.rect.expandInPlace(a.getRect()));
+    }
+
+    getRect(): DivRect {
+        let bottomNoteRect = this.noteHeadRects[0];
+        let topNoteRect = this.noteHeadRects[this.noteHeadRects.length - 1];
+
+        if (this.prevTopNoteY !== topNoteRect.centerY || this.prevBottomNoteY !== bottomNoteRect.centerY) {
+            this.updateRect();
+            this.prevTopNoteY = topNoteRect.centerY;
+            this.prevBottomNoteY = bottomNoteRect.centerY;
+        }
+
+        return this.rect;
     }
 
     offset(dx: number, dy: number) {
         this.noteHeadRects.forEach(n => n.offsetInPlace(dx, dy));
         this.dotRects.forEach(n => n.offsetInPlace(dx, dy));
         this.accidentals.forEach(n => n.offset(dx, dy));
-        this.stemRect?.offsetInPlace(dx, dy);
+        this.stemTip?.offsetInPlace(dx, dy);
+        this.stemBase?.offsetInPlace(dx, dy);
         this.flagRects.forEach(n => n.offsetInPlace(dx, dy));
         this.rect.offsetInPlace(dx, dy);
     }
@@ -254,9 +273,9 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let noteHeadRect = visual.noteHeadRects[noteIndex];
-            let stemRect = visual.stemRect;
+            let stemTip = visual.stemTip;
             let stemDir = this.stemDir;
-            let hasStem = stemRect !== undefined;
+            let hasStem = stemTip !== undefined;
             let stemSide: "left" | "right" | undefined = !hasStem ? undefined : (stemDir === Stem.Up ? "right" : "left");
 
             let padding = noteHeadRect.height / 2;
@@ -299,13 +318,7 @@ export class ObjNoteGroup extends MusicObject {
                         }
                     }
                 case NoteAnchor.StemTip:
-                    // stemRect is defined.
-                    if (stemDir === Stem.Up) {
-                        return { x: centerX, y: stemRect!.top - padding }
-                    }
-                    else if (stemDir === Stem.Down) {
-                        return { x: centerX, y: stemRect!.bottom + padding }
-                    }
+                    return { x: centerX, y: stemTip!.centerY + (stemDir === Stem.Up ? -padding : padding) }
                 default:
                     throw new MusicError(MusicErrorType.Score, "Invalid noteAnchor: " + noteAnchor);
             }
@@ -430,13 +443,18 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     getBeamX(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemRect ?? this.rect;
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip ?? this.rect;
         return rect.centerX;
     }
 
     getBeamY(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemRect ?? this.rect;
-        return this.stemDir === Stem.Up ? rect.top : rect.bottom;
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip;
+        if (rect) {
+            return rect.centerY;
+        }
+        else {
+            return this.stemDir === Stem.Up ? this.rect.top : this.rect.bottom;
+        }
     }
 
     getStemHeight(renderer: Renderer) {
@@ -584,7 +602,8 @@ export class ObjNoteGroup extends MusicObject {
                 : topNoteY;
 
             if (this.rhythmProps.hasStem()) {
-                visual.stemRect = new DivRect(stemX, stemX, Math.min(stemBaseY, stemTipY), Math.max(stemBaseY, stemTipY));
+                visual.stemTip = new DivRect(stemX, stemX, stemTipY, stemTipY);
+                visual.stemBase = new DivRect(stemX, stemX, stemBaseY, stemBaseY);
             }
 
             // Add flag rects
@@ -628,7 +647,7 @@ export class ObjNoteGroup extends MusicObject {
                     fretNumber.layout(renderer);
 
                     let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                    let stemX = this.staffVisuals[0]?.stemRect?.centerX;
+                    let stemX = this.staffVisuals[0]?.stemBase?.centerX;
 
                     let x = stemX ?? noteX;
                     let y = tab.getStringY(stringId);
@@ -670,22 +689,11 @@ export class ObjNoteGroup extends MusicObject {
     setStemTipY(staff: ObjStaff, stemTipY: number) {
         let visual = this.staffVisuals.find(visual => visual.staff === staff);
 
-        if (!visual?.stemRect) {
+        if (!visual?.stemTip || stemTipY === visual.stemTip.centerY) {
             return;
         }
 
-        let oldStemTipY = this.stemDir === Stem.Up ? visual.stemRect.top : visual.stemRect.bottom;
-
-        if (stemTipY === oldStemTipY) {
-            return;
-        }
-
-        let r = visual.stemRect;
-
-        let top = this.stemDir === Stem.Up ? stemTipY : r.top;
-        let bottom = this.stemDir === Stem.Up ? r.bottom : stemTipY;
-
-        visual.stemRect = new DivRect(r.left, r.right, top, bottom);
+        visual.stemTip.top = visual.stemTip.centerY = visual.stemTip.bottom = stemTipY;
 
         this.updateRect();
     }
@@ -765,10 +773,10 @@ export class ObjNoteGroup extends MusicObject {
             visual.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
 
             // Draw stem
-            if (visual.stemRect) {
+            if (visual.stemTip && visual.stemBase) {
                 ctx.beginPath();
-                ctx.moveTo(visual.stemRect.centerX, visual.stemRect.bottom);
-                ctx.lineTo(visual.stemRect.centerX, visual.stemRect.top);
+                ctx.moveTo(visual.stemBase.centerX, visual.stemBase.centerY);
+                ctx.lineTo(visual.stemTip.centerX, visual.stemTip.centerY);
                 ctx.stroke();
             }
 
