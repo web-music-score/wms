@@ -362,7 +362,8 @@ export class ObjRhythmColumn extends MusicObject {
             this.arpeggios = row.getNotationLines().filter(line => line instanceof ObjStaff).map(staff => {
                 let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
                 arpeggio.layout(renderer);
-                arpeggio.offset(this.rect.left - arpeggio.getRect().width, staff.getMiddleLineY() - arpeggio.getRect().centerY);
+                arpeggio.offset(this.rect.left - arpeggio.getRect().right, staff.getMiddleLineY() - arpeggio.getRect().centerY);
+                staff.addObject(arpeggio);
                 return arpeggio;
             });
             this.arpeggios.forEach(arpeggio => this.rect.expandInPlace(arpeggio.getRect()));
@@ -409,7 +410,7 @@ export class ObjRhythmColumn extends MusicObject {
             }
         });
 
-        this.arpeggios.forEach(arpeggio => arpeggio.offset(dx, dy));
+        this.arpeggios.forEach(arpeggio => arpeggio.offset(dx, 0));
         this.shapeRects.forEach(r => r.offsetInPlace(dx, dy));
         this.rect.offsetInPlace(dx, dy);
     }
