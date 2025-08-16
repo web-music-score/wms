@@ -77,7 +77,7 @@ export class DivRect {
      * @param height -
      * @returns 
      */
-    static create(left: number, top: number, width: number, height: number) {
+    static create(left: number, top: number, width: number, height: number): DivRect {
         return new DivRect(left, left + width, top, top + height);
     }
 
@@ -90,7 +90,7 @@ export class DivRect {
      * @param height -
      * @returns 
      */
-    static createCentered(centerX: number, centerY: number, width: number, height: number) {
+    static createCentered(centerX: number, centerY: number, width: number, height: number): DivRect {
         return new DivRect(centerX - width / 2, centerX + width / 2, centerY - height / 2, centerY + height / 2);
     }
 
@@ -103,7 +103,7 @@ export class DivRect {
      * @param bottomh - Bottomsection height.
      * @returns 
      */
-    static createSections(leftw: number, rightw: number, toph: number, bottomh: number) {
+    static createSections(leftw: number, rightw: number, toph: number, bottomh: number): DivRect {
         return new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
     }
 
@@ -156,7 +156,7 @@ export class DivRect {
      * @param y -
      * @returns 
      */
-    contains(x: number, y: number) {
+    contains(x: number, y: number): boolean {
         return x >= this.left && x <= this.right && y >= this.top && y <= this.bottom;
     }
 
@@ -167,7 +167,7 @@ export class DivRect {
      * @param b -
      * @returns 
      */
-    static overlap(a: DivRect, b: DivRect) {
+    static overlap(a: DivRect, b: DivRect): boolean {
         return a.right > b.left && a.left < b.right && a.bottom > b.top && a.top < b.bottom;
     }
 
@@ -178,7 +178,7 @@ export class DivRect {
      * @param b -
      * @returns 
      */
-    static overlapX(a: DivRect, b: DivRect) {
+    static overlapX(a: DivRect, b: DivRect): boolean {
         return a.right > b.left && a.left < b.right;
     }
 
@@ -187,7 +187,7 @@ export class DivRect {
      * @param b -
      * @returns 
      */
-    static equals(a: DivRect | null | undefined, b: DivRect | null | undefined) {
+    static equals(a: DivRect | null | undefined, b: DivRect | null | undefined): boolean {
         if (a == null && b == null) {
             // handles null and undefined
             return true;
@@ -206,7 +206,7 @@ export class DivRect {
      * @param b -
      * @returns 
      */
-    static equalsFrame(a: DivRect | null | undefined, b: DivRect | null | undefined) {
+    static equalsFrame(a: DivRect | null | undefined, b: DivRect | null | undefined): boolean {
         if (a == null && b == null) {
             // handles null and undefined
             return true;
@@ -224,7 +224,7 @@ export class DivRect {
      * 
      * @returns 
      */
-    copy() {
+    copy(): DivRect {
         return new DivRect(this.left, this.centerX, this.right, this.top, this.centerY, this.bottom);
     }
 
@@ -235,7 +235,7 @@ export class DivRect {
      * @param dy -
      * @returns 
      */
-    offsetInPlace(dx: number, dy: number) {
+    offsetInPlace(dx: number, dy: number): DivRect {
         this.left += dx;
         this.centerX += dx;
         this.right += dx;
@@ -252,7 +252,7 @@ export class DivRect {
      * @param dy -
      * @returns 
      */
-    offsetCopy(dx: number, dy: number) {
+    offsetCopy(dx: number, dy: number): DivRect {
         return this.copy().offsetInPlace(dx, dy);
     }
 
@@ -262,7 +262,7 @@ export class DivRect {
      * @param rect - 
      * @returns 
      */
-    expandInPlace(rect: DivRect) {
+    expandInPlace(rect: DivRect): DivRect {
         this.left = Math.min(this.left, rect.left);
         this.right = Math.max(this.right, rect.right);
         this.top = Math.min(this.top, rect.top);
@@ -276,7 +276,7 @@ export class DivRect {
      * @param rect -
      * @returns 
      */
-    expandCopy(rect: DivRect) {
+    expandCopy(rect: DivRect): DivRect {
         return this.copy().expandInPlace(rect);
     }
 
@@ -286,7 +286,7 @@ export class DivRect {
      * @param clipRect -
      * @returns 
      */
-    clipInPlace(clipRect: DivRect) {
+    clipInPlace(clipRect: DivRect): DivRect {
         this.left = Math.max(this.left, clipRect.left);
         this.right = Math.min(this.right, clipRect.right);
         this.centerX = Utils.Math.clamp(this.centerX, this.left, this.right);
@@ -302,7 +302,7 @@ export class DivRect {
      * @param clipRect -
      * @returns 
      */
-    clipCopy(clipRect: DivRect) {
+    clipCopy(clipRect: DivRect): DivRect {
         return this.copy().clipInPlace(clipRect);
     }
 
@@ -313,7 +313,7 @@ export class DivRect {
      * @param scaleY -
      * @returns Copy of scaled Rect.
      */
-    scaleInPlace(scaleX: number, scaleY?: number) {
+    scaleInPlace(scaleX: number, scaleY?: number): DivRect {
         scaleY = scaleY ?? scaleX;
 
         this.left = this.centerX - this.leftw * scaleX;
@@ -330,7 +330,11 @@ export class DivRect {
      * @param scaleY -
      * @returns Copy of scaled Rect.
      */
-    scaleCopy(scaleX: number, scaleY?: number) {
+    scaleCopy(scaleX: number, scaleY?: number): DivRect {
         return this.copy().scaleInPlace(scaleX, scaleY);
+    }
+
+    getRect(): DivRect {
+        return this;
     }
 }
