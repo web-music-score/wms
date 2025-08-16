@@ -5,14 +5,11 @@ import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
-import { ObjNoteGroupTabVisual, ObjNoteGroupVisual } from "./obj-note-group";
-import { ObjRestVisual } from "./obj-rest";
-import { ObjBeamGroupVisual } from "./obj-beam-group";
-import { ObjBarLineVisual } from "./obj-bar-line";
-import { ObjConnective } from "./obj-connective";
-import { ObjSignature } from "./obj-signature";
 
-type NotationLineObject = ObjNoteGroupVisual | ObjNoteGroupTabVisual | ObjRestVisual | ObjBeamGroupVisual | ObjBarLineVisual | ObjConnective | ObjSignature;
+type NotationLineObject = {
+    getRect: () => DivRect,
+    offset: (dx: number, dy: number) => void
+}
 
 export class ObjStaff extends MusicObject {
     readonly clefImageAsset: ImageAsset;
