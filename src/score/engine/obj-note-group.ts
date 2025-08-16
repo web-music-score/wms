@@ -48,8 +48,6 @@ export class ObjNoteGroupVisual extends MusicObject {
     constructor(readonly staff: ObjStaff) {
         super(staff);
 
-        staff.addObject(this);
-
         this.mi = new MNoteGroupVisual(this);
     }
 
@@ -545,13 +543,26 @@ export class ObjNoteGroup extends MusicObject {
 
             let visual = new ObjNoteGroupVisual(staff);
 
+            let stemBaseStaff: ObjStaff = staff;
+            let stemTipStaff: ObjStaff = staff;
+
             this.notes.forEach((note, noteIndex) => {
+                let isBottomNote = noteIndex === 0;
+                let isTopNote = noteIndex === this.notes.length - 1;
+
+                let noteStaff = staff.getActualStaff(note.diatonicId) ?? staff;
                 let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                let noteY = staff.getDiatonicIdY(note.diatonicId);
-                let isNoteOnLine = staff.isLine(note.diatonicId);
+                let noteY = noteStaff.getDiatonicIdY(note.diatonicId);
+                let isNoteOnLine = noteStaff.isLine(note.diatonicId);
+
+                if (isBottomNote && stemDir === Stem.Up) stemBaseStaff = noteStaff;
+                if (isTopNote && stemDir === Stem.Up) stemTipStaff = noteStaff;
+                if (isBottomNote && stemDir === Stem.Down) stemTipStaff = noteStaff;
+                if (isTopNote && stemDir === Stem.Down) stemBaseStaff = noteStaff;
 
                 // Add note head
                 let noteHeadRect = visual.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
+                noteStaff.addObject(noteHeadRect);
 
                 // Add accidental
                 if (accState.needAccidental(note)) {
@@ -560,6 +571,7 @@ export class ObjNoteGroup extends MusicObject {
                         acc.layout(renderer);
                         acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
                     }
+                    noteStaff.addObject(acc);
                 }
 
                 // Add dot
@@ -567,20 +579,26 @@ export class ObjNoteGroup extends MusicObject {
                     let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
                     let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
 
-                    visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                    let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                    visual.dotRects.push(r);
+                    noteStaff.addObject(r);
                 }
 
                 // Add staccato dot
                 if (this.staccato) {
-                    if (stemDir === Stem.Up && noteIndex === 0) {
+                    if (stemDir === Stem.Up && isBottomNote) {
                         let dotX = noteX;
                         let dotY = noteY + unitSize * (isNoteOnLine ? 3 : 2);
-                        visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                        let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                        visual.dotRects.push(r);
+                        stemBaseStaff.addObject(r);
                     }
-                    else if (stemDir === Stem.Down && noteIndex === this.notes.length - 1) {
+                    else if (stemDir === Stem.Down && isTopNote) {
                         let dotX = noteX;
                         let dotY = noteY - unitSize * (isNoteOnLine ? 3 : 2);
-                        visual.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                        let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                        visual.dotRects.push(r);
+                        stemBaseStaff.addObject(r);
                     }
                 }
             });
@@ -588,22 +606,16 @@ export class ObjNoteGroup extends MusicObject {
             // Calculate stem
             let bottomNoteY = visual.noteHeadRects[0].centerY;
             let topNoteY = visual.noteHeadRects[visual.noteHeadRects.length - 1].centerY;
-
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
-
             let stemHeight = this.getStemHeight(renderer);
-
-            let stemTipY = stemDir === Stem.Up
-                ? topNoteY - stemHeight
-                : bottomNoteY + stemHeight;
-
-            let stemBaseY = stemDir === Stem.Up
-                ? bottomNoteY
-                : topNoteY;
+            let stemTipY = stemDir === Stem.Up ? topNoteY - stemHeight : bottomNoteY + stemHeight;
+            let stemBaseY = stemDir === Stem.Up ? bottomNoteY : topNoteY;
 
             if (this.rhythmProps.hasStem()) {
                 visual.stemTip = new DivRect(stemX, stemX, stemTipY, stemTipY);
                 visual.stemBase = new DivRect(stemX, stemX, stemBaseY, stemBaseY);
+                stemTipStaff.addObject(visual.stemTip);
+                stemBaseStaff.addObject(visual.stemBase);
             }
 
             // Add flag rects
@@ -614,15 +626,15 @@ export class ObjNoteGroup extends MusicObject {
                 for (let i = 0; i < flagCount; i++) {
                     let flagAddY = i * unitSize * DocumentSettings.FlagSeparation;
 
-                    visual.flagRects[i] = stemDir === Stem.Up
+                    let r = visual.flagRects[i] = stemDir === Stem.Up
                         ? new DivRect(stemX, stemX + flagWidth, stemTipY + flagAddY, stemTipY + flagHeight + flagAddY)
                         : new DivRect(stemX, stemX + flagWidth, stemTipY - flagHeight - flagAddY, stemTipY - flagAddY);
+
+                    stemTipStaff.addObject(r);
                 }
             }
 
-            if (visual.noteHeadRects.length > 0) {
-                this.staffVisuals.push(visual);
-            }
+            this.staffVisuals.push(visual);
         });
 
         this.tabVisuals.length = 0;

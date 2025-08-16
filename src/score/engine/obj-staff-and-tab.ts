@@ -8,7 +8,8 @@ import { DocumentSettings } from "./settings";
 
 type NotationLineObject = {
     getRect: () => DivRect,
-    offset: (dx: number, dy: number) => void
+    offset?: (dx: number, dy: number) => void
+    offsetInPlace?: (dx: number, dy: number) => void
 }
 
 export class ObjStaff extends MusicObject {
@@ -107,6 +108,18 @@ export class ObjStaff extends MusicObject {
         }
     }
 
+    getActualStaff(diatonicId: number): ObjStaff | undefined {
+        if (this.containsDiatonicId(diatonicId)) {
+            return this;
+        }
+        else if (this.joinedGrandStaff && this.joinedGrandStaff.containsDiatonicId(diatonicId)) {
+            return this.joinedGrandStaff;
+        }
+        else {
+            throw new MusicError(MusicErrorType.Score, "Staff does not contain diatonicId " + diatonicId);
+        }
+    }
+
     getDiatonicIdAt(y: number): number | undefined {
         let diatonicId = Math.round(this.bottomLineDiatonicId - (y - this.bottomLineY) / this.getDiatonicSpacing());
 
@@ -172,7 +185,14 @@ export class ObjStaff extends MusicObject {
     offset(dx: number, dy: number) {
         this.topLineY += dy;
         this.bottomLineY += dy;
-        this.objects.forEach(o => o.offset(0, dy)); // only offset dy
+        this.objects.forEach(o => {
+            if (o.offsetInPlace) {
+                o.offsetInPlace(0, dy);
+            }
+            else if (o.offset) {
+                o.offset(0, dy);
+            }
+        });
         this.rect.offsetInPlace(dx, dy);
     }
 
@@ -261,7 +281,14 @@ export class ObjTab extends MusicObject {
     offset(dx: number, dy: number) {
         this.top += dy;
         this.bottom += dy;
-        this.objects.forEach(o => o.offset(0, dy)); // only offset dy
+        this.objects.forEach(o => {
+            if (o.offsetInPlace) {
+                o.offsetInPlace(0, dy);
+            }
+            else if (o.offset) {
+                o.offset(0, dy);
+            }
+        });
         this.rect.offsetInPlace(dx, dy);
     }
 
