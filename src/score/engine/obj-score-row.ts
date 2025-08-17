@@ -281,13 +281,23 @@ export class ObjScoreRow extends MusicObject {
     }
 
     layoutPositionLines(renderer: Renderer) {
-        let p = renderer.unitSize * 6;
+        let { unitSize } = renderer;
 
         for (let i = 1; i < this.notationLines.length; i++) {
             let prev = this.notationLines[i - 1];
             let cur = this.notationLines[i];
 
-            cur.offset(0, prev.calcBottom() - cur.calcTop() + p);
+            if (
+                prev instanceof ObjStaff && prev.isGrand() && prev.staffConfig.clef === Clef.G &&
+                cur instanceof ObjStaff && cur.isGrand() && cur.staffConfig.clef === Clef.F
+            ) {
+                let sep = unitSize * 6;
+                cur.offset(0, prev.getBottomLineY() - cur.getTopLineY() + sep);
+            }
+            else {
+                let sep = unitSize * 3;
+                cur.offset(0, prev.calcBottom() - cur.calcTop() + sep);
+            }
         }
 
         this.updateRectHeight();
