@@ -128,21 +128,23 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             }
         }
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble);
 
-        let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
+        builder.setKeySignature(guitarCtx.scale);
 
         frettedPositions.forEach(frettedPosition => {
             let noteName = frettedPosition.note.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
             let color = selectedNote?.chromaticId === frettedPosition.chromaticId ? "green" : "black";
-            m.addNote(0, frettedPosition.note, Theory.NoteLength.Quarter, { color });
-            m.addLabel(Score.Label.Note, noteName);
+            builder.addNote(0, frettedPosition.note, Theory.NoteLength.Quarter, { color });
+            builder.addLabel(Score.Label.Note, noteName);
         });
 
         if (frettedPositions.length >= 2) {
             let chordNotes = frettedPositions.map(fretPos => fretPos.note)
-            m.addChord(0, chordNotes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
+            builder.addChord(0, chordNotes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
         }
+
+        let doc = builder.getDocument();
 
         let chordNotes = frettedPositions.map(fretPos => fretPos.note);
         let chordCandidates = Theory.Chord.getChords(chordNotes);

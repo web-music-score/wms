@@ -202,18 +202,20 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         let variantNames = Utils.Map.getMapKeys(variants);
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble);
 
-        let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
+        builder.setKeySignature(guitarCtx.scale);
 
         if (variant) {
             variant.fretPositions.forEach(fretPos => {
                 let noteName = fretPos.note.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
                 let color = selectedFretPosition?.chromaticId === fretPos.chromaticId ? "green" : "black";
-                m.addNote(0, fretPos.note, Theory.NoteLength.Quarter, { color });
-                m.addLabel(Score.Label.Note, noteName);
+                builder.addNote(0, fretPos.note, Theory.NoteLength.Quarter, { color });
+                builder.addLabel(Score.Label.Note, noteName);
             });
         }
+
+        let doc = builder.getDocument();
 
         return (<>
             <Menubar app={app} />

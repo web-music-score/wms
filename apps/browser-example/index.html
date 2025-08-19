@@ -27,16 +27,14 @@
     <script>
         const { Score, Theory } = window.WebMusicScore;
 
-        let doc = new Score.MDocument(Score.StaffPreset.Treble);
-
-        doc.addMeasure()
+        let doc = new Score.DocumentBuilder(Score.StaffPreset.Treble)
             .setTimeSignature("3/4")
             .addNote(0, "C4", Theory.NoteLength.Quarter)
             .addNote(0, "E4", Theory.NoteLength.Quarter)
             .addNote(0, "G4", Theory.NoteLength.Quarter)
-
-        doc.addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], Theory.NoteLength.Half, { dotted: true, arpeggio: true });
+            .addMeasure()
+            .addChord(0, ["C4", "E4", "G4"], Theory.NoteLength.Half, { dotted: true, arpeggio: true })
+            .getDocument();
 
         new Score.MRenderer().
             setCanvas("scoreCanvas").

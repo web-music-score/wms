@@ -2,51 +2,51 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createCompleteRestsDemo() {
-    let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+    return new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble)
 
-    doc.setHeader("Complete Rests");
+        .setHeader("Complete Rests")
 
-    doc.addMeasure()
+        .addMeasure()
         .setKeySignature("C", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(80)
         .addNote(0, "G3", Theory.NoteLength.Whole)
-        .completeRests();
+        .completeRests()
 
-    doc.addMeasure()
-        .completeRests();
+        .addMeasure()
+        .completeRests()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "B3", Theory.NoteLength.Half)
-        .completeRests();
+        .completeRests()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Half, { dotted: true })
         .completeRests()
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "A3", Theory.NoteLength.Quarter)
-        .completeRests();
+        .completeRests()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .completeRests();
+        .completeRests()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "B3", Theory.NoteLength.Sixteenth)
         .completeRests()
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "C4", Theory.NoteLength.Eighth, { stem: Score.Stem.Up })
         .addNote(1, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Down })
-        .completeRests();
+        .completeRests()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "E4", Theory.NoteLength.Half, { stem: Score.Stem.Up, dotted: true })
         .addNote(1, "F3", Theory.NoteLength.Half, { stem: Score.Stem.Down })
-        .completeRests();
+        .completeRests()
 
-    return doc;
+        .getDocument();
 }

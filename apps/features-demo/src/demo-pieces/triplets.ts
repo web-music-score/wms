@@ -2,11 +2,11 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createTripletsDemo() {
-    let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+    return new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble)
 
-    doc.setHeader("Triplets");
+        .setHeader("Triplets")
 
-    doc.addMeasure()
+        .addMeasure()
         .setKeySignature("G", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(80)
@@ -21,9 +21,9 @@ export function createTripletsDemo() {
         .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
         .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
 
-        .addNote(0, "B3", Theory.NoteLength.Quarter);
+        .addNote(0, "B3", Theory.NoteLength.Quarter)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "D4", Theory.NoteLength.Eighth)
 
         .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
@@ -39,9 +39,9 @@ export function createTripletsDemo() {
         .addNote(0, "G3", Theory.NoteLength.Sixteenth, { triplet: true })
         .addNote(0, "F#3", Theory.NoteLength.Sixteenth, { triplet: true })
         .addNote(0, "B3", Theory.NoteLength.Quarter)
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
         .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
         .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
@@ -71,9 +71,9 @@ export function createTripletsDemo() {
         .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
         .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
         .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
         .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
         .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
@@ -88,9 +88,9 @@ export function createTripletsDemo() {
 
         .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
         .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true });
+        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
 
-    doc.addMeasure()
+        .addMeasure()
         .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
         .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
         .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
@@ -106,9 +106,9 @@ export function createTripletsDemo() {
         .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
         .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
         .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .setTimeSignature("3/4")
         .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
         .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
@@ -117,9 +117,9 @@ export function createTripletsDemo() {
         .addNote(0, "D4", Theory.NoteLength.Quarter, { triplet: true })
 
         .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true });
+        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
         .addRest(0, Theory.NoteLength.Quarter, { triplet: true })
 
@@ -128,20 +128,20 @@ export function createTripletsDemo() {
 
         .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
         .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
         .addNote(0, "B3", Theory.NoteLength.Quarter, { triplet: true })
         .addNote(0, "D4", Theory.NoteLength.Quarter, { triplet: true })
 
         .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Half, { triplet: true });
+        .addNote(0, "B3", Theory.NoteLength.Half, { triplet: true })
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Half, { triplet: true })
         .addNote(0, "B3", Theory.NoteLength.Half, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Half, { triplet: true });
+        .addNote(0, "D4", Theory.NoteLength.Half, { triplet: true })
 
-    return doc;
+        .getDocument();
 }

@@ -67,9 +67,9 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
         let guitarCtx = app.getGuitarContext();
         let { scale } = guitarCtx;
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble);
 
-        let m = doc.addMeasure().setKeySignature(scale);
+        builder.setKeySignature(scale);
 
         let compatibleScale = DiatonicChords.isCompatibleScaleType(scale.scaleType);
 
@@ -81,9 +81,9 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
                     let notes = degrees.map(d => new Theory.Note(rootNote.diatonicId + d - 1, scaleNotes[(rootNoteIndex + d - 1) % 7].accidental));
                     let chordName = (Theory.Chord.getChords(notes)[0] ?? "?").toString();
                     let chordOrder = Utils.Math.romanize(rootNoteIndex % 7 + 1);
-                    m.addChord(0, notes, Theory.NoteLength.Quarter);
-                    m.addLabel(Score.Label.Chord, chordName);
-                    m.addLabel(Score.Label.Note, chordOrder);
+                    builder.addChord(0, notes, Theory.NoteLength.Quarter);
+                    builder.addLabel(Score.Label.Chord, chordName);
+                    builder.addLabel(Score.Label.Note, chordOrder);
                 }
 
                 if (chordType === ChordType.Triads) {
@@ -94,6 +94,8 @@ export class DiatonicChords extends React.Component<DiatonicChordsProps, Diatoni
                 }
             });
         }
+
+        let doc = builder.getDocument();
 
         return <>
             <Menubar app={app} />

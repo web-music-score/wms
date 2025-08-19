@@ -2,7 +2,14 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, Connective, ConnectiveSpan, DocumentOptions, Fermata, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, StaffConfig, StaffPreset, TabConfig, TieType } from "./types";
 import { MDocument, MMeasure } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { KeySignature, Note, NoteLength, Scale, ScaleType, TimeSignature, TimeSignatureString } from "@tspro/web-music-score/theory";
+import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString } from "@tspro/web-music-score/theory";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+
+function assertArg(condition: boolean, argName: string, argValue: unknown) {
+    if (!condition) {
+        throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
+    }
+}
 
 export class DocumentBuilder {
     private readonly doc: ObjDocument;
@@ -22,14 +29,14 @@ export class DocumentBuilder {
     }
 
     get measure(): MMeasure {
-        return (this.doc.getFirstMeasure() ?? this.doc.addMeasure()).getMusicInterface();
+        return (this.doc.getLastMeasure() ?? this.doc.addMeasure()).getMusicInterface();
     }
 
     getDocument(): MDocument {
         return this.doc_mi;
     }
 
-    setDocumentHeader(title?: string, composer?: string, arranger?: string): DocumentBuilder {
+    setHeader(title?: string, composer?: string, arranger?: string): DocumentBuilder {
         this.doc_mi.setHeader(title, composer, arranger);
         return this;
     }
@@ -60,25 +67,21 @@ export class DocumentBuilder {
         return this;
     }
 
-    /** @deprecated - Use DocumentBuilder instead. */
     setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean): DocumentBuilder {
         this.measure.setTempo(beatsPerMinute, beatLength, dotted);
         return this;
     }
 
-    /** @deprecated - Use DocumentBuilder instead. */
     addNote(voiceId: number, note: Note | string, noteLength: NoteLength, options?: NoteOptions): DocumentBuilder {
         this.measure.addNote(voiceId, note, noteLength, options);
         return this;
     }
 
-    /** @deprecated - Use DocumentBuilder instead. */
     addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions): DocumentBuilder {
         this.measure.addChord(voiceId, notes, noteLength, options);
         return this;
     }
 
-    /** @deprecated - Use DocumentBuilder instead. */
     addRest(voiceId: number, restLength: NoteLength, options?: RestOptions): DocumentBuilder {
         this.measure.addRest(voiceId, restLength, options);
         return this;
@@ -162,7 +165,26 @@ export class DocumentBuilder {
         return this;
     }
 
-    static createSimpleScaleArpeggio(staffPreset: StaffPreset, scale: Scale, bottomNote: string, numOctaves: number): MDocument {
-        return MDocument.createSimpleScaleArpeggio(staffPreset, scale, bottomNote, numOctaves);
+    addScaleArpeggio(scale: Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
+        assertArg(Utils.Is.isString(bottomNote), "bottomNote", bottomNote);
+        assertArg(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
+
+        let m = this.measure.getMusicObject();
+        let ts = m.getTimeSignature();
+        let notes = scale.getScaleNotes(bottomNote, numOctaves);
+
+        for (let i = 0; i < notes.length; i++) {
+            if (i % ts.beatCount === 0 && i > 0) {
+                this.addMeasure();
+            }
+
+            let note = notes[i];
+
+            this.addNote(0, note, ts.beatLength);
+            this.addLabel(Label.Note, note.formatOmitOctave(SymbolSet.Unicode));
+        }
+
+        return this;
     }
+
 }

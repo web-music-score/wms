@@ -43,20 +43,22 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { fullDiatonicRange: true });
+        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble, { fullDiatonicRange: true });
 
-        let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
+        builder.setKeySignature(guitarCtx.scale);
 
         if (note1) {
             let noteName1 = note1.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-            m.addNote(0, note1, Theory.NoteLength.Half);
-            m.addLabel(Score.Label.Note, noteName1);
+            builder.addNote(0, note1, Theory.NoteLength.Half);
+            builder.addLabel(Score.Label.Note, noteName1);
         }
         if (note2) {
             let noteName2 = note2.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-            m.addNote(0, note2, Theory.NoteLength.Half);
-            m.addLabel(Score.Label.Note, noteName2);
+            builder.addNote(0, note2, Theory.NoteLength.Half);
+            builder.addLabel(Score.Label.Note, noteName2);
         }
+
+        let doc = builder.getDocument();
 
         let note1Str = note1 ? note1.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode) : "";
         let note2Str = note2 ? note2.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode) : "";

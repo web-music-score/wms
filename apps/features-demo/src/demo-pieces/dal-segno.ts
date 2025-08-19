@@ -2,45 +2,45 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createDalSegnoDemo() {
-    let doc = new Score.MDocument(Score.StaffPreset.Treble);
+    return new Score.DocumentBuilder(Score.StaffPreset.Treble)
 
-    doc.setHeader("Dal Segno Navigations");
+        .setHeader("Dal Segno Navigations")
 
-    doc.addMeasure()
+        .addMeasure()
         .setKeySignature("C", Theory.ScaleType.Major)
         .setTimeSignature("2/4")
         .setTempo(120)
-        .addNote(0, "G4", Theory.NoteLength.Half);
-
-    doc.addMeasure()
         .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.Segno);
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G4", Theory.NoteLength.Half)
-        .endRow();
+        .addNavigation(Score.Navigation.Segno)
 
-    doc.addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half);
-
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.toCoda);
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G4", Theory.NoteLength.Half)
-        .endRow();
 
-    doc.addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half);
-
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.DS_al_Coda);
+        .addNavigation(Score.Navigation.toCoda)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.Coda);
+        .endRow()
 
-    return doc;
+        .addMeasure()
+        .addNote(0, "G4", Theory.NoteLength.Half)
+
+        .addMeasure()
+        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNavigation(Score.Navigation.DS_al_Coda)
+
+        .addMeasure()
+        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNavigation(Score.Navigation.Coda)
+
+        .getDocument();
 }

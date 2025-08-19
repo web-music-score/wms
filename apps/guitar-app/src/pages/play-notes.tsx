@@ -35,15 +35,17 @@ export class PlayNotes extends React.Component<PlayNotesProps, PlayNotesState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble, { fullDiatonicRange: true });
+        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble, { fullDiatonicRange: true });
 
-        let m = doc.addMeasure().setKeySignature(guitarCtx.scale);
+        builder.setKeySignature(guitarCtx.scale);
 
         if (selectedNote) {
             let noteName = selectedNote.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);
-            m.addNote(0, selectedNote, Theory.NoteLength.Whole);
-            m.addLabel(Score.Label.Note, noteName);
+            builder.addNote(0, selectedNote, Theory.NoteLength.Whole);
+            builder.addLabel(Score.Label.Note, noteName);
         }
+
+        let doc = builder.getDocument();
 
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
             if (!(event instanceof Score.ScoreStaffPosEvent)) {

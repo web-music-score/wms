@@ -2,11 +2,11 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createTempoAnnotationDemo() {
-    let doc = new Score.MDocument(Score.StaffPreset.GuitarTreble);
+    return new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble)
 
-    doc.setHeader("Tempo Annotation");
+        .setHeader("Tempo Annotation")
 
-    doc.addMeasure()
+        .addMeasure()
         .setKeySignature("G", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(70)
@@ -17,9 +17,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Tempo, "a tempo");
+        .addNote(0, "C4", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Tempo, "a tempo")
 
-    doc.addMeasure()
+        .addMeasure()
         .setTempo(80)
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
@@ -28,9 +28,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "D4", Theory.NoteLength.Eighth);
+        .addNote(0, "D4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -39,9 +39,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Tempo, "a tempo")
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -49,9 +49,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -59,9 +59,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -70,9 +70,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth)
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -80,9 +80,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -90,9 +90,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -100,9 +100,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Tempo, "a tempo")
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -111,9 +111,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth)
-        .endRow();
+        .endRow()
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -121,9 +121,9 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    doc.addMeasure()
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
@@ -131,7 +131,7 @@ export function createTempoAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
-        .addNote(0, "C4", Theory.NoteLength.Eighth);
+        .addNote(0, "C4", Theory.NoteLength.Eighth)
 
-    return doc;
+        .getDocument();
 }

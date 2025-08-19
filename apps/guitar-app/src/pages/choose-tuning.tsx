@@ -53,18 +53,18 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
     private createScore(guitarCtx: ScoreUI.GuitarContext): Score.MDocument {
         let notes = [0, 1, 2, 3, 4, 5].map(i => guitarCtx.getStringTuning(i)).reverse();
 
-        let doc = new Score.MDocument({ type: "staff", clef: Score.Clef.G, isOctaveDown: true });
+        let builder = new Score.DocumentBuilder({ type: "staff", clef: Score.Clef.G, isOctaveDown: true });
 
-        let m = doc.addMeasure().setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
+        builder.setKeySignature(Theory.getScale("C", Theory.ScaleType.Major));
 
         notes.forEach(note => {
-            m.addNote(0, note, Theory.NoteLength.Quarter);
-            m.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
+            builder.addNote(0, note, Theory.NoteLength.Quarter);
+            builder.addLabel(Score.Label.Note, note.format(Theory.PitchNotation.Scientific, Theory.SymbolSet.Unicode));
         });
 
-        m.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
+        builder.addChord(0, notes, Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Up });
 
-        return doc;
+        return builder.getDocument();
     }
 
     render() {
