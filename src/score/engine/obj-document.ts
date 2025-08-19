@@ -154,6 +154,14 @@ export class ObjDocument extends MusicObject {
         return this.header?.title;
     }
 
+    getComposer(): string | undefined {
+        return this.header?.composer;
+    }
+
+    getArranger(): string | undefined {
+        return this.header?.arranger;
+    }
+
     hasSingleMeasure(): boolean {
         return this.measures.length === 1;
     }

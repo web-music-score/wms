@@ -215,7 +215,9 @@ export class MDocument extends MusicInterface {
     /** @internal */
     readonly obj: ObjDocument;
 
+    /** @deprecated - Use DocumentBuilder instead. */
     constructor(staffPreset: StaffPreset, options?: DocumentOptions);
+    /** @deprecated - Use DocumentBuilder instead. */
     constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions);
     constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions) {
         super(MDocument.Name);
@@ -262,6 +264,7 @@ export class MDocument extends MusicInterface {
         return this.obj;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     setHeader(title?: string, composer?: string, arranger?: string): void {
         assertArg(Utils.Is.isStringOrUndefined(title), "title", title);
         assertArg(Utils.Is.isStringOrUndefined(composer), "composer", composer);
@@ -273,10 +276,20 @@ export class MDocument extends MusicInterface {
         return this.obj.getTitle();
     }
 
+    getComposer(): string | undefined {
+        return this.obj.getComposer();
+    }
+
+    getArranger(): string | undefined {
+        return this.obj.getArranger();
+    }
+
+    /** @deprecated - Use DocumentBuilder instead. */
     endRow(): void {
         this.obj.getLastMeasure()?.endRow();
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addMeasure(): MMeasure {
         return this.obj.addMeasure().mi;
     }
@@ -286,6 +299,7 @@ export class MDocument extends MusicInterface {
         return new MPlayer(this, fn).play();
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     static createSimpleScaleArpeggio(staffPreset: StaffPreset, scale: Scale, bottomNote: string, numOctaves: number): MDocument {
         assertArg(Utils.Is.isEnumValue(staffPreset, StaffPreset), "staffPreset", staffPreset);
         assertArg(scale instanceof Scale, "scale", scale);
@@ -409,8 +423,11 @@ export class MMeasure extends MusicInterface {
         return this.obj.getColumns().map(col => col.getMusicInterface());
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     setKeySignature(tonic: string, scaleType: ScaleType): MMeasure;
+    /** @deprecated - Use DocumentBuilder instead. */
     setKeySignature(keySignature: KeySignature): MMeasure;
+    /** @deprecated - Use DocumentBuilder instead. */
     setKeySignature(scale: Scale): MMeasure;
     setKeySignature(...args: unknown[]): MMeasure {
         assertArg((
@@ -422,12 +439,14 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): MMeasure {
         assertArg(timeSignature instanceof TimeSignature || Utils.Is.isString(timeSignature), "timeSignature", timeSignature);
         this.obj.setTimeSignature(timeSignature);
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean): MMeasure {
         assertArg(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
         if (beatLength === undefined) {
@@ -441,6 +460,7 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addNote(voiceId: number, note: Note | string, noteLength: NoteLength, options?: NoteOptions): MMeasure {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
@@ -452,6 +472,7 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions): MMeasure {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
@@ -463,6 +484,7 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addRest(voiceId: number, restLength: NoteLength, options?: RestOptions): MMeasure {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isEnumValue(restLength, NoteLength), "restLength", restLength);
@@ -473,14 +495,18 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addFermata(fermata?: Fermata): MMeasure {
         assertArg(Utils.Is.isEnumValueOrUndefined(fermata, Fermata), "fermata", fermata);
         this.obj.addFermata(fermata ?? Fermata.AtNote);
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addNavigation(navigation: Navigation): MMeasure;
+    /** @deprecated - Use DocumentBuilder instead. */
     addNavigation(navigation: Navigation.EndRepeat, playCount: number): MMeasure;
+    /** @deprecated - Use DocumentBuilder instead. */
     addNavigation(navigation: Navigation.Ending, ...passages: number[]): MMeasure;
     addNavigation(navigation: Navigation, ...args: unknown[]): MMeasure {
         assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
@@ -494,8 +520,11 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): MMeasure;
+    /** @deprecated - Use DocumentBuilder instead. */
     addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): MMeasure;
+    /** @deprecated - Use DocumentBuilder instead. */
     addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): MMeasure;
     addConnective(connective: Connective, ...args: unknown[]): MMeasure {
         assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
@@ -523,6 +552,7 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addLabel(label: Label, text: string): MMeasure {
         assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
         assertArg(Utils.Is.isString(text), "text", text);
@@ -530,6 +560,7 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addAnnotation(annotation: Annotation, text: string): MMeasure {
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
@@ -537,6 +568,7 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     addExtension(extensionLength: NoteLength | number, extensionVisible?: boolean): MMeasure {
         assertArg((
             Utils.Is.isIntegerGte(extensionLength, 0) ||
@@ -548,21 +580,25 @@ export class MMeasure extends MusicInterface {
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     endSong(): MMeasure {
         this.obj.endSong();
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     endSection(): MMeasure {
         this.obj.endSection();
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     endRow(): MMeasure {
         this.obj.endRow();
         return this;
     }
 
+    /** @deprecated - Use DocumentBuilder instead. */
     completeRests(voiceId?: number): MMeasure {
         assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId), "voiceId", voiceId);
         this.obj.completeRests(voiceId);
