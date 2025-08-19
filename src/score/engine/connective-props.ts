@@ -156,7 +156,7 @@ export class ConnectiveProps {
 
     private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) {
         const addConnective = (measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) => {
-            leftNoteGroup.row.getNotationLines()
+            measure.row.getNotationLines()
                 .filter(line => leftNoteGroup.enableConnective(line) && rightNoteGroup.enableConnective(line))
                 .forEach(line => {
                     if (line instanceof ObjStaff) {
