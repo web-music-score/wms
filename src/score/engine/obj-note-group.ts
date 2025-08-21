@@ -440,19 +440,23 @@ export class ObjNoteGroup extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip ?? this.rect;
-        return rect.centerX;
+    getBeamX(staff: ObjStaff): number | undefined {
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip;
+        return rect ? rect.centerX : undefined;
     }
 
-    getBeamY(staff: ObjStaff): number {
+    getBeamY(staff: ObjStaff): number | undefined {
         let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip;
-        if (rect) {
-            return rect.centerY;
-        }
-        else {
-            return this.stemDir === Stem.Up ? this.rect.top : this.rect.bottom;
-        }
+        return rect ? rect.centerY : undefined;
+    }
+
+    getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
+        return this.staffVisuals.map(visual => {
+            let staff = visual.staff;
+            let x = visual.stemTip?.centerX ?? visual.noteHeadRects[0].centerX;
+            let y = visual.stemTip?.centerY ?? (this.stemDir === Stem.Up ? visual.getRect().bottom : visual.getRect().top);
+            return { staff, x, y }
+        });
     }
 
     getStemHeight(renderer: Renderer) {

@@ -29,10 +29,19 @@ const adjustBeamAngle = (dx: number, dy: number) => {
     }
 }
 
+class Segment {
+    constructor(public lx: number, public ly: number, public rx: number, public ry: number, public start: number = 0, public end: number = 1) { }
+    offset(dx: number, dy: number) {
+        this.lx += dx;
+        this.ly += dy;
+        this.rx += dx;
+        this.ry += dy;
+    }
+}
+
 export class ObjBeamGroupVisual extends MusicObject {
     public tripletNumber?: ObjText;
-    public groupLineLeft?: { x: number, y: number };
-    public groupLineRight?: { x: number, y: number };
+    public segments: Segment[] = [];
 
     readonly mi: MBeamGroupVisual;
 
@@ -57,14 +66,7 @@ export class ObjBeamGroupVisual extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        if (this.groupLineLeft) {
-            this.groupLineLeft.x += dx;
-            this.groupLineLeft.y += dy;
-        }
-        if (this.groupLineRight) {
-            this.groupLineRight.x += dx;
-            this.groupLineRight.y += dy;
-        }
+        this.segments.forEach(s => s.offset(dx, dy));
         this.tripletNumber?.offset(dx, dy);
         this.rect.offsetInPlace(dx, dy);
     }
@@ -227,13 +229,18 @@ export class ObjBeamGroup extends MusicObject {
         let { stemDir } = this;
 
         symbols[0].row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
-            let visual = new ObjBeamGroupVisual(staff);
+            let symbolX = symbols.map(s => s.getBeamX(staff));
+            let symbolY = symbols.map(s => s.getBeamY(staff));
 
-            let leftX = symbols[0].getBeamX(staff);
-            let leftY = symbols[0].getBeamY(staff);
+            let leftX = symbolX[0];
+            let leftY = symbolY[0];
 
-            let rightX = symbols[symbols.length - 1].getBeamX(staff);
-            let rightY = symbols[symbols.length - 1].getBeamY(staff);
+            let rightX = symbolX[symbolX.length - 1];
+            let rightY = symbolY[symbolY.length - 1];
+
+            if (leftX === undefined || leftY === undefined || rightX === undefined || rightY === undefined) {
+                return;
+            }
 
             let groupLineDy = unitSize * 2 * (stemDir === Stem.Up ? -1 : 1);
 
@@ -247,52 +254,93 @@ export class ObjBeamGroup extends MusicObject {
             // Find beams y-position
             let raiseBeamY = 0;
 
-            symbols.forEach(s => {
-                let beamY = Utils.Math.interpolateY(leftX, leftY, rightX, rightY, s.getBeamX(staff));
-                let raiseY = s.getBeamY(staff) - beamY;
-                if (stemDir === Stem.Up && raiseY < 0) {
-                    raiseBeamY = Math.min(raiseBeamY, raiseY);
-                }
-                else if (stemDir === Stem.Down && raiseY > 0) {
-                    raiseBeamY = Math.max(raiseBeamY, raiseY);
+            symbolY.forEach((symY, i) => {
+                let symX = symbolX[i];
+                if (symX !== undefined && symY !== undefined) {
+                    let beamY = Utils.Math.interpolateY(leftX, leftY!, rightX, rightY!, symX);
+                    let raiseY = symY - beamY;
+                    if (stemDir === Stem.Up && raiseY < 0) {
+                        raiseBeamY = Math.min(raiseBeamY, raiseY);
+                    }
+                    else if (stemDir === Stem.Down && raiseY > 0) {
+                        raiseBeamY = Math.max(raiseBeamY, raiseY);
+                    }
                 }
             });
 
             leftY += raiseBeamY;
             rightY += raiseBeamY;
 
+            let visual = new ObjBeamGroupVisual(staff);
+
             if (this.type === BeamGroupType.TripletGroup) {
                 let { unitSize } = renderer;
 
                 let ef = unitSize / (rightX - leftX);
 
-                visual.groupLineLeft = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
-                visual.groupLineRight = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
+                let l = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
+                let r = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
 
-                visual.setRect(new DivRect(
-                    visual.groupLineLeft.x,
-                    visual.groupLineRight.x,
-                    Math.min(visual.groupLineLeft.y, visual.groupLineRight.y),
-                    Math.max(visual.groupLineLeft.y, visual.groupLineRight.y)
-                ));
+                visual.segments.push(new Segment(l.x, l.y, r.x, r.y));
+
+                visual.setRect(new DivRect(l.x, r.x, Math.min(l.y, r.y), Math.max(l.y, r.y)));
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
                 raiseBeamY *= 0.5;
 
                 // Update stem tips to beams
-                this.symbols.forEach(s => {
-                    if (s instanceof ObjNoteGroup) {
-                        let beamY = Utils.Math.interpolateY(leftX, leftY, rightX, rightY, s.getBeamX(staff));
+                symbols.forEach((s, i) => {
+                    let symX = symbolX[i];
+                    if (s instanceof ObjNoteGroup && symX !== undefined) {
+                        let beamY = symbolY[i] = Utils.Math.interpolateY(leftX, leftY, rightX, rightY, symX);
                         s.setStemTipY(staff, beamY);
                     }
                 });
 
-                visual.setRect(new DivRect(
-                    leftX,
-                    rightX,
-                    Math.min(leftY, rightY) - beamThickness / 2,
-                    Math.max(leftY, rightY) + beamThickness / 2
-                ));
+                let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (this.stemDir === Stem.Up ? 1 : -1);
+
+                for (let i = 0; i < symbols.length - 1; i++) {
+                    let left = symbols[i];
+                    let right = symbols[i + 1];
+
+                    if (!(left instanceof ObjNoteGroup && right instanceof ObjNoteGroup)) {
+                        continue;
+                    }
+
+                    let leftBeamCount = left.getRightBeamCount();
+                    let rightBeamCount = right.getLeftBeamCount();
+
+                    let lx = symbolX[i];
+                    let ly = symbolY[i];
+                    let rx = symbolX[i + 1];
+                    let ry = symbolY[i + 1];
+
+                    if (lx !== undefined && ly !== undefined && rx !== undefined && ry !== undefined) {
+                        for (let beamId = 0; beamId < Math.max(leftBeamCount, rightBeamCount); beamId++) {
+                            if (beamId < leftBeamCount && beamId < rightBeamCount) {
+                                visual.segments.push(new Segment(lx, ly, rx, ry));
+                            }
+                            else if (leftBeamCount > rightBeamCount) {
+                                visual.segments.push(new Segment(lx, ly, rx, ry, 0, 0.25));
+                            }
+                            else if (rightBeamCount > leftBeamCount) {
+                                visual.segments.push(new Segment(lx, ly, rx, ry, 0.75, 1));
+                            }
+
+                            ly += beamSeparation;
+                            ry += beamSeparation;
+                        }
+                    }
+                }
+
+                if (visual.segments.length > 0) {
+                    visual.setRect(new DivRect(
+                        Math.min(...visual.segments.map(s => s.lx)),
+                        Math.max(...visual.segments.map(s => s.rx)),
+                        Math.min(...visual.segments.map(s => Math.min(s.ly, s.ry))) - beamThickness / 2,
+                        Math.max(...visual.segments.map(s => Math.max(s.ly, s.ry))) + beamThickness / 2
+                    ));
+                }
             }
 
             if (this.isTriplet()) {
@@ -306,14 +354,16 @@ export class ObjBeamGroup extends MusicObject {
 
             this.rect = visual.getRect().copy();
 
-            this.staffVisuals.push(visual);
+            if (visual.segments.length > 0) {
+                this.staffVisuals.push(visual);
+            }
         });
 
         this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
     }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(visual => visual.offset(dx, 0)); // dy is offset in notation line
+        this.staffVisuals.forEach(visual => visual.offset(dx, 0));
         this.rect.offsetInPlace(dx, dy);
     }
 
@@ -325,58 +375,33 @@ export class ObjBeamGroup extends MusicObject {
 
         this.staffVisuals.forEach(visual => {
             if (this.type === BeamGroupType.TripletGroup) {
-                if (visual.groupLineLeft && visual.groupLineRight) {
-                    let l = visual.groupLineLeft;
-                    let r = visual.groupLineRight;
+                let s = visual.segments[0];
 
-                    let tf = visual.tripletNumber ? (visual.tripletNumber.getRect().width / (r.x - l.x) * 1.2) : 0;
+                if (s) {
+                    let tf = visual.tripletNumber ? (visual.tripletNumber.getRect().width / (s.rx - s.lx) * 1.2) : 0;
 
-                    let lc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 - tf / 2);
-                    let rc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 + tf / 2);
+                    let lc = Utils.Math.interpolateCoord(s.lx, s.ly, s.rx, s.ry, 0.5 - tf / 2);
+                    let rc = Utils.Math.interpolateCoord(s.lx, s.ly, s.rx, s.ry, 0.5 + tf / 2);
 
                     let tipH = this.stemDir === Stem.Up ? unitSize : -unitSize;
 
-                    renderer.drawLine(l.x, l.y, lc.x, lc.y, color, lineWidth);
-                    renderer.drawLine(rc.x, rc.y, r.x, r.y, color, lineWidth);
+                    renderer.drawLine(s.lx, s.ly, lc.x, lc.y, color, lineWidth);
+                    renderer.drawLine(rc.x, rc.y, s.rx, s.ry, color, lineWidth);
 
-                    renderer.drawLine(l.x, l.y, l.x, l.y + tipH, color, lineWidth);
-                    renderer.drawLine(r.x, r.y, r.x, r.y + tipH, color, lineWidth);
+                    renderer.drawLine(s.lx, s.ly, s.lx, s.ly + tipH, color, lineWidth);
+                    renderer.drawLine(s.rx, s.ry, s.rx, s.ry + tipH, color, lineWidth);
                 }
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
-                let noteGroups = symbols.filter(s => s instanceof ObjNoteGroup) as ObjNoteGroup[];
-
-                let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (this.stemDir === Stem.Up ? 1 : -1);
-
-                for (let i = 0; i < noteGroups.length - 1; i++) {
-                    let left = noteGroups[i];
-                    let right = noteGroups[i + 1];
-
-                    let leftX = left.getBeamX(visual.staff);
-                    let leftY = left.getBeamY(visual.staff);
-
-                    let rightX = right.getBeamX(visual.staff);
-                    let rightY = right.getBeamY(visual.staff);
-
-                    let leftBeamCount = left.getRightBeamCount();
-                    let rightBeamCount = right.getLeftBeamCount();
-
-                    for (let beamId = 0; beamId < Math.max(leftBeamCount, rightBeamCount); beamId++) {
-
-                        if (beamId < leftBeamCount && beamId < rightBeamCount) {
-                            renderer.drawLine(leftX, leftY, rightX, rightY, color, beamThickness);
-                        }
-                        else if (leftBeamCount > rightBeamCount) {
-                            renderer.drawPartialLine(leftX, leftY, rightX, rightY, 0, 0.25, color, beamThickness);
-                        }
-                        else if (rightBeamCount > leftBeamCount) {
-                            renderer.drawPartialLine(leftX, leftY, rightX, rightY, 0.75, 1, color, beamThickness);
-                        }
-
-                        leftY += beamSeparation;
-                        rightY += beamSeparation;
+                visual.segments.forEach(s => {
+                    if (s.start === 0 && s.end === 1) {
+                        renderer.drawLine(s.lx, s.ly, s.rx, s.ry, color, beamThickness);
                     }
-                }
+                    else {
+                        renderer.drawPartialLine(s.lx, s.ly, s.rx, s.ry, s.start, s.end, color, beamThickness);
+                    }
+
+                });
             }
 
             if (visual.tripletNumber) {

@@ -159,14 +159,23 @@ export class ObjRest extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect() ?? this.rect;
-        return rect.centerX;
+    getBeamX(staff: ObjStaff): number | undefined {
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect();
+        return rect ? rect.centerX : undefined;
     }
 
-    getBeamY(staff: ObjStaff): number {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect() ?? this.rect;
-        return this.stemDir === Stem.Up ? rect.top : rect.bottom;
+    getBeamY(staff: ObjStaff): number | undefined {
+        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect();
+        return rect ? (this.stemDir === Stem.Up ? rect.top : rect.bottom) : undefined;
+    }
+
+    getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
+        return this.staffVisuals.map(visual => {
+            let staff = visual.staff;
+            let x = visual.getRect().centerX;
+            let y = this.stemDir === Stem.Up ? visual.getRect().bottom : visual.getRect().top;
+            return { staff, x, y }
+        });
     }
 
     private getRestDotVerticalDisplacement(noteLength: NoteLength): number {
