@@ -8,10 +8,10 @@ export function createGrandStaffDemo() {
     return new Score.DocumentBuilder(Score.StaffPreset.Grand, { measuresPerRow: 4 })
 
         .setHeader("Grand Staff")
-        .setTimeSignature("4/4")
+        .setTimeSignature("6/8")
         .setKeySignature(scale)
         .addScaleArpeggio(scale, "C2", 4)
-        .endRow()
+        .endSection()
 
         .addMeasure()
         .addChord(0, ["Gb3", "Bb3", "Db4"], Theory.NoteLength.Quarter)
