@@ -46,6 +46,8 @@ class BeamPoint {
 
 export class ObjBeamGroupVisual extends MusicObject {
     public tripletNumber?: ObjText;
+    public tripletNumberDistToBeam = 0;
+
     public points: BeamPoint[] = [];
 
     readonly mi: MBeamGroupVisual;
@@ -300,6 +302,8 @@ export class ObjBeamGroup extends MusicObject {
                 visual.points.push(new BeamPoint(rightStaff, rightSymbol, r.x, r.y));
 
                 visual.setRect(new DivRect(l.x, r.x, Math.min(l.y, r.y), Math.max(l.y, r.y)));
+
+                visual.tripletNumberDistToBeam = 0;
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
                 raiseBeamY *= 0.5;
@@ -328,13 +332,15 @@ export class ObjBeamGroup extends MusicObject {
                         Math.max(...visual.points.map((p, i) => p.y + beamThickness / 2 + (stemDir === Stem.Up ? beamHeight(i) : 0)))
                     ));
                 }
+
+                visual.tripletNumberDistToBeam = groupLineDy;
             }
 
             if (this.isTriplet()) {
                 visual.tripletNumber = new ObjText(this, "3", 0.5, 0.5);
 
                 visual.tripletNumber.layout(renderer);
-                visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + groupLineDy);
+                visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + visual.tripletNumberDistToBeam);
 
                 visual.setRect(visual.getRect().expandInPlace(visual.tripletNumber.getRect()));
             }
@@ -349,16 +355,24 @@ export class ObjBeamGroup extends MusicObject {
         this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
     }
 
-    updateBetweenStemTips() {
+    updateStemTips() {
         this.staffVisuals.forEach(visual => {
             let left = visual.points[0];
             let right = visual.points[visual.points.length - 1];
+
             visual.points.forEach((pt, i) => {
                 if (pt.symbol instanceof ObjNoteGroup && pt !== left && pt !== right) {
                     pt.y = Utils.Math.interpolateY(left.x, left.y, right.x, right.y, pt.x);
                     pt.symbol.setStemTipY(pt.staff, pt.y);
                 }
             });
+
+            if (visual.tripletNumber) {
+                let l = visual.points[0];
+                let r = visual.points[visual.points.length - 1];
+                let y = (l.y + r.y) / 2 + visual.tripletNumberDistToBeam;
+                visual.tripletNumber.offset(0, -visual.tripletNumber.getRect().centerY + y);
+            }
         });
     }
 
@@ -366,7 +380,7 @@ export class ObjBeamGroup extends MusicObject {
         this.staffVisuals.forEach(visual => visual.offset(dx, 0));
         this.rect.offsetInPlace(dx, dy);
 
-        this.updateBetweenStemTips();
+        this.updateStemTips();
     }
 
     draw(renderer: Renderer) {
@@ -398,9 +412,11 @@ export class ObjBeamGroup extends MusicObject {
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
                 let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (this.stemDir === Stem.Up ? 1 : -1);
 
-                for (let i = 0; i < visual.points.length - 1; i++) {
-                    let left = visual.points[i];
-                    let right = visual.points[i + 1];
+                let noteGroupPoints = visual.points.filter(p => p.symbol instanceof ObjNoteGroup);
+
+                for (let i = 0; i < noteGroupPoints.length - 1; i++) {
+                    let left = noteGroupPoints[i];
+                    let right = noteGroupPoints[i + 1];
 
                     if (!(left.symbol instanceof ObjNoteGroup && right.symbol instanceof ObjNoteGroup)) {
                         continue;

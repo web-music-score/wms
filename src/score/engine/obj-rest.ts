@@ -163,7 +163,7 @@ export class ObjRest extends MusicObject {
         return this.staffVisuals.map(visual => {
             let staff = visual.staff;
             let x = visual.getRect().centerX;
-            let y = this.stemDir === Stem.Up ? visual.getRect().bottom : visual.getRect().top;
+            let y = this.stemDir === Stem.Up ? visual.getRect().top : visual.getRect().bottom;
             return { staff, x, y }
         });
     }
