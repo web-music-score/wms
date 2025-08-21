@@ -159,16 +159,6 @@ export class ObjRest extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX(staff: ObjStaff): number | undefined {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect();
-        return rect ? rect.centerX : undefined;
-    }
-
-    getBeamY(staff: ObjStaff): number | undefined {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.getRect();
-        return rect ? (this.stemDir === Stem.Up ? rect.top : rect.bottom) : undefined;
-    }
-
     getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
         return this.staffVisuals.map(visual => {
             let staff = visual.staff;

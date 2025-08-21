@@ -440,16 +440,6 @@ export class ObjNoteGroup extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamX(staff: ObjStaff): number | undefined {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip;
-        return rect ? rect.centerX : undefined;
-    }
-
-    getBeamY(staff: ObjStaff): number | undefined {
-        let rect = this.staffVisuals.find(visual => visual.staff === staff)?.stemTip;
-        return rect ? rect.centerY : undefined;
-    }
-
     getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
         return this.staffVisuals.map(visual => {
             let staff = visual.staff;

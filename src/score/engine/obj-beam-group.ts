@@ -228,9 +228,15 @@ export class ObjBeamGroup extends MusicObject {
         let { unitSize, beamThickness } = renderer;
         let { stemDir } = this;
 
-        symbols[0].row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
-            let symbolX = symbols.map(s => s.getBeamX(staff));
-            let symbolY = symbols.map(s => s.getBeamY(staff));
+        let symbolsBeamCoords = symbols.map(s => s.getBeamCoords());
+
+        symbolsBeamCoords[0].map(s => s?.staff).forEach((staff, index) => {
+            if (!staff) {
+                return;
+            }
+
+            let symbolX = symbolsBeamCoords.map(s => s[index]?.x);
+            let symbolY = symbolsBeamCoords.map(s => s[index]?.y);
 
             let leftX = symbolX[0];
             let leftY = symbolY[0];
@@ -274,8 +280,6 @@ export class ObjBeamGroup extends MusicObject {
             let visual = new ObjBeamGroupVisual(staff);
 
             if (this.type === BeamGroupType.TripletGroup) {
-                let { unitSize } = renderer;
-
                 let ef = unitSize / (rightX - leftX);
 
                 let l = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
