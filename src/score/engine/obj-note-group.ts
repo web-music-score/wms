@@ -444,7 +444,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.staffVisuals.map(visual => {
             let staff = visual.staff;
             let x = visual.stemTip?.centerX ?? visual.noteHeadRects[0].centerX;
-            let y = visual.stemTip?.centerY ?? (this.stemDir === Stem.Up ? visual.getRect().bottom : visual.getRect().top);
+            let y = visual.stemTip?.centerY ?? (this.stemDir === Stem.Up ? visual.getRect().top : visual.getRect().bottom);
             return { staff, x, y }
         });
     }
