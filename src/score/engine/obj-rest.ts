@@ -185,11 +185,10 @@ export class ObjRest extends MusicObject {
     updateAccidentalState(accState: AccidentalState) { }
 
     layout(renderer: Renderer, accState: AccidentalState) {
-        this.rect = new DivRect();
-
         this.staffVisuals.length = 0;
 
         if (this.hide) {
+            this.updateRect();
             return;
         }
 
@@ -251,18 +250,28 @@ export class ObjRest extends MusicObject {
 
             visual.offset(0, staff.getDiatonicIdY(ownDiatonicId));
 
-            this.rect = visual.getRect().copy();
-
             this.staffVisuals.push(visual);
         });
 
-        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
+        this.updateRect();
     }
 
-    updateRect() { }
+    updateRect() {
+        if (this.staffVisuals.length === 0) {
+            this.rect = new DivRect();
+        }
+        else {
+            this.rect = this.staffVisuals[0].getRect().copy();
+            if (this.staffVisuals.length > 1) {
+                for (let i = 1; i < this.staffVisuals.length; i++) {
+                    this.rect.expandInPlace(this.staffVisuals[i].getRect());
+                }
+            }
+        }
+    }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(s => s.offset(dx, 0)); // dy is offset in notation line
+        this.staffVisuals.forEach(s => s.offset(dx, 0));
         this.rect.offsetInPlace(dx, dy);
     }
 
