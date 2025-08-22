@@ -280,6 +280,10 @@ export class ObjScoreRow extends MusicObject {
         });
     }
 
+    updateBeams() {
+        this.measures.forEach(m => m.updateBeams());
+    }
+
     layoutPositionLines(renderer: Renderer) {
         let { unitSize } = renderer;
 

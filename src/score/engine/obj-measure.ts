@@ -1230,6 +1230,10 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
+    updateBeams() {
+        this.beamGroups.forEach(b => b.updateStemTips());
+    }
+
     layoutDone() {
         this.columns.forEach(col => col.layoutDone());
         this.needLayout = false;

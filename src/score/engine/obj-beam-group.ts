@@ -50,7 +50,7 @@ class BeamPoint {
 
 export class ObjBeamGroupVisual extends MusicObject {
     public tripletNumber?: ObjText;
-    public tripletNumberDistToBeam = 0;
+    public tripletNumberOffsetY = 0;
 
     public points: BeamPoint[] = [];
 
@@ -235,17 +235,16 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     layout(renderer: Renderer) {
-        this.rect = new DivRect();
-
         this.staffVisuals.length = 0;
 
         let symbols = this.getSymbols();
 
         if (symbols.length === 0) {
+            this.updateRect();
             return;
         }
 
-        let { unitSize, beamThickness } = renderer;
+        let { unitSize } = renderer;
         let { stemDir } = this;
 
         let symbolsBeamCoords = symbols.map(s => s.getBeamCoords());
@@ -302,6 +301,7 @@ export class ObjBeamGroup extends MusicObject {
 
             leftY += raiseBeamY;
             rightY += raiseBeamY;
+            symbolY = symbolY.map(y => y === undefined ? undefined : y + raiseBeamY);
 
             let visual = new ObjBeamGroupVisual(mainStaff);
 
@@ -314,7 +314,7 @@ export class ObjBeamGroup extends MusicObject {
                 visual.points.push(new BeamPoint(leftStaff, this, leftSymbol, l.x, l.y));
                 visual.points.push(new BeamPoint(rightStaff, this, rightSymbol, r.x, r.y));
 
-                visual.tripletNumberDistToBeam = 0;
+                visual.tripletNumberOffsetY = 0;
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
                 raiseBeamY *= 0.5;
@@ -344,14 +344,14 @@ export class ObjBeamGroup extends MusicObject {
                     }
                 });
 
-                visual.tripletNumberDistToBeam = groupLineDy;
+                visual.tripletNumberOffsetY = groupLineDy;
             }
 
             if (this.isTriplet()) {
                 visual.tripletNumber = new ObjText(this, "3", 0.5, 0.5);
 
                 visual.tripletNumber.layout(renderer);
-                visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + visual.tripletNumberDistToBeam);
+                visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + visual.tripletNumberOffsetY);
             }
 
             if (visual.points.length >= 2) {
@@ -383,17 +383,19 @@ export class ObjBeamGroup extends MusicObject {
             let left = visual.points[0];
             let right = visual.points[visual.points.length - 1];
 
-            visual.points.forEach((pt, i) => {
-                if (pt.symbol instanceof ObjNoteGroup && pt !== left && pt !== right) {
-                    pt.y = Utils.Math.interpolateY(left.x, left.y, right.x, right.y, pt.x);
-                    pt.symbol.setStemTipY(pt.staff, pt.y);
-                }
-            });
+            if (this.type !== BeamGroupType.TripletGroup) {
+                visual.points.forEach(pt => {
+                    if (pt.symbol instanceof ObjNoteGroup) {
+                        if (pt !== left && pt !== right) {
+                            pt.y = Utils.Math.interpolateY(left.x, left.y, right.x, right.y, pt.x);
+                        }
+                        pt.symbol.setStemTipY(pt.staff, pt.y);
+                    }
+                });
+            }
 
             if (visual.tripletNumber) {
-                let l = visual.points[0];
-                let r = visual.points[visual.points.length - 1];
-                let y = (l.y + r.y) / 2 + visual.tripletNumberDistToBeam;
+                let y = (left.y + right.y) / 2 + visual.tripletNumberOffsetY;
                 visual.tripletNumber.offset(0, -visual.tripletNumber.getRect().centerY + y);
             }
         });
@@ -402,15 +404,11 @@ export class ObjBeamGroup extends MusicObject {
     offset(dx: number, dy: number) {
         this.staffVisuals.forEach(visual => visual.offset(dx, 0));
         this.rect.offsetInPlace(dx, dy);
-
-        this.updateStemTips();
     }
 
     draw(renderer: Renderer) {
         let { unitSize, beamThickness, lineWidth } = renderer;
         let color = "black";
-
-        let symbols = this.getSymbols();
 
         this.staffVisuals.forEach(visual => {
             if (this.type === BeamGroupType.TripletGroup) {
