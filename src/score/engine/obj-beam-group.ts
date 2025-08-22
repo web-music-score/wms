@@ -30,17 +30,21 @@ const adjustBeamAngle = (dx: number, dy: number) => {
 }
 
 class BeamPoint {
-    constructor(public staff: ObjStaff, public symbol: RhythmSymbol, public x: number, public y: number) {
+    public topBeamsHeight = 0;
+    public bottomBeamsHeight = 0;
+
+    constructor(public staff: ObjStaff, public beamGroup: ObjBeamGroup, public symbol: RhythmSymbol, public x: number, public y: number) {
         staff.addObject(this);
     }
 
     offset(dx: number, dy: number) {
         this.x += dx;
         this.y += dy;
+        this.beamGroup.updateRect();
     }
 
     getRect(): DivRect {
-        return new DivRect(this.x, this.x, this.x, this.y, this.y, this.y);
+        return new DivRect(this.x, this.x, this.x, this.y - this.topBeamsHeight, this.y, this.y + this.bottomBeamsHeight);
     }
 }
 
@@ -68,14 +72,23 @@ export class ObjBeamGroupVisual extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    setRect(r: DivRect) {
-        this.rect = r;
-    }
-
     offset(dx: number, dy: number) {
         this.points.forEach(p => p.offset(dx, 0));
         this.tripletNumber?.offset(dx, dy);
-        this.rect.offsetInPlace(dx, dy);
+        this.updateRect();
+    }
+
+    updateRect() {
+        if (this.points.length > 0) {
+            this.rect = this.points[0].getRect().copy();
+        }
+        else if (this.tripletNumber) {
+            this.rect = this.tripletNumber.getRect().copy();
+        }
+        this.points.forEach(pt => this.rect.expandInPlace(pt.getRect()));
+        if (this.tripletNumber) {
+            this.rect.expandInPlace(this.tripletNumber.getRect());
+        }
     }
 }
 
@@ -298,40 +311,38 @@ export class ObjBeamGroup extends MusicObject {
                 let l = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
                 let r = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, 1 + ef);
 
-                visual.points.push(new BeamPoint(leftStaff, leftSymbol, l.x, l.y));
-                visual.points.push(new BeamPoint(rightStaff, rightSymbol, r.x, r.y));
-
-                visual.setRect(new DivRect(l.x, r.x, Math.min(l.y, r.y), Math.max(l.y, r.y)));
+                visual.points.push(new BeamPoint(leftStaff, this, leftSymbol, l.x, l.y));
+                visual.points.push(new BeamPoint(rightStaff, this, rightSymbol, r.x, r.y));
 
                 visual.tripletNumberDistToBeam = 0;
             }
             else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
                 raiseBeamY *= 0.5;
 
+                let { beamThickness } = renderer;
+
+                const beamHeight = (i: number) => {
+                    let sym = symbols[i];
+                    if (sym instanceof ObjNoteGroup) {
+                        let beamCount = sym instanceof ObjNoteGroup ? Math.max(sym.getLeftBeamCount(), sym.getRightBeamCount()) : 0;
+                        return DocumentSettings.BeamSeparation * unitSize * (this.stemDir === Stem.Up ? beamCount - 1 : 0);
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+
                 symbols.forEach((sym, i) => {
                     let symStaff = symbolStaff[i];
                     let symX = symbolX[i];
                     let symY = symbolY[i];
                     if (symStaff && symX !== undefined && symY !== undefined) {
-                        visual.points.push(new BeamPoint(symStaff, sym, symX, symY));
+                        let pt = new BeamPoint(symStaff, this, sym, symX, symY);
+                        pt.topBeamsHeight = beamThickness / 2 + (stemDir === Stem.Down ? beamHeight(i) : 0);
+                        pt.bottomBeamsHeight = beamThickness / 2 + (stemDir === Stem.Up ? beamHeight(i) : 0);
+                        visual.points.push(pt);
                     }
                 });
-
-                if (visual.points.length > 0) {
-                    let { beamThickness } = renderer;
-                    let beamHeight = (i: number) => {
-                        let sym = visual.points[i].symbol;
-                        let beamCount = sym instanceof ObjNoteGroup ? Math.max(sym.getLeftBeamCount(), sym.getRightBeamCount()) : 0;
-                        return DocumentSettings.BeamSeparation * unitSize * (this.stemDir === Stem.Up ? beamCount - 1 : 0);
-                    }
-
-                    visual.setRect(new DivRect(
-                        Math.min(...visual.points.map(p => p.x)),
-                        Math.max(...visual.points.map(p => p.x)),
-                        Math.min(...visual.points.map((p, i) => p.y - beamThickness / 2 - (stemDir === Stem.Down ? beamHeight(i) : 0))),
-                        Math.max(...visual.points.map((p, i) => p.y + beamThickness / 2 + (stemDir === Stem.Up ? beamHeight(i) : 0)))
-                    ));
-                }
 
                 visual.tripletNumberDistToBeam = groupLineDy;
             }
@@ -341,18 +352,30 @@ export class ObjBeamGroup extends MusicObject {
 
                 visual.tripletNumber.layout(renderer);
                 visual.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + visual.tripletNumberDistToBeam);
-
-                visual.setRect(visual.getRect().expandInPlace(visual.tripletNumber.getRect()));
             }
 
-            this.rect = visual.getRect().copy();
-
             if (visual.points.length >= 2) {
+                visual.updateRect();
                 this.staffVisuals.push(visual);
             }
         });
 
-        this.staffVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
+        this.updateRect();
+    }
+
+    updateRect() {
+        if (this.staffVisuals.length === 0) {
+            this.rect = new DivRect();
+        }
+        else {
+            this.staffVisuals.forEach(visual => visual.updateRect());
+
+            this.rect = this.staffVisuals[0].getRect().copy();
+
+            for (let i = 1; i < this.staffVisuals.length; i++) {
+                this.rect.expandInPlace(this.staffVisuals[i].getRect());
+            }
+        }
     }
 
     updateStemTips() {
