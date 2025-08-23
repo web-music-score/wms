@@ -43,7 +43,7 @@ export class ObjStaffRest extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     setRect(r: DivRect) {

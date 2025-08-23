@@ -48,6 +48,9 @@ export class ObjStaffNoteGroup extends MusicObject {
     constructor(readonly staff: ObjStaff, readonly noteGroup: ObjNoteGroup) {
         super(staff);
 
+        // Each rect/point is added to correct staff instead. Use getRect() to update rect.
+        //staff.addObject(this);
+
         this.mi = new MStaffNoteGroup(this);
     }
 
@@ -56,7 +59,7 @@ export class ObjStaffNoteGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     updateRect() {
@@ -111,7 +114,7 @@ export class ObjTabNoteGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     updateRect() {
@@ -230,15 +233,15 @@ export class ObjNoteGroup extends MusicObject {
             return [];
         }
 
-        for (let j = 0; j < this.staffObjects.length; j++) {
-            let arr = this.staffObjects[j].pick(x, y);
+        for (let i = 0; i < this.staffObjects.length; i++) {
+            let arr = this.staffObjects[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
         }
 
-        for (let j = 0; j < this.tabObjects.length; j++) {
-            let arr = this.tabObjects[j].pick(x, y);
+        for (let i = 0; i < this.tabObjects.length; i++) {
+            let arr = this.tabObjects[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -665,9 +668,14 @@ export class ObjNoteGroup extends MusicObject {
                 this.tabObjects.push(obj);
             }
         });
+
+        this.updateRect();
     }
 
     updateRect() {
+        this.staffObjects.forEach(obj => obj.updateRect());
+        this.tabObjects.forEach(obj => obj.updateRect());
+
         if (this.staffObjects.length > 0) {
             this.rect = this.staffObjects[0].noteHeadRects[0].copy();
         }
@@ -679,15 +687,8 @@ export class ObjNoteGroup extends MusicObject {
             return;
         }
 
-        this.staffObjects.forEach(obj => {
-            obj.updateRect();
-            this.rect.expandInPlace(obj.getRect());
-        });
-
-        this.tabObjects.forEach(obj => {
-            obj.updateRect();
-            this.rect.expandInPlace(obj.getRect());
-        });
+        this.staffObjects.forEach(obj => this.rect.expandInPlace(obj.getRect()));
+        this.tabObjects.forEach(obj => this.rect.expandInPlace(obj.getRect()));
     }
 
     setStemTipY(staff: ObjStaff, stemTipY: number) {
