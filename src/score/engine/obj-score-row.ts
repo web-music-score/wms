@@ -108,7 +108,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -130,7 +130,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     getConnectivesContentRect(): DivRect {
-        let r = this.rect;
+        let r = this.getRect();
 
         let firstMeasure = this.getFirstMeasure();
         let left = firstMeasure ? firstMeasure.getColumnsContentRect().left : r.left;
@@ -199,12 +199,14 @@ export class ObjScoreRow extends MusicObject {
             return;
         }
 
+        this.requestRectUpdate();
+
         this.notationLines.forEach(line => {
             line.removeObjects();
             line.layoutHeight(renderer);
         });
 
-        let rect = new DivRect(0, 0, 0, 0);
+        this.rect = new DivRect(0, 0, 0, 0);
 
         // Calc min width
         this.minWidth = 0;
@@ -212,12 +214,10 @@ export class ObjScoreRow extends MusicObject {
         // Layout measures
         this.measures.forEach(m => {
             m.layout(renderer);
-            rect.expandInPlace(new DivRect(0, 0, m.getRect().top, m.getRect().bottom));
+            this.rect.expandInPlace(new DivRect(0, 0, m.getRect().top, m.getRect().bottom));
             this.minWidth += m.getMinWidth();
             this.minWidth += m.getPostMeasureBreakWidth();
         });
-
-        this.rect = rect;
     }
 
     layoutWidth(renderer: Renderer, width: number) {
@@ -227,9 +227,8 @@ export class ObjScoreRow extends MusicObject {
 
         let rowWidth = Math.max(width, this.minWidth);
 
-        this.rect = new DivRect(
-            this.rect.left, this.rect.left + rowWidth / 2, this.rect.left + rowWidth,
-            this.rect.top, this.rect.centerY, this.rect.bottom);
+        this.rect.centerX = this.rect.left + rowWidth / 2;
+        this.rect.right = this.rect.left + rowWidth;
 
         this.notationLines.forEach(line => line.layoutWidth(renderer));
 
@@ -304,17 +303,22 @@ export class ObjScoreRow extends MusicObject {
             }
         }
 
-        this.updateRectHeight();
-    }
+        this.requestRectUpdate();
 
-    updateRectHeight() {
+        this.measures.forEach(m => {
+            m.requestRectUpdate();
+            m.getBarLineLeft().requestRectUpdate();
+            m.getBarLineRight().requestRectUpdate();
+            m.getColumns().forEach(col => col.requestRectUpdate());
+        });
+
         let lines = this.getNotationLines();
 
         this.rect.top = lines[0].calcTop();
         this.rect.bottom = lines[lines.length - 1].calcBottom();
-
-        this.measures.forEach(m => m.updateRectHeight());
     }
+
+    updateRect() { }
 
     private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
         if (y === undefined) {
@@ -390,10 +394,12 @@ export class ObjScoreRow extends MusicObject {
 
     layoutPadding(renderer: Renderer) {
         // Add padding to rect
-        let r = this.rect;
         let p = renderer.unitSize / 2;
 
-        this.rect = new DivRect(r.left - p, r.centerX, r.right + p, r.top - p, r.centerY, r.bottom + p);
+        this.rect.left -= p;
+        this.rect.right += p;
+        this.rect.top -= p;
+        this.rect.bottom += p;
     }
 
     layoutDone() {
@@ -415,11 +421,11 @@ export class ObjScoreRow extends MusicObject {
             return;
         }
 
-        renderer.drawDebugRect(this.rect);
+        renderer.drawDebugRect(this.getRect());
 
         // Set clip rect for this row
         ctx.save();
-        ctx.rect(this.rect.left, this.rect.top, this.rect.width, this.rect.height);
+        ctx.rect(this.getRect().left, this.getRect().top, this.getRect().width, this.getRect().height);
         ctx.clip();
 
         // For multiple notation lines draw vertical start line (which is not drawn by measures)

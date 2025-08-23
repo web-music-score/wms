@@ -215,7 +215,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -773,8 +773,8 @@ export class ObjMeasure extends MusicObject {
         return new DivRect(
             this.barLineLeft.getRect().centerX,
             this.barLineRight.getRect().centerX,
-            this.rect.top,
-            this.rect.bottom);
+            this.getRect().top,
+            this.getRect().bottom);
     }
 
     getLeftSolidAreaWidth() {
@@ -1056,6 +1056,8 @@ export class ObjMeasure extends MusicObject {
             return;
         }
 
+        this.requestRectUpdate();
+
         let { unitSize } = renderer;
 
         this.postMeasureBreakWidth = this.hasPostMeasureBreak()
@@ -1156,9 +1158,8 @@ export class ObjMeasure extends MusicObject {
 
         width = Math.max(width, this.getMinWidth());
 
-        this.rect = new DivRect(
-            this.rect.left, this.rect.left + width / 2, this.rect.left + width,
-            this.rect.top, this.rect.centerY, this.rect.bottom);
+        this.rect.centerX = this.rect.left + width / 2;
+        this.rect.right = this.rect.left + width;
 
         let rect: DivRect;
 
@@ -1209,12 +1210,8 @@ export class ObjMeasure extends MusicObject {
             // Connectives enter neighbors, only expand height for now.
             let r = connective.getRect();
 
-            this.rect = new DivRect(
-                this.rect.left,
-                this.rect.right,
-                Math.min(this.rect.top, r.top),
-                Math.max(this.rect.bottom, r.bottom)
-            );
+            this.rect.top = Math.min(this.rect.top, r.top);
+            this.rect.bottom = Math.max(this.rect.bottom, r.bottom);
         });
     }
 
@@ -1239,11 +1236,7 @@ export class ObjMeasure extends MusicObject {
         this.needLayout = false;
     }
 
-    updateRectHeight() {
-        this.barLineLeft.requestRectUpdate();
-        this.columns.forEach(c => c.requestRectUpdate());
-        this.barLineRight.requestRectUpdate();
-
+    updateRect() {
         let tops = [
             ...this.signatures.map(s => s.getRect().top),
             this.barLineLeft.getRect().top,
@@ -1291,10 +1284,12 @@ export class ObjMeasure extends MusicObject {
         this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.offset(dx, dy));
 
         this.rect.offsetInPlace(dx, dy);
+
+        this.requestRectUpdate();
     }
 
     draw(renderer: Renderer) {
-        renderer.drawDebugRect(this.rect);
+        renderer.drawDebugRect(this.getRect());
 
         // Draw staff lines
         let left = this.getStaffLineLeft();
