@@ -1,5 +1,5 @@
 import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
-import { DivRect, MRest, MRestVisual, MusicInterface, RestOptions, Stem } from "../pub";
+import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
@@ -25,17 +25,17 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
     }
 }
 
-export class ObjRestVisual extends MusicObject {
+export class ObjStaffRest extends MusicObject {
     public dotRect?: DivRect;
 
-    readonly mi: MRestVisual;
+    readonly mi: MStaffRest;
 
-    constructor(readonly staff: ObjStaff) {
+    constructor(readonly staff: ObjStaff, readonly rest: ObjRest) {
         super(staff);
 
         staff.addObject(this);
 
-        this.mi = new MRestVisual(this);
+        this.mi = new MStaffRest(this);
     }
 
     getMusicInterface(): MusicInterface {
@@ -66,7 +66,7 @@ export class ObjRest extends MusicObject {
 
     private beamGroup?: ObjBeamGroup;
 
-    readonly staffVisuals: ObjRestVisual[] = [];
+    readonly staffObjects: ObjStaffRest[] = [];
 
     readonly mi: MRest;
 
@@ -136,8 +136,8 @@ export class ObjRest extends MusicObject {
             return [];
         }
 
-        for (let i = 0; i < this.staffVisuals.length; i++) {
-            let arr = this.staffVisuals[i].pick(x, y);
+        for (let i = 0; i < this.staffObjects.length; i++) {
+            let arr = this.staffObjects[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -160,10 +160,10 @@ export class ObjRest extends MusicObject {
     }
 
     getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
-        return this.staffVisuals.map(visual => {
-            let staff = visual.staff;
-            let x = visual.getRect().centerX;
-            let y = this.stemDir === Stem.Up ? visual.getRect().top : visual.getRect().bottom;
+        return this.staffObjects.map(obj => {
+            let staff = obj.staff;
+            let x = obj.getRect().centerX;
+            let y = this.stemDir === Stem.Up ? obj.getRect().top : obj.getRect().bottom;
             return { staff, x, y }
         });
     }
@@ -185,7 +185,7 @@ export class ObjRest extends MusicObject {
     updateAccidentalState(accState: AccidentalState) { }
 
     layout(renderer: Renderer, accState: AccidentalState) {
-        this.staffVisuals.length = 0;
+        this.staffObjects.length = 0;
 
         if (this.hide) {
             this.updateRect();
@@ -232,7 +232,7 @@ export class ObjRest extends MusicObject {
                 return;
             }
 
-            let visual = new ObjRestVisual(staff);
+            let obj = new ObjStaffRest(staff, this);
 
             let r = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
@@ -242,43 +242,43 @@ export class ObjRest extends MusicObject {
                 let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize / 2) * unitSize;
                 let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
-                visual.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
-                r.expandInPlace(visual.dotRect);
+                obj.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                r.expandInPlace(obj.dotRect);
             }
 
-            visual.setRect(r);
+            obj.setRect(r);
 
-            visual.offset(0, staff.getDiatonicIdY(ownDiatonicId));
+            obj.offset(0, staff.getDiatonicIdY(ownDiatonicId));
 
-            this.staffVisuals.push(visual);
+            this.staffObjects.push(obj);
         });
 
         this.updateRect();
     }
 
     updateRect() {
-        if (this.staffVisuals.length === 0) {
+        if (this.staffObjects.length === 0) {
             this.rect = new DivRect();
         }
         else {
-            this.rect = this.staffVisuals[0].getRect().copy();
-            if (this.staffVisuals.length > 1) {
-                for (let i = 1; i < this.staffVisuals.length; i++) {
-                    this.rect.expandInPlace(this.staffVisuals[i].getRect());
+            this.rect = this.staffObjects[0].getRect().copy();
+            if (this.staffObjects.length > 1) {
+                for (let i = 1; i < this.staffObjects.length; i++) {
+                    this.rect.expandInPlace(this.staffObjects[i].getRect());
                 }
             }
         }
     }
 
     offset(dx: number, dy: number) {
-        this.staffVisuals.forEach(s => s.offset(dx, 0));
+        this.staffObjects.forEach(s => s.offset(dx, 0));
         this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) {
         let ctx = renderer.getCanvasContext();
 
-        if (!ctx || this.staffVisuals.length === 0) {
+        if (!ctx || this.staffObjects.length === 0) {
             return;
         }
 
@@ -291,9 +291,9 @@ export class ObjRest extends MusicObject {
         ctx.strokeStyle = ctx.fillStyle = color;
         ctx.lineWidth = lineWidth;
 
-        this.staffVisuals.forEach(visual => {
-            let { dotRect } = visual;
-            let rect = visual.getRect();
+        this.staffObjects.forEach(obj => {
+            let { dotRect } = obj;
+            let rect = obj.getRect();
 
             let x = rect.centerX;
             let y = rect.centerY;

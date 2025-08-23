@@ -1,25 +1,25 @@
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjMeasure } from "./obj-measure";
-import { MBarLineRight, MBarLineLeft, Navigation, DivRect, MusicInterface, MBarLineVisual } from "../pub";
+import { MBarLineRight, MBarLineLeft, Navigation, DivRect, MusicInterface, MStaffTabBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
-export class ObjBarLineVisual extends MusicObject {
+export class ObjStaffTabBarLine extends MusicObject {
     public lineRects: DivRect[] = [];
     public dotRects: DivRect[] = [];
 
-    readonly mi: MBarLineVisual;
+    readonly mi: MStaffTabBarLine;
 
     constructor(readonly line: ObjStaff | ObjTab) {
         super(line);
 
         line.addObject(this);
 
-        this.mi = new MBarLineVisual(this);
+        this.mi = new MStaffTabBarLine(this);
     }
 
     getMusicInterface(): MusicInterface {
@@ -42,7 +42,7 @@ export class ObjBarLineVisual extends MusicObject {
 }
 
 abstract class ObjBarLine extends MusicObject {
-    protected staffTabVisuals: ObjBarLineVisual[] = [];
+    protected staffTabObjects: ObjStaffTabBarLine[] = [];
     protected barLineType = BarLineType.None;
 
     constructor(readonly measure: ObjMeasure) {
@@ -56,8 +56,8 @@ abstract class ObjBarLine extends MusicObject {
             return [];
         }
 
-        for (let i = 0; i < this.staffTabVisuals.length; i++) {
-            let arr = this.staffTabVisuals[i].pick(x, y);
+        for (let i = 0; i < this.staffTabObjects.length; i++) {
+            let arr = this.staffTabObjects[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -67,7 +67,7 @@ abstract class ObjBarLine extends MusicObject {
     }
 
     layout(renderer: Renderer) {
-        this.staffTabVisuals.length = 0;
+        this.staffTabObjects.length = 0;
 
         this.barLineType = this.solveBarLineType();
 
@@ -82,20 +82,20 @@ abstract class ObjBarLine extends MusicObject {
         let dotRadius = dotW / 2;
 
         row.getNotationLines().forEach(line => {
-            let visual = new ObjBarLineVisual(line);
+            let obj = new ObjStaffTabBarLine(line);
 
             let lineCenterY: number;
             let lineDotOff: number;
             let top: number, bottom: number;
 
             const addRect = (left: number, width: number) => {
-                visual.lineRects.push(new DivRect(left, left + width / 2, left + width, top, 0, bottom));
+                obj.lineRects.push(new DivRect(left, left + width / 2, left + width, top, 0, bottom));
             }
 
             const addDots = (cx: number) => {
                 for (let i = -1; i <= 1; i += 2) {
                     let y = lineCenterY + i * lineDotOff;
-                    visual.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, y - dotRadius, y, y + dotRadius));
+                    obj.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, y - dotRadius, y, y + dotRadius));
                 }
             }
 
@@ -114,36 +114,36 @@ abstract class ObjBarLine extends MusicObject {
 
             switch (barLineType) {
                 case BarLineType.None:
-                    visual.setRect(new DivRect(0, 0, 0, top, 0, bottom));
+                    obj.setRect(new DivRect(0, 0, 0, top, 0, bottom));
                     break;
                 case BarLineType.Single:
-                    visual.setRect(new DivRect(-thinW, 0, 0, top, 0, bottom));
+                    obj.setRect(new DivRect(-thinW, 0, 0, top, 0, bottom));
                     addRect(-thinW, thinW);
                     break;
                 case BarLineType.Double:
-                    visual.setRect(new DivRect(-thinW - spaceW - thinW, 0, 0, top, 0, bottom));
+                    obj.setRect(new DivRect(-thinW - spaceW - thinW, 0, 0, top, 0, bottom));
                     addRect(-thinW - spaceW - thinW, thinW);
                     addRect(-thinW, thinW);
                     break;
                 case BarLineType.EndSong:
-                    visual.setRect(new DivRect(-thicW - spaceW - thinW, 0, 0, top, 0, bottom));
+                    obj.setRect(new DivRect(-thicW - spaceW - thinW, 0, 0, top, 0, bottom));
                     addRect(-thinW - spaceW - thicW, thinW);
                     addRect(-thicW, thicW);
                     break;
                 case BarLineType.StartRepeat:
-                    visual.setRect(new DivRect(0, 0, thicW + spaceW + thinW + spaceW + dotW, top, 0, bottom));
+                    obj.setRect(new DivRect(0, 0, thicW + spaceW + thinW + spaceW + dotW, top, 0, bottom));
                     addRect(0, thicW);
                     addRect(thicW + spaceW, thinW);
                     addDots(thicW + spaceW + thinW + spaceW + dotRadius);
                     break;
                 case BarLineType.EndRepeat:
-                    visual.setRect(new DivRect(-thicW - spaceW - thinW - spaceW - dotW, 0, 0, top, 0, bottom));
+                    obj.setRect(new DivRect(-thicW - spaceW - thinW - spaceW - dotW, 0, 0, top, 0, bottom));
                     addRect(-thinW - spaceW - thicW, thinW);
                     addRect(-thicW, thicW);
                     addDots(-thinW - spaceW - thicW - spaceW - dotRadius);
                     break;
                 case BarLineType.EndStartRepeat:
-                    visual.setRect(new DivRect(-dotW - spaceW - thinW - spaceW - thicW / 2, 0, thicW / 2 + spaceW + thinW + spaceW + dotW, top, 0, bottom));
+                    obj.setRect(new DivRect(-dotW - spaceW - thinW - spaceW - thicW / 2, 0, thicW / 2 + spaceW + thinW + spaceW + dotW, top, 0, bottom));
                     addRect(-thicW / 2, thicW);
                     addRect(-thicW / 2 - spaceW - thinW, thinW);
                     addRect(thicW / 2 + spaceW, thinW);
@@ -152,19 +152,19 @@ abstract class ObjBarLine extends MusicObject {
                     break;
             }
 
-            this.staffTabVisuals.push(visual);
+            this.staffTabObjects.push(obj);
         });
 
-        this.rect = this.staffTabVisuals[0].getRect().copy();
+        this.rect = this.staffTabObjects[0].getRect().copy();
 
-        if (this.staffTabVisuals.length > 1) {
-            this.staffTabVisuals.forEach(visual => this.rect.expandInPlace(visual.getRect()));
+        if (this.staffTabObjects.length > 1) {
+            this.staffTabObjects.forEach(obj => this.rect.expandInPlace(obj.getRect()));
         }
     }
 
     updateRectHeight() {
-        let tops = this.staffTabVisuals.map(visual => visual.getRect().top);
-        let bottoms = this.staffTabVisuals.map(visual => visual.getRect().bottom);
+        let tops = this.staffTabObjects.map(obj => obj.getRect().top);
+        let bottoms = this.staffTabObjects.map(obj => obj.getRect().bottom);
 
         if (tops.length === 0 || bottoms.length === 0) {
             this.rect.top = this.rect.bottom = 0;
@@ -177,7 +177,7 @@ abstract class ObjBarLine extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.rect.offsetInPlace(dx, dy);
-        this.staffTabVisuals.forEach(visual => visual.offset(dx, 0));
+        this.staffTabObjects.forEach(obj => obj.offset(dx, 0));
     }
 
     draw(renderer: Renderer) {
@@ -191,9 +191,9 @@ abstract class ObjBarLine extends MusicObject {
 
         ctx.strokeStyle = ctx.fillStyle = "black";
 
-        this.staffTabVisuals.forEach(visual => {
-            visual.lineRects.forEach(r => ctx.fillRect(r.left, r.top, r.width, r.height));
-            visual.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
+        this.staffTabObjects.forEach(obj => {
+            obj.lineRects.forEach(r => ctx.fillRect(r.left, r.top, r.width, r.height));
+            obj.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
         });
     }
 }

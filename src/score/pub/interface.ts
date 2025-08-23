@@ -11,9 +11,9 @@ import { ObjFermata } from "../engine/obj-fermata";
 import { ObjHeader } from "../engine/obj-header";
 import { ObjImage } from "../engine/obj-image";
 import { ObjMeasure } from "../engine/obj-measure";
-import { ObjBarLineRight, ObjBarLineLeft, ObjBarLineVisual } from "../engine/obj-bar-line";
-import { ObjNoteGroupTabVisual, ObjNoteGroup, ObjNoteGroupVisual } from "../engine/obj-note-group";
-import { ObjRest, ObjRestVisual } from "../engine/obj-rest";
+import { ObjBarLineRight, ObjBarLineLeft, ObjStaffTabBarLine } from "../engine/obj-bar-line";
+import { ObjTabNoteGroup, ObjNoteGroup, ObjStaffNoteGroup } from "../engine/obj-note-group";
+import { ObjRest, ObjStaffRest } from "../engine/obj-rest";
 import { ObjRhythmColumn } from "../engine/obj-rhythm-column";
 import { ObjScoreRow } from "../engine/obj-score-row";
 import { ObjSignature } from "../engine/obj-signature";
@@ -22,7 +22,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "./div-rect";
 import { Player } from "../engine/player";
 import { Renderer } from "../engine/renderer";
-import { ObjBeamGroup, ObjBeamGroupVisual } from "../engine/obj-beam-group";
+import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { Clef, Connective, ConnectiveSpan, DocumentOptions, PlayStateChangeListener, StaffConfig, Stem, StringNumber, TabConfig, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
@@ -194,16 +194,16 @@ export class MBeamGroup extends MusicInterface {
 }
 
 /** @public */
-export class MBeamGroupVisual extends MusicInterface {
-    static readonly Name = "BeamGroupVisual";
+export class MStaffBeamGroup extends MusicInterface {
+    static readonly Name = "StaffBeamGroup";
 
     /** @internal */
-    constructor(private readonly obj: ObjBeamGroupVisual) {
-        super(MBeamGroupVisual.Name);
+    constructor(private readonly obj: ObjStaffBeamGroup) {
+        super(MStaffBeamGroup.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjBeamGroupVisual {
+    getMusicObject(): ObjStaffBeamGroup {
         return this.obj;
     }
 }
@@ -637,16 +637,16 @@ export class MBarLineLeft extends MusicInterface {
 }
 
 /** @public */
-export class MBarLineVisual extends MusicInterface {
-    static readonly Name = "BarLineVisual";
+export class MStaffTabBarLine extends MusicInterface {
+    static readonly Name = "StaffTabBarLine";
 
     /** @internal */
-    constructor(private readonly obj: ObjBarLineVisual) {
-        super(MBarLineVisual.Name);
+    constructor(private readonly obj: ObjStaffTabBarLine) {
+        super(MStaffTabBarLine.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjBarLineVisual {
+    getMusicObject(): ObjStaffTabBarLine {
         return this.obj;
     }
 }
@@ -675,32 +675,40 @@ export class MNoteGroup extends MusicInterface {
 }
 
 /** @public */
-export class MNoteGroupVisual extends MusicInterface {
-    static readonly Name = "NoteGroupVisual";
+export class MStaffNoteGroup extends MusicInterface {
+    static readonly Name = "StaffNoteGroup";
 
     /** @internal */
-    constructor(private readonly obj: ObjNoteGroupVisual) {
-        super(MNoteGroupVisual.Name);
+    constructor(private readonly obj: ObjStaffNoteGroup) {
+        super(MStaffNoteGroup.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjNoteGroupVisual {
+    getMusicObject(): ObjStaffNoteGroup {
         return this.obj;
+    }
+
+    getNoteGroup(): MNoteGroup {
+        return this.obj.noteGroup.getMusicInterface();
     }
 }
 
 /** @public */
-export class MNoteGroupTabVisual extends MusicInterface {
-    static readonly Name = "NoteGroupTabVisual";
+export class MTabNoteGroup extends MusicInterface {
+    static readonly Name = "TabNoteGroup";
 
     /** @internal */
-    constructor(private readonly obj: ObjNoteGroupTabVisual) {
-        super(MNoteGroupTabVisual.Name);
+    constructor(private readonly obj: ObjTabNoteGroup) {
+        super(MTabNoteGroup.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjNoteGroupTabVisual {
+    getMusicObject(): ObjTabNoteGroup {
         return this.obj;
+    }
+
+    getNoteGroup(): MNoteGroup {
+        return this.obj.noteGroup.getMusicInterface();
     }
 }
 
@@ -724,17 +732,21 @@ export class MRest extends MusicInterface {
 }
 
 /** @public */
-export class MRestVisual extends MusicInterface {
-    static readonly Name = "RestVisual";
+export class MStaffRest extends MusicInterface {
+    static readonly Name = "StaffRest";
 
     /** @internal */
-    constructor(private readonly obj: ObjRestVisual) {
-        super(MRestVisual.Name);
+    constructor(private readonly obj: ObjStaffRest) {
+        super(MStaffRest.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjRestVisual {
+    getMusicObject(): ObjStaffRest {
         return this.obj;
+    }
+    
+    getRest(): MRest {
+        return this.obj.rest.getMusicInterface();
     }
 }
 
