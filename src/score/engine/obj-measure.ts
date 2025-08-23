@@ -804,7 +804,7 @@ export class ObjMeasure extends MusicObject {
             return prev.getStaffLineRight();
         }
         else {
-            return this.rect.left;
+            return this.getRect().left;
         }
     }
 
@@ -1240,9 +1240,9 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateRectHeight() {
-        this.barLineLeft.updateRectHeight();
-        this.columns.forEach(c => c.updateRectHeight());
-        this.barLineRight.updateRectHeight();
+        this.barLineLeft.requestRectUpdate();
+        this.columns.forEach(c => c.requestRectUpdate());
+        this.barLineRight.requestRectUpdate();
 
         let tops = [
             ...this.signatures.map(s => s.getRect().top),

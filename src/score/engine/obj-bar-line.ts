@@ -27,7 +27,7 @@ export class ObjStaffTabBarLine extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     setRect(r: DivRect) {
@@ -52,7 +52,7 @@ abstract class ObjBarLine extends MusicObject {
     abstract solveBarLineType(): BarLineType;
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -67,6 +67,7 @@ abstract class ObjBarLine extends MusicObject {
     }
 
     layout(renderer: Renderer) {
+        this.requestRectUpdate();
         this.staffTabObjects.length = 0;
 
         this.barLineType = this.solveBarLineType();
@@ -154,30 +155,23 @@ abstract class ObjBarLine extends MusicObject {
 
             this.staffTabObjects.push(obj);
         });
-
-        this.rect = this.staffTabObjects[0].getRect().copy();
-
-        if (this.staffTabObjects.length > 1) {
-            this.staffTabObjects.forEach(obj => this.rect.expandInPlace(obj.getRect()));
-        }
     }
 
-    updateRectHeight() {
-        let tops = this.staffTabObjects.map(obj => obj.getRect().top);
-        let bottoms = this.staffTabObjects.map(obj => obj.getRect().bottom);
-
-        if (tops.length === 0 || bottoms.length === 0) {
-            this.rect.top = this.rect.bottom = 0;
+    updateRect() {
+        if (this.staffTabObjects.length > 0) {
+            this.rect = this.staffTabObjects[0].getRect().copy();
+            for (let i = 1; i < this.staffTabObjects.length; i++) {
+                this.rect.expandInPlace(this.staffTabObjects[i].getRect());
+            }
         }
         else {
-            this.rect.top = Math.min(...tops);
-            this.rect.bottom = Math.max(...bottoms);
+            this.rect = new DivRect();
         }
     }
 
     offset(dx: number, dy: number) {
-        this.rect.offsetInPlace(dx, dy);
         this.staffTabObjects.forEach(obj => obj.offset(dx, 0));
+        this.requestRectUpdate();
     }
 
     draw(renderer: Renderer) {
@@ -187,7 +181,7 @@ abstract class ObjBarLine extends MusicObject {
             return;
         }
 
-        renderer.drawDebugRect(this.rect);
+        renderer.drawDebugRect(this.getRect());
 
         ctx.strokeStyle = ctx.fillStyle = "black";
 

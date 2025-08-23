@@ -131,7 +131,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -383,14 +383,14 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.centerX = 0;
         this.rect.right = rightw;
 
-        this.updateRectHeight();
+        this.requestRectUpdate();
     }
 
     layoutDone() {
         this.needLayout = false;
     }
 
-    updateRectHeight() {
+    updateRect() {
         this.voiceSymbol.filter(s => s !== undefined).forEach(s => s.updateRect());
 
         this.shapeRects = [
@@ -418,11 +418,11 @@ export class ObjRhythmColumn extends MusicObject {
     draw(renderer: Renderer) {
         // Draw ledger lines
         if (this.minDiatonicId !== undefined) {
-            renderer.drawLedgerLines(this.row, this.minDiatonicId, this.rect.centerX);
+            renderer.drawLedgerLines(this.row, this.minDiatonicId, this.getRect().centerX);
         }
 
         if (this.maxDiatonicId !== undefined) {
-            renderer.drawLedgerLines(this.row, this.maxDiatonicId, this.rect.centerX);
+            renderer.drawLedgerLines(this.row, this.maxDiatonicId, this.getRect().centerX);
         }
 
         // Draw symbols
