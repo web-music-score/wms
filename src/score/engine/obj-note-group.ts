@@ -77,12 +77,12 @@ export class ObjStaffNoteGroup extends MusicObject {
         let topNoteRect = this.noteHeadRects[this.noteHeadRects.length - 1];
 
         if (this.prevTopNoteY !== topNoteRect.centerY || this.prevBottomNoteY !== bottomNoteRect.centerY) {
-            this.updateRect();
             this.prevTopNoteY = topNoteRect.centerY;
             this.prevBottomNoteY = bottomNoteRect.centerY;
+            this.requestRectUpdate();
         }
 
-        return this.rect;
+        return super.getRect();
     }
 
     offset(dx: number, dy: number) {
@@ -92,7 +92,8 @@ export class ObjStaffNoteGroup extends MusicObject {
         this.stemTip?.offsetInPlace(dx, dy);
         this.stemBase?.offsetInPlace(dx, dy);
         this.flagRects.forEach(n => n.offsetInPlace(dx, dy));
-        this.rect.offsetInPlace(dx, dy);
+        this.requestRectUpdate();
+        this.noteGroup.requestRectUpdate();
     }
 }
 
@@ -124,7 +125,8 @@ export class ObjTabNoteGroup extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.fretNumbers.forEach(f => f.offset(dx, dy));
-        this.rect.offsetInPlace(dx, dy);
+        this.requestRectUpdate();
+        this.noteGroup.requestRectUpdate();
     }
 }
 
@@ -229,7 +231,7 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -522,6 +524,8 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     layout(renderer: Renderer, accState: AccidentalState) {
+        this.requestRectUpdate();
+
         let { unitSize } = renderer;
         let { row, stemDir } = this;
         let { dotted, flagCount } = this.rhythmProps;
@@ -668,8 +672,6 @@ export class ObjNoteGroup extends MusicObject {
                 this.tabObjects.push(obj);
             }
         });
-
-        this.updateRect();
     }
 
     updateRect() {
@@ -700,13 +702,13 @@ export class ObjNoteGroup extends MusicObject {
 
         obj.stemTip.top = obj.stemTip.centerY = obj.stemTip.bottom = stemTipY;
 
-        this.updateRect();
+        this.requestRectUpdate();
     }
 
     offset(dx: number, dy: number) {
         this.staffObjects.forEach(obj => obj.offset(dx, 0)); // dy is offset in notation line
         this.tabObjects.forEach(obj => obj.offset(dx, 0));   // dy is offset in notation line
-        this.rect.offsetInPlace(dx, dy);
+        this.requestRectUpdate();
     }
 
     draw(renderer: Renderer) {
@@ -716,7 +718,7 @@ export class ObjNoteGroup extends MusicObject {
             return;
         }
 
-        renderer.drawDebugRect(this.rect);
+        renderer.drawDebugRect(this.getRect());
 
         let { lineWidth } = renderer;
         let { color, stemDir } = this;

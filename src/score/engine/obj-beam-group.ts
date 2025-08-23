@@ -40,7 +40,7 @@ class BeamPoint {
     offset(dx: number, dy: number) {
         this.x += dx;
         this.y += dy;
-        this.beamGroup.updateRect();
+        this.beamGroup.requestRectUpdate();
     }
 
     getRect(): DivRect {
@@ -56,7 +56,7 @@ export class ObjStaffBeamGroup extends MusicObject {
 
     readonly mi: MStaffBeamGroup;
 
-    constructor(readonly staff: ObjStaff) {
+    constructor(readonly staff: ObjStaff, readonly beamGroup: ObjBeamGroup) {
         super(staff);
 
         staff.addObject(this);
@@ -69,13 +69,14 @@ export class ObjStaffBeamGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     offset(dx: number, dy: number) {
         this.points.forEach(p => p.offset(dx, 0));
         this.tripletNumber?.offset(dx, dy);
-        this.updateRect();
+        this.requestRectUpdate();
+        this.beamGroup.requestRectUpdate();
     }
 
     updateRect() {
@@ -196,7 +197,7 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -235,12 +236,12 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     layout(renderer: Renderer) {
+        this.requestRectUpdate();
         this.staffObjects.length = 0;
 
         let symbols = this.getSymbols();
 
         if (symbols.length === 0) {
-            this.updateRect();
             return;
         }
 
@@ -303,7 +304,7 @@ export class ObjBeamGroup extends MusicObject {
             rightY += raiseBeamY;
             symbolY = symbolY.map(y => y === undefined ? undefined : y + raiseBeamY);
 
-            let obj = new ObjStaffBeamGroup(mainStaff);
+            let obj = new ObjStaffBeamGroup(mainStaff, this);
 
             if (this.type === BeamGroupType.TripletGroup) {
                 let ef = unitSize / (rightX - leftX);
@@ -355,12 +356,9 @@ export class ObjBeamGroup extends MusicObject {
             }
 
             if (obj.points.length >= 2) {
-                obj.updateRect();
                 this.staffObjects.push(obj);
             }
         });
-
-        this.updateRect();
     }
 
     updateRect() {
@@ -403,7 +401,7 @@ export class ObjBeamGroup extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.staffObjects.forEach(obj => obj.offset(dx, 0));
-        this.rect.offsetInPlace(dx, dy);
+        this.requestRectUpdate();
     }
 
     draw(renderer: Renderer) {

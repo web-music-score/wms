@@ -31,8 +31,6 @@ export class MusicObjectLink {
 }
 
 export abstract class MusicObject {
-    protected rect = new DivRect();
-
     private anchoredLayoutObjects: LayoutObjectWrapper[] = [];
 
     private link?: MusicObjectLink = undefined;
@@ -45,7 +43,20 @@ export abstract class MusicObject {
         return this.parent;
     }
 
+    protected rect = new DivRect();
+    private needRectUpdate = true;
+
+    requestRectUpdate() {
+        this.needRectUpdate = true;
+    }
+
+    updateRect() { }
+
     getRect(): DivRect {
+        if (this.needRectUpdate) {
+            this.updateRect();
+            this.needRectUpdate = false;
+        }
         return this.rect;
     }
 

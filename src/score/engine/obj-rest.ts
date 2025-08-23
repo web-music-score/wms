@@ -26,6 +26,7 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
 }
 
 export class ObjStaffRest extends MusicObject {
+    public restRect = new DivRect();
     public dotRect?: DivRect;
 
     readonly mi: MStaffRest;
@@ -46,13 +47,18 @@ export class ObjStaffRest extends MusicObject {
         return this.getRect().contains(x, y) ? [this] : [];
     }
 
-    setRect(r: DivRect) {
-        this.rect = r;
+    offset(dx: number, dy: number) {
+        this.restRect.offsetInPlace(dx, dy);
+        this.dotRect?.offsetInPlace(dx, dy);
+        this.requestRectUpdate();
+        this.rest.requestRectUpdate();
     }
 
-    offset(dx: number, dy: number) {
-        this.rect.offsetInPlace(dx, dy);
-        this.dotRect?.offsetInPlace(dx, dy);
+    updateRect(): void {
+        this.rect = this.restRect.copy();
+        if (this.dotRect) {
+            this.rect.expandInPlace(this.dotRect);
+        }
     }
 }
 
@@ -132,7 +138,7 @@ export class ObjRest extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        if (!this.rect.contains(x, y)) {
+        if (!this.getRect().contains(x, y)) {
             return [];
         }
 
@@ -185,10 +191,10 @@ export class ObjRest extends MusicObject {
     updateAccidentalState(accState: AccidentalState) { }
 
     layout(renderer: Renderer, accState: AccidentalState) {
+        this.requestRectUpdate();
         this.staffObjects.length = 0;
 
         if (this.hide) {
-            this.updateRect();
             return;
         }
 
@@ -234,7 +240,7 @@ export class ObjRest extends MusicObject {
 
             let obj = new ObjStaffRest(staff, this);
 
-            let r = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+            obj.restRect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
             if (dotted) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
@@ -243,17 +249,12 @@ export class ObjRest extends MusicObject {
                 let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
                 obj.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
-                r.expandInPlace(obj.dotRect);
             }
-
-            obj.setRect(r);
 
             obj.offset(0, staff.getDiatonicIdY(ownDiatonicId));
 
             this.staffObjects.push(obj);
         });
-
-        this.updateRect();
     }
 
     updateRect() {
@@ -272,7 +273,7 @@ export class ObjRest extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.staffObjects.forEach(s => s.offset(dx, 0));
-        this.rect.offsetInPlace(dx, dy);
+        this.requestRectUpdate();
     }
 
     draw(renderer: Renderer) {
@@ -282,7 +283,7 @@ export class ObjRest extends MusicObject {
             return;
         }
 
-        renderer.drawDebugRect(this.rect);
+        renderer.drawDebugRect(this.getRect());
 
         let { unitSize, lineWidth } = renderer;
         let { color } = this;
@@ -292,11 +293,10 @@ export class ObjRest extends MusicObject {
         ctx.lineWidth = lineWidth;
 
         this.staffObjects.forEach(obj => {
-            let { dotRect } = obj;
-            let rect = obj.getRect();
+            let { dotRect, restRect } = obj;
 
-            let x = rect.centerX;
-            let y = rect.centerY;
+            let x = restRect.centerX;
+            let y = restRect.centerY;
 
             if (noteLength === NoteLength.Whole) {
                 ctx.fillRect(x - unitSize, y, unitSize * 2, unitSize);
