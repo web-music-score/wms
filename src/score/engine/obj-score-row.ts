@@ -297,6 +297,8 @@ export class ObjScoreRow extends MusicObject {
 
         this.rect.top = lines[0].calcTop();
         this.rect.bottom = lines[lines.length - 1].calcBottom();
+
+        this.alignStemsToBeams();
     }
 
     updateRect() { }

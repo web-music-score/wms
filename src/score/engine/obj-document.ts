@@ -306,9 +306,6 @@ export class ObjDocument extends MusicObject {
         // Position notation lines
         this.rows.forEach(row => row.layoutPositionLines(renderer));
 
-        // Align stems to beams beams
-        this.rows.forEach(row => row.alignStemsToBeams());
-
         // Layout layout groups
         layoutGroups.forEach(layoutGroup => {
             this.rows.forEach(row => {
