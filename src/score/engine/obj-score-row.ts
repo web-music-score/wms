@@ -253,34 +253,15 @@ export class ObjScoreRow extends MusicObject {
             x += r.width;
             x += m.getPostMeasureBreakWidth();
         });
-    }
 
-    layoutConnectives(renderer: Renderer) {
-        if (!this.needLayout) {
-            return;
-        }
-
-        // Layout connectives
         this.measures.forEach(m => {
             m.layoutConnectives(renderer);
-            this.rect.expandInPlace(m.getRect());
-        });
-    }
-
-    layoutBeams(renderer: Renderer) {
-        if (!this.needLayout) {
-            return;
-        }
-
-        // Layout beams
-        this.measures.forEach(m => {
             m.layoutBeams(renderer);
-            this.rect.expandInPlace(m.getRect());
         });
     }
 
-    updateBeams() {
-        this.measures.forEach(m => m.updateBeams());
+    alignStemsToBeams() {
+        this.measures.forEach(m => m.alignStemsToBeams());
     }
 
     layoutPositionLines(renderer: Renderer) {

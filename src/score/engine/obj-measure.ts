@@ -1207,11 +1207,8 @@ export class ObjMeasure extends MusicObject {
         this.connectives.forEach(connective => {
             connective.layout(renderer);
 
-            // Connectives enter neighbors, only expand height for now.
-            let r = connective.getRect();
-
-            this.rect.top = Math.min(this.rect.top, r.top);
-            this.rect.bottom = Math.max(this.rect.bottom, r.bottom);
+            this.rect.top = Math.min(this.rect.top, connective.getRect().top);
+            this.rect.bottom = Math.max(this.rect.bottom, connective.getRect().bottom);
         });
     }
 
@@ -1223,11 +1220,13 @@ export class ObjMeasure extends MusicObject {
         // Layout Beams
         this.beamGroups.forEach(beamGroup => {
             beamGroup.layout(renderer);
-            this.rect.expandInPlace(beamGroup.getRect());
+
+            this.rect.top = Math.min(this.rect.top, beamGroup.getRect().top);
+            this.rect.bottom = Math.max(this.rect.bottom, beamGroup.getRect().bottom);
         });
     }
 
-    updateBeams() {
+    alignStemsToBeams() {
         this.beamGroups.forEach(b => b.updateStemTips());
     }
 

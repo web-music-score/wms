@@ -303,17 +303,11 @@ export class ObjDocument extends MusicObject {
         // Stretch row to desired width
         this.rows.forEach(row => row.layoutWidth(renderer, rowWidth));
 
-        // Layout connectives
-        this.rows.forEach(row => row.layoutConnectives(renderer));
-
-        // Layout beams
-        this.rows.forEach(row => row.layoutBeams(renderer));
-
         // Position notation lines
         this.rows.forEach(row => row.layoutPositionLines(renderer));
 
-        // Update beams
-        this.rows.forEach(row => row.updateBeams());
+        // Align stems to beams beams
+        this.rows.forEach(row => row.alignStemsToBeams());
 
         // Layout layout groups
         layoutGroups.forEach(layoutGroup => {
