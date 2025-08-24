@@ -41,6 +41,12 @@ export class DocumentBuilder {
         return this;
     }
 
+    setMeasuresPerRow(measuresPerRow: number): DocumentBuilder {
+        assertArg(Utils.Is.isIntegerGte(measuresPerRow, 1) || measuresPerRow === Infinity, "measuresPerRow", measuresPerRow);
+        this.doc.setMeasuresPerRow(measuresPerRow);
+        return this;
+    }
+
     addMeasure(): DocumentBuilder {
         this.doc.addMeasure();
         return this;

@@ -110,8 +110,9 @@ export type RestOptions = {
     triplet?: boolean
 }
 
-/** @public */
+/** @deprecated */
 export type DocumentOptions = {
+    /** @deprecated - Use DocumentBuilder.setMeasuresPerRow. */
     measuresPerRow?: number,
     /** @deprecated - Use tab config with tuning instead of preset. */
     tuning?: string,

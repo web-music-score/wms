@@ -20,7 +20,7 @@ export class ObjDocument extends MusicObject {
     private readonly rows: ObjScoreRow[] = [];
     private readonly measures: ObjMeasure[] = [];
 
-    public readonly measuresPerRow?: number;
+    private measuresPerRow: number = Infinity;
     public readonly tuningName: string;
     public readonly tuningStrings: ReadonlyArray<Note>;
     public readonly tuningLabel: string;
@@ -39,7 +39,7 @@ export class ObjDocument extends MusicObject {
     constructor(readonly mi: MDocument, config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], readonly options?: DocumentOptions) {
         super(undefined);
 
-        this.measuresPerRow = options?.measuresPerRow;
+        this.measuresPerRow = options?.measuresPerRow ?? Infinity;
         this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
         this.tuningStrings = getTuningStrings(this.tuningName);
         this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join("-");
@@ -109,6 +109,10 @@ export class ObjDocument extends MusicObject {
 
     getMusicInterface(): MDocument {
         return this.mi;
+    }
+
+    setMeasuresPerRow(measuresPerRow: number) {
+        this.measuresPerRow = measuresPerRow;
     }
 
     addConnectiveProps(connectiveProps: ConnectiveProps) {
@@ -189,7 +193,7 @@ export class ObjDocument extends MusicObject {
 
     isLastRowFull(): boolean {
         let lastRow = this.getLastRow();
-        return this.measuresPerRow !== undefined && lastRow !== undefined && lastRow.getMeasures().length >= this.measuresPerRow;
+        return lastRow !== undefined && lastRow.getMeasures().length >= this.measuresPerRow;
     }
 
     requestNewRow(): void {
