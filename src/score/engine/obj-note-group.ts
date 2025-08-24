@@ -445,12 +445,13 @@ export class ObjNoteGroup extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
+    getBeamCoords(): ({ staff: ObjStaff, x: number, y: number, stemHeight: number } | undefined)[] {
         return this.staffObjects.map(obj => {
             let staff = obj.staff;
             let x = obj.stemTip?.centerX ?? obj.noteHeadRects[0].centerX;
             let y = obj.stemTip?.centerY ?? (this.stemDir === Stem.Up ? obj.getRect().top : obj.getRect().bottom);
-            return { staff, x, y }
+            let stemHeight = this.stemDir === Stem.Up ? Math.abs(obj.noteHeadRects[0].centerY - y) : Math.abs(obj.noteHeadRects[obj.noteHeadRects.length - 1].centerY - y);
+            return { staff, x, y, stemHeight }
         });
     }
 

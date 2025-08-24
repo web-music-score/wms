@@ -258,6 +258,7 @@ export class ObjBeamGroup extends MusicObject {
             let symbolX = symbolsBeamCoords.map(s => s[index]?.x);
             let symbolY = symbolsBeamCoords.map(s => s[index]?.y);
             let symbolStaff = symbolsBeamCoords.map(s => s[index]?.staff);
+            let symbolStemHeight = symbolsBeamCoords.map(s => s[index]?.stemHeight);
 
             let leftSymbol = symbols[0];
             let leftX = symbolX[0];
@@ -272,6 +273,26 @@ export class ObjBeamGroup extends MusicObject {
             if (leftX === undefined || leftY === undefined || leftStaff === undefined ||
                 rightX === undefined || rightY === undefined || rightStaff === undefined) {
                 return;
+            }
+
+            let leftStemHeight = symbolStemHeight[0] ?? 0;
+            let rightStemHeight = symbolStemHeight[symbolStemHeight.length - 1] ?? 0;
+
+            if (this.type !== BeamGroupType.TripletGroup) {
+                let leftDy = leftStemHeight < rightStemHeight ? Math.sqrt(rightStemHeight - leftStemHeight) : 0;
+                let rightDy = rightStemHeight < leftStemHeight ? Math.sqrt(leftStemHeight - rightStemHeight) : 0;
+                if (stemDir === Stem.Up) {
+                    leftDy *= -1;
+                    rightDy *= -1;
+                }
+                if (leftDy !== 0) {
+                    leftY += leftDy;
+                    symbolY[0]! += leftDy;
+                }
+                if (rightDy !== 0) {
+                    rightY += rightDy;
+                    symbolY[symbolY.length - 1]! += rightDy;
+                }
             }
 
             let groupLineDy = unitSize * 2 * (stemDir === Stem.Up ? -1 : 1);

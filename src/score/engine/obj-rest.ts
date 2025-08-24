@@ -165,12 +165,13 @@ export class ObjRest extends MusicObject {
         this.beamGroup = undefined;
     }
 
-    getBeamCoords(): ({ staff: ObjStaff, x: number, y: number } | undefined)[] {
+    getBeamCoords(): ({ staff: ObjStaff, x: number, y: number, stemHeight: number } | undefined)[] {
         return this.staffObjects.map(obj => {
             let staff = obj.staff;
             let x = obj.getRect().centerX;
             let y = this.stemDir === Stem.Up ? obj.getRect().top : obj.getRect().bottom;
-            return { staff, x, y }
+            let stemHeight = Math.abs(obj.getRect().centerY - y);
+            return { staff, x, y, stemHeight }
         });
     }
 
