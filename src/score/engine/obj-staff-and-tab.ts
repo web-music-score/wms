@@ -1,10 +1,11 @@
-import { Note } from "@tspro/web-music-score/theory";
+import { getTuningStrings, Note, validateTuningName } from "@tspro/web-music-score/theory";
 import { ImageAsset, Renderer } from "./renderer";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
+import { Utils } from "@tspro/ts-utils-lib";
 
 type NotationLineObject = {
     getRect: () => DivRect,
@@ -204,17 +205,40 @@ export class ObjTab extends MusicObject {
     private bottom: number = 0;
 
     private readonly objects: NotationLineObject[] = [];
+    private readonly tuningName?: string;
+    private readonly tuningStrings: ReadonlyArray<Note>;
 
     readonly mi: MTab;
 
     constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig) {
         super(row);
 
+        if (Utils.Is.isArray(tabConfig.tuning)) {
+            this.tuningName = undefined;
+            this.tuningStrings = tabConfig.tuning.map(noteName => Note.getNote(noteName)).reverse();
+        }
+        else if (typeof tabConfig.tuning === "string") {
+            this.tuningName = validateTuningName(tabConfig.tuning);
+            this.tuningStrings = getTuningStrings(this.tuningName);
+        }
+        else {
+            this.tuningName = row.doc.tuningName;
+            this.tuningStrings = getTuningStrings(this.tuningName ?? "Standard");
+        }
+
         this.mi = new MTab(this);
     }
 
     getMusicInterface(): MTab {
         return this.mi;
+    }
+
+    getTuningName(): string | undefined {
+        return this.tuningName;
+    }
+
+    getTuningStrings(): ReadonlyArray<Note> {
+        return this.tuningStrings;
     }
 
     /** Return Y coordinate of string. */

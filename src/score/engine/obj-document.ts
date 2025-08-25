@@ -1,4 +1,4 @@
-import { DefaultTuningName, getTuningStrings, Note, SymbolSet, validateTuningName } from "@tspro/web-music-score/theory";
+import { DefaultTuningName, validateTuningName } from "@tspro/web-music-score/theory";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
@@ -22,8 +22,6 @@ export class ObjDocument extends MusicObject {
 
     private measuresPerRow: number = Infinity;
     public readonly tuningName: string;
-    public readonly tuningStrings: ReadonlyArray<Note>;
-    public readonly tuningLabel: string;
     public readonly fullDiatonicRange: boolean;
 
     public readonly config: (StaffConfig | TabConfig)[] = [];
@@ -41,8 +39,6 @@ export class ObjDocument extends MusicObject {
 
         this.measuresPerRow = options?.measuresPerRow ?? Infinity;
         this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
-        this.tuningStrings = getTuningStrings(this.tuningName);
-        this.tuningLabel = this.tuningStrings.slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join("-");
         this.fullDiatonicRange = options?.fullDiatonicRange === true;
 
         if (Utils.Is.isEnumValue(config, StaffPreset)) {

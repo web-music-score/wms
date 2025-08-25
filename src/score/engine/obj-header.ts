@@ -3,6 +3,8 @@ import { Renderer } from "./renderer";
 import { ObjText } from "./obj-text";
 import { DivRect, MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
+import { ObjTab } from "./obj-staff-and-tab";
+import { SymbolSet } from "theory/types";
 
 export class ObjHeader extends MusicObject {
     private titleText?: ObjText;
@@ -29,9 +31,26 @@ export class ObjHeader extends MusicObject {
             ? new ObjText(this, "Arr.: " + this.arranger, 1, 0)
             : undefined;
 
-        this.tuningText = doc.getFirstRow()?.hasTab === true
-            ? new ObjText(this, doc.tuningName + " tuning:\n" + doc.tuningLabel, 0, 0)
-            : undefined;
+        if (doc.getFirstRow()) {
+            let tuningText: string = "";
+            let tabs = doc.getFirstRow()!.getNotationLines().filter(line => line instanceof ObjTab);
+
+            tabs.forEach((tab, tabIndex) => {
+                if (tabs.length > 1) {
+                    tuningText += `Tab ${(tabIndex + 1)}:\n`;
+                }
+                tuningText += `Tuning: ${tab.getTuningName() ?? ""}\n`;
+                tuningText += tab.getTuningStrings().slice().reverse().map(n => n.formatOmitOctave(SymbolSet.Ascii)).join(" - ");
+                if (tabIndex < tabs.length - 1) {
+                    tuningText += "\n\n";
+                }
+            });
+
+            this.tuningText = new ObjText(this, tuningText, 0, 0);
+        }
+        else {
+            this.tuningText = undefined;
+        }
     }
 
     getMusicInterface(): MHeader {
