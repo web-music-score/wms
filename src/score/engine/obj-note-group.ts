@@ -480,6 +480,10 @@ export class ObjNoteGroup extends MusicObject {
         return this.rightBeamCount;
     }
 
+    isEmpty(): boolean {
+        return this.staffObjects.length === 0 && this.tabObjects.length === 0;
+    }
+
     visibleInStaff(staff: ObjStaff): boolean {
         return staff.containsVoiceId(this.voiceId) &&
             this.staffObjects.some(obj => obj instanceof ObjStaffNoteGroup && obj.staff === staff);

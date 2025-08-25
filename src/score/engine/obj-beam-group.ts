@@ -196,6 +196,10 @@ export class ObjBeamGroup extends MusicObject {
         this.getSymbols().forEach(s => s.resetBeamGroup());
     }
 
+    isEmpty(): boolean {
+        return this.staffObjects.length === 0;
+    }
+
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {
             return [];
@@ -242,6 +246,13 @@ export class ObjBeamGroup extends MusicObject {
         let symbols = this.getSymbols();
 
         if (symbols.length === 0) {
+            return;
+        }
+
+        let voiceId = symbols[0].voiceId;
+
+        // All symbols should have same voiceId.
+        if (symbols.some(symbol => symbol.voiceId !== voiceId)) {
             return;
         }
 

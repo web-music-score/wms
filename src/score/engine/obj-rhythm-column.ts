@@ -269,6 +269,15 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
+    isEmpty(): boolean {
+        for (let i = 0; i < this.voiceSymbol.length; i++) {
+            if (this.voiceSymbol[i] !== undefined && !this.voiceSymbol[i].isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     getPlayerNotes() {
         let playerNotes: ScorePlayerNote[] = [];
 

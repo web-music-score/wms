@@ -1236,31 +1236,27 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateRect() {
-        let tops = [
+        let lines = this.row.getNotationLines();
+
+        this.rect.top = Math.min(
+            lines[0].getRect().top,
             ...this.signatures.map(s => s.getRect().top),
             this.barLineLeft.getRect().top,
-            ...this.columns.map(col => col.getRect().top),
+            ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().top),
             this.barLineRight.getRect().top,
             ...this.connectives.map(c => c.getRect().top),
-            ...this.beamGroups.map(b => b.getRect().top)
-        ];
+            ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().top)
+        );
 
-        let bottoms = [
+        this.rect.bottom = Math.max(
+            lines[lines.length - 1].getRect().bottom,
             ...this.signatures.map(s => s.getRect().bottom),
             this.barLineLeft.getRect().bottom,
-            ...this.columns.map(col => col.getRect().bottom),
+            ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().bottom),
             this.barLineRight.getRect().bottom,
             ...this.connectives.map(c => c.getRect().bottom),
-            ...this.beamGroups.map(b => b.getRect().bottom)
-        ];
-
-        if (tops.length === 0 || bottoms.length === 0) {
-            this.rect.top = this.rect.bottom = 0;
-        }
-        else {
-            this.rect.top = Math.min(...tops);
-            this.rect.bottom = Math.max(...bottoms);
-        }
+            ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().bottom)
+        );
     }
 
     offset(dx: number, dy: number) {

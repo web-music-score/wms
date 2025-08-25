@@ -175,6 +175,10 @@ export class ObjRest extends MusicObject {
         });
     }
 
+    isEmpty(): boolean {
+        return this.staffObjects.length === 0;
+    }
+
     visibleInStaff(staff: ObjStaff): boolean {
         return staff.containsVoiceId(this.voiceId) &&
             this.staffObjects.some(obj => obj instanceof ObjStaffRest && obj.staff === staff);
