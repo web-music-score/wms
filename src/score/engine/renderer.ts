@@ -7,6 +7,7 @@ import { MusicObject } from "./music-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import TrebleClefPng from "./assets/treble-clef.png";
 import BassClefPng from "./assets/bass-clef.png";
+import { ObjStaff } from "./obj-staff-and-tab";
 
 export enum ImageAsset { TrebleClefPng, BassClefPng }
 
@@ -359,7 +360,7 @@ export class Renderer {
         ctx.fillRect(0, staff.getDiatonicIdY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
 
         if (mousePos !== undefined) {
-            this.drawLedgerLines(scoreRow, diatonicId, mousePos.x);
+            this.drawLedgerLines(staff, diatonicId, mousePos.x);
         }
     }
 
@@ -482,13 +483,7 @@ export class Renderer {
         }
     }
 
-    drawLedgerLines(row: ObjScoreRow, diatonicId: number, x: number) {
-        let staff = row.getStaff(diatonicId);
-
-        if (!staff) {
-            return;
-        }
-
+    drawLedgerLines(staff: ObjStaff, diatonicId: number, x: number) {
         let { unitSize } = this;
 
         let ledgerLineWidth = unitSize * DocumentSettings.LedgerLineWidth;

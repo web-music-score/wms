@@ -175,6 +175,11 @@ export class ObjRest extends MusicObject {
         });
     }
 
+    visibleInStaff(staff: ObjStaff): boolean {
+        return staff.containsVoiceId(this.voiceId) &&
+            this.staffObjects.some(obj => obj instanceof ObjStaffRest && obj.staff === staff);
+    }
+
     private getRestDotVerticalDisplacement(noteLength: NoteLength): number {
         switch (noteLength) {
             case NoteLength.Whole: return 1;

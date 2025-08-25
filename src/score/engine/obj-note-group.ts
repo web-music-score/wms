@@ -480,6 +480,11 @@ export class ObjNoteGroup extends MusicObject {
         return this.rightBeamCount;
     }
 
+    visibleInStaff(staff: ObjStaff): boolean {
+        return staff.containsVoiceId(this.voiceId) &&
+            this.staffObjects.some(obj => obj instanceof ObjStaffNoteGroup && obj.staff === staff);
+    }
+
     getPlayTicks(note: Note) {
         let tiedTicks = this.runningConnectives
             .filter(c => c.connective === Connective.Tie)

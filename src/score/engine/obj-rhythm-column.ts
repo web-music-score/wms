@@ -46,6 +46,8 @@ export class ObjRhythmColumn extends MusicObject {
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
+    private staffMinDiatonicId = new Map<ObjStaff, number>();
+    private staffMaxDiatonicId = new Map<ObjStaff, number>();
 
     private arpeggioDir: Arpeggio | undefined;
     private arpeggios: ObjArpeggio[] = [];
@@ -384,6 +386,39 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.right = rightw;
 
         this.requestRectUpdate();
+
+        // Find min/max diatonicId for each staff.
+        this.row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
+            let minDiatonicId: number | undefined = undefined;
+            let maxDiatonicId: number | undefined = undefined;
+
+            this.voiceSymbol.forEach(symbol => {
+                if (symbol.visibleInStaff(staff)) {
+                    if (symbol instanceof ObjNoteGroup) {
+                        minDiatonicId = minDiatonicId === undefined ? symbol.minDiatonicId : Math.min(minDiatonicId, symbol.minDiatonicId);
+                        maxDiatonicId = maxDiatonicId === undefined ? symbol.maxDiatonicId : Math.max(maxDiatonicId, symbol.maxDiatonicId);
+                    }
+                    else if (symbol instanceof ObjRest) {
+                        minDiatonicId = minDiatonicId === undefined ? symbol.ownDiatonicId : Math.min(minDiatonicId, symbol.ownDiatonicId);
+                        maxDiatonicId = maxDiatonicId === undefined ? symbol.ownDiatonicId : Math.max(maxDiatonicId, symbol.ownDiatonicId);
+                    }
+                }
+            });
+
+            if (minDiatonicId !== undefined) {
+                this.staffMinDiatonicId.set(staff, minDiatonicId);
+            }
+            else {
+                this.staffMinDiatonicId.delete(staff);
+            }
+
+            if (maxDiatonicId !== undefined) {
+                this.staffMaxDiatonicId.set(staff, maxDiatonicId);
+            }
+            else {
+                this.staffMaxDiatonicId.delete(staff);
+            }
+        });
     }
 
     layoutDone() {
@@ -417,13 +452,18 @@ export class ObjRhythmColumn extends MusicObject {
 
     draw(renderer: Renderer) {
         // Draw ledger lines
-        if (this.minDiatonicId !== undefined) {
-            renderer.drawLedgerLines(this.row, this.minDiatonicId, this.getRect().centerX);
-        }
+        this.row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
+            let minDiatonicId = this.staffMinDiatonicId.get(staff);
+            let maxDiatonicId = this.staffMaxDiatonicId.get(staff);
 
-        if (this.maxDiatonicId !== undefined) {
-            renderer.drawLedgerLines(this.row, this.maxDiatonicId, this.getRect().centerX);
-        }
+            if (minDiatonicId !== undefined) {
+                renderer.drawLedgerLines(staff, minDiatonicId, this.getRect().centerX);
+            }
+
+            if (maxDiatonicId !== undefined) {
+                renderer.drawLedgerLines(staff, maxDiatonicId, this.getRect().centerX);
+            }
+        });
 
         // Draw symbols
         this.voiceSymbol.forEach(symbol => {
