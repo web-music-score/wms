@@ -146,12 +146,26 @@ export class ObjStaff extends MusicObject {
     calcTop(): number {
         let top = this.topLineY;
         this.objects.forEach(o => top = Math.min(top, o.getRect().top));
+
+        if (this.maxDiatonicId !== undefined) {
+            let y = this.getDiatonicIdY(this.maxDiatonicId);
+            let y2 = this.getDiatonicIdY(this.maxDiatonicId - 1);
+            top = Math.min(top, y - Math.abs(y2 - y) + 1);
+        }
+
         return top;
     }
 
     calcBottom(): number {
         let bottom = this.bottomLineY;
         this.objects.forEach(o => bottom = Math.max(bottom, o.getRect().bottom));
+
+        if (this.minDiatonicId !== undefined) {
+            let y = this.getDiatonicIdY(this.minDiatonicId);
+            let y2 = this.getDiatonicIdY(this.minDiatonicId + 1);
+            bottom = Math.max(bottom, y + Math.abs(y2 - y) - 1);
+        }
+
         return bottom;
     }
 
@@ -222,8 +236,8 @@ export class ObjTab extends MusicObject {
             this.tuningStrings = getTuningStrings(this.tuningName);
         }
         else {
-            this.tuningName = row.doc.tuningName;
-            this.tuningStrings = getTuningStrings(this.tuningName ?? "Standard");
+            this.tuningName = "Standard";
+            this.tuningStrings = getTuningStrings(this.tuningName);
         }
 
         this.mi = new MTab(this);

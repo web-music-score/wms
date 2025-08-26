@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Connective, ConnectiveSpan, DocumentOptions, Fermata, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, StaffConfig, StaffPreset, TabConfig, TieType } from "./types";
+import { Annotation, Connective, ConnectiveSpan, Fermata, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, StaffConfig, StaffPreset, TabConfig, TieType } from "./types";
 import { MDocument, MMeasure } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString } from "@tspro/web-music-score/theory";
@@ -15,14 +15,14 @@ export class DocumentBuilder {
     private readonly doc: ObjDocument;
     private readonly doc_mi: MDocument;
 
-    constructor(staffPreset: StaffPreset, options?: DocumentOptions);
-    constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions);
-    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions) {
+    constructor(staffPreset: StaffPreset);
+    constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[]);
+    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
-            this.doc_mi = new MDocument(config, options);
+            this.doc_mi = new MDocument(config);
         }
         else {
-            this.doc_mi = new MDocument(config, options);
+            this.doc_mi = new MDocument(config);
         }
 
         this.doc = this.doc_mi.getMusicObject();

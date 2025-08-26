@@ -4,7 +4,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, DivRect, DocumentOptions, MDocument, StaffConfig, StaffPreset, TabConfig } from "../pub";
+import { Clef, DivRect, MDocument, StaffConfig, StaffPreset, TabConfig } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
@@ -21,8 +21,6 @@ export class ObjDocument extends MusicObject {
     private readonly measures: ObjMeasure[] = [];
 
     private measuresPerRow: number = Infinity;
-    public readonly tuningName: string;
-    public readonly fullDiatonicRange: boolean;
 
     public readonly config: (StaffConfig | TabConfig)[] = [];
 
@@ -34,38 +32,34 @@ export class ObjDocument extends MusicObject {
 
     private allConnectiveProps: ConnectiveProps[] = [];
 
-    constructor(readonly mi: MDocument, config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], readonly options?: DocumentOptions) {
+    constructor(readonly mi: MDocument, config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
         super(undefined);
-
-        this.measuresPerRow = options?.measuresPerRow ?? Infinity;
-        this.tuningName = validateTuningName(options?.tuning ?? DefaultTuningName);
-        this.fullDiatonicRange = options?.fullDiatonicRange === true;
 
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
             switch (config) {
                 default:
                 case StaffPreset.Treble:
-                    this.config = [{ type: "staff", clef: Clef.G, minNote: this.fullDiatonicRange ? "C3" : undefined, maxNote: this.fullDiatonicRange ? "C7" : undefined }];
+                    this.config = [{ type: "staff", clef: Clef.G }];
                     break;
                 case StaffPreset.Bass:
-                    this.config = [{ type: "staff", clef: Clef.F, minNote: this.fullDiatonicRange ? "C1" : undefined, maxNote: this.fullDiatonicRange ? "C5" : undefined }];
+                    this.config = [{ type: "staff", clef: Clef.F }];
                     break;
                 case StaffPreset.Grand:
                     this.config = [
-                        { type: "staff", clef: Clef.G, isGrand: true, minNote: undefined, maxNote: this.fullDiatonicRange ? "C7" : undefined },
-                        { type: "staff", clef: Clef.F, isGrand: true, maxNote: undefined, minNote: this.fullDiatonicRange ? "C1" : undefined }
+                        { type: "staff", clef: Clef.G, isGrand: true },
+                        { type: "staff", clef: Clef.F, isGrand: true }
                     ];
                     break;
                 case StaffPreset.GuitarTreble:
-                    this.config = [{ type: "staff", clef: Clef.G, isOctaveDown: true, minNote: this.fullDiatonicRange ? "C2" : undefined, maxNote: this.fullDiatonicRange ? "C6" : undefined }];
+                    this.config = [{ type: "staff", clef: Clef.G, isOctaveDown: true }];
                     break;
                 case StaffPreset.GuitarTab:
-                    this.config = [{ type: "tab", tuning: this.tuningName }];
+                    this.config = [{ type: "tab", tuning: "Standard" }];
                     break;
                 case StaffPreset.GuitarCombined:
                     this.config = [
-                        { type: "staff", clef: Clef.G, isOctaveDown: true, minNote: this.fullDiatonicRange ? "C2" : undefined, maxNote: this.fullDiatonicRange ? "C6" : undefined },
-                        { type: "tab", tuning: this.tuningName }
+                        { type: "staff", clef: Clef.G, isOctaveDown: true },
+                        { type: "tab", tuning: "Standard" }
                     ];
                     break;
             }

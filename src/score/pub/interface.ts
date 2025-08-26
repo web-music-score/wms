@@ -25,7 +25,7 @@ import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { Clef, Connective, ConnectiveSpan, DocumentOptions, PlayStateChangeListener, StaffConfig, Stem, StringNumber, TabConfig, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
+import { Clef, Connective, ConnectiveSpan, PlayStateChangeListener, StaffConfig, Stem, StringNumber, TabConfig, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
 import { NoteAnchor, Arpeggio } from "./types";
 import { ScoreEventListener } from "./event";
 import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
@@ -63,10 +63,6 @@ function assertNoteOptions(options: NoteOptions) {
     assertArg(Utils.Is.isBooleanOrUndefined(options.arpeggio) || Utils.Is.isEnumValue(options.arpeggio, Arpeggio), "noteOptions.arpeggio", options.arpeggio);
     assertArg(Utils.Is.isBooleanOrUndefined(options.staccato), "noteOptions.staccato", options.staccato);
     assertArg(Utils.Is.isBooleanOrUndefined(options.diamond), "noteOptions.diamond", options.diamond);
-    assertArg(Utils.Is.isEnumValueOrUndefined(options.tieSpan, TieType) || Utils.Is.isIntegerGte(options.tieSpan, 1), "noteOptions.tieSpan", options.tieSpan);
-    assertArg(Utils.Is.isEnumValueOrUndefined(options.tieAnchor, NoteAnchor), "noteOptions.tieAnchor", options.tieAnchor);
-    assertArg(Utils.Is.isUndefined(options.slurSpan) || Utils.Is.isIntegerGte(options.slurSpan, 1), "noteOptions.slurSpan", options.slurSpan);
-    assertArg(Utils.Is.isEnumValueOrUndefined(options.slurAnchor, NoteAnchor), "noteOptions.slurAnchor", options.slurAnchor);
     assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "noteOptions.triplet", options.triplet);
     assertArg((
         Utils.Is.isUndefined(options.string) ||
@@ -216,10 +212,10 @@ export class MDocument extends MusicInterface {
     readonly obj: ObjDocument;
 
     /** @deprecated - Use DocumentBuilder instead. */
-    constructor(staffPreset: StaffPreset, options?: DocumentOptions);
+    constructor(staffPreset: StaffPreset);
     /** @deprecated - Use DocumentBuilder instead. */
-    constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions);
-    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[], options?: DocumentOptions) {
+    constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[]);
+    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
         super(MDocument.Name);
 
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
@@ -249,14 +245,7 @@ export class MDocument extends MusicInterface {
             assertArg(false, "config", config);
         }
 
-        if (options !== undefined) {
-            assertArg(Utils.Is.isObject(options), "documentOptions", options);
-            assertArg(Utils.Is.isUndefined(options.measuresPerRow) || Utils.Is.isIntegerGte(options.measuresPerRow, 1), "documentOptions.measuresPerRow", options.measuresPerRow);
-            assertArg(Utils.Is.isStringOrUndefined(options.tuning), "documentOptions.tuning", options.tuning);
-            assertArg(Utils.Is.isBooleanOrUndefined(options.fullDiatonicRange), "documentOptions.fullDiatonicRange", options.fullDiatonicRange);
-        }
-
-        this.obj = new ObjDocument(this, config, options);
+        this.obj = new ObjDocument(this, config);
     }
 
     /** @internal */
@@ -744,7 +733,7 @@ export class MStaffRest extends MusicInterface {
     getMusicObject(): ObjStaffRest {
         return this.obj;
     }
-    
+
     getRest(): MRest {
         return this.obj.rest.getMusicInterface();
     }

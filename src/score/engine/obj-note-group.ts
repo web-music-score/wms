@@ -180,13 +180,6 @@ export class ObjNoteGroup extends MusicObject {
         this.arpeggio = solveArpeggio(options?.arpeggio);
         this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
-        if (options?.tieSpan !== undefined) {
-            this.startConnective(new ConnectiveProps(Connective.Tie, options.tieSpan, options.tieAnchor ?? NoteAnchor.Auto, this));
-        }
-        if (options?.slurSpan !== undefined) {
-            this.startConnective(new ConnectiveProps(Connective.Slur, options.slurSpan, options.slurAnchor ?? NoteAnchor.Auto, this));
-        }
-
         this.mi = new MNoteGroup(this);
     }
 

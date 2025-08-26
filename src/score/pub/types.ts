@@ -89,14 +89,6 @@ export type NoteOptions = {
     arpeggio?: Arpeggio | boolean,
     staccato?: boolean,
     diamond?: boolean,
-    /** @deprecated */
-    tieSpan?: TieSpan,
-    /** @deprecated */
-    tieAnchor?: NoteAnchor,
-    /** @deprecated */
-    slurSpan?: SlurSpan,
-    /** @deprecated */
-    slurAnchor?: NoteAnchor,
     triplet?: boolean,
     string?: StringNumber | StringNumber[];
 }
@@ -108,16 +100,6 @@ export type RestOptions = {
     color?: string,
     hide?: boolean,
     triplet?: boolean
-}
-
-/** @deprecated */
-export type DocumentOptions = {
-    /** @deprecated - Use DocumentBuilder.setMeasuresPerRow. */
-    measuresPerRow?: number,
-    /** @deprecated - Use tab config with tuning instead of preset. */
-    tuning?: string,
-    /** @deprecated - Use staff config with min/maxNote instead of preset.*/
-    fullDiatonicRange?: boolean
 }
 
 /** @public */

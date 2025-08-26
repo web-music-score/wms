@@ -1236,10 +1236,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateRect() {
-        let lines = this.row.getNotationLines();
-
         this.rect.top = Math.min(
-            lines[0].getRect().top,
             ...this.signatures.map(s => s.getRect().top),
             this.barLineLeft.getRect().top,
             ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().top),
@@ -1249,7 +1246,6 @@ export class ObjMeasure extends MusicObject {
         );
 
         this.rect.bottom = Math.max(
-            lines[lines.length - 1].getRect().bottom,
             ...this.signatures.map(s => s.getRect().bottom),
             this.barLineLeft.getRect().bottom,
             ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().bottom),
@@ -1257,6 +1253,12 @@ export class ObjMeasure extends MusicObject {
             ...this.connectives.map(c => c.getRect().bottom),
             ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().bottom)
         );
+
+        this.row.getNotationLines().forEach(line => {
+            this.rect.top = Math.min(this.rect.top, line.calcTop());
+            this.rect.bottom = Math.max(this.rect.bottom, line.calcBottom());
+        });
+
     }
 
     offset(dx: number, dy: number) {

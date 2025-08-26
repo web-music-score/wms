@@ -2,7 +2,10 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createGuitarCombinedDemo() {
-    return new Score.DocumentBuilder(Score.StaffPreset.GuitarCombined, { tuning: "Drop D" })
+    return new Score.DocumentBuilder([
+        { type: "staff", clef: Score.Clef.G, isOctaveDown: true, voiceIds: [0, 1] },
+        { type: "tab", tuning: "Drop D", voiceIds: [0, 1] }
+    ])
 
         .setHeader("Guitar Combined")
 
@@ -10,9 +13,9 @@ export function createGuitarCombinedDemo() {
         .setKeySignature("C", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(60)
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { string: 3 })
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { string: 3 })
-        .addNote(0, "C4", Theory.NoteLength.Eighth, { string: 2 })
+        .addNote(1, "G3", Theory.NoteLength.Eighth, { string: 3 })
+        .addNote(1, "G3", Theory.NoteLength.Eighth, { string: 3 })
+        .addNote(1, "C4", Theory.NoteLength.Eighth, { string: 2 })
 
         .addMeasure()
         .addNavigation(Score.Navigation.StartRepeat)
