@@ -32,7 +32,9 @@ export class ObjDocument extends MusicObject {
 
     private allConnectiveProps: ConnectiveProps[] = [];
 
-    constructor(readonly mi: MDocument, config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
+    private readonly mi: MDocument;
+
+    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
         super(undefined);
 
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
@@ -95,6 +97,8 @@ export class ObjDocument extends MusicObject {
 
         // There is always row
         this.rows.push(new ObjScoreRow(this));
+
+        this.mi = new MDocument(this);
     }
 
     getMusicInterface(): MDocument {

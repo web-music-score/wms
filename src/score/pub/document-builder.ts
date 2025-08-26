@@ -1,9 +1,10 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Connective, ConnectiveSpan, Fermata, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, StaffConfig, StaffPreset, TabConfig, TieType } from "./types";
+import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VoiceId } from "./types";
 import { MDocument, MMeasure } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString } from "@tspro/web-music-score/theory";
+import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { ObjMeasure } from "score/engine/obj-measure";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -11,33 +12,121 @@ function assertArg(condition: boolean, argName: string, argValue: unknown) {
     }
 }
 
+function isNote(note: string): boolean {
+    if (typeof note !== "string") {
+        return false;
+    }
+    else {
+        let p = Note.parseNote(note);
+        return p !== undefined && p.octave !== undefined;
+    }
+}
+
+function isVoiceId(value: unknown): value is VoiceId {
+    return Utils.Is.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
+}
+
+function isStringNumber(value: unknown): value is StringNumber {
+    return Utils.Is.isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
+}
+
+function assertStaffConfig(staffConfig: StaffConfig) {
+    assertArg(Utils.Is.isObject(staffConfig), "staffConfig", staffConfig);
+    assertArg(staffConfig.type === "staff", "staffConfig.type", staffConfig.type);
+    assertArg(Utils.Is.isEnumValue(staffConfig.clef, Clef), "staffConfig.clef", staffConfig.clef);
+    assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
+    assertArg(Utils.Is.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
+    assertArg(Utils.Is.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
+    assertArg(Utils.Is.isUndefined(staffConfig.voiceIds) || Utils.Is.isArray(staffConfig.voiceIds) && staffConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "staffConfig.voiceIds", staffConfig.voiceIds);
+    assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isGrand), "staffConfig.isGrand", staffConfig.isGrand);
+}
+
+function assertTabConfig(tabConfig: TabConfig) {
+    assertArg(Utils.Is.isObject(tabConfig), "tabConfig", tabConfig);
+    assertArg(tabConfig.type === "tab", "tabConfig.type", tabConfig.type);
+    if (typeof tabConfig.tuning === "string") {
+        assertArg(TuningNameList.includes(tabConfig.tuning), "tabConfig.tuning", tabConfig.tuning);
+    }
+    else if (Utils.Is.isArray(tabConfig.tuning)) {
+        assertArg(tabConfig.tuning.length === 6 && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
+    }
+    assertArg(Utils.Is.isUndefined(tabConfig.voiceIds) || Utils.Is.isArray(tabConfig.voiceIds) && tabConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "tabConfig.voiceIds", tabConfig.voiceIds);
+}
+
+function assertNoteOptions(options: NoteOptions) {
+    assertArg(Utils.Is.isObject(options), "noteOptions", options);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted), "noteOptions.dotted", options.dotted);
+    assertArg(Utils.Is.isEnumValueOrUndefined(options.stem, Stem), "noteOptions.stem", options.stem);
+    assertArg(Utils.Is.isStringOrUndefined(options.color), "noteOptions.color", options.color);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.arpeggio) || Utils.Is.isEnumValue(options.arpeggio, Arpeggio), "noteOptions.arpeggio", options.arpeggio);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.staccato), "noteOptions.staccato", options.staccato);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.diamond), "noteOptions.diamond", options.diamond);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "noteOptions.triplet", options.triplet);
+    assertArg((
+        Utils.Is.isUndefined(options.string) ||
+        isStringNumber(options.string) ||
+        Utils.Is.isArray(options.string) && options.string.length > 0 && options.string.every(string => isStringNumber(string))
+    ), "noteOptions.string", options.string);
+}
+
+function assertRestOptions(options: RestOptions) {
+    assertArg(Utils.Is.isObject(options), "restOptions", options);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted), "restOptions.dotted", options.dotted);
+    assertArg(Utils.Is.isStringOrUndefined(options.staffPos) || Utils.Is.isInteger(options.staffPos) || options.staffPos instanceof Note, "restOptions.staffPos", options.staffPos);
+    assertArg(Utils.Is.isStringOrUndefined(options.color), "restOptions.color", options.color);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide", options.hide);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "restOptions.triplet", options.triplet);
+}
+
 export class DocumentBuilder {
     private readonly doc: ObjDocument;
-    private readonly doc_mi: MDocument;
 
     constructor(staffPreset: StaffPreset);
     constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[]);
     constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
-            this.doc_mi = new MDocument(config);
+            // Ok
+        }
+        else if (Utils.Is.isObject(config) && config.type === "staff") {
+            assertStaffConfig(config);
+        }
+        else if (Utils.Is.isObject(config) && config.type === "tab") {
+            assertTabConfig(config);
+        }
+        else if (Utils.Is.isArray(config)) {
+            assertArg(config.length > 0, "config", config);
+            config.forEach(c => {
+                if (Utils.Is.isObject(c) && c.type === "staff") {
+                    assertStaffConfig(c);
+                }
+                else if (Utils.Is.isObject(c) && c.type === "tab") {
+                    assertTabConfig(c);
+                }
+                else {
+                    assertArg(false, "config", config);
+                }
+            });
         }
         else {
-            this.doc_mi = new MDocument(config);
+            assertArg(false, "config", config);
         }
 
-        this.doc = this.doc_mi.getMusicObject();
+        this.doc = new ObjDocument(config);
     }
 
-    get measure(): MMeasure {
-        return (this.doc.getLastMeasure() ?? this.doc.addMeasure()).getMusicInterface();
+    get measure(): ObjMeasure {
+        return this.doc.getLastMeasure() ?? this.doc.addMeasure();
     }
 
     getDocument(): MDocument {
-        return this.doc_mi;
+        return this.doc.getMusicInterface();
     }
 
     setHeader(title?: string, composer?: string, arranger?: string): DocumentBuilder {
-        this.doc_mi.setHeader(title, composer, arranger);
+        assertArg(Utils.Is.isStringOrUndefined(title), "title", title);
+        assertArg(Utils.Is.isStringOrUndefined(composer), "composer", composer);
+        assertArg(Utils.Is.isStringOrUndefined(arranger), "arranger", arranger);
+        this.doc.setHeader(title, composer, arranger);
         return this;
     }
 
@@ -56,44 +145,68 @@ export class DocumentBuilder {
     setKeySignature(keySignature: KeySignature): DocumentBuilder;
     setKeySignature(scale: Scale): DocumentBuilder;
     setKeySignature(...args: unknown[]): DocumentBuilder {
-        if (args[0] instanceof KeySignature) {
-            this.measure.setKeySignature(args[0]);
-        }
-        else if (args[0] instanceof Scale) {
-            this.measure.setKeySignature(args[0]);
-        }
-        else if (typeof args[0] === "string" && Utils.Is.isEnumValue(args[1], ScaleType)) {
-            this.measure.setKeySignature(args[0], args[1]);
-        }
+        assertArg((
+            args[0] instanceof Scale ||
+            args[0] instanceof KeySignature ||
+            Utils.Is.isString(args[0]) && Utils.Is.isEnumValue(args[1], ScaleType)
+        ), "keySignature", args);
+        this.measure.setKeySignature(...args);
         return this;
     }
 
     setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): DocumentBuilder {
+        assertArg(timeSignature instanceof TimeSignature || Utils.Is.isString(timeSignature), "timeSignature", timeSignature);
         this.measure.setTimeSignature(timeSignature);
         return this;
     }
 
     setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean): DocumentBuilder {
+        assertArg(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
+        if (beatLength === undefined) {
+            assertArg(Utils.Is.isUndefined(dotted), "dotted", dotted);
+        }
+        else {
+            assertArg(Utils.Is.isEnumValue(beatLength, NoteLength), "beatLength", beatLength);
+            assertArg(Utils.Is.isBooleanOrUndefined(dotted), "dotted", dotted);
+        }
         this.measure.setTempo(beatsPerMinute, beatLength, dotted);
         return this;
     }
 
     addNote(voiceId: number, note: Note | string, noteLength: NoteLength, options?: NoteOptions): DocumentBuilder {
-        this.measure.addNote(voiceId, note, noteLength, options);
+        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+        assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
+        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+        if (options !== undefined) {
+            assertNoteOptions(options);
+        }
+        this.measure.addNoteGroup(voiceId, [note], noteLength, options);
         return this;
     }
 
     addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions): DocumentBuilder {
-        this.measure.addChord(voiceId, notes, noteLength, options);
+        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+        assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
+        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+        if (options !== undefined) {
+            assertNoteOptions(options);
+        }
+        this.measure.addNoteGroup(voiceId, notes, noteLength, options);
         return this;
     }
 
     addRest(voiceId: number, restLength: NoteLength, options?: RestOptions): DocumentBuilder {
+        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+        assertArg(Utils.Is.isEnumValue(restLength, NoteLength), "restLength", restLength);
+        if (options !== undefined) {
+            assertRestOptions(options);
+        }
         this.measure.addRest(voiceId, restLength, options);
         return this;
     }
 
     addFermata(fermata?: Fermata): DocumentBuilder {
+        assertArg(Utils.Is.isEnumValueOrUndefined(fermata, Fermata), "fermata", fermata);
         this.measure.addFermata(fermata ?? Fermata.AtNote);
         return this;
     }
@@ -102,15 +215,14 @@ export class DocumentBuilder {
     addNavigation(navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
     addNavigation(navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
     addNavigation(navigation: Navigation, ...args: unknown[]): DocumentBuilder {
-        if (navigation === Navigation.EndRepeat && typeof args[0] === "number") {
-            this.measure.addNavigation(navigation, args[0]);
+        assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
+        if (navigation === Navigation.EndRepeat && args.length > 0) {
+            assertArg(Utils.Is.isIntegerGte(args[0], 1), "playCount", args[0]);
         }
         else if (navigation === Navigation.Ending && args.length > 0) {
-            this.measure.addNavigation(navigation, ...args as number[]);
+            assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        else {
-            this.measure.addNavigation(navigation);
-        }
+        this.measure.addNavigation(navigation, ...args);
         return this;
     }
 
@@ -118,17 +230,24 @@ export class DocumentBuilder {
     addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): DocumentBuilder;
     addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): DocumentBuilder;
     addConnective(connective: Connective, ...args: unknown[]): DocumentBuilder {
+        assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
+
         if (connective === Connective.Tie) {
+            assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType), "tieSpan", args[0]);
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let tieSpan = args[0] as ConnectiveSpan | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
             this.measure.addConnective(connective, tieSpan, noteAnchor);
         }
         else if (connective === Connective.Slur) {
+            assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]), "slurSpan", args[0]);
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let slurSpan = args[0] as ConnectiveSpan | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
             this.measure.addConnective(connective, slurSpan, noteAnchor);
         }
         else if (connective === Connective.Slide) {
+            assertArg(Utils.Is.isEnumValueOrUndefined(args[0], NoteAnchor), "noteAnchor", args[0]);
             let noteAnchor = args[0] as NoteAnchor | undefined;
             this.measure.addConnective(connective, noteAnchor);
         }
@@ -137,16 +256,26 @@ export class DocumentBuilder {
     }
 
     addLabel(label: Label, text: string): DocumentBuilder {
+        assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
+        assertArg(Utils.Is.isString(text), "text", text);
         this.measure.addLabel(label, text);
         return this;
     }
 
     addAnnotation(annotation: Annotation, text: string): DocumentBuilder {
+        assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
+        assertArg(Utils.Is.isString(text), "text", text);
         this.measure.addAnnotation(annotation, text);
         return this;
     }
 
     addExtension(extensionLength: NoteLength | number, extensionVisible?: boolean): DocumentBuilder {
+        assertArg((
+            Utils.Is.isIntegerGte(extensionLength, 0) ||
+            extensionLength === Infinity ||
+            Utils.Is.isEnumValue(extensionLength, NoteLength)
+        ), "extendionLength", extensionLength);
+        assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
         this.measure.addExtension(extensionLength, extensionVisible ?? true);
         return this;
     }
@@ -167,6 +296,7 @@ export class DocumentBuilder {
     }
 
     completeRests(voiceId?: number): DocumentBuilder {
+        assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId), "voiceId", voiceId);
         this.measure.completeRests(voiceId);
         return this;
     }
@@ -175,7 +305,7 @@ export class DocumentBuilder {
         assertArg(Utils.Is.isString(bottomNote), "bottomNote", bottomNote);
         assertArg(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
 
-        let m = this.measure.getMusicObject();
+        let m = this.measure;
         let ts = m.getTimeSignature();
         let notes = scale.getScaleNotes(bottomNote, numOctaves);
 
@@ -192,5 +322,4 @@ export class DocumentBuilder {
 
         return this;
     }
-
 }

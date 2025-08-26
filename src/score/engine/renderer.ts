@@ -106,7 +106,7 @@ export class Renderer {
     }
 
     get doc(): ObjDocument | undefined {
-        return this.mdoc?.obj;
+        return this.mdoc?.getMusicObject();
     }
 
     private finishImageAsset(asset: ImageAssetData) {
@@ -135,11 +135,11 @@ export class Renderer {
         this.mdoc = mdoc;
 
         if (prevMDoc) {
-            prevMDoc.obj.setRenderer(undefined);
+            prevMDoc.getMusicObject().setRenderer(undefined);
         }
 
         if (mdoc) {
-            mdoc.obj.setRenderer(this);
+            mdoc.getMusicObject().setRenderer(this);
         }
     }
 

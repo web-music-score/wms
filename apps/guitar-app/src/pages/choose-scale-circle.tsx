@@ -28,7 +28,10 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
     }
 
     createNewState(guitarCtx: ScoreUI.GuitarContext) {
-        let doc = Score.MDocument.createSimpleScaleArpeggio(Score.StaffPreset.GuitarTreble, guitarCtx.scale, "B2", 1);
+        let doc = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble)
+            .addScaleArpeggio(guitarCtx.scale, "B2", 1)
+            .getDocument();
+
         return { guitarCtx, doc }
     }
 

@@ -66,12 +66,6 @@ export enum Arpeggio { Up, Down }
 /** @public */
 export enum TieType { Stub = -1, ToMeasureEnd = -2 }
 
-/** @deprecated */
-export type TieSpan = number | TieType;
-
-/** @deprecated */
-export type SlurSpan = number;
-
 /** @public */
 export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
 

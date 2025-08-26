@@ -1,7 +1,7 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
-import { Connective, ConnectiveSpan, NoteAnchor, SlurSpan, Stem, TieSpan, TieType } from "../pub/types";
+import { Connective, ConnectiveSpan, NoteAnchor, Stem, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
 import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
