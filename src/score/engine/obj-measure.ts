@@ -1111,31 +1111,6 @@ export class ObjMeasure extends MusicObject {
             this.endRepeatPlayCountText.layout(renderer);
         }
 
-        // Calc top and bottom
-        let top = Math.min(
-            ...this.signatures.map(signature => signature.getRect().top),
-            this.barLineLeft.getRect().top,
-            ...this.columns.map(col => col.getRect().top),
-            this.barLineRight.getRect().top
-        );
-
-        let bottom = Math.max(
-            ...this.signatures.map(signature => signature.getRect().bottom),
-            this.barLineLeft.getRect().bottom,
-            ...this.columns.map(col => col.getRect().bottom),
-            this.barLineRight.getRect().bottom
-        );
-
-        this.row.getNotationLines().forEach(line => {
-            if (line instanceof ObjTab) {
-                top = Math.min(top, line.getTop());
-                bottom = Math.max(bottom, line.getBottom());
-            }
-        });
-
-        // Set rect toph and bottomh
-        this.rect = new DivRect(0, 0, 0, top, 0, bottom);
-
         let padding = renderer.unitSize;
 
         // Calculated width members
@@ -1158,6 +1133,7 @@ export class ObjMeasure extends MusicObject {
 
         width = Math.max(width, this.getMinWidth());
 
+        this.rect = new DivRect();
         this.rect.centerX = this.rect.left + width / 2;
         this.rect.right = this.rect.left + width;
 
