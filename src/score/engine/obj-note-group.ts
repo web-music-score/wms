@@ -540,7 +540,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.staffObjects.length = 0;
 
-        row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
+        row.getStaves().forEach(staff => {
             if (!staff.containsDiatonicId(this.ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
                 return;
             }
@@ -643,7 +643,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.tabObjects.length = 0;
 
-        row.getNotationLines().filter(line => line instanceof ObjTab).forEach(tab => {
+        row.getTabs().forEach(tab => {
             if (!tab.containsVoiceId(this.voiceId)) {
                 return;
             }

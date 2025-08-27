@@ -1074,7 +1074,7 @@ export class ObjMeasure extends MusicObject {
         let showTempo = !!this.alterTempo;
 
         if (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo) {
-            this.signatures = this.row.getNotationLines().filter(line => line instanceof ObjStaff).map((staff, staffId) => {
+            this.signatures = this.row.getStaves().map((staff, staffId) => {
                 let oldSignature = this.signatures.find(s => s.staff === staff);
 
                 let signature = oldSignature ?? new ObjSignature(this, staff);
@@ -1234,7 +1234,6 @@ export class ObjMeasure extends MusicObject {
             this.rect.top = Math.min(this.rect.top, line.calcTop());
             this.rect.bottom = Math.max(this.rect.bottom, line.calcBottom());
         });
-
     }
 
     offset(dx: number, dy: number) {

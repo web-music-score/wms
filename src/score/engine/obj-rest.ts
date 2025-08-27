@@ -243,7 +243,7 @@ export class ObjRest extends MusicObject {
             bottomh = unitSize * (1 + flagCount + adj);
         }
 
-        this.row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
+        this.row.getStaves().forEach(staff => {
             if (!staff.containsDiatonicId(ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
                 return;
             }

@@ -363,7 +363,7 @@ export class ObjRhythmColumn extends MusicObject {
 
         if (this.arpeggioDir !== undefined) {
             let arpeggioWidth = 0;
-            this.arpeggios = row.getNotationLines().filter(line => line instanceof ObjStaff).map(staff => {
+            this.arpeggios = row.getStaves().map(staff => {
                 let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
                 arpeggio.layout(renderer);
                 arpeggio.offset(-leftw - arpeggio.getRect().right, staff.getMiddleLineY() - arpeggio.getRect().centerY);
@@ -397,7 +397,7 @@ export class ObjRhythmColumn extends MusicObject {
         this.requestRectUpdate();
 
         // Find min/max diatonicId for each staff.
-        this.row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
+        this.row.getStaves().forEach(staff => {
             let minDiatonicId: number | undefined = undefined;
             let maxDiatonicId: number | undefined = undefined;
 
@@ -461,7 +461,7 @@ export class ObjRhythmColumn extends MusicObject {
 
     draw(renderer: Renderer) {
         // Draw ledger lines
-        this.row.getNotationLines().filter(line => line instanceof ObjStaff).forEach(staff => {
+        this.row.getStaves().forEach(staff => {
             let minDiatonicId = this.staffMinDiatonicId.get(staff);
             let maxDiatonicId = this.staffMaxDiatonicId.get(staff);
 

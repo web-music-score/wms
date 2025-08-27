@@ -16,7 +16,9 @@ export class ObjScoreRow extends MusicObject {
 
     private minWidth = 0;
 
-    private readonly notationLines: (ObjStaff | ObjTab)[] = [];
+    private readonly notationLines: ReadonlyArray<ObjStaff | ObjTab>;
+    private readonly staves: ReadonlyArray<ObjStaff>;
+    private readonly tabs: ReadonlyArray<ObjTab>;
 
     private readonly measures: ObjMeasure[] = [];
 
@@ -28,6 +30,8 @@ export class ObjScoreRow extends MusicObject {
         super(doc);
 
         this.notationLines = this.createNotationLines();
+        this.staves = this.notationLines.filter(line => line instanceof ObjStaff);
+        this.tabs = this.notationLines.filter(line => line instanceof ObjTab);
 
         // Set prevRow
         this.prevRow = doc.getLastRow();
@@ -64,34 +68,40 @@ export class ObjScoreRow extends MusicObject {
         return this.notationLines;
     }
 
+    getStaves(): ReadonlyArray<ObjStaff> {
+        return this.staves;
+    }
+
+    getTabs(): ReadonlyArray<ObjTab> {
+        return this.tabs;
+    }
+
     get hasStaff(): boolean {
-        return this.notationLines.some(line => line instanceof ObjStaff);
+        return this.staves.length > 0;
     }
 
     get hasTab(): boolean {
-        return this.notationLines.some(line => line instanceof ObjTab);
+        return this.tabs.length > 0;
     }
 
     getTopStaff(): ObjStaff {
-        for (let i = 0; i < this.notationLines.length; i++) {
-            let line = this.notationLines[i];
-            if (line instanceof ObjStaff) {
-                return line;
-            }
+        let topStaff = this.staves[0];
+        if (topStaff) {
+            return topStaff;
         }
-
-        throw new MusicError(MusicErrorType.Score, "Top staff is required!");
+        else {
+            throw new MusicError(MusicErrorType.Score, "Top staff is required!");
+        }
     }
 
     getBottomStaff(): ObjStaff {
-        for (let i = this.notationLines.length - 1; i >= 0; i--) {
-            let line = this.notationLines[i];
-            if (line instanceof ObjStaff) {
-                return line;
-            }
+        let bottomStaff = this.staves[this.staves.length - 1];
+        if (bottomStaff) {
+            return bottomStaff;
         }
-
-        throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
+        else {
+            throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
+        }
     }
 
     getStaff(diatonicId: number): ObjStaff | undefined {
