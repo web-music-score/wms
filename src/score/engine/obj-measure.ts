@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType } from "../pub";
@@ -58,6 +58,7 @@ export class ObjMeasure extends MusicObject {
     private alterTempo?: AlterTempo;
 
     private signatures: ObjSignature[] = [];
+    private tabStringNotes: ObjText[] = [];
     private barLineLeft: ObjBarLineLeft;
     private columns: ObjRhythmColumn[] = [];
     private barLineRight: ObjBarLineRight;
@@ -221,6 +222,13 @@ export class ObjMeasure extends MusicObject {
 
         for (let i = 0; i < this.signatures.length; i++) {
             let arr = this.signatures[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        for (let i = 0; i < this.tabStringNotes.length; i++) {
+            let arr = this.tabStringNotes[i].pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -1097,6 +1105,23 @@ export class ObjMeasure extends MusicObject {
         // Layout signatures
         this.signatures.forEach(signature => signature.layout(renderer));
 
+        // Layout tab string notes
+        this.tabStringNotes.length = 0;
+        if (this === this.row.getFirstMeasure()) {
+            this.row.getTabs().forEach(tab => {
+                for (let stringId = 0; stringId < 6; stringId++) {
+                    let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
+                    let obj = new ObjText(this, note, 1, 0.5);
+
+                    obj.layout(renderer);
+                    obj.offset(20, tab.getStringY(stringId));
+
+                    this.tabStringNotes.push(obj);
+                    tab.addObject(obj);
+                }
+            });
+        }
+
         // Layout measure start object
         this.barLineLeft.layout(renderer);
 
@@ -1214,6 +1239,7 @@ export class ObjMeasure extends MusicObject {
     updateRect() {
         this.rect.top = Math.min(
             ...this.signatures.map(s => s.getRect().top),
+            ...this.tabStringNotes.map(t => t.getRect().top),
             this.barLineLeft.getRect().top,
             ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().top),
             this.barLineRight.getRect().top,
@@ -1223,6 +1249,7 @@ export class ObjMeasure extends MusicObject {
 
         this.rect.bottom = Math.max(
             ...this.signatures.map(s => s.getRect().bottom),
+            ...this.tabStringNotes.map(t => t.getRect().bottom),
             this.barLineLeft.getRect().bottom,
             ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().bottom),
             this.barLineRight.getRect().bottom,
@@ -1238,6 +1265,8 @@ export class ObjMeasure extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.signatures.forEach(signature => signature.offset(dx, 0));
+
+        this.tabStringNotes.forEach(obj => obj.offset(dx, 0));
 
         this.barLineLeft.offset(dx, dy);
 
@@ -1285,6 +1314,8 @@ export class ObjMeasure extends MusicObject {
         });
 
         this.signatures.forEach(signature => signature.draw(renderer));
+
+        this.tabStringNotes.forEach(obj => obj.draw(renderer));
 
         this.barLineLeft.draw(renderer);
 
