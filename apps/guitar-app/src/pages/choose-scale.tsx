@@ -28,7 +28,8 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
     }
 
     createNewState(guitarCtx: ScoreUI.GuitarContext) {
-        let doc = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble)
+        let doc = new Score.DocumentBuilder()
+            .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
             .addScaleArpeggio(guitarCtx.scale, "B2", 1)
             .getDocument();
 

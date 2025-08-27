@@ -5,8 +5,8 @@ import { MDocument, Arpeggio, Navigation, StaffPreset, Stem, Label, DocumentBuil
 
 /** @public */
 export function createGreensleeves(): MDocument {
-    return new DocumentBuilder(StaffPreset.GuitarTreble)
-
+    return new DocumentBuilder()
+        .setScoreConfiguration(StaffPreset.GuitarTreble)
         .setHeader("Greensleeves")
 
         .addMeasure()

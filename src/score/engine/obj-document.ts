@@ -22,7 +22,7 @@ export class ObjDocument extends MusicObject {
 
     private measuresPerRow: number = Infinity;
 
-    public readonly config: (StaffConfig | TabConfig)[] = [];
+    public nextRowConfig: (StaffConfig | TabConfig)[] = [{ type: "staff", clef: Clef.G }];
 
     private header?: ObjHeader;
 
@@ -34,32 +34,40 @@ export class ObjDocument extends MusicObject {
 
     private readonly mi: MDocument;
 
-    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
+    constructor() {
         super(undefined);
 
+        this.mi = new MDocument(this);
+    }
+
+    getMusicInterface(): MDocument {
+        return this.mi;
+    }
+
+    setScoreConfiguration(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
             switch (config) {
                 default:
                 case StaffPreset.Treble:
-                    this.config = [{ type: "staff", clef: Clef.G }];
+                    this.nextRowConfig = [{ type: "staff", clef: Clef.G }];
                     break;
                 case StaffPreset.Bass:
-                    this.config = [{ type: "staff", clef: Clef.F }];
+                    this.nextRowConfig = [{ type: "staff", clef: Clef.F }];
                     break;
                 case StaffPreset.Grand:
-                    this.config = [
+                    this.nextRowConfig = [
                         { type: "staff", clef: Clef.G, isGrand: true },
                         { type: "staff", clef: Clef.F, isGrand: true }
                     ];
                     break;
                 case StaffPreset.GuitarTreble:
-                    this.config = [{ type: "staff", clef: Clef.G, isOctaveDown: true }];
+                    this.nextRowConfig = [{ type: "staff", clef: Clef.G, isOctaveDown: true }];
                     break;
                 case StaffPreset.GuitarTab:
-                    this.config = [{ type: "tab", tuning: "Standard" }];
+                    this.nextRowConfig = [{ type: "tab", tuning: "Standard" }];
                     break;
                 case StaffPreset.GuitarCombined:
-                    this.config = [
+                    this.nextRowConfig = [
                         { type: "staff", clef: Clef.G, isOctaveDown: true },
                         { type: "tab", tuning: "Standard" }
                     ];
@@ -67,16 +75,16 @@ export class ObjDocument extends MusicObject {
             }
         }
         else if (Utils.Is.isArray(config)) {
-            this.config = config;
+            this.nextRowConfig = config;
         }
         else {
-            this.config = [config];
+            this.nextRowConfig = [config];
         }
 
         // Setup grand staff.
-        for (let i = 0; i < this.config.length - 1; i++) {
-            let treble = this.config[i];
-            let bass = this.config[i + 1];
+        for (let i = 0; i < this.nextRowConfig.length - 1; i++) {
+            let treble = this.nextRowConfig[i];
+            let bass = this.nextRowConfig[i + 1];
             if (treble.type === "staff" && bass.type === "staff") {
                 if (treble.clef === Clef.G && treble.isGrand && bass.clef === Clef.F && bass.isGrand) {
                     treble.minNote = "C4";
@@ -94,15 +102,6 @@ export class ObjDocument extends MusicObject {
                 bass.isGrand = false;
             }
         }
-
-        // There is always row
-        this.rows.push(new ObjScoreRow(this));
-
-        this.mi = new MDocument(this);
-    }
-
-    getMusicInterface(): MDocument {
-        return this.mi;
     }
 
     setMeasuresPerRow(measuresPerRow: number) {
@@ -172,11 +171,17 @@ export class ObjDocument extends MusicObject {
         return this.measures.length > 0 ? this.measures[this.measures.length - 1] : undefined;
     }
 
-    getFirstRow(): ObjScoreRow | undefined {
+    getFirstRow(): ObjScoreRow {
+        if (this.rows.length === 0) {
+            this.rows.push(new ObjScoreRow(this, undefined));
+        }
         return this.rows[0];
     }
 
-    getLastRow(): ObjScoreRow | undefined {
+    getLastRow(): ObjScoreRow {
+        if (this.rows.length === 0) {
+            this.rows.push(new ObjScoreRow(this, undefined));
+        }
         return this.rows[this.rows.length - 1];
     }
 
@@ -196,15 +201,12 @@ export class ObjDocument extends MusicObject {
 
     addMeasure(): ObjMeasure {
         if ((this.isLastRowFull() || this.newRowRequested) && !this.isLastRowEmpty()) {
-            this.rows.push(new ObjScoreRow(this));
+            let prevRow = this.rows.length === 0 ? undefined : this.rows[this.rows.length - 1];
+            this.rows.push(new ObjScoreRow(this, prevRow));
             this.newRowRequested = false;
         }
 
         let lastRow = this.getLastRow();
-
-        if (!lastRow) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add measure because last row is undefined.");
-        }
 
         let measure = new ObjMeasure(lastRow);
 

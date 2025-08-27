@@ -43,12 +43,12 @@ export class Intervals extends React.Component<IntervalsProps, IntervalsState> {
 
         let guitarCtx = app.getGuitarContext();
 
-        let builder = new Score.DocumentBuilder({
-            type: "staff", clef: Score.Clef.G, isOctaveDown: true,
-            minNote: "C2", maxNote: "C6"
-        });
-
-        builder.setKeySignature(guitarCtx.scale);
+        let builder = new Score.DocumentBuilder()
+            .setScoreConfiguration({
+                type: "staff", clef: Score.Clef.G, isOctaveDown: true,
+                minNote: "C2", maxNote: "C6"
+            })
+            .setKeySignature(guitarCtx.scale);
 
         if (note1) {
             let noteName1 = note1.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);

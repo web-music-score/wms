@@ -2,11 +2,11 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createGuitarCombinedDemo() {
-    return new Score.DocumentBuilder([
-        { type: "staff", clef: Score.Clef.G, isOctaveDown: true, voiceIds: [0, 1] },
-        { type: "tab", tuning: "Drop D", voiceIds: [0, 1] }
-    ])
-
+    return new Score.DocumentBuilder()
+        .setScoreConfiguration([
+            { type: "staff", clef: Score.Clef.G, isOctaveDown: true, voiceIds: [0, 1] },
+            { type: "tab", tuning: "Drop D", voiceIds: [0, 1] }
+        ])
         .setHeader("Guitar Combined")
 
         .addMeasure()

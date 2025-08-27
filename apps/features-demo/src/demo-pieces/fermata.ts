@@ -2,8 +2,8 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createFermataDemo() {
-    return new Score.DocumentBuilder(Score.StaffPreset.Bass)
-
+    return new Score.DocumentBuilder()
+        .setScoreConfiguration(Score.StaffPreset.Bass)
         .setHeader("Fermata")
 
         .addMeasure()

@@ -33,7 +33,7 @@ export class ObjHeader extends MusicObject {
 
         if (doc.getFirstRow()) {
             let tuningText: string = "";
-            let tabs = doc.getFirstRow()!.getTabs();
+            let tabs = doc.getFirstRow().getTabs();
 
             tabs.forEach((tab, tabIndex) => {
                 if (tabs.length > 1) {

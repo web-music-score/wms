@@ -5,10 +5,11 @@ export function createGrandStaffDemo() {
 
     let scale = Theory.getScale("Cb", Theory.ScaleType.Major);
 
-    return new Score.DocumentBuilder(Score.StaffPreset.Grand)
-
+    return new Score.DocumentBuilder()
+        .setScoreConfiguration(Score.StaffPreset.Grand)
         .setHeader("Grand Staff")
         .setMeasuresPerRow(4)
+
         .setTimeSignature("6/8")
         .setKeySignature(scale)
         .addScaleArpeggio(scale, "C2", 4)

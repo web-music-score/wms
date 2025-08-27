@@ -202,9 +202,9 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
 
         let variantNames = Utils.Map.getMapKeys(variants);
 
-        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble);
-
-        builder.setKeySignature(guitarCtx.scale);
+        let builder = new Score.DocumentBuilder()
+            .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
+            .setKeySignature(guitarCtx.scale);
 
         if (variant) {
             variant.fretPositions.forEach(fretPos => {

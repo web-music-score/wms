@@ -2,8 +2,8 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createDaCapoDemo() {
-    return new Score.DocumentBuilder(Score.StaffPreset.Treble)
-
+    return new Score.DocumentBuilder()
+        .setScoreConfiguration(Score.StaffPreset.Treble)
         .setHeader("Da Capo Navigations")
 
         .addMeasure()

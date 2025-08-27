@@ -3,8 +3,8 @@ import { MDocument, NoteAnchor, Navigation, Annotation, StaffPreset, Stem, Docum
 
 /** @public */
 export function createAndanteByDiabelli(): MDocument {
-    return new DocumentBuilder(StaffPreset.GuitarTreble)
-
+    return new DocumentBuilder()
+        .setScoreConfiguration(StaffPreset.GuitarTreble)
         .setHeader("Andante", "A. Diabelli")
 
         .addMeasure()
@@ -38,7 +38,7 @@ export function createAndanteByDiabelli(): MDocument {
         .endRow()
 
         .addMeasure()
-        .addNote(0, "D4", NoteLength.Eighth)
+        .addNote(0, "D4", NoteLength.Eighth, { string: 3 })
         .addNote(0, "E4", NoteLength.Eighth)
         .addNote(0, "F#4", NoteLength.Eighth)
         .addNote(0, "G4", NoteLength.Eighth)

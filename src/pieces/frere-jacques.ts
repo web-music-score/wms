@@ -3,8 +3,8 @@ import { DocumentBuilder, MDocument, StaffPreset } from "@tspro/web-music-score/
 
 /** @public */
 export function createFrereJacques(): MDocument {
-    return new DocumentBuilder(StaffPreset.GuitarTreble)
-
+    return new DocumentBuilder()
+        .setScoreConfiguration(StaffPreset.GuitarTreble)
         .setHeader("Frere Jacques")
 
         .addMeasure()

@@ -128,9 +128,9 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
             }
         }
 
-        let builder = new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble);
-
-        builder.setKeySignature(guitarCtx.scale);
+        let builder = new Score.DocumentBuilder()
+            .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
+            .setKeySignature(guitarCtx.scale);
 
         frettedPositions.forEach(frettedPosition => {
             let noteName = frettedPosition.note.format(guitarCtx.pitchNotation, Theory.SymbolSet.Unicode);

@@ -2,8 +2,8 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createGuitarTabDemo() {
-    return new Score.DocumentBuilder(Score.StaffPreset.GuitarTab)
-
+    return new Score.DocumentBuilder()
+        .setScoreConfiguration(Score.StaffPreset.GuitarTab)
         .setHeader("Guitar Tab")
 
         .addMeasure()

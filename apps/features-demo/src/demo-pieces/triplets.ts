@@ -2,8 +2,8 @@ import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createTripletsDemo() {
-    return new Score.DocumentBuilder(Score.StaffPreset.GuitarTreble)
-
+    return new Score.DocumentBuilder()
+        .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
         .setHeader("Triplets")
 
         .addMeasure()

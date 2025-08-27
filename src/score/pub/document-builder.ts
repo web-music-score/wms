@@ -81,9 +81,13 @@ function assertRestOptions(options: RestOptions) {
 export class DocumentBuilder {
     private readonly doc: ObjDocument;
 
-    constructor(staffPreset: StaffPreset);
-    constructor(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[]);
-    constructor(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]) {
+    constructor() {
+        this.doc = new ObjDocument();
+    }
+
+    setScoreConfiguration(staffPreset: StaffPreset): DocumentBuilder;
+    setScoreConfiguration(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[]): DocumentBuilder;
+    setScoreConfiguration(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]): DocumentBuilder {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
             // Ok
         }
@@ -111,7 +115,9 @@ export class DocumentBuilder {
             assertArg(false, "config", config);
         }
 
-        this.doc = new ObjDocument(config);
+        this.doc.setScoreConfiguration(config);
+
+        return this;
     }
 
     get measure(): ObjMeasure {

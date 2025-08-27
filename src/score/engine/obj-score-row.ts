@@ -11,7 +11,6 @@ import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjScoreRow extends MusicObject {
-    private prevRow?: ObjScoreRow;
     private nextRow?: ObjScoreRow;
 
     private minWidth = 0;
@@ -26,15 +25,12 @@ export class ObjScoreRow extends MusicObject {
 
     readonly mi: MScoreRow;
 
-    constructor(readonly doc: ObjDocument) {
+    constructor(readonly doc: ObjDocument, private readonly prevRow: ObjScoreRow | undefined) {
         super(doc);
 
         this.notationLines = this.createNotationLines();
         this.staves = this.notationLines.filter(line => line instanceof ObjStaff);
         this.tabs = this.notationLines.filter(line => line instanceof ObjTab);
-
-        // Set prevRow
-        this.prevRow = doc.getLastRow();
 
         // nextRow of prevRow is this
         if (this.prevRow) {
@@ -49,7 +45,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     private createNotationLines(): (ObjStaff | ObjTab)[] {
-        let notationLines = this.doc.config.map(cfg => cfg.type === "staff" ? new ObjStaff(this, cfg) : new ObjTab(this, cfg));
+        let notationLines = this.doc.nextRowConfig.map(cfg => cfg.type === "staff" ? new ObjStaff(this, cfg) : new ObjTab(this, cfg));
 
         for (let i = 0; i < notationLines.length - 1; i++) {
             let treble = notationLines[i];
