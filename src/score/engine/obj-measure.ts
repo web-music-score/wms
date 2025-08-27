@@ -65,6 +65,8 @@ export class ObjMeasure extends MusicObject {
     private connectives: ObjConnective[] = [];
     private beamGroups: ObjBeamGroup[] = [];
 
+    private tabStringNotesWidth = 0;
+
     private measureId: number;
 
     private needLayout = true;
@@ -812,7 +814,7 @@ export class ObjMeasure extends MusicObject {
             return prev.getStaffLineRight();
         }
         else {
-            return this.getRect().left;
+            return this.getRect().left + this.tabStringNotesWidth;
         }
     }
 
@@ -1075,6 +1077,8 @@ export class ObjMeasure extends MusicObject {
         let isFirstMeasureInRow = this === this.row.getFirstMeasure();
         let isAfterMeasureBreak = this.getPrevMeasure()?.hasPostMeasureBreak() === true;
 
+        this.tabStringNotesWidth = isFirstMeasureInRow && this.row.hasTab ? unitSize * 4 : 0;
+
         let showClef = isFirstMeasureInRow || isAfterMeasureBreak;
         let showMeasureNumber = isFirstMeasureInRow && !this.row.isFirstRow();
         let showKeySignature = isFirstMeasureInRow || isAfterMeasureBreak || !!this.alterKeySignature;
@@ -1111,10 +1115,10 @@ export class ObjMeasure extends MusicObject {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
-                    let obj = new ObjText(this, note, 1, 0.5);
+                    let obj = new ObjText(this, { text: note, scale: 0.8 }, 1, 0.5);
 
                     obj.layout(renderer);
-                    obj.offset(20, tab.getStringY(stringId));
+                    obj.offset(this.tabStringNotesWidth * 0.8, tab.getStringY(stringId));
 
                     this.tabStringNotes.push(obj);
                     tab.addObject(obj);
@@ -1140,6 +1144,7 @@ export class ObjMeasure extends MusicObject {
 
         // Calculated width members
         this.leftSolidAreaWidth =
+            this.tabStringNotesWidth +
             Math.max(0, ...this.signatures.map(signature => signature.getRect().width)) +
             this.barLineLeft.getRect().width +
             padding;
@@ -1166,13 +1171,13 @@ export class ObjMeasure extends MusicObject {
 
         this.signatures.forEach(signature => {
             rect = signature.getRect();
-            signature.offset(this.rect.left - rect.left, -rect.centerY);
+            signature.offset(this.rect.left + this.tabStringNotesWidth - rect.left, -rect.centerY);
         });
 
         let signaturesWidth = Math.max(0, ...this.signatures.map(signature => signature.getRect().width));
 
         rect = this.barLineLeft.getRect();
-        this.barLineLeft.offset(this.rect.left + signaturesWidth - rect.left, -rect.centerY);
+        this.barLineLeft.offset(this.rect.left + this.tabStringNotesWidth + signaturesWidth - rect.left, -rect.centerY);
 
         rect = this.barLineRight.getRect();
         this.barLineRight.offset(this.rect.right - rect.right, -rect.centerY);
