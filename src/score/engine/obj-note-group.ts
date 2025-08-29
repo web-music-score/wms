@@ -678,9 +678,6 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     updateRect() {
-        this.staffObjects.forEach(obj => obj.updateRect());
-        this.tabObjects.forEach(obj => obj.updateRect());
-
         if (this.staffObjects.length > 0) {
             this.rect = this.staffObjects[0].noteHeadRects[0].copy();
         }

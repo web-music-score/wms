@@ -121,6 +121,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getShapeRects(): DivRect[] {
+        this.getRect(); // executes this.updateRect() if required, which sets this.shapeRects.
         return this.shapeRects;
     }
 
@@ -435,10 +436,8 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     updateRect() {
-        this.voiceSymbol.filter(s => s !== undefined).forEach(s => s.updateRect());
-
         this.shapeRects = [
-            ...this.voiceSymbol.filter(s => s !== undefined).map(s => s.getRect().copy()),
+            ...this.voiceSymbol.filter(s => !!s).map(s => s.getRect().copy()),
             ...this.arpeggios.map(a => a.getRect().copy())
         ];
 
@@ -448,12 +447,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.voiceSymbol.forEach(symbol => {
-            if (symbol) {
-                symbol.offset(dx, dy);
-            }
-        });
-
+        this.voiceSymbol.forEach(symbol => symbol?.offset(dx, 0));
         this.arpeggios.forEach(arpeggio => arpeggio.offset(dx, 0));
         this.shapeRects.forEach(r => r.offsetInPlace(dx, dy));
         this.rect.offsetInPlace(dx, dy);

@@ -1,6 +1,6 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { Clef, DivRect, MScoreRow, StaffConfig, TabConfig } from "../pub";
+import { Clef, DivRect, getVoiceIds, MScoreRow, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
@@ -296,7 +296,10 @@ export class ObjScoreRow extends MusicObject {
             m.requestRectUpdate();
             m.getBarLineLeft().requestRectUpdate();
             m.getBarLineRight().requestRectUpdate();
-            m.getColumns().forEach(col => col.requestRectUpdate());
+            m.getColumns().forEach(col => {
+                col.requestRectUpdate();
+                getVoiceIds().forEach(voiceId => col.getVoiceSymbol(voiceId)?.requestRectUpdate());
+            });
         });
 
         let lines = this.getNotationLines();
@@ -339,7 +342,7 @@ export class ObjScoreRow extends MusicObject {
 
             rowY = layoutObj.verticalPos === VerticalPos.BelowStaff
                 ? Math.max(y, rowY ?? y)
-                : Math.min(y, rowY ?? y)
+                : Math.min(y, rowY ?? y);
         });
 
         layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));

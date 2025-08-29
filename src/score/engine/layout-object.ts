@@ -93,8 +93,8 @@ export class LayoutObjectWrapper {
         let staticObjects = measure.getStaticObjects();
         let objShapeRects = musicObj.getShapeRects();
 
-        staticObjects.forEach(resolveObj => {
-            let staticShapeRects = resolveObj.getShapeRects();
+        staticObjects.forEach(staticObj => {
+            let staticShapeRects = staticObj.getShapeRects();
 
             objShapeRects.forEach(objR => {
                 staticShapeRects.forEach(staticR => {
