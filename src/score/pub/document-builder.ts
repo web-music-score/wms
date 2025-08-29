@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VoiceId } from "./types";
+import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VoiceId } from "./types";
 import { MDocument, MMeasure } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
@@ -86,8 +86,8 @@ export class DocumentBuilder {
     }
 
     setScoreConfiguration(staffPreset: StaffPreset): DocumentBuilder;
-    setScoreConfiguration(config: StaffConfig | TabConfig | (StaffConfig | TabConfig)[]): DocumentBuilder;
-    setScoreConfiguration(config: StaffPreset | StaffConfig | TabConfig | (StaffConfig | TabConfig)[]): DocumentBuilder {
+    setScoreConfiguration(config: ScoreConfiguration): DocumentBuilder;
+    setScoreConfiguration(config: StaffPreset | ScoreConfiguration): DocumentBuilder {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
             // Ok
         }

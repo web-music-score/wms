@@ -1,6 +1,6 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { Clef, DivRect, MScoreRow } from "../pub";
+import { Clef, DivRect, MScoreRow, StaffConfig, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
@@ -25,7 +25,7 @@ export class ObjScoreRow extends MusicObject {
 
     readonly mi: MScoreRow;
 
-    constructor(readonly doc: ObjDocument, private readonly prevRow: ObjScoreRow | undefined) {
+    constructor(readonly doc: ObjDocument, private readonly prevRow: ObjScoreRow | undefined, private readonly scoreConfig: (StaffConfig | TabConfig)[]) {
         super(doc);
 
         this.notationLines = this.createNotationLines();
@@ -45,7 +45,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     private createNotationLines(): (ObjStaff | ObjTab)[] {
-        let notationLines = this.doc.nextRowConfig.map(cfg => cfg.type === "staff" ? new ObjStaff(this, cfg) : new ObjTab(this, cfg));
+        let notationLines = this.scoreConfig.map(cfg => cfg.type === "staff" ? new ObjStaff(this, cfg) : new ObjTab(this, cfg));
 
         for (let i = 0; i < notationLines.length - 1; i++) {
             let treble = notationLines[i];

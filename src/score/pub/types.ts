@@ -18,7 +18,7 @@ export enum StaffPreset {
 }
 
 /** @public */
-export enum Clef { G, F }
+export enum Clef { G = "G", F = "F" }
 
 /** @public */
 export type StaffConfig = {
@@ -39,7 +39,7 @@ export type TabConfig = {
 }
 
 /** @public */
-export type DocumentConfig = StaffConfig | TabConfig | (StaffConfig | TabConfig)[];
+export type ScoreConfiguration = StaffConfig | TabConfig | (StaffConfig | TabConfig)[];
 
 /** @public */
 export type VoiceId = 0 | 1 | 2 | 3;
