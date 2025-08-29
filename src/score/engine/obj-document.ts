@@ -102,6 +102,8 @@ export class ObjDocument extends MusicObject {
                 bass.isGrand = false;
             }
         }
+
+        this.requestNewRow();
     }
 
     setMeasuresPerRow(measuresPerRow: number) {
@@ -200,13 +202,13 @@ export class ObjDocument extends MusicObject {
     }
 
     addMeasure(): ObjMeasure {
-        if ((this.isLastRowFull() || this.newRowRequested) && !this.isLastRowEmpty()) {
-            let prevRow = this.rows.length === 0 ? undefined : this.rows[this.rows.length - 1];
-            this.rows.push(new ObjScoreRow(this, prevRow));
+        let lastRow: ObjScoreRow | undefined = this.rows[this.rows.length - 1];
+
+        if (!lastRow || this.newRowRequested && lastRow.getMeasures().length > 0 || lastRow.getMeasures().length >= this.measuresPerRow) {
+            lastRow = new ObjScoreRow(this, lastRow);
+            this.rows.push(lastRow);
             this.newRowRequested = false;
         }
-
-        let lastRow = this.getLastRow();
 
         let measure = new ObjMeasure(lastRow);
 
