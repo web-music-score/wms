@@ -71,12 +71,12 @@ It declares global variable `WebMusicScore` that contains `Core`, `Audio`, `Theo
 and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-cg`).
 
 ```html
-<script src="https://unpkg.com/@tspro/web-music-score@2"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@2.0.0"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@2.0.0/dist/iife/index.global.js"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@3"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@3.0.0"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@3.0.0/dist/iife/index.global.js"></script>
 
 <!--
-    Use one of above. It is recommended to use version number (e.g. @2.0.0 or at least @2).
+    Use one of above. It is recommended to use version number (e.g. @3.0.0 or at least @2).
     This way if there is breaking change between versions your code does not stop working.
 -->
 
