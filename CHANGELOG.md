@@ -1,12 +1,19 @@
 # Changelog
 
-## [2.1.0] - 2025
-## Changed
-- Renamed Arc (tie, slur) to Connective.
+## [3.0.0] - 2025-08-
+Major update and brought some important changes.
+### ** Breaking Changes **
+- Removed old way of creating scores using MDocument, MMeasure, etc. Use DocumentBuilder instead.
+- Removed DocumentOptions. Replaced using functions addScoreConfiguration() and setMeasuresPerRow() in DocumentBuilder.
+- Tie and slur removed from NoteOptions. Use addConnective() in DocumentBuilder.
 
-### Added
-- Connective.Slide
-- Draw connectives to tabs.
+## Added
+- Score configuration with multiple staves and tabs per row.
+- Connective.Slide.
+- Draw connectives in tabs.
+
+## Changed
+- Lots of other minor changes that are not documented here.
 
 ## [2.0.0] - 2025-07-28
 Major update and brought many changes.
