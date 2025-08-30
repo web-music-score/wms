@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.0] - 2025-08-
+## [3.0.0] - 2025-08-30
 Major update and brought some important changes.
 ### ** Breaking Changes **
 - Removed old way of creating scores using MDocument, MMeasure, etc. Use DocumentBuilder instead.
@@ -10,10 +10,10 @@ Major update and brought some important changes.
 ## Added
 - Score configuration with multiple staves and tabs per row.
 - Connective.Slide.
-- Draw connectives in tabs.
+- Draw Connectives in tabs.
 
 ## Changed
-- Lots of other minor changes that are not documented here.
+- Lots of undocumented fixes, changes and improvements.
 
 ## [2.0.0] - 2025-07-28
 Major update and brought many changes.
