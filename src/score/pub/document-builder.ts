@@ -120,7 +120,7 @@ export class DocumentBuilder {
         return this;
     }
 
-    get measure(): ObjMeasure {
+    getMeasure(): ObjMeasure {
         return this.doc.getLastMeasure() ?? this.doc.addMeasure();
     }
 
@@ -156,13 +156,13 @@ export class DocumentBuilder {
             args[0] instanceof KeySignature ||
             Utils.Is.isString(args[0]) && Utils.Is.isEnumValue(args[1], ScaleType)
         ), "keySignature", args);
-        this.measure.setKeySignature(...args);
+        this.getMeasure().setKeySignature(...args);
         return this;
     }
 
     setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): DocumentBuilder {
         assertArg(timeSignature instanceof TimeSignature || Utils.Is.isString(timeSignature), "timeSignature", timeSignature);
-        this.measure.setTimeSignature(timeSignature);
+        this.getMeasure().setTimeSignature(timeSignature);
         return this;
     }
 
@@ -175,7 +175,7 @@ export class DocumentBuilder {
             assertArg(Utils.Is.isEnumValue(beatLength, NoteLength), "beatLength", beatLength);
             assertArg(Utils.Is.isBooleanOrUndefined(dotted), "dotted", dotted);
         }
-        this.measure.setTempo(beatsPerMinute, beatLength, dotted);
+        this.getMeasure().setTempo(beatsPerMinute, beatLength, dotted);
         return this;
     }
 
@@ -186,7 +186,7 @@ export class DocumentBuilder {
         if (options !== undefined) {
             assertNoteOptions(options);
         }
-        this.measure.addNoteGroup(voiceId, [note], noteLength, options);
+        this.getMeasure().addNoteGroup(voiceId, [note], noteLength, options);
         return this;
     }
 
@@ -197,7 +197,7 @@ export class DocumentBuilder {
         if (options !== undefined) {
             assertNoteOptions(options);
         }
-        this.measure.addNoteGroup(voiceId, notes, noteLength, options);
+        this.getMeasure().addNoteGroup(voiceId, notes, noteLength, options);
         return this;
     }
 
@@ -207,13 +207,13 @@ export class DocumentBuilder {
         if (options !== undefined) {
             assertRestOptions(options);
         }
-        this.measure.addRest(voiceId, restLength, options);
+        this.getMeasure().addRest(voiceId, restLength, options);
         return this;
     }
 
     addFermata(fermata?: Fermata): DocumentBuilder {
         assertArg(Utils.Is.isEnumValueOrUndefined(fermata, Fermata), "fermata", fermata);
-        this.measure.addFermata(fermata ?? Fermata.AtNote);
+        this.getMeasure().addFermata(fermata ?? Fermata.AtNote);
         return this;
     }
 
@@ -228,7 +228,7 @@ export class DocumentBuilder {
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        this.measure.addNavigation(navigation, ...args);
+        this.getMeasure().addNavigation(navigation, ...args);
         return this;
     }
 
@@ -243,19 +243,19 @@ export class DocumentBuilder {
             assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let tieSpan = args[0] as ConnectiveSpan | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
-            this.measure.addConnective(connective, tieSpan, noteAnchor);
+            this.getMeasure().addConnective(connective, tieSpan, noteAnchor);
         }
         else if (connective === Connective.Slur) {
             assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]), "slurSpan", args[0]);
             assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let slurSpan = args[0] as ConnectiveSpan | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
-            this.measure.addConnective(connective, slurSpan, noteAnchor);
+            this.getMeasure().addConnective(connective, slurSpan, noteAnchor);
         }
         else if (connective === Connective.Slide) {
             assertArg(Utils.Is.isEnumValueOrUndefined(args[0], NoteAnchor), "noteAnchor", args[0]);
             let noteAnchor = args[0] as NoteAnchor | undefined;
-            this.measure.addConnective(connective, noteAnchor);
+            this.getMeasure().addConnective(connective, noteAnchor);
         }
 
         return this;
@@ -264,14 +264,14 @@ export class DocumentBuilder {
     addLabel(label: Label, text: string): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.measure.addLabel(label, text);
+        this.getMeasure().addLabel(label, text);
         return this;
     }
 
     addAnnotation(annotation: Annotation, text: string): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.measure.addAnnotation(annotation, text);
+        this.getMeasure().addAnnotation(annotation, text);
         return this;
     }
 
@@ -282,28 +282,28 @@ export class DocumentBuilder {
             Utils.Is.isEnumValue(extensionLength, NoteLength)
         ), "extendionLength", extensionLength);
         assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
-        this.measure.addExtension(extensionLength, extensionVisible ?? true);
+        this.getMeasure().addExtension(extensionLength, extensionVisible ?? true);
         return this;
     }
 
     endSong(): DocumentBuilder {
-        this.measure.endSong();
+        this.getMeasure().endSong();
         return this;
     }
 
     endSection(): DocumentBuilder {
-        this.measure.endSection();
+        this.getMeasure().endSection();
         return this;
     }
 
     endRow(): DocumentBuilder {
-        this.measure.endRow();
+        this.doc.getLastMeasure()?.endRow();
         return this;
     }
 
     completeRests(voiceId?: number): DocumentBuilder {
         assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId), "voiceId", voiceId);
-        this.measure.completeRests(voiceId);
+        this.getMeasure().completeRests(voiceId);
         return this;
     }
 
@@ -311,8 +311,7 @@ export class DocumentBuilder {
         assertArg(Utils.Is.isString(bottomNote), "bottomNote", bottomNote);
         assertArg(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
 
-        let m = this.measure;
-        let ts = m.getTimeSignature();
+        let ts = this.getMeasure().getTimeSignature();
         let notes = scale.getScaleNotes(bottomNote, numOctaves);
 
         for (let i = 0; i < notes.length; i++) {
