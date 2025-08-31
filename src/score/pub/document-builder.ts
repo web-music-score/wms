@@ -120,7 +120,7 @@ export class DocumentBuilder {
         return this;
     }
 
-    getMeasure(): ObjMeasure {
+    private getMeasure(): ObjMeasure {
         return this.doc.getLastMeasure() ?? this.doc.addMeasure();
     }
 
