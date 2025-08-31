@@ -1,19 +1,24 @@
 # Publish web-music-score
 
-    cd packages/web-music-score
+## Update Changelog
+ `git log --pretty="- %s"`
 
-    // Update changelog
-    git log --pretty="- %s"
+## Update Version Numbers
+To create patch update: `npm version patch`
 
-    // Update version number
-    npm version major|minor|patch
+To create minor update: `npm version minor`
 
-    // Build production version
-    npm run build
+To create major update:
+- Change version in package.json for main package and all apps: e.g. `"3.0.0"`
+- Create git commit: e.g. `git commit -m "v3.0.0"`
+- Create git tag: e.g. `git tag v3.0.0`
 
-    // Test package
-    npm pack
+## Build
+`npm run build`
 
-    // Publish
-    npm login
-    npm publish --access public
+## Test Package
+`npm pack`
+
+## Publish
+`npm login`
+`npm publish --access public`
