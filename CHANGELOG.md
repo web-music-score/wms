@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.0.0] - 2025-08-30
+## [3.0.0] - 2025-08-31
 Major update and brought some important changes.
 ### ** Breaking Changes **
 - Removed old way of creating scores using MDocument, MMeasure, etc. Use DocumentBuilder instead.
