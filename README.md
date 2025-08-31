@@ -76,7 +76,7 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 <script src="https://unpkg.com/@tspro/web-music-score@3.0.0/dist/iife/index.global.js"></script>
 
 <!--
-    Use one of above. It is recommended to use version number (e.g. @3.0.0 or at least @2).
+    Use one of above. It is recommended to use version number (e.g. @3.0.0 or at least @3).
     This way if there is breaking change between versions your code does not stop working.
 -->
 
@@ -88,14 +88,14 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 
 ## API
 
-Typedoc API reference is available [here](https://pahkasoft.github.io). It has no comments but
-is mostly self explanatory and gives idea of full API.
+Typedoc API reference is available [here](https://pahkasoft.github.io).
+It is not commented but is mostly self explanatory and gives idea of full API.
 
 Following is the main interface explained.
 
-### Create Document
+### Create DocumentBuilder
 
-Document is created using `DocumentBuilder`.
+Documents are created using `DocumentBuilder`.
 
 ```js
 let builder = new Score.DocumentBuilder();
@@ -107,6 +107,8 @@ let doc = builder.getDocument();
 ```
 
 ### Set Score Configuration
+Setting score configuration takes place in first measure of next row.
+
 #### Using preset values
 ```js
 builder.setScoreConfiguration(staffPreset: Score.StaffPreset);
@@ -116,7 +118,7 @@ builder.setScoreConfiguration(staffPreset: Score.StaffPreset);
 * `Score.StaffPreset.Treble`: Staff with treble (G-) clef.
 * `Score.StaffPreset.Bass`: Staff with bass (F-) clef.
 * `Score.StaffPreset.Grand`: Both treble and bas staves.
-* `Score.StaffPreset.GuitarTreble`: `Treble` but one octave lower.
+* `Score.StaffPreset.GuitarTreble`: Same as `Treble` but one octave down.
 * `Score.StaffPreset.GuitarTab`: Guitar tab only.
 * `Score.StaffPreset.GuitarCombined`: Treble and tab for guitar.
 
@@ -135,12 +137,12 @@ builder.setScoreConfiguration(config: (Score.StaffConfig | Score.TabConfig)[]);
 
 `StaffConfig` contains following properties:
 * `type`: "staff"
-* `clef`: Clef can be Score.Clef.G or Score.Clef.F.
+* `clef`: Clef can be `Score.Clef.G` or `Score.Clef.F`.
 * `isOctaveDown`: boolean (optional)
-* `minNote`: string (optional)
-* `maxNote`: string (optional)
+* `minNote`: string (optional), minimum note allowed in staff.
+* `maxNote`: string (optional), maximum note allowed in staff.
 * `voiceIds`: number[] (optional), array of voice ids are visible on this staff.
-* `isGrand`: boolean (optional)
+* `isGrand`: boolean (optional), use this to create grand staff.
 
 `TabConfig` contains following properties:
 * `type`: "tab"
@@ -166,7 +168,7 @@ builder.setScoreConfiguration([
 builder.setMesuresPerRow(measuresPerRow: number)
 ```
 
-`measuresPerRow` can be integer greater than or equal to 1, or Infinity.
+`measuresPerRow` can be integer >= 1, or Infinity (default).
 
 ### Set Header
 ```js
@@ -186,7 +188,7 @@ builder.addMeasure();
 builder.endRow();
 ```
 
-Manually induce row change. Next measure that is added will start new row.
+Manually induce row change. Next measure that is added will begin new row.
 
 ### Set Key Signature
 
@@ -216,7 +218,7 @@ builder.setKeySignature("A", Theory.ScaleType.Aeolian);
  - `Theory.ScaleType.MinorHexatonicBlues`
  - `Theory.ScaleType.HeptatonicBlues`
 
-### SEt Time Signature
+### Set Time Signature
 ```js
 builder.setTimeSignature(timeSignature: string);
 
@@ -416,7 +418,7 @@ builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.Note
 ### Guitar Tab
 
 This library has preliminary guitar tabs rendering. 
-Create document with `Score.StaffPreset.GuitarTab` or `Score.StaffPreset.GuitarCombined`, or use set configuration using TabConfig.
+Create document with `Score.StaffPreset.GuitarTab` or `Score.StaffPreset.GuitarCombined`, or set score configuration with TabConfig.
 
 Add notes with `{ string: number | number[] }` to specify which string the fret number is rendered in guitar tab.
 
@@ -440,7 +442,7 @@ let doc = new Score.DocumentBuilder()
     .addNote(1, "C3", Theory.NoteLength.Quarter)
     .addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Quarter).addLabel(Score.Label.Chord, "C")
     .addRest(1, Theory.NoteLength.Quarter)
-    /// etc.
+    // etc.
     .getDEocument();
 ```
 
