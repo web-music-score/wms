@@ -100,9 +100,13 @@ Documents are created using `DocumentBuilder`.
 ```js
 let builder = new Score.DocumentBuilder();
 
-// Here build document...
+// Here build document, e.g.
+builder
+    .addMEasure()
+    .addNote(0, "C3", Theory.NoteLength.Quarter)
+    // etc.
 
-// When document is ready, return it:
+// When ready, get document:
 let doc = builder.getDocument();
 ```
 
