@@ -1,5 +1,9 @@
 # WebMusicScore
 
+Link: [Typedoc API Reference and Examples](https://pahkasoft.github.io)
+
+---
+
 This library allows you to view and play music scores (notation) in the browser.
 
 I'm not a professional musician. I began learning classical guitar on my own, 
