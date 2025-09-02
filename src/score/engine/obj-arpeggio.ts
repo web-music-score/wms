@@ -2,19 +2,20 @@ import { Arpeggio, DivRect, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
+import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 
 export class ObjArpeggio extends MusicObject {
     private topArrowHeight: number = 0;
     private bottomArrowHeight: number = 0;
 
-    private static NumCycles = 5;
     private cycleHeight: number = 0;
+    private numCycles: number = 0;
 
     private color = "black";
 
     readonly mi: MArpeggio;
 
-    constructor(readonly col: ObjRhythmColumn, readonly arpeggioDir: Arpeggio) {
+    constructor(readonly col: ObjRhythmColumn, readonly line: ObjStaff | ObjTab, readonly arpeggioDir: Arpeggio) {
         super(col);
         this.mi = new MArpeggio(this);
     }
@@ -33,12 +34,16 @@ export class ObjArpeggio extends MusicObject {
         this.topArrowHeight = this.arpeggioDir === Arpeggio.Up ? unitSize : 0;
         this.bottomArrowHeight = this.arpeggioDir === Arpeggio.Down ? unitSize : 0;
 
+        let top = this.line instanceof ObjStaff ? this.line.getTopLineY() : this.line.getTopStringY();
+        let bottom = this.line instanceof ObjStaff ? this.line.getBottomLineY() : this.line.getBottomStringY();
+
         this.cycleHeight = unitSize * 2;
+        this.numCycles = Math.ceil((bottom - top) / this.cycleHeight) + 2;
 
         let width = unitSize * 2;
-        let height = ObjArpeggio.NumCycles * this.cycleHeight + this.topArrowHeight + this.bottomArrowHeight;
+        let height = this.numCycles * this.cycleHeight;
 
-        this.rect = new DivRect(-width / 2, width / 2, -height / 2, height / 2);
+        this.rect = new DivRect(-width / 2, width / 2, -height / 2 - this.topArrowHeight, height / 2 + this.bottomArrowHeight);
     }
 
     offset(dx: number, dy: number) {
@@ -52,7 +57,7 @@ export class ObjArpeggio extends MusicObject {
             return;
         }
 
-        let { lineWidth, unitSize } = renderer;
+        let { lineWidth } = renderer;
         let { rect, topArrowHeight, bottomArrowHeight } = this;
 
         renderer.drawDebugRect(this.rect);
@@ -61,8 +66,7 @@ export class ObjArpeggio extends MusicObject {
         ctx.lineWidth = lineWidth * 2;
 
         ctx.beginPath();
-        for (let i = 0; i < ObjArpeggio.NumCycles; i++) {
-            let y = rect.top + topArrowHeight + i * this.cycleHeight;
+        for (let i = 0, y = rect.top + topArrowHeight; i < this.numCycles; i++, y += this.cycleHeight) {
             ctx.moveTo(rect.centerX, y);
             ctx.quadraticCurveTo(rect.left, y + this.cycleHeight / 4, rect.centerX, y + this.cycleHeight / 2);
             ctx.quadraticCurveTo(rect.right, y + this.cycleHeight * 3 / 4, rect.centerX, y + this.cycleHeight);
@@ -72,16 +76,16 @@ export class ObjArpeggio extends MusicObject {
         if (topArrowHeight > 0) {
             ctx.beginPath();
             ctx.moveTo(rect.centerX, rect.top);
-            ctx.lineTo(rect.right, rect.top + unitSize);
-            ctx.lineTo(rect.left, rect.top + unitSize);
+            ctx.lineTo(rect.right, rect.top + topArrowHeight);
+            ctx.lineTo(rect.left, rect.top + topArrowHeight);
             ctx.fill();
         }
 
         if (bottomArrowHeight > 0) {
             ctx.beginPath();
             ctx.moveTo(rect.centerX, rect.bottom);
-            ctx.lineTo(rect.left, rect.bottom - unitSize);
-            ctx.lineTo(rect.right, rect.bottom - unitSize);
+            ctx.lineTo(rect.left, rect.bottom - bottomArrowHeight);
+            ctx.lineTo(rect.right, rect.bottom - bottomArrowHeight);
             ctx.fill();
         }
     }

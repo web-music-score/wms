@@ -364,12 +364,12 @@ export class ObjRhythmColumn extends MusicObject {
 
         if (this.arpeggioDir !== undefined) {
             let arpeggioWidth = 0;
-            this.arpeggios = row.getStaves().map(staff => {
-                let arpeggio = new ObjArpeggio(this, this.getArpeggioDir());
+            this.arpeggios = row.getNotationLines().map(line => {
+                let arpeggio = new ObjArpeggio(this, line, this.getArpeggioDir());
                 arpeggio.layout(renderer);
-                arpeggio.offset(-leftw - arpeggio.getRect().right, staff.getMiddleLineY() - arpeggio.getRect().centerY);
+                arpeggio.offset(-leftw - arpeggio.getRect().right, line.getRect().centerY - arpeggio.getRect().centerY);
                 arpeggioWidth = Math.max(arpeggioWidth, arpeggio.getRect().width);
-                staff.addObject(arpeggio);
+                line.addObject(arpeggio);
                 return arpeggio;
             });
             leftw += arpeggioWidth;
