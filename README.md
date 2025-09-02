@@ -1,6 +1,6 @@
 # WebMusicScore
 
-Link: [Typedoc API Reference and Examples](https://pahkasoft.github.io)
+Typedoc API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is not commented but is mostly self explanatory and gives idea of full API.
 
 ---
 
@@ -91,9 +91,6 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 ```
 
 ## API
-
-Typedoc API reference is available [here](https://pahkasoft.github.io).
-It is not commented but is mostly self explanatory and gives idea of full API.
 
 Following is the main interface explained.
 
