@@ -10,7 +10,7 @@ To create minor update: `npm version minor`
 
 To create major update:
 - Change version in package.json for main package and all apps: e.g. `"3.0.0"`
-- Create git commit: e.g. `git commit -m "v3.0.0"`
+- Create git commit: e.g. `git commit -a -m "v3.0.0"`
 - Create git tag: e.g. `git tag v3.0.0`
 
 ## Build
