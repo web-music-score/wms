@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.0.1] - 2025-09-03
+
+## Fixed
+- Draw arpeggio curly arrow also to guitar tab.
+
 ## [3.0.0] - 2025-08-31
 Major update and brought some important changes.
 ### ** Breaking Changes **
