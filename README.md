@@ -2,7 +2,7 @@
 
 Typedoc API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is not commented but is mostly self explanatory and gives idea of full API.
 
----
+## About
 
 This library allows you to view and play music scores (notation) in the browser.
 
