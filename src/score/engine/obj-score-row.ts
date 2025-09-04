@@ -5,7 +5,7 @@ import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
 import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
-import { LayoutObjectWrapper, LayoutGroup, VerticalPos } from "./layout-object";
+import { LayoutObjectWrapper, LayoutGroup, VerticalPos, LayoutGroupId } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
@@ -20,6 +20,8 @@ export class ObjScoreRow extends MusicObject {
     private readonly tabs: ReadonlyArray<ObjTab>;
 
     private readonly measures: ObjMeasure[] = [];
+
+    private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
 
     private needLayout = true;
 
@@ -111,6 +113,34 @@ export class ObjScoreRow extends MusicObject {
         }
 
         return undefined;
+    }
+
+    getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
+        let layoutGroup = this.layoutGroups[lauoutGroupId];
+
+        if (!layoutGroup) {
+            layoutGroup = this.layoutGroups[lauoutGroupId] = new LayoutGroup(lauoutGroupId);
+        }
+
+        return layoutGroup;
+    }
+
+    resetLayoutGroups(renderer: Renderer) {
+        // Clear resolved position and layout objects
+        this.layoutGroups.forEach(layoutGroup => {
+            if (layoutGroup) {
+                layoutGroup.clearPositionAndLayout(renderer);
+            }
+        });
+    }
+
+    layoutLayoutGroups(renderer: Renderer) {
+        this.layoutGroups.forEach(layoutGroup => {
+            if (layoutGroup) {
+                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.AboveStaff);
+                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.BelowStaff);
+            }
+        });
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -350,7 +380,7 @@ export class ObjScoreRow extends MusicObject {
 
     layoutLayoutGroup(renderer: Renderer, layoutGroup: LayoutGroup, verticalPos: VerticalPos) {
         // Get this row's objects
-        let rowLayoutObjs = layoutGroup.getLayoutObjects(verticalPos).filter(layoutObj => layoutObj.row === this && !layoutObj.isPositionResolved());
+        let rowLayoutObjs = layoutGroup.getLayoutObjects(verticalPos).filter(layoutObj => !layoutObj.isPositionResolved());
 
         // Positioning horizontally to anchor
         rowLayoutObjs.forEach(layoutObj => {

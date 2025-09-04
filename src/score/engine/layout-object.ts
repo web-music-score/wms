@@ -9,6 +9,7 @@ import { ObjScoreRow } from "./obj-score-row";
 import { Renderer } from "./renderer";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 
 export enum LayoutGroupId {
     Fermata,
@@ -47,7 +48,7 @@ export class LayoutObjectWrapper {
 
     private positionResolved = true;
 
-    constructor(readonly musicObj: LayoutableMusicObject, readonly layoutGroupId: LayoutGroupId, readonly verticalPos: VerticalPos) {
+    constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjStaff | ObjTab, readonly layoutGroupId: LayoutGroupId, readonly verticalPos: VerticalPos) {
         this.measure = requireParentMeasure(musicObj);
         this.row = this.measure.row;
 
@@ -61,7 +62,7 @@ export class LayoutObjectWrapper {
 
         this.anchor.addAnchoredLayoutObject(this);
 
-        this.layoutGroup = this.measure.doc.getLayoutGroup(layoutGroupId);
+        this.layoutGroup = this.row.getLayoutGroup(layoutGroupId);
 
         this.layoutGroup.add(this);
     }

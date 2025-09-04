@@ -1,4 +1,3 @@
-import { DefaultTuningName, validateTuningName } from "@tspro/web-music-score/theory";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
@@ -7,9 +6,7 @@ import { ObjHeader } from "./obj-header";
 import { Clef, DivRect, MDocument, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
-import { LayoutGroup, LayoutGroupId, VerticalPos } from "./layout-object";
 import { ConnectiveProps } from "./connective-props";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Utils } from "@tspro/ts-utils-lib";
 
 export class ObjDocument extends MusicObject {
@@ -25,8 +22,6 @@ export class ObjDocument extends MusicObject {
     private curScoreConfig: (StaffConfig | TabConfig)[] = [{ type: "staff", clef: Clef.G }];
 
     private header?: ObjHeader;
-
-    private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
 
     private newRowRequested: boolean = false;
 
@@ -112,16 +107,6 @@ export class ObjDocument extends MusicObject {
 
     addConnectiveProps(connectiveProps: ConnectiveProps) {
         this.allConnectiveProps.push(connectiveProps);
-    }
-
-    getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
-        let layoutGroup = this.layoutGroups[lauoutGroupId];
-
-        if (!layoutGroup) {
-            layoutGroup = this.layoutGroups[lauoutGroupId] = new LayoutGroup(lauoutGroupId);
-        }
-
-        return layoutGroup;
     }
 
     setRenderer(renderer?: Renderer) {
@@ -277,10 +262,8 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.forEach(props => props.removeConnectives());
         this.allConnectiveProps.forEach(props => props.createConnectives());
 
-        let layoutGroups = this.layoutGroups.filter(layoutGroup => !!layoutGroup);
-
-        // Clear resolved position and layout objects
-        layoutGroups.forEach(layoutGroup => layoutGroup.clearPositionAndLayout(renderer));
+        // Reset layout groups
+        this.rows.forEach(row => row.resetLayoutGroups(renderer));
 
         // Layout rows
         this.rows.forEach(row => row.layout(renderer));
@@ -298,12 +281,7 @@ export class ObjDocument extends MusicObject {
         this.rows.forEach(row => row.layoutPositionLines(renderer));
 
         // Layout layout groups
-        layoutGroups.forEach(layoutGroup => {
-            this.rows.forEach(row => {
-                row.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.AboveStaff);
-                row.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.BelowStaff);
-            });
-        });
+        this.rows.forEach(row => row.layoutLayoutGroups(renderer));
 
         // Add padding to rows
         this.rows.forEach(row => row.layoutPadding(renderer));
