@@ -45,7 +45,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     private createNotationLines(): (ObjStaff | ObjTab)[] {
-        let notationLines = this.scoreConfig.map(cfg => cfg.type === "staff" ? new ObjStaff(this, cfg) : new ObjTab(this, cfg));
+        let notationLines = this.scoreConfig.map((cfg, index) => cfg.type === "staff" ? new ObjStaff(this, cfg, index) : new ObjTab(this, cfg, index));
 
         for (let i = 0; i < notationLines.length - 1; i++) {
             let treble = notationLines[i];

@@ -24,6 +24,7 @@ export enum Clef { G = "G", F = "F" }
 export type StaffConfig = {
     type: "staff",
     clef: Clef,
+    name?: string,
     isOctaveDown?: boolean,
     minNote?: string,
     maxNote?: string,
@@ -34,6 +35,7 @@ export type StaffConfig = {
 /** @public */
 export type TabConfig = {
     type: "tab",
+    name?: string,
     tuning?: string | string[],
     voiceIds?: number[]
 }

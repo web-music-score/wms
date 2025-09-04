@@ -21,6 +21,7 @@ export class ObjStaff extends MusicObject {
     readonly bottomLineDiatonicId: number;
     readonly minDiatonicId?: number;
     readonly maxDiatonicId?: number;
+    readonly name: number | string;
 
     private joinedGrandStaff?: ObjStaff;
 
@@ -31,7 +32,7 @@ export class ObjStaff extends MusicObject {
 
     readonly mi: MStaff;
 
-    constructor(readonly row: ObjScoreRow, readonly staffConfig: StaffConfig) {
+    constructor(readonly row: ObjScoreRow, readonly staffConfig: StaffConfig, index: number) {
         super(row);
 
         const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
@@ -52,6 +53,13 @@ export class ObjStaff extends MusicObject {
 
         this.minDiatonicId = staffConfig.minNote !== undefined ? Math.min(getDiatonicId(staffConfig.minNote, false), this.bottomLineDiatonicId) : undefined;
         this.maxDiatonicId = staffConfig.maxNote !== undefined ? Math.max(getDiatonicId(staffConfig.maxNote, false), this.topLineDiatonicId) : undefined;
+
+        if (typeof staffConfig.name === "string") {
+            this.name = staffConfig.name;
+        }
+        else {
+            this.name = index;
+        }
 
         this.mi = new MStaff(this);
     }
@@ -221,10 +229,11 @@ export class ObjTab extends MusicObject {
     private readonly objects: NotationLineObject[] = [];
     private readonly tuningName?: string;
     private readonly tuningStrings: ReadonlyArray<Note>;
+    readonly name: number | string;
 
     readonly mi: MTab;
 
-    constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig) {
+    constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig, index: number) {
         super(row);
 
         if (Utils.Is.isArray(tabConfig.tuning)) {
@@ -238,6 +247,13 @@ export class ObjTab extends MusicObject {
         else {
             this.tuningName = "Standard";
             this.tuningStrings = getTuningStrings(this.tuningName);
+        }
+
+        if (typeof tabConfig.name === "string") {
+            this.name = tabConfig.name;
+        }
+        else {
+            this.name = index;
         }
 
         this.mi = new MTab(this);
