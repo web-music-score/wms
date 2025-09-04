@@ -21,7 +21,6 @@ export class ObjStaff extends MusicObject {
     readonly bottomLineDiatonicId: number;
     readonly minDiatonicId?: number;
     readonly maxDiatonicId?: number;
-    readonly name: number | string;
 
     private joinedGrandStaff?: ObjStaff;
 
@@ -32,7 +31,7 @@ export class ObjStaff extends MusicObject {
 
     readonly mi: MStaff;
 
-    constructor(readonly row: ObjScoreRow, readonly staffConfig: StaffConfig, index: number) {
+    constructor(readonly row: ObjScoreRow, readonly staffConfig: StaffConfig, readonly id: number) {
         super(row);
 
         const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
@@ -54,13 +53,6 @@ export class ObjStaff extends MusicObject {
         this.minDiatonicId = staffConfig.minNote !== undefined ? Math.min(getDiatonicId(staffConfig.minNote, false), this.bottomLineDiatonicId) : undefined;
         this.maxDiatonicId = staffConfig.maxNote !== undefined ? Math.max(getDiatonicId(staffConfig.maxNote, false), this.topLineDiatonicId) : undefined;
 
-        if (typeof staffConfig.name === "string") {
-            this.name = staffConfig.name;
-        }
-        else {
-            this.name = index;
-        }
-
         this.mi = new MStaff(this);
     }
 
@@ -70,6 +62,10 @@ export class ObjStaff extends MusicObject {
 
     get isOctaveDown(): boolean {
         return this.staffConfig.isOctaveDown === true;
+    }
+
+    get name(): string {
+        return this.staffConfig.name ?? "";
     }
 
     getTopLineY(): number {
@@ -229,11 +225,10 @@ export class ObjTab extends MusicObject {
     private readonly objects: NotationLineObject[] = [];
     private readonly tuningName?: string;
     private readonly tuningStrings: ReadonlyArray<Note>;
-    readonly name: number | string;
 
     readonly mi: MTab;
 
-    constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig, index: number) {
+    constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig, readonly id: number) {
         super(row);
 
         if (Utils.Is.isArray(tabConfig.tuning)) {
@@ -249,18 +244,15 @@ export class ObjTab extends MusicObject {
             this.tuningStrings = getTuningStrings(this.tuningName);
         }
 
-        if (typeof tabConfig.name === "string") {
-            this.name = tabConfig.name;
-        }
-        else {
-            this.name = index;
-        }
-
         this.mi = new MTab(this);
     }
 
     getMusicInterface(): MTab {
         return this.mi;
+    }
+
+    get name(): string {
+        return this.tabConfig.name ?? "";
     }
 
     getTuningName(): string | undefined {
