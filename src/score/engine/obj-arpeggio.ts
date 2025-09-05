@@ -2,7 +2,7 @@ import { Arpeggio, DivRect, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 
 export class ObjArpeggio extends MusicObject {
     private topArrowHeight: number = 0;
@@ -15,7 +15,7 @@ export class ObjArpeggio extends MusicObject {
 
     readonly mi: MArpeggio;
 
-    constructor(readonly col: ObjRhythmColumn, readonly line: ObjStaff | ObjTab, readonly arpeggioDir: Arpeggio) {
+    constructor(readonly col: ObjRhythmColumn, readonly line: ObjNotationLine, readonly arpeggioDir: Arpeggio) {
         super(col);
         this.mi = new MArpeggio(this);
     }
@@ -34,8 +34,8 @@ export class ObjArpeggio extends MusicObject {
         this.topArrowHeight = this.arpeggioDir === Arpeggio.Up ? unitSize : 0;
         this.bottomArrowHeight = this.arpeggioDir === Arpeggio.Down ? unitSize : 0;
 
-        let top = this.line instanceof ObjStaff ? this.line.getTopLineY() : this.line.getTopStringY();
-        let bottom = this.line instanceof ObjStaff ? this.line.getBottomLineY() : this.line.getBottomStringY();
+        let top = this.line.getTopLineY();
+        let bottom = this.line.getBottomLineY();
 
         this.cycleHeight = unitSize * 2;
         this.numCycles = Math.ceil((bottom - top) / this.cycleHeight) + 2;

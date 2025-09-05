@@ -4,7 +4,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, DivRect, MusicInterface, MStaffTabBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
-import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
@@ -14,7 +14,7 @@ export class ObjStaffTabBarLine extends MusicObject {
 
     readonly mi: MStaffTabBarLine;
 
-    constructor(readonly line: ObjStaff | ObjTab) {
+    constructor(readonly line: ObjNotationLine) {
         super(line);
 
         line.addObject(this);
@@ -103,15 +103,14 @@ abstract class ObjBarLine extends MusicObject {
             if (line instanceof ObjStaff) {
                 lineCenterY = line.getMiddleLineY();
                 lineDotOff = line.getDiatonicSpacing();
-                top = line.getTopLineY();
-                bottom = line.getBottomLineY();
             }
             else {
-                lineCenterY = (line.getBottom() + line.getTop()) / 2;
-                lineDotOff = (line.getBottom() - line.getTop()) / 6;
-                top = line.getTopStringY();
-                bottom = line.getBottomStringY();
+                lineCenterY = (line.getBottomLineY() + line.getTopLineY()) / 2;
+                lineDotOff = (line.getBottomLineY() - line.getTopLineY()) / 6;
             }
+
+            top = line.getTopLineY();
+            bottom = line.getBottomLineY();
 
             switch (barLineType) {
                 case BarLineType.None:

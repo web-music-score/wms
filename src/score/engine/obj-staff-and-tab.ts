@@ -13,7 +13,40 @@ type NotationLineObject = {
     offsetInPlace?: (dx: number, dy: number) => void
 }
 
-export class ObjStaff extends MusicObject {
+export abstract class ObjNotationLine extends MusicObject {
+    protected readonly objects: NotationLineObject[] = [];
+
+    public abstract readonly id: number;
+    public abstract readonly name: string;
+
+    constructor(parent: MusicObject) {
+        super(parent);
+    }
+
+    addObject(o: NotationLineObject) {
+        this.objects.push(o);
+    }
+
+    removeObjects() {
+        this.objects.length = 0;
+    }
+
+    abstract calcTop(): number;
+    abstract calcBottom(): number;
+
+    abstract getTopLineY(): number;
+    abstract getBottomLineY(): number;
+
+    abstract containsVoiceId(voiceId: number): boolean;
+    abstract containsDiatonicId(diatonicId: number): boolean;
+
+    abstract layoutWidth(renderer: Renderer): void;
+    abstract layoutHeight(renderer: Renderer): void;
+    abstract offset(dx: number, dy: number): void;
+    abstract draw(renderer: Renderer): void;
+}
+
+export class ObjStaff extends ObjNotationLine {
     readonly clefImageAsset: ImageAsset;
     readonly clefLineDiatonicId: number;
     readonly topLineDiatonicId: number;
@@ -26,8 +59,6 @@ export class ObjStaff extends MusicObject {
 
     private topLineY: number = 0;
     private bottomLineY: number = 0;
-
-    private readonly objects: NotationLineObject[] = [];
 
     readonly mi: MStaff;
 
@@ -173,14 +204,6 @@ export class ObjStaff extends MusicObject {
         return bottom;
     }
 
-    addObject(o: NotationLineObject) {
-        this.objects.push(o);
-    }
-
-    removeObjects() {
-        this.objects.length = 0;
-    }
-
     pick(x: number, y: number): MusicObject[] {
         return [this];
     }
@@ -218,11 +241,10 @@ export class ObjStaff extends MusicObject {
     draw(renderer: Renderer) { }
 }
 
-export class ObjTab extends MusicObject {
+export class ObjTab extends ObjNotationLine {
     private top: number = 0;
     private bottom: number = 0;
 
-    private readonly objects: NotationLineObject[] = [];
     private readonly tuningName?: string;
     private readonly tuningStrings: ReadonlyArray<Note>;
 
@@ -276,6 +298,14 @@ export class ObjTab extends MusicObject {
         return this.getStringY(5);
     }
 
+    getTopLineY(): number {
+        return this.getTopStringY();
+    }
+
+    getBottomLineY(): number {
+        return this.getBottomStringY();
+    }
+
     getTop(): number {
         return this.top;
     }
@@ -288,20 +318,16 @@ export class ObjTab extends MusicObject {
         return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
     }
 
+    containsDiatonicId(diatonicId: number): boolean {
+        return true;
+    }
+
     calcTop(): number {
         return this.top;
     }
 
     calcBottom(): number {
         return this.bottom;
-    }
-
-    addObject(o: NotationLineObject) {
-        this.objects.push(o);
-    }
-
-    removeObjects() {
-        this.objects.length = 0;
     }
 
     pick(x: number, y: number): MusicObject[] {

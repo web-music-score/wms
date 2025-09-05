@@ -9,7 +9,7 @@ import { ObjScoreRow } from "./obj-score-row";
 import { Renderer } from "./renderer";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 
 export enum LayoutGroupId {
     Fermata,
@@ -48,7 +48,7 @@ export class LayoutObjectWrapper {
 
     private positionResolved = true;
 
-    constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjStaff | ObjTab, readonly layoutGroupId: LayoutGroupId, readonly verticalPos: VerticalPos) {
+    constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjNotationLine, readonly layoutGroupId: LayoutGroupId, readonly verticalPos: VerticalPos) {
         this.measure = requireParentMeasure(musicObj);
         this.row = this.measure.row;
 
@@ -80,18 +80,17 @@ export class LayoutObjectWrapper {
     }
 
     resolveClosestToStaffY(renderer: Renderer): number {
-        let { musicObj, measure, verticalPos } = this;
-        let { row } = measure;
+        let { musicObj, measure, verticalPos, line } = this;
 
-        let staffTop = row.hasStaff ? row.getTopStaff().getTopLineY() : row.getRect().centerY;
-        let staffBottom = row.hasStaff ? row.getBottomStaff().getBottomLineY() : row.getRect().centerY;
+        let staffTop = line.getTopLineY();
+        let staffBottom = line.getBottomLineY();
         let staffPadding = renderer.unitSize * 2;
 
         let y = verticalPos === VerticalPos.BelowStaff
             ? staffBottom + staffPadding + musicObj.getRect().toph
             : staffTop - staffPadding - musicObj.getRect().bottomh;
 
-        let staticObjects = measure.getStaticObjects();
+        let staticObjects = measure.getStaticObjects(line);
         let objShapeRects = musicObj.getShapeRects();
 
         staticObjects.forEach(staticObj => {

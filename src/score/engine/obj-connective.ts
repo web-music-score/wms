@@ -1,5 +1,4 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Note } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -8,7 +7,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MConnective, DivRect, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
+import { ObjNotationLine } from "./obj-staff-and-tab";
 
 export class ObjConnective extends MusicObject {
     private lx = 0;
@@ -30,9 +29,9 @@ export class ObjConnective extends MusicObject {
 
     readonly mi: MConnective;
 
-    constructor(connectiveProps: ConnectiveProps, line: ObjStaff | ObjTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
-    constructor(connectiveProps: ConnectiveProps, line: ObjStaff | ObjTab, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, readonly line: ObjStaff | ObjTab, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
+    constructor(connectiveProps: ConnectiveProps, line: ObjNotationLine, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
+    constructor(connectiveProps: ConnectiveProps, line: ObjNotationLine, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
+    constructor(readonly connectiveProps: ConnectiveProps, readonly line: ObjNotationLine, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
 
         this.leftNoteGroup = leftNoteGroup;

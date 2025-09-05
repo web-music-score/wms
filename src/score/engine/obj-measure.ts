@@ -24,7 +24,7 @@ import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
-import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
+import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -451,13 +451,13 @@ export class ObjMeasure extends MusicObject {
         return this.postMeasureBreakWidth;
     }
 
-    private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjStaff | ObjTab, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
+    private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjNotationLine, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
         let w = new LayoutObjectWrapper(musicObj, line, layoutGroupId, verticalPos);
         this.layoutObjects.push(w);
         this.requestLayout();
     }
 
-    private getActiveLine(): ObjStaff | ObjTab {
+    private getActiveLine(): ObjNotationLine {
         return this.row.getNotationLines()[0];
     }
 
@@ -834,7 +834,7 @@ export class ObjMeasure extends MusicObject {
         return this.barLineRight.getRect().centerX;
     }
 
-    getStaticObjects(): ReadonlyArray<ObjRhythmColumn | LayoutableMusicObject> {
+    getStaticObjects(line: ObjNotationLine): ReadonlyArray<ObjRhythmColumn | LayoutableMusicObject> {
         return [
             ...this.getColumns(),
             ...this.layoutObjects
@@ -895,7 +895,7 @@ export class ObjMeasure extends MusicObject {
 
                             const lines = m.row.getNotationLines();
 
-                            let line2: ObjStaff | ObjTab | undefined = lines.find(l => l.name !== "" && l.name === line.name) ?? lines[line.id];
+                            let line2: ObjNotationLine | undefined = lines.find(l => l.name !== "" && l.name === line.name) ?? lines[line.id];
 
                             if (line2) {
                                 m.addLayoutObject(new ObjExtensionLine(m, extension, leftObj, rightObj), line2, layoutGroupId, verticalPos);
@@ -1331,7 +1331,7 @@ export class ObjMeasure extends MusicObject {
                     drawLine(line.getDiatonicIdY(p));
                 }
             }
-            else {
+            else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     drawLine(line.getStringY(stringId));
                 }

@@ -4,7 +4,7 @@ import { Clef, DivRect, getVoiceIds, MScoreRow, StaffConfig, TabConfig } from ".
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
-import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
+import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { LayoutObjectWrapper, LayoutGroup, VerticalPos, LayoutGroupId } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -15,7 +15,7 @@ export class ObjScoreRow extends MusicObject {
 
     private minWidth = 0;
 
-    private readonly notationLines: ReadonlyArray<ObjStaff | ObjTab>;
+    private readonly notationLines: ReadonlyArray<ObjNotationLine>;
     private readonly staves: ReadonlyArray<ObjStaff>;
     private readonly tabs: ReadonlyArray<ObjTab>;
 
@@ -46,7 +46,7 @@ export class ObjScoreRow extends MusicObject {
         return this.mi;
     }
 
-    private createNotationLines(): (ObjStaff | ObjTab)[] {
+    private createNotationLines(): (ObjNotationLine)[] {
         let notationLines = this.scoreConfig.map((cfg, index) => cfg.type === "staff" ? new ObjStaff(this, cfg, index) : new ObjTab(this, cfg, index));
 
         for (let i = 0; i < notationLines.length - 1; i++) {
@@ -62,7 +62,7 @@ export class ObjScoreRow extends MusicObject {
         return notationLines;
     }
 
-    getNotationLines(): ReadonlyArray<ObjStaff | ObjTab> {
+    getNotationLines(): ReadonlyArray<ObjNotationLine> {
         return this.notationLines;
     }
 
@@ -458,14 +458,8 @@ export class ObjScoreRow extends MusicObject {
             let bottoms: number[] = [];
 
             this.notationLines.forEach(line => {
-                if (line instanceof ObjStaff) {
-                    tops.push(line.getTopLineY());
-                    bottoms.push(line.getBottomLineY());
-                }
-                else {
-                    tops.push(line.getTopStringY());
-                    bottoms.push(line.getBottomStringY());
-                }
+                tops.push(line.getTopLineY());
+                bottoms.push(line.getBottomLineY());
             });
 
             let top = Math.min(...tops);

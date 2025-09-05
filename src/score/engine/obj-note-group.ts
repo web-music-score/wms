@@ -11,7 +11,7 @@ import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
+import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 
 function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
     let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
@@ -207,7 +207,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.rhythmProps.triplet;
     }
 
-    enableConnective(line: ObjStaff | ObjTab): boolean {
+    enableConnective(line: ObjNotationLine): boolean {
         return line.containsVoiceId(this.voiceId) && (line instanceof ObjTab || line.containsDiatonicId(this.ownDiatonicId));
     }
 
@@ -253,7 +253,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.notes[0];
     }
 
-    getConnectiveAnchorPoint(connectiveProps: ConnectiveProps, line: ObjStaff | ObjTab, noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
+    getConnectiveAnchorPoint(connectiveProps: ConnectiveProps, line: ObjNotationLine, noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
         if (line instanceof ObjStaff) {
             let staff = line;
 
