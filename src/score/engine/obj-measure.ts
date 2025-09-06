@@ -453,14 +453,11 @@ export class ObjMeasure extends MusicObject {
         return this.postMeasureBreakWidth;
     }
 
-    private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjNotationLine, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
+    private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjNotationLine | undefined, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
+        line ??= this.row.getNotationLines()[0];
         let w = new LayoutObjectWrapper(musicObj, line, layoutGroupId, verticalPos);
         this.layoutObjects.push(w);
         this.requestLayout();
-    }
-
-    private getActiveLine(): ObjNotationLine {
-        return this.row.getNotationLines()[0];
     }
 
     addFermata(fermata: Fermata) {
@@ -469,8 +466,6 @@ export class ObjMeasure extends MusicObject {
         if (!anchor) {
             throw new MusicError(MusicErrorType.Score, "Cannot add Fermata because anchor is undefined.");
         }
-
-        let line = this.getActiveLine();
 
         let fermataObjArr = anchor.getAnchoredLayoutObjects().
             map(layoutObj => layoutObj.musicObj).
@@ -481,10 +476,10 @@ export class ObjMeasure extends MusicObject {
 
         ObjFermata.getFermataPositions(anchor).forEach(fermataPos => {
             if (fermataPos === VerticalPos.AboveStaff && !hasAbove) {
-                this.addLayoutObject(new ObjFermata(anchor, fermataPos), line, LayoutGroupId.Fermata, fermataPos);
+                this.addLayoutObject(new ObjFermata(anchor, fermataPos), undefined, LayoutGroupId.Fermata, fermataPos);
             }
             else if (fermataPos === VerticalPos.BelowStaff && !hasBelow) {
-                this.addLayoutObject(new ObjFermata(anchor, fermataPos), line, LayoutGroupId.Fermata, fermataPos);
+                this.addLayoutObject(new ObjFermata(anchor, fermataPos), undefined, LayoutGroupId.Fermata, fermataPos);
             }
         });
 
@@ -497,8 +492,6 @@ export class ObjMeasure extends MusicObject {
     }
 
     addNavigation(navigation: Navigation, ...args: unknown[]) {
-        let line = this.getActiveLine();
-
         switch (navigation) {
             case Navigation.Ending:
                 if (this.navigationSet.has(navigation)) {
@@ -506,7 +499,7 @@ export class ObjMeasure extends MusicObject {
                 }
                 let anchor = this;
                 let passages = args as number[];
-                this.addLayoutObject(new ObjEnding(anchor, passages), line, LayoutGroupId.Ending, VerticalPos.AboveStaff);
+                this.addLayoutObject(new ObjEnding(anchor, passages), undefined, LayoutGroupId.Ending, VerticalPos.AboveStaff);
                 break;
             case Navigation.DC_al_Coda:
             case Navigation.DC_al_Fine:
@@ -514,7 +507,7 @@ export class ObjMeasure extends MusicObject {
             case Navigation.DS_al_Fine: {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
-                this.addLayoutObject(new ObjText(anchor, text, 1, 1), line, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
+                this.addLayoutObject(new ObjText(anchor, text, 1, 1), undefined, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
                 this.addNavigation(Navigation.EndRepeat);
                 this.endSong();
                 break;
@@ -522,20 +515,20 @@ export class ObjMeasure extends MusicObject {
             case Navigation.Fine: {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
-                this.addLayoutObject(new ObjText(anchor, text, 1, 1), line, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
+                this.addLayoutObject(new ObjText(anchor, text, 1, 1), undefined, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
                 break;
             }
             case Navigation.Segno:
             case Navigation.Coda: {
                 let anchor = this.barLineLeft;
                 let text = getNavigationString(navigation);
-                this.addLayoutObject(new ObjSpecialText(anchor, text), line, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
+                this.addLayoutObject(new ObjSpecialText(anchor, text), undefined, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
                 break;
             }
             case Navigation.toCoda: {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
-                this.addLayoutObject(new ObjSpecialText(anchor, text), line, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
+                this.addLayoutObject(new ObjSpecialText(anchor, text), undefined, LayoutGroupId.Navigation, VerticalPos.AboveStaff);
                 break;
             }
             case Navigation.EndRepeat:
@@ -611,8 +604,6 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
         }
 
-        let line = this.getActiveLine();
-
         let textProps: TextProps = { text }
 
         let layoutGroupId: LayoutGroupId;
@@ -624,7 +615,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         let textObj = new ObjText(anchor, textProps, 0.5, 1);
-        this.addLayoutObject(textObj, line, layoutGroupId, verticalPos);
+        this.addLayoutObject(textObj, undefined, layoutGroupId, verticalPos);
 
         this.enableExtension(textObj);
     }
@@ -639,8 +630,6 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
         }
 
-        let line = this.getActiveLine();
-
         let textProps: TextProps = { text }
 
         let layoutGroupId: LayoutGroupId;
@@ -652,7 +641,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         let textObj = new ObjText(anchor, textProps, 0.5, 1);
-        this.addLayoutObject(textObj, line, layoutGroupId, verticalPos);
+        this.addLayoutObject(textObj, undefined, layoutGroupId, verticalPos);
 
         this.enableExtension(textObj);
     }
@@ -841,10 +830,6 @@ export class ObjMeasure extends MusicObject {
 
         if (!staticObjects) {
             staticObjects = [];
-
-            // FIXME: Jokin parempi ratkaisu
-            this.getColumns().forEach(col => col.updateRect());
-
             this.getColumns().forEach(col => col.getStaticObjects(line).forEach(obj => staticObjects?.push(obj)));
             this.staticObjectsCache.set(line, staticObjects);
         }
@@ -1282,7 +1267,8 @@ export class ObjMeasure extends MusicObject {
             ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().top),
             this.barLineRight.getRect().top,
             ...this.connectives.map(c => c.getRect().top),
-            ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().top)
+            ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().top),
+            ...this.layoutObjects.filter(o => o.isPositionResolved()).map(o => o.musicObj.getRect().top)
         );
 
         this.rect.bottom = Math.max(
@@ -1292,13 +1278,16 @@ export class ObjMeasure extends MusicObject {
             ...this.columns.filter(col => !col.isEmpty()).map(col => col.getRect().bottom),
             this.barLineRight.getRect().bottom,
             ...this.connectives.map(c => c.getRect().bottom),
-            ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().bottom)
+            ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().bottom),
+            ...this.layoutObjects.filter(o => o.isPositionResolved()).map(o => o.musicObj.getRect().bottom)
         );
 
         this.row.getNotationLines().forEach(line => {
             this.rect.top = Math.min(this.rect.top, line.calcTop());
             this.rect.bottom = Math.max(this.rect.bottom, line.calcBottom());
         });
+
+        this.row.requestRectUpdate();
     }
 
     offset(dx: number, dy: number) {

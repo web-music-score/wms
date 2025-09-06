@@ -6,6 +6,9 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
 import { Utils } from "@tspro/ts-utils-lib";
+import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
+import { ObjEnding } from "./obj-ending";
+import { ObjExtensionLine } from "./obj-extension-line";
 
 type NotationLineObject = {
     getRect: () => DivRect,
@@ -19,6 +22,8 @@ export abstract class ObjNotationLine extends MusicObject {
     public abstract readonly id: number;
     public abstract readonly name: string;
 
+    private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
+
     constructor(parent: MusicObject) {
         super(parent);
     }
@@ -29,6 +34,106 @@ export abstract class ObjNotationLine extends MusicObject {
 
     removeObjects() {
         this.objects.length = 0;
+    }
+
+    getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
+        let layoutGroup = this.layoutGroups[lauoutGroupId];
+
+        if (!layoutGroup) {
+            layoutGroup = this.layoutGroups[lauoutGroupId] = new LayoutGroup(lauoutGroupId);
+        }
+
+        return layoutGroup;
+    }
+
+    resetLayoutGroups(renderer: Renderer) {
+        // Clear resolved position and layout objects
+        this.layoutGroups.forEach(layoutGroup => {
+            if (layoutGroup) {
+                layoutGroup.clearPositionAndLayout(renderer);
+            }
+        });
+    }
+
+    layoutLayoutGroups(renderer: Renderer) {
+        this.layoutGroups.forEach(layoutGroup => {
+            if (layoutGroup) {
+                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.AboveStaff);
+                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.BelowStaff);
+            }
+        });
+    }
+
+        private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
+        if (y === undefined) {
+            return;
+        }
+
+        let { measure, musicObj } = layoutObj;
+
+        // Set y-position
+        musicObj.offset(0, y - musicObj.getRect().centerY);
+
+        // Position resolved
+        layoutObj.setPositionResolved();
+
+        // Expand measure
+        measure.getRect().expandInPlace(musicObj.getRect());
+
+        // Expand this row
+        this.rect.expandInPlace(measure.getRect());
+    }
+
+    private alignObjectsY(renderer: Renderer, layoutObjArr: LayoutObjectWrapper[]) {
+        layoutObjArr = layoutObjArr.filter(layoutObj => !layoutObj.isPositionResolved());
+
+        let rowY: number | undefined;
+
+        layoutObjArr.forEach(layoutObj => {
+            let y = layoutObj.resolveClosestToStaffY(renderer);
+
+            rowY = layoutObj.verticalPos === VerticalPos.BelowStaff
+                ? Math.max(y, rowY ?? y)
+                : Math.min(y, rowY ?? y);
+        });
+
+        layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
+    }
+
+    layoutLayoutGroup(renderer: Renderer, layoutGroup: LayoutGroup, verticalPos: VerticalPos) {
+        // Get this row's objects
+        let rowLayoutObjs = layoutGroup.getLayoutObjects(verticalPos).filter(layoutObj => !layoutObj.isPositionResolved());
+
+        // Positioning horizontally to anchor
+        rowLayoutObjs.forEach(layoutObj => {
+            let { musicObj, anchor } = layoutObj;
+
+            if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine) {
+                musicObj.layoutFitToMeasure(renderer);
+            }
+            else {
+                musicObj.offset(anchor.getRect().centerX - musicObj.getRect().centerX, 0);
+            }
+        });
+
+        if (layoutGroup.rowAlign) {
+            // Resolve row-aligned objects
+            this.alignObjectsY(renderer, rowLayoutObjs);
+        }
+        else {
+            // Resolve non-row-aligned objects
+            rowLayoutObjs.forEach(layoutObj => {
+                let link = layoutObj.musicObj.getLink();
+                if (link && link.getHead() === layoutObj.musicObj) {
+                    let objectParts = [link.getHead(), ...link.getTails()];
+                    let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
+                    this.alignObjectsY(renderer, layoutObjs);
+                }
+                else {
+                    this.alignObjectsY(renderer, [layoutObj]);
+                }
+            });
+        }
     }
 
     abstract calcTop(): number;

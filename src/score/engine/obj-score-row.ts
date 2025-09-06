@@ -21,8 +21,6 @@ export class ObjScoreRow extends MusicObject {
 
     private readonly measures: ObjMeasure[] = [];
 
-    private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
-
     private needLayout = true;
 
     readonly mi: MScoreRow;
@@ -115,32 +113,13 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
-        let layoutGroup = this.layoutGroups[lauoutGroupId];
-
-        if (!layoutGroup) {
-            layoutGroup = this.layoutGroups[lauoutGroupId] = new LayoutGroup(lauoutGroupId);
-        }
-
-        return layoutGroup;
-    }
-
     resetLayoutGroups(renderer: Renderer) {
         // Clear resolved position and layout objects
-        this.layoutGroups.forEach(layoutGroup => {
-            if (layoutGroup) {
-                layoutGroup.clearPositionAndLayout(renderer);
-            }
-        });
+        this.notationLines.forEach(line => line.resetLayoutGroups(renderer));
     }
 
     layoutLayoutGroups(renderer: Renderer) {
-        this.layoutGroups.forEach(layoutGroup => {
-            if (layoutGroup) {
-                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.AboveStaff);
-                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.BelowStaff);
-            }
-        });
+        this.notationLines.forEach(line => line.layoutLayoutGroups(renderer));
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -250,7 +229,6 @@ export class ObjScoreRow extends MusicObject {
         // Layout measures
         this.measures.forEach(m => {
             m.layout(renderer);
-            this.rect.expandInPlace(new DivRect(0, 0, m.getRect().top, m.getRect().bottom));
             this.minWidth += m.getMinWidth();
             this.minWidth += m.getPostMeasureBreakWidth();
         });
@@ -296,6 +274,15 @@ export class ObjScoreRow extends MusicObject {
         });
     }
 
+    updateRect() {
+        let left = this.measures.length > 0 ? this.measures[0].getRect().left : 0;
+        let right = this.measures.length > 0 ? this.measures[this.measures.length - 1].getRect().right : 0;
+        let top = Math.min(0, ...this.measures.map(m => m.getRect().top));
+        let bottom = Math.max(0, ...this.measures.map(m => m.getRect().bottom));
+
+        this.rect = new DivRect(left, right, top, bottom);
+    }
+
     alignStemsToBeams() {
         this.measures.forEach(m => m.alignStemsToBeams());
     }
@@ -320,8 +307,6 @@ export class ObjScoreRow extends MusicObject {
             }
         }
 
-        this.requestRectUpdate();
-
         this.measures.forEach(m => {
             m.requestRectUpdate();
             m.getBarLineLeft().requestRectUpdate();
@@ -332,91 +317,16 @@ export class ObjScoreRow extends MusicObject {
             });
         });
 
-        let lines = this.getNotationLines();
-
-        this.rect.top = lines[0].calcTop();
-        this.rect.bottom = lines[lines.length - 1].calcBottom();
-
         this.alignStemsToBeams();
-    }
 
-    updateRect() { }
-
-    private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
-        if (y === undefined) {
-            return;
-        }
-
-        let { measure, musicObj } = layoutObj;
-
-        // Set y-position
-        musicObj.offset(0, y - musicObj.getRect().centerY);
-
-        // Position resolved
-        layoutObj.setPositionResolved();
-
-        // Expand measure
-        measure.getRect().expandInPlace(musicObj.getRect());
-
-        // Expand this row
-        this.rect.expandInPlace(measure.getRect());
-    }
-
-    private alignObjectsY(renderer: Renderer, layoutObjArr: LayoutObjectWrapper[]) {
-        layoutObjArr = layoutObjArr.filter(layoutObj => !layoutObj.isPositionResolved());
-
-        let rowY: number | undefined;
-
-        layoutObjArr.forEach(layoutObj => {
-            let y = layoutObj.resolveClosestToStaffY(renderer);
-
-            rowY = layoutObj.verticalPos === VerticalPos.BelowStaff
-                ? Math.max(y, rowY ?? y)
-                : Math.min(y, rowY ?? y);
-        });
-
-        layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
-    }
-
-    layoutLayoutGroup(renderer: Renderer, layoutGroup: LayoutGroup, verticalPos: VerticalPos) {
-        // Get this row's objects
-        let rowLayoutObjs = layoutGroup.getLayoutObjects(verticalPos).filter(layoutObj => !layoutObj.isPositionResolved());
-
-        // Positioning horizontally to anchor
-        rowLayoutObjs.forEach(layoutObj => {
-            let { musicObj, anchor } = layoutObj;
-
-            if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine) {
-                musicObj.layoutFitToMeasure(renderer);
-            }
-            else {
-                musicObj.offset(anchor.getRect().centerX - musicObj.getRect().centerX, 0);
-            }
-        });
-
-        if (layoutGroup.rowAlign) {
-            // Resolve row-aligned objects
-            this.alignObjectsY(renderer, rowLayoutObjs);
-        }
-        else {
-            // Resolve non-row-aligned objects
-            rowLayoutObjs.forEach(layoutObj => {
-                let link = layoutObj.musicObj.getLink();
-                if (link && link.getHead() === layoutObj.musicObj) {
-                    let objectParts = [link.getHead(), ...link.getTails()];
-                    let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                    this.alignObjectsY(renderer, layoutObjs);
-                }
-                else {
-                    this.alignObjectsY(renderer, [layoutObj]);
-                }
-            });
-        }
+        this.requestRectUpdate();
     }
 
     layoutPadding(renderer: Renderer) {
         // Add padding to rect
         let p = renderer.unitSize / 2;
+
+        this.getRect(); // Update this.rect
 
         this.rect.left -= p;
         this.rect.right += p;

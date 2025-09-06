@@ -130,12 +130,14 @@ export class ObjRhythmColumn extends MusicObject {
 
         this.voiceSymbol.forEach(symbol => {
             if (symbol) {
+                symbol.getRect(); // Update rect
                 symbol.getStaticObjects(line).forEach(obj => staticObjects.push(obj));
             }
         });
 
         this.arpeggios.forEach(arpeggio => {
             if (arpeggio.line === line) {
+                arpeggio.getRect(); // Update rect
                 staticObjects.push(arpeggio);
             }
         });
@@ -212,6 +214,7 @@ export class ObjRhythmColumn extends MusicObject {
         }
 
         this.requestLayout();
+        this.requestRectUpdate();
     }
 
     getVoiceSymbol(voiceId: number): RhythmSymbol | undefined {
@@ -359,6 +362,8 @@ export class ObjRhythmColumn extends MusicObject {
             return;
         }
 
+        this.requestRectUpdate();
+
         this.rect = new DivRect();
 
         let { row } = this;
@@ -412,8 +417,6 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.left = -leftw;
         this.rect.centerX = 0;
         this.rect.right = rightw;
-
-        this.requestRectUpdate();
 
         // Find min/max diatonicId for each staff.
         this.row.getStaves().forEach(staff => {

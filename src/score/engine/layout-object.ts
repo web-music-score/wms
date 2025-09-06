@@ -62,9 +62,11 @@ export class LayoutObjectWrapper {
 
         this.anchor.addAnchoredLayoutObject(this);
 
-        this.layoutGroup = this.row.getLayoutGroup(layoutGroupId);
+        this.layoutGroup = this.line.getLayoutGroup(layoutGroupId);
 
         this.layoutGroup.add(this);
+
+        this.line.addObject(this.musicObj);
     }
 
     clearPositionResolved() {
