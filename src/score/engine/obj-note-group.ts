@@ -223,6 +223,24 @@ export class ObjNoteGroup extends MusicObject {
         this.doc.addConnectiveProps(connectiveProps);
     }
 
+    getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
+        let staticObjects: MusicObject[] = [];
+
+        this.staffObjects.forEach(obj => {
+            if (obj.staff === line) {
+                staticObjects.push(obj);
+            }
+        });
+
+        this.tabObjects.forEach(obj => {
+            if (obj.tab === line) {
+                staticObjects.push(obj);
+            }
+        });
+
+        return staticObjects;
+    }
+
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {
             return [];

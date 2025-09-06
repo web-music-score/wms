@@ -10,7 +10,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjStaff } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -123,6 +123,24 @@ export class ObjRhythmColumn extends MusicObject {
     getShapeRects(): DivRect[] {
         this.getRect(); // executes this.updateRect() if required, which sets this.shapeRects.
         return this.shapeRects;
+    }
+
+    getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
+        let staticObjects: MusicObject[] = [];
+
+        this.voiceSymbol.forEach(symbol => {
+            if (symbol) {
+                symbol.getStaticObjects(line).forEach(obj => staticObjects.push(obj));
+            }
+        });
+
+        this.arpeggios.forEach(arpeggio => {
+            if (arpeggio.line === line) {
+                staticObjects.push(arpeggio);
+            }
+        });
+
+        return staticObjects;
     }
 
     get doc() {

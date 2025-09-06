@@ -7,7 +7,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjStaff } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 
 function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
     if (typeof staffPos === "number") {
@@ -135,6 +135,18 @@ export class ObjRest extends MusicObject {
 
     get triplet() {
         return this.rhythmProps.triplet;
+    }
+
+    getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
+        let staticObjects: MusicObject[] = [];
+
+        this.staffObjects.forEach(obj => {
+            if (obj.staff === line) {
+                staticObjects.push(obj);
+            }
+        });
+
+        return staticObjects;
     }
 
     pick(x: number, y: number): MusicObject[] {

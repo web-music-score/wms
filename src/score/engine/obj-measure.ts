@@ -99,6 +99,8 @@ export class ObjMeasure extends MusicObject {
     private endRepeatPlayCount: number = 2; // play twice.
     private endRepeatPlayCountText?: ObjText;
 
+    private staticObjectsCache = new Map<ObjNotationLine, MusicObject[]>();
+
     readonly mi: MMeasure;
 
     constructor(readonly row: ObjScoreRow) {
@@ -834,13 +836,22 @@ export class ObjMeasure extends MusicObject {
         return this.barLineRight.getRect().centerX;
     }
 
-    getStaticObjects(line: ObjNotationLine): ReadonlyArray<ObjRhythmColumn | LayoutableMusicObject> {
-        return [
-            ...this.getColumns(),
-            ...this.layoutObjects
-                .filter(layoutObj => layoutObj.isPositionResolved())
-                .map(layoutObj => layoutObj.musicObj)
-        ];
+    getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
+        let staticObjects = this.staticObjectsCache.get(line);
+
+        if (!staticObjects) {
+            staticObjects = [];
+
+            // FIXME: Jokin parempi ratkaisu
+            this.getColumns().forEach(col => col.updateRect());
+
+            this.getColumns().forEach(col => col.getStaticObjects(line).forEach(obj => staticObjects?.push(obj)));
+            this.staticObjectsCache.set(line, staticObjects);
+        }
+
+        let layoutObjects = this.layoutObjects.filter(layoutObj => layoutObj.isPositionResolved()).map(layoutObj => layoutObj.musicObj);
+
+        return layoutObjects.length > 0 ? [...staticObjects, ...layoutObjects] : staticObjects;
     }
 
     removeLayoutObjects(musicObj: MusicObject) {
@@ -1085,6 +1096,8 @@ export class ObjMeasure extends MusicObject {
         if (!this.needLayout) {
             return;
         }
+
+        this.staticObjectsCache.clear();
 
         this.requestRectUpdate();
 
