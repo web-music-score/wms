@@ -64,24 +64,16 @@ export abstract class ObjNotationLine extends MusicObject {
         });
     }
 
-        private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
+    private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
         if (y === undefined) {
             return;
         }
 
-        let { measure, musicObj } = layoutObj;
-
         // Set y-position
-        musicObj.offset(0, y - musicObj.getRect().centerY);
+        layoutObj.offset(0, y - layoutObj.getRect().centerY);
 
         // Position resolved
         layoutObj.setPositionResolved();
-
-        // Expand measure
-        measure.getRect().expandInPlace(musicObj.getRect());
-
-        // Expand this row
-        this.rect.expandInPlace(measure.getRect());
     }
 
     private alignObjectsY(renderer: Renderer, layoutObjArr: LayoutObjectWrapper[]) {

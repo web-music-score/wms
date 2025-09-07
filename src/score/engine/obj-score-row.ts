@@ -5,9 +5,6 @@ import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
-import { LayoutObjectWrapper, LayoutGroup, VerticalPos, LayoutGroupId } from "./layout-object";
-import { ObjEnding } from "./obj-ending";
-import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjScoreRow extends MusicObject {
@@ -361,19 +358,11 @@ export class ObjScoreRow extends MusicObject {
         ctx.clip();
 
         // For multiple notation lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && this.notationLines.length > 1 || this.notationLines.length === 1 && this.notationLines[0] instanceof ObjTab) {
+        if (this.getFirstMeasure() && (this.notationLines.length > 1 || this.notationLines[0] instanceof ObjTab)) {
             let left = this.getFirstMeasure()!.getStaffLineLeft();
 
-            let tops: number[] = [];
-            let bottoms: number[] = [];
-
-            this.notationLines.forEach(line => {
-                tops.push(line.getTopLineY());
-                bottoms.push(line.getBottomLineY());
-            });
-
-            let top = Math.min(...tops);
-            let bottom = Math.max(...bottoms);
+            let top = Math.min(...this.notationLines.map(line => line.getTopLineY()));
+            let bottom = Math.max(...this.notationLines.map(line => line.getBottomLineY()));
 
             renderer.drawLine(left, top, left, bottom);
         }

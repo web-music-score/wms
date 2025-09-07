@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjSignature } from "./obj-signature";
@@ -454,9 +454,22 @@ export class ObjMeasure extends MusicObject {
     }
 
     private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjNotationLine | undefined, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
-        line ??= this.row.getNotationLines()[0];
-        let w = new LayoutObjectWrapper(musicObj, line, layoutGroupId, verticalPos);
-        this.layoutObjects.push(w);
+        if (line === undefined) {
+            let lines = this.row.getNotationLines();
+            if (
+                lines.length >= 2 &&
+                lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
+                lines[1] instanceof ObjStaff && lines[1].staffConfig.clef === Clef.F && lines[1].isGrand()
+            ) {
+                line = lines[verticalPos === VerticalPos.BelowStaff ? 1 : 0];
+            }
+            else {
+                line = lines[0];
+            }
+        }
+
+        this.layoutObjects.push(new LayoutObjectWrapper(musicObj, line, layoutGroupId, verticalPos));
+
         this.requestLayout();
     }
 
@@ -834,7 +847,9 @@ export class ObjMeasure extends MusicObject {
             this.staticObjectsCache.set(line, staticObjects);
         }
 
-        let layoutObjects = this.layoutObjects.filter(layoutObj => layoutObj.isPositionResolved()).map(layoutObj => layoutObj.musicObj);
+        let layoutObjects = this.layoutObjects
+            .filter(layoutObj => layoutObj.line === line && layoutObj.isPositionResolved())
+            .map(layoutObj => layoutObj.musicObj);
 
         return layoutObjects.length > 0 ? [...staticObjects, ...layoutObjects] : staticObjects;
     }
@@ -1158,6 +1173,8 @@ export class ObjMeasure extends MusicObject {
             this.endRepeatPlayCountText.layout(renderer);
         }
 
+        this.layoutObjects.forEach(layoutObj => layoutObj.layout(renderer));
+
         let padding = renderer.unitSize;
 
         // Calculated width members
@@ -1309,7 +1326,7 @@ export class ObjMeasure extends MusicObject {
 
         this.beamGroups.forEach(beam => beam.offset(dx, dy));
 
-        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.offset(dx, dy));
+        this.layoutObjects.forEach(layoutObj => layoutObj.offset(dx, 0));
 
         this.rect.offsetInPlace(dx, dy);
 

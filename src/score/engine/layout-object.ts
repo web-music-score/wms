@@ -9,7 +9,7 @@ import { ObjScoreRow } from "./obj-score-row";
 import { Renderer } from "./renderer";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
+import { ObjNotationLine } from "./obj-staff-and-tab";
 
 export enum LayoutGroupId {
     Fermata,
@@ -49,7 +49,7 @@ export class LayoutObjectWrapper {
     private positionResolved = true;
 
     constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjNotationLine, readonly layoutGroupId: LayoutGroupId, readonly verticalPos: VerticalPos) {
-        this.measure = requireParentMeasure(musicObj);
+        this.measure = requireParentMeasure(this.musicObj);
         this.row = this.measure.row;
 
         let anchor = this.musicObj.getParent();
@@ -59,14 +59,10 @@ export class LayoutObjectWrapper {
         }
 
         this.anchor = anchor;
-
         this.anchor.addAnchoredLayoutObject(this);
 
         this.layoutGroup = this.line.getLayoutGroup(layoutGroupId);
-
         this.layoutGroup.add(this);
-
-        this.line.addObject(this.musicObj);
     }
 
     clearPositionResolved() {
@@ -84,13 +80,13 @@ export class LayoutObjectWrapper {
     resolveClosestToStaffY(renderer: Renderer): number {
         let { musicObj, measure, verticalPos, line } = this;
 
-        let staffTop = line.getTopLineY();
-        let staffBottom = line.getBottomLineY();
-        let staffPadding = renderer.unitSize * 2;
+        let lineTop = line.getTopLineY();
+        let lineBottom = line.getBottomLineY();
+        let linePadding = renderer.unitSize * 2;
 
         let y = verticalPos === VerticalPos.BelowStaff
-            ? staffBottom + staffPadding + musicObj.getRect().toph
-            : staffTop - staffPadding - musicObj.getRect().bottomh;
+            ? lineBottom + linePadding + musicObj.getRect().toph
+            : lineTop - linePadding - musicObj.getRect().bottomh;
 
         let staticObjects = measure.getStaticObjects(line);
         let objShapeRects = musicObj.getShapeRects();
@@ -119,6 +115,18 @@ export class LayoutObjectWrapper {
         else {
             return undefined;
         }
+    }
+
+    layout(renderer: Renderer) {
+        this.line.addObject(this);
+    }
+
+    offset(dx: number, dy: number) {
+        this.musicObj.offset(dx, dy);
+    }
+
+    getRect(): DivRect {
+        return this.musicObj.getRect();
     }
 }
 
