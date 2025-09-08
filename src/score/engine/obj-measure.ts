@@ -616,8 +616,14 @@ export class ObjMeasure extends MusicObject {
     private forEachLayoutPosition(layoutPosition: number | string | undefined, defaultVerticalPos: VerticalPos, add: (line: ObjNotationLine, vpos: VerticalPos) => void) {
         const lines = this.row.getNotationLines();
 
-        const addToLine = (lineId: number | string, vpos: VerticalPos) => {
+        const performAdd = (lineId: number | string, vpos: VerticalPos, depth: number): void => {
+            // Just in case recursion depth limit.
+            if (depth >= 5) {
+                return;
+            }
+
             let success = false;
+
             if (typeof lineId === "number") {
                 if (lines[lineId]) {
                     add(lines[lineId], vpos);
@@ -630,7 +636,29 @@ export class ObjMeasure extends MusicObject {
                     success = true;
                 });
             }
-            return success;
+
+            if (typeof lineId === "string" && !success) {
+                let grp = this.doc.getLayoutPositionGroup(lineId);
+                if (grp) {
+                    (Utils.Is.isArray(grp.notationLines) ? grp.notationLines : [grp.notationLines]).forEach(lineId => {
+                        switch (grp.verticalPosition) {
+                            case VerticalPosition.Above:
+                                performAdd(lineId, VerticalPos.Above, depth + 1);
+                                break;
+                            case VerticalPosition.Below:
+                                performAdd(lineId, VerticalPos.Below, depth + 1);
+                                break;
+                            case VerticalPosition.Both:
+                                performAdd(lineId, VerticalPos.Above, depth + 1);
+                                performAdd(lineId, VerticalPos.Below, depth + 1);
+                                break;
+                            case VerticalPosition.Auto:
+                                performAdd(lineId, defaultVerticalPos, depth + 1);
+                                break;
+                        }
+                    });
+                }
+            }
         }
 
         if (layoutPosition === undefined) {
@@ -640,39 +668,14 @@ export class ObjMeasure extends MusicObject {
                 lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
                 lines[1] instanceof ObjStaff && lines[1].staffConfig.clef === Clef.F && lines[1].isGrand()
             ) {
-                addToLine(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
+                performAdd(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos, 0);
             }
             else {
-                addToLine(0, defaultVerticalPos);
+                performAdd(0, defaultVerticalPos, 0);
             }
-            return;
         }
-
-        if (addToLine(layoutPosition, defaultVerticalPos)) {
-            return;
-        }
-
-        if (typeof layoutPosition === "string") {
-            let grp = this.doc.getLayoutPositionGroup(layoutPosition);
-            if (grp) {
-                (Utils.Is.isArray(grp.notationLines) ? grp.notationLines : [grp.notationLines]).forEach(lineId => {
-                    switch (grp.verticalPosition) {
-                        case VerticalPosition.Above:
-                            addToLine(lineId, VerticalPos.Above);
-                            break;
-                        case VerticalPosition.Below:
-                            addToLine(lineId, VerticalPos.Below);
-                            break;
-                        case VerticalPosition.Both:
-                            addToLine(lineId, VerticalPos.Above);
-                            addToLine(lineId, VerticalPos.Below);
-                            break;
-                        case VerticalPosition.Auto:
-                            addToLine(lineId, defaultVerticalPos);
-                            break;
-                    }
-                });
-            }
+        else {
+            performAdd(layoutPosition, defaultVerticalPos, 0);
         }
     }
 

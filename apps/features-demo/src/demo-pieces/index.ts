@@ -15,6 +15,7 @@ import { createCompleteRestsDemo } from "./complete-rests";
 import { createNoteHeadsDemo } from "./note-heads";
 import { createGuitarCombinedDemo } from "./guitar-combined";
 import { createGuitarTabDemo } from "./guitar-tab";
+import { createLayoutGroupsDemo } from "./layout-groups";
 import * as Score from "@tspro/web-music-score/score";
 
 export class DemoPieces {
@@ -54,6 +55,7 @@ export class DemoPieces {
         demos.push(createNoteHeadsDemo());
         demos.push(createGuitarCombinedDemo());
         demos.push(createGuitarTabDemo());
+        demos.push(createLayoutGroupsDemo());
 
         // Sort by title
         pieces.sort((a, b) => (a.getTitle() ?? "").localeCompare(b.getTitle() ?? ""));
