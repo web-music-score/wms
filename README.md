@@ -325,26 +325,6 @@ builder.addFermata(Score.Fermata.AtMeasureEnd);
 - `Score.Fermata.AtNote`: Adds fermata anchored to previously added note, chord or rest.
 - `Score.Fermata.AtMeasureEnd`: Adds fermata at the end of measure.
 
-### Add Connective (tie, slur)
-
-```js
-// Add tie
-builder.addConnective(connective: Score.Connetive.Tie, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
-
-// Add slur
-builder.addConnective(connective: Score.Connetive.Slur, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
-
-// Add slide
-builder.addConnective(connective: Score.Connetive.Slide, noteAnchor?: Score.NoteAnchor);
-```
-
-- `span` describes how many notes the connective is across.
-  It is integer >= 2 (for tie it can be also `Score.TieType.Stub|ToMeasureEnd`).
-  Default value is 2.
-- `noteAnchor` describes the attach point of connective to note.
-  It can be `Score.NoteAnchor.Auto|Above|Center|Below|StemTip`.
-  Default value is `Score.NoteAnchor.Auto`.
-
 ### Add Navigation
 
 Add navigational element to measure.
@@ -405,6 +385,47 @@ builder.addAnnotation(Score.Annotation.Tempo, "accel.");
 * `Score.Annotation.Dynamics`: `text` could be for example `"fff"`, `"cresc."`, `"dim."`, etc.
 * `Score.Annotation.Tempo`: `text` could be for example `"accel."`, `"rit."`, `"a tempo"`, etc.
 
+### Add Elements To Certain Staff Or Tab
+
+There are alternatives to these functions:
+- `addFermata` => `addFermataTo`
+- `addNavigation` => `addNavigationTo`
+- `addAnnotation` => `addAnnotationTo`
+- `addLabel` => `addLabelTo`.
+
+First argument of these alterate functions is:
+
+ `staffTabOrGroup: number | string | (number | string)[]`.
+
+It can be one of following things:
+- `number`: staff/tab index, 0=top staff/tab, etc.
+- `string`: staff/tab name.
+- `string`: staff group name.
+- Or an array of the above.
+
+```js
+// Example: add label to top staff/tab.
+builder.addLabelTo(0, Score.Label.Chord, "Am");
+```
+
+#### Staff Group
+```js
+builder.addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: Score.VerticalPosition);
+```
+
+Arguments are:
+- `groupName`: Name of new staff group.
+- `staffsTabsAndGroups`: single value or an array of staves, tabs and groups (index or name).
+- `verticalPosition` (optional): Can be `Score.VerticalPosition.Above`/`Below`/`Both`/`Auto` (default).
+
+```js
+// Example: create staff group to add elements below top staff/tab.
+// Add staff group
+builder.addStaffGroup("grp1", [0], Score.VertocalPosition.Below);
+// Use group
+builder.addLabelTo("grp1", Score.Label.Note, "C");
+```
+
 ### Add Extension
 
 Adds extension line to element, for example to previously added annotation.
@@ -419,6 +440,26 @@ builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.Note
 `extensionLength` is `number` but `Theory.NoteLength` values can be used as number and multiplied to set desired extension length.
 
 `visible` sets visibility of extension line, visible by default (if omitted).
+
+### Add Connective (tie, slur, slide)
+
+```js
+// Add tie
+builder.addConnective(connective: Score.Connetive.Tie, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
+
+// Add slur
+builder.addConnective(connective: Score.Connetive.Slur, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
+
+// Add slide
+builder.addConnective(connective: Score.Connetive.Slide, noteAnchor?: Score.NoteAnchor);
+```
+
+- `span` describes how many notes the connective is across.
+  It is integer >= 2 (for tie it can be also `Score.TieType.Stub|ToMeasureEnd`).
+  Default value is 2.
+- `noteAnchor` describes the attach point of connective to note.
+  It can be `Score.NoteAnchor.Auto|Above|Center|Below|StemTip`.
+  Default value is `Score.NoteAnchor.Auto`.
 
 ### Guitar Tab
 
