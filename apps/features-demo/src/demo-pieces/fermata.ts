@@ -6,6 +6,8 @@ export function createFermataDemo() {
         .setScoreConfiguration(Score.StaffPreset.Bass)
         .setHeader("Fermata")
 
+        .addLayoutGroup("doubleFermata", 0, Score.VerticalPosition.Both)
+
         .addMeasure()
         .setKeySignature("C", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
@@ -33,7 +35,7 @@ export function createFermataDemo() {
         .addNote(0, "C3", Theory.NoteLength.Eighth)
         .addNote(0, "D3", Theory.NoteLength.Eighth)
         .addRest(0, Theory.NoteLength.Quarter)
-        .addFermata(Score.Fermata.AtMeasureEnd)
+        .addFermataTo("doubleFermata", Score.Fermata.AtMeasureEnd)
 
         .getDocument();
 }

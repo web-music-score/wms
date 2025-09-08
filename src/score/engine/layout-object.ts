@@ -40,8 +40,8 @@ export enum VerticalPos { Above = 0, Below = 1 }
 
 export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding;
 
-export class LayoutObjectPositionGroup {
-    constructor(readonly groupName: string, readonly notationLineIds: NotationLineId | NotationLineId[], readonly verticalPosition: VerticalPosition) { }
+export class LayoutPositionGroup {
+    constructor(readonly groupName: string, readonly notationLines: NotationLineId | NotationLineId[], readonly verticalPosition: VerticalPosition) { }
 }
 
 export class LayoutObjectWrapper {

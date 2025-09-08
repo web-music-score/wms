@@ -8,7 +8,7 @@ import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
 import { Utils } from "@tspro/ts-utils-lib";
-import { LayoutObjectPositionGroup } from "./layout-object";
+import { LayoutPositionGroup } from "./layout-object";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -28,7 +28,7 @@ export class ObjDocument extends MusicObject {
 
     private allConnectiveProps: ConnectiveProps[] = [];
 
-    private layoutObjectPositionGroups = new Map<string, LayoutObjectPositionGroup>();
+    private layoutPositionGroups = new Map<string, LayoutPositionGroup>();
 
     private readonly mi: MDocument;
 
@@ -199,12 +199,12 @@ export class ObjDocument extends MusicObject {
         return measure;
     }
 
-    addLayoutObjectPositionGroup(groupName: string, notationLineIds: NotationLineId | (NotationLineId)[], verticalPosition: VerticalPosition) {
-        this.layoutObjectPositionGroups.set(groupName, new LayoutObjectPositionGroup(groupName, notationLineIds, verticalPosition));
+    addLayoutPositionGroup(groupName: string, notationLines: NotationLineId | NotationLineId[], verticalPosition: VerticalPosition) {
+        this.layoutPositionGroups.set(groupName, new LayoutPositionGroup(groupName, notationLines, verticalPosition));
     }
 
-    getLayoutObjectPositionGroup(groupName: string): LayoutObjectPositionGroup | undefined {
-        return this.layoutObjectPositionGroups.get(groupName);
+    getLayoutPositionGroup(groupName: string): LayoutPositionGroup | undefined {
+        return this.layoutPositionGroups.get(groupName);
     }
 
     getVoiceSymbols(voiceId: number): ReadonlyArray<RhythmSymbol> {

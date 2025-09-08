@@ -211,16 +211,23 @@ export class DocumentBuilder {
         return this;
     }
 
-    addFermata(fermata = Fermata.AtNote): DocumentBuilder {
+    private addFermataInternal(layoutPosition: number | string | undefined, fermata: Fermata): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
         assertArg(Utils.Is.isEnumValue(fermata, Fermata), "fermata", fermata);
-        this.getMeasure().addFermata(undefined, fermata);
+        this.getMeasure().addFermata(layoutPosition, fermata);
         return this;
     }
 
-    addNavigation(navigation: Navigation): DocumentBuilder;
-    addNavigation(navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
-    addNavigation(navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
-    addNavigation(navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+    addFermata(fermata = Fermata.AtNote): DocumentBuilder {
+        return this.addFermataInternal(undefined, fermata);
+    }
+
+    addFermataTo(layoutPosition: number | string, fermata = Fermata.AtNote): DocumentBuilder {
+        return this.addFermataInternal(layoutPosition, fermata);
+    }
+
+    private addNavigationInternal(layoutPosition: number | string | undefined, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
         assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
         if (navigation === Navigation.EndRepeat && args.length > 0) {
             assertArg(Utils.Is.isIntegerGte(args[0], 1), "playCount", args[0]);
@@ -228,8 +235,54 @@ export class DocumentBuilder {
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        this.getMeasure().addNavigation(undefined, navigation, ...args);
+        this.getMeasure().addNavigation(layoutPosition, navigation, ...args);
         return this;
+    }
+
+    addNavigation(navigation: Navigation): DocumentBuilder;
+    addNavigation(navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
+    addNavigation(navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
+    addNavigation(navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        return this.addNavigationInternal(undefined, navigation, ...args);
+    }
+
+    addNavigationTo(layoutPosition: number | string, navigation: Navigation): DocumentBuilder;
+    addNavigationTo(layoutPosition: number | string, navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
+    addNavigationTo(layoutPosition: number | string, navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(layoutPosition: number | string, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        return this.addNavigationInternal(layoutPosition, navigation, ...args);
+    }
+
+    private addLabelInternal(layoutPosition: number | string | undefined, label: Label, text: string): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
+        assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
+        assertArg(Utils.Is.isString(text), "text", text);
+        this.getMeasure().addLabel(layoutPosition, label, text);
+        return this;
+    }
+
+    addLabel(label: Label, text: string): DocumentBuilder {
+        return this.addLabelInternal(undefined, label, text);
+    }
+
+    addLabelTo(layoutPosition: number | string, label: Label, text: string): DocumentBuilder {
+        return this.addLabelInternal(layoutPosition, label, text);
+    }
+
+    private addAnnotationInternal(layoutPosition: number | string | undefined, annotation: Annotation, text: string): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
+        assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
+        assertArg(Utils.Is.isString(text), "text", text);
+        this.getMeasure().addAnnotation(layoutPosition, annotation, text);
+        return this;
+    }
+
+    addAnnotation(annotation: Annotation, text: string): DocumentBuilder {
+        return this.addAnnotationInternal(undefined, annotation, text);
+    }
+
+    addAnnotationTo(layoutPosition: number | string, annotation: Annotation, text: string): DocumentBuilder {
+        return this.addAnnotationInternal(layoutPosition, annotation, text);
     }
 
     addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): DocumentBuilder;
@@ -261,20 +314,6 @@ export class DocumentBuilder {
         return this;
     }
 
-    addLabel(label: Label, text: string): DocumentBuilder {
-        assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
-        assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addLabel(undefined, label, text);
-        return this;
-    }
-
-    addAnnotation(annotation: Annotation, text: string): DocumentBuilder {
-        assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
-        assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addAnnotation(undefined, annotation, text);
-        return this;
-    }
-
     addExtension(extensionLength: NoteLength | number, extensionVisible?: boolean): DocumentBuilder {
         assertArg((
             Utils.Is.isIntegerGte(extensionLength, 0) ||
@@ -286,15 +325,15 @@ export class DocumentBuilder {
         return this;
     }
 
-    addLayoutGroup(groupName: string, notationLineIds: NotationLineId | NotationLineId[], verticalPosition = VerticalPosition.Auto): DocumentBuilder {
+    addLayoutGroup(groupName: string, notationLines: NotationLineId | NotationLineId[], verticalPosition = VerticalPosition.Auto): DocumentBuilder {
         assertArg(Utils.Is.isString(groupName) && groupName.length > 0, "groupName", groupName);
         assertArg(
-            Utils.Is.isString(notationLineIds) && notationLineIds.length > 0 || Utils.Is.isIntegerGte(notationLineIds, 0) ||
-            Utils.Is.isArray(notationLineIds) && notationLineIds.every(line => Utils.Is.isString(line) && line.length > 0 || Utils.Is.isIntegerGte(line, 0)),
-            "notationLineIds", notationLineIds
+            Utils.Is.isString(notationLines) && notationLines.length > 0 || Utils.Is.isIntegerGte(notationLines, 0) ||
+            Utils.Is.isArray(notationLines) && notationLines.every(line => Utils.Is.isString(line) && line.length > 0 || Utils.Is.isIntegerGte(line, 0)),
+            "notationLines", notationLines
         );
         assertArg(Utils.Is.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
-        this.doc.addLayoutObjectPositionGroup(groupName, notationLineIds, verticalPosition);
+        this.doc.addLayoutPositionGroup(groupName, notationLines, verticalPosition);
         return this;
     }
 
