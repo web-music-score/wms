@@ -6,7 +6,7 @@ export function createFermataDemo() {
         .setScoreConfiguration(Score.StaffPreset.Bass)
         .setHeader("Fermata")
 
-        .addLayoutGroup("doubleFermata", 0, Score.VerticalPosition.Both)
+        .addStaffGroup("doubleFermata", 0, Score.VerticalPosition.Both)
 
         .addMeasure()
         .setKeySignature("C", Theory.ScaleType.Major)

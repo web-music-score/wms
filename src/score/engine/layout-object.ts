@@ -1,4 +1,4 @@
-import { DivRect, NotationLineId, VerticalPosition } from "../pub";
+import { DivRect, VerticalPosition } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjFermata } from "./obj-fermata";
@@ -40,8 +40,8 @@ export enum VerticalPos { Above = 0, Below = 1 }
 
 export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding;
 
-export class LayoutPositionGroup {
-    constructor(readonly groupName: string, readonly notationLines: NotationLineId | NotationLineId[], readonly verticalPosition: VerticalPosition) { }
+export class StaffGroup {
+    constructor(readonly groupName: string, readonly staffsTabsAndGroups: number | string | (number | string)[], readonly verticalPosition: VerticalPosition) { }
 }
 
 export class LayoutObjectWrapper {

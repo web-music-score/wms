@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, NotationLineId, VerticalPosition } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjSignature } from "./obj-signature";
@@ -459,14 +459,14 @@ export class ObjMeasure extends MusicObject {
         this.requestRectUpdate();
     }
 
-    addFermata(layoutPosition: number | string | undefined, fermata: Fermata) {
+    addFermata(staffTabOrGroup: number | string | undefined, fermata: Fermata) {
         let anchor = fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn;
 
         if (!anchor) {
             throw new MusicError(MusicErrorType.Score, "Cannot add Fermata because anchor is undefined.");
         }
 
-        this.forEachLayoutPosition(layoutPosition, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
+        this.forEachStaffGroup(staffTabOrGroup, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
             this.addLayoutObject(new ObjFermata(anchor, vpos), line, LayoutGroupId.Fermata, vpos);
         });
 
@@ -478,7 +478,7 @@ export class ObjMeasure extends MusicObject {
         return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
     }
 
-    addNavigation(layoutPosition: number | string | undefined, navigation: Navigation, ...args: unknown[]) {
+    addNavigation(staffTabOrGroup: number | string | undefined, navigation: Navigation, ...args: unknown[]) {
         let addLayoutObjectProps: {
             createObj: () => LayoutableMusicObject,
             layoutGroupId: LayoutGroupId,
@@ -509,7 +509,7 @@ export class ObjMeasure extends MusicObject {
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
-                this.addNavigation(layoutPosition, Navigation.EndRepeat);
+                this.addNavigation(staffTabOrGroup, Navigation.EndRepeat);
                 this.endSong();
                 break;
             }
@@ -566,7 +566,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (addLayoutObjectProps) {
-            this.forEachLayoutPosition(layoutPosition, addLayoutObjectProps.defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+            this.forEachStaffGroup(staffTabOrGroup, addLayoutObjectProps.defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
                 this.addLayoutObject(addLayoutObjectProps.createObj(), line, addLayoutObjectProps.layoutGroupId, vpos);
             });
         }
@@ -613,7 +613,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    private forEachLayoutPosition(layoutPosition: number | string | undefined, defaultVerticalPos: VerticalPos, add: (line: ObjNotationLine, vpos: VerticalPos) => void) {
+    private forEachStaffGroup(staffTabOrGroup: number | string | undefined, defaultVerticalPos: VerticalPos, add: (line: ObjNotationLine, vpos: VerticalPos) => void) {
         const lines = this.row.getNotationLines();
 
         const performAdd = (lineId: number | string, vpos: VerticalPos, depth: number): void => {
@@ -638,9 +638,9 @@ export class ObjMeasure extends MusicObject {
             }
 
             if (typeof lineId === "string" && !success) {
-                let grp = this.doc.getLayoutPositionGroup(lineId);
+                let grp = this.doc.getStaffGroup(lineId);
                 if (grp) {
-                    (Utils.Is.isArray(grp.notationLines) ? grp.notationLines : [grp.notationLines]).forEach(lineId => {
+                    (Utils.Is.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups]).forEach(lineId => {
                         switch (grp.verticalPosition) {
                             case VerticalPosition.Above:
                                 performAdd(lineId, VerticalPos.Above, depth + 1);
@@ -661,8 +661,7 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        if (layoutPosition === undefined) {
-            let lines = this.row.getNotationLines();
+        if (staffTabOrGroup === undefined) {
             if (
                 lines.length >= 2 &&
                 lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
@@ -675,11 +674,11 @@ export class ObjMeasure extends MusicObject {
             }
         }
         else {
-            performAdd(layoutPosition, defaultVerticalPos, 0);
+            performAdd(staffTabOrGroup, defaultVerticalPos, 0);
         }
     }
 
-    addLabel(layoutPosition: number | string | undefined, label: Label, text: string) {
+    addLabel(staffTabOrGroup: number | string | undefined, label: Label, text: string) {
         let anchor = this.lastAddedRhythmColumn;
 
         if (!anchor) {
@@ -699,14 +698,14 @@ export class ObjMeasure extends MusicObject {
             case Label.Chord: layoutGroupId = LayoutGroupId.ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
         }
 
-        this.forEachLayoutPosition(layoutPosition, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+        this.forEachStaffGroup(staffTabOrGroup, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             this.addLayoutObject(textObj, line, layoutGroupId, vpos);
             this.enableExtension(textObj);
         });
     }
 
-    addAnnotation(layoutPosition: number | string | undefined, annotation: Annotation, text: string) {
+    addAnnotation(staffTabOrGroup: number | string | undefined, annotation: Annotation, text: string) {
         let anchor = this.lastAddedRhythmColumn;
 
         if (!anchor) {
@@ -726,7 +725,7 @@ export class ObjMeasure extends MusicObject {
             case Annotation.Tempo: layoutGroupId = LayoutGroupId.TempoAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
         }
 
-        this.forEachLayoutPosition(layoutPosition, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+        this.forEachStaffGroup(staffTabOrGroup, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             this.addLayoutObject(textObj, line, layoutGroupId, vpos);
             this.enableExtension(textObj);

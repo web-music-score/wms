@@ -81,9 +81,6 @@ export type ConnectiveSpan = number | TieType;
 export enum VerticalPosition { Above, Below, Both, Auto }
 
 /** @public */
-export type NotationLineId = number | string;
-
-/** @public */
 export type NoteOptions = {
     dotted?: boolean,
     stem?: Stem,

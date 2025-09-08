@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NotationLineId, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
+import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
 import { MDocument, MMeasure } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
@@ -211,10 +211,10 @@ export class DocumentBuilder {
         return this;
     }
 
-    private addFermataInternal(layoutPosition: number | string | undefined, fermata: Fermata): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
+    private addFermataInternal(staffTabOrGroup: number | string | undefined, fermata: Fermata): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
         assertArg(Utils.Is.isEnumValue(fermata, Fermata), "fermata", fermata);
-        this.getMeasure().addFermata(layoutPosition, fermata);
+        this.getMeasure().addFermata(staffTabOrGroup, fermata);
         return this;
     }
 
@@ -222,12 +222,13 @@ export class DocumentBuilder {
         return this.addFermataInternal(undefined, fermata);
     }
 
-    addFermataTo(layoutPosition: number | string, fermata = Fermata.AtNote): DocumentBuilder {
-        return this.addFermataInternal(layoutPosition, fermata);
+    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addFermataTo(staffTabOrGroup: number | string, fermata = Fermata.AtNote): DocumentBuilder {
+        return this.addFermataInternal(staffTabOrGroup, fermata);
     }
 
-    private addNavigationInternal(layoutPosition: number | string | undefined, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
+    private addNavigationInternal(staffTabOrGroup: number | string | undefined, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
         assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
         if (navigation === Navigation.EndRepeat && args.length > 0) {
             assertArg(Utils.Is.isIntegerGte(args[0], 1), "playCount", args[0]);
@@ -235,7 +236,7 @@ export class DocumentBuilder {
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        this.getMeasure().addNavigation(layoutPosition, navigation, ...args);
+        this.getMeasure().addNavigation(staffTabOrGroup, navigation, ...args);
         return this;
     }
 
@@ -246,18 +247,21 @@ export class DocumentBuilder {
         return this.addNavigationInternal(undefined, navigation, ...args);
     }
 
-    addNavigationTo(layoutPosition: number | string, navigation: Navigation): DocumentBuilder;
-    addNavigationTo(layoutPosition: number | string, navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
-    addNavigationTo(layoutPosition: number | string, navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
-    addNavigationTo(layoutPosition: number | string, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
-        return this.addNavigationInternal(layoutPosition, navigation, ...args);
+    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation): DocumentBuilder;
+    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
+    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        return this.addNavigationInternal(staffTabOrGroup, navigation, ...args);
     }
 
-    private addLabelInternal(layoutPosition: number | string | undefined, label: Label, text: string): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
+    private addLabelInternal(staffTabOrGroup: number | string | undefined, label: Label, text: string): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
         assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addLabel(layoutPosition, label, text);
+        this.getMeasure().addLabel(staffTabOrGroup, label, text);
         return this;
     }
 
@@ -265,15 +269,16 @@ export class DocumentBuilder {
         return this.addLabelInternal(undefined, label, text);
     }
 
-    addLabelTo(layoutPosition: number | string, label: Label, text: string): DocumentBuilder {
-        return this.addLabelInternal(layoutPosition, label, text);
+    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addLabelTo(staffTabOrGroup: number | string, label: Label, text: string): DocumentBuilder {
+        return this.addLabelInternal(staffTabOrGroup, label, text);
     }
 
-    private addAnnotationInternal(layoutPosition: number | string | undefined, annotation: Annotation, text: string): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(layoutPosition) || Utils.Is.isIntegerGte(layoutPosition, 0), "layoutPosition", layoutPosition);
+    private addAnnotationInternal(staffTabOrGroup: number | string | undefined, annotation: Annotation, text: string): DocumentBuilder {
+        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addAnnotation(layoutPosition, annotation, text);
+        this.getMeasure().addAnnotation(staffTabOrGroup, annotation, text);
         return this;
     }
 
@@ -281,8 +286,9 @@ export class DocumentBuilder {
         return this.addAnnotationInternal(undefined, annotation, text);
     }
 
-    addAnnotationTo(layoutPosition: number | string, annotation: Annotation, text: string): DocumentBuilder {
-        return this.addAnnotationInternal(layoutPosition, annotation, text);
+    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addAnnotationTo(staffTabOrGroup: number | string, annotation: Annotation, text: string): DocumentBuilder {
+        return this.addAnnotationInternal(staffTabOrGroup, annotation, text);
     }
 
     addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): DocumentBuilder;
@@ -325,15 +331,22 @@ export class DocumentBuilder {
         return this;
     }
 
-    addLayoutGroup(groupName: string, notationLines: NotationLineId | NotationLineId[], verticalPosition = VerticalPosition.Auto): DocumentBuilder {
+    /**
+     * 
+     * @param groupName - Name of staff group.
+     * @param staffsTabsAndGroups - staff/tab index (0=top), staff/tab name, or staff group name. Single value or array.
+     * @param verticalPosition - Vertical position, are elements added above, below or both.
+     * @returns 
+     */
+    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition = VerticalPosition.Auto): DocumentBuilder {
         assertArg(Utils.Is.isString(groupName) && groupName.length > 0, "groupName", groupName);
         assertArg(
-            Utils.Is.isString(notationLines) && notationLines.length > 0 || Utils.Is.isIntegerGte(notationLines, 0) ||
-            Utils.Is.isArray(notationLines) && notationLines.every(line => Utils.Is.isString(line) && line.length > 0 || Utils.Is.isIntegerGte(line, 0)),
-            "notationLines", notationLines
+            Utils.Is.isString(staffsTabsAndGroups) && staffsTabsAndGroups.length > 0 || Utils.Is.isIntegerGte(staffsTabsAndGroups, 0) ||
+            Utils.Is.isArray(staffsTabsAndGroups) && staffsTabsAndGroups.every(line => Utils.Is.isString(line) && line.length > 0 || Utils.Is.isIntegerGte(line, 0)),
+            "staffsTabsAndGroups", staffsTabsAndGroups
         );
         assertArg(Utils.Is.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
-        this.doc.addLayoutPositionGroup(groupName, notationLines, verticalPosition);
+        this.doc.addStaffGroup(groupName, staffsTabsAndGroups, verticalPosition);
         return this;
     }
 

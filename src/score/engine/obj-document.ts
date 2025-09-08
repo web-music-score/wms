@@ -3,12 +3,12 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, DivRect, MDocument, NotationLineId, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition } from "../pub";
+import { Clef, DivRect, MDocument, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
 import { Utils } from "@tspro/ts-utils-lib";
-import { LayoutPositionGroup } from "./layout-object";
+import { StaffGroup } from "./layout-object";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -28,7 +28,7 @@ export class ObjDocument extends MusicObject {
 
     private allConnectiveProps: ConnectiveProps[] = [];
 
-    private layoutPositionGroups = new Map<string, LayoutPositionGroup>();
+    private staffGroups = new Map<string, StaffGroup>();
 
     private readonly mi: MDocument;
 
@@ -199,12 +199,12 @@ export class ObjDocument extends MusicObject {
         return measure;
     }
 
-    addLayoutPositionGroup(groupName: string, notationLines: NotationLineId | NotationLineId[], verticalPosition: VerticalPosition) {
-        this.layoutPositionGroups.set(groupName, new LayoutPositionGroup(groupName, notationLines, verticalPosition));
+    addStaffGroup(groupName: string, layoutElements: number | string | (number | string)[], verticalPosition: VerticalPosition) {
+        this.staffGroups.set(groupName, new StaffGroup(groupName, layoutElements, verticalPosition));
     }
 
-    getLayoutPositionGroup(groupName: string): LayoutPositionGroup | undefined {
-        return this.layoutPositionGroups.get(groupName);
+    getStaffGroup(groupName: string): StaffGroup | undefined {
+        return this.staffGroups.get(groupName);
     }
 
     getVoiceSymbols(voiceId: number): ReadonlyArray<RhythmSymbol> {
