@@ -467,8 +467,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         this.forEachLayoutPosition(layoutPosition, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
-            let obj = new ObjFermata(anchor, vpos);
-            this.addLayoutObject(obj, line, LayoutGroupId.Fermata, vpos);
+            this.addLayoutObject(new ObjFermata(anchor, vpos), line, LayoutGroupId.Fermata, vpos);
         });
 
         this.disableExtension();
@@ -568,8 +567,7 @@ export class ObjMeasure extends MusicObject {
 
         if (addLayoutObjectProps) {
             this.forEachLayoutPosition(layoutPosition, addLayoutObjectProps.defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-                let obj = addLayoutObjectProps.createObj();
-                this.addLayoutObject(obj, line, addLayoutObjectProps.layoutGroupId, vpos);
+                this.addLayoutObject(addLayoutObjectProps.createObj(), line, addLayoutObjectProps.layoutGroupId, vpos);
             });
         }
 
