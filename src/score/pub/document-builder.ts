@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VoiceId } from "./types";
+import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NotationLineId, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
 import { MDocument, MMeasure } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
@@ -211,9 +211,9 @@ export class DocumentBuilder {
         return this;
     }
 
-    addFermata(fermata?: Fermata): DocumentBuilder {
-        assertArg(Utils.Is.isEnumValueOrUndefined(fermata, Fermata), "fermata", fermata);
-        this.getMeasure().addFermata(fermata ?? Fermata.AtNote);
+    addFermata(fermata = Fermata.AtNote): DocumentBuilder {
+        assertArg(Utils.Is.isEnumValue(fermata, Fermata), "fermata", fermata);
+        this.getMeasure().addFermata(undefined, fermata);
         return this;
     }
 
@@ -228,7 +228,7 @@ export class DocumentBuilder {
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        this.getMeasure().addNavigation(navigation, ...args);
+        this.getMeasure().addNavigation(undefined, navigation, ...args);
         return this;
     }
 
@@ -264,14 +264,14 @@ export class DocumentBuilder {
     addLabel(label: Label, text: string): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addLabel(label, text);
+        this.getMeasure().addLabel(undefined, label, text);
         return this;
     }
 
     addAnnotation(annotation: Annotation, text: string): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addAnnotation(annotation, text);
+        this.getMeasure().addAnnotation(undefined, annotation, text);
         return this;
     }
 
@@ -283,6 +283,18 @@ export class DocumentBuilder {
         ), "extendionLength", extensionLength);
         assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
         this.getMeasure().addExtension(extensionLength, extensionVisible ?? true);
+        return this;
+    }
+
+    addLayoutGroup(groupName: string, notationLineIds: NotationLineId | NotationLineId[], verticalPosition = VerticalPosition.Auto): DocumentBuilder {
+        assertArg(Utils.Is.isString(groupName) && groupName.length > 0, "groupName", groupName);
+        assertArg(
+            Utils.Is.isString(notationLineIds) && notationLineIds.length > 0 || Utils.Is.isIntegerGte(notationLineIds, 0) ||
+            Utils.Is.isArray(notationLineIds) && notationLineIds.every(line => Utils.Is.isString(line) && line.length > 0 || Utils.Is.isIntegerGte(line, 0)),
+            "notationLineIds", notationLineIds
+        );
+        assertArg(Utils.Is.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
+        this.doc.addLayoutObjectPositionGroup(groupName, notationLineIds, verticalPosition);
         return this;
     }
 

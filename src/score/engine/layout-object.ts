@@ -1,4 +1,4 @@
-import { DivRect } from "../pub";
+import { DivRect, NotationLineId, VerticalPosition } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjFermata } from "./obj-fermata";
@@ -36,9 +36,13 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
     throw new MusicError(MusicErrorType.Score, "Parent measure is required but not found!");
 }
 
-export enum VerticalPos { AboveStaff, BelowStaff }
+export enum VerticalPos { Above = 0, Below = 1 }
 
 export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding;
+
+export class LayoutObjectPositionGroup {
+    constructor(readonly groupName: string, readonly notationLineIds: NotationLineId | NotationLineId[], readonly verticalPosition: VerticalPosition) { }
+}
 
 export class LayoutObjectWrapper {
     readonly anchor: MusicObject;
@@ -84,7 +88,7 @@ export class LayoutObjectWrapper {
         let lineBottom = line.getBottomLineY();
         let linePadding = renderer.unitSize * 2;
 
-        let y = verticalPos === VerticalPos.BelowStaff
+        let y = verticalPos === VerticalPos.Below
             ? lineBottom + linePadding + musicObj.getRect().toph
             : lineTop - linePadding - musicObj.getRect().bottomh;
 
@@ -97,7 +101,7 @@ export class LayoutObjectWrapper {
             objShapeRects.forEach(objR => {
                 staticShapeRects.forEach(staticR => {
                     if (DivRect.overlapX(objR, staticR)) {
-                        y = verticalPos === VerticalPos.BelowStaff
+                        y = verticalPos === VerticalPos.Below
                             ? Math.max(y, staticR.bottom + objR.toph + objR.centerY)
                             : Math.min(y, staticR.top - objR.bottomh - objR.centerY);
                     }
@@ -137,8 +141,8 @@ export class LayoutGroup {
     readonly widensColumn: boolean;
 
     constructor(readonly layoutGroupId: number) {
-        this.layoutObjectTable[VerticalPos.AboveStaff] = [];
-        this.layoutObjectTable[VerticalPos.BelowStaff] = [];
+        this.layoutObjectTable[VerticalPos.Above] = [];
+        this.layoutObjectTable[VerticalPos.Below] = [];
 
         this.rowAlign = RowAlignList.indexOf(layoutGroupId) >= 0;
         this.widensColumn = WidenColumnList.indexOf(layoutGroupId) >= 0;

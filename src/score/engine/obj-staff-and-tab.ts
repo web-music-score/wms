@@ -58,8 +58,8 @@ export abstract class ObjNotationLine extends MusicObject {
     layoutLayoutGroups(renderer: Renderer) {
         this.layoutGroups.forEach(layoutGroup => {
             if (layoutGroup) {
-                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.AboveStaff);
-                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.BelowStaff);
+                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.Above);
+                this.layoutLayoutGroup(renderer, layoutGroup, VerticalPos.Below);
             }
         });
     }
@@ -84,7 +84,7 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObjArr.forEach(layoutObj => {
             let y = layoutObj.resolveClosestToStaffY(renderer);
 
-            rowY = layoutObj.verticalPos === VerticalPos.BelowStaff
+            rowY = layoutObj.verticalPos === VerticalPos.Below
                 ? Math.max(y, rowY ?? y)
                 : Math.min(y, rowY ?? y);
         });

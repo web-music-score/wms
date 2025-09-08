@@ -25,10 +25,10 @@ export class ObjFermata extends MusicObject {
         let { row } = measure;
 
         if (row.getTopStaff() !== row.getBottomStaff()) {
-            return [VerticalPos.AboveStaff, VerticalPos.BelowStaff];
+            return [VerticalPos.Above, VerticalPos.Below];
         }
         else {
-            return [VerticalPos.AboveStaff];
+            return [VerticalPos.Above];
         }
     }
 
@@ -57,7 +57,7 @@ export class ObjFermata extends MusicObject {
         }
 
         let { lineWidth, unitSize } = renderer;
-        let upsideDown = this.pos === VerticalPos.BelowStaff;
+        let upsideDown = this.pos === VerticalPos.Below;
 
         let dy = (upsideDown ? unitSize : -unitSize) * 0.7;
 

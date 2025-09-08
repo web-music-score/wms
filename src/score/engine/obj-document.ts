@@ -3,11 +3,12 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, DivRect, MDocument, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig } from "../pub";
+import { Clef, DivRect, MDocument, NotationLineId, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
 import { Utils } from "@tspro/ts-utils-lib";
+import { LayoutObjectPositionGroup } from "./layout-object";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -26,6 +27,8 @@ export class ObjDocument extends MusicObject {
     private newRowRequested: boolean = false;
 
     private allConnectiveProps: ConnectiveProps[] = [];
+
+    private layoutObjectPositionGroups = new Map<string, LayoutObjectPositionGroup>();
 
     private readonly mi: MDocument;
 
@@ -194,6 +197,14 @@ export class ObjDocument extends MusicObject {
         this.requestLayout();
 
         return measure;
+    }
+
+    addLayoutObjectPositionGroup(groupName: string, notationLineIds: NotationLineId | (NotationLineId)[], verticalPosition: VerticalPosition) {
+        this.layoutObjectPositionGroups.set(groupName, new LayoutObjectPositionGroup(groupName, notationLineIds, verticalPosition));
+    }
+
+    getLayoutObjectPositionGroup(groupName: string): LayoutObjectPositionGroup | undefined {
+        return this.layoutObjectPositionGroups.get(groupName);
     }
 
     getVoiceSymbols(voiceId: number): ReadonlyArray<RhythmSymbol> {
