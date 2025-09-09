@@ -616,12 +616,7 @@ export class ObjMeasure extends MusicObject {
     private forEachStaffGroup(staffTabOrGroups: StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, add: (line: ObjNotationLine, vpos: VerticalPos) => void) {
         const lines = this.row.getNotationLines();
 
-        const performAdd = (lineId: number | string, vpos: VerticalPos, depth: number): void => {
-            // Just in case recursion depth limit.
-            if (depth >= 5) {
-                return;
-            }
-
+        const performAdd = (lineId: number | string, vpos: VerticalPos, prevGroups: string[] = []): void => {
             let success = false;
 
             if (typeof lineId === "number") {
@@ -639,21 +634,23 @@ export class ObjMeasure extends MusicObject {
 
             if (typeof lineId === "string" && !success) {
                 let grp = this.doc.getStaffGroup(lineId);
-                if (grp) {
+                if (grp && !prevGroups.includes(lineId)) {
+                    let curGroups = [...prevGroups, lineId];
+
                     (Utils.Is.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups]).forEach(lineId => {
                         switch (grp.verticalPosition) {
                             case VerticalPosition.Above:
-                                performAdd(lineId, VerticalPos.Above, depth + 1);
+                                performAdd(lineId, VerticalPos.Above, curGroups);
                                 break;
                             case VerticalPosition.Below:
-                                performAdd(lineId, VerticalPos.Below, depth + 1);
+                                performAdd(lineId, VerticalPos.Below, curGroups);
                                 break;
                             case VerticalPosition.Both:
-                                performAdd(lineId, VerticalPos.Above, depth + 1);
-                                performAdd(lineId, VerticalPos.Below, depth + 1);
+                                performAdd(lineId, VerticalPos.Above, curGroups);
+                                performAdd(lineId, VerticalPos.Below, curGroups);
                                 break;
                             case VerticalPosition.Auto:
-                                performAdd(lineId, defaultVerticalPos, depth + 1);
+                                performAdd(lineId, defaultVerticalPos, curGroups);
                                 break;
                         }
                     });
@@ -667,17 +664,17 @@ export class ObjMeasure extends MusicObject {
                 lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
                 lines[1] instanceof ObjStaff && lines[1].staffConfig.clef === Clef.F && lines[1].isGrand()
             ) {
-                performAdd(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos, 0);
+                performAdd(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
             }
             else {
-                performAdd(0, defaultVerticalPos, 0);
+                performAdd(0, defaultVerticalPos);
             }
         }
         else if (Utils.Is.isArray(staffTabOrGroups)) {
-            staffTabOrGroups.forEach(s => performAdd(s, defaultVerticalPos, 0));
+            staffTabOrGroups.forEach(s => performAdd(s, defaultVerticalPos));
         }
         else {
-            performAdd(staffTabOrGroups, defaultVerticalPos, 0);
+            performAdd(staffTabOrGroups, defaultVerticalPos);
         }
     }
 
