@@ -81,6 +81,12 @@ export type ConnectiveSpan = number | TieType;
 export enum VerticalPosition { Above, Below, Both, Auto }
 
 /** @public */
+export type StaffTabOrGroup = number | string;
+
+/** @public */
+export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
+
+/** @public */
 export type NoteOptions = {
     dotted?: boolean,
     stem?: Stem,

@@ -397,13 +397,13 @@ There are alternatives to these functions:
 
 First argument of these alterate functions is:
 
- `staffTabOrGroup: number | string | (number | string)[]`.
+ `staffTabOrGroups: Score.StaffTabOrGroups`.
 
 It can be one of following things:
 - `number`: staff/tab index, 0=top staff/tab, etc.
 - `string`: staff/tab name.
 - `string`: staff group name.
-- Or an array of the above.
+- `(number | string)[]`: an array of staff/tab indices, names or group names.
 
 ```js
 // Example: add label to top staff/tab.

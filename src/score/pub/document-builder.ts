@@ -1,8 +1,8 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
-import { MDocument, MMeasure } from "./interface";
+import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
+import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { getScale, KeySignature, Mode, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
+import { KeySignature, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 
@@ -76,6 +76,16 @@ function assertRestOptions(options: RestOptions) {
     assertArg(Utils.Is.isStringOrUndefined(options.color), "restOptions.color", options.color);
     assertArg(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide", options.hide);
     assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "restOptions.triplet", options.triplet);
+}
+
+function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {
+    assertArg(
+        Utils.Is.isStringOrUndefined(staffTabOrGroups) || Utils.Is.isIntegerGte(staffTabOrGroups, 0) ||
+        Utils.Is.isArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
+            Utils.Is.isString(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0)
+        )
+        , "staffTabOrGroup", staffTabOrGroups
+    );
 }
 
 export class DocumentBuilder {
@@ -211,10 +221,10 @@ export class DocumentBuilder {
         return this;
     }
 
-    private addFermataInternal(staffTabOrGroup: number | string | undefined, fermata: Fermata): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
+    private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata): DocumentBuilder {
+        assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(fermata, Fermata), "fermata", fermata);
-        this.getMeasure().addFermata(staffTabOrGroup, fermata);
+        this.getMeasure().addFermata(staffTabOrGroups, fermata);
         return this;
     }
 
@@ -222,13 +232,13 @@ export class DocumentBuilder {
         return this.addFermataInternal(undefined, fermata);
     }
 
-    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addFermataTo(staffTabOrGroup: number | string, fermata = Fermata.AtNote): DocumentBuilder {
-        return this.addFermataInternal(staffTabOrGroup, fermata);
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata = Fermata.AtNote): DocumentBuilder {
+        return this.addFermataInternal(staffTabOrGroups, fermata);
     }
 
-    private addNavigationInternal(staffTabOrGroup: number | string | undefined, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
+    private addNavigationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
         if (navigation === Navigation.EndRepeat && args.length > 0) {
             assertArg(Utils.Is.isIntegerGte(args[0], 1), "playCount", args[0]);
@@ -236,7 +246,7 @@ export class DocumentBuilder {
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        this.getMeasure().addNavigation(staffTabOrGroup, navigation, ...args);
+        this.getMeasure().addNavigation(staffTabOrGroups, navigation, ...args);
         return this;
     }
 
@@ -247,21 +257,21 @@ export class DocumentBuilder {
         return this.addNavigationInternal(undefined, navigation, ...args);
     }
 
-    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation): DocumentBuilder;
-    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
-    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
-    addNavigationTo(staffTabOrGroup: number | string, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
-        return this.addNavigationInternal(staffTabOrGroup, navigation, ...args);
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation): DocumentBuilder;
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+        return this.addNavigationInternal(staffTabOrGroups, navigation, ...args);
     }
 
-    private addLabelInternal(staffTabOrGroup: number | string | undefined, label: Label, text: string): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
+    private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label, text: string): DocumentBuilder {
+        assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addLabel(staffTabOrGroup, label, text);
+        this.getMeasure().addLabel(staffTabOrGroups, label, text);
         return this;
     }
 
@@ -269,16 +279,16 @@ export class DocumentBuilder {
         return this.addLabelInternal(undefined, label, text);
     }
 
-    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addLabelTo(staffTabOrGroup: number | string, label: Label, text: string): DocumentBuilder {
-        return this.addLabelInternal(staffTabOrGroup, label, text);
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addLabelTo(staffTabOrGroups: StaffTabOrGroups, label: Label, text: string): DocumentBuilder {
+        return this.addLabelInternal(staffTabOrGroups, label, text);
     }
 
-    private addAnnotationInternal(staffTabOrGroup: number | string | undefined, annotation: Annotation, text: string): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0), "staffTabOrGroup", staffTabOrGroup);
+    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string): DocumentBuilder {
+        assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addAnnotation(staffTabOrGroup, annotation, text);
+        this.getMeasure().addAnnotation(staffTabOrGroups, annotation, text);
         return this;
     }
 
@@ -286,9 +296,9 @@ export class DocumentBuilder {
         return this.addAnnotationInternal(undefined, annotation, text);
     }
 
-    /** @param staffTabOrGroup  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addAnnotationTo(staffTabOrGroup: number | string, annotation: Annotation, text: string): DocumentBuilder {
-        return this.addAnnotationInternal(staffTabOrGroup, annotation, text);
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation, text: string): DocumentBuilder {
+        return this.addAnnotationInternal(staffTabOrGroups, annotation, text);
     }
 
     addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): DocumentBuilder;
