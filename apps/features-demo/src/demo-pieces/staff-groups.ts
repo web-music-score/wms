@@ -1,13 +1,13 @@
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
-export function createLayoutGroupsDemo() {
+export function createStaffGroupsDemo() {
     return new Score.DocumentBuilder()
         .setScoreConfiguration([
             { type: "staff", clef: Score.Clef.G, isOctaveDown: true, name: "staff1" },
             { type: "staff", clef: Score.Clef.G, isOctaveDown: true, name: "staff2" }
         ])
-        .setHeader("Layout Groups")
+        .setHeader("Staff Groups")
 
         .addStaffGroup("grp1", ["staff1"], Score.VerticalPosition.Above)
         .addStaffGroup("grp2", ["staff1"], Score.VerticalPosition.Below)
