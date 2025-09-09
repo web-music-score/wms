@@ -144,6 +144,7 @@ builder.setScoreConfiguration(config: (Score.StaffConfig | Score.TabConfig)[]);
 * `type`: "staff"
 * `clef`: Clef can be `Score.Clef.G` or `Score.Clef.F`.
 * `isOctaveDown`: boolean (optional)
+* `name`: staff name.
 * `minNote`: string (optional), minimum note allowed in staff.
 * `maxNote`: string (optional), maximum note allowed in staff.
 * `voiceIds`: number[] (optional), array of voice ids are visible on this staff.
@@ -151,6 +152,7 @@ builder.setScoreConfiguration(config: (Score.StaffConfig | Score.TabConfig)[]);
 
 `TabConfig` contains following properties:
 * `type`: "tab"
+* `name`: tab name.
 * `tuning`: string | string[] (optional), tuning name or array of 6 note names for tuning.
 * `voiceIds`: number[] (optional), array of voice ids are visible on this tab.
 
