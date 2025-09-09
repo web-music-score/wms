@@ -4,7 +4,6 @@ declare const __LIB_INFO__: string;
 
 let initialized = false;
 
-/** @public */
 export function init(): void {
     if (initialized) {
         return;

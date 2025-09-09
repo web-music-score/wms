@@ -22,13 +22,10 @@ function mod(n: number, m: number): number {
 const C0_chromaticId = 12;
 const C0_diatonicId = 7;
 
-/** @public */
 export type Accidental = -2 | -1 | 0 | 1 | 2;
 
-/** @public */
 export type NoteLetter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
-/** @public */
 export type ParsedNote = { noteLetter: NoteLetter, accidental: Accidental, octave?: number }
 
 const AccidentalAsciiSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2, "bb"], [-1, "b"], [0, ""], [1, "#"], [2, "x"]]);
@@ -40,7 +37,6 @@ const DiatonicToChromaticMap: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
 
 const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 
-/** @public */
 export class Note {
     private static noteByNameCache = new Map<string, Note>();
     private static chromaticNoteCache = new Map<number, Note>();

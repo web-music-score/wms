@@ -3,7 +3,6 @@ import { MDocument, Arpeggio, Navigation, StaffPreset, Stem, Label, DocumentBuil
 
 // Greensleeves (https://musescore.com/aaron_dc/scores/6167495)
 
-/** @public */
 export function createGreensleeves(): MDocument {
     return new DocumentBuilder()
         .setScoreConfiguration(StaffPreset.GuitarTreble)

@@ -30,7 +30,6 @@ function parseDegree(degree: number | string): { deg: number, acc: number } {
     }
 }
 
-/** @public */
 export enum Mode {
     Ionian = 1,
     Dorian,
@@ -41,15 +40,12 @@ export enum Mode {
     Locrian
 }
 
-/** @public */
 export enum AccidentalType { Natural, Flats, Sharps }
 
-/** @public */
 export function getDefaultKeySignature(): KeySignature {
     return getScale("C", ScaleType.Major);
 }
 
-/** @public */
 export class KeySignature {
     private static readonly OrderOfSharps = "FCGDAEB";
     private static readonly OrderOfFlats = "BEADGCF";

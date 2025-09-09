@@ -2,8 +2,6 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /**
- * @public
- * 
  * DivRect class, left, top, right, bottom rectangle divided into four sections by centerX, centerY.
  */
 export class DivRect {

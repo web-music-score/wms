@@ -15,7 +15,6 @@ function getNoteName(note: Note | number | string) {
     return note.format(PitchNotation.Scientific, SymbolSet.Ascii);
 }
 
-/** @public */
 export interface Instrument {
     getName(): string;
     playNote(note: string, duration?: number, volume?: number): void;
@@ -25,17 +24,14 @@ export interface Instrument {
 const InstrumentList: Instrument[] = [Synthesizer];
 let CurrentInstrument: Instrument = Synthesizer;
 
-/** @public */
 export function getInstrumentList(): ReadonlyArray<string> {
     return InstrumentList.map(instr => instr.getName());
 }
 
-/** @public */
 export function getCurrentInstrument(): string {
     return CurrentInstrument.getName();
 }
 
-/** @public */
 export function registerInstrument(instr: Instrument) {
     if (InstrumentList.some(instr2 => instr2.getName() === instr.getName())) {
         return;
@@ -47,7 +43,6 @@ export function registerInstrument(instr: Instrument) {
 }
 
 
-/** @public */
 export function setInstrument(instrName: string) {
     if (instrName === CurrentInstrument.getName()) {
         return;
@@ -62,12 +57,10 @@ export function setInstrument(instrName: string) {
     }
 }
 
-/** @public */
 export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
     CurrentInstrument.playNote(getNoteName(note), duration, linearVolume);
 }
 
-/** @public */
 export function stop() {
     CurrentInstrument.stop();
 }

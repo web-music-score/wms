@@ -44,18 +44,14 @@ class Fret {
     }
 }
 
-/** @public */
 export class FretPositionData {
     constructor(readonly fretPosition: Readonly<FretPosition>, readonly cellRect: DivRect, readonly noteRect: DivRect) { }
 }
 
-/** @public  */
 export type UpdateFretPositionFunc = (fretPosition: FretPosition) => void;
 
-/** @public  */
 export type ClickFretPositionFunc = (fretPosition: FretPosition) => void;
 
-/** @public */
 export interface GuitarViewProps {
     style?: React.CSSProperties;
     guitarContext: GuitarContext;
@@ -63,14 +59,12 @@ export interface GuitarViewProps {
     onClickFretPosition?: ClickFretPositionFunc;
 }
 
-/** @public */
 export interface GuitarViewState {
     width: number;
     height: number;
     table: FretPositionData[][];
 }
 
-/** @public */
 export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState> {
     state: GuitarViewState;
 

@@ -54,7 +54,6 @@ function removeNoteDuplicates(notes: ReadonlyArray<Note>): Note[] {
     return Utils.Arr.removeDuplicatesCmp(notes, isEqualNote);
 }
 
-/** @public */
 export type ChordInfo = { name: string, degrees: Degree[] }
 
 const ChordInfoList: ReadonlyArray<ChordInfo> = [
@@ -123,7 +122,6 @@ class InvalidChordException extends Error {
     }
 }
 
-/** @public */
 export class Chord {
     readonly name: string;
     readonly notes: Note[];

@@ -1,14 +1,12 @@
 import * as React from "react";
 import { MDocument, MPlaybackButtons } from "@tspro/web-music-score/score";
 
-/** @public */
 export enum PlaybackButtonsLayout {
     PlayStopSingle,
     PlayStop,
     PlayPauseStop
 }
 
-/** @public */
 export interface PlaybackButtonsProps {
     doc: MDocument;
     buttonLayout?: PlaybackButtonsLayout;
@@ -17,14 +15,11 @@ export interface PlaybackButtonsProps {
     stopLabel?: string;
 }
 
-/** @public */
 export interface PlaybackButtonsState {
     controller: MPlaybackButtons;
 }
 
 /**
- * @public
- * 
  * Usage:
  * 
  *  import * as Score from "\@tspro/web-music-score";

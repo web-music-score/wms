@@ -16,10 +16,8 @@ const FullTonicList: ReadonlyArray<string> = [
     "Cb", "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#"
 ];
 
-/** @public */
 export type Degree = 1 | 2 | "b3" | 3 | 4 | "b5" | 5 | "#5" | 6 | "bb7" | "b7" | 7 | "#7" | "b9" | 9 | "#9" | 11 | 13;
 
-/** @public */
 export enum ScaleType {
     Major = "Major",
     NaturalMinor = "Natural Minor",
@@ -63,7 +61,6 @@ function getMode(scaleType: ScaleType) {
     }
 }
 
-/** @public */
 export class Scale extends KeySignature {
     private readonly scaleDegrees: ReadonlyArray<Degree>;
     private readonly scaleNotes: ReadonlyArray<Note>;
@@ -258,7 +255,6 @@ export class Scale extends KeySignature {
     }
 }
 
-/** @public */
 export class ScaleFactory {
     private tonicList: string[] = [];
     private scaleMap: Map<string, Scale> = new Map();
@@ -364,7 +360,6 @@ const ScaleFactoryList: ReadonlyArray<ScaleFactory | string> = [
     new ScaleFactory(ScaleType.HeptatonicBlues),
 ];
 
-/** @public */
 export function getScaleFactoryList(): ReadonlyArray<ScaleFactory | string> {
     return ScaleFactoryList;
 }
@@ -377,7 +372,6 @@ ScaleFactoryList.forEach(factory => {
     }
 });
 
-/** @public */
 export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
     let f = ScaleFactoryMap.get(scaleType);
     if (!f) {
@@ -388,7 +382,6 @@ export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
     }
 }
 
-/** @public */
 export function validateScaleType(scaleType: unknown): ScaleType {
     if (Utils.Is.isEnumValue(scaleType, ScaleType)) {
         return scaleType;
@@ -398,14 +391,12 @@ export function validateScaleType(scaleType: unknown): ScaleType {
     }
 }
 
-/** @public */
 export function getScale(tonic: string, scaleType: ScaleType): Scale {
     return getScaleFactory(scaleType).getScale(tonic);
 }
 
 const DefaultScale = getScale("C", ScaleType.Major);
 
-/** @public */
 export function getDefaultScale() {
     return DefaultScale;
 }

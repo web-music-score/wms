@@ -1,7 +1,6 @@
 import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
 import { DocumentBuilder, MDocument, StaffPreset } from "@tspro/web-music-score/score";
 
-/** @public */
 export function createFrereJacques(): MDocument {
     return new DocumentBuilder()
         .setScoreConfiguration(StaffPreset.GuitarTreble)

@@ -2,10 +2,8 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { RhythmProps, NoteLength } from "./rhythm";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-/** @public */
 export type TimeSignatureString = "2/4" | "3/4" | "4/4" | "6/8" | "9/8";
 
-/** @public */
 export class TimeSignature {
     readonly beatCount: number;
     readonly beatSize: number;
@@ -81,7 +79,6 @@ export class TimeSignature {
 
 let defaultTimeSignature: TimeSignature | undefined;
 
-/** @public */
 export function getDefaultTimeSignature(): TimeSignature {
     if (!defaultTimeSignature) {
         defaultTimeSignature = new TimeSignature(4, 4);

@@ -66,7 +66,6 @@ class ClassicalGuitar implements Instrument {
 
 const CG = new ClassicalGuitar();
 
-/** @public */
 export function registerClassicalGuitar() {
     registerInstrument(CG);
 }

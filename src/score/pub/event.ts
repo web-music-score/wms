@@ -1,22 +1,18 @@
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { MRenderer, MScoreRow, MusicInterface } from "./interface";
 
-/** @public */
 export type ScoreEventType = "enter" | "leave" | "click";
 
-/** @public */
 export abstract class ScoreEvent {
     constructor(readonly type: ScoreEventType) { }
 }
 
-/** @public */
 export class ScoreStaffPosEvent extends ScoreEvent {
     constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
 }
 
-/** @public */
 export class ScoreObjectEvent extends ScoreEvent {
     constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly objects: MusicInterface[]) {
         super(type);
@@ -34,5 +30,4 @@ export class ScoreObjectEvent extends ScoreEvent {
     }
 }
 
-/** @public */
 export type ScoreEventListener = (event: ScoreEvent) => void;

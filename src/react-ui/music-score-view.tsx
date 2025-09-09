@@ -1,15 +1,12 @@
 import * as React from "react";
 import { MDocument, MRenderer, ScoreEventListener } from "@tspro/web-music-score/score";
 
-/** @public */
 export interface MusicScoreViewProps {
     doc: MDocument;
     onScoreEvent?: ScoreEventListener;
 }
 
 /**
- * @public
- * 
  * Usage:
  * 
  *  import * as Score from "\@tspro/web-music-score";

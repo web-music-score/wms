@@ -1,7 +1,6 @@
 import { NoteLength, ScaleType } from "@tspro/web-music-score/theory";
 import { MDocument, NoteAnchor, Navigation, Annotation, StaffPreset, Stem, DocumentBuilder, Connective } from "@tspro/web-music-score/score";
 
-/** @public */
 export function createAndanteByDiabelli(): MDocument {
     return new DocumentBuilder()
         .setScoreConfiguration(StaffPreset.GuitarTreble)

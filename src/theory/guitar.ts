@@ -3,13 +3,10 @@ import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-/** @public */
 export enum Handedness { RightHanded, LeftHanded }
 
-/** @public */
 export const DefaultHandedness = Handedness.RightHanded;
 
-/** @public */
 export function validateHandedness(h: unknown): Handedness {
     if (!Utils.Is.isEnumValue(h, Handedness)) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid handedness: ${h}`);
@@ -27,13 +24,10 @@ export function validateHandedness(h: unknown): Handedness {
  * |--------|----------|---------|----------------|---------------|
  */
 
-/** @public */
 export const TuningNameList: ReadonlyArray<string> = TuningData.list.map(data => data.name);
 
-/** @public */
 export const DefaultTuningName = TuningNameList[0];
 
-/** @public */
 export function validateTuningName(tuningName: string): string {
     if (TuningNameList.indexOf(tuningName) < 0) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name: ${tuningName}`);
@@ -46,7 +40,6 @@ export function validateTuningName(tuningName: string): string {
 const TuningStringsCache = new LRUCache<string, ReadonlyArray<Note>>(100);
 
 /**
- * @public
  * @returns Array of open string notes, note for each string.
  */
 export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {

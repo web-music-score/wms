@@ -1,6 +1,5 @@
 import { Note } from "@tspro/web-music-score/theory";
 
-/** @public */
 export enum StaffPreset {
     /** Treble staff has treble (G-) clef. */
     Treble = 1,
@@ -17,10 +16,8 @@ export enum StaffPreset {
     GuitarCombined = GuitarTab | GuitarTreble
 }
 
-/** @public */
 export enum Clef { G = "G", F = "F" }
 
-/** @public */
 export type StaffConfig = {
     type: "staff",
     clef: Clef,
@@ -32,7 +29,6 @@ export type StaffConfig = {
     isGrand?: boolean
 }
 
-/** @public */
 export type TabConfig = {
     type: "tab",
     name?: string,
@@ -40,53 +36,38 @@ export type TabConfig = {
     voiceIds?: number[]
 }
 
-/** @public */
 export type ScoreConfiguration = StaffConfig | TabConfig | (StaffConfig | TabConfig)[];
 
-/** @public */
 export type VoiceId = 0 | 1 | 2 | 3;
 
-/** @public */
 export function getVoiceIds(): ReadonlyArray<VoiceId> {
     return [0, 1, 2, 3];
 }
 
-/** @public */
 export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** @public */
 export function getStringNumbers(): ReadonlyArray<StringNumber> {
     return [1, 2, 3, 4, 5, 6];
 }
 
-/** @public */
 export enum Stem { Auto, Up, Down }
 
-/** @public */
 export enum Arpeggio { Up, Down }
 
-/** @public */
 export enum TieType { Stub = -1, ToMeasureEnd = -2 }
 
-/** @public */
 export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
 
-/** @public */
 export enum Connective { Tie, Slur, Slide }
 
-/** @public */
 export type ConnectiveSpan = number | TieType;
 
-/** @public */
 export enum VerticalPosition { Above, Below, Both, Auto }
 
-/** @public */
 export type StaffTabOrGroup = number | string;
 
-/** @public */
 export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
-/** @public */
 export type NoteOptions = {
     dotted?: boolean,
     stem?: Stem,
@@ -98,7 +79,6 @@ export type NoteOptions = {
     string?: StringNumber | StringNumber[];
 }
 
-/** @public */
 export type RestOptions = {
     dotted?: boolean,
     staffPos?: Note | string | number, // Note, "C3", or midiNumber
@@ -107,19 +87,15 @@ export type RestOptions = {
     triplet?: boolean
 }
 
-/** @public */
 export enum PlayState { Playing, Paused, Stopped }
 
-/** @public */
 export type PlayStateChangeListener = (playState: PlayState) => void;
 
-/** @public */
 export enum Fermata {
     AtNote,
     AtMeasureEnd
 }
 
-/** @public */
 export enum Navigation {
     /** Repeat back to beginning and play to the "Fine" marking. */
     DC_al_Fine,
@@ -155,7 +131,6 @@ export enum Navigation {
     Ending
 }
 
-/** @public */
 export enum Annotation {
     /** "ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim." */
     Dynamics,
@@ -164,7 +139,6 @@ export enum Annotation {
     Tempo
 }
 
-/** @public */
 export enum Label {
     /** "C", "C#", "Db", "D", etc. */
     Note,

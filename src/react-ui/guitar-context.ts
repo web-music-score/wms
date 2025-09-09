@@ -12,7 +12,6 @@ const DefaultColors = {
     TextColor: "white",
 }
 
-/** @public */
 export class FretPosition {
     readonly note: Note;
     readonly isScaleNote: boolean;
@@ -74,7 +73,6 @@ export class FretPosition {
     }
 }
 
-/** @public */
 export class GuitarContext {
     readonly maxFretId: number;
 

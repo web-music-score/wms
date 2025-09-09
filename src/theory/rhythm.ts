@@ -1,7 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-/** @public */
 export enum NoteLength {
     Whole = 64 * 3, // * 3 because triplets are multiplied by 2 / 3, integer result
     Half = 32 * 3,
@@ -12,10 +11,8 @@ export enum NoteLength {
     SixtyFourth = 1 * 3
 }
 
-/** @public */
 export const MaxNoteLength = NoteLength.Whole;
 
-/** @public */
 export const MinNoteLength = NoteLength.SixtyFourth;
 
 const FlagCountMap = new Map<NoteLength, number>([
@@ -38,7 +35,6 @@ const NoteSymbolMap = new Map<NoteLength, string>([
     [NoteLength.SixtyFourth, "𝅘𝅥𝅱"]
 ]);
 
-/** @public */
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (!Utils.Is.isEnumValue(noteLength, NoteLength)) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
@@ -48,7 +44,6 @@ export function validateNoteLength(noteLength: unknown): NoteLength {
     }
 }
 
-/** @public */
 export class RhythmProps {
     readonly noteLength: NoteLength;
     readonly dotted: boolean;

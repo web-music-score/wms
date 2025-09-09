@@ -52,7 +52,6 @@ function isVoiceId(value: unknown): value is VoiceId {
     return Utils.Is.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
 }
 
-/** @public */
 export abstract class MusicInterface {
     constructor(readonly name: string) { }
 
@@ -64,7 +63,6 @@ export abstract class MusicInterface {
     }
 }
 
-/** @public */
 export class MAccidental extends MusicInterface {
     static readonly Name = "Accidental";
 
@@ -83,7 +81,6 @@ export class MAccidental extends MusicInterface {
     }
 }
 
-/** @public */
 export class MConnective extends MusicInterface {
     static readonly Name = "Connective";
 
@@ -98,7 +95,6 @@ export class MConnective extends MusicInterface {
     }
 }
 
-/** @public */
 export class MArpeggio extends MusicInterface {
     static readonly Name = "Arpeggio";
 
@@ -113,7 +109,6 @@ export class MArpeggio extends MusicInterface {
     }
 }
 
-/** @public */
 export class MBeamGroup extends MusicInterface {
     static readonly Name = "BeamGroup";
 
@@ -128,7 +123,6 @@ export class MBeamGroup extends MusicInterface {
     }
 }
 
-/** @public */
 export class MStaffBeamGroup extends MusicInterface {
     static readonly Name = "StaffBeamGroup";
 
@@ -143,7 +137,6 @@ export class MStaffBeamGroup extends MusicInterface {
     }
 }
 
-/** @public */
 export class MDocument extends MusicInterface {
     static readonly Name = "Document";
 
@@ -175,7 +168,6 @@ export class MDocument extends MusicInterface {
     }
 }
 
-/** @public */
 export class MEnding extends MusicInterface {
     static readonly Name = "Ending";
 
@@ -199,7 +191,6 @@ export class MEnding extends MusicInterface {
     }
 }
 
-/** @public */
 export class MFermata extends MusicInterface {
     static readonly Name = "Fermata";
 
@@ -214,7 +205,6 @@ export class MFermata extends MusicInterface {
     }
 }
 
-/** @public */
 export class MHeader extends MusicInterface {
     static readonly Name = "Header";
 
@@ -241,7 +231,6 @@ export class MHeader extends MusicInterface {
     }
 }
 
-/** @public */
 export class MImage extends MusicInterface {
     static readonly Name = "Image";
 
@@ -256,7 +245,6 @@ export class MImage extends MusicInterface {
     }
 }
 
-/** @public */
 export class MMeasure extends MusicInterface {
     static readonly Name = "Measure";
 
@@ -279,7 +267,6 @@ export class MMeasure extends MusicInterface {
     }
 }
 
-/** @public */
 export class MBarLineRight extends MusicInterface {
     static readonly Name = "BarLineRight";
 
@@ -294,7 +281,6 @@ export class MBarLineRight extends MusicInterface {
     }
 }
 
-/** @public */
 export class MBarLineLeft extends MusicInterface {
     static readonly Name = "BarLineLeft";
 
@@ -309,7 +295,6 @@ export class MBarLineLeft extends MusicInterface {
     }
 }
 
-/** @public */
 export class MStaffTabBarLine extends MusicInterface {
     static readonly Name = "StaffTabBarLine";
 
@@ -324,7 +309,6 @@ export class MStaffTabBarLine extends MusicInterface {
     }
 }
 
-/** @public */
 export class MNoteGroup extends MusicInterface {
     static readonly Name = "NoteGroup";
 
@@ -347,7 +331,6 @@ export class MNoteGroup extends MusicInterface {
     }
 }
 
-/** @public */
 export class MStaffNoteGroup extends MusicInterface {
     static readonly Name = "StaffNoteGroup";
 
@@ -366,7 +349,6 @@ export class MStaffNoteGroup extends MusicInterface {
     }
 }
 
-/** @public */
 export class MTabNoteGroup extends MusicInterface {
     static readonly Name = "TabNoteGroup";
 
@@ -385,7 +367,6 @@ export class MTabNoteGroup extends MusicInterface {
     }
 }
 
-/** @public */
 export class MRest extends MusicInterface {
     static readonly Name = "Rest";
 
@@ -404,7 +385,6 @@ export class MRest extends MusicInterface {
     }
 }
 
-/** @public */
 export class MStaffRest extends MusicInterface {
     static readonly Name = "StaffRest";
 
@@ -423,7 +403,6 @@ export class MStaffRest extends MusicInterface {
     }
 }
 
-/** @public */
 export class MRhythmColumn extends MusicInterface {
     static readonly Name = "RhythmColumn";
 
@@ -444,7 +423,6 @@ export class MRhythmColumn extends MusicInterface {
     }
 }
 
-/** @public */
 export class MScoreRow extends MusicInterface {
     static readonly Name = "ScoreRow";
 
@@ -463,7 +441,6 @@ export class MScoreRow extends MusicInterface {
     }
 }
 
-/** @public */
 export class MStaff extends MusicInterface {
     static readonly Name = "Staff";
 
@@ -478,7 +455,6 @@ export class MStaff extends MusicInterface {
     }
 }
 
-/** @public */
 export class MTab extends MusicInterface {
     static readonly Name = "Tab";
 
@@ -493,7 +469,6 @@ export class MTab extends MusicInterface {
     }
 }
 
-/** @public */
 export class MSignature extends MusicInterface {
     static readonly Name = "Signature";
 
@@ -508,7 +483,6 @@ export class MSignature extends MusicInterface {
     }
 }
 
-/** @public */
 export class MSpecialText extends MusicInterface {
     static readonly Name = "SpecialText";
 
@@ -523,7 +497,6 @@ export class MSpecialText extends MusicInterface {
     }
 }
 
-/** @public */
 export class MText extends MusicInterface {
     static readonly Name = "Text";
 
@@ -542,7 +515,6 @@ export class MText extends MusicInterface {
     }
 }
 
-/** @public */
 export class MExtensionLine extends MusicInterface {
     static readonly Name = "ExtensionLine";
 
@@ -557,7 +529,6 @@ export class MExtensionLine extends MusicInterface {
     }
 }
 
-/** @public */
 export class MPlayer {
     private static currentlyPlaying = new Set<MPlayer>();
 
@@ -605,7 +576,6 @@ export class MPlayer {
     }
 }
 
-/** @public */
 export class MRenderer {
     private readonly renderer: Renderer;
 
@@ -656,7 +626,6 @@ export class MRenderer {
     }
 }
 
-/** @public */
 export class MPlaybackButtons {
     private playButton?: HTMLButtonElement;
     private stopButton?: HTMLButtonElement;

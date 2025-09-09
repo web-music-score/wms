@@ -1,5 +1,4 @@
 
-/** @public */
 export enum MusicErrorType {
     Unknown,
     InvalidArg,
@@ -17,7 +16,6 @@ function formatType(type: MusicErrorType | undefined): string {
     return type === undefined ? "" : `[${MusicErrorType[type]}] `;
 }
 
-/** @public */
 export class MusicError extends Error {
     readonly type: MusicErrorType;
 
