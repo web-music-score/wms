@@ -1,7 +1,12 @@
 # Changelog
 
-## [3.0.1] - 2025-09-03
+## [3.1.0] - 2025-09-
+## Added
+- Staff/TabConfig.name.
+- DocumentBuilder.addStaffGroup().
+- DocumentBuilder.addFermataTo(), .addNavigationTo(), .addAnnotationTo() and .addLabelTo().
 
+## [3.0.1] - 2025-09-03
 ## Fixed
 - Draw arpeggio curly arrow also to guitar tab.
 
