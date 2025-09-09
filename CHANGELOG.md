@@ -1,6 +1,6 @@
 # Changelog
 
-## [3.1.0] - 2025-09-
+## [3.1.0] - 2025-09-09
 ## Added
 - Staff/TabConfig.name.
 - DocumentBuilder.addStaffGroup().
