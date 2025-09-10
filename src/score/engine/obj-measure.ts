@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjSignature } from "./obj-signature";
@@ -459,6 +459,69 @@ export class ObjMeasure extends MusicObject {
         this.requestRectUpdate();
     }
 
+    private forEachStaffGroup(staffTabOrGroups: StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, addFn: (line: ObjNotationLine, vpos: VerticalPos) => void) {
+        const lines = this.row.getNotationLines();
+
+        const addToStaffTabOrGroup = (staffTabOrGroup: StaffTabOrGroup, vpos: VerticalPos, prevGroups: string[] = []): void => {
+            if (typeof staffTabOrGroup === "number") {
+                if (lines[staffTabOrGroup]) {
+                    addFn(lines[staffTabOrGroup], vpos);
+                }
+            }
+            else if (typeof staffTabOrGroup === "string" && staffTabOrGroup.length > 0) {
+                let stavesAndTabs = lines.filter(l => l.name === staffTabOrGroup);
+
+                stavesAndTabs.forEach(line => addFn(line, vpos));
+
+                if (stavesAndTabs.length === 0) {
+                    let grp = this.doc.getStaffGroup(staffTabOrGroup);
+
+                    if (grp && !prevGroups.includes(staffTabOrGroup)) {
+                        let curGroups = [...prevGroups, staffTabOrGroup];
+
+                        (Utils.Is.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups])
+                            .forEach(staffTabOrGroup => {
+                                switch (grp.verticalPosition) {
+                                    case VerticalPosition.Above:
+                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Above, curGroups);
+                                        break;
+                                    case VerticalPosition.Below:
+                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Below, curGroups);
+                                        break;
+                                    case VerticalPosition.Both:
+                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Above, curGroups);
+                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Below, curGroups);
+                                        break;
+                                    case VerticalPosition.Auto:
+                                        addToStaffTabOrGroup(staffTabOrGroup, defaultVerticalPos, curGroups);
+                                        break;
+                                }
+                            });
+                    }
+                }
+            }
+        }
+
+        if (staffTabOrGroups === undefined) {
+            if (
+                lines.length >= 2 &&
+                lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
+                lines[1] instanceof ObjStaff && lines[1].staffConfig.clef === Clef.F && lines[1].isGrand()
+            ) {
+                addToStaffTabOrGroup(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
+            }
+            else {
+                addToStaffTabOrGroup(0, defaultVerticalPos);
+            }
+        }
+        else if (Utils.Is.isArray(staffTabOrGroups)) {
+            staffTabOrGroups.forEach(staffTabOrGroup => addToStaffTabOrGroup(staffTabOrGroup, defaultVerticalPos));
+        }
+        else {
+            addToStaffTabOrGroup(staffTabOrGroups, defaultVerticalPos);
+        }
+    }
+
     addFermata(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata) {
         let anchor = fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn;
 
@@ -579,6 +642,60 @@ export class ObjMeasure extends MusicObject {
         return this.navigationSet.has(n);
     }
 
+    addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string) {
+        let anchor = this.lastAddedRhythmColumn;
+
+        if (!anchor) {
+            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because anchor is undefined.");
+        }
+        else if (text.length === 0) {
+            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
+        }
+
+        let textProps: TextProps = { text }
+
+        let layoutGroupId: LayoutGroupId;
+        let defaultVerticalPos: VerticalPos;
+
+        switch (annotation) {
+            case Annotation.Dynamics: layoutGroupId = LayoutGroupId.DynamicsAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
+            case Annotation.Tempo: layoutGroupId = LayoutGroupId.TempoAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
+        }
+
+        this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+            let textObj = new ObjText(anchor, textProps, 0.5, 1);
+            this.addLayoutObject(textObj, line, layoutGroupId, vpos);
+            this.enableExtension(textObj);
+        });
+    }
+
+    addLabel(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label, text: string) {
+        let anchor = this.lastAddedRhythmColumn;
+
+        if (!anchor) {
+            throw new MusicError(MusicErrorType.Score, "Cannot add label because anchor is undefined.");
+        }
+        else if (text.length === 0) {
+            throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
+        }
+
+        let textProps: TextProps = { text }
+
+        let layoutGroupId: LayoutGroupId;
+        let defaultVerticalPos: VerticalPos;
+
+        switch (label) {
+            case Label.Note: layoutGroupId = LayoutGroupId.NoteLabel; defaultVerticalPos = VerticalPos.Below; break;
+            case Label.Chord: layoutGroupId = LayoutGroupId.ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
+        }
+
+        this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+            let textObj = new ObjText(anchor, textProps, 0.5, 1);
+            this.addLayoutObject(textObj, line, layoutGroupId, vpos);
+            this.enableExtension(textObj);
+        });
+    }
+
     getEnding(): ObjEnding | undefined {
         return this.layoutObjects.map(layoutObj => layoutObj.musicObj).find(musicObj => musicObj instanceof ObjEnding);
     }
@@ -611,125 +728,6 @@ export class ObjMeasure extends MusicObject {
             let noteAnchor = Utils.Is.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
             anchor.startConnective(new ConnectiveProps(Connective.Slide, 2, noteAnchor, anchor));
         }
-    }
-
-    private forEachStaffGroup(staffTabOrGroups: StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, add: (line: ObjNotationLine, vpos: VerticalPos) => void) {
-        const lines = this.row.getNotationLines();
-
-        const performAdd = (lineId: number | string, vpos: VerticalPos, prevGroups: string[] = []): void => {
-            let success = false;
-
-            if (typeof lineId === "number") {
-                if (lines[lineId]) {
-                    add(lines[lineId], vpos);
-                    success = true;
-                }
-            }
-            else if (typeof lineId === "string" && lineId.length > 0) {
-                lines.filter(l => l.name === lineId).forEach(line => {
-                    add(line, vpos);
-                    success = true;
-                });
-            }
-
-            if (typeof lineId === "string" && !success) {
-                let grp = this.doc.getStaffGroup(lineId);
-                if (grp && !prevGroups.includes(lineId)) {
-                    let curGroups = [...prevGroups, lineId];
-
-                    (Utils.Is.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups]).forEach(lineId => {
-                        switch (grp.verticalPosition) {
-                            case VerticalPosition.Above:
-                                performAdd(lineId, VerticalPos.Above, curGroups);
-                                break;
-                            case VerticalPosition.Below:
-                                performAdd(lineId, VerticalPos.Below, curGroups);
-                                break;
-                            case VerticalPosition.Both:
-                                performAdd(lineId, VerticalPos.Above, curGroups);
-                                performAdd(lineId, VerticalPos.Below, curGroups);
-                                break;
-                            case VerticalPosition.Auto:
-                                performAdd(lineId, defaultVerticalPos, curGroups);
-                                break;
-                        }
-                    });
-                }
-            }
-        }
-
-        if (staffTabOrGroups === undefined) {
-            if (
-                lines.length >= 2 &&
-                lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
-                lines[1] instanceof ObjStaff && lines[1].staffConfig.clef === Clef.F && lines[1].isGrand()
-            ) {
-                performAdd(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
-            }
-            else {
-                performAdd(0, defaultVerticalPos);
-            }
-        }
-        else if (Utils.Is.isArray(staffTabOrGroups)) {
-            staffTabOrGroups.forEach(s => performAdd(s, defaultVerticalPos));
-        }
-        else {
-            performAdd(staffTabOrGroups, defaultVerticalPos);
-        }
-    }
-
-    addLabel(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label, text: string) {
-        let anchor = this.lastAddedRhythmColumn;
-
-        if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add label because anchor is undefined.");
-        }
-        else if (text.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
-        }
-
-        let textProps: TextProps = { text }
-
-        let layoutGroupId: LayoutGroupId;
-        let defaultVerticalPos: VerticalPos;
-
-        switch (label) {
-            case Label.Note: layoutGroupId = LayoutGroupId.NoteLabel; defaultVerticalPos = VerticalPos.Below; break;
-            case Label.Chord: layoutGroupId = LayoutGroupId.ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
-        }
-
-        this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            let textObj = new ObjText(anchor, textProps, 0.5, 1);
-            this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(textObj);
-        });
-    }
-
-    addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string) {
-        let anchor = this.lastAddedRhythmColumn;
-
-        if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because anchor is undefined.");
-        }
-        else if (text.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
-        }
-
-        let textProps: TextProps = { text }
-
-        let layoutGroupId: LayoutGroupId;
-        let defaultVerticalPos: VerticalPos;
-
-        switch (annotation) {
-            case Annotation.Dynamics: layoutGroupId = LayoutGroupId.DynamicsAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
-            case Annotation.Tempo: layoutGroupId = LayoutGroupId.TempoAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
-        }
-
-        this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            let textObj = new ObjText(anchor, textProps, 0.5, 1);
-            this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(textObj);
-        });
     }
 
     endSong() {
