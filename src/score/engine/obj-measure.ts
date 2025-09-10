@@ -696,14 +696,6 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    getEnding(): ObjEnding | undefined {
-        return this.layoutObjects.map(layoutObj => layoutObj.musicObj).find(musicObj => musicObj instanceof ObjEnding);
-    }
-
-    getEndRepeatPlayCount() {
-        return this.endRepeatPlayCount;
-    }
-
     addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): void;
     addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): void;
     addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): void;
@@ -730,6 +722,46 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
+    addExtension(extensionLength: number, extensionVisible: boolean) {
+        this.addExtensionToMusicObjects.forEach(musicObj => {
+            let anchor = musicObj.getParent();
+
+            if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
+                let lineStyle: ExtensionLineStyle = "dashed";
+                let linePos: ExtensionLinePos = "bottom";
+
+                let extension = new Extension(musicObj, anchor, extensionLength, extensionVisible, lineStyle, linePos);
+                musicObj.setLink(extension);
+            }
+            else {
+                throw new MusicError(MusicErrorType.Score, "Cannot add extension becaue no compatible music object to attach it to.");
+            }
+        });
+
+        if (this.addExtensionToMusicObjects.length === 0) {
+            throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
+        }
+
+        this.disableExtension();
+        this.requestLayout();
+    }
+
+    private enableExtension(musicObject: MusicObject) {
+        this.addExtensionToMusicObjects.push(musicObject);
+    }
+
+    private disableExtension() {
+        this.addExtensionToMusicObjects = [];
+    }
+
+    getEnding(): ObjEnding | undefined {
+        return this.layoutObjects.map(layoutObj => layoutObj.musicObj).find(musicObj => musicObj instanceof ObjEnding);
+    }
+
+    getEndRepeatPlayCount() {
+        return this.endRepeatPlayCount;
+    }
+
     endSong() {
         this.isEndSong = true;
         this.requestLayout();
@@ -753,38 +785,6 @@ export class ObjMeasure extends MusicObject {
     endRow() {
         this.doc.requestNewRow();
         this.disableExtension();
-    }
-
-    private enableExtension(musicObject: MusicObject) {
-        this.addExtensionToMusicObjects.push(musicObject);
-    }
-
-    private disableExtension() {
-        this.addExtensionToMusicObjects = [];
-    }
-
-    addExtension(extensionLength: number, extensionVisible: boolean) {
-        this.addExtensionToMusicObjects.forEach(musicObj => {
-            let anchor = musicObj.getParent();
-
-            if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
-                let lineStyle: ExtensionLineStyle = "dashed";
-                let linePos: ExtensionLinePos = "bottom";
-
-                let extension = new Extension(musicObj, anchor, extensionLength, extensionVisible, lineStyle, linePos);
-                musicObj.setLink(extension);
-            }
-            else {
-                throw new MusicError(MusicErrorType.Score, "Cannot add extension becaue no compatible music object to attach it to.");
-            }
-        });
-
-        if (this.addExtensionToMusicObjects.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
-        }
-
-        this.disableExtension();
-        this.requestLayout();
     }
 
     private addRhythmSymbol(voiceId: number, symbol: RhythmSymbol) {
