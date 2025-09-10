@@ -399,7 +399,7 @@ First argument of these alterate functions is:
 
  `staffTabOrGroups: Score.StaffTabOrGroups`.
 
-It can be one of following things:
+`StaffTabOrGroups` can be:
 - `number`: staff/tab index, 0=top staff/tab, etc.
 - `string`: staff/tab name.
 - `string`: staff group name.

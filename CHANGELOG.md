@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.1.1] - 2025-09-10
+## Fixed
+- Accept array of staff/tab/group for addFermataTo(), addNavigationTo(), addAnnotationTo() and addLabelTo().
+- Better infinite recursion detection for staff groups.
+
 ## [3.1.0] - 2025-09-09
 ## Added
 - Staff/TabConfig.name.
