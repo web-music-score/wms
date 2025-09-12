@@ -174,7 +174,7 @@ export class ObjRhythmColumn extends MusicObject {
             }
         }
 
-        return [this];
+        return []; // Do not return [this].
     }
 
     hasArpeggio() {
