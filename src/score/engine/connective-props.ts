@@ -4,7 +4,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, ConnectiveSpan, NoteAnchor, Stem, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
-import { ObjTab, ObjStaff } from "./obj-staff-and-tab";
+import { ObjStaff } from "./obj-staff-and-tab";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
