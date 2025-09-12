@@ -17,6 +17,8 @@ export function createStaffGroupsDemo() {
         .addStaffGroup("grp6", ["staff2"], Score.VerticalPosition.Both)
         .addStaffGroup("grp7", ["grp1", "grp5"])
         .addStaffGroup("grp8", ["grp2", "grp4"])
+        .addStaffGroup("grp9", ["grp1", "grp4"])
+        .addStaffGroup("grp10", ["grp2", "grp5"])
 
         .addMeasure()
         .setKeySignature("C", Theory.ScaleType.Major)
@@ -34,8 +36,10 @@ export function createStaffGroupsDemo() {
         .addNote(0, "C4", Theory.NoteLength.Quarter)
 
         .addMeasure()
-        .addNote(0, "C4", Theory.NoteLength.Half).addFermataTo("grp7", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Half).addFermataTo("grp8", Score.Fermata.AtNote)
+        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp7", Score.Fermata.AtNote)
+        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp8", Score.Fermata.AtNote)
+        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp9", Score.Fermata.AtNote)
+        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp10", Score.Fermata.AtNote)
 
         .getDocument();
 }
