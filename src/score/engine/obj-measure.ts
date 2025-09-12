@@ -795,7 +795,10 @@ export class ObjMeasure extends MusicObject {
         this.getVoiceSymbols(voiceId); // Ensures voicesymbols[voiceId] !== undefined
         this.voiceSymbols[voiceId].push(symbol);
 
-        this.createOldStyleTriplets(voiceId);
+        if (symbol.triplet) {
+            this.createOldStyleTriplets(voiceId);
+        }
+
         this.requestBeamsUpdate();
 
         this.lastAddedRhythmColumn = col;
