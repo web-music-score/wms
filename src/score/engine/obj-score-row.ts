@@ -274,8 +274,8 @@ export class ObjScoreRow extends MusicObject {
     updateRect() {
         let left = this.measures.length > 0 ? this.measures[0].getRect().left : 0;
         let right = this.measures.length > 0 ? this.measures[this.measures.length - 1].getRect().right : 0;
-        let top = Math.min(0, ...this.measures.map(m => m.getRect().top));
-        let bottom = Math.max(0, ...this.measures.map(m => m.getRect().bottom));
+        let top = this.measures.length > 0 ? Math.min(...this.measures.map(m => m.getRect().top)) : 0;
+        let bottom = this.measures.length > 0 ? Math.max(...this.measures.map(m => m.getRect().bottom)) : 0;
 
         this.rect = new DivRect(left, right, top, bottom);
     }
