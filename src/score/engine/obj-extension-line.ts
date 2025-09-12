@@ -5,6 +5,7 @@ import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
 import { ObjMeasure } from "./obj-measure";
 import { Extension } from "./extension";
 import { DivRect, MExtensionLine } from "../pub";
+import { ObjNotationLine } from "./obj-staff-and-tab";
 
 export type ExtensionLineLeftObj = ObjBarLineLeft | MusicObject;
 export type ExtensionLineRightObj = ObjRhythmColumn | ObjBarLineRight;
@@ -12,7 +13,7 @@ export type ExtensionLineRightObj = ObjRhythmColumn | ObjBarLineRight;
 export class ObjExtensionLine extends MusicObject {
     readonly mi: MExtensionLine;
 
-    constructor(readonly measure: ObjMeasure, readonly extension: Extension, readonly leftObj: ExtensionLineLeftObj, readonly rightObj: ExtensionLineRightObj) {
+    constructor(readonly measure: ObjMeasure, readonly line: ObjNotationLine, readonly extension: Extension, readonly leftObj: ExtensionLineLeftObj, readonly rightObj: ExtensionLineRightObj) {
         super(measure);
 
         extension.addTail(this);
@@ -96,7 +97,7 @@ export class ObjExtensionLine extends MusicObject {
         // Draw tip end of last line
         let tails = this.extension.getTails();
         if (tails.length > 0 && this === tails[tails.length - 1]) {
-            let tipH = rect.centerY > this.measure.row.getRect().centerY ? -renderer.unitSize : renderer.unitSize;
+            let tipH = rect.centerY > this.line.getRect().centerY ? -renderer.unitSize : renderer.unitSize;
             renderer.drawLine(rect.right, rect.centerY, rect.right, rect.centerY + tipH, "black", renderer.lineWidth);
         }
     }

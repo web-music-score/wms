@@ -982,7 +982,7 @@ export class ObjMeasure extends MusicObject {
                             let line2: ObjNotationLine | undefined = lines.find(l => l.name !== "" && l.name === line.name) ?? lines[line.id];
 
                             if (line2) {
-                                m.addLayoutObject(new ObjExtensionLine(m, extension, leftObj, rightObj), line2, layoutGroupId, verticalPos);
+                                m.addLayoutObject(new ObjExtensionLine(m, line2, extension, leftObj, rightObj), line2, layoutGroupId, verticalPos);
                             }
                         }
                     }
