@@ -10,9 +10,9 @@ export enum StaffPreset {
 
     /** GuitarTreble has treble clef but is one octave lower. */
     GuitarTreble = 4,
-    // /** GuitarTab has tab for guitar. */
+    /** GuitarTab has tab for guitar. */
     GuitarTab = 8,
-    // /** GuitarCombined has treble clef and tab for guitar. */
+    /** GuitarCombined has treble clef and tab for guitar. */
     GuitarCombined = GuitarTab | GuitarTreble
 }
 
@@ -146,3 +146,4 @@ export enum Label {
     /** "C", "Am", "G7", etc. */
     Chord
 }
+
