@@ -161,7 +161,7 @@ export class ObjRest extends MusicObject {
             }
         }
 
-        return [this];
+        return []; // Do not return [this].
     }
 
 
