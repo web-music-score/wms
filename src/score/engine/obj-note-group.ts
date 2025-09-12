@@ -59,7 +59,18 @@ export class ObjStaffNoteGroup extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.getRect().contains(x, y) ? [this] : [];
+        if (!this.getRect().contains(x, y)) {
+            return [];
+        }
+
+        for (let i = 0; i < this.accidentals.length; i++) {
+            let arr = this.accidentals[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        return [this];
     }
 
     updateRect() {
