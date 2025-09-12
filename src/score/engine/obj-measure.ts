@@ -1002,7 +1002,7 @@ export class ObjMeasure extends MusicObject {
 
     private createOldStyleTriplets(voiceId: number) {
 
-        // Create triplets by NoteOptions { triplet }
+        // Create triplets by triplet property of NoteOptions/RestOptions.
         let symbols = this.getVoiceSymbols(voiceId);
 
         if (symbols.length <= 2) {
