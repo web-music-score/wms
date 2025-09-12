@@ -13,7 +13,7 @@ import { ObjConnective } from "./obj-connective";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
-import { ObjBeamGroup } from "./obj-beam-group";
+import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
@@ -795,6 +795,7 @@ export class ObjMeasure extends MusicObject {
         this.getVoiceSymbols(voiceId); // Ensures voicesymbols[voiceId] !== undefined
         this.voiceSymbols[voiceId].push(symbol);
 
+        this.createOldStyleTriplets(voiceId);
         this.requestBeamsUpdate();
 
         this.lastAddedRhythmColumn = col;
@@ -999,16 +1000,55 @@ export class ObjMeasure extends MusicObject {
         this.needBeamsUpdate = true;
     }
 
-    createBeams() {
-        if (!this.needBeamsUpdate || !this.row.hasStaff) {
+    private createOldStyleTriplets(voiceId: number) {
+
+        // Create triplets by NoteOptions { triplet }
+        let symbols = this.getVoiceSymbols(voiceId);
+
+        if (symbols.length <= 2) {
             return;
         }
 
-        // Remove old beams/triplets
-        this.beamGroups.forEach(beamGroup => beamGroup.detach());
-        this.beamGroups.length = 0;
+        // Create triplets
+        for (let i = 0; i < symbols.length;) {
+            let s2 = symbols.slice(i, i + 2);
+            let s3 = symbols.slice(i, i + 3);
 
-        // Recreate beams/triplets
+            if (s2.length === 2 &&
+                s2.every(s => s.triplet) && s2.every(s => s.getBeamGroup() === undefined) &&
+                ObjBeamGroup.createTriplet(s2)) {
+                i += 2;
+            }
+            else if (s3.length === 3 &&
+                s3.every(s => s.triplet) && s3.every(s => s.getBeamGroup() === undefined) &&
+                ObjBeamGroup.createTriplet(s3)) {
+                i += 3;
+            }
+            else {
+                i++;
+            }
+        }
+
+        this.requestLayout();
+    }
+
+    createBeams() {
+        if (!this.needBeamsUpdate/* || !this.row.hasStaff*/) {
+            return;
+        }
+
+        // Remove old beams (do not remove triplets)
+        this.beamGroups = this.beamGroups.filter(beamGroup => {
+            if (beamGroup.getType() === BeamGroupType.RegularBeam) {
+                beamGroup.detach();
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+
+        // Recreate beams
         getVoiceIds().forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId);
 
@@ -1016,23 +1056,6 @@ export class ObjMeasure extends MusicObject {
                 return;
             }
 
-            // Create triplets
-            for (let i = 0; i < symbols.length;) {
-                let s2 = symbols.slice(i, i + 2);
-                let s3 = symbols.slice(i, i + 3);
-
-                if (s2.length === 2 && ObjBeamGroup.createTriplet(s2)) {
-                    i += 2;
-                }
-                else if (s3.length === 3 && ObjBeamGroup.createTriplet(s3)) {
-                    i += 3;
-                }
-                else {
-                    i++;
-                }
-            }
-
-            // Create beams
             if (!DebugSettings.DisableBeams) {
                 let groupSymbols: RhythmSymbol[] = [];
                 let groupStartTicks = 0;

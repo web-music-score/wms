@@ -160,10 +160,6 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     static createTriplet(symbols: RhythmSymbol[]) {
-        if (!symbols.every(s => s.triplet)) {
-            return false;
-        }
-
         // max triplet note length (must have stem)
         let MaxTripletNoteLenght = NoteLength.Half;
 
