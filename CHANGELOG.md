@@ -1,5 +1,17 @@
 # Changelog
 
+## [3.2.0] - 2025-09-12
+## Added
+- Added getter functions to score interface (MDocument, MMeasure, etc.)
+
+## Fixed
+- Extension line tip direction.
+- Cursor top was always 0 (top of document instead of top of row).
+- Pick accidental.
+
+## Changed
+- Do not pick note groups, rests and rhythm columns (only visible with multiple staff/tab anyway).
+
 ## [3.1.1] - 2025-09-10
 ## Fixed
 - Accept array of staff/tab/group for addFermataTo(), addNavigationTo(), addAnnotationTo() and addLabelTo().
