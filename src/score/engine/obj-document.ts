@@ -175,6 +175,14 @@ export class ObjDocument extends MusicObject {
         return this.rows.length === 0 ? this.addNewRow(undefined) : this.rows[this.rows.length - 1];
     }
 
+    getRows(): ReadonlyArray<ObjScoreRow> {
+        return this.rows;
+    }
+
+    getMeasures(): ReadonlyArray<ObjMeasure> {
+        return this.measures;
+    }
+
     requestNewRow(): void {
         this.newRowRequested = true;
     }

@@ -14,7 +14,7 @@ export class ObjStaffTabBarLine extends MusicObject {
 
     readonly mi: MStaffTabBarLine;
 
-    constructor(readonly line: ObjNotationLine) {
+    constructor(readonly barLine: ObjBarLine, readonly line: ObjNotationLine) {
         super(line);
 
         line.addObject(this);
@@ -83,7 +83,7 @@ abstract class ObjBarLine extends MusicObject {
         let dotRadius = dotW / 2;
 
         row.getNotationLines().forEach(line => {
-            let obj = new ObjStaffTabBarLine(line);
+            let obj = new ObjStaffTabBarLine(this, line);
 
             let lineCenterY: number;
             let lineDotOff: number;

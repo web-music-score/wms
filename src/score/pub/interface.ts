@@ -1,6 +1,6 @@
 import * as Audio from "@tspro/web-music-score/audio";
-import { Accidental, Note, NoteLength, KeySignature, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
-import { RhythmProps, Scale, ScaleType, SymbolSet } from "@tspro/web-music-score/theory";
+import { Accidental, Note } from "@tspro/web-music-score/theory";
+import { RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "../engine/music-object";
 import { ObjAccidental } from "../engine/obj-accidental";
 import { ObjConnective } from "../engine/obj-connective";
@@ -25,13 +25,11 @@ import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { Clef, Connective, ConnectiveSpan, PlayStateChangeListener, StaffConfig, Stem, StringNumber, TabConfig, TieType, VoiceId, getStringNumbers, getVoiceIds } from "./types";
-import { NoteAnchor, Arpeggio } from "./types";
+import { PlayStateChangeListener, VoiceId, getVoiceIds } from "./types";
 import { ScoreEventListener } from "./event";
-import { NoteOptions, RestOptions, StaffPreset, Fermata, Navigation, Annotation, Label, PlayState } from "./types";
+import { PlayState } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
-import { DocumentBuilder } from "./document-builder";
+import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -50,6 +48,15 @@ function require_t<T>(t: T | undefined | null, message?: string): T {
 
 function isVoiceId(value: unknown): value is VoiceId {
     return Utils.Is.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
+}
+
+function getNotationLine(line: ObjNotationLine): MStaff | MTab {
+    if (line instanceof ObjStaff || line instanceof ObjTab) {
+        return line.getMusicInterface()
+    }
+    else {
+        throw new MusicError(MusicErrorType.Score, `Notation line not staff nor tab.`);
+    }
 }
 
 export abstract class MusicInterface {
@@ -107,6 +114,14 @@ export class MArpeggio extends MusicInterface {
     getMusicObject(): ObjArpeggio {
         return this.obj;
     }
+
+    getRhythmColumn(): MRhythmColumn {
+        return this.obj.col.getMusicInterface();
+    }
+
+    getNotationLine(): MStaff | MTab {
+        return getNotationLine(this.obj.line);
+    }
 }
 
 export class MBeamGroup extends MusicInterface {
@@ -135,6 +150,10 @@ export class MStaffBeamGroup extends MusicInterface {
     getMusicObject(): ObjStaffBeamGroup {
         return this.obj;
     }
+
+    getStaff(): MStaff {
+        return this.obj.staff.getMusicInterface();
+    }
 }
 
 export class MDocument extends MusicInterface {
@@ -155,11 +174,19 @@ export class MDocument extends MusicInterface {
     }
 
     getComposer(): string | undefined {
-        return this.obj.getComposer();3
+        return this.obj.getComposer(); 3
     }
 
     getArranger(): string | undefined {
         return this.obj.getArranger();
+    }
+
+    getRows(): ReadonlyArray<MScoreRow> {
+        return this.obj.getRows().map(r => r.getMusicInterface());
+    }
+
+    getMeasures(): ReadonlyArray<MMeasure> {
+        return this.obj.getMeasures().map(m => m.getMusicInterface());
     }
 
     play(fn?: PlayStateChangeListener): MPlayer {
@@ -265,6 +292,10 @@ export class MMeasure extends MusicInterface {
     getRhythmColumns(): ReadonlyArray<MRhythmColumn> {
         return this.obj.getColumns().map(col => col.getMusicInterface());
     }
+
+    getRow(): MScoreRow {
+        return this.obj.row.getMusicInterface();
+    }
 }
 
 export class MBarLineRight extends MusicInterface {
@@ -307,6 +338,20 @@ export class MStaffTabBarLine extends MusicInterface {
     getMusicObject(): ObjStaffTabBarLine {
         return this.obj;
     }
+
+    getBarLine(): MBarLineLeft | MBarLineRight {
+        let barLine = this.obj.barLine;
+        if (barLine instanceof ObjBarLineLeft || barLine instanceof ObjBarLineRight) {
+            return barLine.getMusicInterface()
+        }
+        else {
+            throw new MusicError(MusicErrorType.Score, `Bar line not let nor right.`);
+        }
+    }
+
+    getNotationLine(): MStaff | MTab {
+        return getNotationLine(this.obj.line);
+    }
 }
 
 export class MNoteGroup extends MusicInterface {
@@ -329,6 +374,14 @@ export class MNoteGroup extends MusicInterface {
     getRhythmProps(): RhythmProps {
         return this.obj.rhythmProps;
     }
+
+    getRhythmColumn(): MRhythmColumn {
+        return this.obj.col.getMusicInterface();
+    }
+
+    getMeasure(): MMeasure {
+        return this.obj.measure.getMusicInterface();
+    }
 }
 
 export class MStaffNoteGroup extends MusicInterface {
@@ -346,6 +399,18 @@ export class MStaffNoteGroup extends MusicInterface {
 
     getNoteGroup(): MNoteGroup {
         return this.obj.noteGroup.getMusicInterface();
+    }
+
+    getRhythmColumn(): MRhythmColumn {
+        return this.getNoteGroup().getRhythmColumn();
+    }
+
+    getMeasure(): MMeasure {
+        return this.getNoteGroup().getMeasure();
+    }
+
+    getStaff(): MStaff {
+        return this.obj.staff.getMusicInterface();
     }
 }
 
@@ -365,6 +430,18 @@ export class MTabNoteGroup extends MusicInterface {
     getNoteGroup(): MNoteGroup {
         return this.obj.noteGroup.getMusicInterface();
     }
+
+    getRhythmColumn(): MRhythmColumn {
+        return this.getNoteGroup().getRhythmColumn();
+    }
+
+    getMeasure(): MMeasure {
+        return this.getNoteGroup().getMeasure();
+    }
+
+    getTab(): MTab {
+        return this.obj.tab.getMusicInterface();
+    }
 }
 
 export class MRest extends MusicInterface {
@@ -383,6 +460,14 @@ export class MRest extends MusicInterface {
     getRhythmProps(): RhythmProps {
         return this.obj.rhythmProps;
     }
+
+    getRhythmColumn(): MRhythmColumn {
+        return this.obj.col.getMusicInterface();
+    }
+
+    getMeasure(): MMeasure {
+        return this.obj.measure.getMusicInterface();
+    }
 }
 
 export class MStaffRest extends MusicInterface {
@@ -400,6 +485,18 @@ export class MStaffRest extends MusicInterface {
 
     getRest(): MRest {
         return this.obj.rest.getMusicInterface();
+    }
+
+    getRhythmColumn(): MRhythmColumn {
+        return this.getRest().getRhythmColumn();
+    }
+
+    getMeasure(): MMeasure {
+        return this.getRest().getMeasure();
+    }
+
+    getStaff(): MStaff {
+        return this.obj.staff.getMusicInterface();
     }
 }
 
@@ -421,6 +518,17 @@ export class MRhythmColumn extends MusicInterface {
 
         return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
     }
+
+    getMeasure(): MMeasure {
+        return this.obj.measure.getMusicInterface();
+    }
+
+    getVoiceSymbol(voiceId: VoiceId): MNoteGroup | MRest | undefined {
+        let s = this.obj.getVoiceSymbol(voiceId);
+        return s instanceof ObjNoteGroup || s instanceof ObjRest
+            ? s.getMusicInterface()
+            : undefined;
+    }
 }
 
 export class MScoreRow extends MusicInterface {
@@ -436,8 +544,16 @@ export class MScoreRow extends MusicInterface {
         return this.obj;
     }
 
+    getDocument(): MDocument {
+        return this.obj.doc.getMusicInterface();
+    }
+
     getMeasures(): ReadonlyArray<MMeasure> {
         return this.obj.getMeasures().map(m => m.getMusicInterface());
+    }
+
+    getNotationLines(): ReadonlyArray<MStaff | MTab> {
+        return this.obj.getNotationLines().map(line => getNotationLine(line));
     }
 }
 
@@ -453,6 +569,18 @@ export class MStaff extends MusicInterface {
     getMusicObject(): ObjStaff {
         return this.obj;
     }
+
+    getId(): number {
+        return this.obj.id;
+    }
+
+    getName(): string | undefined {
+        return this.obj.name.length > 0 ? this.obj.name : undefined;
+    }
+
+    getRow(): MScoreRow {
+        return this.obj.row.getMusicInterface();
+    }
 }
 
 export class MTab extends MusicInterface {
@@ -466,6 +594,18 @@ export class MTab extends MusicInterface {
     /** @internal */
     getMusicObject(): ObjTab {
         return this.obj;
+    }
+
+    getId(): number {
+        return this.obj.id;
+    }
+
+    getName(): string | undefined {
+        return this.obj.name.length > 0 ? this.obj.name : undefined;
+    }
+
+    getRow(): MScoreRow {
+        return this.obj.row.getMusicInterface();
     }
 }
 
@@ -481,6 +621,10 @@ export class MSignature extends MusicInterface {
     getMusicObject(): ObjSignature {
         return this.obj;
     }
+
+    getStaff(): MStaff {
+        return this.obj.staff.getMusicInterface();
+    }
 }
 
 export class MSpecialText extends MusicInterface {
@@ -494,6 +638,10 @@ export class MSpecialText extends MusicInterface {
     /** @internal */
     getMusicObject(): ObjSpecialText {
         return this.obj;
+    }
+
+    getText(): string {
+        return this.obj.getText();
     }
 }
 
