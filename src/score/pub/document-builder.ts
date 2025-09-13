@@ -90,7 +90,7 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
     );
 }
 
-type TupletBuilder = {
+export type TupletBuilder = {
     addNote: (note: Note | string, noteLength: NoteLength, options?: NoteOptions) => void,
     addChord: (notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions) => void,
     addRest: (restLength: NoteLength, options?: RestOptions) => void
@@ -230,8 +230,17 @@ export class DocumentBuilder {
     }
 
     /**
+     * Usage:
+     * <pre>
+     * addTuplet(0, Theory.Tuplet.Triplet, notes => {
+     *     notes.addNote("G3", Theory.NoteLength.Eighth);
+     *     notes.addNote("B3", Theory.NoteLength.Eighth);
+     *     notes.addNote("D4", Theory.NoteLength.Eighth);
+     * });
+     * </pre>
+     * 
      * @param voiceId 
-     * @param tupletRatio - Pass { parts: number, inTimeOf: number } object, or Theory.Tuplet preset (e.g. Theory.Tuplet.Triplet).
+     * @param tupletRatio - You can also use Theory.Tuplet presets (e.g. Theory.Tuplet.Triplet).
      * @param builder 
      * @returns 
      */
