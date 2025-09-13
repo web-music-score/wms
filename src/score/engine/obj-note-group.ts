@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Note, NoteLength, RhythmProps, TupletRatio } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, NoteLengthStr, RhythmProps, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup } from "../pub";
@@ -168,7 +168,7 @@ export class ObjNoteGroup extends MusicObject {
 
     readonly mi: MNoteGroup;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength, options?: NoteOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         if (!Utils.Is.isIntegerGte(notes.length, 1)) {

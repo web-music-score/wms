@@ -11,6 +11,8 @@ export enum NoteLength {
     SixtyFourth = 1 * 3
 }
 
+export type NoteLengthStr = "1n" | "2n" | "4n" | "8n" | "16n" | "32n" | "64n";
+
 export const MaxNoteLength = NoteLength.Whole;
 
 export const MinNoteLength = NoteLength.SixtyFourth;
@@ -35,12 +37,34 @@ const NoteSymbolMap = new Map<NoteLength, string>([
     [NoteLength.SixtyFourth, "𝅘𝅥𝅱"]
 ]);
 
+const NoteLengthStrMap = new Map<NoteLengthStr, NoteLength>([
+    ["1n", NoteLength.Whole],
+    ["2n", NoteLength.Half],
+    ["4n", NoteLength.Quarter],
+    ["8n", NoteLength.Eighth],
+    ["16n", NoteLength.Sixteenth],
+    ["32n", NoteLength.ThirtySecond],
+    ["64n", NoteLength.SixtyFourth]
+]);
+
 export function validateNoteLength(noteLength: unknown): NoteLength {
-    if (!Utils.Is.isEnumValue(noteLength, NoteLength)) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
+    if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
+        return noteLength;
     }
     else {
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
+    }
+}
+
+export function getNoteLength(noteLength: NoteLength | NoteLengthStr): NoteLength {
+    if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
         return noteLength;
+    }
+    else if (typeof noteLength === "string" && NoteLengthStrMap.get(noteLength)) {
+        return NoteLengthStrMap.get(noteLength)!;
+    }
+    else {
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
     }
 }
 
@@ -67,10 +91,10 @@ export class RhythmProps {
     readonly ticks: number;
     readonly flagCount: number;
 
-    constructor(noteLength: NoteLength, dotted?: boolean, triplet?: boolean);
-    constructor(noteLength: NoteLength, dotted?: boolean, tupletRatio?: TupletRatio);
-    constructor(noteLength: NoteLength, dotted?: boolean, tupletArg?: boolean | TupletRatio) {
-        this.noteLength = validateNoteLength(noteLength);
+    constructor(noteLength: NoteLength | NoteLengthStr, dotted?: boolean, triplet?: boolean);
+    constructor(noteLength: NoteLength | NoteLengthStr, dotted?: boolean, tupletRatio?: TupletRatio);
+    constructor(noteLength: NoteLength | NoteLengthStr, dotted?: boolean, tupletArg?: boolean | TupletRatio) {
+        this.noteLength = getNoteLength(noteLength);
         this.dotted = dotted === true;
         if (typeof tupletArg === "boolean") {
             this.triplet = tupletArg;

@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, Tuplet, TupletRatio, NoteLengthStr } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup } from "../pub";
@@ -805,7 +805,7 @@ export class ObjMeasure extends MusicObject {
         this.lastAddedRhythmSymbol = symbol;
     }
 
-    addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions, tupletRatio?: TupletRatio): ObjNoteGroup {
+    addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions, tupletRatio?: TupletRatio): ObjNoteGroup {
         let realNotes = notes.map(note => typeof note === "string" ? Note.getNote(note) : note);
         let col = this.getRhythmColumn(voiceId);
         let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio);
@@ -813,7 +813,7 @@ export class ObjMeasure extends MusicObject {
         return noteGroup;
     }
 
-    addRest(voiceId: number, restLength: NoteLength, options?: RestOptions, tupletRatio?: TupletRatio): ObjRest {
+    addRest(voiceId: number, restLength: NoteLength | NoteLengthStr, options?: RestOptions, tupletRatio?: TupletRatio): ObjRest {
         let col = this.getRhythmColumn(voiceId);
         let rest = new ObjRest(col, voiceId, restLength, options, tupletRatio);
         this.addRhythmSymbol(voiceId, rest);

@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { KeySignature, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
+import { getNoteLength, KeySignature, Note, NoteLength, NoteLengthStr, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
@@ -90,10 +90,23 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
     );
 }
 
+function isNoteLengthStr(str: unknown): boolean {
+    if (typeof str !== "string") {
+        return false;
+    }
+    try {
+        getNoteLength(str as NoteLengthStr);
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+
 export type TupletBuilder = {
-    addNote: (note: Note | string, noteLength: NoteLength, options?: NoteOptions) => void,
-    addChord: (notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions) => void,
-    addRest: (restLength: NoteLength, options?: RestOptions) => void
+    addNote: (note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => void,
+    addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => void,
+    addRest: (restLength: NoteLength | NoteLengthStr, options?: RestOptions) => void
 }
 
 export class DocumentBuilder {
@@ -197,10 +210,10 @@ export class DocumentBuilder {
         return this;
     }
 
-    addNote(voiceId: number, note: Note | string, noteLength: NoteLength, options?: NoteOptions): DocumentBuilder {
+    addNote(voiceId: number, note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
-        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
         if (options !== undefined) {
             assertNoteOptions(options);
         }
@@ -208,10 +221,10 @@ export class DocumentBuilder {
         return this;
     }
 
-    addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions): DocumentBuilder {
+    addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
-        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
         if (options !== undefined) {
             assertNoteOptions(options);
         }
@@ -219,9 +232,9 @@ export class DocumentBuilder {
         return this;
     }
 
-    addRest(voiceId: number, restLength: NoteLength, options?: RestOptions): DocumentBuilder {
+    addRest(voiceId: number, restLength: NoteLength | NoteLengthStr, options?: RestOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(Utils.Is.isEnumValue(restLength, NoteLength), "restLength", restLength);
+        assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLengthStr(restLength), "restLength", restLength);
         if (options !== undefined) {
             assertRestOptions(options);
         }
@@ -253,7 +266,7 @@ export class DocumentBuilder {
         const helper: TupletBuilder = {
             addNote: (note, noteLength, options) => {
                 assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
-                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
                 if (options !== undefined) {
                     delete options.triplet;
                     assertNoteOptions(options);
@@ -263,7 +276,7 @@ export class DocumentBuilder {
             },
             addChord: (notes, noteLength, options) => {
                 assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
-                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
                 if (options !== undefined) {
                     delete options.triplet;
                     assertNoteOptions(options);
@@ -272,7 +285,7 @@ export class DocumentBuilder {
                 tupletSymbols.push(s);
             },
             addRest: (restLength, options) => {
-                assertArg(Utils.Is.isEnumValue(restLength, NoteLength), "restLength", restLength);
+                assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLengthStr(restLength), "restLength", restLength);
                 if (options !== undefined) {
                     delete options.triplet;
                     assertRestOptions(options);
