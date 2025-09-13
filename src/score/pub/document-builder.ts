@@ -252,17 +252,31 @@ export class DocumentBuilder {
 
         const helper: TupletBuilder = {
             addNote: (note, noteLength, options) => {
-                if (options) delete options.triplet;
+                assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
+                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+                if (options !== undefined) {
+                    delete options.triplet;
+                    assertNoteOptions(options);
+                }
                 let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, options, tupletRatio);
                 tupletSymbols.push(s);
             },
             addChord: (notes, noteLength, options) => {
-                if (options) delete options.triplet;
+                assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
+                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength), "noteLength", noteLength);
+                if (options !== undefined) {
+                    delete options.triplet;
+                    assertNoteOptions(options);
+                }
                 let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, options, tupletRatio);
                 tupletSymbols.push(s);
             },
             addRest: (restLength, options) => {
-                if (options) delete options.triplet;
+                assertArg(Utils.Is.isEnumValue(restLength, NoteLength), "restLength", restLength);
+                if (options !== undefined) {
+                    delete options.triplet;
+                    assertRestOptions(options);
+                }
                 let s = this.getMeasure().addRest(voiceId, restLength, options, tupletRatio);
                 tupletSymbols.push(s);
             }
