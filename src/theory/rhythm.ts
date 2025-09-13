@@ -88,8 +88,8 @@ export class RhythmProps {
         this.ticks = this.noteLength;
         this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
 
-        if (this.dotted && this.triplet) {
-            throw new MusicError(MusicErrorType.Note, "Note cannot be both dotted and triplet!");
+        if (this.dotted && this.tupletRatio !== undefined) {
+            throw new MusicError(MusicErrorType.Note, "Note cannot be both dotted and tuplet!");
         }
         else if (this.dotted && this.noteLength === MinNoteLength) {
             throw new MusicError(MusicErrorType.Note, "Shortest note cannot be dotted!");
