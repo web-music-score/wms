@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MinNoteLength, NoteLength, TupletRatio } from "@tspro/web-music-score/theory";
+import { MinNoteLength, NoteLength, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -155,30 +155,33 @@ export class ObjBeamGroup extends MusicObject {
         }
     }
 
-    static createTuplet(tupletRatio: TupletRatio, symbols: RhythmSymbol[]) {
-        if (tupletRatio.parts !== 3 && tupletRatio.inTimeOf !== 2) {
-            throw new MusicError(MusicErrorType.Score, "Only triplets are supported for now!");
+    static createOldStyleTriplet(symbols: RhythmSymbol[]): number {
+        let s2 = symbols.slice(0, 2);
+        let l2 = s2.map(s => s.rhythmProps.noteLength);
+
+        if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
+            (l2[1] === l2[0] / 2 && l2[0] / 2 >= MinNoteLength) ||
+            (l2[0] === l2[1] / 2 && l2[1] / 2 >= MinNoteLength)
+        )) {
+            new ObjBeamGroup(s2, Tuplet.Triplet);
+            return 2;
         }
 
-        let len = symbols.map(s => s.rhythmProps.noteLength);
+        let s3 = symbols.slice(0, 3);
+        let l3 = s3.map(s => s.rhythmProps.noteLength);
 
-        if (symbols.length === 2) {
-            if (
-                (len[1] === len[0] / 2 && len[0] / 2 >= MinNoteLength) ||
-                (len[0] === len[1] / 2 && len[1] / 2 >= MinNoteLength)
-            ) {
-                new ObjBeamGroup(symbols, tupletRatio);
-                return true;
-            }
-        }
-        else if (symbols.length === 3) {
-            if (len.every(l => l === len[0])) {
-                new ObjBeamGroup(symbols, tupletRatio);
-                return true;
-            }
+        if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
+            l3.every(l => l === l3[0])
+        )) {
+            new ObjBeamGroup(s3, Tuplet.Triplet);
+            return 3;
         }
 
-        return false;
+        return 0;
+    }
+
+    static createTuplet(symbols: RhythmSymbol[], tupletRatio: TupletRatio): void {
+        new ObjBeamGroup(symbols, tupletRatio);
     }
 
     getMusicInterface(): MBeamGroup {

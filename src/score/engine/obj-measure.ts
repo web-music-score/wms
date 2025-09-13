@@ -1004,25 +1004,14 @@ export class ObjMeasure extends MusicObject {
         this.needBeamsUpdate = true;
     }
 
+    // Create triplets by triplet property of NoteOptions/RestOptions.
     private createOldStyleTriplets(voiceId: number) {
-
-        // Create triplets by triplet property of NoteOptions/RestOptions.
         let symbols = this.getVoiceSymbols(voiceId);
 
-        // Create triplets
         for (let i = 0; i < symbols.length;) {
-            let s2 = symbols.slice(i, i + 2);
-            let s3 = symbols.slice(i, i + 3);
-
-            if (s2.length === 2 &&
-                s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) &&
-                ObjBeamGroup.createTuplet(Tuplet.Triplet, s2)) {
-                i += 2;
-            }
-            else if (s3.length === 3 &&
-                s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) &&
-                ObjBeamGroup.createTuplet(Tuplet.Triplet, s3)) {
-                i += 3;
+            if (symbols[i].oldStyleTriplet) {
+                let n = ObjBeamGroup.createOldStyleTriplet(symbols.slice(i, i + 3));
+                i += (n === 0 ? 1 : n);
             }
             else {
                 i++;

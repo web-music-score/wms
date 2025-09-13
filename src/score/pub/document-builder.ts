@@ -261,7 +261,7 @@ export class DocumentBuilder {
 
         builder(helper);
 
-        ObjBeamGroup.createTuplet(tupletRatio, tupletSymbols);
+        ObjBeamGroup.createTuplet(tupletSymbols, tupletRatio);
 
         return this;
     }
