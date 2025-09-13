@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup } from "../pub";
@@ -805,18 +805,19 @@ export class ObjMeasure extends MusicObject {
         this.lastAddedRhythmSymbol = symbol;
     }
 
-    addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions) {
-        let notes2 = notes.map(note => typeof note === "string" ? Note.getNote(note) : note);
-
+    addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions, tupletRatio?: TupletRatio): ObjNoteGroup {
+        let realNotes = notes.map(note => typeof note === "string" ? Note.getNote(note) : note);
         let col = this.getRhythmColumn(voiceId);
-
-        this.addRhythmSymbol(voiceId, new ObjNoteGroup(col, voiceId, notes2, noteLength, options));
+        let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio);
+        this.addRhythmSymbol(voiceId, noteGroup);
+        return noteGroup;
     }
 
-    addRest(voiceId: number, restLength: NoteLength, options?: RestOptions) {
+    addRest(voiceId: number, restLength: NoteLength, options?: RestOptions, tupletRatio?: TupletRatio): ObjRest {
         let col = this.getRhythmColumn(voiceId);
-
-        this.addRhythmSymbol(voiceId, new ObjRest(col, voiceId, restLength, options));
+        let rest = new ObjRest(col, voiceId, restLength, options, tupletRatio);
+        this.addRhythmSymbol(voiceId, rest);
+        return rest;
     }
 
     /**
@@ -1008,23 +1009,19 @@ export class ObjMeasure extends MusicObject {
         // Create triplets by triplet property of NoteOptions/RestOptions.
         let symbols = this.getVoiceSymbols(voiceId);
 
-        if (symbols.length <= 2) {
-            return;
-        }
-
         // Create triplets
         for (let i = 0; i < symbols.length;) {
             let s2 = symbols.slice(i, i + 2);
             let s3 = symbols.slice(i, i + 3);
 
             if (s2.length === 2 &&
-                s2.every(s => s.triplet) && s2.every(s => s.getBeamGroup() === undefined) &&
-                ObjBeamGroup.createTriplet(s2)) {
+                s2.every(s => s.triplet && s.getBeamGroup() === undefined) &&
+                ObjBeamGroup.createTuplet(Tuplet.Triplet, s2)) {
                 i += 2;
             }
             else if (s3.length === 3 &&
-                s3.every(s => s.triplet) && s3.every(s => s.getBeamGroup() === undefined) &&
-                ObjBeamGroup.createTriplet(s3)) {
+                s3.every(s => s.triplet && s.getBeamGroup() === undefined) &&
+                ObjBeamGroup.createTuplet(Tuplet.Triplet, s3)) {
                 i += 3;
             }
             else {
@@ -1040,14 +1037,14 @@ export class ObjMeasure extends MusicObject {
             return;
         }
 
-        // Remove old beams (do not remove triplets)
+        // Remove old beams, keep tuplets.
         this.beamGroups = this.beamGroups.filter(beamGroup => {
-            if (beamGroup.getType() === BeamGroupType.RegularBeam) {
-                beamGroup.detach();
-                return false;
+            if (beamGroup.isTuplet()) {
+                return true;
             }
             else {
-                return true;
+                beamGroup.detach();
+                return false;
             }
         });
 
@@ -1097,7 +1094,7 @@ export class ObjMeasure extends MusicObject {
 
     private static setupBeamGroup(groupSymbols: RhythmSymbol[]) {
         let groupNotes = groupSymbols.map(s => {
-            return s instanceof ObjNoteGroup && s.getBeamGroup()?.isTriplet() !== true ? s : undefined;
+            return s instanceof ObjNoteGroup && s.getBeamGroup()?.isTuplet() !== true ? s : undefined;
         });
 
         ObjNoteGroup.setBeamCounts(groupNotes);

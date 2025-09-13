@@ -146,4 +146,3 @@ export enum Label {
     /** "C", "Am", "G7", etc. */
     Chord
 }
-

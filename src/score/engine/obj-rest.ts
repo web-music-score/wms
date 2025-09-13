@@ -1,4 +1,4 @@
-import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, RhythmProps, TupletRatio } from "@tspro/web-music-score/theory";
 import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
@@ -76,7 +76,7 @@ export class ObjRest extends MusicObject {
 
     readonly mi: MRest;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, noteLength: NoteLength, options?: RestOptions) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, noteLength: NoteLength, options?: RestOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         let diatonicId = getDiatonicIdFromStaffPos(options?.staffPos);
@@ -100,7 +100,9 @@ export class ObjRest extends MusicObject {
 
         this.color = options?.color ?? "black";
         this.hide = options?.hide ?? false;
-        this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
+        this.rhythmProps = tupletRatio
+            ? new RhythmProps(noteLength, options?.dotted, tupletRatio)
+            : new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
         this.mi = new MRest(this);
     }
@@ -169,8 +171,8 @@ export class ObjRest extends MusicObject {
         return this.beamGroup;
     }
 
-    setBeamGroup(beam: ObjBeamGroup) {
-        this.beamGroup = beam;
+    setBeamGroup(beamGroup: ObjBeamGroup) {
+        this.beamGroup = beamGroup;
     }
 
     resetBeamGroup() {

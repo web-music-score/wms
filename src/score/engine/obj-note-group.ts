@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Note, NoteLength, RhythmProps } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, RhythmProps, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup } from "../pub";
@@ -167,7 +167,7 @@ export class ObjNoteGroup extends MusicObject {
 
     readonly mi: MNoteGroup;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength, options?: NoteOptions) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength, options?: NoteOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         if (!Utils.Is.isIntegerGte(notes.length, 1)) {
@@ -189,7 +189,9 @@ export class ObjNoteGroup extends MusicObject {
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = solveArpeggio(options?.arpeggio);
-        this.rhythmProps = new RhythmProps(noteLength, options?.dotted, options?.triplet);
+        this.rhythmProps = tupletRatio
+            ? new RhythmProps(noteLength, options?.dotted, tupletRatio)
+            : new RhythmProps(noteLength, options?.dotted, options?.triplet);
 
         this.mi = new MNoteGroup(this);
     }
@@ -458,8 +460,8 @@ export class ObjNoteGroup extends MusicObject {
         return this.beamGroup;
     }
 
-    setBeamGroup(beam: ObjBeamGroup) {
-        this.beamGroup = beam;
+    setBeamGroup(beamGroup: ObjBeamGroup) {
+        this.beamGroup = beamGroup;
     }
 
     resetBeamGroup() {
@@ -908,11 +910,11 @@ export class ObjNoteGroup extends MusicObject {
         } while (fixAgain);
     }
 
-    static setTripletBeamCounts(triplet: ObjBeamGroup) {
-        let type = triplet.getType();
-        let symbols = triplet.getSymbols();
+    static setTupletBeamCounts(tuplet: ObjBeamGroup) {
+        let type = tuplet.getType();
+        let symbols = tuplet.getSymbols();
 
-        if (type === BeamGroupType.TripletBeam) {
+        if (type === BeamGroupType.TupletBeam) {
             symbols.forEach((s, i) => {
                 if (s instanceof ObjNoteGroup) {
                     s.leftBeamCount = i === 0 ? 0 : s.rhythmProps.flagCount;
@@ -920,15 +922,12 @@ export class ObjNoteGroup extends MusicObject {
                 }
             });
         }
-        else if (type === BeamGroupType.TripletGroup) {
+        else if (type === BeamGroupType.TupletGroup) {
             symbols.forEach(s => {
                 if (s instanceof ObjNoteGroup) {
                     s.leftBeamCount = s.rightBeamCount = 0;
                 }
             });
-        }
-        else {
-            throw new MusicError(MusicErrorType.Score, "Cannot set triplet beam count because triplet beam group type is invalid.");
         }
     }
 

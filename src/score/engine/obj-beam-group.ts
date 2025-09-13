@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MinNoteLength, NoteLength } from "@tspro/web-music-score/theory";
+import { MinNoteLength, NoteLength, TupletRatio } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -12,8 +12,8 @@ import { ObjStaff } from "./obj-staff-and-tab";
 
 export enum BeamGroupType {
     RegularBeam,
-    TripletBeam,
-    TripletGroup
+    TupletBeam,
+    TupletGroup
 }
 
 const adjustBeamAngle = (dx: number, dy: number) => {
@@ -49,8 +49,8 @@ class BeamPoint {
 }
 
 export class ObjStaffBeamGroup extends MusicObject {
-    public tripletNumber?: ObjText;
-    public tripletNumberOffsetY = 0;
+    public tupletNumber?: ObjText;
+    public tupletNumberOffsetY = 0;
 
     public points: BeamPoint[] = [];
 
@@ -74,7 +74,7 @@ export class ObjStaffBeamGroup extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.points.forEach(p => p.offset(dx, 0));
-        this.tripletNumber?.offset(dx, dy);
+        this.tupletNumber?.offset(dx, dy);
         this.requestRectUpdate();
         this.beamGroup.requestRectUpdate();
     }
@@ -83,12 +83,12 @@ export class ObjStaffBeamGroup extends MusicObject {
         if (this.points.length > 0) {
             this.rect = this.points[0].getRect().copy();
         }
-        else if (this.tripletNumber) {
-            this.rect = this.tripletNumber.getRect().copy();
+        else if (this.tupletNumber) {
+            this.rect = this.tupletNumber.getRect().copy();
         }
         this.points.forEach(pt => this.rect.expandInPlace(pt.getRect()));
-        if (this.tripletNumber) {
-            this.rect.expandInPlace(this.tripletNumber.getRect());
+        if (this.tupletNumber) {
+            this.rect.expandInPlace(this.tupletNumber.getRect());
         }
     }
 }
@@ -100,7 +100,7 @@ export class ObjBeamGroup extends MusicObject {
 
     private readonly staffObjects: ObjStaffBeamGroup[] = [];
 
-    private constructor(private readonly symbols: RhythmSymbol[], triplet: boolean) {
+    private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio | undefined) {
         super(symbols[0].measure);
 
         this.mi = new MBeamGroup(this);
@@ -112,11 +112,7 @@ export class ObjBeamGroup extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Beam group need minimum 2 symbols, but " + symbols.length + " given.");
         }
 
-        if (triplet) {
-            if (!symbols.every(s => s.triplet)) {
-                throw new MusicError(MusicErrorType.Score, "Not every symbol's triplet property is true.");
-            }
-
+        if (tupletRatio !== undefined) {
             let isGroup =
                 symbols.length < 3 ||
                 symbols.some(s => !(s instanceof ObjNoteGroup)) ||
@@ -135,9 +131,9 @@ export class ObjBeamGroup extends MusicObject {
                 isGroup = true;
             }
 
-            this.type = isGroup ? BeamGroupType.TripletGroup : BeamGroupType.TripletBeam;
+            this.type = isGroup ? BeamGroupType.TupletGroup : BeamGroupType.TupletBeam;
 
-            ObjNoteGroup.setTripletBeamCounts(this);
+            ObjNoteGroup.setTupletBeamCounts(this);
         }
         else {
             this.type = BeamGroupType.RegularBeam;
@@ -155,28 +151,32 @@ export class ObjBeamGroup extends MusicObject {
 
     static createBeam(noteGroups: ObjNoteGroup[]) {
         if (noteGroups.length > 1) {
-            new ObjBeamGroup(noteGroups, false);
+            new ObjBeamGroup(noteGroups, undefined);
         }
     }
 
-    static createTriplet(symbols: RhythmSymbol[]) {
-        // max triplet note length (must have stem)
-        let MaxTripletNoteLenght = NoteLength.Half;
+    static createTuplet(tupletRatio: TupletRatio, symbols: RhythmSymbol[]) {
+        if(tupletRatio.parts !== 3 && tupletRatio.inTimeOf !== 2) {
+            throw new MusicError(MusicErrorType.Score, "Only triplets are supported for now!");
+        }
+
+        // max triplet note length (must have stem): TODO: Why need stem, rests do not have stem and it works.
+        let MaxTripletNoteLength = NoteLength.Half;
 
         let len = symbols.map(s => s.rhythmProps.noteLength);
 
-        if (symbols.length == 2) {
+        if (symbols.length === 2) {
             if (
-                (len[0] <= MaxTripletNoteLenght && len[1] === len[0] / 2 && len[0] / 2 >= MinNoteLength) ||
-                (len[1] <= MaxTripletNoteLenght && len[0] === len[1] / 2 && len[1] / 2 >= MinNoteLength)
+                (len[0] <= MaxTripletNoteLength && len[1] === len[0] / 2 && len[0] / 2 >= MinNoteLength) ||
+                (len[1] <= MaxTripletNoteLength && len[0] === len[1] / 2 && len[1] / 2 >= MinNoteLength)
             ) {
-                new ObjBeamGroup(symbols, true);
+                new ObjBeamGroup(symbols, tupletRatio);
                 return true;
             }
         }
         else if (symbols.length === 3) {
-            if (len[0] <= MaxTripletNoteLenght && len.every(l => l === len[0])) {
-                new ObjBeamGroup(symbols, true);
+            if (len[0] <= MaxTripletNoteLength && len.every(l => l === len[0])) {
+                new ObjBeamGroup(symbols, tupletRatio);
                 return true;
             }
         }
@@ -215,8 +215,8 @@ export class ObjBeamGroup extends MusicObject {
         return this.type;
     }
 
-    isTriplet() {
-        return this.type === BeamGroupType.TripletBeam || this.type === BeamGroupType.TripletGroup;
+    isTuplet() {
+        return this.type === BeamGroupType.TupletBeam || this.type === BeamGroupType.TupletGroup;
     }
 
     getSymbols(): ReadonlyArray<RhythmSymbol> {
@@ -285,7 +285,7 @@ export class ObjBeamGroup extends MusicObject {
             let leftStemHeight = symbolStemHeight[0] ?? 0;
             let rightStemHeight = symbolStemHeight[symbolStemHeight.length - 1] ?? 0;
 
-            if (this.type !== BeamGroupType.TripletGroup) {
+            if (this.type !== BeamGroupType.TupletGroup) {
                 let leftDy = leftStemHeight < rightStemHeight ? Math.sqrt(rightStemHeight - leftStemHeight) : 0;
                 let rightDy = rightStemHeight < leftStemHeight ? Math.sqrt(leftStemHeight - rightStemHeight) : 0;
                 if (stemDir === Stem.Up) {
@@ -334,7 +334,7 @@ export class ObjBeamGroup extends MusicObject {
 
             let obj = new ObjStaffBeamGroup(mainStaff, this);
 
-            if (this.type === BeamGroupType.TripletGroup) {
+            if (this.type === BeamGroupType.TupletGroup) {
                 let ef = unitSize / (rightX - leftX);
 
                 let l = Utils.Math.interpolateCoord(leftX, leftY + groupLineDy, rightX, rightY + groupLineDy, -ef);
@@ -343,9 +343,9 @@ export class ObjBeamGroup extends MusicObject {
                 obj.points.push(new BeamPoint(leftStaff, this, leftSymbol, l.x, l.y));
                 obj.points.push(new BeamPoint(rightStaff, this, rightSymbol, r.x, r.y));
 
-                obj.tripletNumberOffsetY = 0;
+                obj.tupletNumberOffsetY = 0;
             }
-            else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
+            else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TupletBeam) {
                 raiseBeamY *= 0.5;
 
                 let { beamThickness } = renderer;
@@ -373,14 +373,14 @@ export class ObjBeamGroup extends MusicObject {
                     }
                 });
 
-                obj.tripletNumberOffsetY = groupLineDy;
+                obj.tupletNumberOffsetY = groupLineDy;
             }
 
-            if (this.isTriplet()) {
-                obj.tripletNumber = new ObjText(this, "3", 0.5, 0.5);
+            if (this.isTuplet()) {
+                obj.tupletNumber = new ObjText(this, "3", 0.5, 0.5);
 
-                obj.tripletNumber.layout(renderer);
-                obj.tripletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + obj.tripletNumberOffsetY);
+                obj.tupletNumber.layout(renderer);
+                obj.tupletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + obj.tupletNumberOffsetY);
             }
 
             if (obj.points.length >= 2) {
@@ -409,7 +409,7 @@ export class ObjBeamGroup extends MusicObject {
             let left = obj.points[0];
             let right = obj.points[obj.points.length - 1];
 
-            if (this.type !== BeamGroupType.TripletGroup) {
+            if (this.type !== BeamGroupType.TupletGroup) {
                 obj.points.forEach(pt => {
                     if (pt.symbol instanceof ObjNoteGroup) {
                         if (pt !== left && pt !== right) {
@@ -420,9 +420,9 @@ export class ObjBeamGroup extends MusicObject {
                 });
             }
 
-            if (obj.tripletNumber) {
-                let y = (left.y + right.y) / 2 + obj.tripletNumberOffsetY;
-                obj.tripletNumber.offset(0, -obj.tripletNumber.getRect().centerY + y);
+            if (obj.tupletNumber) {
+                let y = (left.y + right.y) / 2 + obj.tupletNumberOffsetY;
+                obj.tupletNumber.offset(0, -obj.tupletNumber.getRect().centerY + y);
             }
         });
     }
@@ -437,12 +437,12 @@ export class ObjBeamGroup extends MusicObject {
         let color = "black";
 
         this.staffObjects.forEach(obj => {
-            if (this.type === BeamGroupType.TripletGroup) {
+            if (this.type === BeamGroupType.TupletGroup) {
                 let l = obj.points[0];
                 let r = obj.points[obj.points.length - 1];
 
                 if (l && r) {
-                    let tf = obj.tripletNumber ? (obj.tripletNumber.getRect().width / (r.x - l.x) * 1.2) : 0;
+                    let tf = obj.tupletNumber ? (obj.tupletNumber.getRect().width / (r.x - l.x) * 1.2) : 0;
 
                     let lc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 - tf / 2);
                     let rc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 + tf / 2);
@@ -456,7 +456,7 @@ export class ObjBeamGroup extends MusicObject {
                     renderer.drawLine(r.x, r.y, r.x, r.y + tipH, color, lineWidth);
                 }
             }
-            else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TripletBeam) {
+            else if (this.type === BeamGroupType.RegularBeam || this.type === BeamGroupType.TupletBeam) {
                 let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (this.stemDir === Stem.Up ? 1 : -1);
 
                 let noteGroupPoints = obj.points.filter(p => p.symbol instanceof ObjNoteGroup);
@@ -494,8 +494,8 @@ export class ObjBeamGroup extends MusicObject {
                 }
             }
 
-            if (obj.tripletNumber) {
-                obj.tripletNumber.draw(renderer);
+            if (obj.tupletNumber) {
+                obj.tupletNumber.draw(renderer);
             }
         });
     }

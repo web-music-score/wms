@@ -2,9 +2,11 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { KeySignature, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList } from "@tspro/web-music-score/theory";
+import { KeySignature, Note, NoteLength, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
+import { RhythmSymbol } from "score/engine/obj-rhythm-column";
+import { ObjBeamGroup } from "score/engine/obj-beam-group";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -86,6 +88,12 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
         )
         , "staffTabOrGroup", staffTabOrGroups
     );
+}
+
+type TupletBuilder = {
+    addNote: (note: Note | string, noteLength: NoteLength, options?: NoteOptions) => void,
+    addChord: (notes: (Note | string)[], noteLength: NoteLength, options?: NoteOptions) => void,
+    addRest: (restLength: NoteLength, options?: RestOptions) => void
 }
 
 export class DocumentBuilder {
@@ -218,6 +226,47 @@ export class DocumentBuilder {
             assertRestOptions(options);
         }
         this.getMeasure().addRest(voiceId, restLength, options);
+        return this;
+    }
+
+    /**
+     * @param voiceId 
+     * @param tupletRatio - Pass { parts: number, inTimeOf: number } object, or Theory.Tuplet preset (e.g. Theory.Tuplet.Triplet).
+     * @param builder 
+     * @returns 
+     */
+    addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio, builder: (notes: TupletBuilder) => void): DocumentBuilder {
+        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+        assertArg(Utils.Is.isObject(tupletRatio) && Utils.Is.isIntegerGte(tupletRatio?.parts, 2) && Utils.Is.isIntegerGte(tupletRatio?.inTimeOf, 2), "tupletRatio", tupletRatio);
+
+        let tupletSymbols: RhythmSymbol[] = [];
+
+        const helper: TupletBuilder = {
+            addNote: (note, noteLength, options) => {
+                if (options) delete options.triplet;
+                let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, options, tupletRatio);
+                tupletSymbols.push(s);
+            },
+            addChord: (notes, noteLength, options) => {
+                if (options) delete options.triplet;
+                let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, options, tupletRatio);
+                tupletSymbols.push(s);
+            },
+            addRest: (restLength, options) => {
+                if (options) delete options.triplet;
+                let s = this.getMeasure().addRest(voiceId, restLength, options, tupletRatio);
+                tupletSymbols.push(s);
+            }
+        };
+
+        builder(helper);
+
+        // Triplets already created by ObjMeasure.createOldStyleTriplets().
+        if (tupletSymbols.every(s => s.getBeamGroup() === undefined)) {
+            // Create other tuplets.
+            ObjBeamGroup.createTuplet(tupletRatio, tupletSymbols);
+        }
+
         return this;
     }
 
