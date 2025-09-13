@@ -156,26 +156,23 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     static createTuplet(tupletRatio: TupletRatio, symbols: RhythmSymbol[]) {
-        if(tupletRatio.parts !== 3 && tupletRatio.inTimeOf !== 2) {
+        if (tupletRatio.parts !== 3 && tupletRatio.inTimeOf !== 2) {
             throw new MusicError(MusicErrorType.Score, "Only triplets are supported for now!");
         }
-
-        // max triplet note length (must have stem): TODO: Why need stem, rests do not have stem and it works.
-        let MaxTripletNoteLength = NoteLength.Half;
 
         let len = symbols.map(s => s.rhythmProps.noteLength);
 
         if (symbols.length === 2) {
             if (
-                (len[0] <= MaxTripletNoteLength && len[1] === len[0] / 2 && len[0] / 2 >= MinNoteLength) ||
-                (len[1] <= MaxTripletNoteLength && len[0] === len[1] / 2 && len[1] / 2 >= MinNoteLength)
+                (len[1] === len[0] / 2 && len[0] / 2 >= MinNoteLength) ||
+                (len[0] === len[1] / 2 && len[1] / 2 >= MinNoteLength)
             ) {
                 new ObjBeamGroup(symbols, tupletRatio);
                 return true;
             }
         }
         else if (symbols.length === 3) {
-            if (len[0] <= MaxTripletNoteLength && len.every(l => l === len[0])) {
+            if (len.every(l => l === len[0])) {
                 new ObjBeamGroup(symbols, tupletRatio);
                 return true;
             }
