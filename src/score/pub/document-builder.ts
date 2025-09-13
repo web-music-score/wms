@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { getNoteLength, KeySignature, Note, NoteLength, NoteLengthStr, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
+import { getNoteLength, KeySignature, MaxTupletRatioParts, Note, NoteLength, NoteLengthStr, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
@@ -259,7 +259,9 @@ export class DocumentBuilder {
      */
     addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio, builder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(Utils.Is.isObject(tupletRatio) && Utils.Is.isIntegerGte(tupletRatio?.parts, 2) && Utils.Is.isIntegerGte(tupletRatio?.inTimeOf, 2), "tupletRatio", tupletRatio);
+        assertArg(Utils.Is.isObject(tupletRatio) &&
+            Utils.Is.isIntegerGte(tupletRatio.parts, 2) && tupletRatio.parts <= MaxTupletRatioParts &&
+            Utils.Is.isIntegerGte(tupletRatio.inTimeOf, 2), "tupletRatio", tupletRatio);
 
         let tupletSymbols: RhythmSymbol[] = [];
 

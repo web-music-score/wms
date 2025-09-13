@@ -1,14 +1,21 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
+export const MaxTupletRatioParts = 12;
+
+/*
+ * To get integer ticks, NoteLength value must be divisible of all TupletRatio.parts values < MaxTupletRatioParts
+ */ 
+const TickMul = 12 * 11 * 9 * 7 * 5;
+
 export enum NoteLength {
-    Whole = 64 * 3, // * 3 because triplets are multiplied by 2 / 3, integer result
-    Half = 32 * 3,
-    Quarter = 16 * 3,
-    Eighth = 8 * 3,
-    Sixteenth = 4 * 3,
-    ThirtySecond = 2 * 3,
-    SixtyFourth = 1 * 3
+    Whole = 64 * TickMul, 
+    Half = 32 * TickMul,
+    Quarter = 16 * TickMul,
+    Eighth = 8 * TickMul,
+    Sixteenth = 4 * TickMul,
+    ThirtySecond = 2 * TickMul,
+    SixtyFourth = 1 * TickMul
 }
 
 export type NoteLengthStr = "1n" | "2n" | "4n" | "8n" | "16n" | "32n" | "64n";
