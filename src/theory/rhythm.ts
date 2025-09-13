@@ -49,8 +49,13 @@ export interface TupletRatio {
     inTimeOf: number;
 }
 
-export const Tuplet = {
-    Triplet: { parts: 3, inTimeOf: 2 }
+export const Tuplet: Record<"Duplet" | "Triplet" | "Quadruplet", TupletRatio> = {
+    /** 2 in the time of 3 */
+    Duplet: { parts: 2, inTimeOf: 3 },
+    /** 3 in the time of 2 */
+    Triplet: { parts: 3, inTimeOf: 2 },
+    /** 4 in the time of 3 */
+    Quadruplet: { parts: 4, inTimeOf: 3 },
 }
 
 export class RhythmProps {
@@ -79,7 +84,7 @@ export class RhythmProps {
             this.triplet = false;
             this.tupletRatio = undefined;
         }
-        
+
         this.ticks = this.noteLength;
         this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
 
