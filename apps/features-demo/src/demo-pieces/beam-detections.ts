@@ -48,6 +48,12 @@ export function createBeamDetectionDemo() {
         .addNote(0, "G3", Theory.NoteLength.Eighth, { dotted: true })
 
         .addMeasure()
+        .addNote(0, "G3", Theory.NoteLength.Eighth, { dotted: 2 })
+        .addNote(0, "G3", Theory.NoteLength.ThirtySecond)
+        .addNote(0, "G3", Theory.NoteLength.SixtyFourth)
+        .addNote(0, "G3", Theory.NoteLength.Eighth, { dotted: 3 })
+
+        .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "G3", Theory.NoteLength.Sixteenth)
         .addNote(0, "G3", Theory.NoteLength.Sixteenth)
