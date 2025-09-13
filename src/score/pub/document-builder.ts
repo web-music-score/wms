@@ -261,11 +261,7 @@ export class DocumentBuilder {
 
         builder(helper);
 
-        // Triplets already created by ObjMeasure.createOldStyleTriplets().
-        if (tupletSymbols.every(s => s.getBeamGroup() === undefined)) {
-            // Create other tuplets.
-            ObjBeamGroup.createTuplet(tupletRatio, tupletSymbols);
-        }
+        ObjBeamGroup.createTuplet(tupletRatio, tupletSymbols);
 
         return this;
     }

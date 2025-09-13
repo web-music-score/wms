@@ -795,7 +795,7 @@ export class ObjMeasure extends MusicObject {
         this.getVoiceSymbols(voiceId); // Ensures voicesymbols[voiceId] !== undefined
         this.voiceSymbols[voiceId].push(symbol);
 
-        if (symbol.triplet) {
+        if (symbol.oldStyleTriplet) {
             this.createOldStyleTriplets(voiceId);
         }
 
@@ -1015,12 +1015,12 @@ export class ObjMeasure extends MusicObject {
             let s3 = symbols.slice(i, i + 3);
 
             if (s2.length === 2 &&
-                s2.every(s => s.triplet && s.getBeamGroup() === undefined) &&
+                s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) &&
                 ObjBeamGroup.createTuplet(Tuplet.Triplet, s2)) {
                 i += 2;
             }
             else if (s3.length === 3 &&
-                s3.every(s => s.triplet && s.getBeamGroup() === undefined) &&
+                s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) &&
                 ObjBeamGroup.createTuplet(Tuplet.Triplet, s3)) {
                 i += 3;
             }

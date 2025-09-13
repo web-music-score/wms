@@ -68,6 +68,7 @@ export class ObjRest extends MusicObject {
 
     readonly color: string;
     readonly hide: boolean;
+    readonly oldStyleTriplet: boolean;
     readonly rhythmProps: RhythmProps;
 
     private beamGroup?: ObjBeamGroup;
@@ -100,6 +101,7 @@ export class ObjRest extends MusicObject {
 
         this.color = options?.color ?? "black";
         this.hide = options?.hide ?? false;
+        this.oldStyleTriplet = tupletRatio === undefined && options?.triplet === true;
         this.rhythmProps = tupletRatio
             ? new RhythmProps(noteLength, options?.dotted, tupletRatio)
             : new RhythmProps(noteLength, options?.dotted, options?.triplet);
@@ -133,10 +135,6 @@ export class ObjRest extends MusicObject {
 
     get stemDir(): Stem.Up | Stem.Down {
         return this.beamGroup ? this.beamGroup.stemDir : this.ownStemDir;
-    }
-
-    get triplet() {
-        return this.rhythmProps.triplet;
     }
 
     getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {

@@ -153,6 +153,7 @@ export class ObjNoteGroup extends MusicObject {
     readonly staccato: boolean;
     readonly diamond: boolean;
     readonly arpeggio: Arpeggio | undefined;
+    readonly oldStyleTriplet: boolean;
     readonly rhythmProps: RhythmProps;
 
     private startConnnectives: ConnectiveProps[] = [];
@@ -189,6 +190,7 @@ export class ObjNoteGroup extends MusicObject {
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = solveArpeggio(options?.arpeggio);
+        this.oldStyleTriplet = tupletRatio === undefined && options?.triplet === true;
         this.rhythmProps = tupletRatio
             ? new RhythmProps(noteLength, options?.dotted, tupletRatio)
             : new RhythmProps(noteLength, options?.dotted, options?.triplet);
@@ -214,10 +216,6 @@ export class ObjNoteGroup extends MusicObject {
 
     get stemDir(): Stem.Up | Stem.Down {
         return this.beamGroup ? this.beamGroup.stemDir : this.ownStemDir;
-    }
-
-    get triplet() {
-        return this.rhythmProps.triplet;
     }
 
     enableConnective(line: ObjNotationLine): boolean {
