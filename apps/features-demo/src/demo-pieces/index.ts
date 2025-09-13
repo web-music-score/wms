@@ -8,7 +8,7 @@ import { createFermataDemo } from "demo-pieces/fermata";
 import { createStaccatoDemo } from "demo-pieces/staccato";
 import { createSignatureChangeDemo } from "demo-pieces/signature-change";
 import { createGrandStaffDemo } from "./grand-staff";
-import { createTripletsDemo } from "./triplets";
+import { createTupletsDemo } from "./tuplets";
 import { createTempoAnnotationDemo } from "./tempo-annotation";
 import { createDynamicsAnnotationDemo } from "./dynamics-annotation";
 import { createCompleteRestsDemo } from "./complete-rests";
@@ -43,7 +43,7 @@ export class DemoPieces {
         demos.push(createDaCapoDemo());
         demos.push(createDalSegnoDemo());
         demos.push(createBeamDetectionDemo());
-        demos.push(createTripletsDemo());
+        demos.push(createTupletsDemo());
         demos.push(createConnectivesDemo());
         demos.push(createFermataDemo());
         demos.push(createStaccatoDemo());

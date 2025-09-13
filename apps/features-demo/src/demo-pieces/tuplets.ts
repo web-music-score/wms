@@ -1,18 +1,15 @@
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
-export function createTripletsDemo() {
+export function createTupletsDemo() {
     return new Score.DocumentBuilder()
         .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
-        .setHeader("Triplets")
+        .setHeader("Tuplets")
 
         .addMeasure()
         .setKeySignature("G", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(80)
-        //.addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
-        //.addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        //.addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
         .addTuplet(0, Theory.Tuplet.Triplet, notes => {
             notes.addNote("G3", Theory.NoteLength.Eighth);
             notes.addNote("B3", Theory.NoteLength.Eighth);
