@@ -5,11 +5,11 @@ export const MaxTupletRatioParts = 12;
 
 /*
  * To get integer ticks, NoteLength value must be divisible of all TupletRatio.parts values < MaxTupletRatioParts
- */ 
+ */
 const TickMul = 12 * 11 * 9 * 7 * 5;
 
 export enum NoteLength {
-    Whole = 64 * TickMul, 
+    Whole = 64 * TickMul,
     Half = 32 * TickMul,
     Quarter = 16 * TickMul,
     Eighth = 8 * TickMul,
@@ -18,7 +18,9 @@ export enum NoteLength {
     SixtyFourth = 1 * TickMul
 }
 
-export type NoteLengthStr = "1n" | "2n" | "4n" | "8n" | "16n" | "32n" | "64n";
+export type NoteLengthStr =
+    "1n" | "2n" | "4n" | "8n" | "16n" | "32n" | "64n" |
+    "1t" | "2t" | "4t" | "8t" | "16t" | "32t" | "64t";
 
 export const MaxNoteLength = NoteLength.Whole;
 
@@ -51,8 +53,19 @@ const NoteLengthStrMap = new Map<NoteLengthStr, NoteLength>([
     ["8n", NoteLength.Eighth],
     ["16n", NoteLength.Sixteenth],
     ["32n", NoteLength.ThirtySecond],
-    ["64n", NoteLength.SixtyFourth]
+    ["64n", NoteLength.SixtyFourth],
+    ["1t", NoteLength.Whole],
+    ["2t", NoteLength.Half],
+    ["4t", NoteLength.Quarter],
+    ["8t", NoteLength.Eighth],
+    ["16t", NoteLength.Sixteenth],
+    ["32t", NoteLength.ThirtySecond],
+    ["64t", NoteLength.SixtyFourth],
 ]);
+
+export function hasNoteLengthTriplet(noteLength: NoteLength | NoteLengthStr): boolean {
+    return typeof noteLength === "string" && noteLength.endsWith("t");
+}
 
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
@@ -106,6 +119,9 @@ export class RhythmProps {
         }
         else if (Utils.Is.isObject(tupletArg)) {
             this.tupletRatio = tupletArg;
+        }
+        else if (hasNoteLengthTriplet(noteLength)) {
+            this.tupletRatio = Tuplet.Triplet;
         }
         else {
             this.tupletRatio = undefined;

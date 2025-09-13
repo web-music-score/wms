@@ -10,6 +10,7 @@ export function createTupletsDemo() {
         .setKeySignature("G", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
         .setTempo(80)
+
         .addTuplet(0, Theory.Tuplet.Triplet, notes => {
             notes.addNote("G3", Theory.NoteLength.Eighth);
             notes.addNote("B3", Theory.NoteLength.Eighth);
@@ -19,9 +20,9 @@ export function createTupletsDemo() {
         .addNote(0, "D4", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
 
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "D4", "8t")
+        .addNote(0, "B3", "8t")
+        .addNote(0, "G3", "8t")
 
         .addNote(0, "B3", Theory.NoteLength.Quarter)
 
