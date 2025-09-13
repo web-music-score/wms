@@ -4,7 +4,7 @@ export type Tempo = {
     beatsPerMinute: number,
     options: {
         beatLength: NoteLength,
-        dotted: boolean // FIXME: dotCount
+        dotCount: number
     }
 }
 
@@ -12,19 +12,19 @@ let defaultTempo: Tempo | undefined;
 
 export function getDefaultTempo(): Readonly<Tempo> {
     if (!defaultTempo) {
-        defaultTempo = { beatsPerMinute: 120, options: { beatLength: NoteLength.Quarter, dotted: false } }
+        defaultTempo = { beatsPerMinute: 120, options: { beatLength: NoteLength.Quarter, dotCount: 0 } }
     }
     return defaultTempo;
 }
 
 export function getTempoString(tempo: Tempo) {
-    return new RhythmProps(tempo.options.beatLength, tempo.options.dotted ? 1 : 0).toString() + "=" + tempo.beatsPerMinute;
+    return new RhythmProps(tempo.options.beatLength, tempo.options.dotCount).toString() + "=" + tempo.beatsPerMinute;
 }
 
 
 export function alterTempoSpeed(tempo: Tempo, speed: number): Tempo {
     return {
         beatsPerMinute: tempo.beatsPerMinute * speed,
-        options: { beatLength: tempo.options.beatLength, dotted: tempo.options.dotted }
+        options: { beatLength: tempo.options.beatLength, dotCount: tempo.options.dotCount }
     }
 }

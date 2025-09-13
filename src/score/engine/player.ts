@@ -18,7 +18,7 @@ const CrescendoVolumeAdd = 0.5;
 const DiminuendoVolumeSub = 0.5;
 
 function calcTicksDuration(ticks: number, tempo: Tempo): number {
-    let beatTicks = new RhythmProps(tempo.options.beatLength, tempo.options.dotted ? 1 : 0).ticks; // FIXME
+    let beatTicks = new RhythmProps(tempo.options.beatLength, tempo.options.dotCount).ticks;
     let ticksPerMinute = tempo.beatsPerMinute * beatTicks;
     return 60 * ticks / ticksPerMinute;
 }

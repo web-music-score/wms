@@ -13,7 +13,7 @@ import { ObjConnective } from "./obj-connective";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
-import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
+import { ObjBeamGroup } from "./obj-beam-group";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
@@ -30,7 +30,7 @@ type AlterTempo = {
     beatsPerMinute: number,
     options?: {
         beatLength: NoteLength,
-        dotted?: boolean
+        dotCount?: number
     }
 }
 
@@ -403,11 +403,11 @@ export class ObjMeasure extends MusicObject {
         return this.tempo;
     }
 
-    setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean) {
+    setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean | number) {
         this.getPrevMeasure()?.endSection();
 
-        let options = beatLength !== undefined ? { beatLength, dotted } : undefined
-
+        let dotCount = typeof dotted === "number" ? dotted : (dotted === true ? 1 : undefined)
+        let options = beatLength !== undefined ? { beatLength, dotCount } : undefined
         this.alterTempo = { beatsPerMinute, options }
 
         this.updateTempo();
@@ -420,22 +420,22 @@ export class ObjMeasure extends MusicObject {
             let beatsPerMinute = this.alterTempo.beatsPerMinute;
 
             let beatLength: NoteLength;
-            let dotted: boolean;
+            let dotCount: number;
 
             if (this.alterTempo.options) {
                 beatLength = this.alterTempo.options.beatLength;
-                dotted = this.alterTempo.options.dotted ?? false;
+                dotCount = this.alterTempo.options.dotCount ?? 0;
             }
             else if (this.alterTimeSignature) {
                 beatLength = this.alterTimeSignature.beatLength;
-                dotted = false;
+                dotCount = 0;
             }
             else {
                 beatLength = this.tempo.options.beatLength;
-                dotted = this.tempo.options.dotted;
+                dotCount = this.tempo.options.dotCount;
             }
 
-            this.tempo = { beatsPerMinute, options: { beatLength, dotted } }
+            this.tempo = { beatsPerMinute, options: { beatLength, dotCount } }
         }
 
         if (this.nextMeasure) {
