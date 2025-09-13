@@ -92,8 +92,6 @@ export const Tuplet: Record<"Duplet" | "Triplet" | "Quadruplet", TupletRatio> = 
 export class RhythmProps {
     readonly noteLength: NoteLength;
     readonly dotted: boolean;
-    /** @deprecated - replaced by tupletRatio */
-    readonly triplet: boolean;
     readonly tupletRatio?: TupletRatio;
     readonly ticks: number;
     readonly flagCount: number;
@@ -104,15 +102,12 @@ export class RhythmProps {
         this.noteLength = getNoteLength(noteLength);
         this.dotted = dotted === true;
         if (typeof tupletArg === "boolean") {
-            this.triplet = tupletArg;
             this.tupletRatio = tupletArg ? Tuplet.Triplet : undefined;
         }
         else if (Utils.Is.isObject(tupletArg)) {
-            this.triplet = tupletArg.parts === 3 && tupletArg.inTimeOf === 2;
             this.tupletRatio = tupletArg;
         }
         else {
-            this.triplet = false;
             this.tupletRatio = undefined;
         }
 
