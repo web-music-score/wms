@@ -97,7 +97,7 @@ export class ObjBeamGroup extends MusicObject {
     readonly mi: MBeamGroup;
 
     private readonly type: BeamGroupType;
-
+    private readonly showTupletRatio = false;
     private readonly staffObjects: ObjStaffBeamGroup[] = [];
 
     private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio | undefined) {
@@ -377,7 +377,11 @@ export class ObjBeamGroup extends MusicObject {
             }
 
             if (this.isTuplet() && this.tupletRatio) {
-                obj.tupletNumber = new ObjText(this, String(this.tupletRatio.parts), 0.5, 0.5);
+                let txt = this.showTupletRatio
+                    ? String(this.tupletRatio.parts) + ":" + String(this.tupletRatio.inTimeOf)
+                    : String(this.tupletRatio.parts);
+
+                obj.tupletNumber = new ObjText(this, txt, 0.5, 0.5);
 
                 obj.tupletNumber.layout(renderer);
                 obj.tupletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + obj.tupletNumberOffsetY);
