@@ -119,7 +119,7 @@ export class ObjBeamGroup extends MusicObject {
                 symbols.some(s => s.rhythmProps.flagCount !== symbols[0].rhythmProps.flagCount);
 
             // There can be rest between edge notes, no group needed.
-            if (symbols.length === 3 &&
+            if (symbols.length >= 3 &&
                 symbols[0] instanceof ObjNoteGroup &&
                 symbols[symbols.length - 1] instanceof ObjNoteGroup &&
                 symbols[0].rhythmProps.flagCount === symbols[symbols.length - 1].rhythmProps.flagCount) {
