@@ -376,8 +376,8 @@ export class ObjBeamGroup extends MusicObject {
                 obj.tupletNumberOffsetY = groupLineDy;
             }
 
-            if (this.isTuplet()) {
-                obj.tupletNumber = new ObjText(this, "3", 0.5, 0.5);
+            if (this.isTuplet() && this.tupletRatio) {
+                obj.tupletNumber = new ObjText(this, String(this.tupletRatio.parts), 0.5, 0.5);
 
                 obj.tupletNumber.layout(renderer);
                 obj.tupletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + obj.tupletNumberOffsetY);
