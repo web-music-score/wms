@@ -191,9 +191,12 @@ export class ObjNoteGroup extends MusicObject {
         this.diamond = options?.diamond ?? false;
         this.arpeggio = solveArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || hasNoteLengthTriplet(noteLength));
+
+        let dotCount = typeof options?.dotted === "number" ? options.dotted : (options?.dotted === true ? 1 : undefined);
+
         this.rhythmProps = tupletRatio
-            ? new RhythmProps(noteLength, options?.dotted, tupletRatio)
-            : new RhythmProps(noteLength, options?.dotted, options?.triplet);
+            ? new RhythmProps(noteLength, dotCount, tupletRatio)
+            : new RhythmProps(noteLength, dotCount, options?.triplet);
 
         this.mi = new MNoteGroup(this);
     }
@@ -560,7 +563,7 @@ export class ObjNoteGroup extends MusicObject {
 
         let { unitSize } = renderer;
         let { row, stemDir } = this;
-        let { dotted, flagCount } = this.rhythmProps;
+        let { dotCount, flagCount } = this.rhythmProps;
 
         let dotWidth = DocumentSettings.DotSize * unitSize;
 
@@ -607,9 +610,9 @@ export class ObjNoteGroup extends MusicObject {
                     noteStaff.addObject(acc);
                 }
 
-                // Add dot
-                if (dotted) {
-                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2;
+                // Add dots
+                for (let i = 0; i < dotCount; i++) {
+                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2 + i * dotWidth * 1.5;
                     let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
 
                     let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
@@ -844,7 +847,7 @@ export class ObjNoteGroup extends MusicObject {
 
         const isADottedBHalf = (a: ObjNoteGroup, b: ObjNoteGroup) => {
             return a.rhythmProps.noteLength === b.rhythmProps.noteLength * 2 &&
-                a.rhythmProps.dotted && !b.rhythmProps.dotted &&
+                a.rhythmProps.dotCount === 1 && b.rhythmProps.dotCount === 0 && // FIXME? 
                 a.rhythmProps.flagCount > 0 && b.rhythmProps.flagCount > 0;
         }
 

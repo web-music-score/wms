@@ -1149,25 +1149,20 @@ export class ObjMeasure extends MusicObject {
 
         while (remainingTicks > 0) {
             noteLengthValues.forEach(restLength => {
-                let restValue = new RhythmProps(restLength, false);
-
-                if (restValue.canDot()) {
-                    let dottedRestValue = new RhythmProps(restLength, true);
-                    while (dottedRestValue.ticks <= remainingTicks) {
-                        rests.push(dottedRestValue);
-                        remainingTicks -= dottedRestValue.ticks;
+                for (let dotCount = 6; dotCount >= 0; dotCount--) {
+                    try {
+                        let restValue = new RhythmProps(restLength, dotCount);
+                        while (restValue.ticks <= remainingTicks) {
+                            rests.push(restValue);
+                            remainingTicks -= restValue.ticks;
+                        }
                     }
-                }
-
-                while (restValue.ticks <= remainingTicks) {
-                    rests.push(restValue);
-                    remainingTicks -= restValue.ticks;
+                    catch (e) { }
                 }
             });
-
         }
 
-        rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotted }));
+        rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotCount }));
     }
 
     requestLayout() {

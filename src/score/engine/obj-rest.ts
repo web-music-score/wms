@@ -27,7 +27,7 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
 
 export class ObjStaffRest extends MusicObject {
     public restRect = new DivRect();
-    public dotRect?: DivRect;
+    public dotRects: DivRect[] = [];
 
     readonly mi: MStaffRest;
 
@@ -49,16 +49,14 @@ export class ObjStaffRest extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.restRect.offsetInPlace(dx, dy);
-        this.dotRect?.offsetInPlace(dx, dy);
+        this.dotRects.forEach(r => r.offsetInPlace(dx, dy));
         this.requestRectUpdate();
         this.rest.requestRectUpdate();
     }
 
     updateRect(): void {
         this.rect = this.restRect.copy();
-        if (this.dotRect) {
-            this.rect.expandInPlace(this.dotRect);
-        }
+        this.dotRects.forEach(r => this.rect.expandInPlace(r));
     }
 }
 
@@ -102,9 +100,12 @@ export class ObjRest extends MusicObject {
         this.color = options?.color ?? "black";
         this.hide = options?.hide ?? false;
         this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || hasNoteLengthTriplet(noteLength));
+
+        let dotCount = typeof options?.dotted === "number" ? options.dotted : (options?.dotted === true ? 1 : undefined);
+
         this.rhythmProps = tupletRatio
-            ? new RhythmProps(noteLength, options?.dotted, tupletRatio)
-            : new RhythmProps(noteLength, options?.dotted, options?.triplet);
+            ? new RhythmProps(noteLength, dotCount, tupletRatio)
+            : new RhythmProps(noteLength, dotCount, options?.triplet);
 
         this.mi = new MRest(this);
     }
@@ -127,10 +128,6 @@ export class ObjRest extends MusicObject {
 
     get noteLength() {
         return this.rhythmProps.noteLength;
-    }
-
-    get dotted() {
-        return this.rhythmProps.dotted;
     }
 
     get stemDir(): Stem.Up | Stem.Down {
@@ -222,7 +219,7 @@ export class ObjRest extends MusicObject {
 
         let { unitSize } = renderer;
         let { ownDiatonicId } = this;
-        let { noteLength, dotted, flagCount } = this.rhythmProps;
+        let { noteLength, dotCount, flagCount } = this.rhythmProps;
 
         let leftw = 0;
         let rightw = 0;
@@ -264,13 +261,13 @@ export class ObjRest extends MusicObject {
 
             obj.restRect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
 
-            if (dotted) {
+            for (let i = 0; i < dotCount; i++) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
 
-                let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize / 2) * unitSize;
+                let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
                 let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
 
-                obj.dotRect = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                obj.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
             }
 
             obj.offset(0, staff.getDiatonicIdY(ownDiatonicId));
@@ -315,7 +312,7 @@ export class ObjRest extends MusicObject {
         ctx.lineWidth = lineWidth;
 
         this.staffObjects.forEach(obj => {
-            let { dotRect, restRect } = obj;
+            let { dotRects, restRect } = obj;
 
             let x = restRect.centerX;
             let y = restRect.centerY;
@@ -378,9 +375,9 @@ export class ObjRest extends MusicObject {
                 }
             }
 
-            if (dotRect) {
-                renderer.fillCircle(dotRect.centerX, dotRect.centerY, dotRect.width / 2);
-            }
+            dotRects.forEach(r => {
+                renderer.fillCircle(r.centerX, r.centerY, r.width / 2);
+            });
         });
     }
 }

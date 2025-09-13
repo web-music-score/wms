@@ -69,7 +69,7 @@ export type StaffTabOrGroup = number | string;
 export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
 export type NoteOptions = {
-    dotted?: boolean,
+    dotted?: boolean | number,
     stem?: Stem,
     color?: string,
     arpeggio?: Arpeggio | boolean,
@@ -80,7 +80,7 @@ export type NoteOptions = {
 }
 
 export type RestOptions = {
-    dotted?: boolean,
+    dotted?: boolean | number,
     staffPos?: Note | string | number, // Note, "C3", or midiNumber
     color?: string,
     hide?: boolean,

@@ -4,7 +4,7 @@ export type Tempo = {
     beatsPerMinute: number,
     options: {
         beatLength: NoteLength,
-        dotted: boolean
+        dotted: boolean // FIXME: dotCount
     }
 }
 
@@ -18,7 +18,7 @@ export function getDefaultTempo(): Readonly<Tempo> {
 }
 
 export function getTempoString(tempo: Tempo) {
-    return new RhythmProps(tempo.options.beatLength, tempo.options.dotted).toString() + "=" + tempo.beatsPerMinute;
+    return new RhythmProps(tempo.options.beatLength, tempo.options.dotted ? 1 : 0).toString() + "=" + tempo.beatsPerMinute;
 }
 
 

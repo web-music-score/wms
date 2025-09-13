@@ -57,7 +57,7 @@ function assertTabConfig(tabConfig: TabConfig) {
 
 function assertNoteOptions(options: NoteOptions) {
     assertArg(Utils.Is.isObject(options), "noteOptions", options);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted), "noteOptions.dotted", options.dotted);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted) || Utils.Is.isIntegerGte(options.dotted, 0), "noteOptions.dotted", options.dotted);
     assertArg(Utils.Is.isEnumValueOrUndefined(options.stem, Stem), "noteOptions.stem", options.stem);
     assertArg(Utils.Is.isStringOrUndefined(options.color), "noteOptions.color", options.color);
     assertArg(Utils.Is.isBooleanOrUndefined(options.arpeggio) || Utils.Is.isEnumValue(options.arpeggio, Arpeggio), "noteOptions.arpeggio", options.arpeggio);
@@ -73,7 +73,7 @@ function assertNoteOptions(options: NoteOptions) {
 
 function assertRestOptions(options: RestOptions) {
     assertArg(Utils.Is.isObject(options), "restOptions", options);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted), "restOptions.dotted", options.dotted);
+    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted) || Utils.Is.isIntegerGte(options.dotted, 0), "restOptions.dotted", options.dotted);
     assertArg(Utils.Is.isStringOrUndefined(options.staffPos) || Utils.Is.isInteger(options.staffPos) || options.staffPos instanceof Note, "restOptions.staffPos", options.staffPos);
     assertArg(Utils.Is.isStringOrUndefined(options.color), "restOptions.color", options.color);
     assertArg(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide", options.hide);
