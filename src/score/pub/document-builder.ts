@@ -197,13 +197,13 @@ export class DocumentBuilder {
         return this;
     }
 
-    setTempo(beatsPerMinute: number, beatLength?: NoteLength, dotted?: boolean | number): DocumentBuilder {
+    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr, dotted?: boolean | number): DocumentBuilder {
         assertArg(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
         if (beatLength === undefined) {
             assertArg(Utils.Is.isUndefined(dotted), "dotted", dotted);
         }
         else {
-            assertArg(Utils.Is.isEnumValue(beatLength, NoteLength), "beatLength", beatLength);
+            assertArg(Utils.Is.isEnumValue(beatLength, NoteLength) || isNoteLengthStr(beatLength), "beatLength", beatLength);
             assertArg(Utils.Is.isBooleanOrUndefined(dotted) || Utils.Is.isIntegerGte(dotted, 0), "dotted", dotted);
         }
         this.getMeasure().setTempo(beatsPerMinute, beatLength, dotted);

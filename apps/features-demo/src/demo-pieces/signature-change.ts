@@ -9,7 +9,7 @@ export function createSignatureChangeDemo() {
         .addMeasure()
         .setKeySignature("Db", Theory.ScaleType.Major)
         .setTimeSignature("4/4")
-        .setTempo(100)
+        .setTempo(100, "8...")
         .addNote(0, "Db3", Theory.NoteLength.Quarter)
         .addNote(0, "Db3", Theory.NoteLength.Quarter)
         .addNote(0, "Db3", Theory.NoteLength.Quarter)
