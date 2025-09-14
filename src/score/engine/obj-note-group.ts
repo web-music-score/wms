@@ -192,7 +192,9 @@ export class ObjNoteGroup extends MusicObject {
         this.arpeggio = solveArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || hasNoteLengthTriplet(noteLength));
 
-        let dotCount = typeof options?.dotted === "number" ? options.dotted : (options?.dotted === true ? 1 : undefined);
+        let dotCount = typeof options?.dotted === "number"
+            ? (options.dotted > 0 ? options.dotted : undefined)
+            : (options?.dotted === true ? 1 : undefined);
 
         this.rhythmProps = tupletRatio
             ? new RhythmProps(noteLength, dotCount, tupletRatio)
