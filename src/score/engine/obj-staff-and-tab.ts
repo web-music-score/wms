@@ -169,10 +169,13 @@ export class ObjStaff extends ObjNotationLine {
             this.clefLineDiatonicId = getDiatonicId("G4", staffConfig.isOctaveDown === true);
             this.middleLineDiatonicId = this.clefLineDiatonicId + 2;
         }
-        else {
+        else if (staffConfig.clef === Clef.F) {
             this.clefImageAsset = ImageAsset.BassClefPng;
             this.clefLineDiatonicId = getDiatonicId("F3", staffConfig.isOctaveDown === true);
             this.middleLineDiatonicId = this.clefLineDiatonicId - 2;
+        }
+        else {
+            throw new MusicError(MusicErrorType.Score, `Invalid staffConfig.clef ${staffConfig.clef}.`);
         }
 
         this.topLineDiatonicId = this.middleLineDiatonicId + 4;

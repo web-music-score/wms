@@ -106,7 +106,7 @@ Documents are created using `DocumentBuilder`.
 
 ```js
 let doc = new Score.DocumentBuilder()
-    .addScoreConfiguration({ type: "staff", clef: Score.Clef.G, isOctavewDown: true })
+    .addScoreConfiguration({ type: "staff", clef: "G", isOctavewDown: true })
     .setMeasuresPerRow(4)
     .addMeasure()
     .addNote(1, "C3", "4n")
@@ -121,8 +121,8 @@ Setting score configuration takes place in first measure of next row.
 
 #### Using preset values
 ```js
-builder.setScoreConfiguration(Score.StaffPreset.Treble);         // Staff with treble (G-) clef.
-builder.setScoreConfiguration(Score.StaffPreset.Bass);           // Staff with bass (F-) clef.
+builder.setScoreConfiguration(Score.StaffPreset.Treble);         // Staff with treble G-clef.
+builder.setScoreConfiguration(Score.StaffPreset.Bass);           // Staff with bass F-clef.
 builder.setScoreConfiguration(Score.StaffPreset.Grand);          // Both treble and bas staves.
 builder.setScoreConfiguration(Score.StaffPreset.GuitarTreble);   // Same as `Treble` but one octave down.
 builder.setScoreConfiguration(Score.StaffPreset.GuitarTab);      // Guitar tab only.
@@ -131,11 +131,11 @@ builder.setScoreConfiguration(Score.StaffPreset.GuitarCombined); // Treble and t
 
 #### Using configuration objects
 ```js
-builder.setScoreConfiguration({ type: "staff", clef: Score.Clef.G}); // Staff with treble (G-) clef.
-builder.setScoreConfiguration({ type: "staff", clef: Score.Clef.F}); // Staff with bass (F-) clef.
+builder.setScoreConfiguration({ type: "staff", clef: "G"}); // Staff with treble G-clef.
+builder.setScoreConfiguration({ type: "staff", clef: "F"}); // Staff with bass F-clef.
 builder.setScoreConfiguration({
     type: "staff",
-    clef: Score.Clef.G,  // G-clef
+    clef: "G",           // G-clef
     isOctaveDown: false, // (optional) octave down
     name: "staff1",      // (optional) staff name
     minNote: "C2",       // (optional) min allowed note
@@ -143,11 +143,11 @@ builder.setScoreConfiguration({
     voiceIds: [0, 1]     // (optional) only present voices 0 and 1 in this staff
 });
 builder.setScoreConfiguration([
-    { type: "staff", clef: Score.Clef.G, isGrand: true },
-    { type: "staff", clef: Score.Clef.F, isGrand: true }
+    { type: "staff", clef: "G", isGrand: true },
+    { type: "staff", clef: "F", isGrand: true }
 ]); // Grand staff
 builder.setScoreConfiguration([
-    { type: "staff", clef: Score.Clef.G, isOctaveDown: true },
+    { type: "staff", clef: "G", isOctaveDown: true },
     { type: "tab", tuning: "Drop D" }
 ]); // Staff and tab for guitar, tab with Drop D tuning.
 builder.setScoreConfiguration(

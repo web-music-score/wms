@@ -20,7 +20,7 @@ export enum Clef { G = "G", F = "F" }
 
 export type StaffConfig = {
     type: "staff",
-    clef: Clef,
+    clef: "G" | "F",
     name?: string,
     isOctaveDown?: boolean,
     minNote?: string,
