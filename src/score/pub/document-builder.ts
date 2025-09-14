@@ -305,19 +305,19 @@ export class DocumentBuilder {
         return this;
     }
 
-    private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata): DocumentBuilder {
+    private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata | `${Fermata}`): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(fermata, Fermata), "fermata", fermata);
-        this.getMeasure().addFermata(staffTabOrGroups, fermata);
+        this.getMeasure().addFermata(staffTabOrGroups, fermata as Fermata);
         return this;
     }
 
-    addFermata(fermata = Fermata.AtNote): DocumentBuilder {
+    addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         return this.addFermataInternal(undefined, fermata);
     }
 
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata = Fermata.AtNote): DocumentBuilder {
+    addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         return this.addFermataInternal(staffTabOrGroups, fermata);
     }
 
@@ -385,9 +385,9 @@ export class DocumentBuilder {
         return this.addAnnotationInternal(staffTabOrGroups, annotation, text);
     }
 
-    addConnective(connective: Connective.Tie | `${Connective.Tie}`, tieSpan?: number | TieType | `${TieType}`, notAnchor?: NoteAnchor): DocumentBuilder;
-    addConnective(connective: Connective.Slur | `${Connective.Slur}`, slurSpan?: number, notAnchor?: NoteAnchor): DocumentBuilder;
-    addConnective(connective: Connective.Slide | `${Connective.Slide}`, notAnchor?: NoteAnchor): DocumentBuilder;
+    addConnective(connective: Connective.Tie | `${Connective.Tie}`, tieSpan?: number | TieType | `${TieType}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: Connective.Slur | `${Connective.Slur}`, slurSpan?: number, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: Connective.Slide | `${Connective.Slide}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
     addConnective(connective: Connective | `${Connective}`, ...args: unknown[]): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
 
@@ -432,7 +432,7 @@ export class DocumentBuilder {
      * @param verticalPosition - Vertical position, are elements added above, below or both.
      * @returns 
      */
-    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition = VerticalPosition.Auto): DocumentBuilder {
+    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPosition | `${VerticalPosition}` = VerticalPosition.Auto): DocumentBuilder {
         assertArg(Utils.Is.isString(groupName) && groupName.length > 0, "groupName", groupName);
         assertArg(
             Utils.Is.isString(staffsTabsAndGroups) && staffsTabsAndGroups.length > 0 || Utils.Is.isIntegerGte(staffsTabsAndGroups, 0) ||
@@ -440,7 +440,7 @@ export class DocumentBuilder {
             "staffsTabsAndGroups", staffsTabsAndGroups
         );
         assertArg(Utils.Is.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
-        this.doc.addStaffGroup(groupName, staffsTabsAndGroups, verticalPosition);
+        this.doc.addStaffGroup(groupName, staffsTabsAndGroups, verticalPosition as VerticalPosition);
         return this;
     }
 

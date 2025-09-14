@@ -56,11 +56,11 @@ export enum Arpeggio { Up = "up", Down = "down" }
 
 export enum TieType { Stub = "stub", ToMeasureEnd = "toMeasureEnd" }
 
-export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
+export enum NoteAnchor { Auto = "auto", Above = "above", Center = "center", Below = "below", StemTip = "stemTip" }
 
 export enum Connective { Tie = "tie", Slur = "slur", Slide = "slide" }
 
-export enum VerticalPosition { Auto, Above, Below, Both }
+export enum VerticalPosition { Auto = "auto", Above = "above", Below = "below", Both = "both" }
 
 export type StaffTabOrGroup = number | string;
 
@@ -90,8 +90,8 @@ export type TupletOptions = {
 }
 
 export enum Fermata {
-    AtNote,
-    AtMeasureEnd
+    AtNote = "atNote",
+    AtMeasureEnd = "atMeasureEnd"
 }
 
 export enum Navigation {
