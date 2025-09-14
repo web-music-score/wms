@@ -18,11 +18,9 @@ export enum StaffPreset {
 
 export enum Clef { G = "G", F = "F" }
 
-export type TClef = "G" | "F";
-
 export type StaffConfig = {
     type: "staff",
-    clef: TClef,
+    clef: Clef | `${Clef}`,
     name?: string,
     isOctaveDown?: boolean,
     minNote?: string,
