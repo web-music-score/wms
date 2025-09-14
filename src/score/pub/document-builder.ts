@@ -321,7 +321,7 @@ export class DocumentBuilder {
         return this.addFermataInternal(staffTabOrGroups, fermata);
     }
 
-    private addNavigationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+    private addNavigationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
         if (navigation === Navigation.EndRepeat && args.length > 0) {
@@ -330,59 +330,59 @@ export class DocumentBuilder {
         else if (navigation === Navigation.Ending && args.length > 0) {
             assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
         }
-        this.getMeasure().addNavigation(staffTabOrGroups, navigation, ...args);
+        this.getMeasure().addNavigation(staffTabOrGroups, navigation as Navigation, ...args);
         return this;
     }
 
-    addNavigation(navigation: Navigation): DocumentBuilder;
-    addNavigation(navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
-    addNavigation(navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
-    addNavigation(navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+    addNavigation(navigation: Navigation | `${Navigation}`): DocumentBuilder;
+    addNavigation(navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigation(navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigation(navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         return this.addNavigationInternal(undefined, navigation, ...args);
     }
 
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`): DocumentBuilder;
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.EndRepeat, playCount: number): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.Ending, ...passages: number[]): DocumentBuilder;
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation, ...args: unknown[]): DocumentBuilder {
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         return this.addNavigationInternal(staffTabOrGroups, navigation, ...args);
     }
 
-    private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label, text: string): DocumentBuilder {
-        assertStaffTabOrGRoups(staffTabOrGroups);
-        assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
-        assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addLabel(staffTabOrGroups, label, text);
-        return this;
-    }
-
-    addLabel(label: Label, text: string): DocumentBuilder {
-        return this.addLabelInternal(undefined, label, text);
-    }
-
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addLabelTo(staffTabOrGroups: StaffTabOrGroups, label: Label, text: string): DocumentBuilder {
-        return this.addLabelInternal(staffTabOrGroups, label, text);
-    }
-
-    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string): DocumentBuilder {
+    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
-        this.getMeasure().addAnnotation(staffTabOrGroups, annotation, text);
+        this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Annotation, text);
         return this;
     }
 
-    addAnnotation(annotation: Annotation, text: string): DocumentBuilder {
+    addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder {
         return this.addAnnotationInternal(undefined, annotation, text);
     }
 
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation, text: string): DocumentBuilder {
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder {
         return this.addAnnotationInternal(staffTabOrGroups, annotation, text);
+    }
+
+    private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
+        assertStaffTabOrGRoups(staffTabOrGroups);
+        assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
+        assertArg(Utils.Is.isString(text), "text", text);
+        this.getMeasure().addLabel(staffTabOrGroups, label as Label, text);
+        return this;
+    }
+
+    addLabel(label: Label | `${Label}`, text: string): DocumentBuilder {
+        return this.addLabelInternal(undefined, label, text);
+    }
+
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addLabelTo(staffTabOrGroups: StaffTabOrGroups, label: Label | `${Label}`, text: string): DocumentBuilder {
+        return this.addLabelInternal(staffTabOrGroups, label, text);
     }
 
     addConnective(connective: Connective.Tie | `${Connective.Tie}`, tieSpan?: number | TieType | `${TieType}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;

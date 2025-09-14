@@ -96,53 +96,53 @@ export enum Fermata {
 
 export enum Navigation {
     /** Repeat back to beginning and play to the "Fine" marking. */
-    DC_al_Fine,
+    DC_al_Fine = "DC_al_Fine",
 
     /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
-    DC_al_Coda,
+    DC_al_Coda = "DC_al_Coda",
 
     /** Repeat back to Segno sign (𝄋) and play to the "Fine" marking. */
-    DS_al_Fine,
+    DS_al_Fine = "DS_al_Fine",
 
     /** Repeat back to Segno sign (𝄋) and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
-    DS_al_Coda,
+    DS_al_Coda = "DS_al_Coda",
 
     /** "𝄌 Coda" section. */
-    Coda,
+    Coda = "Coda",
 
     /** From "toCoda 𝄌" jump to the "𝄌 Coda" section. */
-    toCoda,
+    toCoda = "toCoda",
 
     /** Jump here from D.S. al Fine or D.S. al Coda. */
-    Segno,
+    Segno = "Segno",
 
     /** Stop playing after D.C. al Fine or D.S. al Fine. */
-    Fine,
+    Fine = "Fine",
 
     /** Start of repeat section. */
-    StartRepeat,
+    StartRepeat = "startRepeat",
 
     /** End of repeat section. Jump to start of repeat section. */
-    EndRepeat,
+    EndRepeat = "endRepeat",
 
     /** Jump to ending with correct passage number. */
-    Ending
+    Ending = "ending"
 }
 
 export enum Annotation {
     /** "ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim." */
-    Dynamics,
+    Dynamics = "dynamics",
 
     /** "accel.", "rit.", "a tempo" */
-    Tempo
+    Tempo = "tempo"
 }
 
 export enum Label {
     /** "C", "C#", "Db", "D", etc. */
-    Note,
+    Note = "note",
 
     /** "C", "Am", "G7", etc. */
-    Chord
+    Chord = "chord"
 }
 
 export enum PlayState { Playing, Paused, Stopped }
