@@ -1,6 +1,6 @@
 # WebMusicScore
 
-Typedoc API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is not commented but is mostly self explanatory and gives idea of full API.
+The API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is not commented but is mostly self explanatory and gives idea of the full API.
 
 ## About
 
@@ -34,6 +34,14 @@ Enough changes until next major update!
 * DocumentOptions functionality is replaced using functions addScoreConfiguration() and setMeasuresPerRow() in DocumentBuilder.
 * Add ties, slurs and slides using addConnective() in DocumentBuilder. Tie and span options removed from NoteOptions.
 
+## Version 4 Update
+
+**Breiking:** Changes were required by new features. No breaking in document building interface.
+
+* Support for generic tuples with DocumentBuilder.addTuplet().
+* Support for multiple dot count.
+* String note length (e.g. use "2n" instead of Theory.NoteLength.Half).
+
 ## Installation
 
 ```sh
@@ -63,9 +71,7 @@ import * as ScoreUI from "@tspro/web-music-score/react-ui";
 import * as Pieces from "@tspro/web-music-score/pieces";
 
 // You can also use require
-const Core = require("@tspro/web-music-score/core");
-
-// etc.
+const Score = require("@tspro/web-music-score/score");
 ```
 
 ## Browser Script
@@ -76,12 +82,12 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 
 ```html
 <script src="https://unpkg.com/@tspro/web-music-score@3"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@3.0.0"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@3.0.0/dist/iife/index.global.js"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4.0.0"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4.0.0/dist/iife/index.global.js"></script>
 
 <!--
-    Use one of above. It is recommended to use version number (e.g. @3.0.0 or at least @3).
-    This way if there is breaking change between versions your code does not stop working.
+    Use one of above. It is recommended to use version number (e.g. @4.0.0 or at least @4).
+    This way if somethiong breaks between versions then your web site does not stop working.
 -->
 
 <script>
@@ -92,23 +98,22 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 
 ## API
 
-Following is the main interface explained.
+Following is introduction to the main interface by simple examples.
 
 ### Create DocumentBuilder
 
 Documents are created using `DocumentBuilder`.
 
 ```js
-let builder = new Score.DocumentBuilder();
-
-// Here build document, e.g.
-builder
-    .addMEasure()
-    .addNote(0, "C3", Theory.NoteLength.Quarter)
+let doc = new Score.DocumentBuilder()
+    .addScoreConfiguration({ type: "staff", clef: Score.Clef.G, isOctavewDown: true })
+    .setMeasuresPerRow(4)
+    .addMeasure()
+    .addNote(1, "C3", "4n")
+    .addChord(1, ["C3", "E3", "G3"], "4n").addLabel(Score.Label.Chord, "C")
+    .addRest(1, "4n")
     // etc.
-
-// When ready, get document:
-let doc = builder.getDocument();
+    .getDEocument();
 ```
 
 ### Set Score Configuration
@@ -116,72 +121,53 @@ Setting score configuration takes place in first measure of next row.
 
 #### Using preset values
 ```js
-builder.setScoreConfiguration(staffPreset: Score.StaffPreset);
-```
-
-`staffPreset` can be:
-* `Score.StaffPreset.Treble`: Staff with treble (G-) clef.
-* `Score.StaffPreset.Bass`: Staff with bass (F-) clef.
-* `Score.StaffPreset.Grand`: Both treble and bas staves.
-* `Score.StaffPreset.GuitarTreble`: Same as `Treble` but one octave down.
-* `Score.StaffPreset.GuitarTab`: Guitar tab only.
-* `Score.StaffPreset.GuitarCombined`: Treble and tab for guitar.
-
-```js
-// Example
-builder.setScoreConfiguration(Score.StaffPreset.GuitarCombined);
+builder.setScoreConfiguration(Score.StaffPreset.Treble);         // Staff with treble (G-) clef.
+builder.setScoreConfiguration(Score.StaffPreset.Bass);           // Staff with bass (F-) clef.
+builder.setScoreConfiguration(Score.StaffPreset.Grand);          // Both treble and bas staves.
+builder.setScoreConfiguration(Score.StaffPreset.GuitarTreble);   // Same as `Treble` but one octave down.
+builder.setScoreConfiguration(Score.StaffPreset.GuitarTab);      // Guitar tab only.
+builder.setScoreConfiguration(Score.StaffPreset.GuitarCombined); // Treble and tab for guitar.
 ```
 
 #### Using configuration objects
 ```js
-builder.setScoreConfiguration(config: Score.StaffConfig | Score.TabConfig);
-builder.setScoreConfiguration(config: (Score.StaffConfig | Score.TabConfig)[]);
-```
-
-`config` is `StaffConfig`, `TabConfig` or array of combination.
-
-`StaffConfig` contains following properties:
-* `type`: "staff"
-* `clef`: Clef can be `Score.Clef.G` or `Score.Clef.F`.
-* `isOctaveDown`: boolean (optional)
-* `name`: staff name.
-* `minNote`: string (optional), minimum note allowed in staff.
-* `maxNote`: string (optional), maximum note allowed in staff.
-* `voiceIds`: number[] (optional), array of voice ids are visible on this staff.
-* `isGrand`: boolean (optional), use this to create grand staff.
-
-`TabConfig` contains following properties:
-* `type`: "tab"
-* `name`: tab name.
-* `tuning`: string | string[] (optional), tuning name or array of 6 note names for tuning.
-* `voiceIds`: number[] (optional), array of voice ids are visible on this tab.
-
-```js
-// Example: Staff and tab for guitar
-builder.setScoreConfiguration([
-    { type: "staff", clef: Score.Clef.G, isOctaveDown: true },
-    { type: "tab", tuning: "Drop D" }
-]);
-
-// Example: Grand staff
+builder.setScoreConfiguration({ type: "staff", clef: Score.Clef.G}); // Staff with treble (G-) clef.
+builder.setScoreConfiguration({ type: "staff", clef: Score.Clef.F}); // Staff with bass (F-) clef.
+builder.setScoreConfiguration({
+    type: "staff",
+    clef: Score.Clef.G,  // G-clef
+    isOctaveDown: false, // (optional) octave down
+    name: "staff1",      // (optional) staff name
+    minNote: "C2",       // (optional) min allowed note
+    maxNote: "C6",       // (optional) max allowed note
+    voiceIds: [0, 1]     // (optional) only present voices 0 and 1 in this staff
+});
 builder.setScoreConfiguration([
     { type: "staff", clef: Score.Clef.G, isGrand: true },
     { type: "staff", clef: Score.Clef.F, isGrand: true }
-]);
+]); // Grand staff
+builder.setScoreConfiguration([
+    { type: "staff", clef: Score.Clef.G, isOctaveDown: true },
+    { type: "tab", tuning: "Drop D" }
+]); // Staff and tab for guitar, tab with Drop D tuning.
+builder.setScoreConfiguration(
+{
+    type: "tab",
+    name: "tab1",
+    tuning: ["E2", "A2", "D3", "G3", "B3", "E4"],
+    voiceIds: 4
+});
 ```
 
 ### Set Automatic Measures Per Row
 ```ts
-builder.setMesuresPerRow(measuresPerRow: number)
+builder.setMesuresPerRow(4);        // Set 4 measures per row
+builder.setMesuresPerRow(Infinity); // Turn off auto row change (default)
 ```
-
-`measuresPerRow` can be integer >= 1, or Infinity (default).
 
 ### Set Header
 ```js
-builder.setHeader(title?: string, composer?: string, arranger?: string);
-
-// Example
+builder.setHeader("Title", "Composer", "Arranger");
 builder.setHeader("Demo Song");
 ```
 
@@ -191,241 +177,140 @@ builder.addMeasure();
 ```
 
 ### End Row
+Manually induce row change. Next measure that is added will begin new row.
+
 ```js
 builder.endRow();
 ```
 
-Manually induce row change. Next measure that is added will begin new row.
-
 ### Set Key Signature
 
 ```js
-builder.setKeySignature(tonic: string, scaleType: Theory.ScaleType);
-
-// Example: Am
-builder.setKeySignature("A", Theory.ScaleType.Aeolian);
+builder.setKeySignature("A", Theory.ScaleType.NaturalMinor); // Create A minor scale. See API reference for all ScaleTypes.
 ```
-
-`tonic` is scale tonic/root note, e.g. "C" (in "C Major").
-
- `scaleType` can be
- - `Theory.ScaleType.Major`
- - `Theory.ScaleType.NaturalMinor`
- - `Theory.ScaleType.HarmonicMinor`
- - `Theory.ScaleType.Ionian`
- - `Theory.ScaleType.Dorian`
- - `Theory.ScaleType.Phrygian`
- - `Theory.ScaleType.Lydian`
- - `Theory.ScaleType.Mixolydian`
- - `Theory.ScaleType.Aeolian`
- - `Theory.ScaleType.Locrian`
- - `Theory.ScaleType.MajorPentatonic`
- - `Theory.ScaleType.MinorPentatonic`
- - `Theory.ScaleType.MajorHexatonicBlues`
- - `Theory.ScaleType.MinorHexatonicBlues`
- - `Theory.ScaleType.HeptatonicBlues`
 
 ### Set Time Signature
 ```js
-builder.setTimeSignature(timeSignature: string);
-
-// Example
+builder.setTimeSignature("2/4");
 builder.setTimeSignature("3/4");
+builder.setTimeSignature("4/4");
+builder.setTimeSignature("6/8");
+builder.setTimeSignature("9/8");
 ```
-
-timeSignature can be:
-- `"2/4"`
-- `"3/4"`
-- `"4/4"`
-- `"6/8"`
-- `"9/8"`
 
 ### Set Tempo
 ```js
-builder.setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLength, dotted?: boolean);
-
-// Example
-builder.setTempo(100, Theory.NoteLength.Quarter);
+builder.setTempo(100, "4n"); // 100 beats per minute, beat length is quarter note.
+builder.setTempo(80, "4n", 2); // 100 beats per minute, beat length is double dotted quarter note.
+builder.setTempo(80, "4.."); // 100 beats per minute, beat length is double dotted quarter note.
 ```
 
-`beatsPerMinute` is self explanatory.
-
-`beatLength` tells  the length of each beat, e.g. Theory.NoteLength.Quarter.
-
-`dotted` tells if `beatLength` is dotted.
-
-### Add Note Or Chord
-
+### Add Note
 ```js
-builder.addNote(voiceId: number, note: string, noteLength: Theory.NoteLength, noteOptions?: Score.NoteOptions);
-builder.addChord(voiceId: number, notes: string[], noteLength: Theory.NoteLength, noteOptions?: Score.NoteOptions);
-
-// Examples
-builder.addNote(0, "C4", Theory.NoteLength.Half, { dotted: true });
-builder.addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Whole, { arpeggio: Score.Arpeggio.Down });
+builder.addNote(0, "C4", "1n");                    // Create whole note "C4"
+builder.addNote(0, "G#3", "8n", { dotted: true }); // Create dotted eighth note "G#3"
+builder.addNote(0, "Bb4", "2..");                  // Create double dotted half note "Bb4"
+builder.addNote(0, "C4", "4n", { stem: Score.Stem.Up }); // Stem direction Up (could be also Down)
+builder.addNote(0, "C4", "4n", { staccate: true }); // Show staccato dot and play in short
+builder.addNote(0, "C4", "4n", { diamond: true }); // Show diamond shaped note head
 ```
 
-`voiceId` can be `0`, `1`, `2` or `3`.
-
-`note` is note name, e.g. `"G#3"`, `"Db3"`.
-
-`notes`: array of notes `string[]` (e.g. `["C3", "E3"]`)
-
-`noteLength` can be:
-* `Theory.NoteLength.Whole`
-* `Theory.NoteLength.Half`
-* `Theory.NoteLength.Quarter`
-* `Theory.NoteLength.Eighth`
-* `Theory.NoteLength.Sixteenth`
-* `Theory.NoteLength.ThirtySecond`
-* `Theory.NoteLength.SixtyFourth`
-
-`noteOptions` is optional object of note options (e.g. `{ dotted: true }`):
-
-| Note option | Type                      |                     |
-|-------------|---------------------------|---------------------|
-| dotted      | `boolean`                 | Create dotted note. |
-| stem        | `Score.Stem.Auto/Up/Down` | Set stem direction. |
-| arpeggio    | `Score.Arpeggio.Up/Down` \| `boolean`  | Play column in arpeggio. |
-| staccato    | `boolean`               | Play column in staccato. |
-| diamond     | `boolean`               | Diamond shaped note head. |
-| triplet     | `boolean`               | Set this note part of triplet. |
-| string      | `number` \| `number[]`  | String number for guitar tab. Array of string numbers for chord. |
+### Add Chord
+```js
+builder.addChord(1, ["C3", "E3", "G3"], "1n", { arpeggio: Score.Arpeggio.Down }); // Create whole note chord of three notes, played in arpeggio.
+```
 
 ### Add Rest
 
 ```js    
-builder.addRest(voideId: number, restLength: Theory.NoteLength, restOptions?: Score.RestOptions);
-
-// Example
-builder.addRest(0, Theory.NoteLength.Sixteenth);
+builder.addRest(0, "16n");               // Add sixteenth rest
+builder.addRest(0, "4n", { dotted: 3 }); // Add triple dotted quarter rest
+builder.addRest(0, "4.");                // Add dotted quarter rest
+builder.addRest(0, "4n", { staffPos: "D3" }); // Draw this quarter rest at level of "D3" note.
+builder.addRest(0, "4n", { hide: true }); // Invisible rest affects playing
 ```
 
- `voiceId` can be `0`, `1`, `2` or `3`.
+### Add Tuplet
+This works for any tuplet:
+```js
+// Example: add triplet
+builder.addTuplet(0, { parts: 3, inTimeOf: 2 }, notes => {
+    notes.addNote("G3", "8n");
+    notes.addNote("B3", "8n");
+    notes.addNote("D4", "8n");
+});
+```
 
-`restLength` is length of rest, similar as noteLength above.
+Triplets can also be created using `triplet` property or string note length:
+```js
+// Example: add triplet using triplet property.
+builder.addNote(0, "G3", "8n", { triplet: true });
+builder.addNote(0, "B3", "8n", { triplet: true });
+builder.addNote(0, "D4", "8n", { triplet: true });
 
-`restOptions` is optional object of rest options (e.g. `{ hide: true }`):
-
-| Rest option | Type         |                     |
-|-------------|--------------|---------------------|
-| dotted      | `boolean`    | Create dotted rest. |
-| staffPos    | `string`     | Staff positions (e.g. `"C3"`). |
-| hide        | `boolean`    | Add invisible rest. |
-| triplet     | `boolean`    | Set this rest part of triplet. |
+// Example: add triplet using string note length.
+builder.addNote(0, "G3", "8t");
+builder.addNote(0, "B3", "8t");
+builder.addNote(0, "D4", "8t");
+```
 
 ### Add Fermata
 
 ```js
-builder.addFermata(fermata?: Score.Fermata);
-
-// Example
-builder.addFermata(Score.Fermata.AtMeasureEnd);
+builder.addNote(0, "C3", "2n").addFermata(Score.Fermata.AtNote); // Add fermata at note.
+builder.addFermata(Score.Fermata.AtMeasureEnd);                 // Add fermata at measure end.
 ```
-
-`fermata` is typeof `Score.Fermata` and can be:
-- `Score.Fermata.AtNote`: Adds fermata anchored to previously added note, chord or rest.
-- `Score.Fermata.AtMeasureEnd`: Adds fermata at the end of measure.
 
 ### Add Navigation
 
-Add navigational element to measure.
-
 ```js
-builder.addNavigation(navigation: Score.Navigation, ...args?);
-
-// Examples
-builder.addNavigation(Score.Navigation.StartRepeat);
-builder.addNavigation(Score.Navigation.EndRepeat, 3);
-builder.addNavigation(Score.Navigation.Ending, 1, 2);
+builder.addNavigation(Score.Navigation.DC_al_Fine);   // Add "DC_al_Fine"
+builder.addNavigation(Score.Navigation.DC_al_Coda);   // Add "DC_al_Coda"
+builder.addNavigation(Score.Navigation.DS_al_Fine);   // Add "DS_al_Fine"
+builder.addNavigation(Score.Navigation.DS_al_Coda);   // Add "DS_al_Coda"
+builder.addNavigation(Score.Navigation.Coda);         // Add "Coda"
+builder.addNavigation(Score.Navigation.toCoda);       // Ass "toCoda"
+builder.addNavigation(Score.Navigation.Segno);        // Add "Segno" symbol
+builder.addNavigation(Score.Navigation.Fine);         // Add "Fine"
+builder.addNavigation(Score.Navigation.StartRepeat);  // Add repeat sections start position
+builder.addNavigation(Score.Navigation.EndRepeat, 3); // Add repeat sections end position, repeat sectionplayed 3 times
+builder.addNavigation(Score.Navigation.Ending, 1, 2); // Add ending, played on 1st and 2nd run
 ```
-
-`navigation` can be:
-* `Score.Navigation.DC_al_Fine`
-* `Score.Navigation.DC_al_Coda`
-* `Score.Navigation.DS_al_Fine`
-* `Score.Navigation.DS_al_Coda`
-* `Score.Navigation.Coda`
-* `Score.Navigation.toCoda`
-* `Score.Navigation.Segno`
-* `Score.Navigation.Fine`
-* `Score.Navigation.StartRepeat`
-* `Score.Navigation.EndRepeat`
-* `Score.Navigation.Ending`
-
-`Score.Navigation.EndRepeat` takes optional second arg which is number of times to repeat (once if omitted).
-
-`Score.Navigation.Ending` takes variable number of number args, each is a passage number.
-
-### Add Label
-
-Add text label anchored to previously added note, chord or rest.
-
-```js
-builder.addLabel(label: Score.Label, text: string);
-
-// Example
-builder.addLabel(Score.Label.Chord, "Am);
-```
-
-`label` can be:
-* `Score.Label.Note`: Used to label notes and is positioned below note.
-* `Score.Label.Chord`: Used to label chords and is positioned on top.
 
 ### Add Annotation
 
 Add annotation text anchored to previously added note, chord or rest.
 
 ```js
-builder.addAnnotation(annotation: Score.Annotation, text: string);
-
-// Example
+builder.addAnnotation(Score.Annotation.Dynamics, "ff");
 builder.addAnnotation(Score.Annotation.Tempo, "accel.");
 ```
 
-`annotation` can be:
-* `Score.Annotation.Dynamics`: `text` could be for example `"fff"`, `"cresc."`, `"dim."`, etc.
-* `Score.Annotation.Tempo`: `text` could be for example `"accel."`, `"rit."`, `"a tempo"`, etc.
+### Add Label
 
-### Add Elements To Certain Staff Or Tab
-
-There are alternatives to these functions:
-- `addFermata` => `addFermataTo`
-- `addNavigation` => `addNavigationTo`
-- `addAnnotation` => `addAnnotationTo`
-- `addLabel` => `addLabelTo`.
-
-First argument of these alterate functions is:
-
- `staffTabOrGroups: Score.StaffTabOrGroups`.
-
-`StaffTabOrGroups` can be:
-- `number`: staff/tab index, 0=top staff/tab, etc.
-- `string`: staff/tab name.
-- `string`: staff group name.
-- `(number | string)[]`: an array of staff/tab indices, names or group names.
+Add text label anchored to previously added note, chord or rest.
 
 ```js
-// Example: add label to top staff/tab.
-builder.addLabelTo(0, Score.Label.Chord, "Am");
+builder.addLabel(Score.Label.Chord, "Am"); // Positioned above staff. Used to label chords.
+builder.addLabel(Score.Label.Note, "C#5"); // Positioned below staff. Used to label notes.
 ```
 
-#### Staff Group
-```js
-builder.addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: Score.VerticalPosition);
-```
+### Positioning Elements
 
-Arguments are:
-- `groupName`: Name of new staff group.
-- `staffsTabsAndGroups`: single value or an array of staves, tabs and groups (index or name).
-- `verticalPosition` (optional): Can be `Score.VerticalPosition.Above`/`Below`/`Both`/`Auto` (default).
+`addFermata`, `addNavigation`, `addAnnotation` and `addLabel` functions have alternate versions 
+`addFermataTo`, `addNavigationTo`, `addAnnotationTo` and `addLabelTo` that contain extra first argument.
 
 ```js
-// Example: create staff group to add elements below top staff/tab.
-// Add staff group
-builder.addStaffGroup("grp1", [0], Score.VertocalPosition.Below);
-// Use group
-builder.addLabelTo("grp1", Score.Label.Note, "C");
+builder.addLabelTo(0, Score.Label.Chord, "Am");        // Add label to top (id 0) staff/tab.
+builder.addLabelTo([0, 1], Score.Label.Chord, "Am");   // Add label to top two (id 0 and 1) staves/tabs.
+builder.addLabelTo("staff1", Score.Label.Chord, "Am"); // Add label to named staff/tab/group.
+builder.addLabelTo("grp1", Score.Label.Chord, "Am");   // Add label to named staff/tab/group.
+
+// Create staff groups
+builder.addStaffGroup("grp1", 0, Score.VertocalPosition.Above);                 // This staff group adds elements above top staff/tab.
+builder.addStaffGroup("grp2", [1], Score.VertocalPosition.Below);               // This staff group adds elements below second staff/tab from top.
+builder.addStaffGroup("grp3", "tab1", Score.VertocalPosition.Both);             // This staff group adds elements above and below tab named "tab1".
+builder.addStaffGroup("grp4", ["staff1", "tab1"], Score.VertocalPosition.Auto); // This staff group uses default location to add element to "staff1" and "tab1".
 ```
 
 ### Add Extension
@@ -433,65 +318,32 @@ builder.addLabelTo("grp1", Score.Label.Note, "C");
 Adds extension line to element, for example to previously added annotation.
 
 ```js
-builder.addExtension(extensionLength: number, visible?: boolean);
-
-// Example
-builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 2, true);
+builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 2);        // Add extension line
+builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 2, false); // Add hidden extension line
 ```
-
-`extensionLength` is `number` but `Theory.NoteLength` values can be used as number and multiplied to set desired extension length.
-
-`visible` sets visibility of extension line, visible by default (if omitted).
 
 ### Add Connective (tie, slur, slide)
 
 ```js
-// Add tie
-builder.addConnective(connective: Score.Connetive.Tie, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
-
-// Add slur
-builder.addConnective(connective: Score.Connetive.Slur, span?: Score.ConnectiveSpan, noteAnchor?: Score.NoteAnchor);
-
-// Add slide
-builder.addConnective(connective: Score.Connetive.Slide, noteAnchor?: Score.NoteAnchor);
+builder.addConnective(Score.Connetive.Tie);   // Add tie
+builder.addConnective(Score.Connetive.Slur);  // Add slur
+builder.addConnective(Score.Connetive.Slide); // Add slide
+builder.addConnective(Score.Connetive.Tie, 3); // Add tie with span value (describes how many notes the connective is across).
+builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Above); // Add slur connected above note.
+builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Below); // Add slur connected below note.
+builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Center); // Add slur connected next to note.
+builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.StemTip); // Add slur connected at stem tip.
 ```
-
-- `span` describes how many notes the connective is across.
-  It is integer >= 2 (for tie it can be also `Score.TieType.Stub|ToMeasureEnd`).
-  Default value is 2.
-- `noteAnchor` describes the attach point of connective to note.
-  It can be `Score.NoteAnchor.Auto|Above|Center|Below|StemTip`.
-  Default value is `Score.NoteAnchor.Auto`.
 
 ### Guitar Tab
 
-This library has preliminary guitar tabs rendering. 
-Create document with `Score.StaffPreset.GuitarTab` or `Score.StaffPreset.GuitarCombined`, or set score configuration with TabConfig.
+This library has preliminary guitar tab rendering. 
 
-Add notes with `{ string: number | number[] }` to specify which string the fret number is rendered in guitar tab.
-
-```js
-// Single note
-builder.addNote(0, "G3", Theory.NoteLength.Eighth, { string: 3 });
-
-// Multi note
-builder.addChord(0, ["E4", "C3"], Theory.NoteLength.Eighth, { string: [1, 5] });
-```
-
-### Queueing
-
-`DocumentBuilder` operations can be queued.
+Add notes with `string` property to specify at what string the fret number is rendered in the tab.
 
 ```js
-let doc = new Score.DocumentBuilder()
-    .addScoreConfiguration({ type: "staff", clef: Score.Clef.G, isOctavewDown: true })
-    .setMeasuresPerRow(4)
-    .addMeasure()
-    .addNote(1, "C3", Theory.NoteLength.Quarter)
-    .addChord(1, ["C3", "E3", "G3"], Theory.NoteLength.Quarter).addLabel(Score.Label.Chord, "C")
-    .addRest(1, Theory.NoteLength.Quarter)
-    // etc.
-    .getDEocument();
+builder.addNote(0, "G3", "8n", { string: 3 });
+builder.addChord(0, ["E4", "C3"], "8n", { string: [1, 5] });
 ```
 
 ### Beams
