@@ -18,9 +18,11 @@ export enum StaffPreset {
 
 export enum Clef { G = "G", F = "F" }
 
+export type TClef = "G" | "F";
+
 export type StaffConfig = {
     type: "staff",
-    clef: "G" | "F",
+    clef: TClef,
     name?: string,
     isOctaveDown?: boolean,
     minNote?: string,
@@ -62,7 +64,7 @@ export enum Connective { Tie, Slur, Slide }
 
 export type ConnectiveSpan = number | TieType;
 
-export enum VerticalPosition { Above, Below, Both, Auto }
+export enum VerticalPosition { Auto, Above, Below, Both }
 
 export type StaffTabOrGroup = number | string;
 
@@ -90,10 +92,6 @@ export type RestOptions = {
 export type TupletOptions = {
     showRatio?: boolean
 }
-
-export enum PlayState { Playing, Paused, Stopped }
-
-export type PlayStateChangeListener = (playState: PlayState) => void;
 
 export enum Fermata {
     AtNote,
@@ -150,3 +148,7 @@ export enum Label {
     /** "C", "Am", "G7", etc. */
     Chord
 }
+
+export enum PlayState { Playing, Paused, Stopped }
+
+export type PlayStateChangeListener = (playState: PlayState) => void;
