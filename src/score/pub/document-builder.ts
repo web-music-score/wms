@@ -261,7 +261,8 @@ export class DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isObject(tupletRatio) &&
             Utils.Is.isIntegerGte(tupletRatio.parts, 2) && tupletRatio.parts <= MaxTupletRatioParts &&
-            Utils.Is.isIntegerGte(tupletRatio.inTimeOf, 2), "tupletRatio", tupletRatio);
+            Utils.Is.isIntegerGte(tupletRatio.inTimeOf, 2) &&
+            Utils.Is.isBooleanOrUndefined(tupletRatio.showRatio), "tupletRatio", tupletRatio);
 
         let tupletSymbols: RhythmSymbol[] = [];
 
