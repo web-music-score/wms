@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
+import { Annotation, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { getNoteLength, KeySignature, MaxTupletRatioParts, Note, NoteLength, NoteLengthStr, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
@@ -385,30 +385,30 @@ export class DocumentBuilder {
         return this.addAnnotationInternal(staffTabOrGroups, annotation, text);
     }
 
-    addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): DocumentBuilder;
-    addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): DocumentBuilder;
-    addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): DocumentBuilder;
-    addConnective(connective: Connective, ...args: unknown[]): DocumentBuilder {
+    addConnective(connective: Connective.Tie | `${Connective.Tie}`, tieSpan?: number | TieType | `${TieType}`, notAnchor?: NoteAnchor): DocumentBuilder;
+    addConnective(connective: Connective.Slur | `${Connective.Slur}`, slurSpan?: number, notAnchor?: NoteAnchor): DocumentBuilder;
+    addConnective(connective: Connective.Slide | `${Connective.Slide}`, notAnchor?: NoteAnchor): DocumentBuilder;
+    addConnective(connective: Connective | `${Connective}`, ...args: unknown[]): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
 
         if (connective === Connective.Tie) {
             assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType), "tieSpan", args[0]);
             assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
-            let tieSpan = args[0] as ConnectiveSpan | undefined;
+            let tieSpan = args[0] as number | TieType | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
-            this.getMeasure().addConnective(connective, tieSpan, noteAnchor);
+            this.getMeasure().addConnective(connective as Connective.Tie, tieSpan, noteAnchor);
         }
         else if (connective === Connective.Slur) {
             assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]), "slurSpan", args[0]);
             assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
-            let slurSpan = args[0] as ConnectiveSpan | undefined;
+            let slurSpan = args[0] as number | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
-            this.getMeasure().addConnective(connective, slurSpan, noteAnchor);
+            this.getMeasure().addConnective(connective as Connective.Slur, slurSpan, noteAnchor);
         }
         else if (connective === Connective.Slide) {
             assertArg(Utils.Is.isEnumValueOrUndefined(args[0], NoteAnchor), "noteAnchor", args[0]);
             let noteAnchor = args[0] as NoteAnchor | undefined;
-            this.getMeasure().addConnective(connective, noteAnchor);
+            this.getMeasure().addConnective(connective as Connective.Slide, noteAnchor);
         }
 
         return this;

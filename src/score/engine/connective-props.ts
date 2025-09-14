@@ -1,16 +1,17 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
-import { Connective, ConnectiveSpan, NoteAnchor, Stem, TieType } from "../pub/types";
+import { Connective, NoteAnchor, Stem, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
 import { ObjStaff } from "./obj-staff-and-tab";
+import { Utils } from "@tspro/ts-utils-lib";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
     arcDir: "up" | "down" = "down";
 
-    constructor(readonly connective: Connective, readonly span: ConnectiveSpan, public noteAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
+    constructor(readonly connective: Connective, readonly span: number | TieType | `${TieType}`, public noteAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
         this.noteGroups = [startNoteGroup];
     }
 
@@ -97,7 +98,7 @@ export class ConnectiveProps {
         let { connective, span } = this;
 
         if (connective === Connective.Tie) {
-            if (span === TieType.Stub || span === TieType.ToMeasureEnd) {
+            if (Utils.Is.isEnumValue(span, TieType)) {
                 let leftNoteGroup = this.noteGroups[0];
                 for (let noteId = 0; noteId < leftNoteGroup.notes.length; noteId++) {
                     this.createObjConnectiveWithTieType(leftNoteGroup, noteId, span);

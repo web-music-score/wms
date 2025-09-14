@@ -103,7 +103,7 @@ export function createGreensleeves(): MDocument {
         .endRow()
 
         .addMeasure()
-        .addChord(0, ["C3", "E3", "G3", "C4", "G4"], NoteLength.Quarter, { dotted: true, arpeggio: Arpeggio.Up, stem: Stem.Up }).addLabel(Label.Chord, "C")
+        .addChord(0, ["C3", "E3", "G3", "C4", "G4"], NoteLength.Quarter, { dotted: true, arpeggio: "up", stem: Stem.Up }).addLabel(Label.Chord, "C")
         .addNote(0, "G4", NoteLength.Eighth, { dotted: true })
         .addNote(0, "F#4", NoteLength.Sixteenth)
         .addNote(0, "E4", NoteLength.Eighth)

@@ -50,17 +50,15 @@ export function getStringNumbers(): ReadonlyArray<StringNumber> {
     return [1, 2, 3, 4, 5, 6];
 }
 
-export enum Stem { Auto, Up, Down }
+export enum Stem { Auto = "auto", Up = "up", Down = "down" }
 
-export enum Arpeggio { Up, Down }
+export enum Arpeggio { Up = "up", Down = "down" }
 
-export enum TieType { Stub = -1, ToMeasureEnd = -2 }
+export enum TieType { Stub = "stub", ToMeasureEnd = "toMeasureEnd" }
 
 export enum NoteAnchor { Auto, Above, Center, Below, StemTip }
 
-export enum Connective { Tie, Slur, Slide }
-
-export type ConnectiveSpan = number | TieType;
+export enum Connective { Tie = "tie", Slur = "slur", Slide = "slide" }
 
 export enum VerticalPosition { Auto, Above, Below, Both }
 
@@ -70,9 +68,9 @@ export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
 export type NoteOptions = {
     dotted?: boolean | number,
-    stem?: Stem,
+    stem?: Stem | `${Stem}`,
     color?: string,
-    arpeggio?: Arpeggio | boolean,
+    arpeggio?: boolean | Arpeggio | `${Arpeggio}`,
     staccato?: boolean,
     diamond?: boolean,
     triplet?: boolean,

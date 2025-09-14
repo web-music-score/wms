@@ -13,6 +13,14 @@ import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 
+function getStem(stem: Stem | `${Stem}` | undefined): Stem | undefined {
+    return Utils.Is.isEnumValue(stem, Stem) ? stem : undefined;
+}
+
+function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
+    return Utils.Is.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
+}
+
 function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
     let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
 
@@ -26,10 +34,6 @@ function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber |
         notes: noteStringData.map(e => e.note),
         strings: noteStringData.every(e => e.string === undefined) ? undefined : noteStringData.map(e => e.string)
     }
-}
-
-function solveArpeggio(a: Arpeggio | boolean | undefined): Arpeggio | undefined {
-    return a === true || a === Arpeggio.Up ? Arpeggio.Up : (a === Arpeggio.Down ? Arpeggio.Down : undefined);
 }
 
 export class ObjStaffNoteGroup extends MusicObject {
@@ -183,13 +187,13 @@ export class ObjNoteGroup extends MusicObject {
         this.maxDiatonicId = this.notes[this.notes.length - 1].diatonicId;
 
         this.ownDiatonicId = this.measure.updateOwnDiatonicId(voiceId, Math.round((this.minDiatonicId + this.maxDiatonicId) / 2));
-        this.ownStemDir = this.measure.updateOwnStemDir(this, options?.stem);
+        this.ownStemDir = this.measure.updateOwnStemDir(this, getStem(options?.stem));
         this.ownString = this.measure.updateOwnString(this, noteStringData.strings);
 
         this.color = options?.color ?? "black";
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
-        this.arpeggio = solveArpeggio(options?.arpeggio);
+        this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || hasNoteLengthTriplet(noteLength));
 
         let dotCount = typeof options?.dotted === "number"
