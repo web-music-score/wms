@@ -696,11 +696,9 @@ export class ObjNoteGroup extends MusicObject {
 
                     fretNumber.layout(renderer);
 
-                    let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
-                    let stemX = this.staffObjects[0]?.stemBase?.centerX;
-
-                    let x = stemX ?? noteX;
+                    let x = this.col.getRect().centerX;
                     let y = tab.getStringY(stringId);
+
                     fretNumber.offset(x, y);
                 }
             });
