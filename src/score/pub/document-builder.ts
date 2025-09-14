@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, VerticalPosition, VoiceId } from "./types";
+import { Annotation, Arpeggio, Clef, Connective, ConnectiveSpan, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { getNoteLength, KeySignature, MaxTupletRatioParts, Note, NoteLength, NoteLengthStr, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
@@ -257,7 +257,7 @@ export class DocumentBuilder {
      * @param builder 
      * @returns 
      */
-    addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio, builder: (notes: TupletBuilder) => void): DocumentBuilder {
+    addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, builder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isObject(tupletRatio) &&
             Utils.Is.isIntegerGte(tupletRatio.parts, 2) && tupletRatio.parts <= MaxTupletRatioParts &&

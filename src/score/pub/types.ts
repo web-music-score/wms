@@ -87,6 +87,10 @@ export type RestOptions = {
     triplet?: boolean
 }
 
+export type TupletOptions = {
+    showRatio?: boolean
+}
+
 export enum PlayState { Playing, Paused, Stopped }
 
 export type PlayStateChangeListener = (playState: PlayState) => void;

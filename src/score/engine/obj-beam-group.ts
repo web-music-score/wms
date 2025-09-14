@@ -4,7 +4,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
-import { DivRect, Stem, MBeamGroup, MusicInterface, MStaffBeamGroup } from "../pub";
+import { DivRect, Stem, MBeamGroup, MusicInterface, MStaffBeamGroup, TupletOptions } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
@@ -97,10 +97,9 @@ export class ObjBeamGroup extends MusicObject {
     readonly mi: MBeamGroup;
 
     private readonly type: BeamGroupType;
-    private readonly showTupletRatio = false;
     private readonly staffObjects: ObjStaffBeamGroup[] = [];
 
-    private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio | undefined) {
+    private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio & TupletOptions | undefined) {
         super(symbols[0].measure);
 
         this.mi = new MBeamGroup(this);
@@ -149,6 +148,10 @@ export class ObjBeamGroup extends MusicObject {
         }
     }
 
+    private get showTupletRatio(): boolean {
+        return this.tupletRatio?.showRatio === true;
+    }
+
     static createBeam(noteGroups: ObjNoteGroup[]) {
         if (noteGroups.length > 1) {
             new ObjBeamGroup(noteGroups, undefined);
@@ -180,7 +183,7 @@ export class ObjBeamGroup extends MusicObject {
         return 0;
     }
 
-    static createTuplet(symbols: RhythmSymbol[], tupletRatio: TupletRatio): void {
+    static createTuplet(symbols: RhythmSymbol[], tupletRatio: TupletRatio & TupletOptions): void {
         new ObjBeamGroup(symbols, tupletRatio);
     }
 
