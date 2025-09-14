@@ -8,11 +8,11 @@ export enum Handedness { RightHanded, LeftHanded }
 export const DefaultHandedness = Handedness.RightHanded;
 
 export function validateHandedness(h: unknown): Handedness {
-    if (!Utils.Is.isEnumValue(h, Handedness)) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid handedness: ${h}`);
+    if (Utils.Is.isEnumValue(h, Handedness)) {
+        return h;
     }
     else {
-        return h;
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid handedness: ${h}`);
     }
 }
 

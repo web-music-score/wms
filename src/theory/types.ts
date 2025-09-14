@@ -10,11 +10,11 @@ export const PitchNotationList = Utils.Enum.getEnumValues(PitchNotation);
 export const DefaultPitchNotation = PitchNotation.Scientific;
 
 export function validatePitchNotation(pn: unknown): PitchNotation {
-    if (!Utils.Is.isEnumValue(pn, PitchNotation)) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid pitchNotation: ${pn}`);
+    if (Utils.Is.isEnumValue(pn, PitchNotation)) {
+        return pn;
     }
     else {
-        return pn;
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid pitchNotation: ${pn}`);
     }
 }
 
@@ -33,10 +33,10 @@ export const DefaultGuitarNoteLabel = GuitarNoteLabel.Default;
 export const GuitarNoteLabelList = Utils.Enum.getEnumValues(GuitarNoteLabel);
 
 export function validateGuitarNoteLabel(label: string): GuitarNoteLabel {
-    if (!Utils.Is.isEnumValue(label, GuitarNoteLabel)) {
-        throw new MusicError(MusicErrorType.Timesignature, `Invalid guitarNoteLabel: ${label}`);
+    if (Utils.Is.isEnumValue(label, GuitarNoteLabel)) {
+        return label;
     }
     else {
-        return label;
+        throw new MusicError(MusicErrorType.Timesignature, `Invalid guitarNoteLabel: ${label}`);
     }
 }
