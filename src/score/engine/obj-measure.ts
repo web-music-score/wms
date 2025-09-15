@@ -43,6 +43,35 @@ export function validateVoiceId(voiceId: number): VoiceId {
     }
 }
 
+function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLengthStr | number)[]): number {
+    if (typeof extensionLength === "string") {
+        extensionLength = [extensionLength];
+    }
+    if (Utils.Is.isArray(extensionLength)) {
+        let totalTicks = 0;
+        for (let i = 0; i < extensionLength.length;) {
+            let str = extensionLength[i];
+            let num = extensionLength[i + 1];
+            if (typeof str === "string") {
+                i++;
+                let ticks = new RhythmProps(str).ticks;
+                if (typeof num === "number") {
+                    i++;
+                    ticks *= num;
+                }
+                totalTicks += ticks;
+            }
+            else {
+                i++;
+            }
+        }
+        return totalTicks;
+    }
+    else {
+        return extensionLength;
+    }
+}
+
 export class ObjMeasure extends MusicObject {
     static readonly MinFlexContentWidth = 10;
 
@@ -733,7 +762,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    addExtension(extensionLength: number, extensionVisible: boolean) {
+    addExtension(extensionLength: number | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible: boolean) {
         this.addExtensionToMusicObjects.forEach(musicObj => {
             let anchor = musicObj.getParent();
 
@@ -741,7 +770,7 @@ export class ObjMeasure extends MusicObject {
                 let lineStyle: ExtensionLineStyle = "dashed";
                 let linePos: ExtensionLinePos = "bottom";
 
-                let extension = new Extension(musicObj, anchor, extensionLength, extensionVisible, lineStyle, linePos);
+                let extension = new Extension(musicObj, anchor, getExtensionTicks(extensionLength), extensionVisible, lineStyle, linePos);
                 musicObj.setLink(extension);
             }
             else {

@@ -414,11 +414,28 @@ export class DocumentBuilder {
         return this;
     }
 
-    addExtension(extensionLength: NoteLength | number, extensionVisible?: boolean): DocumentBuilder {
+    /**
+     * Extension length examples:
+     * <pre>
+     *     "1n" = NoteLength.Whole
+     *     ["4n", 5] = NoteLength.Quarter * 5
+     *     ["1n", "2n", 4] = NoteLength.Whole + NoteLEngth.Half * 4
+     *     etc.
+     * </pre>
+     * @param extensionLength
+     * @param extensionVisible
+     * @returns 
+     */
+    addExtension(extensionLength: number | NoteLength | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible?: boolean): DocumentBuilder {
         assertArg((
             Utils.Is.isIntegerGte(extensionLength, 0) ||
-            extensionLength === Infinity ||
-            Utils.Is.isEnumValue(extensionLength, NoteLength)
+            typeof extensionLength === "number" && extensionLength === Infinity ||
+            Utils.Is.isEnumValue(extensionLength, NoteLength) ||
+            Utils.Is.isString(extensionLength) ||
+            Utils.Is.isArray(extensionLength) && (
+                extensionLength.length > 0 && !Utils.Is.isNumber(extensionLength[0]) &&
+                extensionLength.every(len => Utils.Is.isString(len) || Utils.Is.isNumber(len))
+            )
         ), "extendionLength", extensionLength);
         assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
         this.getMeasure().addExtension(extensionLength, extensionVisible ?? true);
