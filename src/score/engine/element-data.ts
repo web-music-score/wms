@@ -1,3 +1,4 @@
+import { Utils } from "@tspro/ts-utils-lib";
 import { Navigation, Annotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
@@ -16,10 +17,7 @@ export function getNavigationString(navigation: Navigation): string {
     }
 }
 
-export enum KnownText {
-    accel = "accel.",
-    rit = "rit.",
-    a_tempo = "a tempo",
+export enum DynamicsAnnotationText {
     cresc = "cresc.",
     decresc = "decresc.",
     dim = "dim.",
@@ -31,38 +29,35 @@ export enum KnownText {
     mf = "mf",
     f = "f",
     ff = "ff",
-    fff = "fff",
+    fff = "fff"
+}
+
+export enum TempoAnnotationText {
+    accel = "accel.",
+    rit = "rit.",
+    a_tempo = "a tempo"
 }
 
 export function getKnownAnnotation(text: string): Annotation | undefined {
-    switch (text) {
-        case "accel.": return Annotation.Tempo;
-        case "rit.": return Annotation.Tempo;
-        case "a tempo": return Annotation.Tempo;
-        case "cresc.": return Annotation.Dynamics;
-        case "decresc.": return Annotation.Dynamics;
-        case "dim.": return Annotation.Dynamics;
-        case "ppp": return Annotation.Dynamics;
-        case "pp": return Annotation.Dynamics;
-        case "p": return Annotation.Dynamics;
-        case "mp": return Annotation.Dynamics;
-        case "m": return Annotation.Dynamics;
-        case "mf": return Annotation.Dynamics;
-        case "f": return Annotation.Dynamics;
-        case "ff": return Annotation.Dynamics;
-        case "fff": return Annotation.Dynamics;
-        default: return undefined;
+    if (Utils.Is.isEnumValue(text, DynamicsAnnotationText)) {
+        return Annotation.Dynamics;
+    }
+    else if (Utils.Is.isEnumValue(text, TempoAnnotationText)) {
+        return Annotation.Tempo;
+    }
+    else {
+        return undefined;
     }
 }
 
-export function isDynamicsText(text: string) {
+export function isDynamicsText(text: string): boolean {
     return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim."].indexOf(text) >= 0;
 }
 
-export function isDynamicsLevelText(text: string) {
+export function isDynamicsLevelText(text: string): boolean {
     return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff"].indexOf(text) >= 0;
 }
 
-export function isTempoText(text: string) {
+export function isTempoText(text: string): boolean {
     return ["accel.", "rit.", "a tempo"].indexOf(text) >= 0;
 }
