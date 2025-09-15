@@ -186,8 +186,11 @@ builder.endRow();
 ### Set Key Signature
 
 ```js
-builder.setKeySignature("A", Theory.ScaleType.NaturalMinor); // Create A minor scale. See API reference for all ScaleTypes.
+builder.setKeySignature("C", "Major");                       // Create C Major scale.
+builder.setKeySignature("A", Theory.ScaleType.NaturalMinor); // Create A natural minor scale.
 ```
+
+- See API Reference for all scale types.
 
 ### Set Time Signature
 ```js
