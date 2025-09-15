@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { DivRect, Navigation, PlayState, PlayStateChangeListener, getVoiceIds } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
-import { isDynamicsLevelText, DynamicsAnnotationText, TempoAnnotationText } from "./element-data";
+import { isDynamicsLevelText, DynamicsAnnotations, TempoAnnotations } from "./element-data";
 import { Extension } from "./extension";
 
 export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
@@ -305,7 +305,7 @@ export class Player {
             col.getAnchoredLayoutObjects().forEach(layoutObj => {
                 let text = layoutObj.getTextContent() ?? "";
 
-                if (text === TempoAnnotationText.a_tempo) {
+                if (text === TempoAnnotations.a_tempo) {
                     curSpeed = 1;
                 }
                 else if (isDynamicsLevelText(text)) {
@@ -318,7 +318,7 @@ export class Player {
                     let totalTicks = Utils.Math.sum(columnRange.map(c => c.getTicksToNextColumn()));
 
                     switch (text) {
-                        case TempoAnnotationText.accel: {
+                        case TempoAnnotations.accel: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed * AccelerandoSpeedMul;
                             let accuTicks = 0;
@@ -328,7 +328,7 @@ export class Player {
                             });
                             break;
                         }
-                        case TempoAnnotationText.rit: {
+                        case TempoAnnotations.rit: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed / RitardandoSpeedDiv;
                             let accuTicks = 0;
@@ -338,7 +338,7 @@ export class Player {
                             });
                             break;
                         }
-                        case DynamicsAnnotationText.cresc: {
+                        case DynamicsAnnotations.cresc: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
                             if (extensionBreakText && isDynamicsLevelText(extensionBreakText) && getVolume(extensionBreakText) > startVol) {
@@ -351,8 +351,8 @@ export class Player {
                             });
                             break;
                         }
-                        case DynamicsAnnotationText.decresc:
-                        case DynamicsAnnotationText.dim: {
+                        case DynamicsAnnotations.decresc:
+                        case DynamicsAnnotations.dim: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
                             if (extensionBreakText && isDynamicsLevelText(extensionBreakText) && getVolume(extensionBreakText) < startVol) {

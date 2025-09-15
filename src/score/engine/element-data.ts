@@ -17,7 +17,7 @@ export function getNavigationString(navigation: Navigation): string {
     }
 }
 
-export enum DynamicsAnnotationText {
+export enum DynamicsAnnotations {
     cresc = "cresc.",
     decresc = "decresc.",
     dim = "dim.",
@@ -32,17 +32,17 @@ export enum DynamicsAnnotationText {
     fff = "fff"
 }
 
-export enum TempoAnnotationText {
+export enum TempoAnnotations {
     accel = "accel.",
     rit = "rit.",
     a_tempo = "a tempo"
 }
 
-export function getKnownAnnotation(text: string): Annotation | undefined {
-    if (Utils.Is.isEnumValue(text, DynamicsAnnotationText)) {
+export function getAnnotation(text: string): Annotation | undefined {
+    if (Utils.Is.isEnumValue(text, DynamicsAnnotations)) {
         return Annotation.Dynamics;
     }
-    else if (Utils.Is.isEnumValue(text, TempoAnnotationText)) {
+    else if (Utils.Is.isEnumValue(text, TempoAnnotations)) {
         return Annotation.Tempo;
     }
     else {
