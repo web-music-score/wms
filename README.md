@@ -38,9 +38,9 @@ Enough changes until next major update!
 
 **Breiking:** Changes were required by new features. No breaking in document building interface.
 
-* Support for generic tuples with DocumentBuilder.addTuplet().
-* Support for multiple dot count.
-* String note length (e.g. use "2n" instead of Theory.NoteLength.Half).
+* Support generic tuples with DocumentBuilder.addTuplet().
+* Support multiple dot count.
+* Support string arguments in addition to TypeScript enums.
 
 ## Installation
 
