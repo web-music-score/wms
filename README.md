@@ -321,8 +321,9 @@ builder.addStaffGroup("grp4", ["staff1", "tab1"], Score.VertocalPosition.Auto); 
 Adds extension line to element, for example to previously added annotation.
 
 ```js
-builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 2);        // Add extension line
-builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 2, false); // Add hidden extension line
+builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 3);  // Add extension line, length of whole note * 3.
+builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(["1n", 3]);                    // Add extension line, length of whole note * 3.
+builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension("2n", false);                  // Add hidden extension line, length of half note.
 ```
 
 ### Add Connective (tie, slur, slide)
