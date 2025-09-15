@@ -11,7 +11,8 @@ export function getNavigationString(navigation: Navigation): string {
         case Navigation.Segno: return ObjSpecialText.Segno;
         case Navigation.Coda: return ObjSpecialText.Coda;
         case Navigation.toCoda: return ObjSpecialText.toCoda;
-        default: return navigation;
+        default:
+            return navigation[0].toUpperCase() + navigation.substring(1);
     }
 }
 
