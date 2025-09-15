@@ -11,37 +11,6 @@ later taking lessons in classical guitar. I've also studied music theory indepen
 
 This is a work in progress project. Expect changes, bugs, or unexpected behavior.
 
-## Version 2 Update
-
-**Breaking:** Version 2 is major update and brought many changes.
-
-* Introduced subpath modules instead of one big main module. There is no main export.
-* Theory module had big refactor that affected whole library. Renamed all musical terms that
-  were wrong (e.g. pitch => diatonicId, noteId => chromaticId).
-* Score module stayed mostly same. Some changes (e.g. enum StaffKind => StaffPreset) but nothing major.
-* Classical guitar audio was put into separate module (audio-cg) because it bundles over 1MB of audio
-  samples. Also improved default synthesizer audio.
-* Numerous small changes/improvements.
-
-Enough changes until next major update!
-
-## Version 3 Update
-
-**Breaking:** Version 3 is another major update and brought some important changes.
-
-* Support score configuration with multiple notation lines (combination of staves and tabs).
-* Introduced DocumentBuilder to create scores, removed old way.
-* DocumentOptions functionality is replaced using functions addScoreConfiguration() and setMeasuresPerRow() in DocumentBuilder.
-* Add ties, slurs and slides using addConnective() in DocumentBuilder. Tie and span options removed from NoteOptions.
-
-## Version 4 Update
-
-**Breiking:** Changes were required by new features. No breaking in document building interface.
-
-* Support generic tuples with DocumentBuilder.addTuplet().
-* Support multiple dot count.
-* Support string arguments in addition to TypeScript enums.
-
 ## Installation
 
 ```sh
@@ -100,9 +69,7 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 
 Following is introduction to the main interface by simple examples.
 
-### Create DocumentBuilder
-
-Documents are created using `DocumentBuilder`.
+### Using `DocumentBuilder`
 
 ```js
 let doc = new Score.DocumentBuilder()
@@ -116,24 +83,35 @@ let doc = new Score.DocumentBuilder()
     .getDEocument();
 ```
 
+**Hint:**
+```js
+    // In following examples if the function call begins with dot...
+    .addNote(...)
+
+    // ...it means call to the DocumentBuilder object.
+    documentBuilder.addNote(...)
+```
+
+
+
 ### Set Score Configuration
 Setting score configuration takes place in first measure of next row.
 
 #### Using preset values
 ```js
-builder.setScoreConfiguration(Score.StaffPreset.Treble);         // Staff with treble G-clef.
-builder.setScoreConfiguration(Score.StaffPreset.Bass);           // Staff with bass F-clef.
-builder.setScoreConfiguration(Score.StaffPreset.Grand);          // Both treble and bas staves.
-builder.setScoreConfiguration(Score.StaffPreset.GuitarTreble);   // Same as `Treble` but one octave down.
-builder.setScoreConfiguration(Score.StaffPreset.GuitarTab);      // Guitar tab only.
-builder.setScoreConfiguration(Score.StaffPreset.GuitarCombined); // Treble and tab for guitar.
+.setScoreConfiguration(Score.StaffPreset.Treble)         // Staff with treble G-clef.
+.setScoreConfiguration(Score.StaffPreset.Bass)           // Staff with bass F-clef.
+.setScoreConfiguration(Score.StaffPreset.Grand)          // Both treble and bas staves.
+.setScoreConfiguration(Score.StaffPreset.GuitarTreble)   // Same as `Treble` but one octave down.
+.setScoreConfiguration(Score.StaffPreset.GuitarTab)      // Guitar tab only.
+.setScoreConfiguration(Score.StaffPreset.GuitarCombined) // Treble and tab for guitar.
 ```
 
 #### Using configuration objects
 ```js
-builder.setScoreConfiguration({ type: "staff", clef: "G"}); // Staff with treble G-clef.
-builder.setScoreConfiguration({ type: "staff", clef: "F"}); // Staff with bass F-clef.
-builder.setScoreConfiguration({
+.setScoreConfiguration({ type: "staff", clef: "G"}) // Staff with treble G-clef.
+.setScoreConfiguration({ type: "staff", clef: "F"}) // Staff with bass F-clef.
+.setScoreConfiguration({
     type: "staff",
     clef: "G",           // G-clef
     isOctaveDown: false, // (optional) octave down
@@ -141,143 +119,143 @@ builder.setScoreConfiguration({
     minNote: "C2",       // (optional) min allowed note
     maxNote: "C6",       // (optional) max allowed note
     voiceIds: [0, 1]     // (optional) only present voices 0 and 1 in this staff
-});
-builder.setScoreConfiguration([
+})
+.setScoreConfiguration([
     { type: "staff", clef: "G", isGrand: true },
     { type: "staff", clef: "F", isGrand: true }
-]); // Grand staff
-builder.setScoreConfiguration([
+]) // Grand staff
+.setScoreConfiguration([
     { type: "staff", clef: "G", isOctaveDown: true },
     { type: "tab", tuning: "Drop D" }
-]); // Staff and tab for guitar, tab with Drop D tuning.
-builder.setScoreConfiguration(
+]) // Staff and tab for guitar, tab with Drop D tuning.
+.setScoreConfiguration(
 {
     type: "tab",
     name: "tab1",
     tuning: ["E2", "A2", "D3", "G3", "B3", "E4"],
     voiceIds: 4
-});
+})
 ```
 
 ### Set Automatic Measures Per Row
 ```ts
-builder.setMesuresPerRow(4);        // Set 4 measures per row
-builder.setMesuresPerRow(Infinity); // Turn off auto row change (default)
+.setMesuresPerRow(4)        // Set 4 measures per row
+.setMesuresPerRow(Infinity) // Turn off auto row change (default)
 ```
 
 ### Set Header
 ```js
-builder.setHeader("Title", "Composer", "Arranger");
-builder.setHeader("Demo Song");
+.setHeader("Title", "Composer", "Arranger")
+.setHeader("Demo Song")
 ```
 
 ### Add Measure
 ```js
-builder.addMeasure();
+.addMeasure()
 ```
 
 ### End Row
 Manually induce row change. Next measure that is added will begin new row.
 
 ```js
-builder.endRow();
+.endRow()
 ```
 
 ### Set Key Signature
 
 ```js
-builder.setKeySignature("C", "Major");                       // Create C Major scale.
-builder.setKeySignature("A", Theory.ScaleType.NaturalMinor); // Create A natural minor scale.
+.setKeySignature("C", "Major")                       // Create C Major scale.
+.setKeySignature("A", Theory.ScaleType.NaturalMinor) // Create A natural minor scale.
 ```
 
 - See API Reference for all scale types.
 
 ### Set Time Signature
 ```js
-builder.setTimeSignature("2/4");
-builder.setTimeSignature("3/4");
-builder.setTimeSignature("4/4");
-builder.setTimeSignature("6/8");
-builder.setTimeSignature("9/8");
+.setTimeSignature("2/4")
+.setTimeSignature("3/4")
+.setTimeSignature("4/4")
+.setTimeSignature("6/8")
+.setTimeSignature("9/8")
 ```
 
 ### Set Tempo
 ```js
-builder.setTempo(100, "4n"); // 100 beats per minute, beat length is quarter note.
-builder.setTempo(80, "4n", 2); // 100 beats per minute, beat length is double dotted quarter note.
-builder.setTempo(80, "4.."); // 100 beats per minute, beat length is double dotted quarter note.
+.setTempo(100, "4n") // 100 beats per minute, beat length is quarter note.
+.setTempo(80, "4n", 2) // 100 beats per minute, beat length is double dotted quarter note.
+.setTempo(80, "4..") // 100 beats per minute, beat length is double dotted quarter note.
 ```
 
 ### Add Note
 ```js
-builder.addNote(0, "C4", "1n");                    // Create whole note "C4"
-builder.addNote(0, "G#3", "8n", { dotted: true }); // Create dotted eighth note "G#3"
-builder.addNote(0, "Bb4", "2..");                  // Create double dotted half note "Bb4"
-builder.addNote(0, "C4", "4n", { stem: Score.Stem.Up }); // Stem direction Up (could be also Down)
-builder.addNote(0, "C4", "4n", { staccate: true }); // Show staccato dot and play in short
-builder.addNote(0, "C4", "4n", { diamond: true }); // Show diamond shaped note head
+.addNote(0, "C4", "1n")                    // Create whole note "C4"
+.addNote(0, "G#3", "8n", { dotted: true }) // Create dotted eighth note "G#3"
+.addNote(0, "Bb4", "2..")                  // Create double dotted half note "Bb4"
+.addNote(0, "C4", "4n", { stem: Score.Stem.Up }) // Stem direction Up (could be also Down)
+.addNote(0, "C4", "4n", { staccate: true }) // Show staccato dot and play in short
+.addNote(0, "C4", "4n", { diamond: true }) // Show diamond shaped note head
 ```
 
 ### Add Chord
 ```js
-builder.addChord(1, ["C3", "E3", "G3"], "1n", { arpeggio: Score.Arpeggio.Down }); // Create whole note chord of three notes, played in arpeggio.
+.addChord(1, ["C3", "E3", "G3"], "1n", { arpeggio: Score.Arpeggio.Down }) // Create whole note chord of three notes, played in arpeggio.
 ```
 
 ### Add Rest
 
 ```js    
-builder.addRest(0, "16n");               // Add sixteenth rest
-builder.addRest(0, "4n", { dotted: 3 }); // Add triple dotted quarter rest
-builder.addRest(0, "4.");                // Add dotted quarter rest
-builder.addRest(0, "4n", { staffPos: "D3" }); // Draw this quarter rest at level of "D3" note.
-builder.addRest(0, "4n", { hide: true }); // Invisible rest affects playing
+.addRest(0, "16n")               // Add sixteenth rest
+.addRest(0, "4n", { dotted: 3 }) // Add triple dotted quarter rest
+.addRest(0, "4.")                // Add dotted quarter rest
+.addRest(0, "4n", { staffPos: "D3" }) // Draw this quarter rest at level of "D3" note.
+.addRest(0, "4n", { hide: true }) // Invisible rest affects playing
 ```
 
 ### Add Tuplet
 This works for any tuplet:
 ```js
 // Example: add triplet
-builder.addTuplet(0, { parts: 3, inTimeOf: 2 }, notes => {
-    notes.addNote("G3", "8n");
-    notes.addNote("B3", "8n");
-    notes.addNote("D4", "8n");
-});
+.addTuplet(0, { parts: 3, inTimeOf: 2 }, notes => {
+    notes.addNote("G3", "8n")
+    notes.addNote("B3", "8n")
+    notes.addNote("D4", "8n")
+})
 ```
 
 Triplets can also be created using `triplet` property or string note length:
 ```js
 // Example: add triplet using triplet property.
-builder.addNote(0, "G3", "8n", { triplet: true });
-builder.addNote(0, "B3", "8n", { triplet: true });
-builder.addNote(0, "D4", "8n", { triplet: true });
+.addNote(0, "G3", "8n", { triplet: true })
+.addNote(0, "B3", "8n", { triplet: true })
+.addNote(0, "D4", "8n", { triplet: true })
 
 // Example: add triplet using string note length.
-builder.addNote(0, "G3", "8t");
-builder.addNote(0, "B3", "8t");
-builder.addNote(0, "D4", "8t");
+.addNote(0, "G3", "8t")
+.addNote(0, "B3", "8t")
+.addNote(0, "D4", "8t")
 ```
 
 ### Add Fermata
 
 ```js
-builder.addNote(0, "C3", "2n").addFermata(Score.Fermata.AtNote); // Add fermata at note.
-builder.addFermata(Score.Fermata.AtMeasureEnd);                 // Add fermata at measure end.
+.addNote(0, "C3", "2n").addFermata(Score.Fermata.AtNote) // Add fermata at note.
+.addFermata(Score.Fermata.AtMeasureEnd)                 // Add fermata at measure end.
 ```
 
 ### Add Navigation
 
 ```js
-builder.addNavigation(Score.Navigation.DC_al_Fine);   // Add "DC_al_Fine"
-builder.addNavigation(Score.Navigation.DC_al_Coda);   // Add "DC_al_Coda"
-builder.addNavigation(Score.Navigation.DS_al_Fine);   // Add "DS_al_Fine"
-builder.addNavigation(Score.Navigation.DS_al_Coda);   // Add "DS_al_Coda"
-builder.addNavigation(Score.Navigation.Coda);         // Add "Coda"
-builder.addNavigation(Score.Navigation.toCoda);       // Ass "toCoda"
-builder.addNavigation(Score.Navigation.Segno);        // Add "Segno" symbol
-builder.addNavigation(Score.Navigation.Fine);         // Add "Fine"
-builder.addNavigation(Score.Navigation.StartRepeat);  // Add repeat sections start position
-builder.addNavigation(Score.Navigation.EndRepeat, 3); // Add repeat sections end position, repeat sectionplayed 3 times
-builder.addNavigation(Score.Navigation.Ending, 1, 2); // Add ending, played on 1st and 2nd run
+.addNavigation(Score.Navigation.DC_al_Fine)   // Add "DC_al_Fine"
+.addNavigation(Score.Navigation.DC_al_Coda)   // Add "DC_al_Coda"
+.addNavigation(Score.Navigation.DS_al_Fine)   // Add "DS_al_Fine"
+.addNavigation(Score.Navigation.DS_al_Coda)   // Add "DS_al_Coda"
+.addNavigation(Score.Navigation.Coda)         // Add "Coda"
+.addNavigation(Score.Navigation.toCoda)       // Ass "toCoda"
+.addNavigation(Score.Navigation.Segno)        // Add "Segno" symbol
+.addNavigation(Score.Navigation.Fine)         // Add "Fine"
+.addNavigation(Score.Navigation.StartRepeat)  // Add repeat sections start position
+.addNavigation(Score.Navigation.EndRepeat, 3) // Add repeat sections end position, repeat sectionplayed 3 times
+.addNavigation(Score.Navigation.Ending, 1, 2) // Add ending, played on 1st and 2nd run
 ```
 
 ### Add Annotation
@@ -285,8 +263,8 @@ builder.addNavigation(Score.Navigation.Ending, 1, 2); // Add ending, played on 1
 Add annotation text anchored to previously added note, chord or rest.
 
 ```js
-builder.addAnnotation(Score.Annotation.Dynamics, "ff");
-builder.addAnnotation(Score.Annotation.Tempo, "accel.");
+.addAnnotation(Score.Annotation.Dynamics, "ff")
+.addAnnotation(Score.Annotation.Tempo, "accel.")
 ```
 
 ### Add Label
@@ -294,8 +272,8 @@ builder.addAnnotation(Score.Annotation.Tempo, "accel.");
 Add text label anchored to previously added note, chord or rest.
 
 ```js
-builder.addLabel(Score.Label.Chord, "Am"); // Positioned above staff. Used to label chords.
-builder.addLabel(Score.Label.Note, "C#5"); // Positioned below staff. Used to label notes.
+.addLabel(Score.Label.Chord, "Am") // Positioned above staff. Used to label chords.
+.addLabel(Score.Label.Note, "C#5") // Positioned below staff. Used to label notes.
 ```
 
 ### Positioning Elements
@@ -304,16 +282,16 @@ builder.addLabel(Score.Label.Note, "C#5"); // Positioned below staff. Used to la
 `addFermataTo`, `addNavigationTo`, `addAnnotationTo` and `addLabelTo` that contain extra first argument.
 
 ```js
-builder.addLabelTo(0, Score.Label.Chord, "Am");        // Add label to top (id 0) staff/tab.
-builder.addLabelTo([0, 1], Score.Label.Chord, "Am");   // Add label to top two (id 0 and 1) staves/tabs.
-builder.addLabelTo("staff1", Score.Label.Chord, "Am"); // Add label to named staff/tab/group.
-builder.addLabelTo("grp1", Score.Label.Chord, "Am");   // Add label to named staff/tab/group.
+.addLabelTo(0, Score.Label.Chord, "Am")        // Add label to top (id 0) staff/tab.
+.addLabelTo([0, 1], Score.Label.Chord, "Am")   // Add label to top two (id 0 and 1) staves/tabs.
+.addLabelTo("staff1", Score.Label.Chord, "Am") // Add label to named staff/tab/group.
+.addLabelTo("grp1", Score.Label.Chord, "Am")   // Add label to named staff/tab/group.
 
 // Create staff groups
-builder.addStaffGroup("grp1", 0, Score.VertocalPosition.Above);                 // This staff group adds elements above top staff/tab.
-builder.addStaffGroup("grp2", [1], Score.VertocalPosition.Below);               // This staff group adds elements below second staff/tab from top.
-builder.addStaffGroup("grp3", "tab1", Score.VertocalPosition.Both);             // This staff group adds elements above and below tab named "tab1".
-builder.addStaffGroup("grp4", ["staff1", "tab1"], Score.VertocalPosition.Auto); // This staff group uses default location to add element to "staff1" and "tab1".
+.addStaffGroup("grp1", 0, Score.VertocalPosition.Above)                 // This staff group adds elements above top staff/tab.
+.addStaffGroup("grp2", [1], Score.VertocalPosition.Below)               // This staff group adds elements below second staff/tab from top.
+.addStaffGroup("grp3", "tab1", Score.VertocalPosition.Both)             // This staff group adds elements above and below tab named "tab1".
+.addStaffGroup("grp4", ["staff1", "tab1"], Score.VertocalPosition.Auto) // This staff group uses default location to add element to "staff1" and "tab1".
 ```
 
 ### Add Extension
@@ -321,22 +299,22 @@ builder.addStaffGroup("grp4", ["staff1", "tab1"], Score.VertocalPosition.Auto); 
 Adds extension line to element, for example to previously added annotation.
 
 ```js
-builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 3);  // Add extension line, length of whole note * 3.
-builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(["1n", 3]);                    // Add extension line, length of whole note * 3.
-builder.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension("2n", false);                  // Add hidden extension line, length of half note.
+.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 3)  // Add extension line, length of whole note * 3.
+.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(["1n", 3])                    // Add extension line, length of whole note * 3.
+.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension("2n", false)                  // Add hidden extension line, length of half note.
 ```
 
 ### Add Connective (tie, slur, slide)
 
 ```js
-builder.addConnective(Score.Connetive.Tie);   // Add tie
-builder.addConnective(Score.Connetive.Slur);  // Add slur
-builder.addConnective(Score.Connetive.Slide); // Add slide
-builder.addConnective(Score.Connetive.Tie, 3); // Add tie with span value (describes how many notes the connective is across).
-builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Above); // Add slur connected above note.
-builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Below); // Add slur connected below note.
-builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Center); // Add slur connected next to note.
-builder.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.StemTip); // Add slur connected at stem tip.
+.addConnective(Score.Connetive.Tie)   // Add tie
+.addConnective(Score.Connetive.Slur)  // Add slur
+.addConnective(Score.Connetive.Slide) // Add slide
+.addConnective(Score.Connetive.Tie, 3) // Add tie with span value (describes how many notes the connective is across).
+.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Above) // Add slur connected above note.
+.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Below) // Add slur connected below note.
+.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Center) // Add slur connected next to note.
+.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.StemTip) // Add slur connected at stem tip.
 ```
 
 ### Guitar Tab
@@ -346,8 +324,8 @@ This library has preliminary guitar tab rendering.
 Add notes with `string` property to specify at what string the fret number is rendered in the tab.
 
 ```js
-builder.addNote(0, "G3", "8n", { string: 3 });
-builder.addChord(0, ["E4", "C3"], "8n", { string: [1, 5] });
+.addNote(0, "G3", "8n", { string: 3 })
+.addChord(0, ["E4", "C3"], "8n", { string: [1, 5] })
 ```
 
 ### Beams
