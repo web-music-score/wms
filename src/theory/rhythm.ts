@@ -65,11 +65,11 @@ export function hasNoteLengthTriplet(noteLength: NoteLength | NoteLengthStr): bo
 
 export function getNoteLengthDotCount(noteLength: NoteLength | NoteLengthStr): number | undefined {
     if (typeof noteLength === "string") {
-        let n = 0;
-        for (let i = 0; i < noteLength.length; i++) {
-            if (noteLength[i] === ".") n++;
+        let dotCount = 0;
+        for (let char of noteLength) {
+            if (char === ".") dotCount++;
         }
-        return n > 0 ? n : undefined;
+        return dotCount > 0 ? dotCount : undefined;
     }
     else {
         return undefined;
@@ -89,7 +89,7 @@ export function getNoteLength(noteLength: NoteLength | NoteLengthStr): NoteLengt
     if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
         return noteLength;
     }
-    else if (typeof noteLength === "string") {
+    else if (typeof noteLength === "string" && ["n", "t", "."].some(c => noteLength.endsWith(c))) {
         switch (parseInt(noteLength)) {
             case 1: return NoteLength.Whole;
             case 2: return NoteLength.Half;
