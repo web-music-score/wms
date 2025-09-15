@@ -104,11 +104,13 @@ export class ObjBeamGroup extends MusicObject {
 
         this.mi = new MBeamGroup(this);
 
+        let beamGroupName = tupletRatio ? "Tuplet" : "BeamGroup";
+
         if (!symbols.every(s => s.measure === symbols[0].measure)) {
-            throw new MusicError(MusicErrorType.Score, "All beam group symbols are not in same measure.");
+            throw new MusicError(MusicErrorType.Score, `All ${beamGroupName} symbols are not in same measure.`);
         }
         else if (symbols.length < 2) {
-            throw new MusicError(MusicErrorType.Score, "Beam group need minimum 2 symbols, but " + symbols.length + " given.");
+            throw new MusicError(MusicErrorType.Score, `${beamGroupName} needs minimum 2 symbols, but ${symbols.length} given.`);
         }
 
         if (tupletRatio !== undefined) {
@@ -144,7 +146,7 @@ export class ObjBeamGroup extends MusicObject {
             symbols[0].measure.addBeamGroup(this);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot add beam group because some symbol already has one.");
+            throw new MusicError(MusicErrorType.Score, `Cannot add ${beamGroupName} because some symbol already has one.`);
         }
     }
 
