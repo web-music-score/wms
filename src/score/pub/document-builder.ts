@@ -7,7 +7,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
 import { ObjBeamGroup } from "score/engine/obj-beam-group";
-import { getAnnotation } from "score/engine/element-data";
+import { AnnotationsType, getAnnotation } from "score/engine/element-data";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -366,7 +366,7 @@ export class DocumentBuilder {
         return this;
     }
 
-    addAnnotation(text: string): DocumentBuilder;
+    addAnnotation(text: AnnotationsType): DocumentBuilder;
     addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
     addAnnotation(...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
         if (args.length === 1) {
@@ -378,7 +378,7 @@ export class DocumentBuilder {
     }
 
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: string): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: AnnotationsType): DocumentBuilder;
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {

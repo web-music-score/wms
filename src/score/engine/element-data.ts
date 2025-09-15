@@ -38,6 +38,20 @@ export enum TempoAnnotations {
     a_tempo = "a tempo"
 }
 
+export type AnnotationsType = `${DynamicsAnnotations}` | `${TempoAnnotations}`;
+
+export function isDynamicsText(text: string): text is `${DynamicsAnnotations}` {
+    return Utils.Is.isEnumValue(text, DynamicsAnnotations);
+}
+
+export function isDynamicsLevelText(text: string): text is `${DynamicsAnnotations}` {
+    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff"].includes(text);
+}
+
+export function isTempoText(text: string): text is `${TempoAnnotations}` {
+    return Utils.Is.isEnumValue(text, TempoAnnotations);
+}
+
 export function getAnnotation(text: string): Annotation | undefined {
     if (Utils.Is.isEnumValue(text, DynamicsAnnotations)) {
         return Annotation.Dynamics;
@@ -48,16 +62,4 @@ export function getAnnotation(text: string): Annotation | undefined {
     else {
         return undefined;
     }
-}
-
-export function isDynamicsText(text: string): boolean {
-    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim."].indexOf(text) >= 0;
-}
-
-export function isDynamicsLevelText(text: string): boolean {
-    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff"].indexOf(text) >= 0;
-}
-
-export function isTempoText(text: string): boolean {
-    return ["accel.", "rit.", "a tempo"].indexOf(text) >= 0;
 }
