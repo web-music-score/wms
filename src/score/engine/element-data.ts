@@ -1,8 +1,8 @@
 import { Navigation, Annotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
-export function getNavigationString(n: Navigation) {
-    switch (n) {
+export function getNavigationString(navigation: Navigation): string {
+    switch (navigation) {
         case Navigation.DC_al_Coda: return "D.C. al Coda";
         case Navigation.DC_al_Fine: return "D.C. al Fine";
         case Navigation.DS_al_Coda: return "D.S. al Coda";
@@ -11,7 +11,7 @@ export function getNavigationString(n: Navigation) {
         case Navigation.Segno: return ObjSpecialText.Segno;
         case Navigation.Coda: return ObjSpecialText.Coda;
         case Navigation.toCoda: return ObjSpecialText.toCoda;
-        default: return Navigation[n];
+        default: return navigation;
     }
 }
 
