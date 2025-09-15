@@ -178,7 +178,7 @@ export class DocumentBuilder {
         return this;
     }
 
-    setKeySignature(tonic: string, scaleType: ScaleType): DocumentBuilder;
+    setKeySignature(tonic: string, scaleType: ScaleType | `${ScaleType}`): DocumentBuilder;
     setKeySignature(keySignature: KeySignature): DocumentBuilder;
     setKeySignature(scale: Scale): DocumentBuilder;
     setKeySignature(...args: unknown[]): DocumentBuilder {
