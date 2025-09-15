@@ -7,6 +7,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
 import { ObjBeamGroup } from "score/engine/obj-beam-group";
+import { getAnnotation } from "score/engine/element-data";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -351,7 +352,13 @@ export class DocumentBuilder {
         return this.addNavigationInternal(staffTabOrGroups, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder {
+    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}` | undefined, text: string): DocumentBuilder {
+        annotation ??= getAnnotation(text);
+
+        if (annotation === undefined) {
+            throw new MusicError(MusicErrorType.Score, `Annotation text "${text}" is not known annotation.`);
+        }
+
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
         assertArg(Utils.Is.isString(text), "text", text);
@@ -359,13 +366,28 @@ export class DocumentBuilder {
         return this;
     }
 
-    addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder {
-        return this.addAnnotationInternal(undefined, annotation, text);
+    addAnnotation(text: string): DocumentBuilder;
+    addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
+    addAnnotation(...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
+        if (args.length === 1) {
+            return this.addAnnotationInternal(undefined, undefined, args[0]);
+        }
+        else {
+            return this.addAnnotationInternal(undefined, args[0], args[1]);
+        }
     }
 
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder {
-        return this.addAnnotationInternal(staffTabOrGroups, annotation, text);
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: string): DocumentBuilder;
+    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
+        if (args.length === 1) {
+            return this.addAnnotationInternal(staffTabOrGroups, undefined, args[0]);
+        }
+        else {
+            return this.addAnnotationInternal(staffTabOrGroups, args[0], args[1]);
+        }
     }
 
     private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
