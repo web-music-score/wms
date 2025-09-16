@@ -45,7 +45,7 @@ export function isDynamicsText(text: string): text is `${DynamicsAnnotations}` {
 }
 
 export function isDynamicsLevelText(text: string): text is `${DynamicsAnnotations}` {
-    return ["ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff"].includes(text);
+    return /^(p+|f+|m|mp|mf)$/.test(text);
 }
 
 export function isTempoText(text: string): text is `${TempoAnnotations}` {
