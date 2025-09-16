@@ -130,7 +130,7 @@ export const Tuplet: Record<"Duplet" | "Triplet" | "Quadruplet", TupletRatio> = 
 
 export class RhythmProps {
     readonly noteLength: NoteLength;
-    readonly noteLengthN: number; // Whole = 1, Half = 2, Quarter = 4, etc.
+    readonly noteLengthN: number; // whole=1, half=2, quarter=4, etc.
     readonly dotCount: number;
     readonly tupletRatio?: TupletRatio;
     readonly ticks: number;
@@ -212,8 +212,8 @@ export class RhythmProps {
     }
 
     static cmpNoteLength(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
-        let aNoteLength = (a instanceof RhythmProps ? a : RhythmProps.get(a)).noteLength;
-        let bNoteLength = (b instanceof RhythmProps ? b : RhythmProps.get(b)).noteLength;
-        return cmp(bNoteLength, aNoteLength); // Reversed: smaller number is longer note.
+        let aNoteLengthN = (a instanceof RhythmProps ? a : RhythmProps.get(a)).noteLengthN;
+        let bNoteLengthN = (b instanceof RhythmProps ? b : RhythmProps.get(b)).noteLengthN;
+        return cmp(bNoteLengthN, aNoteLengthN); // Reversed: smaller N is longer note (whole=1, half=2, etc.)
     }
 }
