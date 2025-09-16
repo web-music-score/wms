@@ -43,8 +43,8 @@ export class ConnectiveProps {
     }
 
     private computeParams() {
-        let stemDir = this.noteGroups[0].stemDir;
-        let hasStem = this.noteGroups[0].rhythmProps.hasStem;
+        let { stemDir } = this.noteGroups[0];
+        let { hasStem } = this.noteGroups[0].rhythmProps;
 
         if (this.noteAnchor === NoteAnchor.StemTip) {
             this.arcDir = stemDir === Stem.Up ? "up" : "down";

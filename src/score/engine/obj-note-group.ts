@@ -567,7 +567,7 @@ export class ObjNoteGroup extends MusicObject {
 
         let { unitSize } = renderer;
         let { row, stemDir } = this;
-        let { dotCount, flagCount } = this.rhythmProps;
+        let { dotCount, flagCount, hasStem } = this.rhythmProps;
 
         let dotWidth = DocumentSettings.DotSize * unitSize;
 
@@ -651,7 +651,7 @@ export class ObjNoteGroup extends MusicObject {
             let stemTipY = stemDir === Stem.Up ? topNoteY - stemHeight : bottomNoteY + stemHeight;
             let stemBaseY = stemDir === Stem.Up ? bottomNoteY : topNoteY;
 
-            if (this.rhythmProps.hasStem()) {
+            if (hasStem) {
                 obj.stemTip = new DivRect(stemX, stemX, stemTipY, stemTipY);
                 obj.stemBase = new DivRect(stemX, stemX, stemBaseY, stemBaseY);
                 stemTipStaff.addObject(obj.stemTip);

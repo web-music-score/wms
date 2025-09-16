@@ -167,7 +167,7 @@ export class RhythmProps {
         return RhythmProps.get(LongestNoteLength / noteSize);
     }
 
-    hasStem() {
+    get hasStem() {
         return this.noteLength < NoteLength.Whole;
     }
 
