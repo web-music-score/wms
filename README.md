@@ -296,12 +296,14 @@ Add text label anchored to previously added note, chord or rest.
 
 ### Add Extension
 
-Adds extension line to element, for example to previously added annotation.
+Adds extension line to previously added label or annotation.
 
 ```js
-.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(Theory.NoteLength.Whole * 3)  // Add extension line, length of whole note * 3.
-.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension(["1n", 3])                    // Add extension line, length of whole note * 3.
-.addAnnotation(Score.Annotation.Tempo, "accel.").addExtension("2n", false)                  // Add hidden extension line, length of half note.
+.addExtension(len => len.notes("1n", 2), true)    // Add extension line, length is 2 whole notes, visible
+.addExtension(len => len.measures(3), false)      // Add extension line, length is 3 measures, hidden
+.addExtension(len => len.measures(1).notes("8n")) // Add extension line, length is 1 measure + 1 eigth note, visible
+.addExtension(len => len.infinity())              // Add extension line, length is as long as possible, visible
+.addExtension()                                   // Add extension line, length is as long as possible, visible
 ```
 
 ### Add Connective (tie, slur, slide)

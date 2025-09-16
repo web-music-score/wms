@@ -58,7 +58,7 @@ export function createDynamicsAnnotationDemo() {
         .addNote(0, "G3", Theory.NoteLength.Half)
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(Infinity)
+        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(len => len.infinity())
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth)
@@ -79,7 +79,7 @@ export function createDynamicsAnnotationDemo() {
         .addNote(0, "C4", Theory.NoteLength.Eighth)
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "cresc.").addExtension(Infinity)
+        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "cresc.").addExtension(len => len.infinity())
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth)
@@ -110,7 +110,7 @@ export function createDynamicsAnnotationDemo() {
         .addNote(0, "C4", Theory.NoteLength.Eighth)
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "cresc.").addExtension(Theory.NoteLength.Whole)
+        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "cresc.").addExtension(len => len.notes(Theory.NoteLength.Whole))
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "F#4", Theory.NoteLength.Eighth)
@@ -120,7 +120,7 @@ export function createDynamicsAnnotationDemo() {
         .addNote(0, "C4", Theory.NoteLength.Eighth)
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(Theory.NoteLength.Whole)
+        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(len => len.notes(Theory.NoteLength.Whole))
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth)
@@ -131,7 +131,7 @@ export function createDynamicsAnnotationDemo() {
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(Theory.NoteLength.Half)
+        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(len => len.notes(Theory.NoteLength.Half))
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "E4", Theory.NoteLength.Eighth)
@@ -141,7 +141,7 @@ export function createDynamicsAnnotationDemo() {
         .addNote(0, "C4", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "ff")
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(Theory.NoteLength.Half)
+        .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "dim.").addExtension(len => len.notes(Theory.NoteLength.Half))
         .addNote(0, "A3", Theory.NoteLength.Eighth)
         .addNote(0, "B3", Theory.NoteLength.Eighth)
         .addNote(0, "C4", Theory.NoteLength.Eighth)
@@ -153,7 +153,7 @@ export function createDynamicsAnnotationDemo() {
         .addMeasure()
         .addNote(0, "G3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "pp")
         .addNote(0, "A3", Theory.NoteLength.Eighth)
-        .addNote(0, "B3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "cresc.").addExtension(Theory.NoteLength.Half)
+        .addNote(0, "B3", Theory.NoteLength.Eighth).addAnnotation(Score.Annotation.Dynamics, "cresc.").addExtension(len => len.notes(Theory.NoteLength.Half))
         .addNote(0, "E4", Theory.NoteLength.Eighth)
         .addNote(0, "G3", Theory.NoteLength.Eighth)
         .addNote(0, "A3", Theory.NoteLength.Eighth)
