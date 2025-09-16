@@ -467,7 +467,7 @@ export class DocumentBuilder {
             notes: (noteLength, noteCount) => {
                 assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
                 assertArg(Utils.Is.isUndefined(noteCount) || Utils.Is.isNumber(noteCount) && noteCount >= 0, "noteCount", noteCount);
-                ticks += new RhythmProps(noteLength).ticks * (noteCount ?? 1);
+                ticks += RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
                 return helper;
             },
             measures: (measureCount) => {

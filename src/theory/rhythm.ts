@@ -166,10 +166,10 @@ export class RhythmProps {
         /*
             Calculate noteLength example:
                 noteSize = 16 (16th note),
-                MaxNoteLength = NoteLength.Whole = 64
+                LongestNoteLength = NoteLength.Whole = 64
                 noteLength = 64 / 16 = 4 = NoteLength.Sixteenth (16th note)
         */
-        return new RhythmProps(LongestNoteLength / noteSize);
+        return RhythmProps.get(LongestNoteLength / noteSize);
     }
 
     hasStem() {
@@ -178,5 +178,15 @@ export class RhythmProps {
 
     toString() {
         return NoteSymbolMap.get(this.noteLength) + ".".repeat(this.dotCount);
+    }
+
+    private static cache = new Map<NoteLength | NoteLengthStr, RhythmProps>();
+
+    static get(noteLength: NoteLength | NoteLengthStr): RhythmProps {
+        let rhythmProps = this.cache.get(noteLength);
+        if (!rhythmProps) {
+            this.cache.set(noteLength, rhythmProps = new RhythmProps(noteLength));
+        }
+        return rhythmProps;
     }
 }

@@ -54,7 +54,7 @@ function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLength
             let num = extensionLength[i + 1];
             if (typeof str === "string") {
                 i++;
-                let ticks = new RhythmProps(str).ticks;
+                let ticks = RhythmProps.get(str).ticks;
                 if (typeof num === "number") {
                     i++;
                     ticks *= num;
