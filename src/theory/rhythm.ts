@@ -102,6 +102,18 @@ export function getNoteLength(noteLength: NoteLength | NoteLengthStr): NoteLengt
     throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
 }
 
+function getTicks(noteLength: NoteLength): number {
+    switch (noteLength) {
+        case NoteLength.Whole: return 64 * TicksMultiplier;
+        case NoteLength.Half: return 32 * TicksMultiplier;
+        case NoteLength.Quarter: return 16 * TicksMultiplier;
+        case NoteLength.Eighth: return 8 * TicksMultiplier;
+        case NoteLength.Sixteenth: return 4 * TicksMultiplier;
+        case NoteLength.ThirtySecond: return 2 * TicksMultiplier;
+        case NoteLength.SixtyFourth: return 1 * TicksMultiplier;
+    }
+}
+
 export interface TupletRatio {
     parts: number;
     inTimeOf: number;
@@ -138,7 +150,7 @@ export class RhythmProps {
             this.tupletRatio = undefined;
         }
 
-        this.ticks = this.noteLength * TicksMultiplier;
+        this.ticks = getTicks(this.noteLength);
 
         this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
 
@@ -159,14 +171,17 @@ export class RhythmProps {
         }
     }
 
-    static createFromNoteSize(noteSize: number) {
-        /*
-            Calculate noteLength example:
-                noteSize = 16 (16th note),
-                LongestNoteLength = NoteLength.Whole = 64
-                noteLength = 64 / 16 = 4 = NoteLength.Sixteenth (16th note)
-        */
-        return RhythmProps.get(LongestNoteLength / noteSize);
+    static createFromNoteSize(noteSize: number): RhythmProps {
+        switch (noteSize) {
+            case 1: return RhythmProps.get(NoteLength.Whole);
+            case 2: return RhythmProps.get(NoteLength.Half);
+            case 4: return RhythmProps.get(NoteLength.Quarter);
+            case 8: return RhythmProps.get(NoteLength.Eighth);
+            case 16: return RhythmProps.get(NoteLength.Sixteenth);
+            case 32: return RhythmProps.get(NoteLength.ThirtySecond);
+            case 64: return RhythmProps.get(NoteLength.SixtyFourth);
+        }
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteSize: ${noteSize}`)
     }
 
     get hasStem(): boolean {
