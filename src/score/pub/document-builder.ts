@@ -458,7 +458,7 @@ export class DocumentBuilder {
      * @returns 
      */
     addExtension(extensionBuilder?: (len: ExtensionBuilder) => void, extensionVisible?: boolean): DocumentBuilder {
-        assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "extensionBuilder", extensionBuilder);
+        assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "DocumentBuilder.addExtension() was changed, please check README.md or API Reference.", extensionBuilder);
         assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
 
         let ticks: number = 0;
