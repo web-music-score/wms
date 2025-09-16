@@ -200,9 +200,7 @@ export class ObjNoteGroup extends MusicObject {
             ? (options.dotted > 0 ? options.dotted : undefined)
             : (options?.dotted === true ? 1 : undefined);
 
-        this.rhythmProps = tupletRatio
-            ? new RhythmProps(noteLength, dotCount, tupletRatio)
-            : new RhythmProps(noteLength, dotCount, options?.triplet === true ? Tuplet.Triplet : undefined);
+        this.rhythmProps = new RhythmProps(noteLength, dotCount, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
         this.mi = new MNoteGroup(this);
     }
