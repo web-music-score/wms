@@ -65,10 +65,7 @@ export function hasNoteLengthTriplet(noteLength: NoteLength | NoteLengthStr): bo
 
 export function getNoteLengthDotCount(noteLength: NoteLength | NoteLengthStr): number | undefined {
     if (typeof noteLength === "string") {
-        let dotCount = 0;
-        for (let char of noteLength) {
-            if (char === ".") dotCount++;
-        }
+        let dotCount = Utils.Str.charCount(noteLength, ".");
         return dotCount > 0 ? dotCount : undefined;
     }
     else {

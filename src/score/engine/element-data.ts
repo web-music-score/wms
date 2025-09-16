@@ -44,8 +44,14 @@ export function isDynamicsText(text: string): text is `${DynamicsAnnotations}` {
     return Utils.Is.isEnumValue(text, DynamicsAnnotations);
 }
 
-export function isDynamicsLevelText(text: string): text is `${DynamicsAnnotations}` {
-    return /^(p+|f+|m|mp|mf)$/.test(text);
+export function getDynamicsVolume(text: string): number | undefined {
+    if (/^(p+|f+|m|mp|mf)$/.test(text)) {
+        let volume = 0.5 - Utils.Str.charCount(text, "p") * 0.1 + Utils.Str.charCount(text, "f") * 0.1;
+        return Utils.Math.clamp(volume, 0, 1);
+    }
+    else {
+        return undefined;
+    }
 }
 
 export function isTempoText(text: string): text is `${TempoAnnotations}` {

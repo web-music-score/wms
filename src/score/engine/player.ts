@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { DivRect, Navigation, PlayState, PlayStateChangeListener, getVoiceIds } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
-import { isDynamicsLevelText, DynamicsAnnotations, TempoAnnotations } from "./element-data";
+import { DynamicsAnnotations, getDynamicsVolume, TempoAnnotations } from "./element-data";
 import { Extension } from "./extension";
 
 export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
@@ -23,23 +23,8 @@ function calcTicksDuration(ticks: number, tempo: Tempo): number {
     return 60 * ticks / ticksPerMinute;
 }
 
-function getVolume(dynamicsLevelText: string): number {
-    switch (dynamicsLevelText) {
-        case "fff": return 0.9;
-        case "ff": return 0.8;
-        case "f": return 0.7;
-        case "mf": return 0.6;
-        default:
-        case "m": return 0.5;
-        case "mp": return 0.4;
-        case "p": return 0.3;
-        case "pp": return 0.2;
-        case "ppp": return 0.1;
-    }
-}
-
 function getDefaultVolume(): number {
-    return getVolume("m");
+    return getDynamicsVolume("m")!;
 }
 
 function adjustVolume(linearVolume: number) {
@@ -304,12 +289,13 @@ export class Player {
 
             col.getAnchoredLayoutObjects().forEach(layoutObj => {
                 let text = layoutObj.getTextContent() ?? "";
+                let vol: number | undefined;
 
                 if (text === TempoAnnotations.a_tempo) {
                     curSpeed = 1;
                 }
-                else if (isDynamicsLevelText(text)) {
-                    curVolume = getVolume(text);
+                else if ((vol = getDynamicsVolume(text)) !== undefined) {
+                    curVolume = vol;
                 }
                 else if (layoutObj.musicObj.getLink() instanceof Extension) {
                     let extension = layoutObj.musicObj.getLink() as Extension;
@@ -341,8 +327,8 @@ export class Player {
                         case DynamicsAnnotations.cresc: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
-                            if (extensionBreakText && isDynamicsLevelText(extensionBreakText) && getVolume(extensionBreakText) > startVol) {
-                                endVol = getVolume(extensionBreakText);
+                            if (extensionBreakText && (vol = getDynamicsVolume(extensionBreakText)) !== undefined && vol > startVol) {
+                                endVol = vol;
                             }
                             let accuTicks = 0;
                             columnRange.forEach(c => {
@@ -355,8 +341,8 @@ export class Player {
                         case DynamicsAnnotations.dim: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
-                            if (extensionBreakText && isDynamicsLevelText(extensionBreakText) && getVolume(extensionBreakText) < startVol) {
-                                endVol = getVolume(extensionBreakText);
+                            if (extensionBreakText && (vol = getDynamicsVolume(extensionBreakText)) !== undefined && vol < startVol) {
+                                endVol = vol;
                             }
                             let accuTicks = 0;
                             columnRange.forEach(c => {
