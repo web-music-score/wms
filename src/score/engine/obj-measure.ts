@@ -1066,7 +1066,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     createBeams() {
-        if (!this.needBeamsUpdate/* || !this.row.hasStaff*/) {
+        if (!this.needBeamsUpdate) {
             return;
         }
 

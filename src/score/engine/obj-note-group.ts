@@ -852,7 +852,7 @@ export class ObjNoteGroup extends MusicObject {
                 return false;
             }
             for (let dotCount = 1, n = 2; dotCount < 6; dotCount++, n *= 2) {
-                if (a.rhythmProps.noteLength === b.rhythmProps.noteLength * n &&
+                if (a.rhythmProps.noteLengthN === b.rhythmProps.noteLengthN / n &&
                     a.rhythmProps.dotCount === dotCount && b.rhythmProps.dotCount === 0) {
                     return true;
                 }

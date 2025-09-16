@@ -162,21 +162,21 @@ export class ObjBeamGroup extends MusicObject {
 
     static createOldStyleTriplet(symbols: RhythmSymbol[]): number {
         let s2 = symbols.slice(0, 2);
-        let l2 = s2.map(s => s.rhythmProps.noteLength);
+        let n2 = s2.map(s => s.rhythmProps.noteLength);
 
         if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            (l2[1] === l2[0] / 2 && l2[0] / 2 >= ShortestNoteLength) ||
-            (l2[0] === l2[1] / 2 && l2[1] / 2 >= ShortestNoteLength)
-        )) {
+            (RhythmProps.cmpNoteLength(n2[0], ShortestNoteLength) >= 0 && RhythmProps.cmpNoteLength(n2[0] * 2, n2[1]) === 0) ||
+            (RhythmProps.cmpNoteLength(n2[1], ShortestNoteLength) >= 0 && RhythmProps.cmpNoteLength(n2[1] * 2, n2[0]) === 0))
+        ) {
             new ObjBeamGroup(s2, Tuplet.Triplet);
             return 2;
         }
 
         let s3 = symbols.slice(0, 3);
-        let l3 = s3.map(s => s.rhythmProps.noteLength);
+        let n3 = s3.map(s => s.rhythmProps.noteLength);
 
         if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            l3.every(l => l === l3[0])
+            n3.every(n => RhythmProps.cmpNoteLength(n, n3[0]) === 0)
         )) {
             new ObjBeamGroup(s3, Tuplet.Triplet);
             return 3;
