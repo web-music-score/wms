@@ -190,11 +190,9 @@ export class ObjRhythmColumn extends MusicObject {
 
         this.voiceSymbol[voiceId] = symbol;
 
-        if (symbol instanceof ObjRest) {
-            if (!symbol.hide && symbol.noteLength >= NoteLength.Half) {
-                this.minDiatonicId = this.minDiatonicId === undefined ? symbol.ownDiatonicId : Math.min(this.minDiatonicId, symbol.ownDiatonicId);
-                this.maxDiatonicId = this.maxDiatonicId === undefined ? symbol.ownDiatonicId : Math.max(this.maxDiatonicId, symbol.ownDiatonicId);
-            }
+        if (symbol instanceof ObjRest && !symbol.hide) {
+            this.minDiatonicId = this.minDiatonicId === undefined ? symbol.ownDiatonicId : Math.min(this.minDiatonicId, symbol.ownDiatonicId);
+            this.maxDiatonicId = this.maxDiatonicId === undefined ? symbol.ownDiatonicId : Math.max(this.maxDiatonicId, symbol.ownDiatonicId);
         }
         else if (symbol instanceof ObjNoteGroup) {
             // notes are sorted.

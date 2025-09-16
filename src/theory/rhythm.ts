@@ -1,6 +1,8 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
+const cmp = (a: number, b: number): -1 | 0 | 1 => a === b ? 0 : (a < b ? -1 : 1);
+
 export const MaxTupletRatioParts = 12;
 
 /*
@@ -167,11 +169,11 @@ export class RhythmProps {
         return RhythmProps.get(LongestNoteLength / noteSize);
     }
 
-    get hasStem() {
-        return this.noteLength < NoteLength.Whole;
+    get hasStem(): boolean {
+        return RhythmProps.cmpNoteLength(this.noteLength, NoteLength.Whole) < 0;
     }
 
-    toString() {
+    toString(): string {
         return NoteSymbolMap.get(this.noteLength) + ".".repeat(this.dotCount);
     }
 
@@ -183,5 +185,17 @@ export class RhythmProps {
             this.cache.set(noteLength, rhythmProps = new RhythmProps(noteLength));
         }
         return rhythmProps;
+    }
+
+    static cmpTicks(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
+        let aTicks = (a instanceof RhythmProps ? a : RhythmProps.get(a)).ticks;
+        let bTicks = (b instanceof RhythmProps ? b : RhythmProps.get(b)).ticks;
+        return cmp(aTicks, bTicks);
+    }
+
+    static cmpNoteLength(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
+        let aNoteLength = (a instanceof RhythmProps ? a : RhythmProps.get(a)).noteLength;
+        let bNoteLength = (b instanceof RhythmProps ? b : RhythmProps.get(b)).noteLength;
+        return cmp(aNoteLength, bNoteLength);
     }
 }

@@ -486,14 +486,14 @@ export class ObjNoteGroup extends MusicObject {
 
     getStemHeight(renderer: Renderer) {
         let { unitSize } = renderer;
-        let { noteLength, flagCount } = this.rhythmProps;
+        let { flagCount, hasStem } = this.rhythmProps;
 
-        if (noteLength >= NoteLength.Whole) {
-            return 0;
-        }
-        else {
+        if (hasStem) {
             let addY = this.hasBeamCount() ? DocumentSettings.BeamSeparation : DocumentSettings.FlagSeparation;
             return (DocumentSettings.StemHeight + Math.max(0, flagCount - 1) * addY) * unitSize;
+        }
+        else {
+            return 0;
         }
     }
 
@@ -767,7 +767,7 @@ export class ObjNoteGroup extends MusicObject {
 
             // Draw note heads
             obj.noteHeadRects.forEach(r => {
-                let outlinedNoteHead = noteLength >= NoteLength.Half;
+                let outlinedNoteHead = RhythmProps.cmpNoteLength(noteLength, NoteLength.Half) >= 0;
 
                 if (this.diamond) {
                     if (outlinedNoteHead) {

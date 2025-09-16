@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { ShortestNoteLength, NoteLength, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
+import { ShortestNoteLength, NoteLength, Tuplet, TupletRatio, RhythmProps } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -128,7 +128,7 @@ export class ObjBeamGroup extends MusicObject {
             }
 
             // Quarter notes or longer do not have beam => use group.
-            if (symbols.some(s => s.rhythmProps.noteLength >= NoteLength.Quarter)) {
+            if (symbols.some(s => RhythmProps.cmpNoteLength(s.rhythmProps, NoteLength.Quarter) >= 0)) {
                 isGroup = true;
             }
 
