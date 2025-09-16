@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { getNoteLength, KeySignature, MaxTupletRatioParts, Note, NoteLength, NoteLengthStr, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
+import { getNoteLength, KeySignature, MaxTupletRatioParts, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
@@ -105,9 +105,15 @@ function isNoteLengthStr(str: unknown): boolean {
 }
 
 export type TupletBuilder = {
-    addNote: (note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => void,
-    addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => void,
-    addRest: (restLength: NoteLength | NoteLengthStr, options?: RestOptions) => void
+    addNote: (note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => TupletBuilder,
+    addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => TupletBuilder,
+    addRest: (restLength: NoteLength | NoteLengthStr, options?: RestOptions) => TupletBuilder
+}
+
+export type ExtensionBuilder = {
+    notes: (noteLength: NoteLength | NoteLengthStr, noteCount?: number) => ExtensionBuilder,
+    measures: (measureCount: number) => ExtensionBuilder,
+    infinity: () => ExtensionBuilder
 }
 
 export class DocumentBuilder {
@@ -254,11 +260,12 @@ export class DocumentBuilder {
      * 
      * @param voiceId 
      * @param tupletRatio - You can also use Theory.Tuplet presets (e.g. Theory.Tuplet.Triplet).
-     * @param builder 
+     * @param tupletBuilder 
      * @returns 
      */
-    addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, builder: (notes: TupletBuilder) => void): DocumentBuilder {
+    addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, tupletBuilder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+        assertArg(Utils.Is.isFunction(tupletBuilder), "tupletBuilder", tupletBuilder);
         assertArg(Utils.Is.isObject(tupletRatio) &&
             Utils.Is.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioParts) &&
             Utils.Is.isIntegerGte(tupletRatio.inTimeOf, 2) &&
@@ -276,6 +283,7 @@ export class DocumentBuilder {
                 }
                 let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, options, tupletRatio);
                 tupletSymbols.push(s);
+                return helper;
             },
             addChord: (notes, noteLength, options) => {
                 assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
@@ -286,6 +294,7 @@ export class DocumentBuilder {
                 }
                 let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, options, tupletRatio);
                 tupletSymbols.push(s);
+                return helper;
             },
             addRest: (restLength, options) => {
                 assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLengthStr(restLength), "restLength", restLength);
@@ -295,10 +304,11 @@ export class DocumentBuilder {
                 }
                 let s = this.getMeasure().addRest(voiceId, restLength, options, tupletRatio);
                 tupletSymbols.push(s);
+                return helper;
             }
         };
 
-        builder(helper);
+        tupletBuilder(helper);
 
         ObjBeamGroup.createTuplet(tupletSymbols, tupletRatio);
 
@@ -436,27 +446,49 @@ export class DocumentBuilder {
     }
 
     /**
-     * Extension length examples:
+     * Extension length example:
      * <pre>
-     *     "1n" = NoteLength.Whole
-     *     ["4n", 5] = NoteLength.Quarter * 5
-     *     ["1n", "2n", 4] = NoteLength.Whole + NoteLEngth.Half * 4
-     *     etc.
+     *     addExtension(len => len.notes("1n", 2), true)    // length is 2 whole notes, visible
+     *     addExtension(len => len.measures(3), false)      // length is 3 measures, hidden
+     *     addExtension(len => len.measures(1).notes("8n")) // length is 1 measure + 1 eigth note, visible
+     *     addExtension(len => len.infinity())              // length is as long as possible, visible
      * </pre>
      * @param extensionLength
      * @param extensionVisible
      * @returns 
      */
-    addExtension(extensionLength: number | NoteLength | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible?: boolean): DocumentBuilder {
-        assertArg((
-            Utils.Is.isIntegerGte(extensionLength, 0) ||
-            Utils.Is.isPosInfinity(extensionLength) ||
-            Utils.Is.isEnumValue(extensionLength, NoteLength) ||
-            Utils.Is.isNonEmptyString(extensionLength) ||
-            Utils.Is.isNonEmptyArray(extensionLength) && !Utils.Is.isNumber(extensionLength[0]) && extensionLength.every(len => Utils.Is.isNonEmptyString(len) || Utils.Is.isFinite(len) && len >= 0)
-        ), "extendionLength", extensionLength);
+    addExtension(extensionBuilder?: (len: ExtensionBuilder) => void, extensionVisible?: boolean): DocumentBuilder {
+        assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "extensionBuilder", extensionBuilder);
         assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
-        this.getMeasure().addExtension(extensionLength, extensionVisible ?? true);
+
+        let ticks: number = 0;
+
+        const helper: ExtensionBuilder = {
+            notes: (noteLength, noteCount) => {
+                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
+                assertArg(Utils.Is.isUndefined(noteCount) || Utils.Is.isNumber(noteCount) && noteCount >= 0, "noteCount", noteCount);
+                ticks += new RhythmProps(noteLength).ticks * (noteCount ?? 1);
+                return helper;
+            },
+            measures: (measureCount) => {
+                assertArg(Utils.Is.isNumber(measureCount) && measureCount >= 1, "measureCount", measureCount);
+                ticks += this.getMeasure().getMeasureTicks() * measureCount;
+                return helper;
+            },
+            infinity: () => {
+                ticks = Infinity;
+                return helper;
+            }
+        };
+
+        if (extensionBuilder) {
+            extensionBuilder(helper);
+        }
+        else {
+            ticks = Infinity;
+        }
+
+        this.getMeasure().addExtension(ticks, extensionVisible ?? true);
         return this;
     }
 

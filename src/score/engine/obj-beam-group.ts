@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MinNoteLength, NoteLength, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
+import { ShortestNoteLength, NoteLength, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -165,8 +165,8 @@ export class ObjBeamGroup extends MusicObject {
         let l2 = s2.map(s => s.rhythmProps.noteLength);
 
         if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            (l2[1] === l2[0] / 2 && l2[0] / 2 >= MinNoteLength) ||
-            (l2[0] === l2[1] / 2 && l2[1] / 2 >= MinNoteLength)
+            (l2[1] === l2[0] / 2 && l2[0] / 2 >= ShortestNoteLength) ||
+            (l2[0] === l2[1] / 2 && l2[1] / 2 >= ShortestNoteLength)
         )) {
             new ObjBeamGroup(s2, Tuplet.Triplet);
             return 2;

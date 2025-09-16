@@ -419,13 +419,13 @@ export class Player {
             let playerNotes = col.getPlayerNotes();
 
             playerNotes.forEach((note, i) => {
-                let arpeggioDelayTicks = col.hasArpeggio() ? NoteLength.ThirtySecond * i : 0;
+                let arpeggioDelayTicks = col.hasArpeggio() ? new RhythmProps(NoteLength.ThirtySecond).ticks * i : 0;
 
                 let noteSeconds = getDuration(note.ticks + fermataHoldTicks - arpeggioDelayTicks, tempo);
 
                 if (noteSeconds > 0) {
                     if (note.staccato) {
-                        noteSeconds = Math.min(getDuration(NoteLength.Eighth, tempo) / 2, noteSeconds / 2);
+                        noteSeconds = Math.min(getDuration(new RhythmProps(NoteLength.Eighth).ticks, tempo) / 2, noteSeconds / 2);
                     }
 
                     let volume = adjustVolume(col.getPlayerProps().getVolume());

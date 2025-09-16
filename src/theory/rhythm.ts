@@ -6,16 +6,16 @@ export const MaxTupletRatioParts = 12;
 /*
  * To get integer ticks, NoteLength value must be divisible of all TupletRatio.parts values < MaxTupletRatioParts
  */
-const TickMul = 12 * 11 * 9 * 7 * 5;
+const TicksMultiplier = 12 * 11 * 9 * 7 * 5;
 
 export enum NoteLength {
-    Whole = 64 * TickMul,
-    Half = 32 * TickMul,
-    Quarter = 16 * TickMul,
-    Eighth = 8 * TickMul,
-    Sixteenth = 4 * TickMul,
-    ThirtySecond = 2 * TickMul,
-    SixtyFourth = 1 * TickMul
+    Whole = 64,
+    Half = 32,
+    Quarter = 16,
+    Eighth = 8,
+    Sixteenth = 4,
+    ThirtySecond = 2,
+    SixtyFourth = 1
 }
 
 export type NoteLengthStr =
@@ -26,8 +26,8 @@ export type NoteLengthStr =
     "1..." | "2..." | "4..." | "8..." | "16..." | "32..." | "64..." |
     "1...." | "2...." | "4...." | "8...." | "16...." | "32...." | "64....";;
 
-export const MaxNoteLength = NoteLength.Whole;
-export const MinNoteLength = NoteLength.SixtyFourth;
+export const LongestNoteLength = NoteLength.Whole;
+export const ShortestNoteLength = NoteLength.SixtyFourth;
 
 const FlagCountMap = new Map<NoteLength, number>([
     [NoteLength.Whole, 0],
@@ -141,7 +141,8 @@ export class RhythmProps {
             this.tupletRatio = undefined;
         }
 
-        this.ticks = this.noteLength;
+        this.ticks = this.noteLength * TicksMultiplier;
+
         this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
 
         if (this.dotCount > 0 && this.tupletRatio !== undefined) {
@@ -152,7 +153,7 @@ export class RhythmProps {
         }
 
 
-        for (let add = this.noteLength / 2, i = 1; i <= this.dotCount; i++, add /= 2) {
+        for (let add = this.ticks / 2, i = 1; i <= this.dotCount; i++, add /= 2) {
             this.ticks += add;
         }
 
@@ -168,7 +169,7 @@ export class RhythmProps {
                 MaxNoteLength = NoteLength.Whole = 64
                 noteLength = 64 / 16 = 4 = NoteLength.Sixteenth (16th note)
         */
-        return new RhythmProps(MaxNoteLength / noteSize);
+        return new RhythmProps(LongestNoteLength / noteSize);
     }
 
     hasStem() {
