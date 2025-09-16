@@ -4,8 +4,8 @@
 Another major update was required by some new features.
 
 ### **Breiking Changes**
-- `Theory.RhythmProps` was updated to support generic tuples and multiple dot count.
-- **No breaking changes in the document building interface of `Score` module!**
+- `Theory.RhythmProps` got updated to support generic tuples and multiple dot count.
+- `DocumentBuilder.addExtension()` got updated way to set extension length.
 
 ### Added
 - Support generic tuples with `DocumentBuilder.addTuplet()`.
