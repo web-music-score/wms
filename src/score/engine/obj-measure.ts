@@ -702,6 +702,8 @@ export class ObjMeasure extends MusicObject {
             case Annotation.Tempo: layoutGroupId = LayoutGroupId.TempoAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
         }
 
+        this.disableExtension();
+
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             this.addLayoutObject(textObj, line, layoutGroupId, vpos);
@@ -728,6 +730,8 @@ export class ObjMeasure extends MusicObject {
             case Label.Note: layoutGroupId = LayoutGroupId.NoteLabel; defaultVerticalPos = VerticalPos.Below; break;
             case Label.Chord: layoutGroupId = LayoutGroupId.ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
         }
+
+        this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
