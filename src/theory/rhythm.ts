@@ -121,18 +121,13 @@ export class RhythmProps {
     readonly ticks: number;
     readonly flagCount: number;
 
-    constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, triplet?: boolean);
-    constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio);
-    constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletArg?: boolean | TupletRatio) {
+    constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = getNoteLength(noteLength);
 
         this.dotCount = dotCount ?? getNoteLengthDotCount(noteLength) ?? 0;
 
-        if (typeof tupletArg === "boolean") {
-            this.tupletRatio = tupletArg ? Tuplet.Triplet : undefined;
-        }
-        else if (Utils.Is.isObject(tupletArg)) {
-            this.tupletRatio = tupletArg;
+        if (Utils.Is.isObject(tupletRatio)) {
+            this.tupletRatio = tupletRatio;
         }
         else if (hasNoteLengthTriplet(noteLength)) {
             this.tupletRatio = Tuplet.Triplet;

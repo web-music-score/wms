@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { hasNoteLengthTriplet, Note, NoteLength, NoteLengthStr, RhythmProps, TupletRatio } from "@tspro/web-music-score/theory";
+import { hasNoteLengthTriplet, Note, NoteLength, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup } from "../pub";
@@ -202,7 +202,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.rhythmProps = tupletRatio
             ? new RhythmProps(noteLength, dotCount, tupletRatio)
-            : new RhythmProps(noteLength, dotCount, options?.triplet);
+            : new RhythmProps(noteLength, dotCount, options?.triplet === true ? Tuplet.Triplet : undefined);
 
         this.mi = new MNoteGroup(this);
     }

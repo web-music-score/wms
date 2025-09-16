@@ -1,4 +1,4 @@
-import { hasNoteLengthTriplet, Note, NoteLength, NoteLengthStr, RhythmProps, TupletRatio } from "@tspro/web-music-score/theory";
+import { hasNoteLengthTriplet, Note, NoteLength, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
@@ -107,7 +107,7 @@ export class ObjRest extends MusicObject {
 
         this.rhythmProps = tupletRatio
             ? new RhythmProps(noteLength, dotCount, tupletRatio)
-            : new RhythmProps(noteLength, dotCount, options?.triplet);
+            : new RhythmProps(noteLength, dotCount, options?.triplet === true ? Tuplet.Triplet : undefined);
 
         this.mi = new MRest(this);
     }
