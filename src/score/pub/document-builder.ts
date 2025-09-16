@@ -51,7 +51,7 @@ function assertTabConfig(tabConfig: TabConfig) {
         assertArg(TuningNameList.includes(tabConfig.tuning), "tabConfig.tuning", tabConfig.tuning);
     }
     else if (Utils.Is.isArray(tabConfig.tuning)) {
-        assertArg(tabConfig.tuning.length === 6 && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
+        assertArg(tabConfig.tuning.length === getStringNumbers().length && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
     }
     assertArg(Utils.Is.isUndefined(tabConfig.voiceIds) || Utils.Is.isArray(tabConfig.voiceIds) && tabConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "tabConfig.voiceIds", tabConfig.voiceIds);
 }
@@ -68,7 +68,7 @@ function assertNoteOptions(options: NoteOptions) {
     assertArg((
         Utils.Is.isUndefined(options.string) ||
         isStringNumber(options.string) ||
-        Utils.Is.isArray(options.string) && options.string.length > 0 && options.string.every(string => isStringNumber(string))
+        Utils.Is.isNonEmptyArray(options.string) && options.string.every(string => isStringNumber(string))
     ), "noteOptions.string", options.string);
 }
 
@@ -84,7 +84,7 @@ function assertRestOptions(options: RestOptions) {
 function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {
     assertArg(
         Utils.Is.isStringOrUndefined(staffTabOrGroups) || Utils.Is.isIntegerGte(staffTabOrGroups, 0) ||
-        Utils.Is.isArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
+        Utils.Is.isNonEmptyArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
             Utils.Is.isString(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0)
         )
         , "staffTabOrGroup", staffTabOrGroups
@@ -129,8 +129,7 @@ export class DocumentBuilder {
         else if (Utils.Is.isObject(config) && config.type === "tab") {
             assertTabConfig(config);
         }
-        else if (Utils.Is.isArray(config)) {
-            assertArg(config.length > 0, "config", config);
+        else if (Utils.Is.isNonEmptyArray(config)) {
             config.forEach(c => {
                 if (Utils.Is.isObject(c) && c.type === "staff") {
                     assertStaffConfig(c);
@@ -169,7 +168,7 @@ export class DocumentBuilder {
     }
 
     setMeasuresPerRow(measuresPerRow: number): DocumentBuilder {
-        assertArg(Utils.Is.isIntegerGte(measuresPerRow, 1) || measuresPerRow === Infinity, "measuresPerRow", measuresPerRow);
+        assertArg(Utils.Is.isIntegerGte(measuresPerRow, 1) || Utils.Is.isPosInfinity(measuresPerRow), "measuresPerRow", measuresPerRow);
         this.doc.setMeasuresPerRow(measuresPerRow);
         return this;
     }
@@ -193,7 +192,7 @@ export class DocumentBuilder {
     }
 
     setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): DocumentBuilder {
-        assertArg(timeSignature instanceof TimeSignature || Utils.Is.isString(timeSignature), "timeSignature", timeSignature);
+        assertArg(timeSignature instanceof TimeSignature || Utils.Is.isNonEmptyString(timeSignature), "timeSignature", timeSignature);
         this.getMeasure().setTimeSignature(timeSignature);
         return this;
     }
@@ -213,7 +212,7 @@ export class DocumentBuilder {
 
     addNote(voiceId: number, note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
+        assertArg(note instanceof Note || Utils.Is.isNonEmptyString(note), "note", note);
         assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
         if (options !== undefined) {
             assertNoteOptions(options);
@@ -224,7 +223,7 @@ export class DocumentBuilder {
 
     addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
+        assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
         assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
         if (options !== undefined) {
             assertNoteOptions(options);
@@ -261,7 +260,7 @@ export class DocumentBuilder {
     addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, builder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isObject(tupletRatio) &&
-            Utils.Is.isIntegerGte(tupletRatio.parts, 2) && tupletRatio.parts <= MaxTupletRatioParts &&
+            Utils.Is.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioParts) &&
             Utils.Is.isIntegerGte(tupletRatio.inTimeOf, 2) &&
             Utils.Is.isBooleanOrUndefined(tupletRatio.showRatio), "tupletRatio", tupletRatio);
 
@@ -269,7 +268,7 @@ export class DocumentBuilder {
 
         const helper: TupletBuilder = {
             addNote: (note, noteLength, options) => {
-                assertArg(note instanceof Note || Utils.Is.isString(note), "note", note);
+                assertArg(note instanceof Note || Utils.Is.isNonEmptyString(note), "note", note);
                 assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
                 if (options !== undefined) {
                     delete options.triplet;
@@ -279,7 +278,7 @@ export class DocumentBuilder {
                 tupletSymbols.push(s);
             },
             addChord: (notes, noteLength, options) => {
-                assertArg(Utils.Is.isArray(notes) && notes.length >= 1 && notes.every(note => note instanceof Note || Utils.Is.isString(note)), "notes", notes);
+                assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
                 assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLengthStr(noteLength), "noteLength", noteLength);
                 if (options !== undefined) {
                     delete options.triplet;
@@ -361,7 +360,7 @@ export class DocumentBuilder {
 
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
-        assertArg(Utils.Is.isString(text), "text", text);
+        assertArg(Utils.Is.isNonEmptyString(text), "text", text);
         this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Annotation, text);
         return this;
     }
@@ -393,7 +392,7 @@ export class DocumentBuilder {
     private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
-        assertArg(Utils.Is.isString(text), "text", text);
+        assertArg(Utils.Is.isNonEmptyString(text), "text", text);
         this.getMeasure().addLabel(staffTabOrGroups, label as Label, text);
         return this;
     }
@@ -414,14 +413,14 @@ export class DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
 
         if (connective === Connective.Tie) {
-            assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType), "tieSpan", args[0]);
+            assertArg(Utils.Is.isIntegerOrUndefined(args[0]) || Utils.Is.isEnumValue(args[0], TieType), "tieSpan", args[0]);
             assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let tieSpan = args[0] as number | TieType | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
             this.getMeasure().addConnective(connective as Connective.Tie, tieSpan, noteAnchor);
         }
         else if (connective === Connective.Slur) {
-            assertArg(Utils.Is.isUndefined(args[0]) || Utils.Is.isInteger(args[0]), "slurSpan", args[0]);
+            assertArg(Utils.Is.isIntegerOrUndefined(args[0]), "slurSpan", args[0]);
             assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let slurSpan = args[0] as number | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
@@ -451,13 +450,10 @@ export class DocumentBuilder {
     addExtension(extensionLength: number | NoteLength | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible?: boolean): DocumentBuilder {
         assertArg((
             Utils.Is.isIntegerGte(extensionLength, 0) ||
-            typeof extensionLength === "number" && extensionLength === Infinity ||
+            Utils.Is.isPosInfinity(extensionLength) ||
             Utils.Is.isEnumValue(extensionLength, NoteLength) ||
-            Utils.Is.isString(extensionLength) ||
-            Utils.Is.isArray(extensionLength) && (
-                extensionLength.length > 0 && !Utils.Is.isNumber(extensionLength[0]) &&
-                extensionLength.every(len => Utils.Is.isString(len) || Utils.Is.isNumber(len))
-            )
+            Utils.Is.isNonEmptyString(extensionLength) ||
+            Utils.Is.isNonEmptyArray(extensionLength) && !Utils.Is.isNumber(extensionLength[0]) && extensionLength.every(len => Utils.Is.isNonEmptyString(len) || Utils.Is.isFinite(len) && len >= 0)
         ), "extendionLength", extensionLength);
         assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
         this.getMeasure().addExtension(extensionLength, extensionVisible ?? true);
@@ -472,10 +468,10 @@ export class DocumentBuilder {
      * @returns 
      */
     addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPosition | `${VerticalPosition}` = VerticalPosition.Auto): DocumentBuilder {
-        assertArg(Utils.Is.isString(groupName) && groupName.length > 0, "groupName", groupName);
+        assertArg(Utils.Is.isNonEmptyString(groupName), "groupName", groupName);
         assertArg(
-            Utils.Is.isString(staffsTabsAndGroups) && staffsTabsAndGroups.length > 0 || Utils.Is.isIntegerGte(staffsTabsAndGroups, 0) ||
-            Utils.Is.isArray(staffsTabsAndGroups) && staffsTabsAndGroups.every(line => Utils.Is.isString(line) && line.length > 0 || Utils.Is.isIntegerGte(line, 0)),
+            Utils.Is.isNonEmptyString(staffsTabsAndGroups) || Utils.Is.isIntegerGte(staffsTabsAndGroups, 0) ||
+            Utils.Is.isNonEmptyArray(staffsTabsAndGroups) && staffsTabsAndGroups.every(line => Utils.Is.isNonEmptyString(line) || Utils.Is.isIntegerGte(line, 0)),
             "staffsTabsAndGroups", staffsTabsAndGroups
         );
         assertArg(Utils.Is.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
@@ -505,7 +501,7 @@ export class DocumentBuilder {
     }
 
     addScaleArpeggio(scale: Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
-        assertArg(Utils.Is.isString(bottomNote), "bottomNote", bottomNote);
+        assertArg(Utils.Is.isNonEmptyString(bottomNote), "bottomNote", bottomNote);
         assertArg(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
 
         let ts = this.getMeasure().getTimeSignature();
