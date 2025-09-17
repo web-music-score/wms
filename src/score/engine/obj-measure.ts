@@ -1170,7 +1170,7 @@ export class ObjMeasure extends MusicObject {
     completeRests(voiceId?: number) {
         if (voiceId === undefined) {
             if (this.getConsumedTicks() === 0) {
-                // Whole measure is empty.
+                // Whole measure is empty, add rest to voice 0.
                 this.completeRests(0);
             }
             else {
@@ -1190,21 +1190,17 @@ export class ObjMeasure extends MusicObject {
 
         let rests: RhythmProps[] = [];
 
-        let noteLengths: NoteLength[] = [];
-        for (let s = NoteLengthProps.LongestNoteSize; s <= NoteLengthProps.ShortestNoteSize; s *= 2) {
-            noteLengths.push(validateNoteLength(s + "n"));
-        }
-
         while (remainingTicks > 0) {
-            noteLengths.forEach(restLangth => {
-                for (let dotCount = NoteLengthProps.get(restLangth).maxDotCount; dotCount >= 0; dotCount--) {
-                    let restProps = RhythmProps.get(restLangth, dotCount);
+            for (let s = NoteLengthProps.LongestNoteSize; s <= NoteLengthProps.ShortestNoteSize; s *= 2) {
+                let restLength = validateNoteLength(s + "n");
+                for (let dotCount = NoteLengthProps.get(restLength).maxDotCount; dotCount >= 0; dotCount--) {
+                    let restProps = RhythmProps.get(restLength, dotCount);
                     while (restProps.ticks <= remainingTicks) {
                         rests.push(restProps);
                         remainingTicks -= restProps.ticks;
                     }
                 }
-            });
+            }
         }
 
         rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotCount }));
