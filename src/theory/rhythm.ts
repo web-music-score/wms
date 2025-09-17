@@ -61,7 +61,7 @@ export function validateNoteLength(noteLength: unknown): NoteLength {
         return noteLength;
     }
     else {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`);
     }
 }
 
