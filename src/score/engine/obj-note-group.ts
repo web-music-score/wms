@@ -844,16 +844,10 @@ export class ObjNoteGroup extends MusicObject {
     static setBeamCounts(groupNotes: (ObjNoteGroup | undefined)[]) {
 
         const isADottedBHalf = (a: ObjNoteGroup, b: ObjNoteGroup) => {
-            if (a.rhythmProps.flagCount === 0 || b.rhythmProps.flagCount === 0) {
-                return false;
-            }
-            for (let dotCount = 1, n = 2; dotCount < 6; dotCount++, n *= 2) {
-                if (a.rhythmProps.noteSize === b.rhythmProps.noteSize / n &&
-                    a.rhythmProps.dotCount === dotCount && b.rhythmProps.dotCount === 0) {
-                    return true;
-                }
-            }
-            return false;
+            let { flagCount: aFlagCount, noteSize: aNoteSize, dotCount: aDotCount } = a.rhythmProps;
+            let { flagCount: bFlagCount, noteSize: bNoteSize, dotCount: bDotCount } = b.rhythmProps;
+
+            return aFlagCount > 0 && bFlagCount > 0 && aDotCount > 0 && bDotCount === 0 && aNoteSize * Math.pow(2, aDotCount) === bNoteSize;
         }
 
         for (let i = 0; i < groupNotes.length; i++) {
