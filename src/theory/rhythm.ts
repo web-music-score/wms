@@ -157,6 +157,7 @@ export class RhythmProps {
     readonly ticks: number;
     readonly flagCount: number;
     readonly hasStem: boolean;
+    readonly isSolidNoteHead: boolean;
 
     private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = validateNoteLength(noteLength);
@@ -168,6 +169,7 @@ export class RhythmProps {
         this.flagCount = p.flagCount;
         this.dotCount = dotCount ?? p.dotCount;
         this.hasStem = p.hasStem;
+        this.isSolidNoteHead = p.isSolid;
 
         if (Utils.Is.isObject(tupletRatio)) {
             this.tupletRatio = tupletRatio;

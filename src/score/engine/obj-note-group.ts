@@ -756,7 +756,7 @@ export class ObjNoteGroup extends MusicObject {
 
         let { lineWidth } = renderer;
         let { color, stemDir } = this;
-        let { noteLength } = this.rhythmProps;
+        let { isSolidNoteHead } = this.rhythmProps;
 
         this.staffObjects.forEach(obj => {
             // Draw accidentals
@@ -767,10 +767,8 @@ export class ObjNoteGroup extends MusicObject {
 
             // Draw note heads
             obj.noteHeadRects.forEach(r => {
-                let solidNoteHead = NoteLengthProps.get(noteLength).isSolid;
-
                 if (this.diamond) {
-                    if (solidNoteHead) {
+                    if (isSolidNoteHead) {
                         ctx.beginPath();
                         ctx.moveTo(r.centerX, r.top);
                         ctx.lineTo(r.right, r.centerY);
@@ -801,7 +799,7 @@ export class ObjNoteGroup extends MusicObject {
                     ctx.beginPath();
                     ctx.ellipse(r.centerX, r.centerY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
 
-                    if (solidNoteHead) {
+                    if (isSolidNoteHead) {
                         ctx.fill();
                     }
                     else {
@@ -840,9 +838,7 @@ export class ObjNoteGroup extends MusicObject {
         });
 
         // Draw tab fret numbers
-        this.tabObjects.forEach(obj => {
-            obj.fretNumbers.forEach(fn => fn.draw(renderer));
-        });
+        this.tabObjects.forEach(obj => obj.fretNumbers.forEach(fn => fn.draw(renderer)));
     }
 
     static setBeamCounts(groupNotes: (ObjNoteGroup | undefined)[]) {
