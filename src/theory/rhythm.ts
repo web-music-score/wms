@@ -126,6 +126,13 @@ export class NoteLengthProps {
         // Ignores isTriplet.
         return cmp(bNoteSize, aNoteSize);
     }
+
+    static equals(a: NoteLengthProps | NoteLength | NoteLengthStr | number, b: NoteLengthProps | NoteLength | NoteLengthStr | number): boolean {
+        let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
+        let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
+        // Ignores isTriplet.
+        return aNoteSize === bNoteSize;
+    }
 }
 
 export interface TupletRatio {
@@ -217,5 +224,9 @@ export class RhythmProps {
 
     static cmp(a: RhythmProps, b: RhythmProps): -1 | 0 | 1 {
         return cmp(a.ticks, b.ticks);
+    }
+
+    static equals(a: RhythmProps, b: RhythmProps): boolean {
+        return a.ticks === b.ticks;
     }
 }

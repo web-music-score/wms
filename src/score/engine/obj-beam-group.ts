@@ -164,10 +164,7 @@ export class ObjBeamGroup extends MusicObject {
         let s2 = symbols.slice(0, 2);
         let n2 = s2.map(s => s.rhythmProps.noteSize);
 
-        if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            (NoteLengthProps.cmp(n2[0], NoteLengthProps.ShortestNoteSize) >= 0 && NoteLengthProps.cmp(n2[0] * 2, n2[1]) === 0) ||
-            (NoteLengthProps.cmp(n2[1], NoteLengthProps.ShortestNoteSize) >= 0 && NoteLengthProps.cmp(n2[1] * 2, n2[0]) === 0))
-        ) {
+        if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (n2[0] * 2 === n2[1] || n2[1] * 2 === n2[0])) {
             new ObjBeamGroup(s2, Tuplet.Triplet);
             return 2;
         }
@@ -175,9 +172,7 @@ export class ObjBeamGroup extends MusicObject {
         let s3 = symbols.slice(0, 3);
         let n3 = s3.map(s => s.rhythmProps.noteSize);
 
-        if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            n3.every(n => NoteLengthProps.cmp(n, n3[0]) === 0)
-        )) {
+        if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && n3.every(n => n === n3[0])) {
             new ObjBeamGroup(s3, Tuplet.Triplet);
             return 3;
         }
