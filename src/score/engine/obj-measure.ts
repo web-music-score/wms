@@ -902,7 +902,7 @@ export class ObjMeasure extends MusicObject {
         return this.getTimeSignature().measureTicks;
     }
 
-    getConsumedTicks(voiceId?: number) {
+    getConsumedTicks(voiceId?: VoiceId) {
         let measureTicks = 0;
 
         this.columns.forEach(col => {
@@ -1167,43 +1167,48 @@ export class ObjMeasure extends MusicObject {
         return this.voiceSymbols[voiceId];
     }
 
-    completeRests(voiceId?: number) {
+    completeRests(voiceId?: VoiceId | VoiceId[]) {
         if (voiceId === undefined) {
             if (this.getConsumedTicks() === 0) {
                 // Whole measure is empty, add rest to voice 0.
                 this.completeRests(0);
             }
             else {
-                getVoiceIds().forEach(voiceId => {
-                    // Complete rests for voices that are not empty
-                    if (this.getConsumedTicks(voiceId) > 0) {
-                        this.completeRests(voiceId);
-                    }
-                });
+                // Measure is not empty, complete rests for voices that are not empty.
+                this.completeRests(getVoiceIds().filter(id => this.getConsumedTicks(id) > 0));
             }
             return;
         }
+        else if (Utils.Is.isArray(voiceId)) {
+            // Complete rests for given voices.
+            voiceId.forEach(id => this.completeRests(id));
+            return;
+        }
+        else {
+            // Comlete rests for given voice.
+            validateVoiceId(voiceId);
 
-        let measureTicks = this.getMeasureTicks();
-        let consumedTicks = this.getConsumedTicks(voiceId);
-        let remainingTicks = measureTicks - consumedTicks;
+            let measureTicks = this.getMeasureTicks();
+            let consumedTicks = this.getConsumedTicks(voiceId);
+            let remainingTicks = measureTicks - consumedTicks;
 
-        let rests: RhythmProps[] = [];
+            let rests: RhythmProps[] = [];
 
-        while (remainingTicks > 0) {
-            for (let s = NoteLengthProps.LongestNoteSize; s <= NoteLengthProps.ShortestNoteSize; s *= 2) {
-                let restLength = validateNoteLength(s + "n");
-                for (let dotCount = NoteLengthProps.get(restLength).maxDotCount; dotCount >= 0; dotCount--) {
-                    let restProps = RhythmProps.get(restLength, dotCount);
-                    while (restProps.ticks <= remainingTicks) {
-                        rests.push(restProps);
-                        remainingTicks -= restProps.ticks;
+            while (remainingTicks > 0) {
+                for (let s = NoteLengthProps.LongestNoteSize; s <= NoteLengthProps.ShortestNoteSize; s *= 2) {
+                    let restLength = validateNoteLength(s + "n");
+                    for (let dotCount = NoteLengthProps.get(restLength).maxDotCount; dotCount >= 0; dotCount--) {
+                        let restProps = RhythmProps.get(restLength, dotCount);
+                        while (restProps.ticks <= remainingTicks) {
+                            rests.push(restProps);
+                            remainingTicks -= restProps.ticks;
+                        }
                     }
                 }
             }
-        }
 
-        rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotCount }));
+            rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotCount }));
+        }
     }
 
     requestLayout() {

@@ -523,8 +523,8 @@ export class DocumentBuilder {
         return this;
     }
 
-    completeRests(voiceId?: number): DocumentBuilder {
-        assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId), "voiceId", voiceId);
+    completeRests(voiceId?: VoiceId | VoiceId[]): DocumentBuilder {
+        assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId) || Utils.Is.isArray(voiceId) && voiceId.every(id => isVoiceId(id)), "voiceId", voiceId);
         this.getMeasure().completeRests(voiceId);
         return this;
     }
