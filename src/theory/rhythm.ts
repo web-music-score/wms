@@ -56,9 +56,6 @@ export enum NoteLength {
 
 export type NoteLengthStr = `${NoteLength}`;
 
-export const LongestNoteSize = Math.min(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => getNoteSize(noteLength)));
-export const ShortestNoteSize = Math.max(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => getNoteSize(noteLength)));
-
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
         return noteLength;
@@ -68,41 +65,54 @@ export function validateNoteLength(noteLength: unknown): NoteLength {
     }
 }
 
-function getNoteSize(noteLength: NoteLength): number {
-    return parseInt(noteLength);
-}
+export class NoteLengthProps {
+    static LongestNoteSize = Math.min(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => parseInt(noteLength)));
+    static ShortestNoteSize = Math.max(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => parseInt(noteLength)));
 
-function getTicks(noteSize: number): number {
-    let ticks = TicksMultiplier, size = ShortestNoteSize;
-    while (size > 1 && size > noteSize) {
-        size /= 2;
-        ticks *= 2;
-    }
-    return ticks;
-}
+    readonly noteLength: NoteLength;
+    readonly noteSize: number;
+    readonly ticks: number;
+    readonly flagCount: number;
+    readonly dotCount: number;
+    readonly maxDotCount: number;
+    readonly isTriplet: boolean;
 
-function getFlagCount(noteSize: number): number {
-    if (noteSize <= 4) {
-        return 0;
-    }
-    else {
-        let flagCount = 1, size = 8;
-        while (size < noteSize) {
-            size *= 2;
-            flagCount++;
+    private constructor(noteLength: NoteLength | NoteLengthStr) {
+        this.noteLength = validateNoteLength(noteLength);
+        this.noteSize = parseInt(this.noteLength);
+
+        this.ticks = TicksMultiplier;
+        this.maxDotCount = 0;
+        this.dotCount = Utils.Str.charCount(this.noteLength, ".");
+        this.isTriplet = this.noteLength.endsWith("t");
+        this.flagCount = 0;
+
+        let size = NoteLengthProps.ShortestNoteSize;
+        while (size > 1 && size > this.noteSize) {
+            size /= 2;
+            this.ticks *= 2;
+            this.maxDotCount++;
         }
-        return flagCount;
-    }
-}
 
-function getMaxDotCount(noteSize: number): number {
-    let size = ShortestNoteSize, maxDotCount = 0;
-    while (size > 0) {
-        if (size === noteSize) return maxDotCount;
-        size /= 2;
-        maxDotCount++;
+        if (this.noteSize > 4) {
+            this.flagCount = 1;
+            let size = 8;
+            while (size < this.noteSize) {
+                size *= 2;
+                this.flagCount++;
+            }
+        }
     }
-    return 0;
+
+    private static cache = new Map<NoteLength | NoteLengthStr, NoteLengthProps>();
+
+    static get(noteLength: NoteLength | NoteLengthStr): NoteLengthProps {
+        let p = this.cache.get(noteLength);
+        if (!p) {
+            this.cache.set(noteLength, p = new NoteLengthProps(noteLength));
+        }
+        return p;
+    }
 }
 
 export interface TupletRatio {
@@ -130,28 +140,27 @@ export class RhythmProps {
     private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = validateNoteLength(noteLength);
 
-        this.noteSize = getNoteSize(this.noteLength);
+        let p = NoteLengthProps.get(this.noteLength);
 
-        this.dotCount = dotCount ?? RhythmProps.getDotCount(noteLength) ?? 0;
+        this.noteSize = p.noteSize;
+        this.ticks = p.ticks;
+        this.flagCount = p.flagCount;
+        this.dotCount = dotCount ?? p.dotCount;
 
         if (Utils.Is.isObject(tupletRatio)) {
             this.tupletRatio = tupletRatio;
         }
-        else if (RhythmProps.hasTriplet(noteLength)) {
+        else if (p.isTriplet) {
             this.tupletRatio = Tuplet.Triplet;
         }
         else {
             this.tupletRatio = undefined;
         }
 
-        this.ticks = getTicks(this.noteSize);
-
-        this.flagCount = getFlagCount(this.noteSize);
-
         if (this.dotCount > 0 && this.tupletRatio !== undefined) {
             throw new MusicError(MusicErrorType.Note, "Note cannot be both dotted and tuplet!");
         }
-        else if (this.dotCount > getMaxDotCount(this.noteSize)) {
+        else if (this.dotCount > p.maxDotCount) {
             throw new MusicError(MusicErrorType.Note, `Too big dot count ${this.dotCount} for note length ${this.noteLength}.`);
         }
 
@@ -211,14 +220,5 @@ export class RhythmProps {
         let aNoteSize = a instanceof RhythmProps ? a.noteSize : a;
         let bNoteSize = b instanceof RhythmProps ? b.noteSize : b;
         return cmp(bNoteSize, aNoteSize); // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
-    }
-
-    static hasTriplet(noteLength: NoteLength | NoteLengthStr): boolean {
-        return noteLength.endsWith("t");
-    }
-
-    static getDotCount(noteLength: NoteLength | NoteLengthStr): number | undefined {
-        let dotCount = Utils.Str.charCount(noteLength, ".");
-        return dotCount > 0 ? dotCount : undefined;
     }
 }
