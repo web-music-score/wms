@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { ShortestNoteLength, NoteLength, Tuplet, TupletRatio, RhythmProps } from "@tspro/web-music-score/theory";
+import { ShortestNoteSize, NoteLength, Tuplet, TupletRatio, RhythmProps } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -162,21 +162,19 @@ export class ObjBeamGroup extends MusicObject {
 
     static createOldStyleTriplet(symbols: RhythmSymbol[]): number {
         let s2 = symbols.slice(0, 2);
-        let n2 = s2.map(s => s.rhythmProps.noteLength);
 
         if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            (RhythmProps.cmpNoteLength(n2[0], ShortestNoteLength) >= 0 && RhythmProps.cmpNoteLength(n2[0] * 2, n2[1]) === 0) ||
-            (RhythmProps.cmpNoteLength(n2[1], ShortestNoteLength) >= 0 && RhythmProps.cmpNoteLength(n2[1] * 2, n2[0]) === 0))
+            (RhythmProps.cmpNoteSize(s2[0].rhythmProps, ShortestNoteSize) >= 0 && RhythmProps.cmpNoteSize(s2[0].rhythmProps.noteSize * 2, s2[1].rhythmProps) === 0) ||
+            (RhythmProps.cmpNoteSize(s2[1].rhythmProps, ShortestNoteSize) >= 0 && RhythmProps.cmpNoteSize(s2[1].rhythmProps.noteSize * 2, s2[0].rhythmProps) === 0))
         ) {
             new ObjBeamGroup(s2, Tuplet.Triplet);
             return 2;
         }
 
         let s3 = symbols.slice(0, 3);
-        let n3 = s3.map(s => s.rhythmProps.noteLength);
 
         if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            n3.every(n => RhythmProps.cmpNoteLength(n, n3[0]) === 0)
+            s3.every(s => RhythmProps.cmpNoteLength(s.rhythmProps, s3[0].rhythmProps) === 0)
         )) {
             new ObjBeamGroup(s3, Tuplet.Triplet);
             return 3;

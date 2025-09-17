@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { hasNoteLengthTriplet, Note, NoteLength, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup } from "../pub";
@@ -194,7 +194,7 @@ export class ObjNoteGroup extends MusicObject {
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
-        this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || hasNoteLengthTriplet(noteLength));
+        this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || RhythmProps.hasTriplet(noteLength));
 
         let dotCount = typeof options?.dotted === "number"
             ? (options.dotted > 0 ? options.dotted : undefined)
@@ -852,7 +852,7 @@ export class ObjNoteGroup extends MusicObject {
                 return false;
             }
             for (let dotCount = 1, n = 2; dotCount < 6; dotCount++, n *= 2) {
-                if (a.rhythmProps.noteLengthN === b.rhythmProps.noteLengthN / n &&
+                if (a.rhythmProps.noteSize === b.rhythmProps.noteSize / n &&
                     a.rhythmProps.dotCount === dotCount && b.rhythmProps.dotCount === 0) {
                     return true;
                 }

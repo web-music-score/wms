@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, getNoteLength, getNoteLengthDotCount } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup } from "../pub";
@@ -441,11 +441,9 @@ export class ObjMeasure extends MusicObject {
         else {
             let dotCount = typeof dotted === "number" && dotted > 0
                 ? dotted
-                : dotted === true ? 1 : getNoteLengthDotCount(beatLength);
+                : dotted === true ? 1 : RhythmProps.getDotCount(beatLength);
 
-            beatLength = getNoteLength(beatLength);
-
-            let options = { beatLength, dotCount }
+            let options = { beatLength: validateNoteLength(beatLength), dotCount }
 
             this.alterTempo = { beatsPerMinute, options }
         }

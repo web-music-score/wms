@@ -220,14 +220,14 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getMinWidth() {
-        let maxNoteLength = Math.max(...this.voiceSymbol.map(s => s.rhythmProps.noteLength));
+        let maxNoteSize = Math.max(...this.voiceSymbol.map(s => s.rhythmProps.noteSize));
 
         let w = DocumentSettings.NoteHeadWidth;
 
-        switch (maxNoteLength) {
-            case NoteLength.Whole: return w * 5;
-            case NoteLength.Half: return w * 3;
-            case NoteLength.Quarter: return w * 2;
+        switch (maxNoteSize) {
+            case 1: return w * 5; // whole note
+            case 2: return w * 3; // half note
+            case 4: return w * 2; // quarter note
             default: return w;
         }
     }

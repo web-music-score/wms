@@ -11,69 +11,53 @@ export const MaxTupletRatioParts = 12;
 const TicksMultiplier = 12 * 11 * 9 * 7 * 5;
 
 export enum NoteLength {
-    Whole = 1,
-    Half = 2,
-    Quarter = 4,
-    Eighth = 8,
-    Sixteenth = 16,
-    ThirtySecond = 32,
-    SixtyFourth = 64
+    Whole = "1n",
+    WholeTriplet = "1t",
+    WholeDot = "1.",
+    Whole12Dots = "1..",
+    Whole3Dots = "1...",
+    Whole4Dots = "1....",
+    Whole5Dots = "1.....",
+    Whole6Dots = "1......",
+
+    Half = "2n",
+    HalfTriplet = "2t",
+    HalfDot = "2.",
+    Half2Dots = "2..",
+    Half3Dots = "2...",
+    Half4Dots = "2....",
+    Half5Dots = "2.....",
+
+    Quarter = "4n",
+    QuarterTriplet = "4t",
+    QuarterDot = "4.",
+    Quarter2Dots = "4..",
+    Quarter3Dots = "4...",
+    Quarter4Dots = "4....",
+
+    Eighth = "8n",
+    EighthTriplet = "8t",
+    EighthDot = "8.",
+    Eighth2Dots = "8..",
+    Eighth3Dots = "8...",
+
+    Sixteenth = "16n",
+    SixteenthTriplet = "16t",
+    SixteenthDot = "16.",
+    Sixteenth2Dots = "16..",
+
+    ThirtySecond = "32n",
+    ThirtySecondTriplet = "32t",
+    ThirtySecondDot = "32.",
+
+    SixtyFourth = "64n",
+    SixtyFourthTriplet = "64t",
 }
 
-export type NoteLengthStr =
-    "1n" | "2n" | "4n" | "8n" | "16n" | "32n" | "64n" |
-    "1t" | "2t" | "4t" | "8t" | "16t" | "32t" | "64t" |
-    "1." | "2." | "4." | "8." | "16." | "32." | "64." |
-    "1.." | "2.." | "4.." | "8.." | "16.." | "32.." | "64.." |
-    "1..." | "2..." | "4..." | "8..." | "16..." | "32..." | "64..." |
-    "1...." | "2...." | "4...." | "8...." | "16...." | "32...." | "64....";;
+export type NoteLengthStr = `${NoteLength}`;
 
-export const LongestNoteLength = NoteLength.Whole;
-export const ShortestNoteLength = NoteLength.SixtyFourth;
-
-const FlagCountMap = new Map<NoteLength, number>([
-    [NoteLength.Whole, 0],
-    [NoteLength.Half, 0],
-    [NoteLength.Quarter, 0],
-    [NoteLength.Eighth, 1],
-    [NoteLength.Sixteenth, 2],
-    [NoteLength.ThirtySecond, 3],
-    [NoteLength.SixtyFourth, 4]
-]);
-
-const MaxDotCountMap = new Map<NoteLength, number>([
-    [NoteLength.Whole, 6],
-    [NoteLength.Half, 5],
-    [NoteLength.Quarter, 4],
-    [NoteLength.Eighth, 3],
-    [NoteLength.Sixteenth, 2],
-    [NoteLength.ThirtySecond, 1],
-    [NoteLength.SixtyFourth, 0]
-]);
-
-const NoteSymbolMap = new Map<NoteLength, string>([
-    [NoteLength.Whole, "𝅝"],
-    [NoteLength.Half, "𝅗𝅥"],
-    [NoteLength.Quarter, "𝅘𝅥"],
-    [NoteLength.Eighth, "𝅘𝅥𝅮"],
-    [NoteLength.Sixteenth, "𝅘𝅥𝅯"],
-    [NoteLength.ThirtySecond, "𝅘𝅥𝅰"],
-    [NoteLength.SixtyFourth, "𝅘𝅥𝅱"]
-]);
-
-export function hasNoteLengthTriplet(noteLength: NoteLength | NoteLengthStr): boolean {
-    return typeof noteLength === "string" && noteLength.endsWith("t");
-}
-
-export function getNoteLengthDotCount(noteLength: NoteLength | NoteLengthStr): number | undefined {
-    if (typeof noteLength === "string") {
-        let dotCount = Utils.Str.charCount(noteLength, ".");
-        return dotCount > 0 ? dotCount : undefined;
-    }
-    else {
-        return undefined;
-    }
-}
+export const LongestNoteSize = Math.min(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => getNoteSize(noteLength)));
+export const ShortestNoteSize = Math.max(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => getNoteSize(noteLength)));
 
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
@@ -84,34 +68,41 @@ export function validateNoteLength(noteLength: unknown): NoteLength {
     }
 }
 
-export function getNoteLength(noteLength: NoteLength | NoteLengthStr): NoteLength {
-    if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
-        return noteLength;
-    }
-    else if (typeof noteLength === "string" && ["n", "t", "."].some(c => noteLength.endsWith(c))) {
-        switch (parseInt(noteLength)) {
-            case 1: return NoteLength.Whole;
-            case 2: return NoteLength.Half;
-            case 4: return NoteLength.Quarter;
-            case 8: return NoteLength.Eighth;
-            case 16: return NoteLength.Sixteenth;
-            case 32: return NoteLength.ThirtySecond;
-            case 64: return NoteLength.SixtyFourth;
-        }
-    }
-    throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`)
+function getNoteSize(noteLength: NoteLength): number {
+    return parseInt(noteLength);
 }
 
-function getTicks(noteLength: NoteLength): number {
-    switch (noteLength) {
-        case NoteLength.Whole: return 64 * TicksMultiplier;
-        case NoteLength.Half: return 32 * TicksMultiplier;
-        case NoteLength.Quarter: return 16 * TicksMultiplier;
-        case NoteLength.Eighth: return 8 * TicksMultiplier;
-        case NoteLength.Sixteenth: return 4 * TicksMultiplier;
-        case NoteLength.ThirtySecond: return 2 * TicksMultiplier;
-        case NoteLength.SixtyFourth: return 1 * TicksMultiplier;
+function getTicks(noteSize: number): number {
+    let ticks = TicksMultiplier, size = ShortestNoteSize;
+    while (size > 1 && size > noteSize) {
+        size /= 2;
+        ticks *= 2;
     }
+    return ticks;
+}
+
+function getFlagCount(noteSize: number): number {
+    if (noteSize <= 4) {
+        return 0;
+    }
+    else {
+        let flagCount = 1, size = 8;
+        while (size < noteSize) {
+            size *= 2;
+            flagCount++;
+        }
+        return flagCount;
+    }
+}
+
+function getMaxDotCount(noteSize: number): number {
+    let size = ShortestNoteSize, maxDotCount = 0;
+    while (size > 0) {
+        if (size === noteSize) return maxDotCount;
+        size /= 2;
+        maxDotCount++;
+    }
+    return 0;
 }
 
 export interface TupletRatio {
@@ -130,40 +121,39 @@ export const Tuplet: Record<"Duplet" | "Triplet" | "Quadruplet", TupletRatio> = 
 
 export class RhythmProps {
     readonly noteLength: NoteLength;
-    readonly noteLengthN: number; // whole=1, half=2, quarter=4, etc.
+    readonly noteSize: number; // whole=1, half=2, quarter=4, etc.
     readonly dotCount: number;
     readonly tupletRatio?: TupletRatio;
     readonly ticks: number;
     readonly flagCount: number;
 
     private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
-        this.noteLength = getNoteLength(noteLength);
+        this.noteLength = validateNoteLength(noteLength);
 
-        this.noteLengthN = this.noteLength;
+        this.noteSize = getNoteSize(this.noteLength);
 
-        this.dotCount = dotCount ?? getNoteLengthDotCount(noteLength) ?? 0;
+        this.dotCount = dotCount ?? RhythmProps.getDotCount(noteLength) ?? 0;
 
         if (Utils.Is.isObject(tupletRatio)) {
             this.tupletRatio = tupletRatio;
         }
-        else if (hasNoteLengthTriplet(noteLength)) {
+        else if (RhythmProps.hasTriplet(noteLength)) {
             this.tupletRatio = Tuplet.Triplet;
         }
         else {
             this.tupletRatio = undefined;
         }
 
-        this.ticks = getTicks(this.noteLength);
+        this.ticks = getTicks(this.noteSize);
 
-        this.flagCount = FlagCountMap.get(this.noteLength) ?? 0;
+        this.flagCount = getFlagCount(this.noteSize);
 
         if (this.dotCount > 0 && this.tupletRatio !== undefined) {
             throw new MusicError(MusicErrorType.Note, "Note cannot be both dotted and tuplet!");
         }
-        else if (this.dotCount > (MaxDotCountMap.get(this.noteLength) ?? 0)) {
-            throw new MusicError(MusicErrorType.Note, `Too big dot count ${this.dotCount} for note length ${NoteLength[this.noteLength]}.`);
+        else if (this.dotCount > getMaxDotCount(this.noteSize)) {
+            throw new MusicError(MusicErrorType.Note, `Too big dot count ${this.dotCount} for note length ${this.noteLength}.`);
         }
-
 
         for (let add = this.ticks / 2, i = 1; i <= this.dotCount; i++, add /= 2) {
             this.ticks += add;
@@ -175,24 +165,19 @@ export class RhythmProps {
     }
 
     static createFromNoteSize(noteSize: number): RhythmProps {
-        switch (noteSize) {
-            case 1: return RhythmProps.get(NoteLength.Whole);
-            case 2: return RhythmProps.get(NoteLength.Half);
-            case 4: return RhythmProps.get(NoteLength.Quarter);
-            case 8: return RhythmProps.get(NoteLength.Eighth);
-            case 16: return RhythmProps.get(NoteLength.Sixteenth);
-            case 32: return RhythmProps.get(NoteLength.ThirtySecond);
-            case 64: return RhythmProps.get(NoteLength.SixtyFourth);
-        }
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteSize: ${noteSize}`)
+        return RhythmProps.get(validateNoteLength(noteSize + "n"));
     }
 
     get hasStem(): boolean {
         return RhythmProps.cmpNoteLength(this.noteLength, NoteLength.Whole) < 0;
     }
 
+    private static NoteSymbolMap = new Map<number, string>([[1, "𝅝"], [2, "𝅗𝅥"], [4, "𝅘𝅥"], [8, "𝅘𝅥𝅮"], [16, "𝅘𝅥𝅯"], [32, "𝅘𝅥𝅰"], [64, "𝅘𝅥𝅱"], [128, "𝅘𝅥𝅲"]]);
+
     toString(): string {
-        return NoteSymbolMap.get(this.noteLength) + ".".repeat(this.dotCount);
+        let sym = RhythmProps.NoteSymbolMap.get(this.noteSize);
+        let dots = ".".repeat(this.dotCount);
+        return sym ? (sym + dots) : ("" + this.noteSize + (dots.length > 0 ? dots : "n"));
     }
 
     private static cache = new Map<NoteLength | NoteLengthStr, RhythmProps>();
@@ -217,8 +202,23 @@ export class RhythmProps {
     }
 
     static cmpNoteLength(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
-        let aNoteLengthN = (a instanceof RhythmProps ? a : RhythmProps.get(a)).noteLengthN;
-        let bNoteLengthN = (b instanceof RhythmProps ? b : RhythmProps.get(b)).noteLengthN;
-        return cmp(bNoteLengthN, aNoteLengthN); // Reversed: smaller N is longer note (whole=1, half=2, etc.)
+        let aRhythProps = a instanceof RhythmProps ? a : RhythmProps.get(a);
+        let bRhythProps = b instanceof RhythmProps ? b : RhythmProps.get(b);
+        return RhythmProps.cmpNoteSize(aRhythProps, bRhythProps);
+    }
+
+    static cmpNoteSize(a: RhythmProps | number, b: RhythmProps | number): -1 | 0 | 1 {
+        let aNoteSize = a instanceof RhythmProps ? a.noteSize : a;
+        let bNoteSize = b instanceof RhythmProps ? b.noteSize : b;
+        return cmp(bNoteSize, aNoteSize); // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
+    }
+
+    static hasTriplet(noteLength: NoteLength | NoteLengthStr): boolean {
+        return noteLength.endsWith("t");
+    }
+
+    static getDotCount(noteLength: NoteLength | NoteLengthStr): number | undefined {
+        let dotCount = Utils.Str.charCount(noteLength, ".");
+        return dotCount > 0 ? dotCount : undefined;
     }
 }
