@@ -1195,7 +1195,7 @@ export class ObjMeasure extends MusicObject {
             noteLengthValues.forEach(restLength => {
                 for (let dotCount = 6; dotCount >= 0; dotCount--) {
                     try {
-                        let restValue = new RhythmProps(restLength, dotCount);
+                        let restValue = RhythmProps.get(restLength, dotCount);
                         while (restValue.ticks <= remainingTicks) {
                             rests.push(restValue);
                             remainingTicks -= restValue.ticks;

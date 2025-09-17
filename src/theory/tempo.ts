@@ -18,7 +18,7 @@ export function getDefaultTempo(): Readonly<Tempo> {
 }
 
 export function getTempoString(tempo: Tempo) {
-    return new RhythmProps(tempo.options.beatLength, tempo.options.dotCount).toString() + "=" + tempo.beatsPerMinute;
+    return RhythmProps.get(tempo.options.beatLength, tempo.options.dotCount).toString() + "=" + tempo.beatsPerMinute;
 }
 
 

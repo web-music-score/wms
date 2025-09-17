@@ -105,7 +105,7 @@ export class ObjRest extends MusicObject {
             ? (options.dotted > 0 ? options.dotted : undefined)
             : (options?.dotted === true ? 1 : undefined);
 
-        this.rhythmProps = new RhythmProps(noteLength, dotCount, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
+        this.rhythmProps = RhythmProps.get(noteLength, dotCount, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
         this.mi = new MRest(this);
     }

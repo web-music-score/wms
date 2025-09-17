@@ -136,7 +136,7 @@ export class RhythmProps {
     readonly ticks: number;
     readonly flagCount: number;
 
-    constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
+    private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = getNoteLength(noteLength);
 
         this.noteLengthN = this.noteLength;
@@ -197,12 +197,17 @@ export class RhythmProps {
 
     private static cache = new Map<NoteLength | NoteLengthStr, RhythmProps>();
 
-    static get(noteLength: NoteLength | NoteLengthStr): RhythmProps {
-        let rhythmProps = this.cache.get(noteLength);
-        if (!rhythmProps) {
-            this.cache.set(noteLength, rhythmProps = new RhythmProps(noteLength));
+    static get(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio): RhythmProps {
+        if (dotCount !== undefined || tupletRatio !== undefined) {
+            return new RhythmProps(noteLength, dotCount, tupletRatio);
         }
-        return rhythmProps;
+        else {
+            let rhythmProps = this.cache.get(noteLength);
+            if (!rhythmProps) {
+                this.cache.set(noteLength, rhythmProps = new RhythmProps(noteLength));
+            }
+            return rhythmProps;
+        }
     }
 
     static cmpTicks(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
