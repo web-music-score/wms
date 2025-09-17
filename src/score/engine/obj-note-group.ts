@@ -767,10 +767,19 @@ export class ObjNoteGroup extends MusicObject {
 
             // Draw note heads
             obj.noteHeadRects.forEach(r => {
-                let outlinedNoteHead = RhythmProps.cmpNoteLength(noteLength, NoteLength.Half) >= 0;
+                let solidNoteHead = NoteLengthProps.get(noteLength).isSolid;
 
                 if (this.diamond) {
-                    if (outlinedNoteHead) {
+                    if (solidNoteHead) {
+                        ctx.beginPath();
+                        ctx.moveTo(r.centerX, r.top);
+                        ctx.lineTo(r.right, r.centerY);
+                        ctx.lineTo(r.centerX, r.bottom);
+                        ctx.lineTo(r.left, r.centerY);
+                        ctx.lineTo(r.centerX, r.top);
+                        ctx.fill();
+                    }
+                    else {
                         ctx.beginPath();
                         ctx.lineWidth = lineWidth * 2.5;
                         ctx.moveTo(r.centerX, r.top);
@@ -787,25 +796,16 @@ export class ObjNoteGroup extends MusicObject {
                         ctx.lineTo(r.left, r.centerY);
                         ctx.stroke();
                     }
-                    else {
-                        ctx.beginPath();
-                        ctx.moveTo(r.centerX, r.top);
-                        ctx.lineTo(r.right, r.centerY);
-                        ctx.lineTo(r.centerX, r.bottom);
-                        ctx.lineTo(r.left, r.centerY);
-                        ctx.lineTo(r.centerX, r.top);
-                        ctx.fill();
-                    }
                 }
                 else {
                     ctx.beginPath();
                     ctx.ellipse(r.centerX, r.centerY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
 
-                    if (outlinedNoteHead) {
-                        ctx.stroke();
+                    if (solidNoteHead) {
+                        ctx.fill();
                     }
                     else {
-                        ctx.fill();
+                        ctx.stroke();
                     }
                 }
             });

@@ -1190,19 +1190,19 @@ export class ObjMeasure extends MusicObject {
 
         let rests: RhythmProps[] = [];
 
-        let noteLengthValues = Utils.Enum.getEnumValues(NoteLength);
+        let noteLengths: NoteLength[] = [];
+        for (let s = NoteLengthProps.LongestNoteSize; s <= NoteLengthProps.ShortestNoteSize; s *= 2) {
+            noteLengths.push(validateNoteLength(s + "n"));
+        }
 
         while (remainingTicks > 0) {
-            noteLengthValues.forEach(restLength => {
-                for (let dotCount = 6; dotCount >= 0; dotCount--) {
-                    try {
-                        let restValue = RhythmProps.get(restLength, dotCount);
-                        while (restValue.ticks <= remainingTicks) {
-                            rests.push(restValue);
-                            remainingTicks -= restValue.ticks;
-                        }
+            noteLengths.forEach(restLangth => {
+                for (let dotCount = NoteLengthProps.get(restLangth).maxDotCount; dotCount >= 0; dotCount--) {
+                    let restProps = RhythmProps.get(restLangth, dotCount);
+                    while (restProps.ticks <= remainingTicks) {
+                        rests.push(restProps);
+                        remainingTicks -= restProps.ticks;
                     }
-                    catch (e) { }
                 }
             });
         }

@@ -76,22 +76,27 @@ export class NoteLengthProps {
     readonly dotCount: number;
     readonly maxDotCount: number;
     readonly isTriplet: boolean;
+    readonly hasStem: boolean;
+    readonly isSolid: boolean; // Is solid (black) note head?
 
     private constructor(noteLength: NoteLength | NoteLengthStr) {
         this.noteLength = validateNoteLength(noteLength);
-        this.noteSize = parseInt(this.noteLength);
-
+        this.noteSize = parseInt(noteLength);
         this.ticks = TicksMultiplier;
         this.maxDotCount = 0;
-        this.dotCount = Utils.Str.charCount(this.noteLength, ".");
-        this.isTriplet = this.noteLength.endsWith("t");
+        this.dotCount = Utils.Str.charCount(noteLength, ".");
+        this.isTriplet = noteLength.endsWith("t");
         this.flagCount = 0;
+        this.hasStem = this.noteSize > 1;
+        this.isSolid = this.noteSize > 2;
 
         let size = NoteLengthProps.ShortestNoteSize;
         while (size > 1 && size > this.noteSize) {
             size /= 2;
             this.ticks *= 2;
-            this.maxDotCount++;
+            if (!this.isTriplet) {
+                this.maxDotCount++;
+            }
         }
 
         if (this.noteSize > 4) {
@@ -112,6 +117,14 @@ export class NoteLengthProps {
             this.cache.set(noteLength, p = new NoteLengthProps(noteLength));
         }
         return p;
+    }
+
+    static cmp(a: NoteLengthProps | NoteLength | NoteLengthStr | number, b: NoteLengthProps | NoteLength | NoteLengthStr | number): -1 | 0 | 1 {
+        let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
+        let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
+        // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
+        // Ignores isTriplet.
+        return cmp(bNoteSize, aNoteSize);
     }
 }
 
@@ -136,6 +149,7 @@ export class RhythmProps {
     readonly tupletRatio?: TupletRatio;
     readonly ticks: number;
     readonly flagCount: number;
+    readonly hasStem: boolean;
 
     private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = validateNoteLength(noteLength);
@@ -146,6 +160,7 @@ export class RhythmProps {
         this.ticks = p.ticks;
         this.flagCount = p.flagCount;
         this.dotCount = dotCount ?? p.dotCount;
+        this.hasStem = p.hasStem;
 
         if (Utils.Is.isObject(tupletRatio)) {
             this.tupletRatio = tupletRatio;
@@ -177,10 +192,6 @@ export class RhythmProps {
         return RhythmProps.get(validateNoteLength(noteSize + "n"));
     }
 
-    get hasStem(): boolean {
-        return RhythmProps.cmpNoteLength(this.noteLength, NoteLength.Whole) < 0;
-    }
-
     private static NoteSymbolMap = new Map<number, string>([[1, "𝅝"], [2, "𝅗𝅥"], [4, "𝅘𝅥"], [8, "𝅘𝅥𝅮"], [16, "𝅘𝅥𝅯"], [32, "𝅘𝅥𝅰"], [64, "𝅘𝅥𝅱"], [128, "𝅘𝅥𝅲"]]);
 
     toString(): string {
@@ -204,21 +215,7 @@ export class RhythmProps {
         }
     }
 
-    static cmpTicks(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
-        let aTicks = (a instanceof RhythmProps ? a : RhythmProps.get(a)).ticks;
-        let bTicks = (b instanceof RhythmProps ? b : RhythmProps.get(b)).ticks;
-        return cmp(aTicks, bTicks);
-    }
-
-    static cmpNoteLength(a: RhythmProps | NoteLength | NoteLengthStr, b: RhythmProps | NoteLength | NoteLengthStr): -1 | 0 | 1 {
-        let aRhythProps = a instanceof RhythmProps ? a : RhythmProps.get(a);
-        let bRhythProps = b instanceof RhythmProps ? b : RhythmProps.get(b);
-        return RhythmProps.cmpNoteSize(aRhythProps, bRhythProps);
-    }
-
-    static cmpNoteSize(a: RhythmProps | number, b: RhythmProps | number): -1 | 0 | 1 {
-        let aNoteSize = a instanceof RhythmProps ? a.noteSize : a;
-        let bNoteSize = b instanceof RhythmProps ? b.noteSize : b;
-        return cmp(bNoteSize, aNoteSize); // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
+    static cmp(a: RhythmProps, b: RhythmProps): -1 | 0 | 1 {
+        return cmp(a.ticks, b.ticks);
     }
 }

@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { NoteLength, Tuplet, TupletRatio, RhythmProps, NoteLengthProps } from "@tspro/web-music-score/theory";
+import { NoteLength, Tuplet, TupletRatio, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
@@ -128,7 +128,7 @@ export class ObjBeamGroup extends MusicObject {
             }
 
             // Quarter notes or longer do not have beam => use group.
-            if (symbols.some(s => RhythmProps.cmpNoteLength(s.rhythmProps, NoteLength.Quarter) >= 0)) {
+            if (symbols.some(s => NoteLengthProps.cmp(s.rhythmProps.noteLength, NoteLength.Quarter) >= 0)) {
                 isGroup = true;
             }
 
@@ -162,19 +162,21 @@ export class ObjBeamGroup extends MusicObject {
 
     static createOldStyleTriplet(symbols: RhythmSymbol[]): number {
         let s2 = symbols.slice(0, 2);
+        let n2 = s2.map(s => s.rhythmProps.noteSize);
 
         if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            (RhythmProps.cmpNoteSize(s2[0].rhythmProps, NoteLengthProps.ShortestNoteSize) >= 0 && RhythmProps.cmpNoteSize(s2[0].rhythmProps.noteSize * 2, s2[1].rhythmProps) === 0) ||
-            (RhythmProps.cmpNoteSize(s2[1].rhythmProps, NoteLengthProps.ShortestNoteSize) >= 0 && RhythmProps.cmpNoteSize(s2[1].rhythmProps.noteSize * 2, s2[0].rhythmProps) === 0))
+            (NoteLengthProps.cmp(n2[0], NoteLengthProps.ShortestNoteSize) >= 0 && NoteLengthProps.cmp(n2[0] * 2, n2[1]) === 0) ||
+            (NoteLengthProps.cmp(n2[1], NoteLengthProps.ShortestNoteSize) >= 0 && NoteLengthProps.cmp(n2[1] * 2, n2[0]) === 0))
         ) {
             new ObjBeamGroup(s2, Tuplet.Triplet);
             return 2;
         }
 
         let s3 = symbols.slice(0, 3);
+        let n3 = s3.map(s => s.rhythmProps.noteSize);
 
         if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (
-            s3.every(s => RhythmProps.cmpNoteLength(s.rhythmProps, s3[0].rhythmProps) === 0)
+            n3.every(n => NoteLengthProps.cmp(n, n3[0]) === 0)
         )) {
             new ObjBeamGroup(s3, Tuplet.Triplet);
             return 3;
