@@ -207,10 +207,6 @@ export class RhythmProps {
         }
     }
 
-    static createFromNoteSize(noteSize: number): RhythmProps {
-        return RhythmProps.get(validateNoteLength(noteSize + "n"));
-    }
-
     private static NoteSymbolMap = new Map<number, string>([[1, "𝅝"], [2, "𝅗𝅥"], [4, "𝅘𝅥"], [8, "𝅘𝅥𝅮"], [16, "𝅘𝅥𝅯"], [32, "𝅘𝅥𝅰"], [64, "𝅘𝅥𝅱"], [128, "𝅘𝅥𝅲"]]);
 
     toString(): string {
