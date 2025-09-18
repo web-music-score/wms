@@ -83,27 +83,27 @@ export class NoteLengthProps {
         this.noteLength = validateNoteLength(noteLength);
         this.noteSize = parseInt(noteLength);
         this.ticks = TicksMultiplier;
-        this.maxDotCount = 0;
-        this.dotCount = Utils.Str.charCount(noteLength, ".");
         this.isTriplet = noteLength.endsWith("t");
-        this.flagCount = 0;
+        this.dotCount = this.isTriplet ? 0 : Utils.Str.charCount(noteLength, ".");
         this.hasStem = this.noteSize > 1;
         this.isSolid = this.noteSize > 2;
+        this.maxDotCount = 0;
+        this.flagCount = 0;
 
-        let size = NoteLengthProps.ShortestNoteSize;
-        while (size > 1 && size > this.noteSize) {
-            size /= 2;
+        let noteSize = NoteLengthProps.ShortestNoteSize;
+        while (noteSize > 1 && noteSize > this.noteSize) {
+            noteSize /= 2;
             this.ticks *= 2;
             if (!this.isTriplet) {
-                this.maxDotCount++;
+                this.maxDotCount++; // triplets cannot be dotted!
             }
         }
 
         if (this.noteSize > 4) {
             this.flagCount = 1;
-            let size = 8;
-            while (size < this.noteSize) {
-                size *= 2;
+            let noteSize = 8;
+            while (noteSize < this.noteSize) {
+                noteSize *= 2;
                 this.flagCount++;
             }
         }
@@ -119,18 +119,30 @@ export class NoteLengthProps {
         return p;
     }
 
+    /**
+     * Compare note lengths/sizes. Whole (1) > half (2) > quarter (4), etc.
+     * Ignores possible triplet property of note length.
+     * @param a - NoteLengthProps, NoteLength/Str or noteSize
+     * @param b - NoteLengthProps, NoteLength/Str or noteSize
+     * @returns - -1: a < b, 0: a === b, +1: a > b (note length/size comparisons)
+     */
     static cmp(a: NoteLengthProps | NoteLength | NoteLengthStr | number, b: NoteLengthProps | NoteLength | NoteLengthStr | number): -1 | 0 | 1 {
         let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
         let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
         // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
-        // Ignores isTriplet.
         return cmp(bNoteSize, aNoteSize);
     }
 
+    /**
+     * Compare note lengths/sizes for equality.
+     * Ignores possible triplet property of note length.
+     * @param a - NoteLengthProps, NoteLength/Str or noteSize
+     * @param b - NoteLengthProps, NoteLength/Str or noteSize
+     * @returns - true: a === b, false: a !== b (note length/size comparisons)
+     */
     static equals(a: NoteLengthProps | NoteLength | NoteLengthStr | number, b: NoteLengthProps | NoteLength | NoteLengthStr | number): boolean {
         let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
         let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
-        // Ignores isTriplet.
         return aNoteSize === bNoteSize;
     }
 }
@@ -233,10 +245,22 @@ export class RhythmProps {
         }
     }
 
+    /**
+     * Compare duration of rhythm props.
+     * @param a - RhythmProps
+     * @param b - RhythmProps
+     * @returns - -1: a < b, 0: a === b, +1: a > b (duration comparisons)
+     */
     static cmp(a: RhythmProps, b: RhythmProps): -1 | 0 | 1 {
         return cmp(a.ticks, b.ticks);
     }
 
+    /**
+     * Compare duration equality of rhythm props.
+     * @param a - RhythmProps
+     * @param b - RhythmProps
+     * @returns - true: a === b, false: a !== b (duration comparisons)
+     */
     static equals(a: RhythmProps, b: RhythmProps): boolean {
         return a.ticks === b.ticks;
     }
