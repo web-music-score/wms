@@ -84,11 +84,18 @@ export class NoteLengthProps {
         this.noteSize = parseInt(noteLength);
         this.isTriplet = noteLength.endsWith("t");
         this.maxDotCount = this.isTriplet ? 0 : Math.floor(Math.log2(NoteLengthProps.ShortestNoteSize / this.noteSize));
-        this.dotCount = Math.min(this.maxDotCount, Utils.Str.charCount(noteLength, "."));
+        this.dotCount = Utils.Str.charCount(noteLength, ".");
         this.flagCount = this.noteSize > 4 ? Math.floor(Math.log2(this.noteSize / 4)) : 0;
         this.ticks = TicksMultiplier * NoteLengthProps.ShortestNoteSize / this.noteSize;
         this.hasStem = this.noteSize > 1;
         this.isSolid = this.noteSize > 2;
+
+        if (this.dotCount > this.maxDotCount) {
+            throw new MusicError(MusicErrorType.Note, `dotCount ${this.dotCount} > maxDotCount ${this.maxDotCount}, for noteLength "${this.noteLength}".`);
+        }
+        else if (this.isTriplet && this.dotCount > 0) {
+            throw new MusicError(MusicErrorType.Note, `noteLength "${this.noteLength}" is both triplet and dotted!`);
+        }
     }
 
     private static cache = new Map<NoteLength | NoteLengthStr, NoteLengthProps>();
