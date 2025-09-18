@@ -82,31 +82,13 @@ export class NoteLengthProps {
     private constructor(noteLength: NoteLength | NoteLengthStr) {
         this.noteLength = validateNoteLength(noteLength);
         this.noteSize = parseInt(noteLength);
-        this.ticks = TicksMultiplier;
         this.isTriplet = noteLength.endsWith("t");
         this.dotCount = this.isTriplet ? 0 : Utils.Str.charCount(noteLength, ".");
+        this.maxDotCount = this.isTriplet ? 0 : Math.floor(Math.log2(NoteLengthProps.ShortestNoteSize / this.noteSize));
+        this.flagCount = this.noteSize > 4 ? Math.floor(Math.log2(this.noteSize / 4)) : 0;
+        this.ticks = TicksMultiplier * NoteLengthProps.ShortestNoteSize / this.noteSize;
         this.hasStem = this.noteSize > 1;
         this.isSolid = this.noteSize > 2;
-        this.maxDotCount = 0;
-        this.flagCount = 0;
-
-        let noteSize = NoteLengthProps.ShortestNoteSize;
-        while (noteSize > 1 && noteSize > this.noteSize) {
-            noteSize /= 2;
-            this.ticks *= 2;
-            if (!this.isTriplet) {
-                this.maxDotCount++; // triplets cannot be dotted!
-            }
-        }
-
-        if (this.noteSize > 4) {
-            this.flagCount = 1;
-            let noteSize = 8;
-            while (noteSize < this.noteSize) {
-                noteSize *= 2;
-                this.flagCount++;
-            }
-        }
     }
 
     private static cache = new Map<NoteLength | NoteLengthStr, NoteLengthProps>();
