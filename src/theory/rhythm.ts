@@ -83,8 +83,8 @@ export class NoteLengthProps {
         this.noteLength = validateNoteLength(noteLength);
         this.noteSize = parseInt(noteLength);
         this.isTriplet = noteLength.endsWith("t");
-        this.dotCount = this.isTriplet ? 0 : Utils.Str.charCount(noteLength, ".");
         this.maxDotCount = this.isTriplet ? 0 : Math.floor(Math.log2(NoteLengthProps.ShortestNoteSize / this.noteSize));
+        this.dotCount = Math.min(this.maxDotCount, Utils.Str.charCount(noteLength, "."));
         this.flagCount = this.noteSize > 4 ? Math.floor(Math.log2(this.noteSize / 4)) : 0;
         this.ticks = TicksMultiplier * NoteLengthProps.ShortestNoteSize / this.noteSize;
         this.hasStem = this.noteSize > 1;
