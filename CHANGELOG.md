@@ -1,16 +1,20 @@
 # Changelog
 
-## [4.0.0] - 2025-09-16
-Another major update was required by some new features.
+## [4.0.0] - 2025-09-19
+Another major update was required by new features.
 
 ### **Breiking Changes**
-- `Theory.RhythmProps` got updated to support generic tuples and multiple dot count.
-- `DocumentBuilder.addExtension()` got updated way to set extension length.
+- `RhythmProps` had major redesign.
+- `DocumentBuilder.addExtension()` was changed.
 
 ### Added
-- Support generic tuples with `DocumentBuilder.addTuplet()`.
+- Generic tuples with `DocumentBuilder.addTuplet()`.
 - Support multiple dot count.
-- Support string arguments in addition to TypeScript enum objects.
+- Support for "1n", "2n", "4n", etc. string note lengths alongside `NoteLength` enum.
+- Added `NoteLengthProps` to support string note lengths.
+- Support for string arguments alongside typescript enums (in addition to string note lengths).
+
+**Lots of undocumented small changes, updates and fixes!**
 
 ## [3.2.0] - 2025-09-12
 ### Added
