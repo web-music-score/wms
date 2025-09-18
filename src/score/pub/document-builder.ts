@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
-import { KeySignature, MaxTupletRatioParts, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio, validateNoteLength } from "@tspro/web-music-score/theory";
+import { KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
@@ -94,6 +94,16 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
 function isNoteLength(noteLen: unknown): noteLen is NoteLength {
     try {
         validateNoteLength(noteLen);
+        return true;
+    }
+    catch (e) {
+        return false;
+    }
+}
+
+function isTupletRatio(tupletRatio: unknown): tupletRatio is TupletRatio {
+    try {
+        validateTupletRatio(tupletRatio);
         return true;
     }
     catch (e) {
@@ -263,10 +273,7 @@ export class DocumentBuilder {
     addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, tupletBuilder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isFunction(tupletBuilder), "tupletBuilder", tupletBuilder);
-        assertArg(Utils.Is.isObject(tupletRatio) &&
-            Utils.Is.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioParts) &&
-            Utils.Is.isIntegerGte(tupletRatio.inTimeOf, 2) &&
-            Utils.Is.isBooleanOrUndefined(tupletRatio.showRatio), "tupletRatio", tupletRatio);
+        assertArg(isTupletRatio(tupletRatio) && Utils.Is.isBooleanOrUndefined(tupletRatio.showRatio), "tupletRatio", tupletRatio);
 
         let tupletSymbols: RhythmSymbol[] = [];
 

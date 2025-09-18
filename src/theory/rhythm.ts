@@ -3,7 +3,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 const cmp = (a: number, b: number): -1 | 0 | 1 => a === b ? 0 : (a < b ? -1 : 1);
 
-export const MaxTupletRatioParts = 12;
+const MaxTupletRatioValue = 12;
 
 /*
  * To get integer ticks, NoteLength value must be divisible of all TupletRatio.parts values < MaxTupletRatioParts
@@ -71,7 +71,7 @@ export class NoteLengthProps {
 
     readonly noteLength: NoteLength;
     readonly noteSize: number;
-    readonly ticks: number;
+    readonly ticks: number; // Not altered by isTriplet!
     readonly flagCount: number;
     readonly dotCount: number;
     readonly maxDotCount: number;
@@ -140,6 +140,15 @@ export interface TupletRatio {
     inTimeOf: number;
 }
 
+export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
+    if (Utils.Is.isObject(tupletRatio) && Utils.Is.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioValue) && Utils.Is.isIntegerBetween(tupletRatio.inTimeOf, 2, MaxTupletRatioValue)) {
+        return tupletRatio as unknown as TupletRatio;
+    }
+    else {
+        throw new MusicError(MusicErrorType.Note, `Invalid tupletRatio ${JSON.stringify(tupletRatio)}`);
+    }
+}
+
 export const Tuplet: Record<"Duplet" | "Triplet" | "Quadruplet", TupletRatio> = {
     /** 2 in the time of 3 */
     Duplet: { parts: 2, inTimeOf: 3 },
@@ -162,7 +171,7 @@ export class RhythmProps {
     private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = validateNoteLength(noteLength);
 
-        let p = NoteLengthProps.get(this.noteLength);
+        let p = NoteLengthProps.get(noteLength); // Not this.noteLength, misses isTriplet (maxDotCount will be wrong)!
 
         this.noteSize = p.noteSize;
         this.ticks = p.ticks;
@@ -172,7 +181,7 @@ export class RhythmProps {
         this.isSolidNoteHead = p.isSolid;
 
         if (Utils.Is.isObject(tupletRatio)) {
-            this.tupletRatio = tupletRatio;
+            this.tupletRatio = validateTupletRatio(tupletRatio);
         }
         else if (p.isTriplet) {
             this.tupletRatio = Tuplet.Triplet;
@@ -182,7 +191,7 @@ export class RhythmProps {
         }
 
         if (this.dotCount > 0 && this.tupletRatio !== undefined) {
-            throw new MusicError(MusicErrorType.Note, "Note cannot be both dotted and tuplet!");
+            throw new MusicError(MusicErrorType.Note, `Note cannot be both dotted and tuplet!`);
         }
         else if (this.dotCount > p.maxDotCount) {
             throw new MusicError(MusicErrorType.Note, `Too big dot count ${this.dotCount} for note length ${this.noteLength}.`);
