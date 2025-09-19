@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { NoteLength, validateNoteLength, NoteLengthProps } from "./rhythm";
+import { NoteLength, NoteLengthProps } from "./rhythm";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export type TimeSignatureString = "2/4" | "3/4" | "4/4" | "6/8" | "9/8";
@@ -45,9 +45,10 @@ export class TimeSignature {
             throw new MusicError(MusicErrorType.Timesignature, `Invalid beatSize: ${this.beatSize}`);
         }
 
-        this.beatLength = validateNoteLength(this.beatSize + "n");
+        let props = NoteLengthProps.create(this.beatSize);
 
-        this.measureTicks = this.beatCount * NoteLengthProps.get(this.beatLength).ticks;
+        this.beatLength = props.noteLength;
+        this.measureTicks = this.beatCount * props.ticks;
 
         if (this.is(2, 4) || this.is(3, 4) || this.is(4, 4)) {
             this.beamGroupCount = this.beatCount;

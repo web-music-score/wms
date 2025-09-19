@@ -79,7 +79,7 @@ export class NoteLengthProps {
     readonly hasStem: boolean;
     readonly isSolid: boolean; // Is solid (black) note head?
 
-    private constructor(noteLength: NoteLength | NoteLengthStr) {
+    private constructor(noteLength: NoteLength | NoteLengthStr | string) {
         this.noteLength = validateNoteLength(noteLength);
         this.noteSize = parseInt(noteLength);
         this.isTriplet = noteLength.endsWith("t");
@@ -98,14 +98,19 @@ export class NoteLengthProps {
         }
     }
 
-    private static cache = new Map<NoteLength | NoteLengthStr, NoteLengthProps>();
+    private static cache = new Map<NoteLength | NoteLengthStr | string, NoteLengthProps>();
 
-    static get(noteLength: NoteLength | NoteLengthStr): NoteLengthProps {
+    static get(noteLength: NoteLength | NoteLengthStr | string): NoteLengthProps {
         let p = this.cache.get(noteLength);
         if (!p) {
             this.cache.set(noteLength, p = new NoteLengthProps(noteLength));
         }
         return p;
+    }
+
+    static create(noteLength: NoteLength | NoteLengthStr | string | number, dotCount: number = 0): NoteLengthProps {
+        let noteSize = typeof noteLength === "number" ? noteLength : this.get(noteLength).noteSize;
+        return this.get(noteSize + (Utils.Is.isIntegerGte(dotCount, 1) ? ".".repeat(dotCount) : "n"));
     }
 
     /**
