@@ -463,7 +463,7 @@ export class DocumentBuilder {
      * @returns 
      */
     addExtension(extensionBuilder?: (ext: ExtensionBuilder) => void): DocumentBuilder {
-        assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "DocumentBuilder.addExtension() was changed, please check README.md or API Reference.", extensionBuilder);
+        assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "addExtension() has new usage, for e.g. addExtension(ext => ext.measures(2)). Please refer to README or API Reference.", extensionBuilder);
 
         let ticks: number = 0;
         let visible: boolean = true;
