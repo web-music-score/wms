@@ -9,7 +9,12 @@ This library allows you to view and play music scores (notation) in the browser.
 I'm not a professional musician. I began learning classical guitar on my own, 
 later taking lessons in classical guitar. I've also studied music theory independently.
 
-This is a work in progress project. Expect changes, bugs, or unexpected behavior.
+This is a work in progress project. Lately there has been improvements that required major
+version update. As the project matures there might be less major updates, and more minor
+updates and patches.
+
+This version (4.0.0) added support for string note lengths (e.g. "4n", "2..", etc.) and
+other typescript enums for shorter code. 
 
 ## Installation
 
