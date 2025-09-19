@@ -67,22 +67,26 @@ export type StaffTabOrGroup = number | string;
 export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
 export type NoteOptions = {
-    dotted?: boolean | number,
     stem?: Stem | `${Stem}`,
     color?: string,
     arpeggio?: boolean | Arpeggio | `${Arpeggio}`,
     staccato?: boolean,
     diamond?: boolean,
+    string?: StringNumber | StringNumber[],
+    /** @deprecated - Use triplet NoteLength values instead, e.g. NoteLength.QuarterTriplet or "4t", etc. */
     triplet?: boolean,
-    string?: StringNumber | StringNumber[];
+    /** @deprecated - Use dotted NoteLength values instead, e.g. NoteLength.Quarter2Dots or "4..", etc. */
+    dotted?: boolean | number
 }
 
 export type RestOptions = {
-    dotted?: boolean | number,
     staffPos?: Note | string | number, // Note, "C3", or midiNumber
     color?: string,
     hide?: boolean,
-    triplet?: boolean
+    /** @deprecated - Use triplet NoteLength values instead, e.g. NoteLength.QuarterTriplet or "4t", etc. */
+    triplet?: boolean,
+    /** @deprecated - Use dotted NoteLength values instead, e.g. NoteLength.Quarter2Dots or "4..", etc. */
+    dotted?: boolean | number
 }
 
 export type TupletOptions = {
