@@ -134,17 +134,20 @@ export class DocumentBuilder {
         this.doc = new ObjDocument();
     }
 
-    setScoreConfiguration(staffPreset: StaffPreset): DocumentBuilder;
+    setScoreConfiguration(staffPreset: StaffPreset | `${StaffPreset}`): DocumentBuilder;
     setScoreConfiguration(config: ScoreConfiguration): DocumentBuilder;
-    setScoreConfiguration(config: StaffPreset | ScoreConfiguration): DocumentBuilder {
+    setScoreConfiguration(config: StaffPreset | `${StaffPreset}` | ScoreConfiguration): DocumentBuilder {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
             // Ok
+            this.doc.setScoreConfiguration(config);
         }
         else if (Utils.Is.isObject(config) && config.type === "staff") {
             assertStaffConfig(config);
+            this.doc.setScoreConfiguration(config);
         }
         else if (Utils.Is.isObject(config) && config.type === "tab") {
             assertTabConfig(config);
+            this.doc.setScoreConfiguration(config);
         }
         else if (Utils.Is.isNonEmptyArray(config)) {
             config.forEach(c => {
@@ -158,12 +161,11 @@ export class DocumentBuilder {
                     assertArg(false, "config", config);
                 }
             });
+            this.doc.setScoreConfiguration(config);
         }
         else {
             assertArg(false, "config", config);
         }
-
-        this.doc.setScoreConfiguration(config);
 
         return this;
     }

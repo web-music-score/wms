@@ -2,18 +2,18 @@ import { Note } from "@tspro/web-music-score/theory";
 
 export enum StaffPreset {
     /** Treble staff has treble (G-) clef. */
-    Treble = 1,
+    Treble = "treble",
     /** Bass staff has bass (F-) clef. */
-    Bass = 2,
+    Bass = "bass",
     /** Grand staff has both treble and bass clefs. */
-    Grand = Treble | Bass,
+    Grand = "grand",
 
     /** GuitarTreble has treble clef but is one octave lower. */
-    GuitarTreble = 4,
+    GuitarTreble = "guitarTreble",
     /** GuitarTab has tab for guitar. */
-    GuitarTab = 8,
+    GuitarTab = "guitarTab",
     /** GuitarCombined has treble clef and tab for guitar. */
-    GuitarCombined = GuitarTab | GuitarTreble
+    GuitarCombined = "guitarCombined"
 }
 
 export enum Clef { G = "G", F = "F" }
