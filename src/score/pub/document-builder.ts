@@ -70,6 +70,9 @@ function assertNoteOptions(options: NoteOptions) {
         isStringNumber(options.string) ||
         Utils.Is.isNonEmptyArray(options.string) && options.string.every(string => isStringNumber(string))
     ), "noteOptions.string", options.string);
+
+    assertArg((options as any).tieSpan === undefined, "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
+    assertArg((options as any).slurSpan === undefined, "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
 }
 
 function assertRestOptions(options: RestOptions) {
