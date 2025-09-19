@@ -26,16 +26,16 @@
     <button id="playButton" type="button"></button>
 
     <script>
-        const { Score, Theory } = window.WebMusicScore;
+        const { Score } = window.WebMusicScore;
 
         let doc = new Score.DocumentBuilder()
-            .setScoreConfiguration(Score.StaffPreset.Treble)
+            .setScoreConfiguration("treble")
             .setTimeSignature("3/4")
-            .addNote(0, "C4", Theory.NoteLength.Quarter)
-            .addNote(0, "E4", Theory.NoteLength.Quarter)
-            .addNote(0, "G4", Theory.NoteLength.Quarter)
+            .addNote(0, "C4", "4n")
+            .addNote(0, "E4", "4n")
+            .addNote(0, "G4", "4n")
             .addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], Theory.NoteLength.Half, { dotted: true, arpeggio: true })
+            .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
             .getDocument();
 
         new Score.MRenderer().
