@@ -189,7 +189,6 @@ Manually induce row change. Next measure that is added will begin new row.
 ### Add Note
 ```js
 .addNote(0, "C4", "1n")                    // Create whole note "C4"
-.addNote(0, "G#3", "8n", { dotted: true }) // Create dotted eighth note "G#3"
 .addNote(0, "Bb4", "2..")                  // Create double dotted half note "Bb4"
 .addNote(0, "C4", "4n", { stem: Score.Stem.Up }) // Stem direction Up (could be also Down)
 .addNote(0, "C4", "4n", { staccate: true }) // Show staccato dot and play in short
@@ -205,7 +204,6 @@ Manually induce row change. Next measure that is added will begin new row.
 
 ```js    
 .addRest(0, "16n")               // Add sixteenth rest
-.addRest(0, "4n", { dotted: 3 }) // Add triple dotted quarter rest
 .addRest(0, "4.")                // Add dotted quarter rest
 .addRest(0, "4n", { staffPos: "D3" }) // Draw this quarter rest at level of "D3" note.
 .addRest(0, "4n", { hide: true }) // Invisible rest affects playing
@@ -224,11 +222,6 @@ This works for any tuplet:
 
 Triplets can also be created using `triplet` property or string note length:
 ```js
-// Example: add triplet using triplet property.
-.addNote(0, "G3", "8n", { triplet: true })
-.addNote(0, "B3", "8n", { triplet: true })
-.addNote(0, "D4", "8n", { triplet: true })
-
 // Example: add triplet using string note length.
 .addNote(0, "G3", "8t")
 .addNote(0, "B3", "8t")
