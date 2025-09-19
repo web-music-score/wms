@@ -299,11 +299,11 @@ Add text label anchored to previously added note, chord or rest.
 Adds extension line to previously added label or annotation.
 
 ```js
-.addExtension(len => len.notes("1n", 2), true)    // Add extension line, length is 2 whole notes, visible
-.addExtension(len => len.measures(3), false)      // Add extension line, length is 3 measures, hidden
-.addExtension(len => len.measures(1).notes("8n")) // Add extension line, length is 1 measure + 1 eigth note, visible
-.addExtension(len => len.infinity())              // Add extension line, length is as long as possible, visible
-.addExtension()                                   // Add extension line, length is as long as possible, visible
+.addExtension(ext => ext.notes("1n", 2))    // Add extension line, length is 2 whole notes
+.addExtension(ext => ext.measures(3).hide())      // Add extension line, length is 3 measures, hidden
+.addExtension(ext => ext.measures(1).notes("8n")) // Add extension line, length is 1 measure + 1 eigth note
+.addExtension(ext => ext.infinity())              // Add extension line, length is as long as possible
+.addExtension()                                   // Add extension line, length is as long as possible
 ```
 
 ### Add Connective (tie, slur, slide)

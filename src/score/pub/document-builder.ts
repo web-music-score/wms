@@ -120,7 +120,8 @@ export type TupletBuilder = {
 export type ExtensionBuilder = {
     notes: (noteLength: NoteLength | NoteLengthStr, noteCount?: number) => ExtensionBuilder,
     measures: (measureCount: number) => ExtensionBuilder,
-    infinity: () => ExtensionBuilder
+    infinity: () => ExtensionBuilder,
+    hide: () => ExtensionBuilder
 }
 
 export class DocumentBuilder {
@@ -452,20 +453,20 @@ export class DocumentBuilder {
     /**
      * Extension length example:
      * <pre>
-     *     addExtension(len => len.notes("1n", 2), true)    // length is 2 whole notes, visible
-     *     addExtension(len => len.measures(3), false)      // length is 3 measures, hidden
-     *     addExtension(len => len.measures(1).notes("8n")) // length is 1 measure + 1 eigth note, visible
-     *     addExtension(len => len.infinity())              // length is as long as possible, visible
+     *     addExtension(ext => ext.notes("1n", 2))          // length is 2 whole notes
+     *     addExtension(ext => ext.measures(3).hide())      // length is 3 measures, hidden
+     *     addExtension(ext => ext.measures(1).notes("8n")) // length is 1 measure + 1 eigth note
+     *     addExtension(ext => ext.infinity())              // length is as long as possible
      * </pre>
      * @param extensionLength
      * @param extensionVisible
      * @returns 
      */
-    addExtension(extensionBuilder?: (len: ExtensionBuilder) => void, extensionVisible?: boolean): DocumentBuilder {
+    addExtension(extensionBuilder?: (ext: ExtensionBuilder) => void): DocumentBuilder {
         assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "DocumentBuilder.addExtension() was changed, please check README.md or API Reference.", extensionBuilder);
-        assertArg(Utils.Is.isBooleanOrUndefined(extensionVisible), "extensionVisible", extensionVisible);
 
         let ticks: number = 0;
+        let visible: boolean = true;
 
         const helper: ExtensionBuilder = {
             notes: (noteLength, noteCount) => {
@@ -482,6 +483,10 @@ export class DocumentBuilder {
             infinity: () => {
                 ticks = Infinity;
                 return helper;
+            },
+            hide: () => {
+                visible = false;
+                return helper;
             }
         };
 
@@ -492,7 +497,7 @@ export class DocumentBuilder {
             ticks = Infinity;
         }
 
-        this.getMeasure().addExtension(ticks, extensionVisible ?? true);
+        this.getMeasure().addExtension(ticks, visible);
         return this;
     }
 
