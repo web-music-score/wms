@@ -82,7 +82,7 @@ let doc = new Score.DocumentBuilder()
     .setMeasuresPerRow(4)
     .addMeasure()
     .addNote(1, "C3", "4n")
-    .addChord(1, ["C3", "E3", "G3"], "4n").addLabel(Score.Label.Chord, "C")
+    .addChord(1, ["C3", "E3", "G3"], "4n").addLabel("chord", "C")
     .addRest(1, "4n")
     // etc.
     .getDEocument();
@@ -97,19 +97,21 @@ let doc = new Score.DocumentBuilder()
     documentBuilder.addNote(...)
 ```
 
-
-
 ### Set Score Configuration
 Setting score configuration takes place in first measure of next row.
 
 #### Using preset values
+
+For staff presets you can use `Score.StaffPreset` enum values (e.g. `Score.StaffPreset.Treble`) or
+corresponding string values (e.g. `"treble"`).
+
 ```js
-.setScoreConfiguration(Score.StaffPreset.Treble)         // Staff with treble G-clef.
-.setScoreConfiguration(Score.StaffPreset.Bass)           // Staff with bass F-clef.
-.setScoreConfiguration(Score.StaffPreset.Grand)          // Both treble and bas staves.
-.setScoreConfiguration(Score.StaffPreset.GuitarTreble)   // Same as `Treble` but one octave down.
-.setScoreConfiguration(Score.StaffPreset.GuitarTab)      // Guitar tab only.
-.setScoreConfiguration(Score.StaffPreset.GuitarCombined) // Treble and tab for guitar.
+.setScoreConfiguration("treble")         // Staff with treble G-clef.
+.setScoreConfiguration("bass")           // Staff with bass F-clef.
+.setScoreConfiguration("grand")          // Both treble and bas staves.
+.setScoreConfiguration("guitarTreble")   // Same as `Treble` but one octave down.
+.setScoreConfiguration("guitarTab")      // Guitar tab only.
+.setScoreConfiguration("guitarCombined") // Treble and tab for guitar.
 ```
 
 #### Using configuration objects
@@ -167,10 +169,12 @@ Manually induce row change. Next measure that is added will begin new row.
 ```
 
 ### Set Key Signature
+For scale type you can use `Theory.ScaleType` enum values (e.g. `Theory.ScaleType.Major`) or
+corresponding string values (e.g. `"Major"`).
 
 ```js
-.setKeySignature("C", "Major")                       // Create C Major scale.
-.setKeySignature("A", Theory.ScaleType.NaturalMinor) // Create A natural minor scale.
+.setKeySignature("C", "Major")         // Create C Major scale.
+.setKeySignature("A", "Natural Minor") // Create A natural minor scale.
 ```
 
 - See API Reference for all scale types.
@@ -193,16 +197,16 @@ Manually induce row change. Next measure that is added will begin new row.
 
 ### Add Note
 ```js
-.addNote(0, "C4", "1n")                    // Create whole note "C4"
-.addNote(0, "Bb4", "2..")                  // Create double dotted half note "Bb4"
-.addNote(0, "C4", "4n", { stem: Score.Stem.Up }) // Stem direction Up (could be also Down)
+.addNote(0, "C4", "1n")                     // Create whole note "C4"
+.addNote(0, "Bb4", "2..")                   // Create double dotted half note "Bb4"
+.addNote(0, "C4", "4n", { stem: "up" })     // Stem direction Up (could be also Down)
 .addNote(0, "C4", "4n", { staccate: true }) // Show staccato dot and play in short
-.addNote(0, "C4", "4n", { diamond: true }) // Show diamond shaped note head
+.addNote(0, "C4", "4n", { diamond: true })  // Show diamond shaped note head
 ```
 
 ### Add Chord
 ```js
-.addChord(1, ["C3", "E3", "G3"], "1n", { arpeggio: Score.Arpeggio.Down }) // Create whole note chord of three notes, played in arpeggio.
+.addChord(1, ["C3", "E3", "G3"], "1n", { arpeggio: "down" }) // Create whole note chord of three notes, played in arpeggio.
 ```
 
 ### Add Rest
@@ -235,43 +239,55 @@ Triplets can also be created using `triplet` property or string note length:
 
 ### Add Fermata
 
+You can use `Score.Fermata` enum values (e.g. `Scoore.Fermata.AtNote`) or
+corresponding string (e.g. `"atNote"`).
+
 ```js
-.addNote(0, "C3", "2n").addFermata(Score.Fermata.AtNote) // Add fermata at note.
-.addFermata(Score.Fermata.AtMeasureEnd)                 // Add fermata at measure end.
+.addNote(0, "C3", "2n").addFermata("atNote") // Add fermata at note.
+.addFermata("atMeasureEnd")                  // Add fermata at measure end.
 ```
 
 ### Add Navigation
 
+You can use `Score.Navigation` enum values (e.g. `Score.Navigation.Fine`) or
+corresponding string value (e.g. `"Fine"`).
 ```js
-.addNavigation(Score.Navigation.DC_al_Fine)   // Add "DC_al_Fine"
-.addNavigation(Score.Navigation.DC_al_Coda)   // Add "DC_al_Coda"
-.addNavigation(Score.Navigation.DS_al_Fine)   // Add "DS_al_Fine"
-.addNavigation(Score.Navigation.DS_al_Coda)   // Add "DS_al_Coda"
-.addNavigation(Score.Navigation.Coda)         // Add "Coda"
-.addNavigation(Score.Navigation.toCoda)       // Ass "toCoda"
-.addNavigation(Score.Navigation.Segno)        // Add "Segno" symbol
-.addNavigation(Score.Navigation.Fine)         // Add "Fine"
-.addNavigation(Score.Navigation.StartRepeat)  // Add repeat sections start position
-.addNavigation(Score.Navigation.EndRepeat, 3) // Add repeat sections end position, repeat sectionplayed 3 times
-.addNavigation(Score.Navigation.Ending, 1, 2) // Add ending, played on 1st and 2nd run
+.addNavigation("D.C. al Fine") // Add "D.C. al Fine"
+.addNavigation("D.C. al Coda") // Add "D.C. al Coda"
+.addNavigation("D.S. al Fine") // Add "D.S. al Fine"
+.addNavigation("D.S. al Coda") // Add "D.S. al Coda"
+.addNavigation("Coda")         // Add "Coda"
+.addNavigation("toCoda")       // Ass "toCoda"
+.addNavigation("Segno")        // Add "Segno" symbol
+.addNavigation("Fine")         // Add "Fine"
+.addNavigation("startRepeat")  // Add repeat sections start position
+.addNavigation("endRepeat", 3) // Add repeat sections end position, repeat sectionplayed 3 times
+.addNavigation("ending", 1, 2) // Add ending, played on 1st and 2nd run
 ```
 
 ### Add Annotation
 
 Add annotation text anchored to previously added note, chord or rest.
 
+You can use `Score.Annotation` enum values (e.g. `Score.Annotation.Tempo`) or
+corresponding string values (e.g. `"tempo"`).
+
 ```js
-.addAnnotation(Score.Annotation.Dynamics, "ff")
-.addAnnotation(Score.Annotation.Tempo, "accel.")
+.addAnnotation("dynamics", "ff")  // Add dynamics annotation text.
+.addAnnotation("tempo", "accel.") // Add tempo annotation text.
+.addAnnotation("ppp")             // Add annotation text, detect annotation type automatically.
 ```
 
 ### Add Label
 
 Add text label anchored to previously added note, chord or rest.
 
+You can use `Score.Label` enum values (e.g. `Score.Label.Chord`) or
+corresponding string values (e.g. `"chord"`).
+
 ```js
-.addLabel(Score.Label.Chord, "Am") // Positioned above staff. Used to label chords.
-.addLabel(Score.Label.Note, "C#5") // Positioned below staff. Used to label notes.
+.addLabel("chord", "Am") // Add chord label, positioned above staff by default.
+.addLabel("note", "C#5") // Add note label, positioned below staff by default.
 ```
 
 ### Positioning Elements
@@ -280,16 +296,16 @@ Add text label anchored to previously added note, chord or rest.
 `addFermataTo`, `addNavigationTo`, `addAnnotationTo` and `addLabelTo` that contain extra first argument.
 
 ```js
-.addLabelTo(0, Score.Label.Chord, "Am")        // Add label to top (id 0) staff/tab.
-.addLabelTo([0, 1], Score.Label.Chord, "Am")   // Add label to top two (id 0 and 1) staves/tabs.
-.addLabelTo("staff1", Score.Label.Chord, "Am") // Add label to named staff/tab/group.
-.addLabelTo("grp1", Score.Label.Chord, "Am")   // Add label to named staff/tab/group.
+.addLabelTo(0, "chord", "Am")        // Add label to top (id 0) staff/tab.
+.addLabelTo([0, 1], "chord", "Am")   // Add label to top two (id 0 and 1) staves/tabs.
+.addLabelTo("staff1", "chord", "Am") // Add label to named staff/tab/group.
+.addLabelTo("grp1", "chord", "Am")   // Add label to named staff/tab/group.
 
 // Create staff groups
-.addStaffGroup("grp1", 0, Score.VertocalPosition.Above)                 // This staff group adds elements above top staff/tab.
-.addStaffGroup("grp2", [1], Score.VertocalPosition.Below)               // This staff group adds elements below second staff/tab from top.
-.addStaffGroup("grp3", "tab1", Score.VertocalPosition.Both)             // This staff group adds elements above and below tab named "tab1".
-.addStaffGroup("grp4", ["staff1", "tab1"], Score.VertocalPosition.Auto) // This staff group uses default location to add element to "staff1" and "tab1".
+.addStaffGroup("grp1", 0, "above")                 // This staff group adds elements above top staff/tab.
+.addStaffGroup("grp2", [1], "below")               // This staff group adds elements below second staff/tab from top.
+.addStaffGroup("grp3", "tab1", "both")             // This staff group adds elements above and below tab named "tab1".
+.addStaffGroup("grp4", ["staff1", "tab1"], "auto") // This staff group uses default location to add element to "staff1" and "tab1".
 ```
 
 ### Add Extension
@@ -306,15 +322,22 @@ Adds extension line to previously added label or annotation.
 
 ### Add Connective (tie, slur, slide)
 
+For connective type you can use `Score.Connective` enum values (e.g. `Score.Connective.Tie`) or
+corresponding string values (e.g. `"tie"`).
+
+For note anchor you can use `Score.NoteAnchor` enum values (e.g. `Score.NoteAnchor.Above`) or
+corresponding string values (e.g. `"above"`).
+
+
 ```js
-.addConnective(Score.Connetive.Tie)   // Add tie
-.addConnective(Score.Connetive.Slur)  // Add slur
-.addConnective(Score.Connetive.Slide) // Add slide
-.addConnective(Score.Connetive.Tie, 3) // Add tie with span value (describes how many notes the connective is across).
-.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Above) // Add slur connected above note.
-.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Below) // Add slur connected below note.
-.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.Center) // Add slur connected next to note.
-.addConnective(Score.Connetive.Slur, 2, Score.NoteAnchor.StemTip) // Add slur connected at stem tip.
+.addConnective("tie")    // Add tie
+.addConnective("slur")   // Add slur
+.addConnective("slide")  // Add slide
+.addConnective("tie", 3) // Add tie with span value (describes how many notes the connective is across).
+.addConnective("slur", 2, "above")   // Add slur connected above note.
+.addConnective("slur", 2, "below")   // Add slur connected below note.
+.addConnective("slur", 2, "center")  // Add slur connected next to note.
+.addConnective("slur", 2, "stemTip") // Add slur connected at stem tip.
 ```
 
 ### Guitar Tab
