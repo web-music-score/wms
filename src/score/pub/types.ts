@@ -100,28 +100,28 @@ export enum Fermata {
 
 export enum Navigation {
     /** Repeat back to beginning and play to the "Fine" marking. */
-    DC_al_Fine = "DC_al_fine",
+    DC_al_Fine = "D.C. al Fine",
 
     /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
-    DC_al_Coda = "DC_al_coda",
+    DC_al_Coda = "D.C. al Coda",
 
     /** Repeat back to Segno sign (𝄋) and play to the "Fine" marking. */
-    DS_al_Fine = "DS_al_fine",
+    DS_al_Fine = "D.S. al Fine",
 
     /** Repeat back to Segno sign (𝄋) and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
-    DS_al_Coda = "DS_al_coda",
+    DS_al_Coda = "D.S. al Coda",
 
     /** "𝄌 Coda" section. */
-    Coda = "coda",
+    Coda = "Coda",
 
     /** From "toCoda 𝄌" jump to the "𝄌 Coda" section. */
     toCoda = "toCoda",
 
     /** Jump here from D.S. al Fine or D.S. al Coda. */
-    Segno = "segno",
+    Segno = "Segno",
 
     /** Stop playing after D.C. al Fine or D.S. al Fine. */
-    Fine = "fine",
+    Fine = "Fine",
 
     /** Start of repeat section. */
     StartRepeat = "startRepeat",
