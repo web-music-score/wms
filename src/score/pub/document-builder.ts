@@ -71,8 +71,8 @@ function assertNoteOptions(options: NoteOptions) {
         Utils.Is.isNonEmptyArray(options.string) && options.string.every(string => isStringNumber(string))
     ), "noteOptions.string", options.string);
 
-    assertArg((options as any).tieSpan === undefined, "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
-    assertArg((options as any).slurSpan === undefined, "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
+    assertArg(Utils.Is.isUndefined((options as any).tieSpan), "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
+    assertArg(Utils.Is.isUndefined((options as any).slurSpan), "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
 }
 
 function assertRestOptions(options: RestOptions) {
