@@ -102,8 +102,8 @@ Setting score configuration takes place in first measure of next row.
 
 #### Using preset values
 
-For staff presets you can use `Score.StaffPreset` enum values (e.g. `Score.StaffPreset.Treble`) or
-corresponding string values (e.g. `"treble"`).
+For staff presets you can use `Score.StaffPreset` enum values (e.g. `Score.StaffPreset.Treble`)
+or corresponding string values (e.g. `"treble"`).
 
 ```js
 .setScoreConfiguration("treble")         // Staff with treble G-clef.
@@ -169,8 +169,8 @@ Manually induce row change. Next measure that is added will begin new row.
 ```
 
 ### Set Key Signature
-For scale type you can use `Theory.ScaleType` enum values (e.g. `Theory.ScaleType.Major`) or
-corresponding string values (e.g. `"Major"`).
+For scale type you can use `Theory.ScaleType` enum values (e.g. `Theory.ScaleType.Major`)
+or corresponding string values (e.g. `"Major"`).
 
 ```js
 .setKeySignature("C", "Major")         // Create C Major scale.
@@ -239,8 +239,8 @@ Triplets can also be created using `triplet` property or string note length:
 
 ### Add Fermata
 
-You can use `Score.Fermata` enum values (e.g. `Scoore.Fermata.AtNote`) or
-corresponding string (e.g. `"atNote"`).
+For fermata you can use `Score.Fermata` enum values (e.g. `Scoore.Fermata.AtNote`)
+or corresponding string values (e.g. `"atNote"`).
 
 ```js
 .addNote(0, "C3", "2n").addFermata("atNote") // Add fermata at note.
@@ -249,8 +249,9 @@ corresponding string (e.g. `"atNote"`).
 
 ### Add Navigation
 
-You can use `Score.Navigation` enum values (e.g. `Score.Navigation.Fine`) or
-corresponding string value (e.g. `"Fine"`).
+For navigation you can use `Score.Navigation` enum values (e.g. `Score.Navigation.DC_al_Fine`)
+or corresponding string values (e.g. `"D.C. al Fine"`).
+
 ```js
 .addNavigation("D.C. al Fine") // Add "D.C. al Fine"
 .addNavigation("D.C. al Coda") // Add "D.C. al Coda"
@@ -269,8 +270,8 @@ corresponding string value (e.g. `"Fine"`).
 
 Add annotation text anchored to previously added note, chord or rest.
 
-You can use `Score.Annotation` enum values (e.g. `Score.Annotation.Tempo`) or
-corresponding string values (e.g. `"tempo"`).
+For annotation you can use `Score.Annotation` enum values (e.g. `Score.Annotation.Tempo`)
+or corresponding string values (e.g. `"tempo"`).
 
 ```js
 .addAnnotation("dynamics", "ff")  // Add dynamics annotation text.
@@ -282,8 +283,8 @@ corresponding string values (e.g. `"tempo"`).
 
 Add text label anchored to previously added note, chord or rest.
 
-You can use `Score.Label` enum values (e.g. `Score.Label.Chord`) or
-corresponding string values (e.g. `"chord"`).
+For label you can use `Score.Label` enum values (e.g. `Score.Label.Chord`)
+or corresponding string values (e.g. `"chord"`).
 
 ```js
 .addLabel("chord", "Am") // Add chord label, positioned above staff by default.
@@ -322,11 +323,11 @@ Adds extension line to previously added label or annotation.
 
 ### Add Connective (tie, slur, slide)
 
-For connective type you can use `Score.Connective` enum values (e.g. `Score.Connective.Tie`) or
-corresponding string values (e.g. `"tie"`).
+For connective you can use `Score.Connective` enum values (e.g. `Score.Connective.Tie`)
+or corresponding string values (e.g. `"tie"`).
 
-For note anchor you can use `Score.NoteAnchor` enum values (e.g. `Score.NoteAnchor.Above`) or
-corresponding string values (e.g. `"above"`).
+For note anchor you can use `Score.NoteAnchor` enum values (e.g. `Score.NoteAnchor.Above`)
+or corresponding string values (e.g. `"above"`).
 
 
 ```js
