@@ -1,45 +1,44 @@
-import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createStaffGroupsDemo() {
     return new Score.DocumentBuilder()
+        .setHeader("Staff Groups")
         .setScoreConfiguration([
             { type: "staff", clef: Score.Clef.G, isOctaveDown: true, name: "staff1" },
             { type: "staff", clef: Score.Clef.G, isOctaveDown: true, name: "staff2" }
         ])
-        .setHeader("Staff Groups")
 
-        .addStaffGroup("grp1", ["staff1"], Score.VerticalPosition.Above)
-        .addStaffGroup("grp2", ["staff1"], Score.VerticalPosition.Below)
-        .addStaffGroup("grp3", ["staff1"], Score.VerticalPosition.Both)
-        .addStaffGroup("grp4", ["staff2"], Score.VerticalPosition.Above)
-        .addStaffGroup("grp5", ["staff2"], Score.VerticalPosition.Below)
-        .addStaffGroup("grp6", ["staff2"], Score.VerticalPosition.Both)
+        .addStaffGroup("grp1", ["staff1"], "above")
+        .addStaffGroup("grp2", ["staff1"], "below")
+        .addStaffGroup("grp3", ["staff1"], "both")
+        .addStaffGroup("grp4", ["staff2"], "above")
+        .addStaffGroup("grp5", ["staff2"], "below")
+        .addStaffGroup("grp6", ["staff2"], "both")
         .addStaffGroup("grp7", ["grp1", "grp5"])
         .addStaffGroup("grp8", ["grp2", "grp4"])
         .addStaffGroup("grp9", ["grp1", "grp4"])
         .addStaffGroup("grp10", ["grp2", "grp5"])
 
         .addMeasure()
-        .setKeySignature("C", Theory.ScaleType.Major)
+        .setKeySignature("C", "Major")
         .setTimeSignature("4/4")
         .setTempo(80)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp1", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp2", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp3", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter)
+        .addNote(0, "C4", "4n").addFermataTo("grp1", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp2", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp3", "atNote")
+        .addNote(0, "C4", "4n")
 
         .addMeasure()
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp4", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp5", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp6", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter)
+        .addNote(0, "C4", "4n").addFermataTo("grp4", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp5", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp6", "atNote")
+        .addNote(0, "C4", "4n")
 
         .addMeasure()
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp7", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp8", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp9", Score.Fermata.AtNote)
-        .addNote(0, "C4", Theory.NoteLength.Quarter).addFermataTo("grp10", Score.Fermata.AtNote)
+        .addNote(0, "C4", "4n").addFermataTo("grp7", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp8", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp9", "atNote")
+        .addNote(0, "C4", "4n").addFermataTo("grp10", "atNote")
 
         .getDocument();
 }

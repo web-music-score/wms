@@ -3,44 +3,44 @@ import * as Score from "@tspro/web-music-score/score";
 
 export function createDalSegnoDemo() {
     return new Score.DocumentBuilder()
-        .setScoreConfiguration(Score.StaffPreset.Treble)
-        .setHeader("Dal Segno Navigations")
+        .setHeader("Dal Segno Navigation")
+        .setScoreConfiguration("treble")
 
         .addMeasure()
-        .setKeySignature("C", Theory.ScaleType.Major)
+        .setKeySignature("C", "Major")
         .setTimeSignature("2/4")
         .setTempo(120)
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.Segno)
+        .addNote(0, "G4", "2n")
+        .addNavigation("Segno")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.toCoda)
+        .addNote(0, "G4", "2n")
+        .addNavigation("toCoda")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.DS_al_Coda)
+        .addNote(0, "G4", "2n")
+        .addNavigation("D.S. al Coda")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.Coda)
+        .addNote(0, "G4", "2n")
+        .addNavigation("Coda")
 
         .getDocument();
 }

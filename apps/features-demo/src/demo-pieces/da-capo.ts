@@ -1,34 +1,33 @@
-import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createDaCapoDemo() {
     return new Score.DocumentBuilder()
-        .setScoreConfiguration(Score.StaffPreset.Treble)
-        .setHeader("Da Capo Navigations")
+        .setHeader("Da Capo Navigation")
+        .setScoreConfiguration("treble")
 
         .addMeasure()
-        .setKeySignature("C", Theory.ScaleType.Major)
+        .setKeySignature("C", "Major")
         .setTimeSignature("2/4")
         .setTempo(120)
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.Fine)
+        .addNote(0, "G4", "2n")
+        .addNavigation("Fine")
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
+        .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNote(0, "G4", Theory.NoteLength.Half)
-        .addNavigation(Score.Navigation.DC_al_Fine)
+        .addNote(0, "G4", "2n")
+        .addNavigation("D.C. al Fine")
 
         .getDocument();
 }

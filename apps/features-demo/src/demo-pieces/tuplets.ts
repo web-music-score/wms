@@ -3,148 +3,148 @@ import * as Score from "@tspro/web-music-score/score";
 
 export function createTupletsDemo() {
     return new Score.DocumentBuilder()
-        .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
         .setHeader("Tuplets")
+        .setScoreConfiguration("guitarTreble")
 
         .addMeasure()
-        .setKeySignature("G", Theory.ScaleType.Major)
+        .setKeySignature("G", "Major")
         .setTimeSignature("4/4")
         .setTempo(80)
 
         .addTuplet(0, Theory.Tuplet.Triplet, notes => {
-            notes.addNote("G3", Theory.NoteLength.Eighth);
-            notes.addNote("B3", Theory.NoteLength.Eighth);
-            notes.addNote("D4", Theory.NoteLength.Eighth);
+            notes.addNote("G3", "8n");
+            notes.addNote("B3", "8n");
+            notes.addNote("D4", "8n");
         })
 
-        .addNote(0, "D4", Theory.NoteLength.Eighth)
-        .addNote(0, "A3", Theory.NoteLength.Eighth)
+        .addNote(0, "D4", "8n")
+        .addNote(0, "A3", "8n")
 
         .addNote(0, "D4", "8t")
         .addNote(0, "B3", "8t")
         .addNote(0, "G3", "8t")
 
-        .addNote(0, "B3", Theory.NoteLength.Quarter)
+        .addNote(0, "B3", "4n")
 
         .addMeasure()
-        .addNote(0, "D4", Theory.NoteLength.Eighth)
+        .addNote(0, "D4", "8n")
 
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "8t")
+        .addNote(0, "B3", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "A3", Theory.NoteLength.Eighth)
+        .addNote(0, "A3", "8n")
 
-        .addNote(0, "D4", Theory.NoteLength.Sixteenth, { triplet: true, stem: Score.Stem.Down })
-        .addNote(0, "C4", Theory.NoteLength.Sixteenth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Sixteenth, { triplet: true })
-        .addNote(0, "A3", Theory.NoteLength.Sixteenth, { triplet: true, stem: Score.Stem.Down })
-        .addNote(0, "G3", Theory.NoteLength.Sixteenth, { triplet: true })
-        .addNote(0, "F#3", Theory.NoteLength.Sixteenth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Quarter)
+        .addNote(0, "D4", "16t", { stem: "down" })
+        .addNote(0, "C4", "16t")
+        .addNote(0, "B3", "16t")
+        .addNote(0, "A3", "16t", { stem: "down" })
+        .addNote(0, "G3", "16t")
+        .addNote(0, "F#3", "16t")
+        .addNote(0, "B3", "4n")
         .endRow()
 
         .addMeasure()
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "D4", "8t", { stem: "up" })
+        .addNote(0, "D4", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "D4", "8t", { stem: "up" })
+        .addNote(0, "D4", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "D4", "8t", { stem: "up" })
+        .addNote(0, "D4", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "D4", "8t", { stem: "up" })
+        .addNote(0, "D4", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(1, "G3", Theory.NoteLength.Quarter, { stem: Score.Stem.Down })
+        .addNote(1, "G3", "4n", { stem: "down" })
 
-        .addNote(1, "G3", Theory.NoteLength.Eighth, { stem: Score.Stem.Down })
-        .addNote(1, "G3", Theory.NoteLength.Eighth, { stem: Score.Stem.Down })
+        .addNote(1, "G3", "8n", { stem: "down" })
+        .addNote(1, "G3", "8n", { stem: "down" })
 
-        .addNote(1, "G3", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Down })
-        .addNote(1, "G3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(1, "G3", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(1, "G3", "8t", { stem: "down" })
+        .addNote(1, "G3", "8t")
+        .addNote(1, "G3", "8t")
 
-        .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
-        .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
-        .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
-        .addNote(1, "G3", Theory.NoteLength.Sixteenth, { stem: Score.Stem.Down })
+        .addNote(1, "G3", "16n", { stem: "down" })
+        .addNote(1, "G3", "16n", { stem: "down" })
+        .addNote(1, "G3", "16n", { stem: "down" })
+        .addNote(1, "G3", "16n", { stem: "down" })
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "8t")
+        .addNote(0, "B3", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addRest(0, "8t")
+        .addNote(0, "B3", "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Down })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "8t", { stem: "down" })
+        .addRest(0, "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
-        .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "8t", { stem: "up" })
+        .addNote(0, "B3", "8t")
+        .addRest(0, "8t")
 
         .addMeasure()
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addRest(0, "8t")
+        .addRest(0, "8t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Down })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "8t", { stem: "down" })
+        .addRest(0, "8t")
+        .addRest(0, "8t")
 
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Eighth, { triplet: true, stem: Score.Stem.Up })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
+        .addRest(0, "8t")
+        .addNote(0, "B3", "8t", { stem: "up" })
+        .addRest(0, "8t")
 
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
+        .addRest(0, "8t")
+        .addRest(0, "8t")
+        .addRest(0, "8t")
         .endRow()
 
         .addMeasure()
         .setTimeSignature("3/4")
-        .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "4t")
+        .addNote(0, "D4", "8t")
 
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Quarter, { triplet: true })
+        .addNote(0, "G3", "8t")
+        .addNote(0, "D4", "4t")
 
-        .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
+        .addNote(0, "G3", "4t")
+        .addRest(0, "8t")
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
-        .addRest(0, Theory.NoteLength.Quarter, { triplet: true })
+        .addNote(0, "G3", "8t")
+        .addRest(0, "4t")
 
-        .addRest(0, Theory.NoteLength.Quarter, { triplet: true })
-        .addNote(0, "G3", Theory.NoteLength.Eighth, { triplet: true })
+        .addRest(0, "4t")
+        .addNote(0, "G3", "8t")
 
-        .addRest(0, Theory.NoteLength.Eighth, { triplet: true })
-        .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
+        .addRest(0, "8t")
+        .addNote(0, "G3", "4t")
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Quarter, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Quarter, { triplet: true })
+        .addNote(0, "G3", "4t")
+        .addNote(0, "B3", "4t")
+        .addNote(0, "D4", "4t")
 
-        .addNote(0, "G3", Theory.NoteLength.Quarter, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Half, { triplet: true })
+        .addNote(0, "G3", "4t")
+        .addNote(0, "B3", "2t")
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Half, { triplet: true })
-        .addNote(0, "B3", Theory.NoteLength.Half, { triplet: true })
-        .addNote(0, "D4", Theory.NoteLength.Half, { triplet: true })
+        .addNote(0, "G3", "2t")
+        .addNote(0, "B3", "2t")
+        .addNote(0, "D4", "2t")
 
         .getDocument();
 }

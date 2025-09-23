@@ -1,13 +1,12 @@
-import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
 export function createStaccatoDemo() {
     return new Score.DocumentBuilder()
-        .setScoreConfiguration(Score.StaffPreset.Treble)
+        .setScoreConfiguration("treble")
         .setHeader("Staccato")
 
         .addMeasure()
-        .setKeySignature("E", Theory.ScaleType.NaturalMinor)
+        .setKeySignature("E", "Natural Minor")
         .setTimeSignature("4/4")
         .addNote(0, "E4", "8n", { staccato: true, stem: "up" })
         .addNote(0, "F#4", "8n", { staccato: true })

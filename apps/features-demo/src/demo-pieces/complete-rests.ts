@@ -3,34 +3,34 @@ import * as Score from "@tspro/web-music-score/score";
 
 export function createCompleteRestsDemo() {
     return new Score.DocumentBuilder()
-        .setScoreConfiguration(Score.StaffPreset.GuitarTreble)
         .setHeader("Complete Rests")
+        .setScoreConfiguration("guitarTreble")
 
         .addMeasure()
-        .setKeySignature("C", Theory.ScaleType.Major)
+        .setKeySignature("C", "Major")
         .setTimeSignature("4/4")
         .setTempo(80)
-        .addNote(0, "G3", Theory.NoteLength.Whole)
+        .addNote(0, "G3", "1n")
         .completeRests()
 
         .addMeasure()
         .completeRests()
 
         .addMeasure()
-        .addNote(0, "B3", Theory.NoteLength.Half)
+        .addNote(0, "B3", "2n")
         .completeRests()
 
         .addMeasure()
-        .addNote(0, "G3", Theory.NoteLength.Half, { dotted: true })
+        .addNote(0, "G3", "2.")
         .completeRests()
         .endRow()
 
         .addMeasure()
-        .addNote(0, "A3", Theory.NoteLength.Quarter)
+        .addNote(0, "A3", "4n")
         .completeRests()
 
         .addMeasure()
-        .addNote(0, "B3", Theory.NoteLength.Eighth)
+        .addNote(0, "B3", "8n")
         .completeRests()
 
         .addMeasure()
@@ -39,13 +39,13 @@ export function createCompleteRestsDemo() {
         .endRow()
 
         .addMeasure()
-        .addNote(0, "C4", Theory.NoteLength.Eighth, { stem: Score.Stem.Up })
-        .addNote(1, "D3", Theory.NoteLength.Quarter, { stem: Score.Stem.Down })
+        .addNote(0, "C4", "8n", { stem: "up" })
+        .addNote(1, "D3", "4n", { stem: "down" })
         .completeRests()
 
         .addMeasure()
-        .addNote(0, "E4", Theory.NoteLength.Half, { stem: Score.Stem.Up, dotted: true })
-        .addNote(1, "F3", Theory.NoteLength.Half, { stem: Score.Stem.Down })
+        .addNote(0, "E4", "2.", { stem: "up" })
+        .addNote(1, "F3", "2n", { stem: "down" })
         .completeRests()
 
         .getDocument();
