@@ -387,11 +387,25 @@ export function validateScaleType(scaleType: unknown): ScaleType {
         return scaleType;
     }
     else {
-        throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
+        throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: "${scaleType}"`);
     }
 }
 
-export function getScale(tonic: string, scaleType: ScaleType | `${ScaleType}`): Scale {
+export function getScale(tonic: string, scaleType: ScaleType | `${ScaleType}`): Scale;
+export function getScale(scale: string): Scale;
+export function getScale(arg0: string, arg1?: ScaleType | `${ScaleType}`): Scale {
+    let tonic: string;
+    let scaleType: ScaleType;
+
+    if (arg1 !== undefined) {
+        tonic = arg0;
+        scaleType = validateScaleType(arg1);
+    }
+    else {
+        tonic = arg0.split(" ")[0];
+        scaleType = validateScaleType(arg0.substring(tonic.length + 1));
+    }
+
     return getScaleFactory(scaleType).getScale(tonic);
 }
 

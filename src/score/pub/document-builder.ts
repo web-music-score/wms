@@ -199,12 +199,13 @@ export class DocumentBuilder {
 
     setKeySignature(tonic: string, scaleType: ScaleType | `${ScaleType}`): DocumentBuilder;
     setKeySignature(keySignature: KeySignature): DocumentBuilder;
+    setKeySignature(keySignature: string): DocumentBuilder;
     setKeySignature(scale: Scale): DocumentBuilder;
     setKeySignature(...args: unknown[]): DocumentBuilder {
         assertArg((
             args[0] instanceof Scale ||
             args[0] instanceof KeySignature ||
-            Utils.Is.isString(args[0]) && Utils.Is.isEnumValue(args[1], ScaleType)
+            Utils.Is.isNonEmptyString(args[0]) && (args.length === 1 || Utils.Is.isEnumValue(args[1], ScaleType))
         ), "keySignature", args);
         this.getMeasure().setKeySignature(...args);
         return this;
