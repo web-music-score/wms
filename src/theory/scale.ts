@@ -364,7 +364,7 @@ export function getScaleFactoryList(): ReadonlyArray<ScaleFactory | string> {
     return ScaleFactoryList;
 }
 
-const ScaleFactoryMap = new Map<ScaleType, ScaleFactory>();
+const ScaleFactoryMap = new Map<ScaleType | `${ScaleType}`, ScaleFactory>();
 
 ScaleFactoryList.forEach(factory => {
     if (factory instanceof ScaleFactory) {
@@ -372,7 +372,7 @@ ScaleFactoryList.forEach(factory => {
     }
 });
 
-export function getScaleFactory(scaleType: ScaleType): ScaleFactory {
+export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFactory {
     let f = ScaleFactoryMap.get(scaleType);
     if (!f) {
         throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
@@ -391,7 +391,7 @@ export function validateScaleType(scaleType: unknown): ScaleType {
     }
 }
 
-export function getScale(tonic: string, scaleType: ScaleType): Scale {
+export function getScale(tonic: string, scaleType: ScaleType | `${ScaleType}`): Scale {
     return getScaleFactory(scaleType).getScale(tonic);
 }
 
