@@ -1,6 +1,6 @@
 # WebMusicScore
 
-The API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is not commented but is mostly self explanatory and gives idea of the full API.
+The API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is very little commented but gives idea of the full API.
 
 ## About
 
@@ -13,8 +13,7 @@ This is a work in progress project. Lately there has been improvements that requ
 version update. As the project matures there might be less major updates, and more minor
 updates and patches.
 
-This version (4.0.0) added support for string note lengths (e.g. "4n", "2..", etc.) and
-other typescript enums for shorter code. 
+This version (4.0.0) added support for string arguments in addition to typescript enums (e.g. NoteLength.Quarter => "4n", just to name one).
 
 ## Installation
 
@@ -50,9 +49,10 @@ const Score = require("@tspro/web-music-score/score");
 
 ## Browser Script
 
-This is an experimental module that can be used in html page via unpkg CDN.
-It declares global variable `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, 
-and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-cg`).
+This module that can be used in html page via unpkg CDN. It declares global variable 
+`WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, and `Pieces` as 
+corresponding subpath modules (`react-ui` and `audio-cg` are not included in this 
+browser module).
 
 ```html
 <script src="https://unpkg.com/@tspro/web-music-score@3"></script>
@@ -72,7 +72,7 @@ and `Pieces` as corresponding subpath modules (excluding `react-ui` and `audio-c
 
 ## API
 
-Following is introduction to the main interface by simple examples.
+Following is introduction to the main interface with the help of simple examples.
 
 ### Using `DocumentBuilder`
 
@@ -90,15 +90,17 @@ let doc = new Score.DocumentBuilder()
 
 **Hint:**
 ```js
-    // In following examples if the function call begins with dot...
+    // In following examples this:
     .addNote(...)
 
-    // ...it means call to the DocumentBuilder object.
+    // means call to the DocumentBuilder object:
     documentBuilder.addNote(...)
+
+    // It is just shortened for simplicity.
 ```
 
 ### Set Score Configuration
-Setting score configuration takes place in first measure of next row.
+New score configuration takes place in the first measure of next row.
 
 #### Using preset values
 
@@ -141,7 +143,7 @@ or corresponding string values (e.g. `"treble"`).
     name: "tab1",
     tuning: ["E2", "A2", "D3", "G3", "B3", "E4"],
     voiceIds: 4
-})
+}) // Tab with guitar tuning, present only voiceId 4 in this tab.
 ```
 
 ### Set Automatic Measures Per Row
@@ -152,20 +154,18 @@ or corresponding string values (e.g. `"treble"`).
 
 ### Set Header
 ```js
-.setHeader("Title", "Composer", "Arranger")
-.setHeader("Demo Song")
+.setHeader("Title", "Composer", "Arranger") // Set title, composer and arranger
+.setHeader("Title")                         // Set title only
 ```
 
 ### Add Measure
 ```js
-.addMeasure()
+.addMeasure() // Add new measure
 ```
 
 ### End Row
-Manually induce row change. Next measure that is added will begin new row.
-
 ```js
-.endRow()
+.endRow() // Manually induce row change. Next measure that is added will begin new row.
 ```
 
 ### Set Key Signature
@@ -173,25 +173,23 @@ For scale type you can use `Theory.ScaleType` enum values (e.g. `Theory.ScaleTyp
 or corresponding string values (e.g. `"Major"`).
 
 ```js
-.setKeySignature("C", "Major")         // Create C Major scale.
+.setKeySignature("C Major")            // Create C Major scale.
+.setKeySignature("D", "Major")         // Create D Major scale.
 .setKeySignature("A", "Natural Minor") // Create A natural minor scale.
 ```
 
-- See API Reference for all scale types.
-
 ### Set Time Signature
 ```js
-.setTimeSignature("2/4")
-.setTimeSignature("3/4")
-.setTimeSignature("4/4")
-.setTimeSignature("6/8")
-.setTimeSignature("9/8")
+.setTimeSignature("2/4") // Set time signature of 2/4
+.setTimeSignature("3/4") // Set time signature of 3/4
+.setTimeSignature("4/4") // Set time signature of 4/4
+.setTimeSignature("6/8") // Set time signature of 6/8
+.setTimeSignature("9/8") // Set time signature of 9/8
 ```
 
 ### Set Tempo
 ```js
 .setTempo(100, "4n") // 100 beats per minute, beat length is quarter note.
-.setTempo(80, "4n", 2) // 100 beats per minute, beat length is double dotted quarter note.
 .setTempo(80, "4..") // 100 beats per minute, beat length is double dotted quarter note.
 ```
 
@@ -212,10 +210,10 @@ or corresponding string values (e.g. `"Major"`).
 ### Add Rest
 
 ```js    
-.addRest(0, "16n")               // Add sixteenth rest
-.addRest(0, "4.")                // Add dotted quarter rest
+.addRest(0, "16n")                    // Add sixteenth rest
+.addRest(0, "4.")                     // Add dotted quarter rest
 .addRest(0, "4n", { staffPos: "D3" }) // Draw this quarter rest at level of "D3" note.
-.addRest(0, "4n", { hide: true }) // Invisible rest affects playing
+.addRest(0, "4n", { hide: true })     // Invisible rest affects playing
 ```
 
 ### Add Tuplet
@@ -229,9 +227,9 @@ This works for any tuplet:
 })
 ```
 
-Triplets can also be created using `triplet` property or string note length:
+Triplets can also be created using note length (e.g. NoteLength.EighthTriplet or "8t").
 ```js
-// Example: add triplet using string note length.
+// Example: add triplet using triplet note length.
 .addNote(0, "G3", "8t")
 .addNote(0, "B3", "8t")
 .addNote(0, "D4", "8t")
@@ -248,6 +246,8 @@ or corresponding string values (e.g. `"atNote"`).
 ```
 
 ### Add Navigation
+
+Add navigation element to measure.
 
 For navigation you can use `Score.Navigation` enum values (e.g. `Score.Navigation.DC_al_Fine`)
 or corresponding string values (e.g. `"D.C. al Fine"`).
@@ -276,7 +276,7 @@ or corresponding string values (e.g. `"tempo"`).
 ```js
 .addAnnotation("dynamics", "ff")  // Add dynamics annotation text.
 .addAnnotation("tempo", "accel.") // Add tempo annotation text.
-.addAnnotation("ppp")             // Add annotation text, detect annotation type automatically.
+.addAnnotation("ppp")             // Add annotation text, detect annotation type automatically (incomplete list of annotations supported).
 ```
 
 ### Add Label
@@ -299,14 +299,14 @@ or corresponding string values (e.g. `"chord"`).
 ```js
 .addLabelTo(0, "chord", "Am")        // Add label to top (id 0) staff/tab.
 .addLabelTo([0, 1], "chord", "Am")   // Add label to top two (id 0 and 1) staves/tabs.
-.addLabelTo("staff1", "chord", "Am") // Add label to named staff/tab/group.
-.addLabelTo("grp1", "chord", "Am")   // Add label to named staff/tab/group.
+.addLabelTo("staff1", "chord", "Am") // Add label to staff/tab/group named "staff1".
+.addLabelTo("grp1", "chord", "Am")   // Add label to staff/tab/group named "grp1".
 
 // Create staff groups
-.addStaffGroup("grp1", 0, "above")                 // This staff group adds elements above top staff/tab.
-.addStaffGroup("grp2", [1], "below")               // This staff group adds elements below second staff/tab from top.
-.addStaffGroup("grp3", "tab1", "both")             // This staff group adds elements above and below tab named "tab1".
-.addStaffGroup("grp4", ["staff1", "tab1"], "auto") // This staff group uses default location to add element to "staff1" and "tab1".
+.addStaffGroup("grp1", 0, "above")                 // This staff group layouts elements above top staff/tab.
+.addStaffGroup("grp2", [1], "below")               // This staff group layouts elements below second staff/tab from top.
+.addStaffGroup("grp3", "tab1", "both")             // This staff group layouts elements above and below tab named "tab1".
+.addStaffGroup("grp4", ["staff1", "tab1"], "auto") // This staff group layouts elements to their default locations in "staff1" and "tab1".
 ```
 
 ### Add Extension
@@ -343,7 +343,7 @@ or corresponding string values (e.g. `"above"`).
 
 ### Guitar Tab
 
-This library has preliminary guitar tab rendering. 
+This library has simple guitar tab rendering. 
 
 Add notes with `string` property to specify at what string the fret number is rendered in the tab.
 
@@ -361,12 +361,12 @@ Beams are detected and added automatically.
 Default instrument is `Synthesizer`.
 
 `Classical Guitar` is available via `audio-cg` module.
-It was included as separate module because it contains over 1MB of audio samples bundled in it.
+It is included as separate module because it contains over 1MB of guitar audio samples bundled in it.
 
 ```js
 import { registerClassicalGuitar } from "@tspro/web-music-score/audio-cg";
 
-registerClassicalGuitar();
+registerClassicalGuitar(); // This registers classical guitar audio, and takes it into use.
 ```
 
 ### Play Document
@@ -376,13 +376,13 @@ registerClassicalGuitar();
 doc.play();
 
 // More playback options:
-let player = new MPlayer(doc);
+let player = new Score.MPlayer(doc);
 
 player.play();
 player.pause();
 player.stop();
 
-MPlayer.stopAll();
+Score.MPlayer.stopAll();
 ```
 
 ### Viewing Using React JSX/TSX
