@@ -55,13 +55,13 @@ corresponding subpath modules (`react-ui` and `audio-cg` are not included in thi
 browser module).
 
 ```html
-<script src="https://unpkg.com/@tspro/web-music-score@3"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4"></script>
 <script src="https://unpkg.com/@tspro/web-music-score@4.0.0"></script>
 <script src="https://unpkg.com/@tspro/web-music-score@4.0.0/dist/iife/index.global.js"></script>
 
 <!--
     Use one of above. It is recommended to use version number (e.g. @4.0.0 or at least @4).
-    This way if somethiong breaks between versions then your web site does not stop working.
+    This way if something breaks between versions then your web site does not stop working.
 -->
 
 <script>

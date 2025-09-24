@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.0.0] - 2025-09-19
+## [4.0.0] - 2025-09-24
 Another major update was required by new features.
 
 ### **Breiking Changes**
@@ -10,11 +10,11 @@ Another major update was required by new features.
 ### Added
 - Generic tuples with `DocumentBuilder.addTuplet()`.
 - Support multiple dot count.
+- Added `NoteLengthProps` to support note lengths.
 - Support for "1n", "2n", "4n", etc. string note lengths alongside `NoteLength` enum.
-- Added `NoteLengthProps` to support string note lengths.
-- Support for string arguments alongside typescript enums (in addition to string note lengths).
+- Support for all other string arguments alongside typescript enums.
 
-**Lots of undocumented small changes, updates and fixes!**
+**Lots of other undocumented small changes, updates and fixes!**
 
 ## [3.2.0] - 2025-09-12
 ### Added

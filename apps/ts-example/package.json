@@ -1,9 +1,9 @@
 {
     "name": "ts-example",
-    "version": "3.0.0",
+    "version": "4.0.0",
     "private": true,
     "dependencies": {
-        "@tspro/web-music-score": "^3.0.0",
+        "@tspro/web-music-score": "^4.0.0",
         "core-js": "^3.43.0",
         "regenerator-runtime": "^0.14.1"
     },
