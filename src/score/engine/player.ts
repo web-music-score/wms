@@ -3,11 +3,11 @@ import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-musi
 import * as Audio from "@tspro/web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, Navigation, PlayState, PlayStateChangeListener, getVoiceIds } from "../pub";
+import { DivRect, Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAnnotation, TempoAnnotation } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
-import { DynamicsAnnotations, getDynamicsVolume, TempoAnnotations } from "./element-data";
 import { Extension } from "./extension";
+import { getDynamicsVolume } from "./element-data";
 
 export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
 
@@ -291,7 +291,7 @@ export class Player {
                 let text = layoutObj.getTextContent() ?? "";
                 let vol: number | undefined;
 
-                if (text === TempoAnnotations.a_tempo) {
+                if (text === TempoAnnotation.a_tempo) {
                     curSpeed = 1;
                 }
                 else if ((vol = getDynamicsVolume(text)) !== undefined) {
@@ -304,7 +304,7 @@ export class Player {
                     let totalTicks = Utils.Math.sum(columnRange.map(c => c.getTicksToNextColumn()));
 
                     switch (text) {
-                        case TempoAnnotations.accel: {
+                        case TempoAnnotation.accel: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed * AccelerandoSpeedMul;
                             let accuTicks = 0;
@@ -314,7 +314,7 @@ export class Player {
                             });
                             break;
                         }
-                        case TempoAnnotations.rit: {
+                        case TempoAnnotation.rit: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed / RitardandoSpeedDiv;
                             let accuTicks = 0;
@@ -324,7 +324,7 @@ export class Player {
                             });
                             break;
                         }
-                        case DynamicsAnnotations.cresc: {
+                        case DynamicsAnnotation.cresc: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
                             if (extensionBreakText && (vol = getDynamicsVolume(extensionBreakText)) !== undefined && vol > startVol) {
@@ -337,8 +337,8 @@ export class Player {
                             });
                             break;
                         }
-                        case DynamicsAnnotations.decresc:
-                        case DynamicsAnnotations.dim: {
+                        case DynamicsAnnotation.decresc:
+                        case DynamicsAnnotation.dim: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
                             if (extensionBreakText && (vol = getDynamicsVolume(extensionBreakText)) !== undefined && vol < startVol) {

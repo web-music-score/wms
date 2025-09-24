@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation } from "../pub";
+import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
 export function getNavigationString(navigation: Navigation): string {
@@ -17,31 +17,8 @@ export function getNavigationString(navigation: Navigation): string {
     }
 }
 
-export enum DynamicsAnnotations {
-    cresc = "cresc.",
-    decresc = "decresc.",
-    dim = "dim.",
-    ppp = "ppp",
-    pp = "pp",
-    p = "p",
-    mp = "mp",
-    m = "m",
-    mf = "mf",
-    f = "f",
-    ff = "ff",
-    fff = "fff"
-}
-
-export enum TempoAnnotations {
-    accel = "accel.",
-    rit = "rit.",
-    a_tempo = "a tempo"
-}
-
-export type AnnotationsType = `${DynamicsAnnotations}` | `${TempoAnnotations}`;
-
-export function isDynamicsText(text: string): text is `${DynamicsAnnotations}` {
-    return Utils.Is.isEnumValue(text, DynamicsAnnotations);
+export function isDynamicsText(text: string): text is `${DynamicsAnnotation}` {
+    return Utils.Is.isEnumValue(text, DynamicsAnnotation);
 }
 
 export function getDynamicsVolume(text: string): number | undefined {
@@ -54,15 +31,15 @@ export function getDynamicsVolume(text: string): number | undefined {
     }
 }
 
-export function isTempoText(text: string): text is `${TempoAnnotations}` {
-    return Utils.Is.isEnumValue(text, TempoAnnotations);
+export function isTempoText(text: string): text is `${TempoAnnotation}` {
+    return Utils.Is.isEnumValue(text, TempoAnnotation);
 }
 
 export function getAnnotation(text: string): Annotation | undefined {
-    if (Utils.Is.isEnumValue(text, DynamicsAnnotations)) {
+    if (Utils.Is.isEnumValue(text, DynamicsAnnotation)) {
         return Annotation.Dynamics;
     }
-    else if (Utils.Is.isEnumValue(text, TempoAnnotations)) {
+    else if (Utils.Is.isEnumValue(text, TempoAnnotation)) {
         return Annotation.Tempo;
     }
     else {

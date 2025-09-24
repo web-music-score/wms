@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./interface";
 import { ObjDocument } from "../engine/obj-document";
 import { KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -7,7 +7,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
 import { ObjBeamGroup } from "score/engine/obj-beam-group";
-import { AnnotationsType, getAnnotation } from "score/engine/element-data";
+import { getAnnotation } from "score/engine/element-data";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -390,7 +390,7 @@ export class DocumentBuilder {
         return this;
     }
 
-    addAnnotation(text: AnnotationsType): DocumentBuilder;
+    addAnnotation(text: AnnotationText): DocumentBuilder;
     addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
     addAnnotation(...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
         if (args.length === 1) {
@@ -402,7 +402,7 @@ export class DocumentBuilder {
     }
 
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: AnnotationsType): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: AnnotationText): DocumentBuilder;
     /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {

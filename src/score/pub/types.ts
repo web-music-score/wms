@@ -141,6 +141,29 @@ export enum Annotation {
     Tempo = "tempo"
 }
 
+export enum DynamicsAnnotation {
+    cresc = "cresc.",
+    decresc = "decresc.",
+    dim = "dim.",
+    ppp = "ppp",
+    pp = "pp",
+    p = "p",
+    mp = "mp",
+    m = "m",
+    mf = "mf",
+    f = "f",
+    ff = "ff",
+    fff = "fff"
+}
+
+export enum TempoAnnotation {
+    accel = "accel.",
+    rit = "rit.",
+    a_tempo = "a tempo"
+}
+
+export type AnnotationText = `${DynamicsAnnotation}` | `${TempoAnnotation}`;
+
 export enum Label {
     /** "C", "C#", "Db", "D", etc. */
     Note = "note",
