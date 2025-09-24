@@ -468,9 +468,6 @@ export class DocumentBuilder {
      *     addExtension(ext => ext.measures(1).notes("8n")) // length is 1 measure + 1 eigth note
      *     addExtension(ext => ext.infinity())              // length is as long as possible
      * </pre>
-     * @param extensionLength
-     * @param extensionVisible
-     * @returns 
      */
     addExtension(extensionBuilder?: (ext: ExtensionBuilder) => void): DocumentBuilder {
         assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "addExtension() has new usage, for e.g. addExtension(ext => ext.measures(2)). Please refer to README or API Reference.", extensionBuilder);
