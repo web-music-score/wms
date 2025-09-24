@@ -217,6 +217,10 @@ export class DocumentBuilder {
         return this;
     }
 
+    setTempo(beatsPerMinute: number): DocumentBuilder;
+    setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr): DocumentBuilder;
+    /** @deprecated - Use dotted beatLength instead (e.g. "4..") */
+    setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr, dotted: boolean | number): DocumentBuilder;
     setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr, dotted?: boolean | number): DocumentBuilder {
         assertArg(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
         if (beatLength === undefined) {
