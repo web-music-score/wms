@@ -114,27 +114,94 @@ function isTupletRatio(tupletRatio: unknown): tupletRatio is TupletRatio {
     }
 }
 
+/** Tuplet builder type. */
 export type TupletBuilder = {
+    /**
+     * Add note to a tuplet.
+     * @param note - Note instance of Note or string (e.g. "D4").
+     * @param noteLength - Note length (e.g. "4n").
+     * @param options - Note options.
+     * @returns - This tuplet builder object.
+     */
     addNote: (note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => TupletBuilder,
+    /**
+     * Add chord to a tuplet.
+     * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
+     * @param noteLength - Note length (e.g. "4n"). 
+     * @param options - Note options. 
+     * @returns - This tuplet builder object. 
+     */
     addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => TupletBuilder,
+    /**
+     * Add rest to a tuplet.
+     * @param restLength - Rest length (e.g. "4n").  
+     * @param options - Rest options.
+     * @returns - This tuplet builder object. 
+     */
     addRest: (restLength: NoteLength | NoteLengthStr, options?: RestOptions) => TupletBuilder
 }
 
+/** Etension builder type. */
 export type ExtensionBuilder = {
+    /**
+     * Increase extension length by note length multiplied by number of notes.
+     * @param noteLength - Length of note (e.g. "2n").
+     * @param noteCount - Number of note lengths (default = 1).
+     * @returns - this extension builder object.
+     */
     notes: (noteLength: NoteLength | NoteLengthStr, noteCount?: number) => ExtensionBuilder,
+    /**
+     * Increase length of extension length by given number of measures.
+     * @param measureCount - Number of measures.
+     * @returns - this extension builder object.
+     */
     measures: (measureCount: number) => ExtensionBuilder,
+    /**
+     * Create as long extension line as possible.
+     * @returns - this extension builder object.
+     */
     infinity: () => ExtensionBuilder,
+    /**
+     * Create an invisible extension.
+     * @returns - this extension builder object.
+     */
     hide: () => ExtensionBuilder
 }
 
+/**
+ * Document builder class.
+ * <pre>
+ * // Example
+ * let doc = new Score.DocumentBuilder()
+ *     .addScoreConfiguration({ type: "staff", clef: "G", isOctavewDown: true })
+ *     .setMeasuresPerRow(4)
+ *     .addMeasure()
+ *     .addNote(1, "C3", "4n")
+ *     .addChord(1, ["C3", "E3", "G3"], "4n").addLabel("chord", "C")
+ *     .addRest(1, "4n")
+ *     // etc.
+ *     .getDEocument();
+ * </pre>
+ */
 export class DocumentBuilder {
     private readonly doc: ObjDocument;
 
+    /**
+     * Create new document builder instance.
+     */
     constructor() {
         this.doc = new ObjDocument();
     }
 
+    /**
+     * Use staff preset values to set score confguration. This call will request new score row.
+     * @param staffPreset - Staff preset (e.g. "treble").
+     */
     setScoreConfiguration(staffPreset: StaffPreset | `${StaffPreset}`): DocumentBuilder;
+    /**
+     * Use staff preset values to set score confguration. This call will request new score row.
+     * @param config - Score configuration (e.g. { type: "staff", clef: "G", isOctavewDown: true }).
+     */
     setScoreConfiguration(config: ScoreConfiguration): DocumentBuilder;
     setScoreConfiguration(config: StaffPreset | `${StaffPreset}` | ScoreConfiguration): DocumentBuilder {
         if (Utils.Is.isEnumValue(config, StaffPreset)) {
@@ -174,10 +241,21 @@ export class DocumentBuilder {
         return this.doc.getLastMeasure() ?? this.doc.addMeasure();
     }
 
+    /**
+     * Get music document after finished building.
+     * @returns - Music document.
+     */
     getDocument(): MDocument {
         return this.doc.getMusicInterface();
     }
 
+    /**
+     * Set header texts.
+     * @param title - Title of this docmument/musical piece.
+     * @param composer - Composer of this document/musical piece.
+     * @param arranger - Arranger of this document/musical piece.
+     * @returns - This document builder instance.
+     */
     setHeader(title?: string, composer?: string, arranger?: string): DocumentBuilder {
         assertArg(Utils.Is.isStringOrUndefined(title), "title", title);
         assertArg(Utils.Is.isStringOrUndefined(composer), "composer", composer);
@@ -186,20 +264,50 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Automatically limit number of measures per score row.
+     * @param measuresPerRow - Number of measures per row. Must be integer >=1 or Infinity.
+     * @returns - This document builder instance.
+     */
     setMeasuresPerRow(measuresPerRow: number): DocumentBuilder {
         assertArg(Utils.Is.isIntegerGte(measuresPerRow, 1) || Utils.Is.isPosInfinity(measuresPerRow), "measuresPerRow", measuresPerRow);
         this.doc.setMeasuresPerRow(measuresPerRow);
         return this;
     }
 
+    /**
+     * Add new measure.
+     * @returns - This document builder instance.
+     */
     addMeasure(): DocumentBuilder {
         this.doc.addMeasure();
         return this;
     }
 
+    /**
+     * Set key signature for current measure and forward.
+     * @param tonic - Tonic note (e.g. "C").
+     * @param scaleType - Scale type (e.g. string "Major" or ScaleType.Major).
+     * @returns - This document builder instance.
+     */
     setKeySignature(tonic: string, scaleType: ScaleType | `${ScaleType}`): DocumentBuilder;
+    /**
+     * Set key signature for current measure and forward.
+     * @param keySignature - KeySignature object instance.
+     * @returns - This document builder instance.
+     */
     setKeySignature(keySignature: KeySignature): DocumentBuilder;
+    /**
+     * Set key signature for current measure and forward.
+     * @param keySignature - Key signature string (e.g. "C Major").
+     * @returns - This document builder instance.
+     */
     setKeySignature(keySignature: string): DocumentBuilder;
+    /**
+     * Set key signature for current measure and forward.
+     * @param scale - Scale object instance.
+     * @returns - This document builder instance.
+     */
     setKeySignature(scale: Scale): DocumentBuilder;
     setKeySignature(...args: unknown[]): DocumentBuilder {
         assertArg((
@@ -211,15 +319,37 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Set time signature for current measure and forward.
+     * @param timeSignature - TimeSignature  object instance or string (e.g. "3/4").
+     * @returns - This document builder instance.
+     */
     setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): DocumentBuilder {
         assertArg(timeSignature instanceof TimeSignature || Utils.Is.isNonEmptyString(timeSignature), "timeSignature", timeSignature);
         this.getMeasure().setTimeSignature(timeSignature);
         return this;
     }
 
+    /**
+     * Set tempo.
+     * @param beatsPerMinute - Tempo beats per minute.
+     * @returns - This document builder instance.
+     */
     setTempo(beatsPerMinute: number): DocumentBuilder;
+    /**
+     * Set tempo.
+     * @param beatsPerMinute - Tempo beats per minute.
+     * @param beatLength - Length of one beat.
+     * @returns - This document builder instance.
+     */
     setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr): DocumentBuilder;
-    /** @deprecated - Use dotted beatLength instead (e.g. "4..") */
+    /**
+     * @deprecated - Use dotted beatLength instead (e.g. "4..").
+     * @param beatsPerMinute - Tempo beats per minute.
+     * @param beatLength - Length of one beat.
+     * @param dotted - Dot count of length of one beat.
+     * @returns - This document builder instance.
+     */
     setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr, dotted: boolean | number): DocumentBuilder;
     setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr, dotted?: boolean | number): DocumentBuilder {
         assertArg(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
@@ -234,6 +364,14 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Add note o current measure.
+     * @param voiceId - Voice id to add note to.
+     * @param note - Note instance of Note or string (e.g. "D4").
+     * @param noteLength - Note length (e.g. "4n").
+     * @param options - Note options.
+     * @returns - This document builder instance.
+     */
     addNote(voiceId: number, note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(note instanceof Note || Utils.Is.isNonEmptyString(note), "note", note);
@@ -245,6 +383,13 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * @param voiceId - Voice id to add chord to.
+     * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
+     * @param noteLength - Note length (e.g. "4n"). 
+     * @param options - Note options. 
+     * @returns - This document builder instance.
+     */
     addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
@@ -256,6 +401,13 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * 
+     * @param voiceId - Voice id to add rest to.
+     * @param restLength - Rest length (e.g. "4n").  
+     * @param options - Rest options.
+     * @returns - This document builder instance.
+     */
     addRest(voiceId: number, restLength: NoteLength | NoteLengthStr, options?: RestOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLength(restLength), "restLength", restLength);
@@ -276,10 +428,10 @@ export class DocumentBuilder {
      * });
      * </pre>
      * 
-     * @param voiceId 
+     * @param voiceId - Voice id to add tuplet to.
      * @param tupletRatio - You can also use Theory.Tuplet presets (e.g. Theory.Tuplet.Triplet).
-     * @param tupletBuilder 
-     * @returns 
+     * @param tupletBuilder - Tuplet builder function to build tuplet.
+     * @returns - This document builder instance.
      */
     addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, tupletBuilder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
@@ -337,11 +489,21 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Add fermata to current measure.
+     * @param fermata - Fermata type (e.g. "atNote" or Fermata.AtrNote).
+     * @returns - This document builder instance.
+     */
     addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         return this.addFermataInternal(undefined, fermata);
     }
 
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add Fermata to current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param fermata - Fermata type (e.g. "atNote" or Fermata.AtrNote).
+     * @returns - This document builder instance.
+     */
     addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         return this.addFermataInternal(staffTabOrGroups, fermata);
     }
@@ -359,18 +521,52 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Add navigation element to current measure.
+     * @param navigation - Navigation element (e.g. "D.S. al Fine" or Navigation.DS_al_Fine).
+     * @returns - This document builder instance.
+     */
     addNavigation(navigation: Navigation | `${Navigation}`): DocumentBuilder;
+    /**
+     * Add end repeat navigation element to current measure.
+     * @param navigation - End repeat navigation element ("endRepeat" or Navigation.EndRepeat).
+     * @param playCount - Number of times to play the ended repeat section.
+     * @returns - This document builder instance.
+     */
     addNavigation(navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    /**
+     * Add ending navigation element to current measure.
+     * @param navigation - Ending navigation element ("ending" or Navigation.Ending).
+     * @param passages - Passage numbers for measure marked by this ending is played.
+     * @returns - This document builder instance.
+     */
     addNavigation(navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
     addNavigation(navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         return this.addNavigationInternal(undefined, navigation, ...args);
     }
 
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add navigation element to current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param navigation 
+     * @returns - This document builder instance.
+     */
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`): DocumentBuilder;
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add end repeat navigation element to current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param navigation 
+     * @param playCount 
+     * @returns - This document builder instance.
+     */
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add ending navigation element to current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param navigation 
+     * @param passages 
+     * @returns - This document builder instance.
+     */
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         return this.addNavigationInternal(staffTabOrGroups, navigation, ...args);
@@ -390,7 +586,18 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Add annotation text to column of last added note/chord/rest in current measure.
+     * @param text - Known annotation text (e.g. "pp").
+     * @returns - This document builder instance.
+     */
     addAnnotation(text: AnnotationText): DocumentBuilder;
+    /**
+     * Add annotation text to column of last added note/chord/rest in current measure.
+     * @param annotation - Annotation type (e.g. "tempo" or Annotation.Tempo).
+     * @param text - Annotation text (unrestricted).
+     * @returns - This document builder instance.
+     */
     addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
     addAnnotation(...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
         if (args.length === 1) {
@@ -401,9 +608,20 @@ export class DocumentBuilder {
         }
     }
 
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add annotation text to column of last added note/chord/rest in current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param text - Known annotation text (e.g. "pp").
+     * @returns - This document builder instance.
+     */
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: AnnotationText): DocumentBuilder;
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add annotation text to column of last added note/chord/rest in current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param annotation - Annotation type (e.g. "tempo" or Annotation.Tempo).
+     * @param text - Annotation text (unrestricted).
+     * @returns - This document builder instance.
+     */
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
         if (args.length === 1) {
@@ -422,17 +640,49 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Add label text to column of last added note/chord/rest in current measure.
+     * @param label - Label type (e.g. "chord" or Label.Chord).
+     * @param text - label text (e.g. "Am").
+     * @returns - This document builder instance.
+     */
     addLabel(label: Label | `${Label}`, text: string): DocumentBuilder {
         return this.addLabelInternal(undefined, label, text);
     }
 
-    /** @param staffTabOrGroups  - staff/tab index (0=top), staff/tab name, or staff group name. */
+    /**
+     * Add label text to column of last added note/chord/rest in current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param label - Label type (e.g. "chord" or Label.Chord).
+     * @param text - label text (e.g. "Am").
+     * @returns - This document builder instance.
+     */
     addLabelTo(staffTabOrGroups: StaffTabOrGroups, label: Label | `${Label}`, text: string): DocumentBuilder {
         return this.addLabelInternal(staffTabOrGroups, label, text);
     }
 
+    /**
+     * Add tie starting from last added note/chord.
+     * @param connective - Connective type ("tie" or Connective.Tie).
+     * @param tieSpan - How many notes across this tie spans.
+     * @param notAnchor - Anchor point for note and this tie.
+     * @returns - This document builder instance.
+     */
     addConnective(connective: Connective.Tie | `${Connective.Tie}`, tieSpan?: number | TieType | `${TieType}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
+    /**
+     * Add slur starting from last added note/chord.
+     * @param connective - Connective type ("slur" or Connective.Slur).
+     * @param slurSpan - How many notes across this slur spans.
+     * @param notAnchor - Anchor point for note and this slur.
+     * @returns - This document builder instance.
+     */
     addConnective(connective: Connective.Slur | `${Connective.Slur}`, slurSpan?: number, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
+    /**
+     * Add slide starting from last added note/chord.
+     * @param connective - Connective type ("slide" or Connective.Slide).
+     * @param notAnchor - Anchor point for note and this slide.
+     * @returns - This document builder instance.
+     */
     addConnective(connective: Connective.Slide | `${Connective.Slide}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
     addConnective(connective: Connective | `${Connective}`, ...args: unknown[]): DocumentBuilder {
         assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
@@ -461,13 +711,16 @@ export class DocumentBuilder {
     }
 
     /**
-     * Extension length example:
+     * Add extension line to previously added annotation or label element.
      * <pre>
+     *     // Example
      *     addExtension(ext => ext.notes("1n", 2))          // length is 2 whole notes
      *     addExtension(ext => ext.measures(3).hide())      // length is 3 measures, hidden
      *     addExtension(ext => ext.measures(1).notes("8n")) // length is 1 measure + 1 eigth note
      *     addExtension(ext => ext.infinity())              // length is as long as possible
      * </pre>
+     * @param extensionBuilder - Extension builder function used to build exstension.
+     * @returns - This document builder instance.
      */
     addExtension(extensionBuilder?: (ext: ExtensionBuilder) => void): DocumentBuilder {
         assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "addExtension() has new usage, for e.g. addExtension(ext => ext.measures(2)). Please refer to README or API Reference.", extensionBuilder);
@@ -509,11 +762,11 @@ export class DocumentBuilder {
     }
 
     /**
-     * 
+     * Add staff group.
      * @param groupName - Name of staff group.
      * @param staffsTabsAndGroups - staff/tab index (0=top), staff/tab name, or staff group name. Single value or array.
      * @param verticalPosition - Vertical position, are elements added above, below or both.
-     * @returns 
+     * @returns - This document builder instance.
      */
     addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPosition | `${VerticalPosition}` = VerticalPosition.Auto): DocumentBuilder {
         assertArg(Utils.Is.isNonEmptyString(groupName), "groupName", groupName);
@@ -527,27 +780,51 @@ export class DocumentBuilder {
         return this;
     }
 
+    /**
+     * Add song end. Adds certain bar line at the end of measure.
+     * @returns - This document builder instance.
+     */
     endSong(): DocumentBuilder {
         this.getMeasure().endSong();
         return this;
     }
 
+    /**
+     * Add section end. Adds certain bar line at the end of measure.
+     * @returns - This document builder instance.
+     */
     endSection(): DocumentBuilder {
         this.getMeasure().endSection();
         return this;
     }
 
+    /**
+     * End current score row. Next measure will start new row.
+     * @returns - This document builder instance.
+     */
     endRow(): DocumentBuilder {
         this.doc.getLastMeasure()?.endRow();
         return this;
     }
 
+    /**
+     * Add rests to fill current measure.
+     * @param voiceId - Voice id to add rests to. Single value, array or all if omitted.
+     * @returns - This document builder instance.
+     */
     completeRests(voiceId?: VoiceId | VoiceId[]): DocumentBuilder {
         assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId) || Utils.Is.isArray(voiceId) && voiceId.every(id => isVoiceId(id)), "voiceId", voiceId);
         this.getMeasure().completeRests(voiceId);
         return this;
     }
 
+    /**
+     * Add notes of given scale in ascending order.
+     * @param scale - Scale.
+     * @param bottomNote - Scale starts from note >= bottom note.
+     * @param numOctaves - Number of octaves to add.
+     * @returns - This document builder instance.
+     */
     addScaleArpeggio(scale: Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
         assertArg(Utils.Is.isNonEmptyString(bottomNote), "bottomNote", bottomNote);
         assertArg(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
