@@ -1,5 +1,6 @@
 import { Note } from "@tspro/web-music-score/theory";
 
+/** Staff preset values for score configuration. */
 export enum StaffPreset {
     /** Treble staff has treble (G-) clef. */
     Treble = "treble",
@@ -15,63 +16,145 @@ export enum StaffPreset {
     /** GuitarCombined has treble clef and tab for guitar. */
     GuitarCombined = "guitarCombined"
 }
+/** Clef for staff notation lines. */
+export enum Clef {
+    /** G-clef (treble cleff) */
+    G = "G",
+    /** F-clef (bass cleff) */
+    F = "F"
+}
 
-export enum Clef { G = "G", F = "F" }
-
+/** Staff config to add staff notation line in score configuration. */
 export type StaffConfig = {
+    /** Config type, must be "staff" for staff config. */
     type: "staff",
+    /** G-clef or F-clef for this staff config? */
     clef: Clef | `${Clef}`,
+    /** Set name for this staff config. */
     name?: string,
+    /** Set octave down with G-clef for guitar treble staff notation line. */
     isOctaveDown?: boolean,
+    /** Lowest note (e.g. "C2")that can be presented in this staff notation line. */
     minNote?: string,
+    /** Highest note (e.g. "C6") that can be presented in this staff notation line. */
     maxNote?: string,
+    /** Voice ids that are presented in this staff notation line. */
     voiceIds?: number[],
+    /** Set true for two staff configs with G-clef and F-clef to create grand staff. */
     isGrand?: boolean
 }
 
+/** Tab config to add guitar tab in score configuration. */
 export type TabConfig = {
+    /** Config type, must be "tab" for tab config. */
     type: "tab",
+    /** Set name for this tab config. */
     name?: string,
     tuning?: string | string[],
+    /** Voice ids that are presented in this guitar tab notation line. */
     voiceIds?: number[]
 }
 
+/** Score configuration. */
 export type ScoreConfiguration = StaffConfig | TabConfig | (StaffConfig | TabConfig)[];
 
+/** VoiceId type. */
 export type VoiceId = 0 | 1 | 2 | 3;
 
+/** Get supported VoiceIds. Returns [0, 1, 2, 3]. */
 export function getVoiceIds(): ReadonlyArray<VoiceId> {
     return [0, 1, 2, 3];
 }
 
+/** Strng number type. */
 export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
 
+/** Get strin numbers. Returns [0, 1, 2, 3, 4, 5]. */
 export function getStringNumbers(): ReadonlyArray<StringNumber> {
     return [1, 2, 3, 4, 5, 6];
 }
 
-export enum Stem { Auto = "auto", Up = "up", Down = "down" }
+/** Stem direction enum. */
+export enum Stem {
+    /** Auto stem direction. */
+    Auto = "auto",
+    /** Stem is upwards. */
+    Up = "up",
+    /** Stm is downwards. */
+    Down = "down"
+}
 
-export enum Arpeggio { Up = "up", Down = "down" }
+/** Arpeggio direction enum. */
+export enum Arpeggio {
+    /** Upwards, chord played from lowes to highest. */
+    Up = "up",
+    /** Downwards, chord played from highest to loest. */
+    Down = "down"
+}
 
-export enum TieType { Stub = "stub", ToMeasureEnd = "toMeasureEnd" }
+/** Special tie length enum. */
+export enum TieType {
+    /** Stub tie is short tie that left anchors to note and has not right anchor point. */
+    Stub = "stub",
+    /** To measure end tie is tie that left anchors to note and right anchors to measure end. */
+    ToMeasureEnd = "toMeasureEnd"
+}
 
-export enum NoteAnchor { Auto = "auto", Above = "above", Center = "center", Below = "below", StemTip = "stemTip" }
+/** Anchor point enum for connectives (ties, slurs, slides). */
+export enum NoteAnchor {
+    /** Automatically choose anchor point using simple logic. */
+    Auto = "auto",
+    /** Anchor connective above note head. */
+    Above = "above",
+    /** Anchor connective center/next to note head.*/
+    Center = "center",
+    /** Anchor connective below note head. */
+    Below = "below",
+    /** Anchor connective to stem tip. */
+    StemTip = "stemTip"
+}
 
-export enum Connective { Tie = "tie", Slur = "slur", Slide = "slide" }
+/** Connective enum. */
+export enum Connective {
+    /** Tie, connects two or more adjacent notes of same pitch with arc. */
+    Tie = "tie",
+    /** Slur, connects two or more adjacent notes of different pitch with arc. */
+    Slur = "slur",
+    /** Slide, connects two adjacent notes of different pitch with straight line. */
+    Slide = "slide"
+}
 
-export enum VerticalPosition { Auto = "auto", Above = "above", Below = "below", Both = "both" }
+/** Vertical position enum used to layout notation elements. */
+export enum VerticalPosition {
+    /** Automatic/default layout position depending on element. */
+    Auto = "auto",
+    /** Add  element above staff/tab. */
+    Above = "above",
+    /** Add element below staff/tab. */
+    Below = "below",
+    /** Add element both above and below staff/tab. */
+    Both = "both"
+}
 
+/** Staff/tab/group type can be staff/tab index or staff/tab/group name. */
 export type StaffTabOrGroup = number | string;
 
+/** Staff/tab/group snglevalue or array of values. */
 export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
+/** Options for notes/chords. */
 export type NoteOptions = {
+    /** Stem direction. */
     stem?: Stem | `${Stem}`,
+    /** Set color. */
     color?: string,
+    /** Arepggio direction for chords. true = "up". */
     arpeggio?: boolean | Arpeggio | `${Arpeggio}`,
+    /** Add staccato dot. */
     staccato?: boolean,
+    /** Use diamond shaped note head. */
     diamond?: boolean,
+    /** Set string number (array of numbers for chord) to use in guitar tab. */
     string?: StringNumber | StringNumber[],
     /** @deprecated - Use triplet NoteLength values instead, e.g. NoteLength.QuarterTriplet or "4t", etc. */
     triplet?: boolean,
@@ -79,9 +162,13 @@ export type NoteOptions = {
     dotted?: boolean | number
 }
 
+/** Options for rests. */
 export type RestOptions = {
-    staffPos?: Note | string | number, // Note, "C3", or midiNumber
+    /** Set staff position for this rest. Can be instance of Note, string (e.g. "C3"), or midiNumber. */
+    staffPos?: Note | string | number,
+    /** Set color. */
     color?: string,
+    /** Hide this rest, still affects playing. */
     hide?: boolean,
     /** @deprecated - Use triplet NoteLength values instead, e.g. NoteLength.QuarterTriplet or "4t", etc. */
     triplet?: boolean,
@@ -89,15 +176,21 @@ export type RestOptions = {
     dotted?: boolean | number
 }
 
+/** Tuplet options. */
 export type TupletOptions = {
+    /** Show tuplet ratio (e.g. "3:2") instead of number of parts (e.g. "3"). */
     showRatio?: boolean
 }
 
+/** Fermata enum. */
 export enum Fermata {
+    /** Anchor fermata to note/rest. */
     AtNote = "atNote",
+    /** Anchor fermata to measure end. */
     AtMeasureEnd = "atMeasureEnd"
 }
 
+/** Navigation element enum. */
 export enum Navigation {
     /** Repeat back to beginning and play to the "Fine" marking. */
     DC_al_Fine = "D.C. al Fine",
@@ -133,6 +226,7 @@ export enum Navigation {
     Ending = "ending"
 }
 
+/** Annotation element enum. */
 export enum Annotation {
     /** "ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim." */
     Dynamics = "dynamics",
@@ -141,6 +235,7 @@ export enum Annotation {
     Tempo = "tempo"
 }
 
+/** Some known dynamics annotations. */
 export enum DynamicsAnnotation {
     cresc = "cresc.",
     decresc = "decresc.",
@@ -156,14 +251,17 @@ export enum DynamicsAnnotation {
     fff = "fff"
 }
 
+/** Some known tempo annotations. */
 export enum TempoAnnotation {
     accel = "accel.",
     rit = "rit.",
     a_tempo = "a tempo"
 }
 
+/** Known annotation test type. */
 export type AnnotationText = `${DynamicsAnnotation}` | `${TempoAnnotation}`;
 
+/** Label element enum. */
 export enum Label {
     /** "C", "C#", "Db", "D", etc. */
     Note = "note",
@@ -172,6 +270,15 @@ export enum Label {
     Chord = "chord"
 }
 
-export enum PlayState { Playing, Paused, Stopped }
+/** Play state enum. */
+export enum PlayState {
+    /** Playing. */
+    Playing,
+    /** Paused. */
+    Paused,
+    /** Stopped. */
+    Stopped
+}
 
+/** Play state change listener type. */
 export type PlayStateChangeListener = (playState: PlayState) => void;
