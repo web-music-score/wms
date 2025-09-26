@@ -21,19 +21,23 @@ export interface PlaybackButtonsState {
 
 /**
  * Usage:
+ * <pre>
+ *   // Using with React TSX/JSX
+ *   import * as Score from "\@tspro/web-music-score/score";
+ *   import * as Pieces from "@tspro/web-music-score/pieces";
  * 
- *  import * as Score from "\@tspro/web-music-score";
+ *   // Create sample musicdocument.
+ *   const doc = Pieces.createFrereJacques();
  * 
- *  \<Score.PlaybackButtons doc=\{doc\} /\>
+ *   // Create default playback buttons
+ *   &lt;Score.PlaybackButtons doc={doc} /&gt;
  * 
- * To set custom play, pause and stop labels:
+ *   // Create playback buttons with custom play, pause and stop labels:
+ *   &lt;Score.PlaybackButtons doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" /&gt;
  * 
- *  \<Score.PlaybackButtons doc=\{doc\} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" /\>
- * 
- * To use different button layout.
- * 
- *  \<Score.PlaybackButtons doc=\{doc\} buttonLayout=\{Score.PlaybackButtonsLayout.PlayStopSingle\} /\>
- * 
+ *   // Create playback buttons with different button layout.
+ *   &lt;Score.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} /&gt;
+ * </pre>
  */
 export class PlaybackButtons extends React.Component<PlaybackButtonsProps, PlaybackButtonsState> {
 

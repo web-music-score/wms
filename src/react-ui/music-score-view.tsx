@@ -7,11 +7,21 @@ export interface MusicScoreViewProps {
 }
 
 /**
- * Usage:
+ * Music score view react component.
+ * <pre>
+ *   // Using with React TSX/JSX
+ *   import * as Score from "@tspro/web-music-score/react";
+ *   import * as Pieces from "@tspro/web-music-score/pieces";
+ *  
+ *   // Render function of react component.
+ *   render() {
+ *       const doc = Pieces.createFrereJacques();
  * 
- *  import * as Score from "\@tspro/web-music-score";
- * 
- *  \<Score.MusicScoreView doc=\{doc\} /\>
+ *       return &lt;&gt;
+ *          &lt;Score.MusicScoreView doc=\{doc\} /&gt;
+ *       &lt;/&gt;;
+ *   }
+ * </pre>
  */
 export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
 

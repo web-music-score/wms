@@ -44,12 +44,21 @@ class Fret {
     }
 }
 
+/** Data for fret position. */
 export class FretPositionData {
+    /**
+     * Create new fret position data instance.
+     * @param fretPosition - Fret position.
+     * @param cellRect - Rect of fret position cell (space around string and between fret and next fret).
+     * @param noteRect - Rect to display note name in circle.
+     */
     constructor(readonly fretPosition: Readonly<FretPosition>, readonly cellRect: DivRect, readonly noteRect: DivRect) { }
 }
 
+/** Update fret position function type. */
 export type UpdateFretPositionFunc = (fretPosition: FretPosition) => void;
 
+/** Click fret position function type. */
 export type ClickFretPositionFunc = (fretPosition: FretPosition) => void;
 
 export interface GuitarViewProps {
@@ -65,6 +74,35 @@ export interface GuitarViewState {
     table: FretPositionData[][];
 }
 
+/**
+ * Guitar (neck) view react component.
+ * <pre>
+ *   // Using with React TSX/JSX
+ *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
+ *   import * as Theory from "@tspro/web-music-score/theory";
+ *  
+ *   // Render function of react component.
+ *   render() {
+ *       const guitarCtx = new ScoreUI.GuitarContext(
+ *           "Standard",                     // Tuning name.
+ *           Theory.getScale("C Major"),     // Scale.
+ *           Theory.DefaultHandedness,       // Guitar handedness.
+ *           Theory.DefaultPitchNotation,    // Pitch notation.
+ *           Theory.DefaultGuitarNoteLabel); // Guitar note label type.
+ * 
+ *       const onUpdateFretPosition: ScoreUI.UpdateFretPositionFunc = (fretPos) => { }
+ *       const onClickFretPosition: ScoreUI.ClickFretPositionFunc = (fretPos) => { }
+ * 
+ *       return &lt;&gt;
+ *           &lt;ScoreUI.GuitarView
+ *               style={{ position: "relative", width: 640 }}
+ *               guitarContext={guitarCtx}
+ *               onUpdateFretPosition={onUpdateFretPosition}
+ *               onClickFretPosition={onClickFretPosition} /&gt;
+ *      &lt;/&gt;;
+ *   }
+ * </pre>
+ */
 export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState> {
     state: GuitarViewState;
 
