@@ -66,6 +66,9 @@ class ClassicalGuitar implements Instrument {
 
 const CG = new ClassicalGuitar();
 
+/**
+ * Register classical guitar audio instrument, and set is as current instrument.
+ */
 export function registerClassicalGuitar() {
     registerInstrument(CG);
 }

@@ -1,4 +1,5 @@
 
+/** Enum of music error types. */
 export enum MusicErrorType {
     Unknown,
     InvalidArg,
@@ -8,6 +9,7 @@ export enum MusicErrorType {
     Timesignature,
     Score
 }
+
 function isType(type: unknown): type is MusicErrorType {
     return typeof type === "number" && type in MusicErrorType;
 }
@@ -16,10 +18,21 @@ function formatType(type: MusicErrorType | undefined): string {
     return type === undefined ? "" : `[${MusicErrorType[type]}] `;
 }
 
+/** Music error class. */
 export class MusicError extends Error {
+    /** Music error type. */
     readonly type: MusicErrorType;
 
+    /**
+     * Create new music error instance.
+     * @param message - Error message.
+     */
     constructor(message: string);
+    /**
+     * Create new musicerror instance.
+     * @param type - Music error type.
+     * @param message - Error message.
+     */
     constructor(type: MusicErrorType, message: string);
     constructor(...args: [string] | [MusicErrorType, string]) {
         const [type, msg] = args.length === 1

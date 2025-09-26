@@ -1,5 +1,10 @@
 import { MDocument, DocumentBuilder } from "@tspro/web-music-score/score";
 
+/**
+ * Create Andante by A. Diabelli music piece.
+ * 
+ * @returns - Music document.
+ */
 export function createAndanteByDiabelli(): MDocument {
     return new DocumentBuilder()
         .setScoreConfiguration("guitarTreble")

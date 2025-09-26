@@ -1,7 +1,12 @@
 import { DocumentBuilder, MDocument } from "@tspro/web-music-score/score";
 
-// Score: https://musescore.com/user/17324226/scores/7296137
-
+/**
+ * Create Frere Jacques (round) music piece.<br />
+ * <br />
+ * Source: https://musescore.com/user/17324226/scores/7296137
+ * 
+ * @returns - Music document.
+ */
 export function createFrereJacques(): MDocument {
     return new DocumentBuilder()
         .setHeader("Frere Jacques")

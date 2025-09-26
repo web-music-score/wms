@@ -1,7 +1,12 @@
 import { MDocument, Navigation, DocumentBuilder } from "@tspro/web-music-score/score";
 
-// Greensleeves (https://musescore.com/aaron_dc/scores/6167495)
-
+/**
+ * Create Greensleeves music piece.<br />
+ * <br />
+ * Source: https://musescore.com/aaron_dc/scores/6167495
+ * 
+ * @returns - Music document.
+ */
 export function createGreensleeves(): MDocument {
     return new DocumentBuilder()
         .setScoreConfiguration("guitarTreble")
