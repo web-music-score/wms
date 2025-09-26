@@ -1,4 +1,3 @@
-import * as Audio from "@tspro/web-music-score/audio";
 import { Accidental, Note } from "@tspro/web-music-score/theory";
 import { RhythmProps } from "@tspro/web-music-score/theory";
 import { MusicObject } from "../engine/music-object";
@@ -19,30 +18,17 @@ import { ObjScoreRow } from "../engine/obj-score-row";
 import { ObjSignature } from "../engine/obj-signature";
 import { ObjText } from "../engine/obj-text";
 import { Utils } from "@tspro/ts-utils-lib";
-import { DivRect } from "./div-rect";
-import { Player } from "../engine/player";
-import { Renderer } from "../engine/renderer";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { PlayStateChangeListener, VoiceId, getVoiceIds } from "./types";
-import { ScoreEventListener } from "./event";
-import { PlayState } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
+import { MPlayer } from "./music-interface";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
         throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
-    }
-}
-
-function require_t<T>(t: T | undefined | null, message?: string): T {
-    if (t === undefined || t === null) {
-        throw new TypeError(message);
-    }
-    else {
-        return t;
     }
 }
 
@@ -59,18 +45,29 @@ function getNotationLine(line: ObjNotationLine): MStaff | MTab {
     }
 }
 
+/** Abstract music interface object class. */
 export abstract class MusicInterface {
+    /**
+     * Create new music interface object.
+     * @param name - OBject name.
+     */
     constructor(readonly name: string) { }
 
     /** @internal */
     abstract getMusicObject(): MusicObject;
 
+    /**
+     * Get parent object.
+     * @returns - Parent object or undefined.
+     */
     getParent(): MusicInterface | undefined {
         return this.getMusicObject().getParent()?.getMusicInterface();
     }
 }
 
+/** Accidental object. */
 export class MAccidental extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Accidental";
 
     /** @internal */
@@ -83,12 +80,18 @@ export class MAccidental extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get accidental.
+     * @returns - Accidental (e.g. 1 = #).
+     */
     getAccidental(): Accidental {
         return this.obj.accidental;
     }
 }
 
+/** Connective object. */
 export class MConnective extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Connective";
 
     /** @internal */
@@ -102,7 +105,9 @@ export class MConnective extends MusicInterface {
     }
 }
 
+/** Arpeggio object. */
 export class MArpeggio extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Arpeggio";
 
     /** @internal */
@@ -115,16 +120,26 @@ export class MArpeggio extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get rhythm column this arpeggio is in.
+     * @returns - Rhythm column.
+     */
     getRhythmColumn(): MRhythmColumn {
         return this.obj.col.getMusicInterface();
     }
 
+    /**
+     * Get notation line this arpeggio is in.
+     * @returns - Staff or tab object.
+     */
     getNotationLine(): MStaff | MTab {
         return getNotationLine(this.obj.line);
     }
 }
 
+/** Beam group object. */
 export class MBeamGroup extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "BeamGroup";
 
     /** @internal */
@@ -138,7 +153,9 @@ export class MBeamGroup extends MusicInterface {
     }
 }
 
+/** Beam group object of certain staff. */
 export class MStaffBeamGroup extends MusicInterface {
+    /** Object name. */
     static readonly Name = "StaffBeamGroup";
 
     /** @internal */
@@ -151,12 +168,18 @@ export class MStaffBeamGroup extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get staff this beam group is in.
+     * @returns - Staff object.
+     */
     getStaff(): MStaff {
         return this.obj.staff.getMusicInterface();
     }
 }
 
+/** Document object. */
 export class MDocument extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Document";
 
     /** @internal */
@@ -169,33 +192,60 @@ export class MDocument extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get title.
+     * @returns - Title string or undefined.
+     */
     getTitle(): string | undefined {
         return this.obj.getTitle();
     }
 
+    /**
+     * Get composer.
+     * @returns - Composer string or undefined.
+     */
     getComposer(): string | undefined {
         return this.obj.getComposer(); 3
     }
 
+    /**
+     * Get arranger.
+     * @returns - Arranger string or undefined.
+     */
     getArranger(): string | undefined {
         return this.obj.getArranger();
     }
 
+    /**
+     * Get score rows.
+     * @returns - Array or score rows.
+     */
     getRows(): ReadonlyArray<MScoreRow> {
         return this.obj.getRows().map(r => r.getMusicInterface());
     }
 
+    /**
+     * Get measures.
+     * @returns - Array of measures.
+     */
     getMeasures(): ReadonlyArray<MMeasure> {
         return this.obj.getMeasures().map(m => m.getMusicInterface());
     }
 
-    play(fn?: PlayStateChangeListener): MPlayer {
-        assertArg(Utils.Is.isFunctionOrUndefined(fn), "playStateChangeListener", fn);
-        return new MPlayer(this, fn).play();
+    /**
+     * Play this document.
+     * @param playStateChangeListener - Play state change listener function or undefined.
+     * @returns - Player instance.
+     */
+    play(playStateChangeListener?: PlayStateChangeListener): MPlayer {
+        assertArg(Utils.Is.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
+        return new MPlayer(this, playStateChangeListener).play();
     }
 }
 
+/** Ending object. */
 export class MEnding extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Ending";
 
     /** @internal */
@@ -208,17 +258,28 @@ export class MEnding extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get passages.
+     * @returns - Array of passage numbers, e.g. passage number 1 means that this ending is played on first pass.
+     */
     getPassages(): ReadonlyArray<number> {
         return this.obj.passages;
     }
 
+    /**
+     * Has passage number?
+     * @param passage - Passage number to find out.
+     * @returns - Boolean whether this ending has asked passage number.
+     */
     hasPassage(passage: number): boolean {
         assertArg(Utils.Is.isIntegerGte(passage, 1), "passage", passage);
         return this.obj.hasPassage(passage);
     }
 }
 
+/** Fermata object. */
 export class MFermata extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "Fermata";
 
     /** @internal */
@@ -232,7 +293,9 @@ export class MFermata extends MusicInterface {
     }
 }
 
+/** Header object. */
 export class MHeader extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "Header";
 
     /** @internal */
@@ -245,20 +308,34 @@ export class MHeader extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get title.
+     * @returns - Title string or undefined.
+     */
     getTitle(): string | undefined {
         return this.obj.title;
     }
 
+    /**
+     * Get composer.
+     * @returns - Composer string or undefined.
+     */
     getComposer(): string | undefined {
         return this.obj.composer;
     }
 
+    /**
+     * Get arranger.
+     * @returns - Arranger string or undefined.
+     */
     getArranger(): string | undefined {
         return this.obj.arranger;
     }
 }
 
+/** Image object. */
 export class MImage extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Image";
 
     /** @internal */
@@ -272,7 +349,9 @@ export class MImage extends MusicInterface {
     }
 }
 
+/** Measure object. */
 export class MMeasure extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "Measure";
 
     /** @internal */
@@ -285,20 +364,34 @@ export class MMeasure extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get measure number.
+     * @returns - Measure number starting from 1, or 0 if upbeat.
+     */
     getMeasureNumber(): number {
         return this.obj.getMeasureNumber();
     }
 
+    /**
+     * Get rhythm columns.
+     * @returns - Array of rhythm columns.
+     */
     getRhythmColumns(): ReadonlyArray<MRhythmColumn> {
         return this.obj.getColumns().map(col => col.getMusicInterface());
     }
 
+    /**
+     * Get score row that this measure is in.
+     * @returns - Score row.
+     */
     getRow(): MScoreRow {
         return this.obj.row.getMusicInterface();
     }
 }
 
+/** Right bar line object. */
 export class MBarLineRight extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "BarLineRight";
 
     /** @internal */
@@ -312,7 +405,9 @@ export class MBarLineRight extends MusicInterface {
     }
 }
 
+/** Left bar line object. */
 export class MBarLineLeft extends MusicInterface {
+    /** Object name. */
     static readonly Name = "BarLineLeft";
 
     /** @internal */
@@ -326,7 +421,9 @@ export class MBarLineLeft extends MusicInterface {
     }
 }
 
+/** Bar line object for certain staff or tab. */
 export class MStaffTabBarLine extends MusicInterface {
+    /** Object name. */
     static readonly Name = "StaffTabBarLine";
 
     /** @internal */
@@ -339,6 +436,10 @@ export class MStaffTabBarLine extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get parent bar line object.
+     * @returns - Parent bar line object.
+     */
     getBarLine(): MBarLineLeft | MBarLineRight {
         let barLine = this.obj.barLine;
         if (barLine instanceof ObjBarLineLeft || barLine instanceof ObjBarLineRight) {
@@ -349,12 +450,18 @@ export class MStaffTabBarLine extends MusicInterface {
         }
     }
 
+    /**
+     * Get staff or tab this bar lien object is in.
+     * @returns - Staff or tab.
+     */
     getNotationLine(): MStaff | MTab {
         return getNotationLine(this.obj.line);
     }
 }
 
+/** Note group object. */
 export class MNoteGroup extends MusicInterface {
+    /** Object name. */
     static readonly Name = "NoteGroup";
 
     /** @internal */
@@ -367,24 +474,42 @@ export class MNoteGroup extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get notes of this note group.
+     * @returns - Array of Note instances.
+     */
     getNotes(): ReadonlyArray<Note> {
         return this.obj.notes;
     }
 
+    /**
+     * Get rhythm props of this note group.
+     * @returns - Rhythm props.
+     */
     getRhythmProps(): RhythmProps {
         return this.obj.rhythmProps;
     }
 
+    /**
+     * Get rhythm column this note group is in.
+     * @returns - Rhythm column.
+     */
     getRhythmColumn(): MRhythmColumn {
         return this.obj.col.getMusicInterface();
     }
 
+    /**
+     * Get the measure this note group is in.
+     * @returns - Measure.
+     */
     getMeasure(): MMeasure {
         return this.obj.measure.getMusicInterface();
     }
 }
 
+/** Note group object of certain staff. */
 export class MStaffNoteGroup extends MusicInterface {
+    /** Object name. */
     static readonly Name = "StaffNoteGroup";
 
     /** @internal */
@@ -397,24 +522,42 @@ export class MStaffNoteGroup extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get parent note group.
+     * @returns - Parent note group.
+     */
     getNoteGroup(): MNoteGroup {
         return this.obj.noteGroup.getMusicInterface();
     }
 
+    /**
+     * Get rhythm column this note group is in.
+     * @returns - Rhythm column.
+     */
     getRhythmColumn(): MRhythmColumn {
         return this.getNoteGroup().getRhythmColumn();
     }
 
+    /**
+     * Get the measure this note group is in.
+     * @returns - Measure.
+     */
     getMeasure(): MMeasure {
         return this.getNoteGroup().getMeasure();
     }
 
+    /**
+     * Get staff notation line this note group is in.
+     * @returns - Staff object.
+     */
     getStaff(): MStaff {
         return this.obj.staff.getMusicInterface();
     }
 }
 
+/** Note group object of certain tab. Contains fret numbers for tab. */
 export class MTabNoteGroup extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "TabNoteGroup";
 
     /** @internal */
@@ -427,24 +570,42 @@ export class MTabNoteGroup extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get parent note group.
+     * @returns - Parent note group.
+     */
     getNoteGroup(): MNoteGroup {
         return this.obj.noteGroup.getMusicInterface();
     }
 
+    /**
+     * Get rhythm column this note group is in.
+     * @returns - Rhythm column.
+     */
     getRhythmColumn(): MRhythmColumn {
         return this.getNoteGroup().getRhythmColumn();
     }
 
+    /**
+     * Get the measure this note group is in.
+     * @returns - Measure.
+     */
     getMeasure(): MMeasure {
         return this.getNoteGroup().getMeasure();
     }
 
+    /**
+     * Get guitar tab this note group is in.
+     * @returns - Tab object.
+     */
     getTab(): MTab {
         return this.obj.tab.getMusicInterface();
     }
 }
 
+/** Rest object. */
 export class MRest extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "Rest";
 
     /** @internal */
@@ -457,20 +618,34 @@ export class MRest extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get rhythm props of this rest.
+     * @returns - Rhythm props.
+     */
     getRhythmProps(): RhythmProps {
         return this.obj.rhythmProps;
     }
 
+    /**
+     * Get rhythm column this rest is in.
+     * @returns - Rhythm column.
+     */
     getRhythmColumn(): MRhythmColumn {
         return this.obj.col.getMusicInterface();
     }
 
+    /**
+     * Get the measure this rest is in.
+     * @returns - Measure.
+     */
     getMeasure(): MMeasure {
         return this.obj.measure.getMusicInterface();
     }
 }
 
+/** Rest object for certain tab. */
 export class MStaffRest extends MusicInterface {
+    /** Object name. */
     static readonly Name = "StaffRest";
 
     /** @internal */
@@ -483,24 +658,42 @@ export class MStaffRest extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get parent rest object.
+     * @returns - Parent rest object.
+     */
     getRest(): MRest {
         return this.obj.rest.getMusicInterface();
     }
 
+    /**
+     * Get rhythm column this rest is in.
+     * @returns - Rhythm column.
+     */
     getRhythmColumn(): MRhythmColumn {
         return this.getRest().getRhythmColumn();
     }
 
+    /**
+     * Get the measure this rest is in.
+     * @returns - Measure.
+     */
     getMeasure(): MMeasure {
         return this.getRest().getMeasure();
     }
 
+    /**
+     * Get staff notation line this rest is in.
+     * @returns - Staff object.
+     */
     getStaff(): MStaff {
         return this.obj.staff.getMusicInterface();
     }
 }
 
+/** Rhythm column object. */
 export class MRhythmColumn extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "RhythmColumn";
 
     /** @internal */
@@ -513,25 +706,41 @@ export class MRhythmColumn extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get symbol (note group or rest) of this column for given voice id.
+     * @param voiceId - Voice id.
+     * @returns - Note group, rest or undefined.
+     */
     getRhythmSymbol(voiceId: number): MNoteGroup | MRest | undefined {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
 
         return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
     }
 
+    /**
+     * Get symbol (note group or rest) of this column for given voice id.
+     * @deprecated - Use getRhythmSymbol(voiceId) instead.
+     * @param voiceId - Voice id.
+     * @returns - Note group, rest or undefined.
+     */
+    getVoiceSymbol(voiceId: VoiceId): MNoteGroup | MRest | undefined {
+        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+
+        return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
+    }
+
+    /**
+     * Get the measure this rhythm column is in.
+     * @returns - Measure.
+     */
     getMeasure(): MMeasure {
         return this.obj.measure.getMusicInterface();
     }
-
-    getVoiceSymbol(voiceId: VoiceId): MNoteGroup | MRest | undefined {
-        let s = this.obj.getVoiceSymbol(voiceId);
-        return s instanceof ObjNoteGroup || s instanceof ObjRest
-            ? s.getMusicInterface()
-            : undefined;
-    }
 }
 
+/** Score row object. */
 export class MScoreRow extends MusicInterface {
+    /** Object name. */
     static readonly Name = "ScoreRow";
 
     /** @internal */
@@ -544,20 +753,34 @@ export class MScoreRow extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Parent music document.
+     * @returns - Parent music document.
+     */
     getDocument(): MDocument {
         return this.obj.doc.getMusicInterface();
     }
 
+    /**
+     * Get measures of this score row.
+     * @returns - Array of measures.
+     */
     getMeasures(): ReadonlyArray<MMeasure> {
         return this.obj.getMeasures().map(m => m.getMusicInterface());
     }
 
+    /**
+     * Get notation lines (staves and tabs) of this score row.
+     * @returns - Array of staves and tabs.
+     */
     getNotationLines(): ReadonlyArray<MStaff | MTab> {
         return this.obj.getNotationLines().map(line => getNotationLine(line));
     }
 }
 
+/** Staff notatio line object. */
 export class MStaff extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Staff";
 
     /** @internal */
@@ -570,20 +793,34 @@ export class MStaff extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get index of this staff in score row.
+     * @returns - Index (0=top notation line).
+     */
     getId(): number {
         return this.obj.id;
     }
 
+    /**
+     * Get name of this staff.
+     * @returns - Staff name.
+     */
     getName(): string | undefined {
         return this.obj.name.length > 0 ? this.obj.name : undefined;
     }
 
+    /**
+     * Get the score row this staff is in.
+     * @returns - Score row.
+     */
     getRow(): MScoreRow {
         return this.obj.row.getMusicInterface();
     }
 }
 
+/** Guitar tab notation line object. */
 export class MTab extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Tab";
 
     /** @internal */
@@ -596,20 +833,34 @@ export class MTab extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get index of this guitar tab in score row.
+     * @returns - Index (0=top notation line).
+     */
     getId(): number {
         return this.obj.id;
     }
 
+    /**
+     * Get name of this guitar tab.
+     * @returns - Staff name.
+     */
     getName(): string | undefined {
         return this.obj.name.length > 0 ? this.obj.name : undefined;
     }
 
+    /**
+     * Get the score row this guitar tab is in.
+     * @returns - Score row.
+     */
     getRow(): MScoreRow {
         return this.obj.row.getMusicInterface();
     }
 }
 
+/** Signature object contains clef, key signature, time signature and tempo, all optional depending on measure. */
 export class MSignature extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Signature";
 
     /** @internal */
@@ -622,12 +873,18 @@ export class MSignature extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get staff notation line this signature is in.
+     * @returns - Staff object.
+     */
     getStaff(): MStaff {
         return this.obj.staff.getMusicInterface();
     }
 }
 
+/** Spacial text object contains text and possibly special symbols (e.g. Segno or Coda). */
 export class MSpecialText extends MusicInterface {
+    /** Object name. */
     static readonly Name = "SpecialText";
 
     /** @internal */
@@ -640,12 +897,18 @@ export class MSpecialText extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get text content.
+     * @returns - Text content.
+     */
     getText(): string {
         return this.obj.getText();
     }
 }
 
+/** Text object. */
 export class MText extends MusicInterface {
+    /** Object name. */
     static readonly Name = "Text";
 
     /** @internal */
@@ -658,12 +921,18 @@ export class MText extends MusicInterface {
         return this.obj;
     }
 
+    /**
+     * Get text content.
+     * @returns - Text content.
+     */
     getText(): string {
         return this.obj.getText();
     }
 }
 
+/** Extension line object. */
 export class MExtensionLine extends MusicInterface {
+    /** OBject name. */
     static readonly Name = "ExtensionLine";
 
     /** @internal */
@@ -674,273 +943,5 @@ export class MExtensionLine extends MusicInterface {
     /** @internal */
     getMusicObject(): ObjExtensionLine {
         return this.obj;
-    }
-}
-
-export class MPlayer {
-    private static currentlyPlaying = new Set<MPlayer>();
-
-    private readonly player: Player;
-
-    constructor(doc: MDocument, fn?: PlayStateChangeListener) {
-        assertArg(doc instanceof MDocument, "doc", doc);
-        assertArg(Utils.Is.isFunctionOrUndefined(fn), "playStateChangeListener", fn);
-
-        this.player = new Player();
-
-        this.player.setDocument(doc.getMusicObject());
-        this.player.setCursorPositionChangeListener((cursorRect?: DivRect) => doc.getMusicObject().updateCursorRect(cursorRect));
-
-        if (fn) {
-            this.player.setPlayStateChnageListener(fn);
-        }
-    }
-
-    static stopAll() {
-        this.currentlyPlaying.forEach(p => p.stop());
-        Audio.stop();
-    }
-
-    play() {
-        MPlayer.currentlyPlaying.add(this);
-
-        this.player.play();
-
-        return this;
-    }
-
-    pause() {
-        this.player.pause();
-
-        return this;
-    }
-
-    stop() {
-        this.player.stop();
-
-        MPlayer.currentlyPlaying.delete(this);
-
-        return this;
-    }
-}
-
-export class MRenderer {
-    private readonly renderer: Renderer;
-
-    constructor() {
-        this.renderer = new Renderer(this);
-    }
-
-    setDocument(doc?: MDocument) {
-        assertArg(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
-
-        this.renderer.setDocument(doc);
-        return this;
-    }
-
-    setCanvas(canvas: HTMLCanvasElement | string) {
-
-        canvas = require_t(Utils.Dom.getCanvas(canvas), typeof canvas === "string"
-            ? "Cannot set renderer canvas because invalid canvas id: " + canvas
-            : "Cannot set renderer canvas because given canvas is undefined.");
-        this.renderer.setCanvas(canvas);
-        return this;
-    }
-
-    setScoreEventListener(fn: ScoreEventListener) {
-        assertArg(Utils.Is.isFunctionOrUndefined(fn), "scoreEventListener", fn);
-        this.renderer.setScoreEventListener(fn);
-    }
-
-    hilightObject(obj?: MusicInterface) {
-        this.renderer.hilightObject(obj?.getMusicObject());
-    }
-
-    hilightStaffPos(staffPos?: { scoreRow: MScoreRow, diatonicId: number }) {
-        this.renderer.hilightStaffPos(staffPos ? {
-            scoreRow: staffPos.scoreRow.getMusicObject(),
-            diatonicId: staffPos.diatonicId
-        } : undefined);
-    }
-
-    draw() {
-        try {
-            this.renderer.draw();
-        }
-        catch (e) {
-            console.log("Draw failed in music renderer.");
-            console.log(e);
-        }
-    }
-}
-
-export class MPlaybackButtons {
-    private playButton?: HTMLButtonElement;
-    private stopButton?: HTMLButtonElement;
-    private playStopButton?: HTMLButtonElement;
-    private pauseButton?: HTMLButtonElement;
-
-    private onPlay: () => void;
-    private onStop: () => void;
-    private onPlayStop: () => void;
-    private onPause: () => void;
-
-    private playLabel = "Play";
-    private stopLabel = "Stop";
-    private pauseLabel = "Pause";
-
-    private playState: PlayState = PlayState.Stopped;
-
-    private player?: MPlayer = undefined;
-
-    constructor() {
-        this.onPlay = () => this.player?.play();
-        this.onStop = () => this.player?.stop();
-        this.onPlayStop = () => { this.playState === PlayState.Playing ? this.player?.stop() : this.player?.play(); }
-        this.onPause = () => this.player?.pause();
-
-        this.updateButtons();
-    }
-
-    setDocument(doc?: MDocument) {
-        assertArg(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
-
-        this.onStop();
-
-        if (doc) {
-            this.player = new MPlayer(doc, (playState: PlayState) => {
-                this.playState = playState;
-                this.updateButtons();
-            });
-        }
-        else {
-            this.player = undefined;
-        }
-
-        this.updateButtons();
-
-        return this;
-    }
-
-    detachDocument() {
-        this.setDocument(undefined);
-    }
-
-    private updateButtons() {
-        if (this.playButton) {
-            this.playButton.disabled = this.player ? (this.playState === PlayState.Playing) : true;
-            this.playButton.innerText = this.playLabel;
-        }
-
-        if (this.stopButton) {
-            this.stopButton.disabled = this.player ? (this.playState === PlayState.Stopped) : true;
-            this.stopButton.innerText = this.stopLabel;
-        }
-
-        if (this.playStopButton) {
-            this.playStopButton.disabled = this.player ? false : true;
-            this.playStopButton.innerText = this.playState === PlayState.Playing ? this.stopLabel : this.playLabel;
-        }
-
-        if (this.pauseButton) {
-            this.pauseButton.disabled = this.player ? (this.playState !== PlayState.Playing) : true;
-            this.pauseButton.innerText = this.pauseLabel;
-        }
-    }
-
-    setPlayButton(btn: HTMLButtonElement | string, btnLabel?: string) {
-        assertArg(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
-
-        MPlaybackButtons.removeOnClickListeners(this.playButton, this.onPlay);
-
-        this.playButton = require_t(Utils.Dom.getButton(btn), "Play button required!");
-        this.playLabel = btnLabel ?? "Play";
-
-        MPlaybackButtons.removeOnClickListeners(this.playButton, "all");
-        MPlaybackButtons.addOnClickListener(this.playButton, this.onPlay);
-
-        this.updateButtons();
-
-        return this;
-    }
-
-    setStopButton(btn: HTMLButtonElement | string, btnLabel?: string) {
-        assertArg(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
-
-        MPlaybackButtons.removeOnClickListeners(this.stopButton, this.onStop);
-
-        this.stopButton = require_t(Utils.Dom.getButton(btn), "Stop button required!");
-        this.stopLabel = btnLabel ?? "Stop";
-
-        MPlaybackButtons.removeOnClickListeners(this.stopButton, "all");
-        MPlaybackButtons.addOnClickListener(this.stopButton, this.onStop);
-
-        this.updateButtons();
-
-        return this;
-    }
-
-    setPlayStopButton(btn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string) {
-        assertArg(Utils.Is.isStringOrUndefined(playLabel), "playLabel", playLabel);
-        assertArg(Utils.Is.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
-
-        MPlaybackButtons.removeOnClickListeners(this.playStopButton, this.onPlayStop);
-
-        this.playStopButton = require_t(Utils.Dom.getButton(btn), "Play/stop button required!");
-        this.playLabel = playLabel ?? "Play";
-        this.stopLabel = stopLabel ?? "Stop";
-
-        MPlaybackButtons.removeOnClickListeners(this.playStopButton, "all");
-        MPlaybackButtons.addOnClickListener(this.playStopButton, this.onPlayStop);
-
-        this.updateButtons();
-
-        return this;
-    }
-
-    setPauseButton(btn: HTMLButtonElement | string, btnLabel?: string) {
-        assertArg(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
-
-        MPlaybackButtons.removeOnClickListeners(this.pauseButton, this.onPause);
-
-        this.pauseButton = require_t(Utils.Dom.getButton(btn), "Pause button required!");
-        this.pauseLabel = btnLabel ?? "Pause";
-
-        MPlaybackButtons.removeOnClickListeners(this.pauseButton, "all");
-        MPlaybackButtons.addOnClickListener(this.pauseButton, this.onPause);
-
-        this.updateButtons();
-
-        return this;
-    }
-
-    private static savedOnClickListeners = new Map<HTMLButtonElement, (() => void)[]>();
-
-    private static removeOnClickListeners(btn: HTMLButtonElement | undefined, onClick: (() => void) | "all") {
-        if (btn) {
-            let savedListeners = this.savedOnClickListeners.get(btn) || [];
-            let remainingListeners: (() => void)[] = [];
-
-            savedListeners.forEach(l => {
-                if (onClick === l || onClick === "all") {
-                    btn.removeEventListener("click", l);
-                }
-                else {
-                    remainingListeners.push(l);
-                }
-            });
-
-            this.savedOnClickListeners.set(btn, remainingListeners);
-        }
-    }
-
-    private static addOnClickListener(btn: HTMLButtonElement, onClick: () => void) {
-        assertArg(Utils.Is.isFunction(onClick), "onClick", onClick);
-
-        btn.addEventListener("click", onClick);
-
-        let clickListeners = this.savedOnClickListeners.get(btn) || [];
-
-        this.savedOnClickListeners.set(btn, [...clickListeners, onClick]);
     }
 }

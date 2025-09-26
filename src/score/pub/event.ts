@@ -1,5 +1,6 @@
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { MRenderer, MScoreRow, MusicInterface } from "./interface";
+import { MRenderer } from "./music-interface";
+import { MScoreRow, MusicInterface } from "./music-objects";
 
 /** Score event type. */
 export type ScoreEventType = "enter" | "leave" | "click";
