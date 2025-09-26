@@ -1,4 +1,4 @@
-import { createAndanteByDiabelli, createGreensleeves } from "@tspro/web-music-score/pieces";
+import { createAndanteByDiabelli, createGreensleeves, createFrereJacques } from "@tspro/web-music-score/pieces";
 import { createRepeatsAndEndingsDemo } from "demo-pieces/repeats-endings";
 import { createDaCapoDemo } from "demo-pieces/da-capo";
 import { createDalSegnoDemo } from "demo-pieces/dal-segno";
@@ -37,6 +37,7 @@ export class DemoPieces {
         // Add sample pieces
         pieces.push(createGreensleeves());
         pieces.push(createAndanteByDiabelli());
+        pieces.push(createFrereJacques());
 
         // Add features demos
         demos.push(createRepeatsAndEndingsDemo());
