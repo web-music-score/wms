@@ -1,5 +1,17 @@
 # Changelog
 
+## [4.0.1] - 2025-09-28
+## Fixed
+- Invalid typedoc @params.
+- AnotationType was not referenced for typedoc.
+- Deprecated misspelled NoteLength.Whole12Dots.
+
+## Changed
+- Improved Frere Jacques demo piece.
+
+## Added
+- Typedoc comments for all public exports.
+
 ## [4.0.0] - 2025-09-24
 Another major update was required by new features.
 
