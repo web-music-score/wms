@@ -22,11 +22,21 @@ function mod(n: number, m: number): number {
 const C0_chromaticId = 12;
 const C0_diatonicId = 7;
 
+/** Accidental type. */
 export type Accidental = -2 | -1 | 0 | 1 | 2;
 
+/** Note letter type. */
 export type NoteLetter = "C" | "D" | "E" | "F" | "G" | "A" | "B";
 
-export type ParsedNote = { noteLetter: NoteLetter, accidental: Accidental, octave?: number }
+/** Parsed note props. */
+export type ParsedNote = {
+    /** Note letter (e.g. "C" in "C#4"). */
+    noteLetter: NoteLetter,
+    /** Accidental (e.g. "1" (#=1) in "C#4"). */
+    accidental: Accidental,
+    /** Octave if available(e.g. "4" in "C#4"). */
+    octave?: number
+}
 
 const AccidentalAsciiSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2, "bb"], [-1, "b"], [0, ""], [1, "#"], [2, "x"]]);
 const AccidentalUnicodeSymbolMap: ReadonlyMap<Accidental, string> = new Map([[-2, "𝄫"], [-1, "♭"], [0, ""], [1, "♯"], [2, "𝄪"]]);
@@ -37,16 +47,37 @@ const DiatonicToChromaticMap: ReadonlyArray<number> = [0, 2, 4, 5, 7, 9, 11];
 
 const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 
+/** Note class. */
 export class Note {
     private static noteByNameCache = new Map<string, Note>();
     private static chromaticNoteCache = new Map<number, Note>();
 
+    /** Diatonic class */
     readonly diatonicClass: number;
+    /** Accidental. */
     readonly accidental: Accidental;
+    /** Octave. */
     readonly octave: number;
 
+    /**
+     * Create new Note object instance.
+     * @param diatonicId - Diatonic id.
+     * @param accidental - Accidental (-2, -1, 0, 1 or 2).
+     */
     constructor(diatonicId: number, accidental: number);
+    /**
+     * Create new Note object instance.
+     * @param diatonicClass - Diatonic class [0, 11].
+     * @param accidental - Accidental (-2, -1, 0, 1 or 2).
+     * @param octave - Octave.
+     */
     constructor(diatonicClass: number, accidental: number, octave: number);
+    /**
+     * Create new Note object instance.
+     * @param noteLetter - Note letter (e.g. "C").
+     * @param accidental Accidental (-2, -1, 0, 1 or 2).
+     * @param octave - Octave.
+     */
     constructor(noteLetter: string, accidental: number, octave: number);
     constructor(arg: number | string, accidental: number, octave?: number) {
         if (typeof arg === "number" && typeof accidental === "number" && octave === undefined) {
@@ -73,27 +104,38 @@ export class Note {
         }
     }
 
+    /** Diatonic id getter. */
     get diatonicId(): number {
         return Note.getDiatonicIdInOctave(this.diatonicClass, this.octave);
     }
 
+    /** Chromatic id getter. */
     get chromaticId(): number {
         return Note.getChromaticIdInOctave(DiatonicToChromaticMap[this.diatonicClass] + this.accidental, this.octave);
     }
 
+    /** Midi number getter (implemented same as chromatic id). */
     get midiNumber(): number {
         return this.chromaticId;
     }
 
+    /** Chromatic class getter. */
     get chromaticClass(): number {
         return Note.getChromaticClass(DiatonicToChromaticMap[this.diatonicClass] + this.accidental);
     }
 
+    /** Note letter getter. */
     get noteLetter(): NoteLetter {
         return NoteLetters[this.diatonicClass];
     }
 
-    format(pitchNotation: PitchNotation, symbolSet: SymbolSet) {
+    /**
+     * Format note to string presentation.
+     * @param pitchNotation - Pitchy notation.
+     * @param symbolSet - Symbol set.
+     * @returns - String presentation of note.
+     */
+    format(pitchNotation: PitchNotation, symbolSet: SymbolSet): string {
         let { noteLetter, octave } = this;
         let accidentalSymbol = Note.getAccidentalSymbol(this.accidental, symbolSet);
 
@@ -112,12 +154,22 @@ export class Note {
         }
     }
 
+    /**
+     * Format note to string presentation without octave number.
+     * @param symbolSet - Symbol set.
+     * @returns - String presentation of note without octave number.
+     */
     formatOmitOctave(symbolSet: SymbolSet) {
         let noteLetter = NoteLetters[this.diatonicClass];
         let accidental = Note.getAccidentalSymbol(this.accidental, symbolSet);
         return noteLetter + accidental;
     }
 
+    /**
+     * Get note.
+     * @param noteName - Note name (e.g. "C4").
+     * @returns - Note.
+     */
     static getNote(noteName: string): Note {
         let note = this.noteByNameCache.get(noteName);
 
@@ -139,6 +191,11 @@ export class Note {
         return note;
     }
 
+    /**
+     * Get chromatic note. There are number of alternatives, this function uses simple logic to choose one.
+     * @param chromaticId - Chromatic id.
+     * @returns - Note.
+     */
     static getChromaticNote(chromaticId: number): Note {
         let note = this.chromaticNoteCache.get(chromaticId);
 
@@ -162,7 +219,15 @@ export class Note {
         return note;
     }
 
+    /**
+     * GEt diatoni class from diatonic id.
+     * @param diatonicId - Diatonicid.
+     */
     static getDiatonicClass(diatonicId: number): number;
+    /**
+     * Getdiatonic class from note name.
+     * @param noteName - Note name.
+     */
     static getDiatonicClass(noteName: string): number;
     static getDiatonicClass(arg: number | string): number {
         if (typeof arg === "number") {
@@ -178,26 +243,59 @@ export class Note {
         }
     }
 
-    static getOctaveFromDiatonicId(diatonicId: number) {
+    /**
+     * Get octave from diatonic id.
+     * @param diatonicId - Diatonic id.
+     * @returns - Octave.
+     */
+    static getOctaveFromDiatonicId(diatonicId: number): number {
         return Math.floor((diatonicId - C0_diatonicId) / 7);
     }
 
-    static getDiatonicIdInOctave(diatonicId: number, octave: number) {
+    /**
+     * Get diatonic id in given octave (transposes diatonic id to given octave).
+     * @param diatonicId - Original diatonic id.
+     * @param octave - Octave.
+     * @returns - Transposed diatonic id.
+     */
+    static getDiatonicIdInOctave(diatonicId: number, octave: number): number {
         return Note.getDiatonicClass(diatonicId) + octave * 7 + C0_diatonicId;
     }
 
-    static getChromaticClass(chromaticId: number) {
+    /**
+     * Get chromatic class from chromatic id.
+     * @param chromaticId - Chromatic id.
+     * @returns - Chromatic class.
+     */
+    static getChromaticClass(chromaticId: number): number {
         return mod(chromaticId, 12);
     }
 
-    static getOctaveFromChromaticId(chromaticId: number) {
+    /**
+     * Get octave from chromatic id.
+     * @param chromaticId - Chromatic id.
+     * @returns - Octave.
+     */
+    static getOctaveFromChromaticId(chromaticId: number): number {
         return Math.floor((chromaticId - C0_chromaticId) / 12);
     }
 
+    /**
+     * Get chromatic id in given octave (transposes chromatic id to given octave).
+     * @param chromaticId - Original chromatic id.
+     * @param octave - Octave.
+     * @returns - Transpose chromatic id.
+     */
     static getChromaticIdInOctave(chromaticId: number, octave: number) {
         return Note.getChromaticClass(chromaticId) + octave * 12 + C0_chromaticId;
     }
 
+    /**
+     * Test if given two notes are equal.
+     * @param a - Note a.
+     * @param b - Note b.
+     * @returns - True/false.
+     */
     static equals(a: Note | null | undefined, b: Note | null | undefined): boolean {
         if (a == null && b == null) {
             // Handled both null and udefined
@@ -211,7 +309,13 @@ export class Note {
         }
     }
 
-    static replaceAccidentalSymbols(str: string, symbolSet: SymbolSet) {
+    /**
+     * Replace accidental symbols in given string to givn symbol set (ascii/unicode).
+     * @param str - String to replace.
+     * @param symbolSet - Symbol set.
+     * @returns - String with updated accidental symbols.
+     */
+    static replaceAccidentalSymbols(str: string, symbolSet: SymbolSet): string {
         if (symbolSet === SymbolSet.Unicode) {
             return str.replace("bb", "𝄫").replace("b", "♭").replace("#", "♯").replace("x", "𝄪");
         }
@@ -220,10 +324,20 @@ export class Note {
         }
     }
 
+    /**
+     * Test if given string is valid note name.
+     * @param noteName - Note name to validate.
+     * @returns - True/false.
+     */
     static isValidNoteName(noteName: string): boolean {
         return NoteNameRegex.test(noteName);
     }
 
+    /**
+     * Parse note name string to note props.
+     * @param noteName - Note name to parse.
+     * @returns - Parsed note props or undefined if parsing error.
+     */
     static parseNote(noteName: string): Readonly<ParsedNote> | undefined {
         let m = NoteNameRegex.exec(noteName);
         if (!m) {
@@ -241,6 +355,12 @@ export class Note {
         return { noteLetter: noteLetter, accidental, octave }
     }
 
+    /**
+     * Get scientific note name from given note name.
+     * @param noteName - Note name.
+     * @param symbolSet - Symbol set (ascii/unicode) for scientific note name.
+     * @returns - Scientific note name.
+     */
     static getScientificNoteName(noteName: string, symbolSet: SymbolSet): string {
         let p = Note.parseNote(noteName);
         if (!p) {
@@ -250,12 +370,23 @@ export class Note {
         return noteLetter + Note.getAccidentalSymbol(accidental, symbolSet) + (octave ?? "");
     }
 
-    static getAccidentalSymbol(accidental: Accidental, symbolsSet: SymbolSet) {
+    /**
+     * Get symbol of given accidental in given symbol set (ascii/unicide).
+     * @param accidental - Accidental.
+     * @param symbolsSet - Symbol set.
+     * @returns - Accidental symbol or undefined (invalid accidental).
+     */
+    static getAccidentalSymbol(accidental: Accidental, symbolsSet: SymbolSet): string | undefined {
         return symbolsSet === SymbolSet.Unicode
             ? AccidentalUnicodeSymbolMap.get(accidental)
             : AccidentalAsciiSymbolMap.get(accidental);
     }
 
+    /**
+     * Get accidental value from given accidental symbol.
+     * @param accidentalSymbol - Accidental symbol (e.g. "#").
+     * @returns - Accidental vlaue.
+     */
     static getAccidental(accidentalSymbol: string): Accidental {
         let accidental = AccidentalMap.get(accidentalSymbol);
         if (accidental === undefined) {
@@ -264,10 +395,22 @@ export class Note {
         return accidental;
     }
 
+    /**
+     * Get note letter from given diatonic id.
+     * @param diatonicId - Diatonic id.
+     * @returns - Note letter.
+     */
     static getNoteLetter(diatonicId: number): NoteLetter {
         return NoteLetters[Note.getDiatonicClass(diatonicId)];
     }
 
+    /**
+     * Find next lowest possible diatonic id that is above given bottom level.
+     * @param diatonicId - Diatonic id to begin with.
+     * @param bottomDiatonicId - Bottom diatonic id.
+     * @param addOctaveIfEqual - If true then add one octave if diatonic id would equal to bottom diatonic id.
+     * @returns - Diatonic id.
+     */
     static findNextDiatonicIdAbove(diatonicId: number, bottomDiatonicId: number, addOctaveIfEqual: boolean): number {
         let diatonicClass = Note.getDiatonicClass(diatonicId);
         let bottomDiatonicClass = Note.getDiatonicClass(bottomDiatonicId);
@@ -279,7 +422,12 @@ export class Note {
         return Note.getDiatonicIdInOctave(diatonicClass, Note.getOctaveFromDiatonicId(bottomDiatonicId) + addOctave);
     }
 
-    static validateDiatonicId(diatonicId: number): number {
+    /**
+     * Validate if given argument is diatonic id.
+     * @param diatonicId - Diatonic id to validate.
+     * @returns - Valid diatonic id or throws.
+     */
+    static validateDiatonicId(diatonicId: unknown): number {
         if (Utils.Is.isInteger(diatonicId)) {
             return diatonicId;
         }
@@ -288,8 +436,13 @@ export class Note {
         }
     }
 
-    static validateDiatonicClass(diatonicClass: number): number {
-        if (Utils.Is.isInteger(diatonicClass) && diatonicClass >= 0 && diatonicClass < 7) {
+    /**
+     * Validate if given argument is diatonic class.
+     * @param diatonicClass - Diatonic class to validate.
+     * @returns - Valid diatonic class or throws.
+     */
+    static validateDiatonicClass(diatonicClass: unknown): number {
+        if (Utils.Is.isIntegerBetween(diatonicClass, 0, 6)) {
             return diatonicClass;
         }
         else {
@@ -297,7 +450,12 @@ export class Note {
         }
     }
 
-    static validateChromaticId(chromaticId: number): number {
+    /**
+     * Validate if given argument is chromatic id.
+     * @param chromaticId - Chromatic id to validate.
+     * @returns - Valid chromatic id, or throws.
+     */
+    static validateChromaticId(chromaticId: unknown): number {
         if (Utils.Is.isInteger(chromaticId)) {
             return chromaticId;
         }
@@ -306,8 +464,13 @@ export class Note {
         }
     }
 
-    static validatechromaticClass(chromaticClass: number): number {
-        if (Utils.Is.isInteger(chromaticClass) && chromaticClass >= 0 && chromaticClass < 12) {
+    /**
+     * Validate if given argument is chromatic class.
+     * @param chromaticClass - Chromatic class to validate.
+     * @returns - Valid chromatic class, or throws.
+     */
+    static validatechromaticClass(chromaticClass: unknown): number {
+        if (Utils.Is.isIntegerBetween(chromaticClass, 0, 11)) {
             return chromaticClass;
         }
         else {
@@ -315,15 +478,25 @@ export class Note {
         }
     }
 
-    static validateNoteLetter(note: string): NoteLetter {
-        if (NoteLetters.some(n => n === note)) {
-            return note as NoteLetter;
+    /**
+     * Validate if given argument if note letter.
+     * @param noteLetter - Note letter to validate.
+     * @returns - Valid note letter or throws.
+     */
+    static validateNoteLetter(noteLetter: unknown): NoteLetter {
+        if (NoteLetters.some(n => n === noteLetter)) {
+            return noteLetter as NoteLetter;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid note: ${note}`);
+            throw new MusicError(MusicErrorType.Note, `Invalid note: ${noteLetter}`);
         }
     }
 
+    /**
+     * Validate if given argument is octave.
+     * @param octave - Octave to validate.
+     * @returns - Valid octave or throws.
+     */
     static validateOctave(octave: number): number {
         if (Utils.Is.isInteger(octave)) {
             return octave;
@@ -333,8 +506,13 @@ export class Note {
         }
     }
 
-    static validateAccidental(acc: number): Accidental {
-        if (Utils.Is.isInteger(acc) && acc >= -2 && acc <= 2) {
+    /**
+     * Validate if given argument is valid accidental.
+     * @param acc - Accidental to validate.
+     * @returns - Valid accidental or thorws.
+     */
+    static validateAccidental(acc: unknown): Accidental {
+        if (Utils.Is.isIntegerBetween(acc, -2, 2)) {
             return acc as Accidental;
         }
         else {
@@ -368,6 +546,12 @@ export class Note {
         return uniqueSet;
     }
 
+    /**
+     * Function to compare two notes using diatonic id and accidental properties of notes.
+     * @param a - Note a.
+     * @param b - Note b.
+     * @returns - -1, 0 or 1.
+     */
     static compareFunc(a: Note, b: Note) {
         if (a.diatonicId < b.diatonicId) {
             return -1;

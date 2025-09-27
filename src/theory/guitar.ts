@@ -3,10 +3,22 @@ import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-export enum Handedness { RightHanded, LeftHanded }
+/** Guitar handedness enum. */
+export enum Handedness {
+    /** Right handed guitar. */
+    RightHanded,
+    /** Left handed guitar. */
+    LeftHanded
+}
 
+/** Default guitar handedness (Handedness.RightHanded). */
 export const DefaultHandedness = Handedness.RightHanded;
 
+/**
+ * Validate if given argument is guitar handedness.
+ * @param h - Guitar handedness to validate.
+ * @returns - Guitar handedness if valid, else throws.
+ */
 export function validateHandedness(h: unknown): Handedness {
     if (Utils.Is.isEnumValue(h, Handedness)) {
         return h;
@@ -24,10 +36,17 @@ export function validateHandedness(h: unknown): Handedness {
  * |--------|----------|---------|----------------|---------------|
  */
 
+/** Guitar tuning name list. */
 export const TuningNameList: ReadonlyArray<string> = TuningData.list.map(data => data.name);
 
-export const DefaultTuningName = TuningNameList[0];
+/** DEfault tuning name (Standard). */
+export const DefaultTuningName: string = TuningNameList[0];
 
+/**
+ * Validate if given argument is available tuning name.
+ * @param tuningName - Tuning name to validate.
+ * @returns - Tuning name if valid, or throws.
+ */
 export function validateTuningName(tuningName: string): string {
     if (TuningNameList.indexOf(tuningName) < 0) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name: ${tuningName}`);
@@ -40,7 +59,9 @@ export function validateTuningName(tuningName: string): string {
 const TuningStringsCache = new LRUCache<string, ReadonlyArray<Note>>(100);
 
 /**
- * @returns Array of open string notes, note for each string.
+ * Get guitar tuning, note for each open string.
+ * @param tuningName - Tuning name.
+ * @returns Array of open string notes.
  */
 export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {
     let tuningStrings = TuningStringsCache.get(tuningName);

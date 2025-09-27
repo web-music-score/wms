@@ -16,26 +16,40 @@ const FullTonicList: ReadonlyArray<string> = [
     "Cb", "C", "C#", "Db", "D", "D#", "Eb", "E", "E#", "Fb", "F", "F#", "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B", "B#"
 ];
 
+/** Degree type. */
 export type Degree = 1 | 2 | "b3" | 3 | 4 | "b5" | 5 | "#5" | 6 | "bb7" | "b7" | 7 | "#7" | "b9" | 9 | "#9" | 11 | 13;
 
+/** Scale type enum. */
 export enum ScaleType {
+    /** Major scale. */
     Major = "Major",
+    /** Natural minor scale. */
     NaturalMinor = "Natural Minor",
+    /** Harmonic minor scale. */
     HarmonicMinor = "Harmonic Minor",
-    // Modes:
+    /** Mode: Ionian. */
     Ionian = "Ionian",
+    /** Mode: Dorian. */
     Dorian = "Dorian",
+    /** Mode: Phrygian. */
     Phrygian = "Phrygian",
+    /** Mode: Lydian. */
     Lydian = "Lydian",
+    /** Mode: Mixolydian. */
     Mixolydian = "Mixolydian",
+    /** Mode: Aeolian (minor). */
     Aeolian = "Aeolian",
+    /** Mode: Locrian (rare). */
     Locrian = "Locrian",
-    // Other
+    /** Major pentatonic scale. */
     MajorPentatonic = "Major Pentatonic",
+    /** Minor pentatoni scale. */
     MinorPentatonic = "Minor Pentatonic",
-    // Blues
+    /** Major hexatonic blues scale. */
     MajorHexatonicBlues = "Major Hexatonic Blues",
+    /** Minor hexatonic blues scale. */
     MinorHexatonicBlues = "Minor Hexatonic Blues",
+    /** Heptatonic blues scale. */
     HeptatonicBlues = "Heptatonic Blues",
 }
 
@@ -61,11 +75,20 @@ function getMode(scaleType: ScaleType) {
     }
 }
 
+/** Scale class. */
 export class Scale extends KeySignature {
+    /** Degrees of scale notes. */
     private readonly scaleDegrees: ReadonlyArray<Degree>;
+    /** Scale notes. */
     private readonly scaleNotes: ReadonlyArray<Note>;
+    /** Degrees (or undefined) of chromatic classes. */
     private readonly chromaticClassDegree: ReadonlyArray<Degree | undefined>;
 
+    /**
+     * Create nev scale object instance.
+     * @param tonic - Tonic (e.g. "C" in "C Major").
+     * @param scaleType - Scale typo ("e.g. "Major" in "C Major").
+     */
     constructor(readonly tonic: string, readonly scaleType: ScaleType) {
         super(tonic, getMode(scaleType));
 
@@ -109,6 +132,12 @@ export class Scale extends KeySignature {
         });
     }
 
+    /**
+     * Compare if two scales equals.
+     * @param a - Scale a.
+     * @param b - Scale b.
+     * @returns - Boolean equality of given scales.
+     */
     static equals(a: Scale | null | undefined, b: Scale | null | undefined): boolean {
         if (a == null && b == null) {
             // handles null and undefined
@@ -122,7 +151,12 @@ export class Scale extends KeySignature {
         }
     }
 
-    getScaleName(symbolSet?: SymbolSet) {
+    /**
+     * Get scale name.
+     * @param symbolSet - Symbol set to format scale name in ascii or unicode.
+     * @returns - Scale name string.
+     */
+    getScaleName(symbolSet?: SymbolSet): string {
         switch (symbolSet) {
             case SymbolSet.Unicode:
                 return Note.getScientificNoteName(this.tonic, symbolSet) + " " + this.scaleType;
@@ -131,7 +165,13 @@ export class Scale extends KeySignature {
         }
     }
 
-    getScaleNotes(bottomNote: string, numOctaves: number): Note[] {
+    /**
+     * Get scale notes.
+     * @param bottomNote - Computed scale notes begin no lower than this note.
+     * @param numOctaves - How many octaves?
+     * @returns - Array of scale notes.
+     */
+    getScaleNotes(bottomNote: string, numOctaves: number): ReadonlyArray<Note> {
         if (!Utils.Is.isIntegerGte(numOctaves, 1)) {
             throw new MusicError(MusicErrorType.Scale, `Invalid numOctaves: ${numOctaves}`);
         }
@@ -152,10 +192,18 @@ export class Scale extends KeySignature {
         });
     }
 
+    /**
+     * Get scale overview (e.g. "C - D - E - F - G - A - B" for "C Major" scale).
+     * @returns - Scale overview string.
+     */
     getScaleOverview() {
         return this.getScaleNotes("C4", 1).map(note => note.formatOmitOctave(SymbolSet.Unicode)).join(" - ");
     }
 
+    /**
+     * Get scale steps, array of 1 (half step) and 2 (whole step), (e.g. [2, 2, 1, 2, 2, 2, 1] for Major scale).
+     * @returns - Array of scale steps.
+     */
     getScaleSteps(): number[] {
         let chromaticIds = this.getScaleNotes("C4", 1).map(note => note.chromaticId);
         let steps: number[] = [];
@@ -165,18 +213,37 @@ export class Scale extends KeySignature {
         return steps;
     }
 
+    /**
+     * Get scale steps string presentation, array of "H" (half step) and "W" (whole step), (e.g. ["W", "W", "H", "W", "W", "W", "H"] for Major scale).
+     * @returns - Array of scale steps string presentation.
+     */
     getScaleStringSteps(): string[] {
         return this.getScaleSteps().map(step => step === 1 ? "H" : (step === 2 ? "W" : (step.toString() + "H")));
     }
 
+    /**
+     * Test if given note is scale note.
+     * @param note - Note to test.
+     * @returns - True/false.
+     */
     isScaleNote(note: Note): boolean {
         return this.chromaticClassDegree[note.chromaticClass] !== undefined;
     }
 
+    /**
+     * Test if given note is scale root note.
+     * @param note - Note to test.
+     * @returns - True/false.
+     */
     isScaleRootNote(note: Note): boolean {
         return String(this.chromaticClassDegree[note.chromaticClass]) === "1";
     }
 
+    /**
+     * Get interval value between scale root note and given note.
+     * @param note - Note.
+     * @returns - Interval.
+     */
     getIntervalFromRootNote(note: Note): Interval {
         let rootNote = this.getScaleNotes("C0", 1)[0];
 
@@ -200,6 +267,11 @@ export class Scale extends KeySignature {
 
     private preferredChromaticNoteCache = new Map<number, Note>();
 
+    /**
+     * Get preferred chromatic note from given chromatic id.
+     * @param chromaticId - Chromatic id.
+     * @returns - Note.
+     */
     getPreferredChromaticNote(chromaticId: number): Note {
         Note.validateChromaticId(chromaticId);
 
@@ -255,10 +327,15 @@ export class Scale extends KeySignature {
     }
 }
 
+/** Scale factory class. */
 export class ScaleFactory {
     private tonicList: string[] = [];
     private scaleMap: Map<string, Scale> = new Map();
 
+    /**
+     * Create new scale factory object instance.
+     * @param type - Scale type.
+     */
     constructor(readonly type: ScaleType) {
         let naturalScales: Scale[] = [];
         let sharpScales: Scale[] = [];
@@ -312,18 +389,35 @@ export class ScaleFactory {
         ];
     }
 
+    /**
+     * Get list of tonics (e.g. "C", "C#", ... for Major scale type).
+     * @returns - Array of tonics.
+     */
     getTonicList(): ReadonlyArray<string> {
         return this.tonicList;
     }
 
+    /**
+     * Get default tonic.
+     * @returns - Default tonic.
+     */
     getDefaultTonic(): string {
         return this.tonicList[0];
     }
 
+    /**
+     * Get scale type.
+     * @returns - SCale type.
+     */
     getType(): ScaleType {
         return this.type;
     }
 
+    /**
+     * Get scale by given tonic.
+     * @param tonic - Tonic (e.g. "C").
+     * @returns - Scale.
+     */
     getScale(tonic: string): Scale {
         let scale = this.scaleMap.get(tonic);
         if (!scale) {
@@ -334,7 +428,12 @@ export class ScaleFactory {
         }
     }
 
-    hasScale(tonic: string) {
+    /**
+     * Test if this scale factory has scale for given tonic value.
+     * @param tonic - Tonic.
+     * @returns - True/false.
+     */
+    hasScale(tonic: string): boolean {
         return this.scaleMap.get(tonic) !== undefined;
     }
 }
@@ -360,6 +459,10 @@ const ScaleFactoryList: ReadonlyArray<ScaleFactory | string> = [
     new ScaleFactory(ScaleType.HeptatonicBlues),
 ];
 
+/**
+ * Get array of scale factories, has some title string between to category.
+ * @returns - Array of scale factories.
+ */
 export function getScaleFactoryList(): ReadonlyArray<ScaleFactory | string> {
     return ScaleFactoryList;
 }
@@ -372,6 +475,11 @@ ScaleFactoryList.forEach(factory => {
     }
 });
 
+/**
+ * Get scale factory for given scale type.
+ * @param scaleType - Scale type.
+ * @returns - Scale factory.
+ */
 export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFactory {
     let f = ScaleFactoryMap.get(scaleType);
     if (!f) {
@@ -382,6 +490,11 @@ export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFac
     }
 }
 
+/**
+ * Validate scale type.
+ * @param scaleType - Scale type of unknown value.
+ * @returns - Scale type if given argument was valid scale type, or throws.
+ */
 export function validateScaleType(scaleType: unknown): ScaleType {
     if (Utils.Is.isEnumValue(scaleType, ScaleType)) {
         return scaleType;
@@ -391,7 +504,16 @@ export function validateScaleType(scaleType: unknown): ScaleType {
     }
 }
 
+/**
+ * Get scale.
+ * @param tonic - Tonic (e.g. "C").
+ * @param scaleType - Scale type (e.g. "Major").
+ */
 export function getScale(tonic: string, scaleType: ScaleType | `${ScaleType}`): Scale;
+/**
+ * Get scale.
+ * @param scale - Scale name (e.g. "C Major").
+ */
 export function getScale(scale: string): Scale;
 export function getScale(arg0: string, arg1?: ScaleType | `${ScaleType}`): Scale {
     let tonic: string;
@@ -411,6 +533,10 @@ export function getScale(arg0: string, arg1?: ScaleType | `${ScaleType}`): Scale
 
 const DefaultScale = getScale("C", ScaleType.Major);
 
+/**
+ * Get default scale ("C Major").
+ * @returns - Default scale.
+ */
 export function getDefaultScale() {
     return DefaultScale;
 }

@@ -54,6 +54,7 @@ function removeNoteDuplicates(notes: ReadonlyArray<Note>): Note[] {
     return Utils.Arr.removeDuplicatesCmp(notes, isEqualNote);
 }
 
+/** Chord info type. */
 export type ChordInfo = { name: string, degrees: Degree[] }
 
 const ChordInfoList: ReadonlyArray<ChordInfo> = [
@@ -122,10 +123,15 @@ class InvalidChordException extends Error {
     }
 }
 
+/** Chord class. */
 export class Chord {
+    /** Chord name. */
     readonly name: string;
+    /** Notes of this chord. */
     readonly notes: Note[];
+    /** Notes that are omitted in this chord (partial chord). */
     readonly omitNotes: boolean[];
+    /** Bass note if not chord root note (e.g. "B" in "C/B"). */
     readonly slashBassNote?: Note;
 
     private constructor(readonly chordInfo: ChordInfo, chordNotes: ReadonlyArray<Note>, readonly rootNote: Note, bassNote: Note) {
@@ -184,6 +190,11 @@ export class Chord {
         }
     }
 
+    /**
+     * Get all chords that can be made up with given notes.
+     * @param notes - Array of notes.
+     * @returns - Array of chords.
+     */
     static getChords(notes: ReadonlyArray<Note>): ReadonlyArray<Chord> {
         let chords: Chord[] = [];
 
@@ -245,7 +256,8 @@ export class Chord {
     }
 
     /**
-     * @returns Chord name e.g. "C/B"
+     * Get chord string presentation.
+     * @returns Chord string presentation (e.g. "C/B").
      */
     toString() {
         let symbolSet = SymbolSet.Unicode;
@@ -257,7 +269,8 @@ export class Chord {
     }
 
     /**
-     * @returns Degree notation string, e.g. "E - 1(C) - 3(E) - 5(G)"
+     * Get degree notation string (e.g. "E - 1(C) - 3(E) - 5(G)").
+     * @returns Degree notation string.
      */
     getDegreeNotationString() {
         let symbolSet = SymbolSet.Unicode;
@@ -271,7 +284,8 @@ export class Chord {
     }
 
     /**
-     * @returns Omitted degrees string e.g. "Omits 5(G), 9(D)"
+     * Get string presentation of omitted degrees (e.g. "Omits 5(G), 9(D)").
+     * @returns - String presentation of omitted degrees.
      */
     getOmittedDegreesString() {
         let omittedStrList = this.omitNotes.map((omit, i) => {
@@ -282,16 +296,18 @@ export class Chord {
     }
 
     /**
-     * @param i - Degree index
-     * @returns Degree string for given degree index, e.g. "3"
+     * Degree index for given degree index (e.g. "3").
+     * @param i - Chord degree index (e.g. 0 is first note degree of chord).
+     * @returns Degree string.
      */
     private getDegreeStr(i: number) {
         return Note.replaceAccidentalSymbols("" + this.chordInfo.degrees[i], SymbolSet.Unicode);
     }
 
     /**
-     * @param i - Degree index
-     * @returns Note string for given degree index, e.g. "E"
+     * Get note name for given degree index (e.g. "E").
+     * @param i - Chord degree index (e.g. 0 is first note degree of chord).
+     * @returns - Note name string.
      */
     private getNoteStr(i: number) {
         return this.notes[i].formatOmitOctave(SymbolSet.Unicode);

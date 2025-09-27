@@ -2,8 +2,10 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
+/** Interval direction type. */
 export type IntervalDirection = "Unison" | "Ascending" | "Descending";
 
+/** Interval quality type. */
 export type IntervalQuality =
     | "Perfect"
     | "Major"
@@ -113,9 +115,12 @@ function getIntervalQuality(diatonicInterval: number, chromaticInterval: number)
     }
 }
 
-
-
-export function validateIntervalQuality(q: string): IntervalQuality {
+/**
+ * Validate interval quality of unkown value.
+ * @param q - Interval quality to validate.
+ * @returns - Interval quality if valid, else throws.
+ */
+export function validateIntervalQuality(q: unknown): IntervalQuality {
     if (!(q === "Perfect" || q === "Major" || q === "minor" || q === "Augmented" || q === "diminished" || q === "Doubly Augmented" || q === "doubly diminished")) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quality: ${q}`);
     }
@@ -141,10 +146,15 @@ class InvalidIntervalException extends Error {
     }
 }
 
+/** Interval class. */
 export class Interval {
+    /** Interval direction. */
     readonly direction: IntervalDirection;
+    /** Number of semitones. */
     readonly semitones: number;
+    /** Interval quantity. */
     readonly quantity: number;
+    /** Interval quality. */
     readonly quality: IntervalQuality;
 
     private constructor(readonly note1: Note, readonly note2: Note) {
@@ -169,6 +179,12 @@ export class Interval {
         }
     }
 
+    /**
+     * Get interval between given two notes.
+     * @param note1 - First note.
+     * @param note2 - Second note.
+     * @returns - Interval if valid, or undefined.
+     */
     static get(note1: Note, note2: Note): Interval | undefined {
         try {
             return new Interval(note1, note2);
@@ -183,6 +199,10 @@ export class Interval {
         }
     }
 
+    /**
+     * Get string presentation of interval (e.g. "Descending Major 2").
+     * @returns - Interval string.
+     */
     toString(): string {
         let direction = this.direction === "Unison" ? "" : (this.direction + " ");
         let quality = this.quality + " ";
@@ -191,6 +211,10 @@ export class Interval {
         return direction + quality + quantity;
     }
 
+    /**
+     * Get abbrevated string presentation of interval (e.g. "↓M2").
+     * @returns - Interval abbrevated string.
+     */
     toAbbrString(): string {
         let direction = this.direction === "Descending" ? "↓" : "";
         let quality = IntervalQualityAbbrMap.get(this.quality) ?? "?";

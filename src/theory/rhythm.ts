@@ -10,6 +10,7 @@ const MaxTupletRatioValue = 12;
  */
 const TicksMultiplier = 12 * 11 * 9 * 7 * 5;
 
+/** Note length enum. */
 export enum NoteLength {
     Whole = "1n",
     WholeTriplet = "1t",
@@ -54,8 +55,14 @@ export enum NoteLength {
     SixtyFourthTriplet = "64t",
 }
 
+/** String values type of note length enum. */
 export type NoteLengthStr = `${NoteLength}`;
 
+/**
+ * Validate if given argument is note length.
+ * @param noteLength - Note length to validate.
+ * @returns - Valid note length or throws.
+ */
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
         return noteLength;
@@ -65,19 +72,31 @@ export function validateNoteLength(noteLength: unknown): NoteLength {
     }
 }
 
+/** Note length props class. */
 export class NoteLengthProps {
-    static LongestNoteSize = Math.min(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => parseInt(noteLength)));
-    static ShortestNoteSize = Math.max(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => parseInt(noteLength)));
+    /** Longest note size (e.g. 1 = whole note). */
+    static LongestNoteSize: number = Math.min(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => parseInt(noteLength)));
+    /** Shortest note size (e.g. 64 = sixtyfourth note). */
+    static ShortestNoteSize: number = Math.max(...Utils.Enum.getEnumValues(NoteLength).map(noteLength => parseInt(noteLength)));
 
+    /** Note length. */
     readonly noteLength: NoteLength;
+    /** Note size (whole=1, half=2, quarter=4, ...). */
     readonly noteSize: number;
-    readonly ticks: number; // Not altered by isTriplet!
+    /** Number of ticks (not altered by isTriplet). */
+    readonly ticks: number;
+    /** Flag count. */
     readonly flagCount: number;
+    /** Dot count. */
     readonly dotCount: number;
+    /** Max dot count. */
     readonly maxDotCount: number;
+    /** Is triplet? */
     readonly isTriplet: boolean;
+    /** Has note stem. */
     readonly hasStem: boolean;
-    readonly isSolid: boolean; // Is solid (black) note head?
+    /** Is note head solid (black)? */
+    readonly isSolid: boolean;
 
     private constructor(noteLength: NoteLength | NoteLengthStr | string) {
         this.noteLength = validateNoteLength(noteLength);
@@ -100,6 +119,11 @@ export class NoteLengthProps {
 
     private static cache = new Map<NoteLength | NoteLengthStr | string, NoteLengthProps>();
 
+    /**
+     * Get note length props.
+     * @param noteLength - Note length.
+     * @returns - Note length props.
+     */
     static get(noteLength: NoteLength | NoteLengthStr | string): NoteLengthProps {
         let p = this.cache.get(noteLength);
         if (!p) {
@@ -108,6 +132,12 @@ export class NoteLengthProps {
         return p;
     }
 
+    /**
+     * Create note length props.
+     * @param noteLength - Note length or note size.
+     * @param dotCount - Dot count.
+     * @returns - Note length props.
+     */
     static create(noteLength: NoteLength | NoteLengthStr | string | number, dotCount: number = 0): NoteLengthProps {
         let noteSize = typeof noteLength === "number" ? noteLength : this.get(noteLength).noteSize;
         return this.get(noteSize + (Utils.Is.isIntegerGte(dotCount, 1) ? ".".repeat(dotCount) : "n"));
@@ -141,11 +171,19 @@ export class NoteLengthProps {
     }
 }
 
+/** Tuplet ratio interface. */
 export interface TupletRatio {
+    /** Number of parts (notes). */
     parts: number;
+    /** Played int time of (notes). */
     inTimeOf: number;
 }
 
+/**
+ * Validate if given argument is tuplet ratio.
+ * @param tupletRatio - Tuplet ratio to validate.
+ * @returns - Valid tuplet ratio or throws.
+ */
 export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
     if (Utils.Is.isObject(tupletRatio) && Utils.Is.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioValue) && Utils.Is.isIntegerBetween(tupletRatio.inTimeOf, 2, MaxTupletRatioValue)) {
         return tupletRatio as unknown as TupletRatio;
@@ -155,23 +193,33 @@ export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
     }
 }
 
+/** Some preset tuplet ratio values. */
 export const Tuplet: Record<"Duplet" | "Triplet" | "Quadruplet", TupletRatio> = {
-    /** 2 in the time of 3 */
+    /** Duplet: 2 in the time of 3 */
     Duplet: { parts: 2, inTimeOf: 3 },
-    /** 3 in the time of 2 */
+    /** Triplet: 3 in the time of 2 */
     Triplet: { parts: 3, inTimeOf: 2 },
-    /** 4 in the time of 3 */
+    /** Quadruplet: 4 in the time of 3 */
     Quadruplet: { parts: 4, inTimeOf: 3 },
 }
 
+/** Rhythm props class. */
 export class RhythmProps {
+    /** Note length. */
     readonly noteLength: NoteLength;
-    readonly noteSize: number; // whole=1, half=2, quarter=4, etc.
+    /** Note size (whole=1, half=2, quarter=4, ...). */
+    readonly noteSize: number;
+    /** Dot count. */
     readonly dotCount: number;
+    /** Tuplet ratio. */
     readonly tupletRatio?: TupletRatio;
+    /** Number of ticks. */
     readonly ticks: number;
+    /** Flag count. */
     readonly flagCount: number;
+    /** Has note stem. */
     readonly hasStem: boolean;
+    /** Is note head solid (black)? */
     readonly isSolidNoteHead: boolean;
 
     private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
@@ -214,6 +262,10 @@ export class RhythmProps {
 
     private static NoteSymbolMap = new Map<number, string>([[1, "𝅝"], [2, "𝅗𝅥"], [4, "𝅘𝅥"], [8, "𝅘𝅥𝅮"], [16, "𝅘𝅥𝅯"], [32, "𝅘𝅥𝅰"], [64, "𝅘𝅥𝅱"], [128, "𝅘𝅥𝅲"]]);
 
+    /**
+     * Get string presentation of rhythm props.
+     * @returns - String presentation.
+     */
     toString(): string {
         let sym = RhythmProps.NoteSymbolMap.get(this.noteSize);
         let dots = ".".repeat(this.dotCount);
@@ -222,6 +274,13 @@ export class RhythmProps {
 
     private static cache = new Map<NoteLength | NoteLengthStr, RhythmProps>();
 
+    /**
+     * Get rhythm props with given arguments.
+     * @param noteLength - Note length.
+     * @param dotCount - Dot count.
+     * @param tupletRatio - Tuplet ratio.
+     * @returns - Rhythm props.
+     */
     static get(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio): RhythmProps {
         if (dotCount !== undefined || tupletRatio !== undefined) {
             return new RhythmProps(noteLength, dotCount, tupletRatio);

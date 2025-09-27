@@ -2,24 +2,31 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, NoteLengthProps } from "./rhythm";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
+/** Time signature string type. */
 export type TimeSignatureString = "2/4" | "3/4" | "4/4" | "6/8" | "9/8";
 
+/** Time signature class. */
 export class TimeSignature {
+    /** Number of beats in measure, upper value (e.g. "3" in "3/4"). */
     readonly beatCount: number;
+    /** Beat size of time signature, lower value (e.g. "4" in "3/4"). */
     readonly beatSize: number;
-
-    /** Lengths in ticks */
+    /** Beat length. */
     readonly beatLength: NoteLength;
+    /** Number of ticks in measure. */
     readonly measureTicks: number;
-
+    /** Number of beam groups in measure. */
     readonly beamGroupCount: number;
+    /** Length of one beam group. */
     readonly beamGroupLength: number;
 
     /**
+     * Create new time signature instance.
      * @param str - For example "4/4".
      */
     constructor(str: TimeSignatureString);
     /**
+     * Create new time signature instance.
      * @param beatCount - Measure beat count.
      * @param beatSize - Size value: whole-note=1, half-note=2, quarter-note=4, etc.
      */
@@ -68,10 +75,20 @@ export class TimeSignature {
         }
     }
 
+    /**
+     * Test whether this time signature has given beat count and size.
+     * @param beatCount - Beat count.
+     * @param beatSize - Beat size.
+     * @returns - Boolean whether this time signature match given beat count and size.
+     */
     is(beatCount: number, beatSize: number) {
         return this.beatCount === beatCount && this.beatSize === beatSize;
     }
 
+    /**
+     * Get string representation of this time signature (e.g. "3/4").
+     * @returns - String representation.
+     */
     toString() {
         return this.beatCount + "/" + this.beatSize;
     }
@@ -79,6 +96,10 @@ export class TimeSignature {
 
 let defaultTimeSignature: TimeSignature | undefined;
 
+/**
+ * Get default time signature ("4/4").
+ * @returns - Default time signature.
+ */
 export function getDefaultTimeSignature(): TimeSignature {
     if (!defaultTimeSignature) {
         defaultTimeSignature = new TimeSignature(4, 4);
