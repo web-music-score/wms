@@ -12,46 +12,81 @@ const TicksMultiplier = 12 * 11 * 9 * 7 * 5;
 
 /** Note length enum. */
 export enum NoteLength {
+    /** Whole note. */
     Whole = "1n",
+    /** Whole note creating a triplet. */
     WholeTriplet = "1t",
+    /** Dotted whole note. */
     WholeDot = "1.",
+    /** Double dotted whole note. */
     Whole12Dots = "1..",
+    /** Triple dotted whole note. */
     Whole3Dots = "1...",
+    /** Quadruple-dotted whole note. */
     Whole4Dots = "1....",
+    /** Quintuple-dotted whole note. */
     Whole5Dots = "1.....",
+    /** Sextuple-dotted whole note. */
     Whole6Dots = "1......",
 
+    /** Half note. */
     Half = "2n",
+    /** Half note creating a triplet. */
     HalfTriplet = "2t",
+    /** Dotted half note. */
     HalfDot = "2.",
+    /** Double dotted half note. */
     Half2Dots = "2..",
+    /** Triple dotted half note. */
     Half3Dots = "2...",
+    /** Quadruple-dotted half note. */
     Half4Dots = "2....",
+    /** Quintuple-dotted half notre. */
     Half5Dots = "2.....",
 
+    /** Quarter note. */
     Quarter = "4n",
+    /** Quarter note creating a triplet. */
     QuarterTriplet = "4t",
+    /** Dotted quarter note. */
     QuarterDot = "4.",
+    /** Double dotted quarter note. */
     Quarter2Dots = "4..",
+    /** Triple dotted quarter note. */
     Quarter3Dots = "4...",
+    /** Quadruple-dotted quarter note. */
     Quarter4Dots = "4....",
 
+    /** Eighth note. */
     Eighth = "8n",
+    /** Eighth note creating a triplet. */
     EighthTriplet = "8t",
+    /** Dotted eighth note. */
     EighthDot = "8.",
+    /** Double dotted eighth note. */
     Eighth2Dots = "8..",
+    /** Triple dotted eighth note. */
     Eighth3Dots = "8...",
 
+    /** Sixteenth note. */
     Sixteenth = "16n",
+    /** Sixteenth note creating a triplet. */
     SixteenthTriplet = "16t",
+    /** Dotted sixteenth note. */
     SixteenthDot = "16.",
+    /** Double dotted sixteenth note. */
     Sixteenth2Dots = "16..",
 
+    /** Thirtysecond note. */
     ThirtySecond = "32n",
+    /** Thirtysecond note creating a triplet. */
     ThirtySecondTriplet = "32t",
+    /** Dotted thritysecond note. */
     ThirtySecondDot = "32.",
 
+    /** Sixtyfourth note. */
     SixtyFourth = "64n",
+    /** Sixtyfourth note creating a triplet. */
     SixtyFourthTriplet = "64t",
 }
 
