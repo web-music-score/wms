@@ -31,8 +31,8 @@
     },
     "scripts": {
         "start": "webpack serve --mode=development --progress",
-        "build:dev": "webpack --mode=development --progress",
-        "build:prod": "webpack --mode=production --progress"
+        "build:dev": "rimraf dist && webpack --mode=development --progress",
+        "build:prod": "rimraf dist && webpack --mode=production --progress"
     },
     "browserslist": [
         "defaults"
