@@ -13,7 +13,7 @@ This is a work in progress project. Lately there has been improvements that requ
 version update. As the project matures there might be less major updates, and more minor
 updates and patches.
 
-This version (4.0.0) added support for string arguments in addition to typescript enums (e.g. NoteLength.Quarter => "4n", just to name one).
+Version 4.0.0 added support for string arguments in addition to typescript enums (e.g. NoteLength.Quarter => "4n", just to name one).
 
 ## Installation
 
