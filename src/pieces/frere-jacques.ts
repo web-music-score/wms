@@ -9,7 +9,7 @@ import { DocumentBuilder, MDocument } from "@tspro/web-music-score/score";
  */
 export function createFrereJacques(): MDocument {
     return new DocumentBuilder()
-        .setHeader("Frere Jacques")
+        .setHeader("Frère Jacques", "Traditional")
         .setScoreConfiguration([
             { type: "staff", clef: "G", voiceIds: [0] },
             { type: "staff", clef: "F", voiceIds: [1] }
