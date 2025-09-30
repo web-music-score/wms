@@ -1088,42 +1088,48 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
+        let ts = this.getTimeSignature();
+
+        if (!this.needBeamsUpdate || ts.beamGroupSizes.length === 0) {
+            return;
+        }
+
         // Recreate beams
         getVoiceIds().forEach(voiceId => {
-            let symbols = this.getVoiceSymbols(voiceId);
+            let symbols = this.getVoiceSymbols(voiceId).slice();
 
-            if (symbols.length <= 2) {
-                return;
-            }
-
-            if (!DebugSettings.DisableBeams) {
-                let groupSymbols: RhythmSymbol[] = [];
+            if (symbols.length >= 2) {
+                let symbolsStartTicks = this.isUpBeat() ? Math.max(0, this.getMeasureTicks() - this.getConsumedTicks()) : 0;
                 let groupStartTicks = 0;
-                let groupEndTicks = 0;
 
-                // Is upbeat? Set starting ticks position.
-                if (this.isUpBeat()) {
-                    let startTicks = Math.max(0, this.getMeasureTicks() - this.getConsumedTicks());
-                    groupStartTicks = groupEndTicks = startTicks;
+                for (let groupId = 0; groupId < ts.beamGroupSizes.length; groupId++) {
+                    let beamGroupSize = ts.beamGroupSizes[groupId];
+
+                    let groupSizeSum = 0;
+                    beamGroupSize.forEach(s => groupSizeSum += s);
+
+                    let groupLength = groupSizeSum * NoteLengthProps.get("8n").ticks;
+
+                    let groupSymbols: RhythmSymbol[] = [];
+                    let groupSymbolsLength = 0;
+
+                    while (symbols.length > 0 && groupSymbolsLength < groupLength) {
+                        let symbol = symbols[0];
+                        if (symbol.col.positionTicks >= groupStartTicks) {
+                            groupSymbols.push(symbol);
+                            groupSymbolsLength += symbol.rhythmProps.ticks;
+                            symbols.shift();
+                        }
+                        else {
+                            break;
+                        }
+                    }
+
+                    ObjMeasure.setupBeamGroup(groupSymbols, beamGroupSize);
+
+                    symbolsStartTicks += groupSymbolsLength;
+                    groupStartTicks += groupLength;
                 }
-
-                let ts = this.getTimeSignature();
-
-                symbols.forEach(symbol => {
-                    groupSymbols.push(symbol);
-
-                    groupEndTicks += symbol.rhythmProps.ticks;
-
-                    if (groupStartTicks === 0 && groupEndTicks === ts.beamGroupLength) {
-                        // Perfect group, setup beams
-                        ObjMeasure.setupBeamGroup(groupSymbols);
-                    }
-
-                    while (groupEndTicks >= ts.beamGroupLength) {
-                        groupSymbols = [];
-                        groupStartTicks = groupEndTicks = groupEndTicks - ts.beamGroupLength;
-                    }
-                });
             }
         });
 
@@ -1132,27 +1138,54 @@ export class ObjMeasure extends MusicObject {
         this.requestLayout();
     }
 
-    private static setupBeamGroup(groupSymbols: RhythmSymbol[]) {
-        let groupNotes = groupSymbols.map(s => {
-            return s instanceof ObjNoteGroup && s.getBeamGroup()?.isTuplet() !== true ? s : undefined;
-        });
+    private static setupBeamGroup(groupSymbols: RhythmSymbol[], mainBeamGroupSizeArr: number[]): boolean {
+        if (mainBeamGroupSizeArr.length === 0) {
+            return false;
+        }
+
+        let groupNotes = groupSymbols.map(s => s instanceof ObjNoteGroup && s.getBeamGroup()?.isTuplet() !== true ? s : undefined);
 
         ObjNoteGroup.setBeamCounts(groupNotes);
 
-        // Add Beams objects
-        let beamNotes: ObjNoteGroup[] = [];
+        let beamGroupSizeArrList: number[][] = [mainBeamGroupSizeArr];
 
-        groupNotes.forEach(noteGroup => {
-            if (noteGroup && noteGroup.hasBeamCount()) {
-                beamNotes.push(noteGroup);
-            }
-            else {
-                ObjBeamGroup.createBeam(beamNotes);
-                beamNotes = [];
-            }
-        });
+        if (mainBeamGroupSizeArr.length > 1) {
+            let sum = 0;
+            mainBeamGroupSizeArr.forEach(s => sum += s);
+            beamGroupSizeArrList.unshift([sum]);
+        }
 
-        ObjBeamGroup.createBeam(beamNotes);
+        let beamsCreated = false;
+
+        while(beamGroupSizeArrList.length > 0 && !beamsCreated) {
+            let beamGroupSizeArr = beamGroupSizeArrList.shift()!;
+
+            let groupSymbolsCopy = groupSymbols.slice();
+
+            beamGroupSizeArr.forEach(beamGroupSize => {
+                let beamGroupLength = beamGroupSize * NoteLengthProps.get("8n").ticks;
+                let beamNotesLength = 0;
+                let beamNotes: (ObjNoteGroup | undefined)[] = [];
+
+                while (beamNotesLength < beamGroupLength && groupSymbolsCopy.length > 0) {
+                    let symbol = groupSymbolsCopy.shift()!;
+                    beamNotesLength += symbol.rhythmProps.ticks;
+                    beamNotes.push(symbol instanceof ObjNoteGroup && symbol.getBeamGroup()?.isTuplet() !== true ? symbol : undefined);
+                }
+
+                if (
+                    beamNotesLength === beamGroupLength &&
+                    beamNotes.every(n => n !== undefined) &&
+                    (beamNotes.every(n => n.rhythmProps.flagCount === 1) || beamGroupSizeArrList.length === 0)
+                ) {
+                    ObjBeamGroup.createBeam(beamNotes);
+                    beamsCreated = true;
+                }
+
+            });
+        }
+
+        return beamsCreated;
     }
 
     getBarLineLeft() {

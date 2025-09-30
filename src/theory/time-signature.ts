@@ -15,10 +15,8 @@ export class TimeSignature {
     readonly beatLength: NoteLength;
     /** Number of ticks in measure. */
     readonly measureTicks: number;
-    /** Number of beam groups in measure. */
-    readonly beamGroupCount: number;
-    /** Length of one beam group. */
-    readonly beamGroupLength: number;
+    /** Beam groups (e.g. [[2], [2]] or [[2, 2], [2, 2]] (first try as [[4], [4]])). */
+    readonly beamGroupSizes: number[][] = [];
 
     /**
      * Create new time signature instance.
@@ -57,21 +55,27 @@ export class TimeSignature {
         this.beatLength = props.noteLength;
         this.measureTicks = this.beatCount * props.ticks;
 
-        if (this.is(2, 4) || this.is(3, 4) || this.is(4, 4)) {
-            this.beamGroupCount = this.beatCount;
+        if (this.is(2, 4)) {
+            this.beamGroupSizes = [[2], [2]];
         }
-        else if (this.is(6, 8) || this.is(9, 8)) {
-            this.beamGroupCount = this.beatCount / 3;
+        else if (this.is(3, 4)) {
+            this.beamGroupSizes = [[2], [2], [2]];
+        }
+        else if (this.is(4, 4)) {
+            this.beamGroupSizes = [[2, 2], [2, 2]];
+        }
+        else if (this.is(6, 8)) {
+            this.beamGroupSizes = [[3], [3]];
+        }
+        else if (this.is(9, 8)) {
+            this.beamGroupSizes = [[3], [3], [3]];
+        }
+        else if (this.is(12, 8)) {
+            this.beamGroupSizes = [[3], [3], [3], [3]];
         }
         else {
-            console.warn("Not necessarily an error, but unsupported time signature: " + this.toString());
-            this.beamGroupCount = 1;
-        }
-
-        this.beamGroupLength = this.measureTicks / this.beamGroupCount;
-
-        if (!Utils.Is.isIntegerGte(this.beamGroupLength, 1)) {
-            throw new MusicError(MusicErrorType.Timesignature, `Invalid beamGroupLength: ${this.beamGroupLength}`);
+            this.beamGroupSizes = [];
+            console.warn("No beam detection implemented for time signature: " + this.toString());
         }
     }
 

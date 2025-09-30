@@ -9,6 +9,10 @@ export function createBeamDetectionDemo() {
         .setKeySignature("G", "Major")
         .setTimeSignature("2/4")
         .setTempo(80)
+        .addNote(0, "G3", "8n")
+        .addNote(0, "G3", "8n")
+
+        .addMeasure()
         .addNote(0, "G3", "4n")
         .addNote(0, "G3", "4n")
 
