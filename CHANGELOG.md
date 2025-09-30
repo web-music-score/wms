@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.1.0] - 2025-10-02
+## Added
+- 2-2-2-2 beam grouping for 4/4 time signature.
+- 12/8 time signature.
+- 5/8 time signature and 2-3 and 3-2 beam groupings.
+- 7/8 time signature and 2-2-3 and 3-2-2 beam groupings.
+
 ## [4.0.1] - 2025-09-28
 ## Fixed
 - Invalid typedoc @params.

@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
-import { KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureEnum, TimeSignatureString, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
+import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureEnum, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
@@ -328,28 +328,30 @@ export class DocumentBuilder {
     /**
      * Set time signature for current measure and forward.
      * @param timeSignature - TimeSignatureEnum value or string (e.g. "3/4").
+     * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: TimeSignatureEnum | TimeSignatureString): DocumentBuilder;
+    setTimeSignature(timeSignature: TimeSignatureEnum | `${TimeSignatureEnum}`, beamGrouping?: BeamGrouping | `${BeamGrouping}`): DocumentBuilder;
     /**
      * Set time signature for current measure and forward.
      * @param beatCount - Beat count of time signature (e.g. 3 in "3/4").
      * @param beatSize - Beat size of time signature (e.g. 4 in "3/4").
+     * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(beatCount: number, beatSize: number): DocumentBuilder;
+    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: BeamGrouping | `${BeamGrouping}`): DocumentBuilder;
     setTimeSignature(...args: unknown[]): DocumentBuilder {
-        assertArg(
-            args[0] instanceof TimeSignature ||
-            Utils.Is.isEnumValue(args[0], TimeSignatureEnum) ||
-            Utils.Is.isIntegerGte(args[0], 2) && Utils.Is.isIntegerGte(args[1], 2),
-            "timeSignature", args[0]);
-
-        if (args[0] instanceof TimeSignature || Utils.Is.isEnumValue(args[0], TimeSignatureEnum)) {
+        if (args[0] instanceof TimeSignature) {
             this.getMeasure().setTimeSignature(args[0]);
         }
-        else if (Utils.Is.isInteger(args[0]) && Utils.Is.isInteger(args[1])) {
+        else if (Utils.Is.isEnumValue(args[0], TimeSignatureEnum) && Utils.Is.isEnumValueOrUndefined(args[1], BeamGrouping)) {
             this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1]));
+        }
+        else if (Utils.Is.isIntegerGte(args[0], 1) && Utils.Is.isIntegerGte(args[1], 1) && Utils.Is.isEnumValueOrUndefined(args[2], BeamGrouping)) {
+            this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1], args[2]));
+        }
+        else {
+            assertArg(false, "timeSignature args", args);
         }
 
         return this;

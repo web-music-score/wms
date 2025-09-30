@@ -410,12 +410,10 @@ export class ObjMeasure extends MusicObject {
         return this.timeSignature;
     }
 
-    setTimeSignature(timeSignature: TimeSignature | TimeSignatureString) {
+    setTimeSignature(timeSignature: TimeSignature) {
         this.getPrevMeasure()?.endSection();
 
-        this.alterTimeSignature = timeSignature instanceof TimeSignature
-            ? timeSignature
-            : new TimeSignature(timeSignature);
+        this.alterTimeSignature = timeSignature;
 
         this.updateTimeSignature();
     }

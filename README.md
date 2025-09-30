@@ -183,12 +183,14 @@ For time signature you can use `Theory.TimeSignatureEnum` enum values (e.g. `The
 or corresponding string values (e.g. `"2/4"`).
 
 ```js
-.setTimeSignature("2/4") // Set time signature of 2/4.
-.setTimeSignature("3/4") // Set time signature of 3/4.
-.setTimeSignature("4/4") // Set time signature of 4/4.
-.setTimeSignature("6/8") // Set time signature of 6/8.
-.setTimeSignature("9/8") // Set time signature of 9/8.
-.setTimeSignature(12, 8) // Set time signature of 12/8 using number arguments beatCount and beatSize.
+.setTimeSignature("2/4")          // Set time signature of 2/4.
+.setTimeSignature("3/4")          // Set time signature of 3/4.
+.setTimeSignature("4/4")          // Set time signature of 4/4.
+.setTimeSignature("5/8", "2-3")   // Set time signature of 5/8. Available beam groupings are "2-3" (default) and "3-2".
+.setTimeSignature("6/8")          // Set time signature of 6/8.
+.setTimeSignature("7/8", "2-2-3") // Set time signature of 7/8. Available beam groupings are "2-2-3" (default) and "3-2-2".
+.setTimeSignature("9/8")          // Set time signature of 9/8.
+.setTimeSignature(12, 8)          // Set time signature of 12/8 using number arguments beatCount and beatSize.
 ```
 
 ### Set Tempo
