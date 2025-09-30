@@ -2,8 +2,18 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, NoteLengthProps } from "./rhythm";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
+/** TimeSignature enum.  */
+export enum TimeSignatureEnum {
+    _2_4 = "2/4",
+    _3_4 = "3/4",
+    _4_4 = "4/4",
+    _6_8 = "6/8",
+    _9_8 = "9/8",
+    _12_8 = "12/8"
+}
+
 /** Time signature string type. */
-export type TimeSignatureString = "2/4" | "3/4" | "4/4" | "6/8" | "9/8";
+export type TimeSignatureString = `${TimeSignatureEnum}`;
 
 /** Time signature class. */
 export class TimeSignature {
@@ -20,9 +30,9 @@ export class TimeSignature {
 
     /**
      * Create new time signature instance.
-     * @param str - For example "4/4".
+     * @param timeSignature - For example "4/4".
      */
-    constructor(str: TimeSignatureString);
+    constructor(timeSignature: TimeSignatureEnum | TimeSignatureString);
     /**
      * Create new time signature instance.
      * @param beatCount - Measure beat count.
@@ -30,12 +40,12 @@ export class TimeSignature {
      */
     constructor(beatCount: number, beatSize: number);
     constructor(...args: unknown[]) {
-        if (args.length === 1 && typeof args[0] === "string") {
+        if (Utils.Is.isEnumValue(args[0], TimeSignatureEnum)) {
             let parts = args[0].split("/");
             this.beatCount = +parts[0];
             this.beatSize = +parts[1];
         }
-        else if (args.length === 2 && typeof args[0] === "number" && typeof args[1] === "number") {
+        else if (Utils.Is.isIntegerGte(args[0], 2) && Utils.Is.isIntegerGte(args[1], 2)) {
             this.beatCount = args[0];
             this.beatSize = args[1];
         }
@@ -74,8 +84,7 @@ export class TimeSignature {
             this.beamGroupSizes = [[3], [3], [3], [3]];
         }
         else {
-            this.beamGroupSizes = [];
-            console.warn("No beam detection implemented for time signature: " + this.toString());
+            throw new MusicError(MusicErrorType.Timesignature, "Unimplemented time signature: " + this.toString());
         }
     }
 

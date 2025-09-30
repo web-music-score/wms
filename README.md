@@ -179,12 +179,16 @@ or corresponding string values (e.g. `"Major"`).
 ```
 
 ### Set Time Signature
+For time signature you can use `Theory.TimeSignatureEnum` enum values (e.g. `Theory.TimeSignatureEnum._2_4`)
+or corresponding string values (e.g. `"2/4"`).
+
 ```js
-.setTimeSignature("2/4") // Set time signature of 2/4
-.setTimeSignature("3/4") // Set time signature of 3/4
-.setTimeSignature("4/4") // Set time signature of 4/4
-.setTimeSignature("6/8") // Set time signature of 6/8
-.setTimeSignature("9/8") // Set time signature of 9/8
+.setTimeSignature("2/4") // Set time signature of 2/4.
+.setTimeSignature("3/4") // Set time signature of 3/4.
+.setTimeSignature("4/4") // Set time signature of 4/4.
+.setTimeSignature("6/8") // Set time signature of 6/8.
+.setTimeSignature("9/8") // Set time signature of 9/8.
+.setTimeSignature(12, 8) // Set time signature of 12/8 using number arguments beatCount and beatSize.
 ```
 
 ### Set Tempo

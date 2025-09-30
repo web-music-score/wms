@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
-import { KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureString, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
+import { KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatureEnum, TimeSignatureString, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "score/engine/obj-measure";
 import { RhythmSymbol } from "score/engine/obj-rhythm-column";
@@ -321,12 +321,37 @@ export class DocumentBuilder {
 
     /**
      * Set time signature for current measure and forward.
-     * @param timeSignature - TimeSignature  object instance or string (e.g. "3/4").
+     * @param timeSignature - TimeSignature object instance.
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: TimeSignature | TimeSignatureString): DocumentBuilder {
-        assertArg(timeSignature instanceof TimeSignature || Utils.Is.isNonEmptyString(timeSignature), "timeSignature", timeSignature);
-        this.getMeasure().setTimeSignature(timeSignature);
+    setTimeSignature(timeSignature: TimeSignature): DocumentBuilder;
+    /**
+     * Set time signature for current measure and forward.
+     * @param timeSignature - TimeSignatureEnum value or string (e.g. "3/4").
+     * @returns - This document builder instance.
+     */
+    setTimeSignature(timeSignature: TimeSignatureEnum | TimeSignatureString): DocumentBuilder;
+    /**
+     * Set time signature for current measure and forward.
+     * @param beatCount - Beat count of time signature (e.g. 3 in "3/4").
+     * @param beatSize - Beat size of time signature (e.g. 4 in "3/4").
+     * @returns - This document builder instance.
+     */
+    setTimeSignature(beatCount: number, beatSize: number): DocumentBuilder;
+    setTimeSignature(...args: unknown[]): DocumentBuilder {
+        assertArg(
+            args[0] instanceof TimeSignature ||
+            Utils.Is.isEnumValue(args[0], TimeSignatureEnum) ||
+            Utils.Is.isIntegerGte(args[0], 2) && Utils.Is.isIntegerGte(args[1], 2),
+            "timeSignature", args[0]);
+
+        if (args[0] instanceof TimeSignature || Utils.Is.isEnumValue(args[0], TimeSignatureEnum)) {
+            this.getMeasure().setTimeSignature(args[0]);
+        }
+        else if (Utils.Is.isInteger(args[0]) && Utils.Is.isInteger(args[1])) {
+            this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1]));
+        }
+
         return this;
     }
 
