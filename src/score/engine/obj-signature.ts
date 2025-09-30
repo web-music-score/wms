@@ -90,10 +90,10 @@ export class ObjSignature extends MusicObject {
             let timeSignature = this.measure.getTimeSignature();
 
             let beatCount = timeSignature.beatCount.toString();
-            this.beatCountText = new ObjText(this, { text: beatCount, scale: 1.4 }, 0, 0.5);
+            this.beatCountText = new ObjText(this, { text: beatCount, scale: 1.4 }, 0.5, 0.5);
 
             let beatSize = timeSignature.beatSize.toString();
-            this.beatSizeText = new ObjText(this, { text: beatSize, scale: 1.4 }, 0, 0.5);
+            this.beatSizeText = new ObjText(this, { text: beatSize, scale: 1.4 }, 0.5, 0.5);
         }
         else {
             this.beatCountText = this.beatSizeText = undefined;
@@ -261,16 +261,19 @@ export class ObjSignature extends MusicObject {
 
         let right = x;
 
+        this.beatCountText?.layout(renderer);
+        this.beatSizeText?.layout(renderer);
+
+        let tsWidth = Math.max(this.beatCountText?.getRect().width ?? 0, this.beatSizeText?.getRect().width ?? 0);
+
         if (this.beatCountText) {
-            this.beatCountText.layout(renderer);
-            this.beatCountText.offset(x + paddingX, staff.getDiatonicIdY(staff.middleLineDiatonicId + 2));
+            this.beatCountText.offset(x + tsWidth / 2 + paddingX, staff.getDiatonicIdY(staff.middleLineDiatonicId + 2));
             this.rect.expandInPlace(this.beatCountText.getRect());
             right = Math.max(right, this.rect.right);
         }
 
         if (this.beatSizeText) {
-            this.beatSizeText.layout(renderer);
-            this.beatSizeText.offset(x + paddingX, staff.getDiatonicIdY(staff.bottomLineDiatonicId + 2));
+            this.beatSizeText.offset(x + tsWidth / 2 + paddingX, staff.getDiatonicIdY(staff.bottomLineDiatonicId + 2));
             this.rect.expandInPlace(this.beatSizeText.getRect());
             right = Math.max(right, this.rect.right);
         }
