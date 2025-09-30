@@ -730,13 +730,10 @@ export class ObjNoteGroup extends MusicObject {
     setStemTipY(staff: ObjStaff, stemTipY: number) {
         let obj = this.staffObjects.find(obj => obj.staff === staff);
 
-        if (!obj?.stemTip || stemTipY === obj.stemTip.centerY) {
-            return;
+        if (this.hasBeamCount() && obj?.stemTip && stemTipY !== obj.stemTip.centerY) {
+            obj.stemTip.top = obj.stemTip.centerY = obj.stemTip.bottom = stemTipY;
+            this.requestRectUpdate();
         }
-
-        obj.stemTip.top = obj.stemTip.centerY = obj.stemTip.bottom = stemTipY;
-
-        this.requestRectUpdate();
     }
 
     offset(dx: number, dy: number) {
