@@ -8,7 +8,7 @@ export function createGrandStaffDemo() {
     return new Score.DocumentBuilder()
         .setHeader("Grand Staff")
         .setScoreConfiguration("grand")
-        .setMeasuresPerRow(4)
+        .setMeasuresPerRow(3)
 
         .setTimeSignature("6/8")
         .setKeySignature(scale)
