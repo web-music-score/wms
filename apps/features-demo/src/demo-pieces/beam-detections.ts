@@ -194,6 +194,7 @@ export function createBeamDetectionDemo() {
         .addNote(0, "G3", "16n")
 
         .addMeasure()
+        .setTimeSignature("6/8")
         .addNote(0, "G3", "8.")
         .addNote(0, "G3", "8.")
         .addNote(0, "G3", "16n")
