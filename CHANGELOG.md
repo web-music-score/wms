@@ -1,6 +1,6 @@
 # Changelog
 
-## [4.1.0] - 2025-10-02
+## [4.1.0] - 2025-10-01
 ## Added
 - 4-4 (in adition to 2-2-2-2) beam grouping for 4/4 time signature.
 - 12/8 time signature.
