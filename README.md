@@ -363,7 +363,13 @@ Add notes with `string` property to specify at what string the fret number is re
 
 ### Beams
 
-Beams are detected and added automatically.
+Beams are detected using beam grouping logic that is defined for each time signature.
+
+For following time signatures there are options.
+- For 5/8 time signature you can use `2-3` or `3-2` beam grouping.
+- For 7/8 time signature you can use `2-2-3` or `3-2-2` beam grouping.
+
+See more in **Set Time Signature** section above.
 
 ### Classical Guitar Audio Module
 
