@@ -364,12 +364,21 @@ Add notes with `string` property to specify at what string the fret number is re
 ### Beams
 
 Beams are detected using beam grouping logic that is defined for each time signature.
+These are the beam groupings for each time signature.
 
-For following time signatures there are options.
-- For 5/8 time signature you can use `2-3` or `3-2` beam grouping.
-- For 7/8 time signature you can use `2-2-3` or `3-2-2` beam grouping.
+| Time signature | Beam grouping |
+|----------------|---------------|
+| `2/4` | `2-2` |
+| `3/4` | `2-2-2` |
+| `4/4` | `4-4` and `2-2-2-2` together |
+| `5/8` | `2-3` or `3-2`, user selectable |
+| `6/8` | `3-3` |
+| `7/8` | `2-2-3` or `3-2-2`, user selectable |
+| `9/8` | `3-3-3` |
+| `12/8` | `3-3-3-3` |
 
-See more in **Set Time Signature** section above.
+How to set beam grouping for `5/8` and `7/8` time signatures,
+see [Set Time Signature](#set-time-signature) section above.
 
 ### Classical Guitar Audio Module
 
