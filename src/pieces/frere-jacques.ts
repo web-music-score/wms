@@ -100,7 +100,6 @@ export function createFrereJacques(): MDocument {
 
         .addMeasure()
         .setMeasuresPerRow(4)
-        .addNavigation("ending", 1)
         .addNote(0, "D4", "4n")
         .addNote(0, "E4", "4n")
         .addNote(0, "F#4", "4n")
@@ -122,7 +121,6 @@ export function createFrereJacques(): MDocument {
         .addRest(1, "4n")
 
         .addMeasure()
-        .addNavigation("ending", 2)
         .addNote(0, "F#4", "4n")
         .addNote(0, "D4", "4n")
         .addNote(0, "F#4", "4n")
