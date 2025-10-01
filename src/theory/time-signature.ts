@@ -3,7 +3,7 @@ import { NoteLength, NoteLengthProps } from "./rhythm";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /** Time signature enum.  */
-export enum TimeSignatureEnum {
+export enum TimeSignatures {
     /** 2/4 time signature. */
     _2_4 = "2/4",
     /** 3/4 time signature. */
@@ -22,11 +22,8 @@ export enum TimeSignatureEnum {
     _12_8 = "12/8"
 }
 
-/**
- * Time signature string type.
- * @deprecated
- * */
-export type TimeSignatureString = `${TimeSignatureEnum}`;
+/** @deprecated - Use TimeSignatures enum values or just it's string values. */
+export type TimeSignatureString = `${TimeSignatures}`;
 
 /** Beam grouping enum. */
 export enum BeamGrouping {
@@ -58,7 +55,7 @@ export class TimeSignature {
      * @param timeSignature - For example "4/4".
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      */
-    constructor(timeSignature: TimeSignatureEnum | `${TimeSignatureEnum}`, beamGrouping?: BeamGrouping | `${BeamGrouping}`);
+    constructor(timeSignature: TimeSignatures | `${TimeSignatures}`, beamGrouping?: BeamGrouping | `${BeamGrouping}`);
     /**
      * Create new time signature instance.
      * @param beatCount - Measure beat count.
@@ -69,7 +66,7 @@ export class TimeSignature {
     constructor(...args: unknown[]) {
         let beamGrouping: BeamGrouping | undefined;
 
-        if (Utils.Is.isEnumValue(args[0], TimeSignatureEnum)) {
+        if (Utils.Is.isEnumValue(args[0], TimeSignatures)) {
             let parts = args[0].split("/");
 
             this.beatCount = +parts[0];
