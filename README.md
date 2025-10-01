@@ -56,11 +56,11 @@ browser module).
 
 ```html
 <script src="https://unpkg.com/@tspro/web-music-score@4"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@4.0.0"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@4.0.0/dist/iife/index.global.js"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4.1.0"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4.1.0/dist/iife/index.global.js"></script>
 
 <!--
-    Use one of above. It is recommended to use version number (e.g. @4.0.0 or at least @4).
+    Use one of above. It is recommended to use version number (e.g. @4.1.0 or at least @4).
     This way if something breaks between versions then your web site does not stop working.
 -->
 
@@ -179,8 +179,11 @@ or corresponding string values (e.g. `"Major"`).
 ```
 
 ### Set Time Signature
-For time signature you can use `Theory.TimeSignatureEnum` enum values (e.g. `Theory.TimeSignatureEnum._2_4`)
+For time signature you can use `Theory.TimeSignatures` enum values (e.g. `Theory.TimeSignatures._2_4`)
 or corresponding string values (e.g. `"2/4"`).
+
+For optional beam grouping argument for 5/8 and 7/8 time signatures you can use `Theory.BeamGrouping`
+enum values (e.g. `Theory.BeamGrouping._2_2_3`) or corresponding string values (e.g. `"2-2-3"`).
 
 ```js
 .setTimeSignature("2/4")          // Set time signature of 2/4.
@@ -190,7 +193,7 @@ or corresponding string values (e.g. `"2/4"`).
 .setTimeSignature("6/8")          // Set time signature of 6/8.
 .setTimeSignature("7/8", "2-2-3") // Set time signature of 7/8. Available beam groupings are "2-2-3" (default) and "3-2-2".
 .setTimeSignature("9/8")          // Set time signature of 9/8.
-.setTimeSignature(12, 8)          // Set time signature of 12/8 using number arguments beatCount and beatSize.
+.setTimeSignature(12, 8)          // Set time signature of 12/8 using number arguments.
 ```
 
 ### Set Tempo
