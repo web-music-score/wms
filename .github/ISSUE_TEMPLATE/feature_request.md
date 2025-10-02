@@ -1,6 +1,6 @@
 ---
-name: WebMusicScore Feature Request
-about: Suggest an improvement or new feature for WebMusicScore
+name: Feature Request
+about: Suggest an improvement or new feature
 title: "[Feature]: "
 labels: enhancement
 assignees: ''
@@ -8,7 +8,7 @@ assignees: ''
 
 ## Describe the feature
 
-What would you like WebMusicScore to do?
+What would you like this library to do?
 
 ## Use case
 

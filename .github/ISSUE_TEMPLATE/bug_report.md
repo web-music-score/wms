@@ -1,6 +1,6 @@
 ---
-name: WebMusicScore Bug Report
-about: Report a problem with WebMusicScore
+name: Bug Report
+about: Report a problem
 title: "[Bug]: "
 labels: bug
 assignees: ''
