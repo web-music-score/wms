@@ -1,6 +1,6 @@
 # WebMusicScore
 
-The API Reference, Examples and Demos can be found [here](https://pahkasoft.github.io). The API Reference is very little commented but gives idea of the full API.
+TS Docs, Examples and Demos can be found [here](https://pahkasoft.github.io).
 
 ## About
 
@@ -12,8 +12,6 @@ later taking lessons in classical guitar. I've also studied music theory indepen
 This is a work in progress project. Lately there has been improvements that required major
 version update. As the project matures there might be less major updates, and more minor
 updates and patches.
-
-Version 4.0.0 added support for string arguments in addition to typescript enums (e.g. NoteLength.Quarter => "4n", just to name one).
 
 ## Installation
 
@@ -55,14 +53,17 @@ corresponding subpath modules (`react-ui` and `audio-cg` are not included in thi
 browser module).
 
 ```html
-<script src="https://unpkg.com/@tspro/web-music-score@4"></script>
+<!--
+    It is recommended to use exact version number so that if something
+    breaks between versions then your web site does not stop working.
+-->
 <script src="https://unpkg.com/@tspro/web-music-score@4.1.0"></script>
-<script src="https://unpkg.com/@tspro/web-music-score@4.1.0/dist/iife/index.global.js"></script>
 
 <!--
-    Use one of above. It is recommended to use version number (e.g. @4.1.0 or at least @4).
-    This way if something breaks between versions then your web site does not stop working.
+    Or you can use direct link to the js bundle.
 -->
+<script src="https://unpkg.com/@tspro/web-music-score@4.1.0/dist/iife/index.global.js"></script>
+
 
 <script>
     const { Core, Audio, Theory, Score, Pieces } = window.WebMusicScore;
@@ -497,11 +498,9 @@ While designed for compatibility in mind, the library has not been explicitly te
 
 ## Report a Bug
 
-Found a bug or unexpected behavior?
+Found a bug or unexpected behavior? Suggest a feature or impovement?
 
-[Please open a new issue.](https://github.com/pahkasoft/issues/issues/new)
-
-You can also suggest a feature or impovement.
+[Please open a new issue.](https://github.com/pahkasoft/web-music-score/issues/new/choose)
 
 Thanks for helping improve the project!
 
