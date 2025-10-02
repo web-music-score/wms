@@ -204,8 +204,9 @@ enum values (e.g. `Theory.BeamGrouping._2_2_3`) or corresponding string values (
 
 ### Add Note
 ```js
-.addNote(0, "C4", "1n")                     // Create whole note "C4"
-.addNote(0, "Bb4", "2..")                   // Create double dotted half note "Bb4"
+.addNote(0, "C4", "1n")                     // Add whole note "C4"
+.addNote(0, ["C4", "D4", "G4"], "1n")       // Add three notes "C4", "D4", "G4" seuqentially (no chord).
+.addNote(0, "Bb4", "2..")                   // Add double dotted half note "Bb4"
 .addNote(0, "C4", "4n", { stem: "up" })     // Stem direction Up (could be also Down)
 .addNote(0, "C4", "4n", { staccate: true }) // Show staccato dot and play in short
 .addNote(0, "C4", "4n", { diamond: true })  // Show diamond shaped note head
@@ -226,7 +227,7 @@ enum values (e.g. `Theory.BeamGrouping._2_2_3`) or corresponding string values (
 ```
 
 ### Add Tuplet
-This works for any tuplet:
+This generic function works for any tuplet:
 ```js
 // Example: add triplet
 .addTuplet(0, { parts: 3, inTimeOf: 2 }, notes => {
@@ -239,9 +240,16 @@ This works for any tuplet:
 Triplets can also be created using note length (e.g. NoteLength.EighthTriplet or "8t").
 ```js
 // Example: add triplet using triplet note length.
-.addNote(0, "G3", "8t")
-.addNote(0, "B3", "8t")
-.addNote(0, "D4", "8t")
+.addNote(0, ["G3", "B3", "D4"], "8t")
+```
+
+### Add Lyrics
+
+```js
+.addLyrics(1, "4n", "Are")     // Add lyrics syllable, length of quarter note, verse 1.
+.addLyrics(1, "4n", "you")     // Add lyrics syllable, length of quarter note, verse 1.
+.addLyrics(1, "4n", "sleep -") // Add lyrics syllable, length of quarter note, verse 1.
+.addLyrics(1, "4n", "ing?")    // Add lyrics syllable, length of quarter note, verse 1.
 ```
 
 ### Add Fermata
@@ -302,8 +310,8 @@ or corresponding string values (e.g. `"chord"`).
 
 ### Positioning Elements
 
-`addFermata`, `addNavigation`, `addAnnotation` and `addLabel` functions have alternate versions 
-`addFermataTo`, `addNavigationTo`, `addAnnotationTo` and `addLabelTo` that contain extra first argument.
+`addLyrics`, `addFermata`, `addNavigation`, `addAnnotation` and `addLabel` functions have alternate versions 
+`addLyricsTo`, `addFermataTo`, `addNavigationTo`, `addAnnotationTo` and `addLabelTo` that contain extra first argument.
 
 ```js
 .addLabelTo(0, "chord", "Am")        // Add label to top (id 0) staff/tab.
