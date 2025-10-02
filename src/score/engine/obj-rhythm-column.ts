@@ -43,9 +43,11 @@ export type ScorePlayerNote = {
 
 export type RhythmSymbol = ObjNoteGroup | ObjRest;
 
+type LyricsContainerData = { lyricsContainer: LyricsContainer, verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos }
+
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
-    private readonly lyricsContainers: { lyricsContainer: LyricsContainer, verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos }[] = [];
+    private readonly lyricsContainers: LyricsContainerData[] = [];
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
@@ -220,6 +222,10 @@ export class ObjRhythmColumn extends MusicObject {
 
     getVoiceSymbol(voiceId: VoiceId): RhythmSymbol | undefined {
         return this.voiceSymbol[voiceId];
+    }
+
+    getLyricsContainerDatas(): ReadonlyArray<LyricsContainerData> {
+        return this.lyricsContainers;
     }
 
     getLyricsContainer(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos, lyricsLength?: NoteLength): LyricsContainer | undefined {

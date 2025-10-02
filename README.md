@@ -245,16 +245,24 @@ Triplets can also be created using note length (e.g. NoteLength.EighthTriplet or
 
 ### Add Lyrics
 
+For lyrics align you can use `Score.LyricsAlign` enum values (e.g. `Score.LyricsAlign.Left`)
+or corresponding string values (e.g. `"left"`).
+
+For lyrics hyphen you can use `Score.LyricsHyphen` enum values (e.g. `Score.LyricsHyphen.Hyphen`)
+or corresponding string values (e.g. `"-"`).
+
 ```js
-.addLyrics(1, "4n", "Are")     // Add lyrics syllable, length of quarter note, verse 1.
-.addLyrics(1, "4n", "you")     // Add lyrics syllable, length of quarter note, verse 1.
-.addLyrics(1, "4n", "sleep -") // Add lyrics syllable, length of quarter note, verse 1.
-.addLyrics(1, "4n", "ing?")    // Add lyrics syllable, length of quarter note, verse 1.
+.addLyrics(1, "4n", "La")                      // Add lyrics text/syllable "La", quarter note length, verse 1.
+.addLyrics(2, "4n", "La", { align: "left" })   // Left align lyrics text/syllable.
+.addLyrics(2, "4n", "La", { align: "center" }) // Center align lyrics text/syllable.
+.addLyrics(2, "4n", "La", { align: "right" })  // Right align lyrics text/syllable.
+.addLyrics(3, "4n", "La", { hyphen: "-" })     // Add hyphen (short line '-') centered between this and next syllable.
+.addLyrics(3, "4n", "La", { hyphen: "---" })   // Add extender (long line) between this and next syllable.
 ```
 
 ### Add Fermata
 
-For fermata you can use `Score.Fermata` enum values (e.g. `Scoore.Fermata.AtNote`)
+For fermata you can use `Score.Fermata` enum values (e.g. `Score.Fermata.AtNote`)
 or corresponding string values (e.g. `"atNote"`).
 
 ```js

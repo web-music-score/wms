@@ -200,10 +200,20 @@ export enum LyricsAlign {
     Right = "right"
 }
 
+/** Lyrics hyphen.*/
+export enum LyricsHyphen {
+    /** Hyphen. */
+    Hyphen = "-",
+    /** Extender. */
+    Extender = "---"
+}
+
 /** Lyrics options. */
 export type LyricsOptions = {
     /** Alignment of lyrics text/syllable. */
-    align?: LyricsAlign | `${LyricsAlign}`
+    align?: LyricsAlign | `${LyricsAlign}`,
+    /** Hyphen or extender after lyrics text/syllable. */
+    hyphen?: LyricsHyphen | `${LyricsHyphen}`
 }
 
 /** Fermata enum. */

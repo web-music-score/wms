@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -91,6 +91,7 @@ function assertRestOptions(restOptions: RestOptions) {
 function assertLyricsOptions(lyricsOptions: LyricsOptions) {
     assertArg(Utils.Is.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
     assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
+    assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.hyphen, LyricsHyphen), "lyricsOptions.hyphen", lyricsOptions.hyphen);
 }
 
 function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {

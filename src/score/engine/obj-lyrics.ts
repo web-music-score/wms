@@ -1,9 +1,12 @@
-import { DivRect, LyricsAlign, LyricsOptions, MLyrics, VerseNumber } from "../pub";
+import { DivRect, LyricsAlign, LyricsHyphen, LyricsOptions, MLyrics, VerseNumber } from "../pub";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { NoteLength, RhythmProps } from "theory/rhythm";
 import { ObjText } from "./obj-text";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
+import { ObjNotationLine } from "./obj-staff-and-tab";
+import { VerticalPos } from "./layout-object";
+import { Utils } from "@tspro/ts-utils-lib";
 
 export class LyricsContainer {
     readonly lyricsObjects: ObjLyrics[] = [];
@@ -13,22 +16,47 @@ export class LyricsContainer {
         this.rhythmProps = RhythmProps.get(lyricsLength);
     }
 
-    addLyricsObject(lyricsObj: ObjLyrics) {
-        this.lyricsObjects.push(lyricsObj);
+    addLyricsObject(addObj: ObjLyrics) {
+        this.lyricsObjects.push(addObj);
+
+        let prevLyricsObject: ObjLyrics | undefined;
+
+        try {
+            this.col.measure.getColumns().forEach(col => {
+                col.getLyricsContainerDatas().forEach(data => {
+                    data.lyricsContainer.lyricsObjects.forEach(curObj => {
+                        if (curObj.verse === addObj.verse && curObj.line === addObj.line && curObj.vpos === addObj.vpos) {
+                            if (curObj === addObj) {
+                                prevLyricsObject?.setNextLyricsObject(addObj);
+                                throw 0;
+                            }
+                            else {
+                                prevLyricsObject = curObj;
+                            }
+                        }
+                    });
+                });
+            });
+        }
+        catch (e) { }
     }
 }
 
 export class ObjLyrics extends MusicObject {
-    private readonly color: string = "black";
+    private nextLyricsObject?: ObjLyrics;
 
+    private readonly color: string = "black";
+    private readonly hyphen?: LyricsHyphen;
     private readonly text: ObjText;
 
     readonly mi: MLyrics;
 
-    constructor(parent: MusicObject, lyricsText: string, lyricsOptions?: LyricsOptions) {
+    constructor(parent: MusicObject, readonly verse: VerseNumber, readonly line: ObjNotationLine, readonly vpos: VerticalPos, lyricsText: string, lyricsOptions?: LyricsOptions) {
         super(parent);
 
         let halign = lyricsOptions?.align === LyricsAlign.Left ? 0 : lyricsOptions?.align === LyricsAlign.Right ? 1 : 0.5;
+
+        this.hyphen = Utils.Is.isEnumValue(lyricsOptions?.hyphen, LyricsHyphen) ? lyricsOptions?.hyphen : undefined;
 
         this.text = new ObjText(this, { text: lyricsText, color: this.color, scale: 0.8 }, halign, 0);
 
@@ -43,6 +71,10 @@ export class ObjLyrics extends MusicObject {
 
     getText(): string {
         return this.text.getText();
+    }
+
+    setNextLyricsObject(lyricsObj: ObjLyrics) {
+        this.nextLyricsObject = lyricsObj;
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -61,5 +93,25 @@ export class ObjLyrics extends MusicObject {
 
     draw(renderer: Renderer) {
         this.text.draw(renderer);
+
+        const ctx = renderer.getCanvasContext();
+
+        if (ctx && this.nextLyricsObject && this.hyphen !== undefined) {
+            // Draw hyphen/extender line between this and next lyrics.
+            let l = this.getRect();
+            let r = this.nextLyricsObject.getRect();
+
+            let maxw = (r.left - l.right) * 0.85;
+            let w = this.hyphen === LyricsHyphen.Hyphen ? Math.min(renderer.unitSize * 1.5, maxw) : maxw;
+
+            if (w > 0) {
+                ctx.lineWidth = renderer.lineWidth;
+                ctx.strokeStyle = ctx.fillStyle = this.color;
+
+                ctx.moveTo((r.left + l.right) / 2 - w / 2, (l.top + l.bottom) / 2);
+                ctx.lineTo((r.left + l.right) / 2 + w / 2, (r.top + r.bottom) / 2);
+                ctx.stroke();
+            }
+        }
     }
 }

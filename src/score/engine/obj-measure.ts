@@ -129,7 +129,6 @@ export class ObjMeasure extends MusicObject {
     private useString: (StringNumber[] | undefined)[/* voiceId */] = [];
 
     private voiceSymbols: RhythmSymbol[/* voiceId */][] = [];
-    private lyricsContainers: LyricsContainer[/* verse */][] = [];
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
     private lastAddedRhythmSymbol?: RhythmSymbol;
@@ -896,19 +895,12 @@ export class ObjMeasure extends MusicObject {
             let lyricsContainer = col.getLyricsContainer(verse, line, vpos, validateNoteLength(lyricsLength));
 
             if (lyricsContainer) {
-                let lyricsObj = new ObjLyrics(col, lyricsText, lyricsOptions);
+                let lyricsObj = new ObjLyrics(col, verse, line, vpos, lyricsText, lyricsOptions);
                 lyricsContainer.addLyricsObject(lyricsObj);
-
                 this.addLayoutObject(lyricsObj, line, getVerseLayoutGroupId(verse), vpos);
-
-                this.lyricsContainers[verse] ??= [];
-
-                if (!this.lyricsContainers[verse].includes(lyricsContainer)) {
-                    this.lyricsContainers[verse].push(lyricsContainer);
-                }
-
-                this.lastAddedRhythmColumn = col;
             }
+
+            this.lastAddedRhythmColumn = col;
         });
     }
 
@@ -1244,12 +1236,6 @@ export class ObjMeasure extends MusicObject {
         validateVoiceId(voiceId);
         this.voiceSymbols[voiceId] ??= [];
         return this.voiceSymbols[voiceId];
-    }
-
-    getLyricsContainers(verse: VerseNumber): ReadonlyArray<LyricsContainer> {
-        validateVerseNumber(verse);
-        this.lyricsContainers[verse] ??= [];
-        return this.lyricsContainers[verse];
     }
 
     completeRests(voiceId?: VoiceId | VoiceId[]) {
