@@ -60,32 +60,37 @@ function assertTabConfig(tabConfig: TabConfig) {
     assertArg(Utils.Is.isUndefined(tabConfig.voiceIds) || Utils.Is.isArray(tabConfig.voiceIds) && tabConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "tabConfig.voiceIds", tabConfig.voiceIds);
 }
 
-function assertNoteOptions(options: NoteOptions) {
-    assertArg(Utils.Is.isObject(options), "noteOptions", options);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted) || Utils.Is.isIntegerGte(options.dotted, 0), "noteOptions.dotted", options.dotted);
-    assertArg(Utils.Is.isEnumValueOrUndefined(options.stem, Stem), "noteOptions.stem", options.stem);
-    assertArg(Utils.Is.isStringOrUndefined(options.color), "noteOptions.color", options.color);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.arpeggio) || Utils.Is.isEnumValue(options.arpeggio, Arpeggio), "noteOptions.arpeggio", options.arpeggio);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.staccato), "noteOptions.staccato", options.staccato);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.diamond), "noteOptions.diamond", options.diamond);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "noteOptions.triplet", options.triplet);
+function assertNoteOptions(noteOptions: NoteOptions) {
+    assertArg(Utils.Is.isObject(noteOptions), "noteOptions", noteOptions);
+    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.dotted) || Utils.Is.isIntegerGte(noteOptions.dotted, 0), "noteOptions.dotted", noteOptions.dotted);
+    assertArg(Utils.Is.isEnumValueOrUndefined(noteOptions.stem, Stem), "noteOptions.stem", noteOptions.stem);
+    assertArg(Utils.Is.isStringOrUndefined(noteOptions.color), "noteOptions.color", noteOptions.color);
+    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.arpeggio) || Utils.Is.isEnumValue(noteOptions.arpeggio, Arpeggio), "noteOptions.arpeggio", noteOptions.arpeggio);
+    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.staccato), "noteOptions.staccato", noteOptions.staccato);
+    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.diamond), "noteOptions.diamond", noteOptions.diamond);
+    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.triplet), "noteOptions.triplet", noteOptions.triplet);
     assertArg((
-        Utils.Is.isUndefined(options.string) ||
-        isStringNumber(options.string) ||
-        Utils.Is.isNonEmptyArray(options.string) && options.string.every(string => isStringNumber(string))
-    ), "noteOptions.string", options.string);
+        Utils.Is.isUndefined(noteOptions.string) ||
+        isStringNumber(noteOptions.string) ||
+        Utils.Is.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => isStringNumber(string))
+    ), "noteOptions.string", noteOptions.string);
 
-    assertArg(Utils.Is.isUndefined((options as any).tieSpan), "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
-    assertArg(Utils.Is.isUndefined((options as any).slurSpan), "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
+    assertArg(Utils.Is.isUndefined((noteOptions as any).tieSpan), "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
+    assertArg(Utils.Is.isUndefined((noteOptions as any).slurSpan), "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
 }
 
-function assertRestOptions(options: RestOptions) {
-    assertArg(Utils.Is.isObject(options), "restOptions", options);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.dotted) || Utils.Is.isIntegerGte(options.dotted, 0), "restOptions.dotted", options.dotted);
-    assertArg(Utils.Is.isStringOrUndefined(options.staffPos) || Utils.Is.isInteger(options.staffPos) || options.staffPos instanceof Note, "restOptions.staffPos", options.staffPos);
-    assertArg(Utils.Is.isStringOrUndefined(options.color), "restOptions.color", options.color);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.hide), "restOptions.hide", options.hide);
-    assertArg(Utils.Is.isBooleanOrUndefined(options.triplet), "restOptions.triplet", options.triplet);
+function assertRestOptions(restOptions: RestOptions) {
+    assertArg(Utils.Is.isObject(restOptions), "restOptions", restOptions);
+    assertArg(Utils.Is.isBooleanOrUndefined(restOptions.dotted) || Utils.Is.isIntegerGte(restOptions.dotted, 0), "restOptions.dotted", restOptions.dotted);
+    assertArg(Utils.Is.isStringOrUndefined(restOptions.staffPos) || Utils.Is.isInteger(restOptions.staffPos) || restOptions.staffPos instanceof Note, "restOptions.staffPos", restOptions.staffPos);
+    assertArg(Utils.Is.isStringOrUndefined(restOptions.color), "restOptions.color", restOptions.color);
+    assertArg(Utils.Is.isBooleanOrUndefined(restOptions.hide), "restOptions.hide", restOptions.hide);
+    assertArg(Utils.Is.isBooleanOrUndefined(restOptions.triplet), "restOptions.triplet", restOptions.triplet);
+}
+
+function assertLyricsOptions(lyricsOptions: LyricsOptions) {
+    assertArg(Utils.Is.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
+    assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
 }
 
 function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {
@@ -96,11 +101,6 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
         )
         , "staffTabOrGroup", staffTabOrGroups
     );
-}
-
-function assertLyricsOptions(lyricsOptions: LyricsOptions) {
-    assertArg(Utils.Is.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
-    assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
 }
 
 function isNoteLength(noteLen: unknown): noteLen is NoteLength {
@@ -127,27 +127,27 @@ function isTupletRatio(tupletRatio: unknown): tupletRatio is TupletRatio {
 export type TupletBuilder = {
     /**
      * Add note to a tuplet.
-     * @param note - Note instance of Note or string (e.g. "D4").
+     * @param note - Instance of Note or string, single value (e.g. "C4") or array (e.g. ["C4", "E4", "G4"]).
      * @param noteLength - Note length (e.g. "4n").
-     * @param options - Note options.
+     * @param noteOptions - Note options.
      * @returns - This tuplet builder object.
      */
-    addNote: (note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => TupletBuilder,
+    addNote: (note: Note | string | (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions) => TupletBuilder,
     /**
      * Add chord to a tuplet.
      * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
      * @param noteLength - Note length (e.g. "4n"). 
-     * @param options - Note options. 
+     * @param noteOptions - Note options. 
      * @returns - This tuplet builder object. 
      */
-    addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions) => TupletBuilder,
+    addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions) => TupletBuilder,
     /**
      * Add rest to a tuplet.
      * @param restLength - Rest length (e.g. "4n").  
-     * @param options - Rest options.
+     * @param restOptions - Rest options.
      * @returns - This tuplet builder object. 
      */
-    addRest: (restLength: NoteLength | NoteLengthStr, options?: RestOptions) => TupletBuilder
+    addRest: (restLength: NoteLength | NoteLengthStr, restOptions?: RestOptions) => TupletBuilder
 }
 
 /** Etension builder type. */
@@ -403,19 +403,26 @@ export class DocumentBuilder {
     /**
      * Add note to current measure.
      * @param voiceId - Voice id to add note to.
-     * @param note - Note instance of Note or string (e.g. "D4").
+     * @param note - Instance of Note or string, single value (e.g. "C4") or array (e.g. ["C4", "E4", "G4"]).
      * @param noteLength - Note length (e.g. "4n").
-     * @param options - Note options.
+     * @param noteOptions - Note options.
      * @returns - This document builder instance.
      */
-    addNote(voiceId: VoiceId, note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
+    addNote(voiceId: VoiceId, note: Note | string | (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(note instanceof Note || Utils.Is.isNonEmptyString(note), "note", note);
+        assertArg(
+            note instanceof Note || Utils.Is.isNonEmptyString(note) ||
+            Utils.Is.isArray(note) && note.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)),
+            "note", note);
         assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
-        if (options !== undefined) {
-            assertNoteOptions(options);
+        noteOptions ??= {}
+        assertNoteOptions(noteOptions);
+        if (Utils.Is.isArray(note)) {
+            note.forEach(note => this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions));
         }
-        this.getMeasure().addNoteGroup(voiceId, [note], noteLength, options);
+        else {
+            this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions);
+        }
         return this;
     }
 
@@ -424,17 +431,16 @@ export class DocumentBuilder {
      * @param voiceId - Voice id to add chord to.
      * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
      * @param noteLength - Note length (e.g. "4n"). 
-     * @param options - Note options. 
+     * @param noteOptions - Note options. 
      * @returns - This document builder instance.
      */
-    addChord(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
+    addChord(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
         assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
-        if (options !== undefined) {
-            assertNoteOptions(options);
-        }
-        this.getMeasure().addNoteGroup(voiceId, notes, noteLength, options);
+        noteOptions ??= {}
+        assertNoteOptions(noteOptions);
+        this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptions);
         return this;
     }
 
@@ -442,16 +448,15 @@ export class DocumentBuilder {
      * Add rest to current measure.
      * @param voiceId - Voice id to add rest to.
      * @param restLength - Rest length (e.g. "4n").  
-     * @param options - Rest options.
+     * @param restOptions - Rest options.
      * @returns - This document builder instance.
      */
-    addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, options?: RestOptions): DocumentBuilder {
+    addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, restOptions?: RestOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLength(restLength), "restLength", restLength);
-        if (options !== undefined) {
-            assertRestOptions(options);
-        }
-        this.getMeasure().addRest(voiceId, restLength, options);
+        restOptions ??= {}
+        assertRestOptions(restOptions);
+        this.getMeasure().addRest(voiceId, restLength, restOptions);
         return this;
     }
 
@@ -478,35 +483,43 @@ export class DocumentBuilder {
         let tupletSymbols: RhythmSymbol[] = [];
 
         const helper: TupletBuilder = {
-            addNote: (note, noteLength, options) => {
-                assertArg(note instanceof Note || Utils.Is.isNonEmptyString(note), "note", note);
+            addNote: (note, noteLength, noteOptions) => {
+                assertArg(
+                    note instanceof Note || Utils.Is.isNonEmptyString(note) ||
+                    Utils.Is.isArray(note) && note.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)),
+                    "note", note);
                 assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
-                if (options !== undefined) {
-                    delete options.triplet;
-                    assertNoteOptions(options);
+                noteOptions ??= {}
+                delete noteOptions.triplet;
+                assertNoteOptions(noteOptions);
+                if (Utils.Is.isArray(note)) {
+                    note.forEach(note => {
+                        let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions, tupletRatio);
+                        tupletSymbols.push(s);
+                    });
                 }
-                let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, options, tupletRatio);
-                tupletSymbols.push(s);
+                else {
+                    let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions, tupletRatio);
+                    tupletSymbols.push(s);
+                }
                 return helper;
             },
-            addChord: (notes, noteLength, options) => {
+            addChord: (notes, noteLength, noteOptions) => {
                 assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
                 assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
-                if (options !== undefined) {
-                    delete options.triplet;
-                    assertNoteOptions(options);
-                }
-                let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, options, tupletRatio);
+                noteOptions ??= {}
+                delete noteOptions.triplet;
+                assertNoteOptions(noteOptions);
+                let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptions, tupletRatio);
                 tupletSymbols.push(s);
                 return helper;
             },
-            addRest: (restLength, options) => {
+            addRest: (restLength, restOptions) => {
                 assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLength(restLength), "restLength", restLength);
-                if (options !== undefined) {
-                    delete options.triplet;
-                    assertRestOptions(options);
-                }
-                let s = this.getMeasure().addRest(voiceId, restLength, options, tupletRatio);
+                restOptions ??= {}
+                delete restOptions.triplet;
+                assertRestOptions(restOptions);
+                let s = this.getMeasure().addRest(voiceId, restLength, restOptions, tupletRatio);
                 tupletSymbols.push(s);
                 return helper;
             }

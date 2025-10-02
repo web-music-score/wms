@@ -11,28 +11,22 @@ export function createTupletsDemo() {
         .setTimeSignature("4/4")
         .setTempo(80)
 
-        .addTuplet(0, Theory.Tuplet.Triplet, notes => {
-            notes.addNote("G3", "8n");
-            notes.addNote("B3", "8n");
-            notes.addNote("D4", "8n");
-        })
+        .addTuplet(0, Theory.Tuplet.Triplet, notes => notes.addNote(["G3", "B3", "D4"], "8n"))
 
         .addNote(0, "D4", "8n")
         .addNote(0, "A3", "8n")
 
-        .addNote(0, "D4", "8t")
-        .addNote(0, "B3", "8t")
-        .addNote(0, "G3", "8t")
+        .addTuplet(0, Theory.Tuplet.Triplet, notes => {
+            notes.addNote("D4", "8n");
+            notes.addNote("B3", "8n");
+            notes.addNote("G3", "8n");
+        })
 
         .addNote(0, "B3", "4n")
 
         .addMeasure()
         .addNote(0, "D4", "8n")
-
-        .addNote(0, "G3", "8t")
-        .addNote(0, "B3", "8t")
-        .addNote(0, "D4", "8t")
-
+        .addNote(0, ["G3", "B3", "D4"], "8t")
         .addNote(0, "A3", "8n")
 
         .addNote(0, "D4", "16t", { stem: "down" })
