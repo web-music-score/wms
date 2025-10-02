@@ -19,21 +19,27 @@ export class LyricsContainer {
     addLyricsObject(addObj: ObjLyrics) {
         this.lyricsObjects.push(addObj);
 
-        let prevLyricsObject: ObjLyrics | undefined;
-
         try {
-            this.col.measure.getColumns().forEach(col => {
-                col.getLyricsContainerDatas().forEach(data => {
-                    data.lyricsContainer.lyricsObjects.forEach(curObj => {
-                        if (curObj.verse === addObj.verse && curObj.line === addObj.line && curObj.vpos === addObj.vpos) {
-                            if (curObj === addObj) {
-                                prevLyricsObject?.setNextLyricsObject(addObj);
-                                throw 0;
+            let prevLyricsObject: ObjLyrics | undefined;
+
+            let measures = this.col.measure.getPrevMeasure()
+                ? [this.col.measure.getPrevMeasure()!, this.col.measure]
+                : [this.col.measure];
+
+            measures.forEach(m => {
+                m.getColumns().forEach(col => {
+                    col.getLyricsContainerDatas().forEach(data => {
+                        data.lyricsContainer.lyricsObjects.forEach(curObj => {
+                            if (curObj.verse === addObj.verse && curObj.line === addObj.line && curObj.vpos === addObj.vpos) {
+                                if (curObj === addObj) {
+                                    prevLyricsObject?.setNextLyricsObject(addObj);
+                                    throw 0;
+                                }
+                                else {
+                                    prevLyricsObject = curObj;
+                                }
                             }
-                            else {
-                                prevLyricsObject = curObj;
-                            }
-                        }
+                        });
                     });
                 });
             });
@@ -96,20 +102,24 @@ export class ObjLyrics extends MusicObject {
 
         const ctx = renderer.getCanvasContext();
 
-        if (ctx && this.nextLyricsObject && this.hyphen !== undefined) {
+        if (ctx && this.hyphen !== undefined) {
             // Draw hyphen/extender line between this and next lyrics.
             let l = this.getRect();
-            let r = this.nextLyricsObject.getRect();
+            let r = this.nextLyricsObject?.getRect();
 
-            let maxw = (r.left - l.right) * 0.85;
-            let w = this.hyphen === LyricsHyphen.Hyphen ? Math.min(renderer.unitSize * 1.5, maxw) : maxw;
+            let hyphenw = renderer.unitSize * 1.5;
+            let maxw = r ? (r.left - l.right) * 0.85 : hyphenw;
+            let w = this.hyphen === LyricsHyphen.Hyphen ? Math.min(hyphenw, maxw) : maxw;
 
             if (w > 0) {
                 ctx.lineWidth = renderer.lineWidth;
                 ctx.strokeStyle = ctx.fillStyle = this.color;
 
-                ctx.moveTo((r.left + l.right) / 2 - w / 2, (l.top + l.bottom) / 2);
-                ctx.lineTo((r.left + l.right) / 2 + w / 2, (r.top + r.bottom) / 2);
+                let cx = r ? (r.left + l.right) / 2 : (l.right + w / 0.85)
+                let cy = (l.top + l.bottom) / 2;
+
+                ctx.moveTo(cx - w / 2, cy);
+                ctx.lineTo(cx + w / 2, cy);
                 ctx.stroke();
             }
         }
