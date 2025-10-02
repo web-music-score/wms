@@ -4,8 +4,12 @@
     "author": "PahkaSoft",
     "license": "MIT",
     "private": false,
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/pahkasoft/web-music-score.git"
+    },
     "bugs": {
-        "url": "https://github.com/pahkasoft/issues/issues/new"
+        "url": "https://github.com/pahkasoft/web-music-score/issues/new/choose"
     },
     "description": "TS/JS component for rendering and playing music scores in the browser.",
     "exports": {
