@@ -535,11 +535,11 @@ export class DocumentBuilder {
 
     private currentLyricsAlign: LyricsAlign | `${LyricsAlign}` = LyricsAlign.Center;
 
-    private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string, lyricsOptions?: LyricsOptions): DocumentBuilder {
+    private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(isVerseNumber(verse), "verse", verse);
         assertArg(Utils.Is.isEnumValue(lyricsLength, NoteLength), "lyricsLength", lyricsLength);
-        assertArg(Utils.Is.isString(lyricsText), "lyricsText", lyricsText);
+        assertArg(Utils.Is.isString(lyricsText) || Utils.Is.isArray(lyricsText) && lyricsText.every(text => Utils.Is.isString(text)), "lyricsText", lyricsText);
 
         lyricsOptions ??= {}
 
@@ -552,7 +552,13 @@ export class DocumentBuilder {
             lyricsOptions.align ??= this.currentLyricsAlign;
         }
 
-        this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, lyricsText, lyricsOptions);
+        if (Utils.Is.isArray(lyricsText)) {
+            lyricsText.forEach(text => this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, text, lyricsOptions));
+        }
+        else {
+            this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, lyricsText, lyricsOptions);
+        }
+
         return this;
     }
 
@@ -560,11 +566,11 @@ export class DocumentBuilder {
      * Add lyrics to current measure.
      * @param verse - Verse number (e.g. 1).
      * @param lyricsLength - Lyrics text length (e.g. "2n").
-     * @param lyricsText - Lyrics text (empty space if omitted).
+     * @param lyricsText - Lyrics text (empty space if omitted), single value or array.
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyrics(verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string, lyricsOptions?: LyricsOptions): DocumentBuilder {
+    addLyrics(verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
         return this.addLyricsInternal(undefined, verse, lyricsLength, lyricsText ?? "", lyricsOptions);
     }
 
@@ -573,11 +579,11 @@ export class DocumentBuilder {
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
      * @param verse - Verse number (e.g. 1).
      * @param lyricsLength - Lyrics text length (e.g. "2n").
-     * @param lyricsText - Lyrics text (empty space if omitted).
+     * @param lyricsText - Lyrics text (empty space if omitted), single value or array.
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyricsTo(staffTabOrGroups: StaffTabOrGroups, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string, lyricsOptions?: LyricsOptions): DocumentBuilder {
+    addLyricsTo(staffTabOrGroups: StaffTabOrGroups, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
         return this.addLyricsInternal(staffTabOrGroups, verse, lyricsLength, lyricsText ?? "", lyricsOptions);
     }
 

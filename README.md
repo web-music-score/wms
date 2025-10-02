@@ -254,6 +254,7 @@ or corresponding string values (e.g. `"-"`).
 
 ```js
 .addLyrics(1, "4n", "La")                      // Add lyrics text/syllable "La", quarter note length, verse 1.
+.addLyrics(1, "4n", ["La", "la", "la", "la"])  // Add multiple lysics texts/syllables, each quarter note length, verse 1.
 .addLyrics(2, "4n", "La", { align: "left" })   // Left align lyrics text/syllable.
 .addLyrics(2, "4n", "La", { align: "center" }) // Center align lyrics text/syllable.
 .addLyrics(2, "4n", "La", { align: "right" })  // Right align lyrics text/syllable.
