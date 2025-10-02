@@ -24,9 +24,16 @@ export function createLyricsDemo() {
         .addNote(0, "C4", "2n").addLyrics(1, "2n", "Hyp", { align: "center", hyphen: "-" })
         .addNote(0, "D4", "2n").addLyrics(1, "2n", "hen")
 
-                .addMeasure()
+        .addMeasure()
         .addNote(0, "C4", "2n").addLyrics(1, "2n", "Ext", { hyphen: "---" })
         .addNote(0, "D4", "2n").addLyrics(1, "2n", "ender")
+        .endRow()
+
+        .addMeasure()
+        .addNote(0, "C4", "4n").addLyrics(1, "4n", "1. La").addLyrics(2, "4n", "2. Aa", { hyphen: "---" }).addLyrics(3, "4n", "3. Hal", { hyphen: "-" })
+        .addNote(0, "D4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa", { hyphen: "---" }).addLyrics(3, "4n", "le", { hyphen: "-" })
+        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa", { hyphen: "---" }).addLyrics(3, "4n", "lu", { hyphen: "-" })
+        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa").addLyrics(3, "4n", "jah.")
 
         .getDocument();
 }
