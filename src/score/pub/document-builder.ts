@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVoiceIds, Label, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -31,6 +31,10 @@ function isVoiceId(value: unknown): value is VoiceId {
 
 function isStringNumber(value: unknown): value is StringNumber {
     return Utils.Is.isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
+}
+
+function isVerseNumber(value: unknown): value is VerseNumber {
+    return Utils.Is.isNumber(value) && (<number[]>getVerseNumbers()).indexOf(value) >= 0;
 }
 
 function assertStaffConfig(staffConfig: StaffConfig) {
@@ -92,6 +96,11 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
         )
         , "staffTabOrGroup", staffTabOrGroups
     );
+}
+
+function assertLyricsOptions(lyricsOptions: LyricsOptions) {
+    assertArg(Utils.Is.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
+    assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
 }
 
 function isNoteLength(noteLen: unknown): noteLen is NoteLength {
@@ -392,14 +401,14 @@ export class DocumentBuilder {
     }
 
     /**
-     * Add note o current measure.
+     * Add note to current measure.
      * @param voiceId - Voice id to add note to.
      * @param note - Note instance of Note or string (e.g. "D4").
      * @param noteLength - Note length (e.g. "4n").
      * @param options - Note options.
      * @returns - This document builder instance.
      */
-    addNote(voiceId: number, note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
+    addNote(voiceId: VoiceId, note: Note | string, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(note instanceof Note || Utils.Is.isNonEmptyString(note), "note", note);
         assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
@@ -411,13 +420,14 @@ export class DocumentBuilder {
     }
 
     /**
+     * Add chord to current measure.
      * @param voiceId - Voice id to add chord to.
      * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
      * @param noteLength - Note length (e.g. "4n"). 
      * @param options - Note options. 
      * @returns - This document builder instance.
      */
-    addChord(voiceId: number, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
+    addChord(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
         assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
@@ -429,13 +439,13 @@ export class DocumentBuilder {
     }
 
     /**
-     * 
+     * Add rest to current measure.
      * @param voiceId - Voice id to add rest to.
      * @param restLength - Rest length (e.g. "4n").  
      * @param options - Rest options.
      * @returns - This document builder instance.
      */
-    addRest(voiceId: number, restLength: NoteLength | NoteLengthStr, options?: RestOptions): DocumentBuilder {
+    addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, options?: RestOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLength(restLength), "restLength", restLength);
         if (options !== undefined) {
@@ -507,6 +517,54 @@ export class DocumentBuilder {
         ObjBeamGroup.createTuplet(tupletSymbols, tupletRatio);
 
         return this;
+    }
+
+    private currentLyricsAlign: LyricsAlign | `${LyricsAlign}` = LyricsAlign.Center;
+
+    private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string, lyricsOptions?: LyricsOptions): DocumentBuilder {
+        assertStaffTabOrGRoups(staffTabOrGroups);
+        assertArg(isVerseNumber(verse), "verse", verse);
+        assertArg(Utils.Is.isEnumValue(lyricsLength, NoteLength), "lyricsLength", lyricsLength);
+        assertArg(Utils.Is.isString(lyricsText), "lyricsText", lyricsText);
+
+        lyricsOptions ??= {}
+
+        assertLyricsOptions(lyricsOptions);
+
+        if (lyricsOptions.align !== undefined) {
+            this.currentLyricsAlign = lyricsOptions.align;
+        }
+        else {
+            lyricsOptions.align ??= this.currentLyricsAlign;
+        }
+
+        this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, lyricsText, lyricsOptions);
+        return this;
+    }
+
+    /**
+     * Add lyrics to current measure.
+     * @param verse - Verse number (e.g. 1).
+     * @param lyricsLength - Lyrics text length (e.g. "2n").
+     * @param lyricsText - Lyrics text (empty space if omitted).
+     * @param lyricsOptions - Lyrics options.
+     * @returns - This document builder instance.
+     */
+    addLyrics(verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string, lyricsOptions?: LyricsOptions): DocumentBuilder {
+        return this.addLyricsInternal(undefined, verse, lyricsLength, lyricsText ?? "", lyricsOptions);
+    }
+
+    /**
+     * Add lyrics to current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param verse - Verse number (e.g. 1).
+     * @param lyricsLength - Lyrics text length (e.g. "2n").
+     * @param lyricsText - Lyrics text (empty space if omitted).
+     * @param lyricsOptions - Lyrics options.
+     * @returns - This document builder instance.
+     */
+    addLyricsTo(staffTabOrGroups: StaffTabOrGroups, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string, lyricsOptions?: LyricsOptions): DocumentBuilder {
+        return this.addLyricsInternal(staffTabOrGroups, verse, lyricsLength, lyricsText ?? "", lyricsOptions);
     }
 
     private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata | `${Fermata}`): DocumentBuilder {

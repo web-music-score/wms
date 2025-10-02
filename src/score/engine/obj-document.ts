@@ -3,7 +3,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, DivRect, MDocument, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition } from "../pub";
+import { Clef, DivRect, MDocument, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
@@ -215,7 +215,7 @@ export class ObjDocument extends MusicObject {
         return this.staffGroups.get(groupName);
     }
 
-    getVoiceSymbols(voiceId: number): ReadonlyArray<RhythmSymbol> {
+    getVoiceSymbols(voiceId: VoiceId): ReadonlyArray<RhythmSymbol> {
         let voiceSymbols: RhythmSymbol[] = [];
         this.forEachMeasure(m => voiceSymbols = voiceSymbols.concat(m.getVoiceSymbols(voiceId)));
         return voiceSymbols;

@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjSignature } from "./obj-signature";
@@ -25,6 +25,7 @@ import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
+import { LyricsContainer, ObjLyrics } from "./obj-lyrics";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -34,12 +35,21 @@ type AlterTempo = {
     }
 }
 
-export function validateVoiceId(voiceId: number): VoiceId {
-    if ((<number[]>getVoiceIds()).indexOf(voiceId) < 0) {
+export function validateVoiceId(voiceId: unknown): VoiceId {
+    if (typeof voiceId === "number" && (<number[]>getVoiceIds()).indexOf(voiceId) < 0) {
         throw new MusicError(MusicErrorType.Score, "Invalid voiceId: " + voiceId);
     }
     else {
         return voiceId as VoiceId;
+    }
+}
+
+export function validateVerseNumber(verse: number): VerseNumber {
+    if (typeof verse === "number" && (<number[]>getVerseNumbers()).indexOf(verse) < 0) {
+        throw new MusicError(MusicErrorType.Score, "Invalid lyrics verse: " + verse);
+    }
+    else {
+        return verse as VerseNumber;
     }
 }
 
@@ -69,6 +79,16 @@ function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLength
     }
     else {
         return extensionLength;
+    }
+}
+
+function getVerseLayoutGroupId(verse: VerseNumber): LayoutGroupId {
+    switch (verse) {
+        case 1: return LayoutGroupId.LyricsVerse1;
+        case 2: return LayoutGroupId.LyricsVerse2;
+        case 3: return LayoutGroupId.LyricsVerse3;
+        default:
+            throw new MusicError(MusicErrorType.Unknown, "VerseNumber is not 1, 2 or 3.");
     }
 }
 
@@ -109,6 +129,7 @@ export class ObjMeasure extends MusicObject {
     private useString: (StringNumber[] | undefined)[/* voiceId */] = [];
 
     private voiceSymbols: RhythmSymbol[/* voiceId */][] = [];
+    private lyricsContainers: LyricsContainer[/* verse */][] = [];
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
     private lastAddedRhythmSymbol?: RhythmSymbol;
@@ -836,12 +857,12 @@ export class ObjMeasure extends MusicObject {
         this.disableExtension();
     }
 
-    private addRhythmSymbol(voiceId: number, symbol: RhythmSymbol) {
-        let { col } = symbol;
+    private addRhythmSymbol(symbol: RhythmSymbol) {
+        let { col, voiceId } = symbol;
 
         col.setVoiceSymbol(voiceId, symbol);
 
-        this.getVoiceSymbols(voiceId); // Ensures voicesymbols[voiceId] !== undefined
+        this.voiceSymbols[voiceId] ??= [];
         this.voiceSymbols[voiceId].push(symbol);
 
         if (symbol.oldStyleTriplet) {
@@ -854,19 +875,41 @@ export class ObjMeasure extends MusicObject {
         this.lastAddedRhythmSymbol = symbol;
     }
 
-    addNoteGroup(voiceId: number, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions, tupletRatio?: TupletRatio): ObjNoteGroup {
+    addNoteGroup(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions, tupletRatio?: TupletRatio): ObjNoteGroup {
         let realNotes = notes.map(note => typeof note === "string" ? Note.getNote(note) : note);
         let col = this.getRhythmColumn(voiceId);
         let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio);
-        this.addRhythmSymbol(voiceId, noteGroup);
+        this.addRhythmSymbol(noteGroup);
         return noteGroup;
     }
 
-    addRest(voiceId: number, restLength: NoteLength | NoteLengthStr, options?: RestOptions, tupletRatio?: TupletRatio): ObjRest {
+    addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, options?: RestOptions, tupletRatio?: TupletRatio): ObjRest {
         let col = this.getRhythmColumn(voiceId);
         let rest = new ObjRest(col, voiceId, restLength, options, tupletRatio);
-        this.addRhythmSymbol(voiceId, rest);
+        this.addRhythmSymbol(rest);
         return rest;
+    }
+
+    addLyrics(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string, lyricsOptions: LyricsOptions) {
+        this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
+            let col = this.getRhythmColumn({ verse, line, vpos });
+            let lyricsContainer = col.getLyricsContainer(verse, line, vpos, validateNoteLength(lyricsLength));
+
+            if (lyricsContainer) {
+                let lyricsObj = new ObjLyrics(col, lyricsText, lyricsOptions);
+                lyricsContainer.addLyricsObject(lyricsObj);
+
+                this.addLayoutObject(lyricsObj, line, getVerseLayoutGroupId(verse), vpos);
+
+                this.lyricsContainers[verse] ??= [];
+
+                if (!this.lyricsContainers[verse].includes(lyricsContainer)) {
+                    this.lyricsContainers[verse].push(lyricsContainer);
+                }
+
+                this.lastAddedRhythmColumn = col;
+            }
+        });
     }
 
     /**
@@ -874,13 +917,16 @@ export class ObjMeasure extends MusicObject {
      * @param positionTicks - get ObjRhythmColumn with positionTicks. Insert new if necessary.
      * @returns 
      */
-    private getRhythmColumn(voiceId: number): ObjRhythmColumn {
-        // Find next positionTicks for symbol in voiceId.
+    private getRhythmColumn(arg: VoiceId | { verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos }): ObjRhythmColumn {
+        // Find next positionTicks for symbol in voiceId or lyrics object in verse.
         let positionTicks = 0;
 
         for (let i = this.columns.length - 1; i >= 0 && positionTicks === 0; i--) {
             let col = this.columns[i];
-            let symbol = col.getVoiceSymbol(voiceId);
+            let symbol = typeof arg === "number"
+                ? col.getVoiceSymbol(arg)
+                : col.getLyricsContainer(arg.verse, arg.line, arg.vpos);
+
             if (symbol) {
                 positionTicks = col.positionTicks + symbol.rhythmProps.ticks;
             }
@@ -1054,7 +1100,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     // Create triplets by triplet property of NoteOptions/RestOptions.
-    private createOldStyleTriplets(voiceId: number) {
+    private createOldStyleTriplets(voiceId: VoiceId) {
         let symbols = this.getVoiceSymbols(voiceId);
 
         for (let i = 0; i < symbols.length;) {
@@ -1155,7 +1201,7 @@ export class ObjMeasure extends MusicObject {
 
         let beamsCreated = false;
 
-        while(beamGroupSizeArrList.length > 0 && !beamsCreated) {
+        while (beamGroupSizeArrList.length > 0 && !beamsCreated) {
             let beamGroupSizeArr = beamGroupSizeArrList.shift()!;
 
             let groupSymbolsCopy = groupSymbols.slice();
@@ -1194,14 +1240,16 @@ export class ObjMeasure extends MusicObject {
         return this.barLineRight;
     }
 
-    getVoiceSymbols(voiceId: number): ReadonlyArray<RhythmSymbol> {
+    getVoiceSymbols(voiceId: VoiceId): ReadonlyArray<RhythmSymbol> {
         validateVoiceId(voiceId);
-
-        if (this.voiceSymbols[voiceId] === undefined) {
-            this.voiceSymbols[voiceId] = [];
-        }
-
+        this.voiceSymbols[voiceId] ??= [];
         return this.voiceSymbols[voiceId];
+    }
+
+    getLyricsContainers(verse: VerseNumber): ReadonlyArray<LyricsContainer> {
+        validateVerseNumber(verse);
+        this.lyricsContainers[verse] ??= [];
+        return this.lyricsContainers[verse];
     }
 
     completeRests(voiceId?: VoiceId | VoiceId[]) {

@@ -58,20 +58,28 @@ export type TabConfig = {
 /** Score configuration. */
 export type ScoreConfiguration = StaffConfig | TabConfig | (StaffConfig | TabConfig)[];
 
-/** VoiceId type. */
+/** Voice id. */
 export type VoiceId = 0 | 1 | 2 | 3;
 
-/** Get supported VoiceIds. Returns [0, 1, 2, 3]. */
+/** Get supported voice ids. Returns [0, 1, 2, 3]. */
 export function getVoiceIds(): ReadonlyArray<VoiceId> {
     return [0, 1, 2, 3];
 }
 
-/** Strng number type. */
+/** Strng number. */
 export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
 
-/** Get strin numbers. Returns [0, 1, 2, 3, 4, 5]. */
+/** Get string numbers. Returns [0, 1, 2, 3, 4, 5]. */
 export function getStringNumbers(): ReadonlyArray<StringNumber> {
     return [1, 2, 3, 4, 5, 6];
+}
+
+/** Verse number. */
+export type VerseNumber = 1 | 2 | 3;
+
+/** Get supported verse numbers. Returns [1, 2, 3]. */
+export function getVerseNumbers(): ReadonlyArray<VerseNumber> {
+    return [1, 2, 3];
 }
 
 /** Stem direction enum. */
@@ -180,6 +188,22 @@ export type RestOptions = {
 export type TupletOptions = {
     /** Show tuplet ratio (e.g. "3:2") instead of number of parts (e.g. "3"). */
     showRatio?: boolean
+}
+
+/** Lyrics text/syllable alignment.*/
+export enum LyricsAlign {
+    /** Left align lyrics text/syllable. */
+    Left = "left",
+    /** Center align lyrics text/syllable. */
+    Center = "center",
+    /** Right align lyrics text/syllable. */
+    Right = "right"
+}
+
+/** Lyrics options. */
+export type LyricsOptions = {
+    /** Alignment of lyrics text/syllable. */
+    align?: LyricsAlign | `${LyricsAlign}`
 }
 
 /** Fermata enum. */

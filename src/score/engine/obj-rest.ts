@@ -1,5 +1,5 @@
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
-import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem } from "../pub";
+import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
@@ -75,7 +75,7 @@ export class ObjRest extends MusicObject {
 
     readonly mi: MRest;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: number, noteLength: NoteLength | NoteLengthStr, options?: RestOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLength | NoteLengthStr, options?: RestOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         let diatonicId = getDiatonicIdFromStaffPos(options?.staffPos);

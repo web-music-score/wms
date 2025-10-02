@@ -10,6 +10,7 @@ import { Renderer } from "./renderer";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
+import { ObjLyrics } from "./obj-lyrics";
 
 export enum LayoutGroupId {
     Fermata,
@@ -18,11 +19,27 @@ export enum LayoutGroupId {
     Ending,
     TempoAnnotation,
     DynamicsAnnotation,
-    ChordLabel
+    ChordLabel,
+    LyricsVerse1,
+    LyricsVerse2,
+    LyricsVerse3
 }
 
-const WidenColumnList = [LayoutGroupId.NoteLabel, LayoutGroupId.ChordLabel];
-const RowAlignList = [LayoutGroupId.Navigation, LayoutGroupId.Ending, LayoutGroupId.TempoAnnotation, LayoutGroupId.DynamicsAnnotation, LayoutGroupId.ChordLabel];
+const WidenColumnList = [
+    LayoutGroupId.NoteLabel,
+    LayoutGroupId.ChordLabel
+];;
+
+const RowAlignList = [
+    LayoutGroupId.Navigation,
+    LayoutGroupId.Ending,
+    LayoutGroupId.TempoAnnotation,
+    LayoutGroupId.DynamicsAnnotation,
+    LayoutGroupId.ChordLabel,
+    LayoutGroupId.LyricsVerse1,
+    LayoutGroupId.LyricsVerse2,
+    LayoutGroupId.LyricsVerse3
+];
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
     while (p) {
@@ -38,7 +55,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
 
 export enum VerticalPos { Above = 0, Below = 1 }
 
-export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding;
+export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding | ObjLyrics;
 
 export class StaffGroup {
     constructor(readonly groupName: string, readonly staffsTabsAndGroups: number | string | (number | string)[], readonly verticalPosition: VerticalPosition) { }

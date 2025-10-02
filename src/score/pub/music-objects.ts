@@ -25,6 +25,7 @@ import { PlayStateChangeListener, VoiceId, getVoiceIds } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
 import { MPlayer } from "./music-interface";
+import { ObjLyrics } from "score/engine/obj-lyrics";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -711,7 +712,7 @@ export class MRhythmColumn extends MusicInterface {
      * @param voiceId - Voice id.
      * @returns - Note group, rest or undefined.
      */
-    getRhythmSymbol(voiceId: number): MNoteGroup | MRest | undefined {
+    getRhythmSymbol(voiceId: VoiceId): MNoteGroup | MRest | undefined {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
 
         return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
@@ -924,6 +925,30 @@ export class MText extends MusicInterface {
     /**
      * Get text content.
      * @returns - Text content.
+     */
+    getText(): string {
+        return this.obj.getText();
+    }
+}
+
+/** Lyrics object. */
+export class MLyrics extends MusicInterface {
+    /** Object name. */
+    static readonly Name = "Lyrics";
+
+    /** @internal */
+    constructor(private readonly obj: ObjLyrics) {
+        super(MLyrics.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjLyrics {
+        return this.obj;
+    }
+
+    /**
+     * Get lyrics text.
+     * @returns - Lyrics text.
      */
     getText(): string {
         return this.obj.getText();

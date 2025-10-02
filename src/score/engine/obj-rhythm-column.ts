@@ -1,16 +1,18 @@
-import { Note, NoteLength } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, validateNoteLength } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds } from "../pub";
+import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
-import { ObjMeasure, validateVoiceId } from "./obj-measure";
+import { ObjMeasure, validateVerseNumber, validateVoiceId } from "./obj-measure";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
+import { LyricsContainer } from "./obj-lyrics";
+import { VerticalPos } from "./layout-object";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -43,6 +45,7 @@ export type RhythmSymbol = ObjNoteGroup | ObjRest;
 
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
+    private readonly lyricsContainers: { lyricsContainer: LyricsContainer, verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos }[] = [];
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
@@ -185,7 +188,7 @@ export class ObjRhythmColumn extends MusicObject {
         return this.arpeggioDir ?? Arpeggio.Up;
     }
 
-    setVoiceSymbol(voiceId: number, symbol: RhythmSymbol) {
+    setVoiceSymbol(voiceId: VoiceId, symbol: RhythmSymbol) {
         validateVoiceId(voiceId);
 
         this.voiceSymbol[voiceId] = symbol;
@@ -215,8 +218,23 @@ export class ObjRhythmColumn extends MusicObject {
         this.requestRectUpdate();
     }
 
-    getVoiceSymbol(voiceId: number): RhythmSymbol | undefined {
+    getVoiceSymbol(voiceId: VoiceId): RhythmSymbol | undefined {
         return this.voiceSymbol[voiceId];
+    }
+
+    getLyricsContainer(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos, lyricsLength?: NoteLength): LyricsContainer | undefined {
+        let data = this.lyricsContainers.find(data => data.verse === verse && data.line === line && data.vpos === vpos);
+
+        if (data === undefined && lyricsLength !== undefined) {
+            data = { lyricsContainer: new LyricsContainer(this, validateNoteLength(lyricsLength)), verse, line, vpos }
+
+            this.lyricsContainers.push(data);
+
+            this.requestLayout();
+            this.requestRectUpdate();
+        }
+
+        return data?.lyricsContainer;
     }
 
     getMinWidth() {
