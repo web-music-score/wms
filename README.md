@@ -187,14 +187,15 @@ For optional beam grouping argument for 5/8 and 7/8 time signatures you can use 
 enum values (e.g. `Theory.BeamGrouping._2_2_3`) or corresponding string values (e.g. `"2-2-3"`).
 
 ```js
-.setTimeSignature("2/4")          // Set time signature of 2/4.
-.setTimeSignature("3/4")          // Set time signature of 3/4.
-.setTimeSignature("4/4")          // Set time signature of 4/4.
-.setTimeSignature("5/8", "2-3")   // Set time signature of 5/8. Available beam groupings are "2-3" (default) and "3-2".
-.setTimeSignature("6/8")          // Set time signature of 6/8.
-.setTimeSignature("7/8", "2-2-3") // Set time signature of 7/8. Available beam groupings are "2-2-3" (default) and "3-2-2".
-.setTimeSignature("9/8")          // Set time signature of 9/8.
-.setTimeSignature(12, 8)          // Set time signature of 12/8 using number arguments.
+.setTimeSignature("2/4")          // Set 2/4 time signature.
+.setTimeSignature("3/4")          // Set 3/4 time signature.
+.setTimeSignature("4/4")          // Set 4/4 time signature.
+.setTimeSignature("3/8")          // Set 3/8 time signature.
+.setTimeSignature("5/8", "2-3")   // Set 5/8 time signature. Available beam groupings are "2-3" (default) and "3-2".
+.setTimeSignature("6/8")          // Set 6/8 time signature.
+.setTimeSignature("7/8", "2-2-3") // Set 7/8 time signature. Available beam groupings are "2-2-3" (default) and "3-2-2".
+.setTimeSignature("9/8")          // Set 9/8 time signature.
+.setTimeSignature(12, 8)          // Set 12/8 time signature using number arguments.
 ```
 
 ### Set Tempo
@@ -389,6 +390,7 @@ These are the beam groupings for each time signature.
 | `2/4` | `2-2` |
 | `3/4` | `2-2-2` |
 | `4/4` | `4-4` and `2-2-2-2` together |
+| `3/8` | `3` |
 | `5/8` | `2-3` or `3-2`, user selectable |
 | `6/8` | `3-3` |
 | `7/8` | `2-2-3` or `3-2-2`, user selectable |

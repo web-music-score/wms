@@ -10,6 +10,8 @@ export enum TimeSignatures {
     _3_4 = "3/4",
     /** 4/4 time signature. */
     _4_4 = "4/4",
+    /** 3/8 time signature. */
+    _3_8 = "3/8",
     /** 5/8 time signature. */
     _5_8 = "5/8",
     /** 6/8 time signature. */
@@ -108,6 +110,9 @@ export class TimeSignature {
         }
         else if (this.is(4, 4)) {
             this.beamGroupSizes = [[2, 2], [2, 2]];
+        }
+        else if (this.is(3, 8)) {
+            this.beamGroupSizes = [[3]];
         }
         else if (this.is(5, 8)) {
             if (!Utils.Is.isUndefined(beamGrouping) && beamGrouping !== BeamGrouping._2_3 && beamGrouping !== BeamGrouping._3_2) {
