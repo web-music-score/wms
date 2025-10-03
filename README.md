@@ -1,6 +1,6 @@
-# WebMusicScore
+# Web Music Score
 
-TS Docs, Examples and Demos can be found [here](https://pahkasoft.github.io).
+Homepage (docs, examples and demos): [Web Music Score](https://pahkasoft.github.io/web-music-score)
 
 ## About
 
