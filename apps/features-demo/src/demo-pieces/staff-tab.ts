@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createGuitarTabDemo() {
+export function createStaffConfigTabDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Guitar Tab")
+        .setHeader("Staff Config: Tab")
         .setScoreConfiguration("guitarTab")
 
         .addMeasure()

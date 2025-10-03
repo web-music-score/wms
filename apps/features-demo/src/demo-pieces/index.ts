@@ -1,20 +1,22 @@
 import { createAndanteByDiabelli, createGreensleeves, createFrereJacques } from "@tspro/web-music-score/pieces";
-import { createRepeatsAndEndingsDemo } from "demo-pieces/repeats-endings";
-import { createDaCapoDemo } from "demo-pieces/da-capo";
-import { createDalSegnoDemo } from "demo-pieces/dal-segno";
-import { createBeamDetectionDemo } from "demo-pieces/beam-detections";
+import { createNavigationRepeatEndingDemo } from "demo-pieces/navigation-repeats-endings";
+import { createNavigationDCAlFineDemo } from "demo-pieces/navigation-DC_al_Fine";
+import { createNavigationDCAlCodaDemo } from "demo-pieces/navigation-DC_al_Coda";
+import { createNavigationDSAlFineDemo } from "demo-pieces/navigation-DS_al_Fine";
+import { createNavigationDSAlCodaDemo } from "demo-pieces/navigation-DS_al_Coda";
+import { createBeamsDetectionDemo } from "demo-pieces/beams-detections";
 import { createConnectivesDemo } from "demo-pieces/connectives";
 import { createFermataDemo } from "demo-pieces/fermata";
 import { createStaccatoDemo } from "demo-pieces/staccato";
 import { createSignatureChangeDemo } from "demo-pieces/signature-change";
-import { createGrandStaffDemo } from "./grand-staff";
-import { createTupletsDemo } from "./tuplets";
-import { createTempoAnnotationDemo } from "./tempo-annotation";
-import { createDynamicsAnnotationDemo } from "./dynamics-annotation";
+import { createStaffConfigGrandDemo } from "./staff-grand";
+import { createBeamsTupletsDemo } from "./beams-tuplets";
+import { createAnnotationTempoDemo } from "./annotation-tempo";
+import { createAnnotationDynamicsDemo } from "./annotation-dynamics";
 import { createCompleteRestsDemo } from "./complete-rests";
 import { createNoteHeadsDemo } from "./note-heads";
-import { createGuitarCombinedDemo } from "./guitar-combined";
-import { createGuitarTabDemo } from "./guitar-tab";
+import { createStaffConfigGuitarDemo } from "./staff-guitar";
+import { createStaffConfigTabDemo } from "./staff-tab";
 import { createStaffGroupsDemo } from "./staff-groups";
 import { createLyricsDemo } from "./lyrics";
 import * as Score from "@tspro/web-music-score/score";
@@ -41,22 +43,24 @@ export class DemoPieces {
         pieces.push(createFrereJacques());
 
         // Add features demos
-        demos.push(createRepeatsAndEndingsDemo());
-        demos.push(createDaCapoDemo());
-        demos.push(createDalSegnoDemo());
-        demos.push(createBeamDetectionDemo());
-        demos.push(createTupletsDemo());
+        demos.push(createNavigationRepeatEndingDemo());
+        demos.push(createNavigationDCAlFineDemo());
+        demos.push(createNavigationDCAlCodaDemo());
+        demos.push(createNavigationDSAlFineDemo());
+        demos.push(createNavigationDSAlCodaDemo());
+        demos.push(createBeamsDetectionDemo());
+        demos.push(createBeamsTupletsDemo());
         demos.push(createConnectivesDemo());
         demos.push(createFermataDemo());
         demos.push(createStaccatoDemo());
         demos.push(createSignatureChangeDemo());
-        demos.push(createGrandStaffDemo());
-        demos.push(createTempoAnnotationDemo());
-        demos.push(createDynamicsAnnotationDemo());
+        demos.push(createStaffConfigGrandDemo());
+        demos.push(createAnnotationTempoDemo());
+        demos.push(createAnnotationDynamicsDemo());
         demos.push(createCompleteRestsDemo());
         demos.push(createNoteHeadsDemo());
-        demos.push(createGuitarCombinedDemo());
-        demos.push(createGuitarTabDemo());
+        demos.push(createStaffConfigGuitarDemo());
+        demos.push(createStaffConfigTabDemo());
         demos.push(createStaffGroupsDemo());
         demos.push(createLyricsDemo());
 
@@ -65,9 +69,9 @@ export class DemoPieces {
         demos.sort((a, b) => (a.getTitle() ?? "").localeCompare(b.getTitle() ?? ""));
 
         this.docs = [
-            "--- Sample Pieces ---",
+            "--- Pieces ---",
             ...pieces,
-            "--- Feature Demos ---",
+            "--- Features ---",
             ...demos
         ];
     }

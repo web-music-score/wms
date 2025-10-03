@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createBeamDetectionDemo() {
+export function createBeamsDetectionDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Beam Detection")
+        .setHeader("Beams: Detection")
         .setScoreConfiguration("guitarTreble")
 
         .addMeasure()

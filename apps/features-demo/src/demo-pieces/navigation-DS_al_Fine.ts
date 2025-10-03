@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createDaCapoDemo() {
+export function createNavigationDSAlFineDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Da Capo Navigation")
+        .setHeader("Navigation: D.S. al Fine")
         .setScoreConfiguration("treble")
 
         .addMeasure()
@@ -12,6 +12,7 @@ export function createDaCapoDemo() {
         .addNote(0, "G4", "2n")
 
         .addMeasure()
+        .addNavigation("Segno")
         .addNote(0, "G4", "2n")
 
         .addMeasure()
@@ -27,7 +28,7 @@ export function createDaCapoDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("D.C. al Fine")
+        .addNavigation("D.S. al Fine")
 
         .getDocument();
 }

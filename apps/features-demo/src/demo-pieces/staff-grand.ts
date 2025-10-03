@@ -1,12 +1,12 @@
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
-export function createGrandStaffDemo() {
+export function createStaffConfigGrandDemo() {
 
     let scale = Theory.getScale("Cb", "Major");
 
     return new Score.DocumentBuilder()
-        .setHeader("Grand Staff")
+        .setHeader("Staff Config: Grand")
         .setScoreConfiguration("grand")
         .setMeasuresPerRow(3)
 

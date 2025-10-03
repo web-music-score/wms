@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createDynamicsAnnotationDemo() {
+export function createAnnotationDynamicsDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Dynamics Annotation")
+        .setHeader("Annotation: Dynamics")
         .setScoreConfiguration("guitarTreble")
 
         .addMeasure()

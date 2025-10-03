@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createTempoAnnotationDemo() {
+export function createAnnotationTempoDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Tempo Annotation")
+        .setHeader("Annotation: Tempo")
         .setScoreConfiguration("guitarTreble")
 
         .addMeasure()

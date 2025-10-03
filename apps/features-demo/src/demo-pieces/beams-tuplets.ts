@@ -1,9 +1,9 @@
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 
-export function createTupletsDemo() {
+export function createBeamsTupletsDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Tuplets")
+        .setHeader("Beams: Tuplets")
         .setScoreConfiguration("guitarTreble")
 
         .addMeasure()

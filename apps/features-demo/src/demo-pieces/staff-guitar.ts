@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createGuitarCombinedDemo() {
+export function createStaffConfigGuitarDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Guitar Combined")
+        .setHeader("Staff Config: Guitar (Combined)")
         .setScoreConfiguration([
             { type: "staff", clef: "G", isOctaveDown: true, voiceIds: [0, 1] },
             { type: "tab", tuning: "Drop D", voiceIds: [0, 1] }

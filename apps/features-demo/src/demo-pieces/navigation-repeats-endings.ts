@@ -1,8 +1,8 @@
 import * as Score from "@tspro/web-music-score/score";
 
-export function createRepeatsAndEndingsDemo() {
+export function createNavigationRepeatEndingDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Repeats And Endings")
+        .setHeader("Navigation: Repeat & Ending")
         .setScoreConfiguration("guitarTreble")
 
         .addMeasure()
