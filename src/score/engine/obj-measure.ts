@@ -899,8 +899,13 @@ export class ObjMeasure extends MusicObject {
 
             if (lyricsContainer) {
                 let lyricsObj = new ObjLyrics(col, verse, line, vpos, lyricsText, lyricsOptions);
-                this.addLyricsObject(lyricsObj);
+
+                let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
+                lyricsArr.push(lyricsObj);
+                lyricsArr.sort((a, b) => cmp(a.col.positionTicks, b.col.positionTicks));
+
                 lyricsContainer.addLyricsObject(lyricsObj);
+
                 this.addLayoutObject(lyricsObj, line, getVerseLayoutGroupId(verse), vpos);
             }
 
@@ -1030,17 +1035,6 @@ export class ObjMeasure extends MusicObject {
         }
 
         return lyricsArr;
-    }
-
-    private addLyricsObject(lyricsObj: ObjLyrics): void {
-        let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
-
-        let i = lyricsArr.indexOf(lyricsObj);
-
-        if (i < 0) {
-            lyricsArr.push(lyricsObj);
-            lyricsArr.sort((a, b) => cmp(a.col.positionTicks, b.col.positionTicks));
-        }
     }
 
     getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
