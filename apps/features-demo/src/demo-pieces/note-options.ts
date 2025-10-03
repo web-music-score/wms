@@ -41,6 +41,40 @@ export function createNoteOptionsDemo() {
         .addNote(0, "D5", "4n", { diamond: true })
         .endRow()
 
+        .addMeasure()
+        .addNote(0, "E4", "1n", { stem: "up" }).addLyrics(1, "8n", "notes lengths")
+
+        .addMeasure()
+        .addNote(0, "E4", "2n")
+        .addNote(0, ["E4", "E4"], "4n")
+
+        .addMeasure()
+        .addNote(0, ["E4", "E4"], "8n")
+        .addNote(0, ["E4", "E4", "E4", "E4"], "16n")
+        .addRest(0, "2n")
+
+        .addMeasure()
+        .addNote(0, ["E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4"], "32n")
+        .addRest(0, "2.")
+
+        .endRow()
+
+        .addMeasure()
+        .addNote(0, ["E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4"], "64n")
+        .addRest(0, "2.")
+
+        .addMeasure()
+        .addNote(0, "E4", "8n").addLyrics(1, "8n", "flags")
+        .addNote(0, "E4", "16n").addLyrics(1, "16n")
+        .addNote(0, "E4", "32n").addLyrics(1, "32n")
+        .addNote(0, "E4", "64n").addLyrics(1, "64n")
+        .addNote(0, "E4", "8.").addLyrics(1, "8n", "dots")
+        .addNote(0, "E4", "8..")
+        .addNote(0, "E4", "8...")
+        .completeRests()
+
+        .endRow()
+
         .setScoreConfiguration("guitarTreble")
         .addMeasure()
         .setKeySignature("D Major")
