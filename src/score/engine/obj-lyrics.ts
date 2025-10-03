@@ -7,6 +7,9 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { VerticalPos } from "./layout-object";
 import { Utils } from "@tspro/ts-utils-lib";
+import { ObjMeasure } from "./obj-measure";
+
+const cmp = (a: number, b: number): -1 | 0 | 1 => a === b ? 0 : (a < b ? -1 : 1);
 
 export class LyricsContainer {
     readonly lyricsObjects: ObjLyrics[] = [];
@@ -16,35 +19,55 @@ export class LyricsContainer {
         this.rhythmProps = RhythmProps.get(lyricsLength);
     }
 
+    private static lyricsObjCache: Map<ObjNotationLine, Map<VerticalPos, Map<VerseNumber, Map<ObjMeasure, ObjLyrics[]>>>> = new Map();
+
     addLyricsObject(addObj: ObjLyrics) {
         this.lyricsObjects.push(addObj);
 
-        try {
-            let prevLyricsObject: ObjLyrics | undefined;
+        let vposMap = LyricsContainer.lyricsObjCache.get(addObj.line);
 
-            let measures = this.col.measure.getPrevMeasure()
-                ? [this.col.measure.getPrevMeasure()!, this.col.measure]
-                : [this.col.measure];
-
-            measures.forEach(m => {
-                m.getColumns().forEach(col => {
-                    col.getLyricsContainerDatas().forEach(data => {
-                        data.lyricsContainer.lyricsObjects.forEach(curObj => {
-                            if (curObj.verse === addObj.verse && curObj.line === addObj.line && curObj.vpos === addObj.vpos) {
-                                if (curObj === addObj) {
-                                    prevLyricsObject?.setNextLyricsObject(addObj);
-                                    throw 0;
-                                }
-                                else {
-                                    prevLyricsObject = curObj;
-                                }
-                            }
-                        });
-                    });
-                });
-            });
+        if (vposMap === undefined) {
+            vposMap = new Map();
+            LyricsContainer.lyricsObjCache.set(addObj.line, vposMap);
         }
-        catch (e) { }
+
+        let verseMap = vposMap.get(addObj.vpos);
+
+        if (verseMap === undefined) {
+            verseMap = new Map();
+            vposMap.set(addObj.vpos, verseMap);
+        }
+
+        let measureMap = verseMap.get(addObj.verse);
+
+        if (measureMap === undefined) {
+            measureMap = new Map();
+            verseMap.set(addObj.verse, measureMap);
+        }
+
+        let lyricsArr = measureMap.get(addObj.measure);
+
+        if (lyricsArr === undefined) {
+            lyricsArr = [];
+            measureMap.set(addObj.measure, lyricsArr);
+        }
+
+        lyricsArr.push(addObj);
+        lyricsArr.sort((a, b) => cmp(a.col.positionTicks, b.col.positionTicks));
+
+        let i = lyricsArr.indexOf(addObj);
+        if (i > 0) {
+            lyricsArr[i - 1].setNextLyricsObject(addObj);
+        }
+        else if (i === 0) {
+            let prevMeasure = addObj.measure.getPrevMeasure();
+            if (prevMeasure) {
+                lyricsArr = LyricsContainer.lyricsObjCache.get(addObj.line)?.get(addObj.vpos)?.get(addObj.verse)?.get(prevMeasure) ?? [];
+                if (lyricsArr.length > 0) {
+                    lyricsArr[lyricsArr.length - 1].setNextLyricsObject(addObj);
+                }
+            }
+        }
     }
 }
 
@@ -57,8 +80,8 @@ export class ObjLyrics extends MusicObject {
 
     readonly mi: MLyrics;
 
-    constructor(parent: MusicObject, readonly verse: VerseNumber, readonly line: ObjNotationLine, readonly vpos: VerticalPos, lyricsText: string, lyricsOptions?: LyricsOptions) {
-        super(parent);
+    constructor(readonly col: ObjRhythmColumn, readonly verse: VerseNumber, readonly line: ObjNotationLine, readonly vpos: VerticalPos, lyricsText: string, lyricsOptions?: LyricsOptions) {
+        super(col);
 
         let halign = lyricsOptions?.align === LyricsAlign.Left ? 0 : lyricsOptions?.align === LyricsAlign.Right ? 1 : 0.5;
 
@@ -73,6 +96,10 @@ export class ObjLyrics extends MusicObject {
 
     getMusicInterface(): MLyrics {
         return this.mi;
+    }
+
+    get measure(): ObjMeasure {
+        return this.col.measure;
     }
 
     getText(): string {

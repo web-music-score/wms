@@ -30,6 +30,27 @@ export function createLyricsDemo() {
         .endRow()
 
         .addMeasure()
+        .setTimeSignature("2/4")
+        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Hyp", { hyphen: "-" })
+
+        .addMeasure()
+        .addNote(0, "C4", "2n").addLyrics(1, "2n", "hen")
+
+        .addMeasure()
+        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Ext", { hyphen: "---" })
+
+        .addMeasure()
+        .addNote(0, "C4", "2n").addLyrics(1, "2n", "ender")
+
+        .addMeasure()
+        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Hyp", { hyphen: "-" })
+        .endRow()
+
+        .addMeasure()
+        .addNote(0, "C4", "2n").addLyrics(1, "2n", "hen")
+
+
+        .addMeasure()
         .addNote(0, "C4", "4n").addLyrics(1, "4n", "1. La").addLyrics(2, "4n", "2. Aa", { hyphen: "---" }).addLyrics(3, "4n", "3. Hal", { hyphen: "-" })
         .addNote(0, "D4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa", { hyphen: "---" }).addLyrics(3, "4n", "le", { hyphen: "-" })
         .addNote(0, "C4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa", { hyphen: "---" }).addLyrics(3, "4n", "lu", { hyphen: "-" })
