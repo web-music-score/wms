@@ -57,12 +57,12 @@ browser module).
     It is recommended to use exact version number so that if something
     breaks between versions then your web site does not stop working.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@4.1.0"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4.2.0"></script>
 
 <!--
     Or you can use direct link to the js bundle.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@4.1.0/dist/iife/index.global.js"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@4.2.0/dist/iife/index.global.js"></script>
 
 
 <script>

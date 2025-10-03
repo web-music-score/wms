@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.2.0] - 2025-10-03
+## Added
+- Add support for lyrics/syllables with alignment and hyphen/extender.
+- addNote accepts array of notes to add multiple notes at once.
+- 3/8 time signature.
+
 ## [4.1.0] - 2025-10-01
 ## Added
 - 4-4 (in adition to 2-2-2-2) beam grouping for 4/4 time signature.
