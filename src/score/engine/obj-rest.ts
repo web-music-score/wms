@@ -193,17 +193,17 @@ export class ObjRest extends MusicObject {
             this.staffObjects.some(obj => obj instanceof ObjStaffRest && obj.staff === staff);
     }
 
-    private getRestDotVerticalDisplacement(noteLength: NoteLength): number {
-        switch (noteLength) {
-            case NoteLength.Whole: return 1;
-            case NoteLength.Half: return -1;
-            case NoteLength.Quarter: return -1;
-            case NoteLength.Eighth: return -1;
-            case NoteLength.Sixteenth: return -1;
-            case NoteLength.ThirtySecond: return -3;
-            case NoteLength.SixtyFourth: return -3;
+    private getRestDotVerticalDisplacement(noteSize: number): number {
+        switch (noteSize) {
+            case 1: return 1;
+            case 2: return -1;
+            case 4: return -1;
+            case 8: return -1;
+            case 16: return -1;
+            case 32: return -3;
+            case 64: return -3;
             default:
-                throw new MusicError(MusicErrorType.Score, "Cannot get rest dot vertical displacement because note length is invalid.");
+                throw new MusicError(MusicErrorType.Score, `Get rest dot vertical displacement: Invalid note size: ${noteSize}`);
         }
     }
 
@@ -219,26 +219,26 @@ export class ObjRest extends MusicObject {
 
         let { unitSize } = renderer;
         let { ownDiatonicId } = this;
-        let { noteLength, dotCount, flagCount } = this.rhythmProps;
+        let { noteSize, dotCount, flagCount } = this.rhythmProps;
 
         let leftw = 0;
         let rightw = 0;
         let toph = 0;
         let bottomh = 0;
 
-        if (noteLength === NoteLength.Whole) {
+        if (NoteLengthProps.equals(noteSize, NoteLength.Whole)) {
             leftw = unitSize;
             rightw = unitSize;
             toph = 0;
             bottomh = unitSize;
         }
-        else if (noteLength === NoteLength.Half) {
+        else if (NoteLengthProps.equals(noteSize, NoteLength.Half)) {
             leftw = unitSize;
             rightw = unitSize;
             toph = unitSize;
             bottomh = 0;
         }
-        else if (noteLength === NoteLength.Quarter) {
+        else if (NoteLengthProps.equals(noteSize, NoteLength.Quarter)) {
             leftw = unitSize * 1;
             rightw = unitSize * 1;
             toph = unitSize * 3.2;
@@ -265,7 +265,7 @@ export class ObjRest extends MusicObject {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
 
                 let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
-                let dotY = this.getRestDotVerticalDisplacement(noteLength) * unitSize;
+                let dotY = this.getRestDotVerticalDisplacement(noteSize) * unitSize;
 
                 obj.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
             }
@@ -306,7 +306,7 @@ export class ObjRest extends MusicObject {
 
         let { unitSize, lineWidth } = renderer;
         let { color } = this;
-        let { noteLength, flagCount } = this.rhythmProps;
+        let { noteSize, flagCount } = this.rhythmProps;
 
         ctx.strokeStyle = ctx.fillStyle = color;
         ctx.lineWidth = lineWidth;
@@ -317,13 +317,13 @@ export class ObjRest extends MusicObject {
             let x = restRect.centerX;
             let y = restRect.centerY;
 
-            if (noteLength === NoteLength.Whole) {
+            if (NoteLengthProps.equals(noteSize, NoteLength.Whole)) {
                 ctx.fillRect(x - unitSize, y, unitSize * 2, unitSize);
             }
-            else if (noteLength === NoteLength.Half) {
+            else if (NoteLengthProps.equals(noteSize, NoteLength.Half)) {
                 ctx.fillRect(x - unitSize, y - unitSize, unitSize * 2, unitSize);
             }
-            else if (noteLength === NoteLength.Quarter) {
+            else if (NoteLengthProps.equals(noteSize, NoteLength.Quarter)) {
                 ctx.beginPath();
                 // Upper part
                 ctx.moveTo(x - unitSize * 0.6, y - unitSize * 3.2);
