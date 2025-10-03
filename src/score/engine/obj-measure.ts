@@ -25,7 +25,9 @@ import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
-import { LyricsContainer, ObjLyrics } from "./obj-lyrics";
+import { ObjLyrics } from "./obj-lyrics";
+
+const cmp = (a: number, b: number): -1 | 0 | 1 => a === b ? 0 : (a < b ? -1 : 1);
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -149,6 +151,7 @@ export class ObjMeasure extends MusicObject {
     private endRepeatPlayCountText?: ObjText;
 
     private staticObjectsCache = new Map<ObjNotationLine, MusicObject[]>();
+    private lyricsObjectsCache = new Map<ObjNotationLine, Map<VerticalPos, Map<VerseNumber, ObjLyrics[]>>>();
 
     readonly mi: MMeasure;
 
@@ -896,6 +899,7 @@ export class ObjMeasure extends MusicObject {
 
             if (lyricsContainer) {
                 let lyricsObj = new ObjLyrics(col, verse, line, vpos, lyricsText, lyricsOptions);
+                this.addLyricsObject(lyricsObj);
                 lyricsContainer.addLyricsObject(lyricsObj);
                 this.addLayoutObject(lyricsObj, line, getVerseLayoutGroupId(verse), vpos);
             }
@@ -1001,6 +1005,60 @@ export class ObjMeasure extends MusicObject {
 
     getStaffLineRight() {
         return this.barLineRight.getRect().centerX;
+    }
+
+    private getLyricsObjects(line: ObjNotationLine, vpos: VerticalPos, verse: VerseNumber): ObjLyrics[] {
+        let vposMap = this.lyricsObjectsCache.get(line);
+
+        if (vposMap === undefined) {
+            vposMap = new Map();
+            this.lyricsObjectsCache.set(line, vposMap);
+        }
+
+        let verseMap = vposMap.get(vpos);
+
+        if (verseMap === undefined) {
+            verseMap = new Map();
+            vposMap.set(vpos, verseMap);
+        }
+
+        let lyricsArr = verseMap.get(verse);
+
+        if (lyricsArr === undefined) {
+            lyricsArr = [];
+            verseMap.set(verse, lyricsArr);
+        }
+
+        return lyricsArr;
+    }
+
+    private addLyricsObject(lyricsObj: ObjLyrics): void {
+        let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
+
+        let i = lyricsArr.indexOf(lyricsObj);
+
+        if (i < 0) {
+            lyricsArr.push(lyricsObj);
+            lyricsArr.sort((a, b) => cmp(a.col.positionTicks, b.col.positionTicks));
+        }
+    }
+
+    getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
+        let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
+
+        let i = lyricsArr.indexOf(lyricsObj);
+
+        if (i > 0) {
+            return lyricsArr[i - 1];
+        }
+        else if (i === 0) {
+            let lyricsArr = lyricsObj.measure.getPrevMeasure()?.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
+            if (lyricsArr && lyricsArr.length > 0) {
+                return lyricsArr[lyricsArr.length - 1];
+            }
+        }
+
+        return undefined;
     }
 
     getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
