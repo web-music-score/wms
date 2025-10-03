@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.2.1] - 2025-10-04
+## Fixed
+- Error was thrown with dotted rests.
+
 ## [4.2.0] - 2025-10-03
 ## Added
 - Add support for lyrics/syllables with alignment and hyphen/extender.
