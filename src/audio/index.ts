@@ -1,10 +1,10 @@
 import { Note, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { Synthesizer } from "./audio-synth";
 import { init as initCore, MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Instrument } from "./instrument";
+import { Instrument, linearToDecibels } from "./instrument";
 import { Utils } from "@tspro/ts-utils-lib";
 
-export { Instrument }
+export { Instrument, linearToDecibels }
 
 initCore();
 
