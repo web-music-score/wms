@@ -76,7 +76,7 @@ export interface GuitarViewState {
 
 /**
  * Guitar (neck) view react component.
- * <pre>
+ * ```ts
  *   // Using with React TSX/JSX
  *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
  *   import * as Theory from "@tspro/web-music-score/theory";
@@ -93,15 +93,15 @@ export interface GuitarViewState {
  *       const onUpdateFretPosition: ScoreUI.UpdateFretPositionFunc = (fretPos) => { }
  *       const onClickFretPosition: ScoreUI.ClickFretPositionFunc = (fretPos) => { }
  * 
- *       return &lt;&gt;
- *           &lt;ScoreUI.GuitarView
+ *       return <>
+ *           <ScoreUI.GuitarView
  *               style={{ position: "relative", width: 640 }}
  *               guitarContext={guitarCtx}
  *               onUpdateFretPosition={onUpdateFretPosition}
- *               onClickFretPosition={onClickFretPosition} /&gt;
- *      &lt;/&gt;;
+ *               onClickFretPosition={onClickFretPosition} />
+ *      </>;
  *   }
- * </pre>
+ * ```
  */
 export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState> {
     state: GuitarViewState;

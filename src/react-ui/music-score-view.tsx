@@ -8,7 +8,7 @@ export interface MusicScoreViewProps {
 
 /**
  * Music score view react component.
- * <pre>
+ * ```ts
  *   // Using with React TSX/JSX
  *   import * as Score from "@tspro/web-music-score/react";
  *   import * as Pieces from "@tspro/web-music-score/pieces";
@@ -17,11 +17,11 @@ export interface MusicScoreViewProps {
  *   render() {
  *       const doc = Pieces.createFrereJacques();
  * 
- *       return &lt;&gt;
- *          &lt;Score.MusicScoreView doc=\{doc\} /&gt;
- *       &lt;/&gt;;
+ *       return <>
+ *          <Score.MusicScoreView doc=\{doc\} />
+ *       </>;
  *   }
- * </pre>
+ * ```
  */
 export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
 

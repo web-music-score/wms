@@ -180,7 +180,7 @@ export type ExtensionBuilder = {
 
 /**
  * Document builder class.
- * <pre>
+ * ```ts
  * // Example
  * let doc = new Score.DocumentBuilder()
  *     .addScoreConfiguration({ type: "staff", clef: "G", isOctavewDown: true })
@@ -191,7 +191,7 @@ export type ExtensionBuilder = {
  *     .addRest(1, "4n")
  *     // etc.
  *     .getDEocument();
- * </pre>
+ * ```
  */
 export class DocumentBuilder {
     private readonly doc: ObjDocument;
@@ -463,13 +463,13 @@ export class DocumentBuilder {
 
     /**
      * Usage:
-     * <pre>
+     * ```ts
      * addTuplet(0, Theory.Tuplet.Triplet, notes => {
      *     notes.addNote("G3", Theory.NoteLength.Eighth);
      *     notes.addNote("B3", Theory.NoteLength.Eighth);
      *     notes.addNote("D4", Theory.NoteLength.Eighth);
      * });
-     * </pre>
+     * ```
      * 
      * @param voiceId - Voice id to add tuplet to.
      * @param tupletRatio - You can also use Theory.Tuplet presets (e.g. Theory.Tuplet.Triplet).
@@ -817,13 +817,13 @@ export class DocumentBuilder {
 
     /**
      * Add extension line to previously added annotation or label element.
-     * <pre>
+     * ```ts
      *     // Example
      *     addExtension(ext => ext.notes("1n", 2))          // length is 2 whole notes
      *     addExtension(ext => ext.measures(3).hide())      // length is 3 measures, hidden
      *     addExtension(ext => ext.measures(1).notes("8n")) // length is 1 measure + 1 eigth note
      *     addExtension(ext => ext.infinity())              // length is as long as possible
-     * </pre>
+     * ```
      * @param extensionBuilder - Extension builder function used to build exstension.
      * @returns - This document builder instance.
      */

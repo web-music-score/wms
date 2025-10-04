@@ -43,7 +43,7 @@ export interface CircleOfFifthsProps {
 
 /**
  * Circle of fifths react component.
- * <pre>
+ * ```ts
  *   // Using with React TSX/JSX
  *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
  *   import * as Theory from "@tspro/web-music-score/theory";
@@ -56,14 +56,14 @@ export interface CircleOfFifthsProps {
  *           console.log("New scale is " + newScale.getScaleName());
  *       }
  * 
- *       return &lt;&gt;
- *          &lt;ScoreUI.CircleOfFifths
+ *       return <>
+ *          <ScoreUI.CircleOfFifths
  *              style={{ position: "relative", padding: "0.5em" }}
  *              scale={curScale}
- *              onScaleChange={onChangeScale} /&gt;
- *      &lt;/&gt;;
+ *              onScaleChange={onChangeScale} />
+ *      </>;
  *   }
- * </pre>
+ * ```
  */
 export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
     constructor(props: CircleOfFifthsProps) {
