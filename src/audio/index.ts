@@ -20,6 +20,7 @@ function getNoteName(note: Note | number | string) {
 }
 
 const InstrumentList: Instrument[] = [Synthesizer];
+
 let CurrentInstrument: Instrument = Synthesizer;
 
 /**
@@ -39,11 +40,11 @@ export function getCurrentInstrument(): string {
 }
 
 /**
- * Register new instrument.
- * @param instr - Instrument object implementing Instrument interface.
+ * Add and use instrument.
+ * @param instrument - Object that implements Instrument interface. Can be single instrument or array of instruments.
  */
-export function registerInstrument(instr: Instrument | Instrument[]): void {
-    (Utils.Is.isArray(instr) ? instr : [instr])
+export function addInstrument(instrument: Instrument | Instrument[]): void {
+    (Utils.Is.isArray(instrument) ? instrument : [instrument])
         .forEach(instr => {
             if (
                 !Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) ||
@@ -62,22 +63,22 @@ export function registerInstrument(instr: Instrument | Instrument[]): void {
             }
 
             // Set as current.
-            setInstrument(instr.getName());
+            useInstrument(instr.getName());
         });
 }
 
 /**
- * Set current instrument to use in playback.
- * @param instrName - Instrument name.
+ * Set instrument to use in playback.
+ * @param instrumentName - Instrument name.
  */
-export function setInstrument(instrName: string): void {
-    if (instrName === CurrentInstrument.getName()) {
+export function useInstrument(instrumentName: string): void {
+    if (instrumentName === CurrentInstrument.getName()) {
         return;
     }
 
     CurrentInstrument.stop();
 
-    let instr = InstrumentList.find(instr => instr.getName() === instrName);
+    let instr = InstrumentList.find(instr => instr.getName() === instrumentName);
 
     if (instr) {
         CurrentInstrument = instr;

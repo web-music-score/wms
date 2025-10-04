@@ -18,7 +18,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
     constructor(props: {}) {
         super(props);
 
-        Audio.registerInstrument(ClassicalGuitar);
+        Audio.addInstrument(ClassicalGuitar);
 
         this.state = {
             instrument: Audio.getCurrentInstrument(),
@@ -42,7 +42,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
         }
 
         const onChangeInstrument = (instrument: string) => {
-            Audio.setInstrument(instrument);
+            Audio.useInstrument(instrument);
             this.setState({ instrument });
         }
 

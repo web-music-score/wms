@@ -86,8 +86,8 @@ React module `react-ui` is not included available for browser usage.
     // Classical guitar audio is available via global name Audio_ClassicalGuitar.
     const { ClassicalGuitar } = window.Audio_ClassicalGuitar;
 
-    // Register classical guitar instrument.
-    Audio.registerInstrument(ClassicalGuitar);
+    // Add and use classical guitar instrument.
+    Audio.addInstrument(ClassicalGuitar);
 </script>
 ```
 
@@ -431,8 +431,8 @@ Other instruments need to be registered manually.
 // Import classical guitar instrument.
 import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
 
-// Register and activate classical guitar instrument.
-Audio.registerInstrument(ClassicalGuitar);
+// Add and use classical guitar instrument.
+Audio.addInstrument(ClassicalGuitar);
 ```
 
 You can easily create and register your own instrument.
@@ -444,8 +444,8 @@ class MyCoolInstrument implements Audio.Instrument {
     stop() { }
 }
 
-// Register and activate.
-Audio.registerInstrument(new MyCoolInstrument());
+// Add and use my cool instrument.
+Audio.addInstrument(new MyCoolInstrument());
 ```
 
 ### Play Document

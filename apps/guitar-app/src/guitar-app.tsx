@@ -58,7 +58,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
     constructor(props: {}) {
         super(props);
 
-        Audio.registerInstrument(ClassicalGuitar);
+        Audio.addInstrument(ClassicalGuitar);
 
         Cookies.setExpireDays(30);
 
@@ -119,7 +119,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
             instrument = Audio.getCurrentInstrument();
         }
 
-        Audio.setInstrument(instrument);
+        Audio.useInstrument(instrument);
 
         let windowRect = new Score.DivRect();
 
@@ -200,11 +200,11 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
         GuitarApp.back();
     }
 
-    setInstrument(instrument: string) {
+    useInstrument(instrument: string) {
         if (instrument !== this.state.instrument) {
             this.setState({ instrument });
             Cookies.save(AppCookies.Instrument, instrument);
-            Audio.setInstrument(instrument);
+            Audio.useInstrument(instrument);
         }
     }
 

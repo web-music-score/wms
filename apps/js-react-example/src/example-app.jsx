@@ -10,7 +10,7 @@ export class ExampleApp extends React.Component {
     constructor(props) {
         super(props);
 
-        Audio.registerInstrument(ClassicalGuitar);
+        Audio.addInstrument(ClassicalGuitar);
 
         let doc = createFrereJacques();
 

@@ -2,7 +2,7 @@
 
 ## [5.0.0] - 2025-10-04
 ### **Breiking Changes**
-- Audio interface/instruments required update to create audio-cg iife module for browser.
+- Audio interface/instruments required update to create independent audio-cg iife module for browser.
 
 ## [4.2.1] - 2025-10-04
 ## Fixed

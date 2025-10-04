@@ -22,7 +22,7 @@ import { Instrument } from "../../audio/instrument";
  *   import * as Audio from "@tspro/web-music-score/audio";
  *   import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
  * 
- *   Audio.registerInstrument(ClassicalGuitar);
+ *   Audio.addInstrument(ClassicalGuitar);
  * ```
  */
 const ClassicalGuitar: Instrument = new GenericInstrument("Classical Guitar", {

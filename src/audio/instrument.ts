@@ -6,15 +6,15 @@
  * ```ts
  *   import * as Audio from "@tspro/web-music-score/audio";
  * 
- *   class CoolInstrument implements Audio.Instrument {
+ *   class MyCoolInstrument implements Audio.Instrument {
  *       constructor() { }
- *       getName() { return "Cool Instrument"; }
+ *       getName() { return "My Cool Instrument"; }
  *       playNote(note: string, duration: number, linearVolume: number) { }
  *       stop() { }
  *   }
  * 
- *   // Register and activate.
- *   Audio.registerInstrument(new CoolInstrument());
+ *   // Add and use my cool instrument.
+ *   Audio.addInstrument(new MyCoolInstrument());
  * ```
  */
 export interface Instrument {
@@ -23,7 +23,7 @@ export interface Instrument {
      * @return - Instrument name.
      */
     getName(): string;
-    
+
     /**
      * Play a note.
      * @param note - Note to play (e.g. "C4").
@@ -31,7 +31,7 @@ export interface Instrument {
      * @param linearVolume - Linear volume in range [0, 1].
      */
     playNote(note: string, duration: number, linearVolume: number): void;
-    
+
     /**
      * Stop playback.
      */
@@ -39,18 +39,12 @@ export interface Instrument {
 }
 
 /**
- * Linear to decibel volume converter, can be useful with instruments.
- * @param linearVolume - Linear volume 0..1.
- * @returns - DEcibel volume.
+ * Linear volume to decibels converter.
+ * @param linearVolume - Linear volume in range [0, 1].
+ * @returns - Volume in decibels.
  */
 export function linearToDecibels(linearVolume: number): number {
-    if (!isFinite(linearVolume)) {
-        throw new Error("linearToDecibel: Invalid linearVolume = " + linearVolume);
-    }
-    else if (linearVolume <= 0) {
-        return -Infinity;
-    }
-    else {
-        return 20 * Math.log10(linearVolume);
-    }
+    return (!isFinite(linearVolume) || linearVolume <= 0)
+        ? -Infinity
+        : 20 * Math.log10(linearVolume);
 }

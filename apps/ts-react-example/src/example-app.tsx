@@ -14,7 +14,7 @@ export class ExampleApp extends React.Component<{}, ExampleAppState> {
     constructor(props: {}) {
         super(props);
 
-        Audio.registerInstrument(ClassicalGuitar);
+        Audio.addInstrument(ClassicalGuitar);
 
         let doc = createFrereJacques();
 

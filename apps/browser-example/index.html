@@ -30,7 +30,7 @@
         const { Audio, Score } = window.WebMusicScore;
         const { ClassicalGuitar } = window.Audio_ClassicalGuitar;
 
-        Audio.registerInstrument(ClassicalGuitar);
+        Audio.addInstrument(ClassicalGuitar);
 
         let doc = new Score.DocumentBuilder()
             .setScoreConfiguration("treble")
