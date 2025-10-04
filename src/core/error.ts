@@ -7,7 +7,8 @@ export enum MusicErrorType {
     Scale,
     KeySignature,
     Timesignature,
-    Score
+    Score,
+    Audio
 }
 
 function isType(type: unknown): type is MusicErrorType {

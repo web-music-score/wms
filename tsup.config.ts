@@ -10,7 +10,7 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
-            'audio-cg/index': 'src/audio-cg/index.ts',
+            'audio-cg/index': 'src/audio-instruments/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
             'react-ui/index': 'src/react-ui/index.ts',
@@ -37,7 +37,7 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
-            'audio-cg/index': 'src/audio-cg/index.ts',
+            'audio-cg/index': 'src/audio-instruments/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
             'react-ui/index': 'src/react-ui/index.ts',
@@ -76,6 +76,27 @@ export default defineConfig([
         },
         define: {
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (iife)`)
+        },
+        esbuildPlugins: [tsupPluginInlineAssets()]
+    },
+
+    // audio-cg IIFE bundle
+    {
+        entry: {
+            'iife/audio-cg': 'src/audio-instruments/audio-cg/index.ts'
+        },
+        outDir: 'dist',
+        target: 'es2015',
+        format: ['iife'],
+        globalName: 'Audio_ClassicalGuitar',
+        sourcemap: true,
+        minify: true,
+        clean: false, // Don't wipe dist from the previous build
+        banner: {
+            js: bannerText
+        },
+        define: {
+            __LIB_INFO__: JSON.stringify(`Audio_ClassicalGuitar v${pkg.version} (iife)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()]
     }

@@ -13,6 +13,20 @@ This is a work in progress project. Lately there has been improvements that requ
 version update. As the project matures there might be less major updates, and more minor
 updates and patches.
 
+## Version 5 Update
+
+Version 5.0.0 changed audio interface so that audio modules are independent moudles not
+dependant of the lib. Now they can be used in browser environment as separate iife module.
+
+For more info, see sections [Browser Modules](#browser-modules) and [Instruments](#instruments)
+
+## Help Wanted
+
+If someone has piano or keyboard and can record samples for me I'd be happy to add a new instrument. 
+For the classical guitar instrument I recorded notes `E2`, `A2`, `D3`, `G3`, `B3`, `E4`,
+`A4`, `E5` and `A5`.
+Something similar would be ok but it is not limited to that. I use mp3 files e.g. "E2.mp3", etc. My email is available on [GitHub](https://github.com/pahkasoft) for signed in visitors.
+
 ## Installation
 
 ```sh
@@ -45,29 +59,35 @@ import * as Pieces from "@tspro/web-music-score/pieces";
 const Score = require("@tspro/web-music-score/score");
 ```
 
-## Browser Script
+## Browser Modules
 
-This module that can be used in html page via unpkg CDN. It declares global variable 
-`WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`, and `Pieces` as 
-corresponding subpath modules (`react-ui` and `audio-cg` are not included in this 
-browser module).
+This lib can be used in browser via unpkg CDN using iife bundle. It declares
+global name `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`,
+and `Pieces` as corresponding subpath modules.
+
+React module `react-ui` is not included available for browser usage.
 
 ```html
 <!--
-    It is recommended to use exact version number so that if something
-    breaks between versions then your web site does not stop working.
+    It is recommended to use exact version number and direct link to the bundle so
+    that if something breaks between versions then your web site does not stop working.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@4.2.0"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@5.0.0/dist/iife/index.global.js"></script>
 
 <!--
-    Or you can use direct link to the js bundle.
+    Classical guitar now also available for browser module.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@4.2.0/dist/iife/index.global.js"></script>
-
+<script src="https://unpkg.com/@tspro/web-music-score@5.0.0/dist/iife/audio-cg.global.js"></script>
 
 <script>
+    // The lib is available via global name WebMusicScore.
     const { Core, Audio, Theory, Score, Pieces } = window.WebMusicScore;
-    // ...
+
+    // Classical guitar audio is available via global name Audio_ClassicalGuitar.
+    const { ClassicalGuitar } = window.Audio_ClassicalGuitar;
+
+    // Register classical guitar instrument.
+    Audio.registerInstrument(ClassicalGuitar);
 </script>
 ```
 
@@ -400,17 +420,32 @@ These are the beam groupings for each time signature.
 How to set beam grouping for `5/8` and `7/8` time signatures,
 see [Set Time Signature](#set-time-signature) section above.
 
-### Classical Guitar Audio Module
+### Instruments
 
-Default instrument is `Synthesizer`.
+Default instrument `Synthesizer` is available out of the box.
+Other instruments need to be registered manually.
 
 `Classical Guitar` is available via `audio-cg` module.
-It is included as separate module because it contains over 1MB of guitar audio samples bundled in it.
 
 ```js
-import { registerClassicalGuitar } from "@tspro/web-music-score/audio-cg";
+// Import classical guitar instrument.
+import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
 
-registerClassicalGuitar(); // This registers classical guitar audio, and takes it into use.
+// Register and activate classical guitar instrument.
+Audio.registerInstrument(ClassicalGuitar);
+```
+
+You can easily create and register your own instrument.
+```js
+class MyCoolInstrument implements Audio.Instrument {
+    constructor() { }
+    getName() { return "My Cool Instrument"; }
+    playNote(note: string, duration: number, linearVolume: number) { }
+    stop() { }
+}
+
+// Register and activate.
+Audio.registerInstrument(new MyCoolInstrument());
 ```
 
 ### Play Document

@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as Audio from "@tspro/web-music-score/audio";
-import { registerClassicalGuitar } from "@tspro/web-music-score/audio-cg";
+import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
 import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
@@ -18,7 +18,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
     constructor(props: {}) {
         super(props);
 
-        registerClassicalGuitar();
+        Audio.registerInstrument(ClassicalGuitar);
 
         this.state = {
             instrument: Audio.getCurrentInstrument(),

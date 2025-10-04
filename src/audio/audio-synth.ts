@@ -1,8 +1,7 @@
 import * as Tone from "tone";
-import { Instrument } from ".";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Instrument, linearToDecibels } from "./instrument";
 
-class Synth implements Instrument {
+class SynthesizerInstr implements Instrument {
     private audioSource: Tone.PolySynth | undefined;
 
     constructor() {
@@ -33,14 +32,11 @@ class Synth implements Instrument {
         return "Synthesizer";
     }
 
-    playNote(note: string, duration?: number, linearVolume?: number) {
+    playNote(note: string, duration: number, linearVolume: number) {
         try {
             if (this.audioSource) {
-                if (linearVolume !== undefined) {
-                    this.audioSource.volume.value = Utils.Math.linearToDecibels(linearVolume);
-                }
-
-                this.audioSource.triggerAttackRelease(note, duration ?? "2n");
+                this.audioSource.volume.value = linearToDecibels(linearVolume);
+                this.audioSource.triggerAttackRelease(note, duration);
             }
         }
         catch (err) { }
@@ -56,4 +52,6 @@ class Synth implements Instrument {
     }
 }
 
-export const Synthesizer = new Synth();
+const Synthesizer: Instrument = new SynthesizerInstr();
+
+export { Synthesizer }

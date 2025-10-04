@@ -1,8 +1,8 @@
 import * as React from "react";
 
 // Try require
-const { registerClassicalGuitar } = require("@tspro/web-music-score/audio-cg");
-const Score = require("@tspro/web-music-score/score");
+const { ClassicalGuitar } = require("@tspro/web-music-score/audio-cg");
+const Audio = require("@tspro/web-music-score/audio");
 const ScoreUI = require("@tspro/web-music-score/react-ui");
 const { createFrereJacques } = require("@tspro/web-music-score/pieces");
 
@@ -10,7 +10,7 @@ export class ExampleApp extends React.Component {
     constructor(props) {
         super(props);
 
-        registerClassicalGuitar();
+        Audio.registerInstrument(ClassicalGuitar);
 
         let doc = createFrereJacques();
 

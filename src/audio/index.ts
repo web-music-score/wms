@@ -1,6 +1,10 @@
 import { Note, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
-import { Synthesizer } from "./synth";
-import { init as initCore } from "@tspro/web-music-score/core";
+import { Synthesizer } from "./audio-synth";
+import { init as initCore, MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { Instrument } from "./instrument";
+import { Utils } from "@tspro/ts-utils-lib";
+
+export { Instrument }
 
 initCore();
 
@@ -13,28 +17,6 @@ function getNoteName(note: Note | number | string) {
         note = Note.getChromaticNote(note);
     }
     return note.format(PitchNotation.Scientific, SymbolSet.Ascii);
-}
-
-/** Instrument interface. */
-export interface Instrument {
-    /**
-     * Get instrument name.
-     * @return - Instrument name.
-     */
-    getName(): string;
-    
-    /**
-     * Play a note.
-     * @param note - Note to play (e.g. "C4").
-     * @param duration - Play duration in seconds.
-     * @param volume - Linear volume in range [0, 1].
-     */
-    playNote(note: string, duration?: number, volume?: number): void;
-    
-    /**
-     * Stop playback.
-     */
-    stop(): void;
 }
 
 const InstrumentList: Instrument[] = [Synthesizer];
@@ -60,14 +42,28 @@ export function getCurrentInstrument(): string {
  * Register new instrument.
  * @param instr - Instrument object implementing Instrument interface.
  */
-export function registerInstrument(instr: Instrument): void {
-    if (InstrumentList.some(instr2 => instr2.getName() === instr.getName())) {
-        return;
-    }
+export function registerInstrument(instr: Instrument | Instrument[]): void {
+    (Utils.Is.isArray(instr) ? instr : [instr])
+        .forEach(instr => {
+            if (
+                !Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) ||
+                !Utils.Is.isFunction(instr.getName) ||
+                !Utils.Is.isFunction(instr.playNote) ||
+                !Utils.Is.isFunction(instr.stop)
+            ) {
+                throw new MusicError(MusicErrorType.Audio, "Invalid instrument object: " + instr);
+            }
 
-    InstrumentList.push(instr);
+            if (InstrumentList.some(instr2 => instr2.getName() === instr.getName())) {
+                console.warn(`Instrument "${instr.getName()}" already registered!`);
+            }
+            else {
+                InstrumentList.push(instr);
+            }
 
-    setInstrument(instr.getName());
+            // Set as current.
+            setInstrument(instr.getName());
+        });
 }
 
 /**
@@ -94,7 +90,7 @@ export function setInstrument(instrName: string): void {
  * @param duration - Play duration in seconds.
  * @param linearVolume - Linear volume in range [0, 1].
  */
-export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
+export function playNote(note: Note | string | number, duration: number, linearVolume: number) {
     CurrentInstrument.playNote(getNoteName(note), duration, linearVolume);
 }
 

@@ -11,22 +11,26 @@
     <h1>WebMusicScore Browser Example</h1>
 
     <!--
-	// Paikallinen
+	// Paikalliset
     <script src="../../node_modules/@tspro/web-music-score/dist/iife/index.global.js"></script>
+    <script src="../../node_modules/@tspro/web-music-score/dist/iife/audio-cg.global.js"></script>
 
 	// CDN
-    <script src="https://unpkg.com/@tspro/web-music-score@4"></script>
-    <script src="https://unpkg.com/@tspro/web-music-score@4.2.0"></script>
-    <script src="https://unpkg.com/@tspro/web-music-score@4.2.0/dist/iife/index.global.js"></script>
+    <script src="https://unpkg.com/@tspro/web-music-score@5.0.0/dist/iife/index.global.js"></script>
+    <script src="https://unpkg.com/@tspro/web-music-score@5.0.0/dist/iife/audio-cg.global.js"></script>
 	-->
 
     <script src="../../node_modules/@tspro/web-music-score/dist/iife/index.global.js"></script>
+    <script src="../../node_modules/@tspro/web-music-score/dist/iife/audio-cg.global.js"></script>
 
     <canvas id="scoreCanvas"></canvas><br />
     <button id="playButton" type="button"></button>
 
     <script>
-        const { Score } = window.WebMusicScore;
+        const { Audio, Score } = window.WebMusicScore;
+        const { ClassicalGuitar } = window.Audio_ClassicalGuitar;
+
+        Audio.registerInstrument(ClassicalGuitar);
 
         let doc = new Score.DocumentBuilder()
             .setScoreConfiguration("treble")

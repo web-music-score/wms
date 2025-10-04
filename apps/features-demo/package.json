@@ -1,10 +1,10 @@
 {
     "name": "features-demo",
-    "version": "4.0.0",
+    "version": "5.0.0",
     "private": true,
     "dependencies": {
         "@tspro/ts-utils-lib": "^1.3.0",
-        "@tspro/web-music-score": "^4.0.0",
+        "@tspro/web-music-score": "^5.0.0",
         "bootstrap": "^5.3.7",
         "core-js": "^3.43.0",
         "react": "^18.0.0",

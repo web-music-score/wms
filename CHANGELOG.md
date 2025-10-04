@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.0.0] - 2025-10-04
+### **Breiking Changes**
+- Audio interface/instruments required update to create audio-cg iife module for browser.
+
 ## [4.2.1] - 2025-10-04
 ## Fixed
 - Error was thrown with dotted rests.
