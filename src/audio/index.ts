@@ -21,7 +21,16 @@ function getNoteName(note: Note | number | string) {
 
 const InstrumentList: Instrument[] = [Synthesizer];
 
-let CurrentInstrument: Instrument = Synthesizer;
+let currentInstrument: Instrument = Synthesizer;
+
+const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
+    let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
+    return 60 * (1 / noteSize) / (beatsPerMinute * (1 / beatSize));
+})(2, 80, "4/4"); // Half note, 120 bpm, 4/4 time signature.
+
+const DefaultVolume = 1;
+
+let isMuted: boolean = false;
 
 /**
  * Get instrument name list.
@@ -36,7 +45,7 @@ export function getInstrumentList(): ReadonlyArray<string> {
  * @returns - Name of current instrument.
  */
 export function getCurrentInstrument(): string {
-    return CurrentInstrument.getName();
+    return currentInstrument.getName();
 }
 
 /**
@@ -72,25 +81,18 @@ export function addInstrument(instrument: Instrument | Instrument[]): void {
  * @param instrumentName - Instrument name.
  */
 export function useInstrument(instrumentName: string): void {
-    if (instrumentName === CurrentInstrument.getName()) {
+    if (instrumentName === currentInstrument.getName()) {
         return;
     }
 
-    CurrentInstrument.stop();
+    currentInstrument.stop();
 
     let instr = InstrumentList.find(instr => instr.getName() === instrumentName);
 
     if (instr) {
-        CurrentInstrument = instr;
+        currentInstrument = instr;
     }
 }
-
-const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
-    let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
-    return 60 * (1 / noteSize) / (beatsPerMinute * (1 / beatSize));
-})(2, 80, "4/4"); // Half note, 120 bpm, 4/4 time signature.
-
-const DefaultVolume = 1;
 
 /**
  * Play a note using current instrument.
@@ -99,12 +101,29 @@ const DefaultVolume = 1;
  * @param linearVolume - Linear volume in range [0, 1].
  */
 export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
-    CurrentInstrument.playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
+    if (!isMuted) {
+        currentInstrument.playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
+    }
 }
 
 /**
- * Stop playing on current instrument.
+ * Stop playback on current instrument.
  */
 export function stop() {
-    CurrentInstrument.stop();
+    currentInstrument.stop();
+}
+
+/**
+ * Mute playback on current instrument.
+ */
+export function mute() {
+    stop();
+    isMuted = true;
+}
+
+/**
+ * Unmute playback on current instrument.
+ */
+export function unmute() {
+    isMuted = false;
 }
