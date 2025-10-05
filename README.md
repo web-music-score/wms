@@ -15,17 +15,16 @@ updates and patches.
 
 ## Version 5 Update
 
-Version 5.0.0 changed audio interface so that audio modules are independent moudles not
-dependant of the lib. Now they can be used in browser environment as separate iife module.
+Version 5.0.0 updated audio interface, instrument bundles are no longer dependant of the main lib and can be loaded in browser environment as independent modules.
 
-For more info, see sections [Browser Modules](#browser-modules) and [Instruments](#instruments)
+- How to add and use instrument, see sections [Instruments](#instruments)
+- How to add and use instrument browser version, see sections [Browser Modules](#browser-modules)
 
 ## Help Wanted
 
-If someone has piano or keyboard and can record samples for me I'd be happy to add a new instrument. 
-For the classical guitar instrument I recorded notes `E2`, `A2`, `D3`, `G3`, `B3`, `E4`,
-`A4`, `E5` and `A5`.
-Something similar would be ok but it is not limited to that. I use mp3 files e.g. "E2.mp3", etc. My email is available on [GitHub](https://github.com/pahkasoft) for signed in visitors.
+If someone has piano or keyboard and can record samples for me I'd be happy to add a new instrument.
+About ten mp3 samples between C2 to C6 would be fine (named "E2.mp3", etc).
+My email can be found on [GitHub](https://github.com/pahkasoft) (visible for signed in users).
 
 ## Installation
 

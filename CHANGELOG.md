@@ -1,8 +1,13 @@
 # Changelog
 
-## [5.0.0] - 2025-10-04
+## [5.0.0] - 2025-10-05
+Major update required to enable independent browser iife instrument modules.
+
 ### **Breiking Changes**
-- Audio interface/instruments required update to create independent audio-cg iife module for browser.
+- Converted audio instrument modules (currently only audio-cg) independant of main lib.
+- Instead of using registerClassicalGuitar() => use import { ClassicalGuitar } and Audio.addInstrument(ClassicalGuitar).
+- Renamed Audio.registerInstrument() => Audio.addInstrument().
+- Renamed Audio.setInstrument() => Audio.useInstrument().
 
 ## [4.2.1] - 2025-10-04
 ## Fixed
