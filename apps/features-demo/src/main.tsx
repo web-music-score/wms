@@ -4,7 +4,7 @@ import "regenerator-runtime/runtime";
 import * as React from "react";
 import *as ReactDOM from "react-dom/client";
 
-import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import DemoApp from "./demo-app";
 
