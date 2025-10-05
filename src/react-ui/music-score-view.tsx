@@ -54,6 +54,10 @@ export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
             }
         }
 
-        return <canvas style={{ position: "relative" }} ref={setCanvas}>Canvas error!</canvas>;
+        return (
+            <canvas style={{ position: "relative" }} ref={setCanvas}>
+                Your browser does not support the HTML canvas tag.
+            </canvas>
+        );
     }
 }
