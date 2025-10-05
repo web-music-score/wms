@@ -10,15 +10,18 @@ export interface MusicScoreViewProps {
  * Music score view react component.
  * ```ts
  *   // Using with React TSX/JSX
- *   import * as Score from "@tspro/web-music-score/react";
- *   import * as Pieces from "@tspro/web-music-score/pieces";
+ *   import * as Score from "@tspro/web-music-score/score";
+ *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
  *  
  *   // Render function of react component.
  *   render() {
- *       const doc = Pieces.createFrereJacques();
+ *       // Create document.
+ *       const doc = new Score.DocumentBuilder()
+ *           // Build document...
+ *           .getDocument();
  * 
  *       return <>
- *          <Score.MusicScoreView doc=\{doc\} />
+ *          <ScoreUI.MusicScoreView doc={doc} />
  *       </>;
  *   }
  * ```
