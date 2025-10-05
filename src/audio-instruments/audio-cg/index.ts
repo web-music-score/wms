@@ -1,3 +1,8 @@
+/**
+ * Make this module "audio-cg" in typedoc instead of "audio-instruments/audio-cg".
+ * @module audio-cg
+ */
+
 // Import audio samples.
 import E2_mp3 from "./E2.mp3";
 import A2_mp3 from "./A2.mp3";
