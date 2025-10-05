@@ -30,7 +30,7 @@ const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute:
 
 const DefaultVolume = 1;
 
-let isMuted: boolean = false;
+let mutePlayback: boolean = false;
 
 /**
  * Get instrument name list.
@@ -101,7 +101,7 @@ export function useInstrument(instrumentName: string): void {
  * @param linearVolume - Linear volume in range [0, 1].
  */
 export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
-    if (!isMuted) {
+    if (!mutePlayback) {
         currentInstrument.playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
     }
 }
@@ -118,12 +118,20 @@ export function stop() {
  */
 export function mute() {
     stop();
-    isMuted = true;
+    mutePlayback = true;
 }
 
 /**
  * Unmute playback on current instrument.
  */
 export function unmute() {
-    isMuted = false;
+    mutePlayback = false;
+}
+
+/**
+ * Is playback muted?
+ * @returns True/false.
+ */
+export function isMuted(): boolean {
+    return mutePlayback;
 }
