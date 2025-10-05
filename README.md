@@ -470,12 +470,14 @@ Score.MPlayer.stopAll();
 <ScoreUI.MusicScoreView doc={doc} />
 
 // Add playback buttons
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle}/> // Single Play/Stopo button
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStop}/>       // Play and Stop buttons
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayPauseStop}/>  // Play, Pause and Stop buttons
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={"playStopSingle"}/> // Single Play/Stopo button
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={"playStop"}/>       // Play and Stop buttons
+<ScoreUI.PlaybackButtons doc={doc} buttonLayout={"playPauseStop"}/>  // Play, Pause and Stop buttons
 ```
 
-Bootstrap is used for better visual appearance, but it needs to be installed and loaded.
+Hint! Bootstrap is used for better visual appearance.
+- Install bootstrap: `npm install bootstrap`
+- Import in app entry: `import "bootstrap/dist/css/bootstrap.min.css";`
 
 ### Viewing Using Plain JS/TS
 
@@ -508,10 +510,10 @@ let p = new Score.MPlaybackButtons().
     setDocument(doc);
 
 // You can also set combined play/stop button.
-p.setPlayStopButton("playStopButtonId")
+p.setPlayStopButton("playStopButtonId");
 
 // You can also pass HTMLButtonElement instead of element id.
-p.setPlayButton(playButtonElement)
+p.setPlayButton(playButtonElement);
 ```
 
 ### MusicError
