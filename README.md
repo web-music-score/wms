@@ -469,10 +469,11 @@ Score.MPlayer.stopAll();
 // Draw document
 <ScoreUI.MusicScoreView doc={doc} />
 
-// Add playback buttons
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={"playStopSingle"}/> // Single Play/Stopo button
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={"playStop"}/>       // Play and Stop buttons
-<ScoreUI.PlaybackButtons doc={doc} buttonLayout={"playPauseStop"}/>  // Play, Pause and Stop buttons
+// Show playback buttons
+<ScoreUI.PlaybackButtons doc={doc} singlePlayStop /> // Single play/stop button.
+<ScoreUI.PlaybackButtons doc={doc} playStop />       // Play and stop buttons.
+<ScoreUI.PlaybackButtons doc={doc} playPauseStop />  // Play, pause and Stop buttons.
+<ScoreUI.PlaybackButtons doc={doc} />                // Default is play, pause and Stop buttons.
 ```
 
 Hint! Bootstrap is used for better visual appearance.

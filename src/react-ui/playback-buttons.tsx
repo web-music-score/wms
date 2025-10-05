@@ -1,15 +1,23 @@
 import * as React from "react";
 import { MDocument, MPlaybackButtons } from "@tspro/web-music-score/score";
 
+/**
+ * Playback buttons layout
+ * @deprecated - Use `PlaybackButtonsProps` properties `singlePlayStop`, `playStop` or `playPauseStop` instead. 
+ */
 export enum PlaybackButtonsLayout {
-    PlayStopSingle = "playStopSingle",
-    PlayStop = "playStop",
-    PlayPauseStop = "playPauseStop"
+    PlayStopSingle,
+    PlayStop,
+    PlayPauseStop
 }
 
 export interface PlaybackButtonsProps {
     doc: MDocument;
-    buttonLayout?: PlaybackButtonsLayout | `${PlaybackButtonsLayout}`;
+    /** @deprecated - Use `singlePlayStop`, `playStop` or `playPauseStop` properties instead. */
+    buttonLayout?: PlaybackButtonsLayout;
+    singlePlayStop?: boolean;
+    playStop?: boolean;
+    playPauseStop?: boolean;
     playLabel?: string;
     pauseLabel?: string;
     stopLabel?: string;
@@ -31,14 +39,20 @@ export interface PlaybackButtonsState {
  *       // Build document...
  *       .getDocument();
  * 
- *   // Create default playback buttons.
+ *   // Create default playback buttons (play, pause and stop buttons).
  *   <ScoreUI.PlaybackButtons doc={doc} />
+ *
+ *   // Create playback buttons with single play/stop button.
+ *   <ScoreUI.PlaybackButtons doc={doc} singlePlayStop />
  * 
- *   // Create playback buttons with custom play, pause and stop labels.
+ *   // Create playback buttons with play and stop buttons.
+ *   <ScoreUI.PlaybackButtons doc={doc} playStop />
+ * 
+ *   // Create playback buttons with play, pause and stop buttons.
+ *   <ScoreUI.PlaybackButtons doc={doc} playPauseStop />
+ * 
+ *   // You can also set custom play, pause and stop button labels.
  *   <ScoreUI.PlaybackButtons doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" />
- * 
- *   // Create playback buttons with different button layout.
- *   <ScoreUI.PlaybackButtons doc={doc} buttonLayout={Score.PlaybackButtonsLayout.PlayStopSingle} />
  * ```
  */
 export class PlaybackButtons extends React.Component<PlaybackButtonsProps, PlaybackButtonsState> {
@@ -60,12 +74,19 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
     }
 
     render() {
-        let { buttonLayout, playLabel, pauseLabel, stopLabel } = this.props;
+        let { buttonLayout, singlePlayStop, playStop, playPauseStop, playLabel, pauseLabel, stopLabel } = this.props;
         let { controller } = this.state;
 
         playLabel ??= "Play";
         pauseLabel ??= "Pause";
         stopLabel ??= "Stop";
+
+        if(singlePlayStop) buttonLayout = PlaybackButtonsLayout.PlayStopSingle;
+        if(playStop) buttonLayout = PlaybackButtonsLayout.PlayStop;
+        if(playPauseStop) buttonLayout = PlaybackButtonsLayout.PlayPauseStop;
+
+        // Default is play pause stop
+        buttonLayout ??= PlaybackButtonsLayout.PlayPauseStop;
 
         switch (buttonLayout) {
             case PlaybackButtonsLayout.PlayStopSingle:
@@ -80,7 +101,6 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
                     </div>
                 );
             case PlaybackButtonsLayout.PlayPauseStop:
-            default:
                 return (
                     <div className="btn-group">
                         <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
@@ -88,6 +108,8 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
                         <button className="btn btn-primary" ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
                     </div>
                 );
+            default:
+                return <div>Invalid button layout: {buttonLayout}</div>;
         }
     }
 }
