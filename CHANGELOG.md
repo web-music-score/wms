@@ -1,5 +1,14 @@
 # Changelog
 
+## [5.1.0] - 2025-10-
+## Added
+- Audio functions: mute(), unmute() and isMuted().
+- String args alongside PlaybackButtonLayout enum.
+- Added audio-synth as an own module.
+
+## Fixed
+- Documentation errors.
+
 ## [5.0.0] - 2025-10-05
 Major update required to enable independent browser iife instrument modules.
 
