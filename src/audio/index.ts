@@ -85,14 +85,21 @@ export function useInstrument(instrumentName: string): void {
     }
 }
 
+const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
+    let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
+    return 60 * (1 / noteSize) / (beatsPerMinute * (1 / beatSize));
+})(2, 80, "4/4"); // Half note, 120 bpm, 4/4 time signature.
+
+const DefaultVolume = 1;
+
 /**
  * Play a note using current instrument.
  * @param note - Note instance of Note object, note name (e.g. "C4"), or midiNumber.
  * @param duration - Play duration in seconds.
  * @param linearVolume - Linear volume in range [0, 1].
  */
-export function playNote(note: Note | string | number, duration: number, linearVolume: number) {
-    CurrentInstrument.playNote(getNoteName(note), duration, linearVolume);
+export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
+    CurrentInstrument.playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
 }
 
 /**
