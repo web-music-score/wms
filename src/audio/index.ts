@@ -26,7 +26,7 @@ let currentInstrument: Instrument = Synthesizer;
 const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
     let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
     return 60 * (1 / noteSize) / (beatsPerMinute * (1 / beatSize));
-})(2, 80, "4/4"); // Half note, 120 bpm, 4/4 time signature.
+})(2, 80, "4/4"); // Half note, 80 bpm, 4/4 time signature.
 
 const DefaultVolume = 1;
 
