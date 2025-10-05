@@ -20,7 +20,7 @@ import { GenericInstrument } from "../generic-instrument";
 import { Instrument } from "../../audio/instrument";
 
 /**
- * Default export is the classical guitar instrument object.
+ * Export classical guitar instrument object.
  * 
  * ```ts
  *   // Usage

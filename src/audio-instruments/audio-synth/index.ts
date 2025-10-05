@@ -1,5 +1,13 @@
+/**
+ * Make this module "audio-synth" in typedoc instead of "audio-instruments/audio-synth".
+ * @module audio-synth
+ */
+
+// Use direct path to instrument.ts in audio module.
+// Instrument modules must not depend on the audio module.
+import { Instrument, linearToDecibels } from "../../audio/instrument";
+
 import * as Tone from "tone";
-import { Instrument, linearToDecibels } from "./instrument";
 
 class SynthesizerInstr implements Instrument {
     private audioSource: Tone.PolySynth | undefined;
@@ -52,6 +60,11 @@ class SynthesizerInstr implements Instrument {
     }
 }
 
+/**
+ * Export synthesizer instrument object.
+ * 
+ * Synthesizer is default instrument and enabled out of the box.
+ */
 const Synthesizer: Instrument = new SynthesizerInstr();
 
 export { Synthesizer }

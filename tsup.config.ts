@@ -10,6 +10,7 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
+            'audio-synth/index': 'src/audio-instruments/audio-synth/index.ts',
             'audio-cg/index': 'src/audio-instruments/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
@@ -37,6 +38,7 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
+            'audio-synth/index': 'src/audio-instruments/audio-synth/index.ts',
             'audio-cg/index': 'src/audio-instruments/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
