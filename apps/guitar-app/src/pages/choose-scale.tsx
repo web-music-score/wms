@@ -76,7 +76,7 @@ export class ChooseScale extends React.Component<ChooseScaleProps, ChooseScaleSt
                         <SelectScaleForm scale={scale} onScaleChange={scale => this.onChangeScale(scale)} />
                     </Col>
                     <Col>
-                        <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
+                        <ScoreUI.PlaybackButtons doc={doc} singlePlayStop />
                     </Col>
                     <Col>
                         <Button variant="primary" onClick={() => this.onOK()}>OK</Button>

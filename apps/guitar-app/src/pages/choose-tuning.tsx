@@ -111,7 +111,7 @@ export class ChooseTuning extends React.Component<ChooseTuningProps, ChooseTunin
                     </Col>
                 </Row>
                 <Row xs="auto">
-                    <ScoreUI.PlaybackButtons doc={score} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
+                    <ScoreUI.PlaybackButtons doc={score} singlePlayStop />
                 </Row>
 
             </Container>

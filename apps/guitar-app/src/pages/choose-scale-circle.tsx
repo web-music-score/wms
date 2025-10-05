@@ -76,7 +76,7 @@ export class ChooseScaleCircle extends React.Component<ChooseScaleCircleProps, C
                         <Alert variant="info">{scale.getScaleName()} - scale</Alert>
                     </Col>
                     <Col>
-                        <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
+                        <ScoreUI.PlaybackButtons doc={doc} singlePlayStop />
                     </Col>
                     <Col>
                         <Button variant="primary" onClick={() => this.onOK()}>OK</Button>

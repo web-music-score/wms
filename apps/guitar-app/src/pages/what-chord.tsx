@@ -174,7 +174,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
                     </Col>
                 </Row>
                 <Row xs="auto">
-                    <ScoreUI.PlaybackButtons doc={doc} buttonLayout={ScoreUI.PlaybackButtonsLayout.PlayStopSingle} />
+                    <ScoreUI.PlaybackButtons doc={doc} singlePlayStop />
                 </Row>
                 <br />
                 <Row xs="auto">
