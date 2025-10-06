@@ -6,6 +6,7 @@
 - Added audio-synth as an own module.
 - Added PlaybackButtons properties singlePlayStop, playStop and playPauseStop (deprecated buttonLayout).
 - Added grandId property to staff config, deprecated isGrand property.
+- Added tab signature (show tempo, measure number and time siganture).
 
 ## Fixed
 - Documentation errors.
