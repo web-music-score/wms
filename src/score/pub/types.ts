@@ -25,7 +25,7 @@ export enum Clef {
 }
 
 /** Base config for staff and tab configs. */
-export type StaffTabBaseConfig = {
+export type BaseConfig = {
     /** Name for this staff/tab config. */
     name?: string;
     /** Voice ids that are presented in this staff/tab. */
@@ -33,7 +33,7 @@ export type StaffTabBaseConfig = {
 }
 
 /** Staff config to add staff notation line in score configuration. */
-export type StaffConfig = StaffTabBaseConfig & {
+export type StaffConfig = BaseConfig & {
     /** Config type, must be "staff" for staff config. */
     type: "staff";
     /** G-clef or F-clef for this staff config? */
@@ -54,7 +54,7 @@ export type StaffConfig = StaffTabBaseConfig & {
 }
 
 /** Tab config to add guitar tab in score configuration. */
-export type TabConfig = StaffTabBaseConfig & {
+export type TabConfig = BaseConfig & {
     /** Config type, must be "tab" for tab config. */
     type: "tab";
     /** Tuning name or array six notes (tune for each string). */

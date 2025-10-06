@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, StaffTabBaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -37,7 +37,7 @@ function isVerseNumber(value: unknown): value is VerseNumber {
     return Utils.Is.isNumber(value) && (<number[]>getVerseNumbers()).indexOf(value) >= 0;
 }
 
-function assertBaseConfig(baseConfig: StaffTabBaseConfig) {
+function assertBaseConfig(baseConfig: BaseConfig) {
     assertArg(Utils.Is.isObject(baseConfig), "baseConfig", baseConfig);
     assertArg(Utils.Is.isStringOrUndefined(baseConfig.name), "baseConfig.name", baseConfig.name);
     assertArg(Utils.Is.isUndefined(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
