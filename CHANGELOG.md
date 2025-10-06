@@ -5,6 +5,7 @@
 - Audio functions: mute(), unmute() and isMuted().
 - Added audio-synth as an own module.
 - Added PlaybackButtons properties singlePlayStop, playStop and playPauseStop (deprecated buttonLayout).
+- Added grandId property to staff config, deprecated isGrand property.
 
 ## Fixed
 - Documentation errors.
