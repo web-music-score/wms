@@ -47,8 +47,10 @@ export class ObjScoreRow extends MusicObject {
         for (let i = 0; i < notationLines.length - 1; i++) {
             let treble = notationLines[i];
             let bass = notationLines[i + 1];
-            if (treble instanceof ObjStaff && treble.isGrand() && treble.staffConfig.clef === Clef.G &&
-                bass instanceof ObjStaff && bass.isGrand() && bass.staffConfig.clef === Clef.F) {
+            if (
+                treble instanceof ObjStaff && bass instanceof ObjStaff &&
+                treble.staffConfig.grandId !== undefined && treble.staffConfig.grandId === bass.staffConfig.grandId
+            ) {
                 treble.joinGrandStaff(bass);
                 bass.joinGrandStaff(treble);
             }
@@ -291,9 +293,11 @@ export class ObjScoreRow extends MusicObject {
             let prev = this.notationLines[i - 1];
             let cur = this.notationLines[i];
 
+            let treble = this.notationLines[i - 1];
+            let bass = this.notationLines[i];
             if (
-                prev instanceof ObjStaff && prev.isGrand() && prev.staffConfig.clef === Clef.G &&
-                cur instanceof ObjStaff && cur.isGrand() && cur.staffConfig.clef === Clef.F
+                treble instanceof ObjStaff && bass instanceof ObjStaff &&
+                treble.staffConfig.grandId !== undefined && treble.staffConfig.grandId === bass.staffConfig.grandId
             ) {
                 let sep = unitSize * 6;
                 cur.offset(0, prev.getBottomLineY() - cur.getTopLineY() + sep);

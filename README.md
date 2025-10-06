@@ -150,8 +150,8 @@ or corresponding string values (e.g. `"treble"`).
     voiceIds: [0, 1]     // (optional) only present voices 0 and 1 in this staff
 })
 .setScoreConfiguration([
-    { type: "staff", clef: "G", isGrand: true },
-    { type: "staff", clef: "F", isGrand: true }
+    { type: "staff", clef: "G", grandId: "grand1" },
+    { type: "staff", clef: "F", grandId: "grand1" }
 ]) // Grand staff
 .setScoreConfiguration([
     { type: "staff", clef: "G", isOctaveDown: true },

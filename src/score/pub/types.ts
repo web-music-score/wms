@@ -24,35 +24,41 @@ export enum Clef {
     F = "F"
 }
 
+/** Base config for staff and tab configs. */
+export type StaffTabBaseConfig = {
+    /** Name for this staff/tab config. */
+    name?: string;
+    /** Voice ids that are presented in this staff/tab. */
+    voiceIds?: number[];
+}
+
 /** Staff config to add staff notation line in score configuration. */
-export type StaffConfig = {
+export type StaffConfig = StaffTabBaseConfig & {
     /** Config type, must be "staff" for staff config. */
-    type: "staff",
+    type: "staff";
     /** G-clef or F-clef for this staff config? */
-    clef: Clef | `${Clef}`,
-    /** Set name for this staff config. */
-    name?: string,
+    clef: Clef | `${Clef}`;
     /** Set octave down with G-clef for guitar treble staff notation line. */
-    isOctaveDown?: boolean,
+    isOctaveDown?: boolean;
     /** Lowest note (e.g. "C2")that can be presented in this staff notation line. */
-    minNote?: string,
+    minNote?: string;
     /** Highest note (e.g. "C6") that can be presented in this staff notation line. */
-    maxNote?: string,
-    /** Voice ids that are presented in this staff notation line. */
-    voiceIds?: number[],
-    /** Set true for two staff configs with G-clef and F-clef to create grand staff. */
-    isGrand?: boolean
+    maxNote?: string;
+    /**
+     * To create grand staff: use same `grandId` value (e.g. "grand1") for two
+     * consequtive staves, first having G-clef and second having F-clef.
+     */
+    grandId?: string;
+    /** @deprecated - Use `grandId` property instead. */
+    isGrand?: boolean;
 }
 
 /** Tab config to add guitar tab in score configuration. */
-export type TabConfig = {
+export type TabConfig = StaffTabBaseConfig & {
     /** Config type, must be "tab" for tab config. */
-    type: "tab",
-    /** Set name for this tab config. */
-    name?: string,
-    tuning?: string | string[],
-    /** Voice ids that are presented in this guitar tab notation line. */
-    voiceIds?: number[]
+    type: "tab";
+    /** Tuning name or array six notes (tune for each string). */
+    tuning?: string | string[];
 }
 
 /** Score configuration. */

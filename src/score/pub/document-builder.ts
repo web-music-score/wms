@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, StaffTabBaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -37,27 +37,34 @@ function isVerseNumber(value: unknown): value is VerseNumber {
     return Utils.Is.isNumber(value) && (<number[]>getVerseNumbers()).indexOf(value) >= 0;
 }
 
+function assertBaseConfig(baseConfig: StaffTabBaseConfig) {
+    assertArg(Utils.Is.isObject(baseConfig), "baseConfig", baseConfig);
+    assertArg(Utils.Is.isStringOrUndefined(baseConfig.name), "baseConfig.name", baseConfig.name);
+    assertArg(Utils.Is.isUndefined(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
+}
+
 function assertStaffConfig(staffConfig: StaffConfig) {
+    assertBaseConfig(staffConfig);
     assertArg(Utils.Is.isObject(staffConfig), "staffConfig", staffConfig);
     assertArg(staffConfig.type === "staff", "staffConfig.type", staffConfig.type);
     assertArg(Utils.Is.isEnumValue(staffConfig.clef, Clef), "staffConfig.clef", staffConfig.clef);
     assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
     assertArg(Utils.Is.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
     assertArg(Utils.Is.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
-    assertArg(Utils.Is.isUndefined(staffConfig.voiceIds) || Utils.Is.isArray(staffConfig.voiceIds) && staffConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "staffConfig.voiceIds", staffConfig.voiceIds);
+    assertArg(Utils.Is.isStringOrUndefined(staffConfig.grandId), "staffConfig.grandId", staffConfig.grandId);
     assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isGrand), "staffConfig.isGrand", staffConfig.isGrand);
 }
 
 function assertTabConfig(tabConfig: TabConfig) {
+    assertBaseConfig(tabConfig);
     assertArg(Utils.Is.isObject(tabConfig), "tabConfig", tabConfig);
     assertArg(tabConfig.type === "tab", "tabConfig.type", tabConfig.type);
-    if (typeof tabConfig.tuning === "string") {
+    if (Utils.Is.isString(tabConfig.tuning)) {
         assertArg(TuningNameList.includes(tabConfig.tuning), "tabConfig.tuning", tabConfig.tuning);
     }
     else if (Utils.Is.isArray(tabConfig.tuning)) {
         assertArg(tabConfig.tuning.length === getStringNumbers().length && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
     }
-    assertArg(Utils.Is.isUndefined(tabConfig.voiceIds) || Utils.Is.isArray(tabConfig.voiceIds) && tabConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "tabConfig.voiceIds", tabConfig.voiceIds);
 }
 
 function assertNoteOptions(noteOptions: NoteOptions) {

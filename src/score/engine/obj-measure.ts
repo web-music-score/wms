@@ -573,8 +573,8 @@ export class ObjMeasure extends MusicObject {
         if (staffTabOrGroups === undefined) {
             if (
                 lines.length >= 2 &&
-                lines[0] instanceof ObjStaff && lines[0].staffConfig.clef === Clef.G && lines[0].isGrand() &&
-                lines[1] instanceof ObjStaff && lines[1].staffConfig.clef === Clef.F && lines[1].isGrand()
+                lines[0] instanceof ObjStaff && lines[1] instanceof ObjStaff &&
+                lines[0].staffConfig.grandId !== undefined && lines[0].staffConfig.grandId === lines[1].staffConfig.grandId
             ) {
                 addToStaffTabOrGroup(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
             }

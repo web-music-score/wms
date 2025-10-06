@@ -9,6 +9,7 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
 import { Utils } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
+import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -54,8 +55,8 @@ export class ObjDocument extends MusicObject {
                     break;
                 case StaffPreset.Grand:
                     this.curScoreConfig = [
-                        { type: "staff", clef: Clef.G, isGrand: true },
-                        { type: "staff", clef: Clef.F, isGrand: true }
+                        { type: "staff", clef: Clef.G, grandId: "grand1" },
+                        { type: "staff", clef: Clef.F, grandId: "grand1" }
                     ];
                     break;
                 case StaffPreset.GuitarTreble:
@@ -79,25 +80,71 @@ export class ObjDocument extends MusicObject {
             this.curScoreConfig = [config];
         }
 
-        // Setup grand staff.
-        for (let i = 0; i < this.curScoreConfig.length - 1; i++) {
-            let treble = this.curScoreConfig[i];
-            let bass = this.curScoreConfig[i + 1];
-            if (treble.type === "staff" && bass.type === "staff") {
-                if (treble.clef === Clef.G && treble.isGrand && bass.clef === Clef.F && bass.isGrand) {
-                    treble.minNote = "C4";
-                    bass.maxNote = "B3";
-                    treble.isOctaveDown = bass.isOctaveDown = false;
+        // Convert deprecated isGRand into grandId.
+        for (let cfgId = 0, grandId = "grand"; cfgId < this.curScoreConfig.length;) {
+            let treble = this.curScoreConfig[cfgId];
+            let bass = this.curScoreConfig[cfgId + 1];
+
+            // Create unique grandId.
+            while(this.curScoreConfig.filter(cfg => cfg.type === "staff").findIndex(cfg => cfg.grandId === grandId) >= 0) {
+                grandId += "A";
+            }
+
+            if (treble && treble.type === "staff" && treble.isGrand) {
+                if (treble.grandId !== undefined) {
+                    throw new MusicError(MusicErrorType.Score, `Grand staff error: mixing isGrand and grandId!`);
+                }
+                else if (bass && bass.type === "staff" && bass.isGrand) {
+                    if (bass.grandId !== undefined) {
+                        throw new MusicError(MusicErrorType.Score, `Grand staff error: mixing isGrand and grandId!`);
+                    }
+                    else {
+                        treble.grandId = grandId;
+                        bass.grandId = grandId;
+                        treble.isGrand = bass.isGrand = false;
+                        cfgId += 2;
+                    }
                 }
                 else {
-                    treble.isGrand = bass.isGrand = false;
+                    throw new MusicError(MusicErrorType.Score, `Grand staff error: invalid use of isGrand!`);
                 }
             }
-            else if (treble.type === "staff") {
-                treble.isGrand = false;
+            else {
+                cfgId++;
             }
-            else if (bass.type === "staff") {
-                bass.isGrand = false;
+        }
+
+        // Setup grand staff.
+        for (let cfgId: number = 0, usedGrandIdes: string[] = []; cfgId < this.curScoreConfig.length;) {
+            let treble = this.curScoreConfig[cfgId];
+            let bass = this.curScoreConfig[cfgId + 1];
+
+            if (treble && bass && treble.type === "staff" && bass.type === "staff" && treble.grandId !== undefined && treble.grandId === bass.grandId) {
+                if (usedGrandIdes.includes(treble.grandId)) {
+                    throw new MusicError(MusicErrorType.Score, `Grand staff error: grandId "${treble.grandId}" already used!`);
+                }
+                else if (treble.clef !== Clef.G) {
+                    throw new MusicError(MusicErrorType.Score, `Grand staff error: Invalid treble clef "${treble.clef}"!`);
+                }
+                else if (bass.clef !== Clef.F) {
+                    throw new MusicError(MusicErrorType.Score, `Grand staff error: Invalid treble clef "${treble.clef}"!`);
+                }
+                else if (treble.isOctaveDown || bass.isOctaveDown) {
+                    throw new MusicError(MusicErrorType.Score, `Grand staff error: cannot use isOctaveDown option!`);
+                }
+
+                usedGrandIdes.push(treble.grandId);
+
+                treble.minNote = "C4";
+                bass.maxNote = "B3";
+
+                cfgId += 2;
+            }
+            else if (treble && treble.type === "staff" && treble.grandId !== undefined) {
+                throw new MusicError(MusicErrorType.Score, `Grand staff error: invalid use of grandId "${treble.grandId}"!`);
+            }
+            else {
+                cfgId++;
             }
         }
 

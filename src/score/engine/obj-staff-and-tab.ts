@@ -274,10 +274,6 @@ export class ObjStaff extends ObjNotationLine {
         return !this.staffConfig.voiceIds || this.staffConfig.voiceIds.includes(voiceId);
     }
 
-    isGrand(): boolean {
-        return this.staffConfig.isGrand === true;
-    }
-
     calcTop(): number {
         let top = this.topLineY;
         this.objects.forEach(o => top = Math.min(top, o.getRect().top));
