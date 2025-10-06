@@ -15,7 +15,7 @@ import { ObjTabNoteGroup, ObjNoteGroup, ObjStaffNoteGroup } from "../engine/obj-
 import { ObjRest, ObjStaffRest } from "../engine/obj-rest";
 import { ObjRhythmColumn } from "../engine/obj-rhythm-column";
 import { ObjScoreRow } from "../engine/obj-score-row";
-import { ObjSignature } from "../engine/obj-signature";
+import { ObjStaffSignature, ObjTabSignature } from "../engine/obj-signature";
 import { ObjText } from "../engine/obj-text";
 import { Utils } from "@tspro/ts-utils-lib";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
@@ -859,18 +859,18 @@ export class MTab extends MusicInterface {
     }
 }
 
-/** Signature object contains clef, key signature, time signature and tempo, all optional depending on measure. */
-export class MSignature extends MusicInterface {
+/** Staff signature object contains clef, key signature, time signature, tempo and measure number, all optional depending on measure. */
+export class MStaffSignature extends MusicInterface {
     /** Object name. */
-    static readonly Name = "Signature";
+    static readonly Name = "StaffSignature";
 
     /** @internal */
-    constructor(private readonly obj: ObjSignature) {
-        super(MSignature.Name);
+    constructor(private readonly obj: ObjStaffSignature) {
+        super(MStaffSignature.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjSignature {
+    getMusicObject(): ObjStaffSignature {
         return this.obj;
     }
 
@@ -880,6 +880,30 @@ export class MSignature extends MusicInterface {
      */
     getStaff(): MStaff {
         return this.obj.staff.getMusicInterface();
+    }
+}
+
+/** Tab signature object contains time signature, tempo and measure number, all optional depending on measure. */
+export class MTabSignature extends MusicInterface {
+    /** Object name. */
+    static readonly Name = "TabSignature";
+
+    /** @internal */
+    constructor(private readonly obj: ObjTabSignature) {
+        super(MTabSignature.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjTabSignature {
+        return this.obj;
+    }
+
+    /**
+     * Get tab notation line this signature is in.
+     * @returns - Tab object.
+     */
+    getTab(): MTab {
+        return this.obj.tab.getMusicInterface();
     }
 }
 

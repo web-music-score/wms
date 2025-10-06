@@ -1,15 +1,15 @@
 import { Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
-import { Clef, DivRect, MSignature } from "../pub";
+import { Clef, DivRect, MStaffSignature, MTabSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { Renderer } from "./renderer";
 import { ObjImage } from "./obj-image";
-import { ObjStaff } from "./obj-staff-and-tab";
+import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-export class ObjSignature extends MusicObject {
+export class ObjStaffSignature extends MusicObject {
     private clefImage?: ObjImage;
     private eightBelowClef?: ObjText;
     private measureNumber?: ObjText;
@@ -19,15 +19,15 @@ export class ObjSignature extends MusicObject {
     private beatSizeText?: ObjText;
     private tempoText?: ObjText;
 
-    readonly mi: MSignature;
+    readonly mi: MStaffSignature;
 
     constructor(readonly measure: ObjMeasure, readonly staff: ObjStaff) {
         super(measure);
 
-        this.mi = new MSignature(this);
+        this.mi = new MStaffSignature(this);
     }
 
-    getMusicInterface(): MSignature {
+    getMusicInterface(): MStaffSignature {
         return this.mi;
     }
 
@@ -338,6 +338,179 @@ export class ObjSignature extends MusicObject {
         // Draw key signature
         this.ksNeutralizeAccidentals.forEach(acc => acc.draw(renderer));
         this.ksNewAccidentals.forEach(acc => acc.draw(renderer));
+
+        // Draw time signature
+        if (this.beatCountText) {
+            this.beatCountText.draw(renderer);
+        }
+        if (this.beatSizeText) {
+            this.beatSizeText.draw(renderer);
+        }
+
+        // Draw tempo
+        if (this.tempoText) {
+            this.tempoText.draw(renderer);
+        }
+    }
+}
+
+export class ObjTabSignature extends MusicObject {
+    private measureNumber?: ObjText;
+    private beatCountText?: ObjText;
+    private beatSizeText?: ObjText;
+    private tempoText?: ObjText;
+
+    readonly mi: MTabSignature;
+
+    constructor(readonly measure: ObjMeasure, readonly tab: ObjTab) {
+        super(measure);
+
+        this.mi = new MTabSignature(this);
+    }
+
+    getMusicInterface(): MTabSignature {
+        return this.mi;
+    }
+
+    updateMeasureNumber(showMeasureNumber: boolean) {
+        if (showMeasureNumber) {
+            let text = this.measure.getMeasureNumber().toString();
+            this.measureNumber = new ObjText(this, text, 0, 1);
+        }
+        else {
+            this.measureNumber = undefined;
+        }
+    }
+
+    updateTimeSignature(showTimeSignature: boolean) {
+        if (showTimeSignature) {
+            let timeSignature = this.measure.getTimeSignature();
+
+            let beatCount = timeSignature.beatCount.toString();
+            this.beatCountText = new ObjText(this, { text: beatCount, scale: 1.4 }, 0.5, 0.5);
+
+            let beatSize = timeSignature.beatSize.toString();
+            this.beatSizeText = new ObjText(this, { text: beatSize, scale: 1.4 }, 0.5, 0.5);
+        }
+        else {
+            this.beatCountText = this.beatSizeText = undefined;
+        }
+    }
+
+    updateTempo(showTempo: boolean) {
+        if (showTempo) {
+            let tempoStr = getTempoString(this.measure.getTempo());
+            this.tempoText = new ObjText(this, tempoStr, 0, 1);
+        }
+        else {
+            this.tempoText = undefined;
+        }
+    }
+
+
+    pick(x: number, y: number): MusicObject[] {
+        if (!this.rect.contains(x, y)) {
+            return [];
+        }
+
+        if (this.beatCountText) {
+            let arr = this.beatCountText.pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        if (this.beatSizeText) {
+            let arr = this.beatSizeText.pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        if (this.tempoText) {
+            let arr = this.tempoText.pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        if (this.measureNumber) {
+            let arr = this.measureNumber.pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        return [this];
+    }
+
+    layout(renderer: Renderer) {
+        let { unitSize } = renderer;
+        let { tab } = this;
+
+        let paddingX = unitSize;
+
+        let x = 0;
+        let topLineY = tab.getTopLineY();
+
+        this.rect = new DivRect();
+
+        if (this.measureNumber) {
+            this.measureNumber.layout(renderer);
+            this.measureNumber.offset(0, topLineY);
+            this.rect.expandInPlace(this.measureNumber.getRect());
+            x = Math.max(x, this.rect.right);
+        }
+
+        this.beatCountText?.layout(renderer);
+        this.beatSizeText?.layout(renderer);
+
+        let tsWidth = Math.max(this.beatCountText?.getRect().width ?? 0, this.beatSizeText?.getRect().width ?? 0);
+
+        if (this.beatCountText) {
+            this.beatCountText.offset(0 + tsWidth / 2 + paddingX, tab.getRect().centerY - this.beatCountText.getRect().bottomh);
+            this.rect.expandInPlace(this.beatCountText.getRect());
+        }
+
+        if (this.beatSizeText) {
+            this.beatSizeText.offset(0 + tsWidth / 2 + paddingX, tab.getRect().centerY + this.beatSizeText.getRect().toph);
+            this.rect.expandInPlace(this.beatSizeText.getRect());
+        }
+
+        if (this.tempoText) {
+            this.tempoText.layout(renderer);
+            this.tempoText.offset(x + unitSize * 2, topLineY);
+            this.rect.expandInPlace(this.tempoText.getRect());
+        }
+
+        this.rect.right += paddingX;
+    }
+
+    offset(dx: number, dy: number) {
+        if (this.measureNumber) {
+            this.measureNumber.offset(dx, dy);
+        }
+
+        if (this.beatCountText) {
+            this.beatCountText.offset(dx, dy);
+        }
+
+        if (this.beatSizeText) {
+            this.beatSizeText.offset(dx, dy);
+        }
+
+        if (this.tempoText) {
+            this.tempoText.offset(dx, dy);
+        }
+
+        this.rect.offsetInPlace(dx, dy);
+    }
+
+    draw(renderer: Renderer) {
+        // Draw measure number
+        if (this.measureNumber) {
+            this.measureNumber.draw(renderer);
+        }
 
         // Draw time signature
         if (this.beatCountText) {

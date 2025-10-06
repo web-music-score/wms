@@ -1,11 +1,11 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps, getTempoString } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
-import { ObjSignature } from "./obj-signature";
+import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjEnding } from "./obj-ending";
@@ -14,7 +14,7 @@ import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjBeamGroup } from "./obj-beam-group";
-import { DebugSettings, DocumentSettings } from "./settings";
+import { DocumentSettings } from "./settings";
 import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-fermata";
@@ -108,7 +108,7 @@ export class ObjMeasure extends MusicObject {
     private alterTimeSignature?: TimeSignature;
     private alterTempo?: AlterTempo;
 
-    private signatures: ObjSignature[] = [];
+    private signatures: (ObjStaffSignature | ObjTabSignature)[] = [];
     private tabStringNotes: ObjText[] = [];
     private barLineLeft: ObjBarLineLeft;
     private columns: ObjRhythmColumn[] = [];
@@ -1367,29 +1367,42 @@ export class ObjMeasure extends MusicObject {
         let showTimeSignature = !!this.alterTimeSignature;
         let showTempo = !!this.alterTempo;
 
-        if (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo) {
-            this.signatures = this.row.getStaves().map((staff, staffId) => {
-                let oldSignature = this.signatures.find(s => s.staff === staff);
+        this.signatures = [];
 
-                let signature = oldSignature ?? new ObjSignature(this, staff);
+        this.row.getNotationLines().forEach((line, lineId) => {
+            if (line instanceof ObjStaff && (showClef || showMeasureNumber || showKeySignature || showTimeSignature || showTempo)) {
+                let oldSignature = this.signatures.filter(s => s instanceof ObjStaffSignature).find(s => s.staff === line);
+
+                let signature = oldSignature ?? new ObjStaffSignature(this, line);
 
                 signature.staff.addObject(signature);
 
                 signature.updateClefImage(renderer, showClef);
-                signature.updateMeasureNumber(showMeasureNumber && staffId === 0);
+                signature.updateMeasureNumber(showMeasureNumber && lineId === 0);
                 signature.updateKeySignature(showKeySignature);
                 signature.updateTimeSignature(showTimeSignature);
-                signature.updateTempo(showTempo && staffId === 0);
+                signature.updateTempo(showTempo && lineId === 0);
 
-                return signature;
-            });
-        }
-        else {
-            this.signatures = [];
-        }
+                signature.layout(renderer);
 
-        // Layout signatures
-        this.signatures.forEach(signature => signature.layout(renderer));
+                this.signatures.push(signature);
+            }
+            else if (line instanceof ObjTab && (showMeasureNumber || showTimeSignature || showTempo)) {
+                let oldSignature = this.signatures.filter(s => s instanceof ObjTabSignature).find(s => s.tab === line);
+
+                let signature = oldSignature ?? new ObjTabSignature(this, line);
+
+                signature.tab.addObject(signature);
+
+                signature.updateMeasureNumber(showMeasureNumber && lineId === 0);
+                signature.updateTimeSignature(showTimeSignature);
+                signature.updateTempo(showTempo && lineId === 0);
+
+                signature.layout(renderer);
+
+                this.signatures.push(signature);
+            }
+        });
 
         // Layout tab string notes
         this.tabStringNotes.length = 0;
