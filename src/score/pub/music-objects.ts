@@ -26,6 +26,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
 import { MPlayer } from "./music-interface";
 import { ObjLyrics } from "score/engine/obj-lyrics";
+import { ObjTabRhythm } from "score/engine/obj-tab-rhythm";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -901,6 +902,38 @@ export class MTabSignature extends MusicInterface {
     /**
      * Get tab notation line this signature is in.
      * @returns - Tab object.
+     */
+    getTab(): MTab {
+        return this.obj.tab.getMusicInterface();
+    }
+}
+
+/** Tab rhythm object. */
+export class MTabRhythm extends MusicInterface {
+    /** Object name. */
+    static readonly Name = "TabRhythm";
+
+    /** @internal */
+    constructor(private readonly obj: ObjTabRhythm) {
+        super(MTabRhythm.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjTabRhythm {
+        return this.obj;
+    }
+
+    /**
+     * Get measure.
+     * @returns - Measure.
+     */
+    getMeasure(): MMeasure {
+        return this.obj.measure.getMusicInterface();
+    }
+
+    /**
+     * Get tab.
+     * @returns - Tab.
      */
     getTab(): MTab {
         return this.obj.tab.getMusicInterface();

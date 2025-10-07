@@ -219,38 +219,7 @@ export class ObjRest extends MusicObject {
 
         let { unitSize } = renderer;
         let { ownDiatonicId } = this;
-        let { noteSize, dotCount, flagCount } = this.rhythmProps;
-
-        let leftw = 0;
-        let rightw = 0;
-        let toph = 0;
-        let bottomh = 0;
-
-        if (NoteLengthProps.equals(noteSize, NoteLength.Whole)) {
-            leftw = unitSize;
-            rightw = unitSize;
-            toph = 0;
-            bottomh = unitSize;
-        }
-        else if (NoteLengthProps.equals(noteSize, NoteLength.Half)) {
-            leftw = unitSize;
-            rightw = unitSize;
-            toph = unitSize;
-            bottomh = 0;
-        }
-        else if (NoteLengthProps.equals(noteSize, NoteLength.Quarter)) {
-            leftw = unitSize * 1;
-            rightw = unitSize * 1;
-            toph = unitSize * 3.2;
-            bottomh = unitSize * 3;
-        }
-        else {
-            let adj = 1 - flagCount % 2;
-            leftw = unitSize * (1 + flagCount * 0.25);
-            rightw = unitSize * (1 + flagCount * 0.125);
-            toph = unitSize * (0.5 + flagCount - adj);
-            bottomh = unitSize * (1 + flagCount + adj);
-        }
+        let { noteSize, dotCount } = this.rhythmProps;
 
         this.row.getStaves().forEach(staff => {
             if (!staff.containsDiatonicId(ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
@@ -259,12 +228,12 @@ export class ObjRest extends MusicObject {
 
             let obj = new ObjStaffRest(staff, this);
 
-            obj.restRect = new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+            obj.restRect = renderer.getRestRect(noteSize);
 
             for (let i = 0; i < dotCount; i++) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
 
-                let dotX = rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
+                let dotX = obj.restRect.rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
                 let dotY = this.getRestDotVerticalDisplacement(noteSize) * unitSize;
 
                 obj.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
@@ -304,9 +273,9 @@ export class ObjRest extends MusicObject {
 
         renderer.drawDebugRect(this.getRect());
 
-        let { unitSize, lineWidth } = renderer;
+        let { lineWidth } = renderer;
         let { color } = this;
-        let { noteSize, flagCount } = this.rhythmProps;
+        let { noteSize } = this.rhythmProps;
 
         ctx.strokeStyle = ctx.fillStyle = color;
         ctx.lineWidth = lineWidth;
@@ -317,63 +286,7 @@ export class ObjRest extends MusicObject {
             let x = restRect.centerX;
             let y = restRect.centerY;
 
-            if (NoteLengthProps.equals(noteSize, NoteLength.Whole)) {
-                ctx.fillRect(x - unitSize, y, unitSize * 2, unitSize);
-            }
-            else if (NoteLengthProps.equals(noteSize, NoteLength.Half)) {
-                ctx.fillRect(x - unitSize, y - unitSize, unitSize * 2, unitSize);
-            }
-            else if (NoteLengthProps.equals(noteSize, NoteLength.Quarter)) {
-                ctx.beginPath();
-                // Upper part
-                ctx.moveTo(x - unitSize * 0.6, y - unitSize * 3.2);
-                ctx.lineTo(x + unitSize * 0.7, y - unitSize * 1.5);
-                ctx.quadraticCurveTo(
-                    x - unitSize * 0.8, y - unitSize * 0.5,
-                    x + unitSize * 1, y + unitSize * 1.5
-                );
-                ctx.lineTo(x - unitSize * 1, y - unitSize * 0.75);
-                ctx.quadraticCurveTo(
-                    x + unitSize * 0.2, y - unitSize * 1.5,
-                    x - unitSize * 0.6, y - unitSize * 3.2
-                );
-                // Lower part
-                ctx.moveTo(x + unitSize * 1, y + unitSize * 1.5);
-                ctx.quadraticCurveTo(
-                    x - unitSize * 0.8, y + unitSize * 1,
-                    x - unitSize * 0.2, y + unitSize * 2.8
-                );
-                ctx.bezierCurveTo(
-                    x - unitSize * 1.8, y + unitSize * 1.5,
-                    x - unitSize * 0.6, y - unitSize * 0.2,
-                    x + unitSize * 0.9, y + unitSize * 1.5
-                );
-                ctx.fill();
-                ctx.stroke();
-            }
-            else if (flagCount > 0) {
-                let adj = 1 - flagCount % 2;
-                let fx = (p: number) => x + (-p * 0.25 + 0.5) * unitSize;
-                let fy = (p: number) => y + (p + adj) * unitSize;
-
-                ctx.beginPath();
-                ctx.moveTo(fx(1 + flagCount), fy(1 + flagCount));
-                ctx.lineTo(fx(-0.5 - flagCount), fy(-0.5 - flagCount));
-                ctx.stroke();
-
-                for (let i = 0; i < flagCount; i++) {
-                    let t = flagCount - i * 2;
-                    ctx.beginPath();
-                    ctx.moveTo(fx(t - 2.5), fy(t - 2.5));
-                    ctx.quadraticCurveTo(
-                        fx(t - 0.5) + unitSize * 0.25, fy(t - 1.5),
-                        fx(t - 1.5) - unitSize * 1.5, fy(t - 1.5));
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.arc(fx(t - 2) - unitSize * 1.5, fy(t - 2), unitSize * 0.5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            }
+            renderer.drawRest(noteSize, x, y, color);
 
             dotRects.forEach(r => {
                 renderer.fillCircle(r.centerX, r.centerY, r.width / 2);

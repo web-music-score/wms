@@ -9,6 +9,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
+import { ObjTabRhythm } from "./obj-tab-rhythm";
 
 type NotationLineObject = {
     getRect: () => DivRect,
@@ -100,7 +101,7 @@ export abstract class ObjNotationLine extends MusicObject {
         rowLayoutObjs.forEach(layoutObj => {
             let { musicObj, anchor } = layoutObj;
 
-            if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine) {
+            if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine || musicObj instanceof ObjTabRhythm) {
                 musicObj.layoutFitToMeasure(renderer);
             }
             else {

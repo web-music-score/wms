@@ -11,8 +11,10 @@ import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
+import { ObjTabRhythm } from "./obj-tab-rhythm";
 
 export enum LayoutGroupId {
+    TabRhythm,
     Fermata,
     NoteLabel,
     Navigation,
@@ -31,6 +33,7 @@ const WidenColumnList = [
 ];;
 
 const RowAlignList = [
+    LayoutGroupId.TabRhythm,
     LayoutGroupId.Navigation,
     LayoutGroupId.Ending,
     LayoutGroupId.TempoAnnotation,
@@ -55,7 +58,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
 
 export enum VerticalPos { Above = 0, Below = 1 }
 
-export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding | ObjLyrics;
+export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjFermata | ObjEnding | ObjLyrics | ObjTabRhythm;
 
 export class StaffGroup {
     constructor(readonly groupName: string, readonly staffsTabsAndGroups: number | string | (number | string)[], readonly verticalPosition: VerticalPosition) { }

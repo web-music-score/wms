@@ -26,8 +26,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
-
-const cmp = (a: number, b: number): -1 | 0 | 1 => a === b ? 0 : (a < b ? -1 : 1);
+import { ObjTabRhythm } from "./obj-tab-rhythm";
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -176,6 +175,12 @@ export class ObjMeasure extends MusicObject {
         this.updateKeySignature();
         this.updateTimeSignature();
         this.updateTempo();
+
+        // Create tab rhythm objects
+        this.row.getTabs().forEach(tab => {
+            this.addLayoutObject(new ObjTabRhythm(this, tab), tab, LayoutGroupId.TabRhythm, VerticalPos.Above);
+        });
+
     }
 
     getMusicInterface(): MMeasure {
@@ -902,7 +907,7 @@ export class ObjMeasure extends MusicObject {
 
                 let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
                 lyricsArr.push(lyricsObj);
-                lyricsArr.sort((a, b) => cmp(a.col.positionTicks, b.col.positionTicks));
+                lyricsArr.sort((a, b) => Utils.Math.cmp(a.col.positionTicks, b.col.positionTicks));
 
                 lyricsContainer.addLyricsObject(lyricsObj);
 
