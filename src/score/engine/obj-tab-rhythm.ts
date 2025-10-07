@@ -108,7 +108,7 @@ export class ObjTabRhythm extends MusicObject {
 
         const drawRest = (sym: ObjRest) => {
             ctx.save();
-            let scale = 0.75;
+            let scale = 0.65;
             let x = sym.col.getRect().centerX / scale;
             let y = (this.getRect().top + this.getRect().bottom) / 2 / scale;
             ctx.scale(scale, scale);
