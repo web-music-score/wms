@@ -1,8 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-const cmp = (a: number, b: number): -1 | 0 | 1 => a === b ? 0 : (a < b ? -1 : 1);
-
 const MaxTupletRatioValue = 12;
 
 /*
@@ -191,7 +189,7 @@ export class NoteLengthProps {
         let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
         let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
         // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
-        return cmp(bNoteSize, aNoteSize);
+        return Utils.Math.cmp(bNoteSize, aNoteSize);
     }
 
     /**
@@ -338,7 +336,7 @@ export class RhythmProps {
      * @returns - -1: a < b, 0: a === b, +1: a > b (duration comparisons)
      */
     static cmp(a: RhythmProps, b: RhythmProps): -1 | 0 | 1 {
-        return cmp(a.ticks, b.ticks);
+        return Utils.Math.cmp(a.ticks, b.ticks);
     }
 
     /**
