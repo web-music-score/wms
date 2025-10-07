@@ -501,12 +501,24 @@ export class ObjNoteGroup extends MusicObject {
         return this.leftBeamCount > 0 || this.rightBeamCount > 0;
     }
 
-    getLeftBeamCount() {
+    getLeftBeamCount(): number {
         return this.leftBeamCount;
     }
 
-    getRightBeamCount() {
+    getRightBeamCount(): number {
         return this.rightBeamCount;
+    }
+
+    setLeftBeamCount(count: number) {
+        this.leftBeamCount = count;
+    }
+
+    setRightBeamCount(count: number) {
+        this.rightBeamCount = count;
+    }
+
+    hasTuplet(): boolean {
+        return this.rhythmProps.tupletRatio !== undefined;
     }
 
     isEmpty(): boolean {
@@ -817,115 +829,11 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             // Draw flags
-            obj.flagRects.forEach(rect => {
-                let left = rect.left;
-                let right = rect.right;
-                let width = right - left;
-                let top = stemDir === Stem.Up ? rect.top : rect.bottom;
-                let bottom = stemDir === Stem.Up ? rect.bottom : rect.top;
-
-                ctx.beginPath();
-                ctx.moveTo(left, top);
-                ctx.bezierCurveTo(
-                    left, top * 0.75 + bottom * 0.25,
-                    left + width * 1.5, top * 0.5 + bottom * 0.5,
-                    left + width * 0.5, bottom);
-                ctx.stroke();
-            });
+            obj.flagRects.forEach(rect => renderer.drawFlag(rect, stemDir === Stem.Up ? "up" : "down"));
         });
 
         // Draw tab fret numbers
         this.tabObjects.forEach(obj => obj.fretNumbers.forEach(fn => fn.draw(renderer)));
-    }
-
-    static setBeamCounts(groupNotes: (ObjNoteGroup | undefined)[]) {
-
-        const isADottedBHalf = (a: ObjNoteGroup, b: ObjNoteGroup) => {
-            let { flagCount: aFlagCount, noteSize: aNoteSize, dotCount: aDotCount } = a.rhythmProps;
-            let { flagCount: bFlagCount, noteSize: bNoteSize, dotCount: bDotCount } = b.rhythmProps;
-
-            return aFlagCount > 0 && bFlagCount > 0 && aDotCount > 0 && bDotCount === 0 && aNoteSize * Math.pow(2, aDotCount) === bNoteSize;
-        }
-
-        for (let i = 0; i < groupNotes.length; i++) {
-            let center = groupNotes[i];
-            let left = groupNotes[i - 1];
-            let right = groupNotes[i + 1];
-
-            if (center) {
-                center.leftBeamCount = 0;
-                center.rightBeamCount = 0;
-
-                // Set left beam count
-                if (left) {
-                    if (left.rhythmProps.flagCount === center.rhythmProps.flagCount || isADottedBHalf(left, center) || isADottedBHalf(center, left)) {
-                        center.leftBeamCount = center.rhythmProps.flagCount;
-                    }
-                    else {
-                        center.leftBeamCount = Math.min(left.rhythmProps.flagCount, center.rhythmProps.flagCount);
-                    }
-                }
-
-                // Set right beam count
-                if (right) {
-                    if (right.rhythmProps.flagCount === center.rhythmProps.flagCount || isADottedBHalf(right, center) || isADottedBHalf(center, right)) {
-                        center.rightBeamCount = center.rhythmProps.flagCount;
-                    }
-                    else {
-                        center.rightBeamCount = Math.min(right.rhythmProps.flagCount, center.rhythmProps.flagCount);
-                    }
-                }
-            }
-        }
-
-        // Fix beam counts
-        let fixAgain: boolean;
-
-        do {
-            fixAgain = false;
-
-            for (let i = 0; i < groupNotes.length; i++) {
-                let center = groupNotes[i];
-                let left = groupNotes[i - 1];
-                let right = groupNotes[i + 1];
-
-                // If neither left or right beam count equals flag count, then reset beam counts.
-                if (center && center.leftBeamCount !== center.rhythmProps.flagCount && center.rightBeamCount !== center.rhythmProps.flagCount) {
-                    center.leftBeamCount = center.rightBeamCount = 0;
-
-                    if (left && left.rightBeamCount > 0) {
-                        left.rightBeamCount = 0;
-                        fixAgain = true; // left changed => fix again.
-                    }
-
-                    if (right && right.leftBeamCount > 0) {
-                        right.leftBeamCount = 0;
-                        fixAgain = true; // Right changed => fix again.
-                    }
-                }
-            }
-        } while (fixAgain);
-    }
-
-    static setTupletBeamCounts(tuplet: ObjBeamGroup) {
-        let type = tuplet.getType();
-        let symbols = tuplet.getSymbols();
-
-        if (type === BeamGroupType.TupletBeam) {
-            symbols.forEach((s, i) => {
-                if (s instanceof ObjNoteGroup) {
-                    s.leftBeamCount = i === 0 ? 0 : s.rhythmProps.flagCount;
-                    s.rightBeamCount = (i === symbols.length - 1) ? 0 : s.rhythmProps.flagCount;
-                }
-            });
-        }
-        else if (type === BeamGroupType.TupletGroup) {
-            symbols.forEach(s => {
-                if (s instanceof ObjNoteGroup) {
-                    s.leftBeamCount = s.rightBeamCount = 0;
-                }
-            });
-        }
     }
 
     getDotVerticalDisplacement(staff: ObjStaff, diatonicId: number, stemDir: Stem) {

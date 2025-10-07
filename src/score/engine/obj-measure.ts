@@ -13,7 +13,7 @@ import { ObjConnective } from "./obj-connective";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
-import { ObjBeamGroup } from "./obj-beam-group";
+import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
@@ -1191,37 +1191,52 @@ export class ObjMeasure extends MusicObject {
         getVoiceIds().forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId).slice();
 
-            if (symbols.length >= 2) {
-                let symbolsStartTicks = this.isUpBeat() ? Math.max(0, this.getMeasureTicks() - this.getConsumedTicks()) : 0;
-                let groupStartTicks = 0;
+            if (symbols.length < 2) {
+                return;
+            }
 
-                for (let groupId = 0; groupId < ts.beamGroupSizes.length; groupId++) {
-                    let beamGroupSize = ts.beamGroupSizes[groupId];
+            let upBeatStartTicks = this.isUpBeat() ? Math.max(0, this.getMeasureTicks() - this.getConsumedTicks()) : 0;
+            let groupStartTicks = 0;
 
-                    let groupSizeSum = 0;
-                    beamGroupSize.forEach(s => groupSizeSum += s);
+            for (let groupId = 0; groupId < ts.beamGroupSizes.length; groupId++) {
+                let beamGroupSize = ts.beamGroupSizes[groupId];
 
-                    let groupLength = groupSizeSum * NoteLengthProps.get("8n").ticks;
+                let beamGroupSizeList: number[][] = [beamGroupSize];
 
-                    let groupSymbols: RhythmSymbol[] = [];
-                    let groupSymbolsLength = 0;
+                if (beamGroupSize.length > 1) {
+                    beamGroupSizeList.unshift([Utils.Math.sum(beamGroupSize)]);
+                }
 
-                    while (symbols.length > 0 && groupSymbolsLength < groupLength) {
-                        let symbol = symbols[0];
-                        if (symbol.col.positionTicks >= groupStartTicks) {
-                            groupSymbols.push(symbol);
-                            groupSymbolsLength += symbol.rhythmProps.ticks;
-                            symbols.shift();
+                let beamsCreated = false;
+                let groupStartTicksSave = groupStartTicks;
+
+                while (beamGroupSizeList.length > 0 && !beamsCreated) {
+                    let beamGroupSize2 = beamGroupSizeList.shift()!;
+
+                    groupStartTicks = groupStartTicksSave;
+
+                    beamGroupSize2.forEach(beamGroupSize3 => {
+                        let beamGroupTicks = beamGroupSize3 * NoteLengthProps.get("8n").ticks;
+
+                        let groupSymbols = symbols.filter(symbol => {
+                            let symbolStartTicks = upBeatStartTicks + symbol.col.positionTicks;
+                            let symbolTicks = symbol.rhythmProps.ticks;
+                            return symbolStartTicks >= groupStartTicks && symbolStartTicks + symbolTicks <= groupStartTicks + beamGroupTicks;
+                        });
+
+                        let groupNotesTicks = Utils.Math.sum(groupSymbols.map(sym => sym.rhythmProps.ticks));
+
+                        if (
+                            groupNotesTicks === beamGroupTicks &&
+                            groupSymbols.every(n => n instanceof ObjNoteGroup) &&
+                            (groupSymbols.every(n => n.rhythmProps.flagCount === 1) || beamGroupSizeList.length === 0)
+                        ) {
+                            ObjBeamGroup.createBeam(groupSymbols);
+                            beamsCreated = true;
                         }
-                        else {
-                            break;
-                        }
-                    }
 
-                    ObjMeasure.setupBeamGroup(groupSymbols, beamGroupSize);
-
-                    symbolsStartTicks += groupSymbolsLength;
-                    groupStartTicks += groupLength;
+                        groupStartTicks += beamGroupTicks;
+                    });
                 }
             }
         });
@@ -1229,56 +1244,6 @@ export class ObjMeasure extends MusicObject {
         this.needBeamsUpdate = false;
 
         this.requestLayout();
-    }
-
-    private static setupBeamGroup(groupSymbols: RhythmSymbol[], mainBeamGroupSizeArr: number[]): boolean {
-        if (mainBeamGroupSizeArr.length === 0) {
-            return false;
-        }
-
-        let groupNotes = groupSymbols.map(s => s instanceof ObjNoteGroup && s.getBeamGroup()?.isTuplet() !== true ? s : undefined);
-
-        ObjNoteGroup.setBeamCounts(groupNotes);
-
-        let beamGroupSizeArrList: number[][] = [mainBeamGroupSizeArr];
-
-        if (mainBeamGroupSizeArr.length > 1) {
-            let sum = 0;
-            mainBeamGroupSizeArr.forEach(s => sum += s);
-            beamGroupSizeArrList.unshift([sum]);
-        }
-
-        let beamsCreated = false;
-
-        while (beamGroupSizeArrList.length > 0 && !beamsCreated) {
-            let beamGroupSizeArr = beamGroupSizeArrList.shift()!;
-
-            let groupSymbolsCopy = groupSymbols.slice();
-
-            beamGroupSizeArr.forEach(beamGroupSize => {
-                let beamGroupLength = beamGroupSize * NoteLengthProps.get("8n").ticks;
-                let beamNotesLength = 0;
-                let beamNotes: (ObjNoteGroup | undefined)[] = [];
-
-                while (beamNotesLength < beamGroupLength && groupSymbolsCopy.length > 0) {
-                    let symbol = groupSymbolsCopy.shift()!;
-                    beamNotesLength += symbol.rhythmProps.ticks;
-                    beamNotes.push(symbol instanceof ObjNoteGroup && symbol.getBeamGroup()?.isTuplet() !== true ? symbol : undefined);
-                }
-
-                if (
-                    beamNotesLength === beamGroupLength &&
-                    beamNotes.every(n => n !== undefined) &&
-                    (beamNotes.every(n => n.rhythmProps.flagCount === 1) || beamGroupSizeArrList.length === 0)
-                ) {
-                    ObjBeamGroup.createBeam(beamNotes);
-                    beamsCreated = true;
-                }
-
-            });
-        }
-
-        return beamsCreated;
     }
 
     getBarLineLeft() {

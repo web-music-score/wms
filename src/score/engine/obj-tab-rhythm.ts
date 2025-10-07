@@ -1,4 +1,4 @@
-import { DivRect, getVoiceIds, MTabRhythm, VoiceId } from "../pub";
+import { DivRect, getVoiceIds, MTabRhythm, Stem, VoiceId } from "../pub";
 import { Renderer } from "./renderer";
 import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
@@ -69,8 +69,10 @@ export class ObjTabRhythm extends MusicObject {
         let { unitSize, lineWidth } = renderer;
 
         let flagSize = unitSize;
+        let dotSpace = unitSize;
+        let dotWidth = unitSize * 0.25;
 
-        const drawNote = (sym: ObjNoteGroup, drawFlag: boolean) => {
+        const drawNote = (sym: ObjNoteGroup, drawStemOnly: boolean) => {
             if (sym.rhythmProps.noteSize >= 2) {
                 renderer.drawLine(
                     sym.col.getRect().centerX,
@@ -81,17 +83,26 @@ export class ObjTabRhythm extends MusicObject {
                     sym.rhythmProps.noteSize === 4 ? lineWidth * 2 : lineWidth
                 );
             }
-            if (drawFlag) {
-                for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
-                    renderer.drawLine(
-                        sym.col.getRect().centerX,
-                        this.getRect().top + i * flagSize,
-                        sym.col.getRect().centerX + flagSize,
-                        this.getRect().top + (i + 1) * flagSize,
-                        "black",
-                        lineWidth
-                    );
-                }
+
+            if (drawStemOnly) {
+                return;
+            }
+
+            for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
+                renderer.drawFlag(new DivRect(
+                    sym.col.getRect().centerX,
+                    sym.col.getRect().centerX + flagSize,
+                    this.getRect().top + i * flagSize,
+                    this.getRect().top + (i + 2) * flagSize
+                ), "up");
+            }
+
+            for (let i = 0; i < sym.rhythmProps.dotCount; i++) {
+                renderer.fillCircle(
+                    sym.getRect().centerX + dotSpace * (i + 1),
+                    this.getRect().bottom - dotWidth,
+                    dotWidth
+                );
             }
         }
 
@@ -138,9 +149,6 @@ export class ObjTabRhythm extends MusicObject {
                 );
             }
 
-            let dotSpace = unitSize;
-            let dotWidth = unitSize * 0.25;
-
             for (let i = 0; i < left.rhythmProps.dotCount; i++) {
                 renderer.fillCircle(
                     left.getRect().centerX + dotSpace * (i + 1),
@@ -148,6 +156,7 @@ export class ObjTabRhythm extends MusicObject {
                     dotWidth
                 );
             }
+
             for (let i = 0; i < right.rhythmProps.dotCount; i++) {
                 renderer.fillCircle(
                     right.getRect().centerX + dotSpace * (i + 1),
@@ -175,7 +184,7 @@ export class ObjTabRhythm extends MusicObject {
                     let cur = beamGroup.getSymbols()[j];
                     let next = beamGroup.getSymbols()[j + 1];
                     if (cur instanceof ObjNoteGroup) {
-                        drawNote(cur, false);
+                        drawNote(cur, true);
 
                         if (next instanceof ObjNoteGroup) {
                             drawBeam(cur, next);
@@ -191,7 +200,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
             }
             else if (curSym instanceof ObjNoteGroup) {
-                drawNote(curSym, true);
+                drawNote(curSym, false);
             }
             else if (curSym instanceof ObjRest) {
                 drawRest(curSym);

@@ -134,10 +134,12 @@ export class ObjBeamGroup extends MusicObject {
 
             this.type = isGroup ? BeamGroupType.TupletGroup : BeamGroupType.TupletBeam;
 
-            ObjNoteGroup.setTupletBeamCounts(this);
+            this.setTupletBeamCounts();
         }
         else {
             this.type = BeamGroupType.RegularBeam;
+
+            this.setBeamCounts();
         }
 
         // Add this beam group to symbols and measure.
@@ -148,6 +150,20 @@ export class ObjBeamGroup extends MusicObject {
         else {
             throw new MusicError(MusicErrorType.Score, `Cannot add ${beamGroupName} because some symbol already has one.`);
         }
+
+        // If regular beam has zero left or right beam count then detach.
+        if (this.type === BeamGroupType.RegularBeam) {
+            this.symbols.filter(sym => sym instanceof ObjNoteGroup).some((sym, i) => {
+                let first = i === 0;
+                let last = i === this.symbols.length - 1;
+                if (first && sym.getRightBeamCount() === 0 ||
+                    last && sym.getLeftBeamCount() === 0 ||
+                    !first && !last && (sym.getLeftBeamCount() === 0 || sym.getRightBeamCount() === 0)
+                ) {
+                    this.detach();
+                }
+            });
+        }
     }
 
     private get showTupletRatio(): boolean {
@@ -155,7 +171,7 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     static createBeam(noteGroups: ObjNoteGroup[]) {
-        if (noteGroups.length > 1) {
+        if (noteGroups.length > 1 && noteGroups.every(ng => !ng.hasTuplet())) {
             new ObjBeamGroup(noteGroups, undefined);
         }
     }
@@ -502,5 +518,98 @@ export class ObjBeamGroup extends MusicObject {
                 obj.tupletNumber.draw(renderer);
             }
         });
+    }
+
+    private setBeamCounts() {
+        const isADottedBHalf = (a: ObjNoteGroup, b: ObjNoteGroup) => {
+            let { flagCount: aFlagCount, noteSize: aNoteSize, dotCount: aDotCount } = a.rhythmProps;
+            let { flagCount: bFlagCount, noteSize: bNoteSize, dotCount: bDotCount } = b.rhythmProps;
+
+            return aFlagCount > 0 && bFlagCount > 0 && aDotCount > 0 && bDotCount === 0 && aNoteSize * Math.pow(2, aDotCount) === bNoteSize;
+        }
+
+        let groupNotes = this.symbols.filter(s => s instanceof ObjNoteGroup);
+
+        for (let i = 0; i < groupNotes.length; i++) {
+            let center = groupNotes[i];
+            let left = groupNotes[i - 1];
+            let right = groupNotes[i + 1];
+
+            if (center) {
+                center.setLeftBeamCount(0);
+                center.setRightBeamCount(0);
+
+                // Set left beam count
+                if (left) {
+                    if (left.rhythmProps.flagCount === center.rhythmProps.flagCount || isADottedBHalf(left, center) || isADottedBHalf(center, left)) {
+                        center.setLeftBeamCount(center.rhythmProps.flagCount);
+                    }
+                    else {
+                        center.setLeftBeamCount(Math.min(left.rhythmProps.flagCount, center.rhythmProps.flagCount));
+                    }
+                }
+
+                // Set right beam count
+                if (right) {
+                    if (right.rhythmProps.flagCount === center.rhythmProps.flagCount || isADottedBHalf(right, center) || isADottedBHalf(center, right)) {
+                        center.setRightBeamCount(center.rhythmProps.flagCount);
+                    }
+                    else {
+                        center.setRightBeamCount(Math.min(right.rhythmProps.flagCount, center.rhythmProps.flagCount));
+                    }
+                }
+            }
+        }
+
+        // Fix beam counts
+        let fixAgain: boolean;
+
+        do {
+            fixAgain = false;
+
+            for (let i = 0; i < groupNotes.length; i++) {
+                let center = groupNotes[i];
+                let left = groupNotes[i - 1];
+                let right = groupNotes[i + 1];
+
+                // If neither left or right beam count equals flag count, then reset beam counts.
+                if (center && center.getLeftBeamCount() !== center.rhythmProps.flagCount && center.getRightBeamCount() !== center.rhythmProps.flagCount) {
+                    center.setLeftBeamCount(0);
+                    center.setRightBeamCount(0);
+
+                    if (left && left.getRightBeamCount() > 0) {
+                        left.setRightBeamCount(0);
+                        fixAgain = true; // left changed => fix again.
+                    }
+
+                    if (right && right.getLeftBeamCount() > 0) {
+                        right.setLeftBeamCount(0);
+                        fixAgain = true; // Right changed => fix again.
+                    }
+                }
+            }
+        } while (fixAgain);
+    }
+
+    private setTupletBeamCounts() {
+        let type = this.getType();
+        let symbols = this.getSymbols();
+
+        if (type === BeamGroupType.TupletBeam) {
+            symbols.forEach((s, i) => {
+                if (s instanceof ObjNoteGroup) {
+                    s.setLeftBeamCount(i === 0 ? 0 : s.rhythmProps.flagCount);
+                    s.setRightBeamCount((i === symbols.length - 1) ? 0 : s.rhythmProps.flagCount);
+                }
+            });
+        }
+        else if (type === BeamGroupType.TupletGroup) {
+            symbols.forEach(s => {
+                if (s instanceof ObjNoteGroup) {
+                    s.setLeftBeamCount(0);
+                    s.setRightBeamCount(0);
+                }
+            });
+        }
     }
 }

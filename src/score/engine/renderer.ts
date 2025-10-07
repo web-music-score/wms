@@ -616,4 +616,26 @@ export class Renderer {
             }
         }
     }
+
+    drawFlag(rect: DivRect, dir: "up" | "down") {
+        let ctx = this.getCanvasContext();
+
+        if (!ctx) {
+            return;
+        }
+
+        let left = rect.left;
+        let right = rect.right;
+        let width = right - left;
+        let top = dir === "up" ? rect.top : rect.bottom;
+        let bottom = dir === "up" ? rect.bottom : rect.top;
+
+        ctx.beginPath();
+        ctx.moveTo(left, top);
+        ctx.bezierCurveTo(
+            left, top * 0.75 + bottom * 0.25,
+            left + width * 1.5, top * 0.5 + bottom * 0.5,
+            left + width * 0.5, bottom);
+        ctx.stroke();
+    }
 }
