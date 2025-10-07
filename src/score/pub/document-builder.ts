@@ -426,7 +426,11 @@ export class DocumentBuilder {
         noteOptions ??= {}
         assertNoteOptions(noteOptions);
         if (Utils.Is.isArray(note)) {
-            note.forEach(note => this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions));
+            let string = noteOptions.string;
+            note.forEach((note, noteId) => {
+                noteOptions.string = Utils.Is.isArray(string) ? string[noteId] : string;
+                this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions);
+            });
         }
         else {
             this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions);
@@ -501,7 +505,9 @@ export class DocumentBuilder {
                 delete noteOptions.triplet;
                 assertNoteOptions(noteOptions);
                 if (Utils.Is.isArray(note)) {
-                    note.forEach(note => {
+                    let string = noteOptions.string;
+                    note.forEach((note, noteId) => {
+                        noteOptions.string = Utils.Is.isArray(string) ? string[noteId] : string;
                         let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions, tupletRatio);
                         tupletSymbols.push(s);
                     });
