@@ -11,7 +11,8 @@
 
 ## Fixed
 - Documentation errors.
-
+- Correctly apply NoteOptions.string for each note when using addNote with arrya of notes.
+- Incorrectly detected upbeat beams.
 
 ## [5.0.0] - 2025-10-05
 Major update required to enable independent browser iife instrument modules.
