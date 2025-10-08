@@ -420,11 +420,15 @@ export class ObjTab extends ObjNotationLine {
     }
 
     calcTop(): number {
-        return this.top;
+        let { top } = this;
+        this.objects.forEach(o => top = Math.min(top, o.getRect().top));
+        return top;
     }
 
     calcBottom(): number {
-        return this.bottom;
+        let { bottom } = this;
+        this.objects.forEach(o => bottom = Math.max(bottom, o.getRect().bottom));
+        return bottom;
     }
 
     pick(x: number, y: number): MusicObject[] {

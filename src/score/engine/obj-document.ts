@@ -347,7 +347,7 @@ export class ObjDocument extends MusicObject {
         this.rows.forEach(row => row.layoutLayoutGroups(renderer));
 
         // Position notation lines
-        this.rows.forEach(row => row.layoutPositionLines(renderer));
+        this.rows.forEach(row => row.layoutSetNotationLines(renderer));
 
         // Add padding to rows
         this.rows.forEach(row => row.layoutPadding(renderer));

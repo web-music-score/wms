@@ -286,25 +286,23 @@ export class ObjScoreRow extends MusicObject {
         this.measures.forEach(m => m.alignStemsToBeams());
     }
 
-    layoutPositionLines(renderer: Renderer) {
+    layoutSetNotationLines(renderer: Renderer) {
         let { unitSize } = renderer;
 
         for (let i = 1; i < this.notationLines.length; i++) {
             let prev = this.notationLines[i - 1];
             let cur = this.notationLines[i];
 
-            let treble = this.notationLines[i - 1];
-            let bass = this.notationLines[i];
             if (
-                treble instanceof ObjStaff && bass instanceof ObjStaff &&
-                treble.staffConfig.grandId !== undefined && treble.staffConfig.grandId === bass.staffConfig.grandId
+                prev instanceof ObjStaff && cur instanceof ObjStaff &&
+                prev.staffConfig.grandId !== undefined && prev.staffConfig.grandId === cur.staffConfig.grandId
             ) {
-                let sep = unitSize * 6;
-                cur.offset(0, prev.getBottomLineY() - cur.getTopLineY() + sep);
+                let dy = prev.getBottomLineY() - cur.getTopLineY() + unitSize * 6;
+                cur.offset(0, dy);
             }
             else {
-                let sep = unitSize * 3;
-                cur.offset(0, prev.calcBottom() - cur.calcTop() + sep);
+                let dy = prev.calcBottom() - cur.calcTop() + unitSize * 3;
+                cur.offset(0, dy);
             }
         }
 
