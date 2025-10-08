@@ -498,6 +498,9 @@ export class ObjBeamGroup extends MusicObject {
                     let rx = right.x;
                     let ry = right.y;
 
+                    // Increase beam separation with angle.
+                    let dy = beamSeparation * (1 + 0.5 * Math.abs(Math.atan2(ry - ly, rx - lx)));
+
                     for (let beamId = 0; beamId < Math.max(leftBeamCount, rightBeamCount); beamId++) {
                         if (beamId < leftBeamCount && beamId < rightBeamCount) {
                             renderer.drawLine(lx, ly, rx, ry, color, beamThickness);
@@ -509,8 +512,8 @@ export class ObjBeamGroup extends MusicObject {
                             renderer.drawPartialLine(lx, ly, rx, ry, 0.75, 1, color, beamThickness);
                         }
 
-                        ly += beamSeparation;
-                        ry += beamSeparation;
+                        ly += dy;
+                        ry += dy;
                     }
                 }
             }
