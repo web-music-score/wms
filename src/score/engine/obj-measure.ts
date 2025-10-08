@@ -1,6 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps, getTempoString } from "@tspro/web-music-score/theory";
-import { Tempo, getDefaultTempo, TimeSignature, TimeSignatureString, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
+import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions } from "../pub";
 import { Renderer } from "./renderer";
@@ -13,7 +13,7 @@ import { ObjConnective } from "./obj-connective";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
-import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
+import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
