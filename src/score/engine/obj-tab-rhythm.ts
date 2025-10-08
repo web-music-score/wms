@@ -50,15 +50,15 @@ export class ObjTabRhythm extends MusicObject {
     layoutFitToMeasure(renderer: Renderer) {
         let { unitSize, fontSize } = renderer;
         let { measure } = this;
-
         let { left, right } = measure.getColumnsContentRect();
+        let stemHeight = unitSize * 5;
 
         this.rect.left = left;
         this.rect.centerX = (left + right) / 2;
         this.rect.right = right;
         this.rect.top = this.hasTuplets() ? -fontSize : 0;
-        this.rect.centerY = 0; // Center line is above stem top, under tuplet number.
-        this.rect.bottom = unitSize * 5;
+        this.rect.centerY = 0; // Center line is at stem top, under the tuplet number.
+        this.rect.bottom = stemHeight;
     }
 
     offset(dx: number, dy: number) {
