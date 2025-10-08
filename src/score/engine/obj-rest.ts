@@ -184,6 +184,10 @@ export class ObjRest extends MusicObject {
         });
     }
 
+    hasTuplet(): boolean {
+        return this.rhythmProps.tupletRatio !== undefined;
+    }
+
     isEmpty(): boolean {
         return this.staffObjects.length === 0;
     }

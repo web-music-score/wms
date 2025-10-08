@@ -75,6 +75,13 @@ export function createStaffConfigTabDemo() {
         .completeRests()
 
         .addMeasure()
+        .addRest(0, "8.")
+        .addRest(0, "8..")
+        .addRest(0, "8...")
+        .completeRests()
+        .endRow()
+
+        .addMeasure()
         .addRest(0, "1n")
 
         .addMeasure()
@@ -110,6 +117,23 @@ export function createStaffConfigTabDemo() {
         .addNote(0, "G3", "2n", { string: 3 })
         .addNote(0, "G3", "2n", { string: 3 })
         .addNavigation("ending", 2)
+
+        .addMeasure()
+        .addNote(0, "G3", "8t", { string: 3 })
+        .addNote(0, "G3", "8t", { string: 3 })
+        .addNote(0, "G3", "8t", { string: 3 })
+
+        .addNote(0, "G3", "8t", { string: 3 })
+        .addNote(0, "G3", "4t", { string: 3 })
+
+        .addNote(0, "G3", "8t", { string: 3 })
+        .addRest(0, "8t")
+        .addNote(0, "G3", "8t", { string: 3 })
+
+        .addNote(0, "G3", "8t", { string: 3 })
+        .addNote(0, "G3", "8t", { string: 3 })
+        .addRest(0, "8t")
+        .completeRests()
 
         .getDocument();
 }

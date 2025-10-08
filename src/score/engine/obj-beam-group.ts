@@ -235,6 +235,12 @@ export class ObjBeamGroup extends MusicObject {
         return this.type === BeamGroupType.TupletBeam || this.type === BeamGroupType.TupletGroup;
     }
 
+    getTupletRatioText(): string {
+        return this.showTupletRatio
+            ? String(this.tupletRatio?.parts) + ":" + String(this.tupletRatio?.inTimeOf)
+            : String(this.tupletRatio?.parts);
+    }
+
     getSymbols(): ReadonlyArray<RhythmSymbol> {
         return this.symbols;
     }
@@ -392,13 +398,8 @@ export class ObjBeamGroup extends MusicObject {
                 obj.tupletNumberOffsetY = groupLineDy;
             }
 
-            if (this.isTuplet() && this.tupletRatio) {
-                let txt = this.showTupletRatio
-                    ? String(this.tupletRatio.parts) + ":" + String(this.tupletRatio.inTimeOf)
-                    : String(this.tupletRatio.parts);
-
-                obj.tupletNumber = new ObjText(this, txt, 0.5, 0.5);
-
+            if (this.isTuplet()) {
+                obj.tupletNumber = new ObjText(this, this.getTupletRatioText(), 0.5, 0.5);
                 obj.tupletNumber.layout(renderer);
                 obj.tupletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + obj.tupletNumberOffsetY);
             }

@@ -1165,6 +1165,10 @@ export class ObjMeasure extends MusicObject {
         this.requestLayout();
     }
 
+    getBeamGroups(): ReadonlyArray<ObjBeamGroup> {
+        return this.beamGroups;
+    }
+
     createBeams() {
         if (!this.needBeamsUpdate) {
             return;
