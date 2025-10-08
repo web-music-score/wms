@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.1.0] - 2025-10-
+## [5.1.0] - 2025-10-08
 ## Added
 - Audio functions: mute(), unmute() and isMuted().
 - Added audio-synth as an own module.
