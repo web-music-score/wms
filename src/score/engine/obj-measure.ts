@@ -1211,10 +1211,10 @@ export class ObjMeasure extends MusicObject {
                     beamGroupSizeList.unshift([Utils.Math.sum(beamGroupSize)]);
                 }
 
-                let beamsCreated = false;
+                let beamCreated = false;
                 let groupStartTicksSave = groupStartTicks;
 
-                while (beamGroupSizeList.length > 0 && !beamsCreated) {
+                while (beamGroupSizeList.length > 0 && !beamCreated) {
                     let beamGroupSize2 = beamGroupSizeList.shift()!;
 
                     groupStartTicks = groupStartTicksSave;
@@ -1235,8 +1235,7 @@ export class ObjMeasure extends MusicObject {
                             groupSymbols.every(n => n instanceof ObjNoteGroup) &&
                             (groupSymbols.every(n => n.rhythmProps.flagCount === 1) || beamGroupSizeList.length === 0)
                         ) {
-                            ObjBeamGroup.createBeam(groupSymbols);
-                            beamsCreated = true;
+                            beamCreated ||= ObjBeamGroup.createBeam(groupSymbols);
                         }
 
                         groupStartTicks += beamGroupTicks;

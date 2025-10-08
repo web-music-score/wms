@@ -160,7 +160,7 @@ export class ObjBeamGroup extends MusicObject {
                     last && sym.getLeftBeamCount() === 0 ||
                     !first && !last && (sym.getLeftBeamCount() === 0 || sym.getRightBeamCount() === 0)
                 ) {
-                    this.detach();
+                    throw this;
                 }
             });
         }
@@ -170,10 +170,19 @@ export class ObjBeamGroup extends MusicObject {
         return this.tupletRatio?.showRatio === true;
     }
 
-    static createBeam(noteGroups: ObjNoteGroup[]) {
+    static createBeam(noteGroups: ObjNoteGroup[]): boolean {
         if (noteGroups.length > 1 && noteGroups.every(ng => !ng.hasTuplet())) {
-            new ObjBeamGroup(noteGroups, undefined);
+            try {
+                new ObjBeamGroup(noteGroups, undefined);
+                return true;
+            }
+            catch (err) {
+                if (err instanceof ObjBeamGroup) {
+                    err.detach();
+                }
+            }
         }
+        return false;
     }
 
     static createOldStyleTriplet(symbols: RhythmSymbol[]): number {
