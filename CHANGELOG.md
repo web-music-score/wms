@@ -12,7 +12,10 @@
 ## Fixed
 - Documentation errors.
 - Correctly apply NoteOptions.string for each note when using addNote with arrya of notes.
-- Incorrectly detected upbeat beams.
+- Incorrect detection upbeat beams.
+- Increase beam separation by angle.
+- Better tempo position above staff.
+- Distance between staff and tab.
 
 ## [5.0.0] - 2025-10-05
 Major update required to enable independent browser iife instrument modules.
