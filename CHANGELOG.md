@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.1.1] - 2025-10-
+## Fixed
+- Beam not created correctly near tuplet.
+
 ## [5.1.0] - 2025-10-08
 ## Added
 - Audio functions: mute(), unmute() and isMuted().
