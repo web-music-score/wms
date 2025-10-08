@@ -281,8 +281,13 @@ export class ObjStaffSignature extends MusicObject {
         x = right;
 
         if (this.tempoText) {
+            let tempoBottom = Math.min(
+                this.clefImage ? this.clefImage.getRect().top : staff.getTopLineY(),
+                ...this.ksNeutralizeAccidentals.map(o => o.getRect().top),
+                ...this.ksNewAccidentals.map(o => o.getRect().top)
+            );
             this.tempoText.layout(renderer);
-            this.tempoText.offset(x, Math.min(this.rect.top, staff.getTopLineY()));
+            this.tempoText.offset(x, tempoBottom);
             this.rect.expandInPlace(this.tempoText.getRect());
         }
 
@@ -290,67 +295,37 @@ export class ObjStaffSignature extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        if (this.clefImage) {
-            this.clefImage.offset(dx, dy);
-        }
-
-        if (this.eightBelowClef) {
-            this.eightBelowClef.offset(dx, dy);
-        }
-
-        if (this.measureNumber) {
-            this.measureNumber.offset(dx, dy);
-        }
-
+        this.clefImage?.offset(dx, dy);
+        this.eightBelowClef?.offset(dx, dy);
+        this.measureNumber?.offset(dx, dy);
         this.ksNeutralizeAccidentals.forEach(acc => acc.offset(dx, dy));
         this.ksNewAccidentals.forEach(acc => acc.offset(dx, dy));
-
-        if (this.beatCountText) {
-            this.beatCountText.offset(dx, dy);
-        }
-
-        if (this.beatSizeText) {
-            this.beatSizeText.offset(dx, dy);
-        }
-
-        if (this.tempoText) {
-            this.tempoText.offset(dx, dy);
-        }
-
+        this.beatCountText?.offset(dx, dy);
+        this.beatSizeText?.offset(dx, dy);
+        this.tempoText?.offset(dx, dy);
         this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) {
         // Draw Clef
-        if (this.clefImage) {
-            this.clefImage.draw(renderer);
-        }
+        this.clefImage?.draw(renderer);
 
-        if (this.eightBelowClef) {
-            this.eightBelowClef.draw(renderer);
-        }
+        // DRaw 8 below clef
+        this.eightBelowClef?.draw(renderer);
 
         // Draw measure number
-        if (this.measureNumber) {
-            this.measureNumber.draw(renderer);
-        }
+        this.measureNumber?.draw(renderer);
 
         // Draw key signature
         this.ksNeutralizeAccidentals.forEach(acc => acc.draw(renderer));
         this.ksNewAccidentals.forEach(acc => acc.draw(renderer));
 
         // Draw time signature
-        if (this.beatCountText) {
-            this.beatCountText.draw(renderer);
-        }
-        if (this.beatSizeText) {
-            this.beatSizeText.draw(renderer);
-        }
+        this.beatCountText?.draw(renderer);
+        this.beatSizeText?.draw(renderer);
 
         // Draw tempo
-        if (this.tempoText) {
-            this.tempoText.draw(renderer);
-        }
+        this.tempoText?.draw(renderer);
     }
 }
 
@@ -487,42 +462,22 @@ export class ObjTabSignature extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        if (this.measureNumber) {
-            this.measureNumber.offset(dx, dy);
-        }
-
-        if (this.beatCountText) {
-            this.beatCountText.offset(dx, dy);
-        }
-
-        if (this.beatSizeText) {
-            this.beatSizeText.offset(dx, dy);
-        }
-
-        if (this.tempoText) {
-            this.tempoText.offset(dx, dy);
-        }
-
+        this.measureNumber?.offset(dx, dy);
+        this.beatCountText?.offset(dx, dy);
+        this.beatSizeText?.offset(dx, dy);
+        this.tempoText?.offset(dx, dy);
         this.rect.offsetInPlace(dx, dy);
     }
 
     draw(renderer: Renderer) {
         // Draw measure number
-        if (this.measureNumber) {
-            this.measureNumber.draw(renderer);
-        }
+        this.measureNumber?.draw(renderer);
 
         // Draw time signature
-        if (this.beatCountText) {
-            this.beatCountText.draw(renderer);
-        }
-        if (this.beatSizeText) {
-            this.beatSizeText.draw(renderer);
-        }
+        this.beatCountText?.draw(renderer);
+        this.beatSizeText?.draw(renderer);
 
         // Draw tempo
-        if (this.tempoText) {
-            this.tempoText.draw(renderer);
-        }
+        this.tempoText?.draw(renderer);
     }
 }
