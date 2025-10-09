@@ -503,20 +503,21 @@ export class ObjBeamGroup extends MusicObject {
                 let noteGroupPoints = obj.points.filter(p => p.symbol instanceof ObjNoteGroup);
 
                 // Calc beam separation, affected by beam angle.
-                let left = noteGroupPoints[0];
-                let right = noteGroupPoints[noteGroupPoints.length - 1];
-                let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (stemDir === Stem.Up ? 1 : -1)
-                    * (1 + 0.5 * Math.abs(Math.atan2(right.y - left.y, right.x - left.x)));
+                let { x: lx, y: ly } = noteGroupPoints[0];
+                let { x: rx, y: ry } = noteGroupPoints[noteGroupPoints.length - 1];
+                let beamSeparation = DocumentSettings.BeamSeparation
+                    * unitSize * (stemDir === Stem.Up ? 1 : -1)
+                    * (1 + 0.5 * Math.abs(Math.atan2(ry - ly, rx - lx)));
 
                 for (let i = 0; i < noteGroupPoints.length - 1; i++) {
-                    let { x: lx, y: ly } = noteGroupPoints[i];
-                    let { x: rx, y: ry } = noteGroupPoints[i + 1];
+                    let { x: lx, y: ly, symbol: lsymbol } = noteGroupPoints[i];
+                    let { x: rx, y: ry, symbol: rsymbol } = noteGroupPoints[i + 1];
 
                     ly += (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
                     ry += (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
 
-                    let leftBeamCount = (<ObjNoteGroup>left.symbol).getRightBeamCount();
-                    let rightBeamCount = (<ObjNoteGroup>right.symbol).getLeftBeamCount();
+                    let leftBeamCount = (<ObjNoteGroup>lsymbol).getRightBeamCount();
+                    let rightBeamCount = (<ObjNoteGroup>rsymbol).getLeftBeamCount();
 
                     for (let beamId = 0; beamId < Math.max(leftBeamCount, rightBeamCount); beamId++) {
                         if (beamId < leftBeamCount && beamId < rightBeamCount) {
