@@ -473,29 +473,27 @@ export class ObjBeamGroup extends MusicObject {
         if (type === BeamGroupType.TupletGroup) {
             let tipHeight = (stemDir === Stem.Up ? 1 : -1) * unitSize;
             this.staffObjects.forEach(obj => {
-                let l = obj.points[0];
-                let r = obj.points[obj.points.length - 1];
+                let { x: lx, y: ly } = obj.points[0];
+                let { x: rx, y: ry } = obj.points[obj.points.length - 1];
 
-                if (l && r) {
-                    if (obj.tupletNumber) {
-                        let tf = obj.tupletNumber.getRect().width / (r.x - l.x) * 1.2;
+                if (obj.tupletNumber) {
+                    let tf = obj.tupletNumber.getRect().width / (rx - lx) * 1.2;
 
-                        let lc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 - tf / 2);
-                        let rc = Utils.Math.interpolateCoord(l.x, l.y, r.x, r.y, 0.5 + tf / 2);
+                    let lc = Utils.Math.interpolateCoord(lx, ly, rx, ry, 0.5 - tf / 2);
+                    let rc = Utils.Math.interpolateCoord(lx, ly, rx, ry, 0.5 + tf / 2);
 
-                        // Draw lines from left tot tuplet number and from tuplet number to right.
-                        renderer.drawLine(l.x, l.y, lc.x, lc.y, color, lineWidth);
-                        renderer.drawLine(rc.x, rc.y, r.x, r.y, color, lineWidth);
-                    }
-                    else {
-                        // Draw line from left to right.
-                        renderer.drawLine(l.x, l.y, r.x, r.y, color, lineWidth);
-                    }
-
-                    // Draw tip
-                    renderer.drawLine(l.x, l.y, l.x, l.y + tipHeight, color, lineWidth);
-                    renderer.drawLine(r.x, r.y, r.x, r.y + tipHeight, color, lineWidth);
+                    // Draw lines from left tot tuplet number and from tuplet number to right.
+                    renderer.drawLine(lx, ly, lc.x, lc.y, color, lineWidth);
+                    renderer.drawLine(rc.x, rc.y, rx, ry, color, lineWidth);
                 }
+                else {
+                    // Draw line from left to right.
+                    renderer.drawLine(lx, ly, rx, ry, color, lineWidth);
+                }
+
+                // Draw tip
+                renderer.drawLine(lx, ly, lx, ly + tipHeight, color, lineWidth);
+                renderer.drawLine(rx, ry, rx, ry + tipHeight, color, lineWidth);
             });
         }
         else if (type === BeamGroupType.RegularBeam || type === BeamGroupType.TupletBeam) {
