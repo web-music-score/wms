@@ -399,6 +399,11 @@ export class Player {
 
         const col = this.playerColumnSequence[this.playPos];
 
+        if (!col) {
+            this.stop();
+            return;
+        }
+
         const getDuration = (ticks: number, tempo: Tempo) => {
             let seconds = calcTicksDuration(ticks, tempo);
             return Math.max(0, seconds);
@@ -526,6 +531,11 @@ export class Player {
         }
 
         let col = this.playerColumnSequence[this.playPos];
+
+        if (!col) {
+            return undefined;
+        }
+
         let measure = col.measure;
 
         let x = col.getRect().centerX;
