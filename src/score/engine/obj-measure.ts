@@ -1021,22 +1021,19 @@ export class ObjMeasure extends MusicObject {
         let vposMap = this.lyricsObjectsCache.get(line);
 
         if (vposMap === undefined) {
-            vposMap = new Map();
-            this.lyricsObjectsCache.set(line, vposMap);
+            this.lyricsObjectsCache.set(line, vposMap = new Map());
         }
 
         let verseMap = vposMap.get(vpos);
 
         if (verseMap === undefined) {
-            verseMap = new Map();
-            vposMap.set(vpos, verseMap);
+            vposMap.set(vpos, verseMap = new Map());
         }
 
         let lyricsArr = verseMap.get(verse);
 
         if (lyricsArr === undefined) {
-            lyricsArr = [];
-            verseMap.set(verse, lyricsArr);
+            verseMap.set(verse, lyricsArr = []);
         }
 
         return lyricsArr;

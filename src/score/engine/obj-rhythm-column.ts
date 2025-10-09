@@ -4,7 +4,7 @@ import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, Voice
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
-import { ObjMeasure, validateVerseNumber, validateVoiceId } from "./obj-measure";
+import { ObjMeasure, validateVoiceId } from "./obj-measure";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
@@ -43,11 +43,10 @@ export type ScorePlayerNote = {
 
 export type RhythmSymbol = ObjNoteGroup | ObjRest;
 
-type LyricsContainerData = { lyricsContainer: LyricsContainer, verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos }
-
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
-    private readonly lyricsContainers: LyricsContainerData[] = [];
+
+    private readonly lyricsContainerCache = new Map<ObjNotationLine, Map<VerticalPos, Map<VerseNumber, LyricsContainer>>>();
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
@@ -224,23 +223,26 @@ export class ObjRhythmColumn extends MusicObject {
         return this.voiceSymbol[voiceId];
     }
 
-    getLyricsContainerDatas(): ReadonlyArray<LyricsContainerData> {
-        return this.lyricsContainers;
-    }
-
     getLyricsContainer(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos, lyricsLength?: NoteLength): LyricsContainer | undefined {
-        let data = this.lyricsContainers.find(data => data.verse === verse && data.line === line && data.vpos === vpos);
+        let vposMap = this.lyricsContainerCache.get(line);
 
-        if (data === undefined && lyricsLength !== undefined) {
-            data = { lyricsContainer: new LyricsContainer(this, validateNoteLength(lyricsLength)), verse, line, vpos }
-
-            this.lyricsContainers.push(data);
-
-            this.requestLayout();
-            this.requestRectUpdate();
+        if (vposMap === undefined) {
+            this.lyricsContainerCache.set(line, vposMap = new Map());
         }
 
-        return data?.lyricsContainer;
+        let verseMap = vposMap.get(vpos);
+
+        if (verseMap === undefined) {
+            vposMap.set(vpos, verseMap = new Map());
+        }
+
+        let lyricsContainer = verseMap.get(verse);
+
+        if (lyricsContainer === undefined && lyricsLength !== undefined) {
+            verseMap.set(verse, lyricsContainer = new LyricsContainer(this, validateNoteLength(lyricsLength)));
+        }
+
+        return lyricsContainer;
     }
 
     getMinWidth() {
