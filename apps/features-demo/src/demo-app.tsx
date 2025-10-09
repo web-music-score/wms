@@ -5,6 +5,8 @@ import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
 
+ Audio.addInstrument(ClassicalGuitar);
+
 type DemoAppState = {
     instrument: string;
     doc: Score.MDocument;
@@ -17,8 +19,6 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
 
     constructor(props: {}) {
         super(props);
-
-        Audio.addInstrument(ClassicalGuitar);
 
         this.state = {
             instrument: Audio.getCurrentInstrument(),
