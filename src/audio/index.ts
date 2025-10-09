@@ -65,7 +65,7 @@ export function addInstrument(instrument: Instrument | Instrument[]): void {
             }
 
             if (InstrumentList.some(instr2 => instr2.getName() === instr.getName())) {
-                console.warn(`Instrument "${instr.getName()}" already registered!`);
+                console.warn(`Instrument "${instr.getName()}" already added!`);
             }
             else {
                 InstrumentList.push(instr);
