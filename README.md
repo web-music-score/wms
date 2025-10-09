@@ -82,8 +82,8 @@ React module `react-ui` is not included available for browser usage.
     // The lib is available via global name WebMusicScore.
     const { Core, Audio, Theory, Score, Pieces } = window.WebMusicScore;
 
-    // Classical guitar audio is available via global name Audio_ClassicalGuitar.
-    const { ClassicalGuitar } = window.Audio_ClassicalGuitar;
+    // Classical guitar instrument is available via global name Audio_CG.
+    const { ClassicalGuitar } = window.Audio_CG;
 
     // Add and use classical guitar instrument.
     Audio.addInstrument(ClassicalGuitar);

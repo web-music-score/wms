@@ -90,15 +90,24 @@ export default defineConfig([
         outDir: 'dist',
         target: 'es2015',
         format: ['iife'],
-        globalName: 'Audio_ClassicalGuitar',
+        globalName: 'Audio_CG',
         sourcemap: true,
         minify: true,
         clean: false, // Don't wipe dist from the previous build
         banner: {
             js: bannerText
         },
+        footer: {
+            js: `
+// Backward compatibility alias
+var Audio_ClassicalGuitar = Audio_CG;
+if (typeof window !== "undefined") {
+    window.Audio_ClassicalGuitar = window.Audio_CG = Audio_CG;
+}
+`
+        },
         define: {
-            __LIB_INFO__: JSON.stringify(`Audio_ClassicalGuitar v${pkg.version} (iife)`)
+            __LIB_INFO__: JSON.stringify(`Audio_CG v${pkg.version} (iife)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()]
     }

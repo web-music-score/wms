@@ -4,6 +4,9 @@
 ## Fixed
 - Beam not created correctly near tuplet.
 
+## Changed
+- Renamed iife globalName "Audio_ClassicalGuitar" to "Audio_CG" and added alias to support old name too.
+
 ## [5.1.0] - 2025-10-08
 ## Added
 - Audio functions: mute(), unmute() and isMuted().
