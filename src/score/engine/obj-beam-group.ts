@@ -499,28 +499,24 @@ export class ObjBeamGroup extends MusicObject {
             });
         }
         else if (type === BeamGroupType.RegularBeam || type === BeamGroupType.TupletBeam) {
-            let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (stemDir === Stem.Up ? 1 : -1);
             this.staffObjects.forEach(obj => {
                 let noteGroupPoints = obj.points.filter(p => p.symbol instanceof ObjNoteGroup);
 
+                // Calc beam separation, affected by beam angle.
+                let left = noteGroupPoints[0];
+                let right = noteGroupPoints[noteGroupPoints.length - 1];
+                let beamSeparation = DocumentSettings.BeamSeparation * unitSize * (stemDir === Stem.Up ? 1 : -1)
+                    * (1 + 0.5 * Math.abs(Math.atan2(right.y - left.y, right.x - left.x)));
+
                 for (let i = 0; i < noteGroupPoints.length - 1; i++) {
-                    let left = noteGroupPoints[i];
-                    let right = noteGroupPoints[i + 1];
+                    let { x: lx, y: ly } = noteGroupPoints[i];
+                    let { x: rx, y: ry } = noteGroupPoints[i + 1];
 
-                    if (!(left.symbol instanceof ObjNoteGroup && right.symbol instanceof ObjNoteGroup)) {
-                        continue;
-                    }
+                    ly += (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
+                    ry += (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
 
-                    let lx = left.x;
-                    let ly = left.y + (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
-                    let rx = right.x;
-                    let ry = right.y + (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
-
-                    // Increase beam separation with angle.
-                    let dy = beamSeparation * (1 + 0.5 * Math.abs(Math.atan2(ry - ly, rx - lx)));
-
-                    let leftBeamCount = left.symbol.getRightBeamCount();
-                    let rightBeamCount = right.symbol.getLeftBeamCount();
+                    let leftBeamCount = (<ObjNoteGroup>left.symbol).getRightBeamCount();
+                    let rightBeamCount = (<ObjNoteGroup>right.symbol).getLeftBeamCount();
 
                     for (let beamId = 0; beamId < Math.max(leftBeamCount, rightBeamCount); beamId++) {
                         if (beamId < leftBeamCount && beamId < rightBeamCount) {
@@ -533,8 +529,8 @@ export class ObjBeamGroup extends MusicObject {
                             renderer.drawPartialLine(lx, ly, rx, ry, 0.75, 1, color, beamThickness);
                         }
 
-                        ly += dy;
-                        ry += dy;
+                        ly += beamSeparation;
+                        ry += beamSeparation;
                     }
                 }
             });
