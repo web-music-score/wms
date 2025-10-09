@@ -1,11 +1,12 @@
 # Changelog
 
-## [5.1.1] - 2025-10-
+## [5.2.0] - 2025-10-09
 ## Fixed
 - Beam not created correctly near tuplet.
+- play() on empty music document crashed.
 
 ## Changed
-- Renamed iife globalName "Audio_ClassicalGuitar" to "Audio_CG" and added alias to support old name too.
+- Renamed audio-cg iife global name to Audio_CG but also support old name Audio_ClassicalGuitar.
 
 ## [5.1.0] - 2025-10-08
 ## Added
