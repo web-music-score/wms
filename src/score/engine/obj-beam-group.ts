@@ -93,6 +93,10 @@ export class ObjStaffBeamGroup extends MusicObject {
     }
 }
 
+class InvalidBeamGroup {
+    constructor(readonly beamGroup: ObjBeamGroup, readonly message: string) { }
+}
+
 export class ObjBeamGroup extends MusicObject {
     readonly mi: MBeamGroup;
 
@@ -160,10 +164,32 @@ export class ObjBeamGroup extends MusicObject {
                     last && sym.getLeftBeamCount() === 0 ||
                     !first && !last && (sym.getLeftBeamCount() === 0 || sym.getRightBeamCount() === 0)
                 ) {
-                    throw this;
+                    throw new InvalidBeamGroup(this, "Beam has zero left or right beam count!");
                 }
             });
         }
+
+        // All symbols should have same voiceId.
+        if (symbols.some(symbol => symbol.voiceId !== symbols[0].voiceId)) {
+            if (this.type === BeamGroupType.RegularBeam) {
+                throw new InvalidBeamGroup(this, "Beam symbols have different voiceId.");
+            }
+            else {
+                throw new MusicError(MusicErrorType.Score, `Tuplet symbols have different voiceId.`);
+            }
+        }
+
+        // All symbols must be visible (but can be in multiple staves).
+        symbols[0].row.getStaves().forEach(staff => {
+            if (staff.getActualStaff(symbols[0].ownDiatonicId) && staff.containsVoiceId(symbols[0].voiceId)) {
+                symbols.forEach(sym => {
+                    let actualStaff = staff.getActualStaff(sym.ownDiatonicId);
+                    if (!actualStaff || !actualStaff.containsVoiceId(sym.voiceId)) {
+                        throw new InvalidBeamGroup(this, "Some of beam or tuplet symbols are not visible!");
+                    }
+                });
+            }
+        });
     }
 
     private get showTupletRatio(): boolean {
@@ -177,8 +203,11 @@ export class ObjBeamGroup extends MusicObject {
                 return true;
             }
             catch (err) {
-                if (err instanceof ObjBeamGroup) {
-                    err.detach();
+                if (err instanceof InvalidBeamGroup) {
+                    err.beamGroup.detach();
+                }
+                else {
+                    throw err;
                 }
             }
         }
@@ -186,27 +215,48 @@ export class ObjBeamGroup extends MusicObject {
     }
 
     static createOldStyleTriplet(symbols: RhythmSymbol[]): number {
-        let s2 = symbols.slice(0, 2);
-        let n2 = s2.map(s => s.rhythmProps.noteSize);
+        try {
+            let s2 = symbols.slice(0, 2);
+            let n2 = s2.map(s => s.rhythmProps.noteSize);
 
-        if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (n2[0] * 2 === n2[1] || n2[1] * 2 === n2[0])) {
-            new ObjBeamGroup(s2, Tuplet.Triplet);
-            return 2;
+            if (s2.length === 2 && s2.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && (n2[0] * 2 === n2[1] || n2[1] * 2 === n2[0])) {
+                new ObjBeamGroup(s2, Tuplet.Triplet);
+                return 2;
+            }
+
+            let s3 = symbols.slice(0, 3);
+            let n3 = s3.map(s => s.rhythmProps.noteSize);
+
+            if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && n3.every(n => n === n3[0])) {
+                new ObjBeamGroup(s3, Tuplet.Triplet);
+                return 3;
+            }
         }
-
-        let s3 = symbols.slice(0, 3);
-        let n3 = s3.map(s => s.rhythmProps.noteSize);
-
-        if (s3.length === 3 && s3.every(s => s.oldStyleTriplet && s.getBeamGroup() === undefined) && n3.every(n => n === n3[0])) {
-            new ObjBeamGroup(s3, Tuplet.Triplet);
-            return 3;
+        catch (err) {
+            if (err instanceof InvalidBeamGroup) {
+                console.error(err.message);
+                err.beamGroup.detach();
+            }
+            else {
+                throw err;
+            }
         }
-
         return 0;
     }
 
     static createTuplet(symbols: RhythmSymbol[], tupletRatio: TupletRatio & TupletOptions): void {
-        new ObjBeamGroup(symbols, tupletRatio);
+        try {
+            new ObjBeamGroup(symbols, tupletRatio);
+        }
+        catch (err) {
+            if (err instanceof InvalidBeamGroup) {
+                console.error(err.message);
+                err.beamGroup.detach();
+            }
+            else {
+                throw err;
+            }
+        }
     }
 
     getMusicInterface(): MBeamGroup {
@@ -277,13 +327,6 @@ export class ObjBeamGroup extends MusicObject {
         let symbols = this.getSymbols();
 
         if (symbols.length === 0) {
-            return;
-        }
-
-        let voiceId = symbols[0].voiceId;
-
-        // All symbols should have same voiceId.
-        if (symbols.some(symbol => symbol.voiceId !== voiceId)) {
             return;
         }
 

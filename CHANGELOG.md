@@ -1,8 +1,9 @@
 # Changelog
 
-## [5.2.0] - 2025-10-09
+## [5.2.0] - 2025-10-10
 ## Fixed
 - Beam not created correctly near tuplet.
+- Create beam only if all beam notes are visible.
 - play() on empty music document crashed.
 
 ## Changed
