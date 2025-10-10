@@ -71,12 +71,12 @@ React module `react-ui` is not included available for browser usage.
     It is recommended to use exact version number and direct link to the bundle so
     that if something breaks between versions then your web site does not stop working.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@5.1.0/dist/iife/index.global.js"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@5.2.0/dist/iife/index.global.js"></script>
 
 <!--
     Classical guitar now also available for browser module.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@5.1.0/dist/iife/audio-cg.global.js"></script>
+<script src="https://unpkg.com/@tspro/web-music-score@5.2.0/dist/iife/audio-cg.global.js"></script>
 
 <script>
     // The lib is available via global name WebMusicScore.

@@ -4,6 +4,7 @@
 ## Fixed
 - Beam not created correctly near tuplet.
 - Create beam only if all beam notes are visible.
+- Not all beams in group were created.
 - play() on empty music document crashed.
 
 ## Changed
