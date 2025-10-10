@@ -445,8 +445,16 @@ export class ObjBeamGroup extends MusicObject {
                     let symY = symbolY[i];
                     if (symStaff && symX !== undefined && symY !== undefined) {
                         let pt = new BeamPoint(symStaff, this, sym, symX, symY);
-                        pt.topBeamsHeight = beamThickness / 2 + (stemDir === Stem.Down ? beamHeight(i) : 0);
-                        pt.bottomBeamsHeight = beamThickness / 2 + (stemDir === Stem.Up ? beamHeight(i) : 0);
+                        switch (stemDir) {
+                            case Stem.Up:
+                                pt.topBeamsHeight = beamThickness / 2;
+                                pt.bottomBeamsHeight = beamThickness / 2 + beamHeight(i);
+                                break;
+                            case Stem.Down:
+                                pt.topBeamsHeight = beamThickness / 2 + beamHeight(i);
+                                pt.bottomBeamsHeight = beamThickness / 2;
+                                break;
+                        }
                         obj.points.push(pt);
                     }
                 });
@@ -553,9 +561,6 @@ export class ObjBeamGroup extends MusicObject {
                 for (let i = 0; i < noteGroupPoints.length - 1; i++) {
                     let { x: lx, y: ly, symbol: lsymbol } = noteGroupPoints[i];
                     let { x: rx, y: ry, symbol: rsymbol } = noteGroupPoints[i + 1];
-
-                    ly += (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
-                    ry += (stemDir === Stem.Up ? 1 : -1) * beamThickness / 2;
 
                     let leftBeamCount = (<ObjNoteGroup>lsymbol).getRightBeamCount();
                     let rightBeamCount = (<ObjNoteGroup>rsymbol).getLeftBeamCount();
