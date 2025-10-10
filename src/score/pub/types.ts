@@ -156,6 +156,12 @@ export type StaffTabOrGroup = number | string;
 /** Staff/tab/group snglevalue or array of values. */
 export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
+/** Measure options. */
+export type MeasureOptions ={
+    /** show measure number? */
+    showNumber?: boolean
+}
+
 /** Options for notes/chords. */
 export type NoteOptions = {
     /** Stem direction. */

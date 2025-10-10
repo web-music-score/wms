@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.3.0] - 2025-10-
+## Added
+- MeasureOptions with showNumber property.
+
 ## [5.2.0] - 2025-10-10
 ## Fixed
 - Beam not created correctly near tuplet.

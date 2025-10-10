@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps, getTempoString } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -154,7 +154,7 @@ export class ObjMeasure extends MusicObject {
 
     readonly mi: MMeasure;
 
-    constructor(readonly row: ObjScoreRow) {
+    constructor(readonly row: ObjScoreRow, private readonly options: MeasureOptions) {
         super(row);
 
         this.mi = new MMeasure(this);
@@ -1335,7 +1335,7 @@ export class ObjMeasure extends MusicObject {
         this.tabStringNotesWidth = isFirstMeasureInRow && this.row.hasTab ? unitSize * 4 : 0;
 
         let showClef = isFirstMeasureInRow || isAfterMeasureBreak;
-        let showMeasureNumber = isFirstMeasureInRow && !this.row.isFirstRow();
+        let showMeasureNumber = this.options.showNumber === false ? false : (this.options.showNumber === true || isFirstMeasureInRow && !this.row.isFirstRow());
         let showKeySignature = isFirstMeasureInRow || isAfterMeasureBreak || !!this.alterKeySignature;
         let showTimeSignature = !!this.alterTimeSignature;
         let showTempo = !!this.alterTempo;

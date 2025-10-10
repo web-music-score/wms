@@ -3,7 +3,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, DivRect, MDocument, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
+import { Clef, DivRect, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
@@ -234,7 +234,7 @@ export class ObjDocument extends MusicObject {
         this.newRowRequested = true;
     }
 
-    addMeasure(): ObjMeasure {
+    addMeasure(measureOptions: MeasureOptions): ObjMeasure {
         let lastRow: ObjScoreRow | undefined = this.rows[this.rows.length - 1];
 
         if (!lastRow || this.newRowRequested && lastRow.getMeasures().length > 0 || lastRow.getMeasures().length >= this.measuresPerRow) {
@@ -242,7 +242,7 @@ export class ObjDocument extends MusicObject {
             this.newRowRequested = false;
         }
 
-        let measure = new ObjMeasure(lastRow);
+        let measure = new ObjMeasure(lastRow, measureOptions);
 
         this.measures.push(measure);
 

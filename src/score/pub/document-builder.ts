@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -99,6 +99,11 @@ function assertLyricsOptions(lyricsOptions: LyricsOptions) {
     assertArg(Utils.Is.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
     assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
     assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.hyphen, LyricsHyphen), "lyricsOptions.hyphen", lyricsOptions.hyphen);
+}
+
+function assertMeasureOptions(measureOptions: MeasureOptions) {
+    assertArg(Utils.Is.isObject(measureOptions), "measureOptions", measureOptions);
+    assertArg(Utils.Is.isBooleanOrUndefined(measureOptions.showNumber), "measureOptions.showNumber", measureOptions.showNumber);
 }
 
 function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {
@@ -254,8 +259,10 @@ export class DocumentBuilder {
         return this;
     }
 
+    private static DefaultMeasureOptions: MeasureOptions = {}
+
     private getMeasure(): ObjMeasure {
-        return this.doc.getLastMeasure() ?? this.doc.addMeasure();
+        return this.doc.getLastMeasure() ?? this.doc.addMeasure(DocumentBuilder.DefaultMeasureOptions);
     }
 
     /**
@@ -294,10 +301,13 @@ export class DocumentBuilder {
 
     /**
      * Add new measure.
+     * @param measureOptions - Measure options.
      * @returns - This document builder instance.
      */
-    addMeasure(): DocumentBuilder {
-        this.doc.addMeasure();
+    addMeasure(measureOptions?: MeasureOptions): DocumentBuilder {
+        measureOptions ??= {};
+        assertMeasureOptions(measureOptions);
+        this.doc.addMeasure(measureOptions);
         return this;
     }
 
