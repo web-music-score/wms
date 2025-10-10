@@ -1,4 +1,4 @@
-import { createAndanteByDiabelli, createGreensleeves, createFrereJacques } from "@tspro/web-music-score/pieces";
+import * as Pieces from "@tspro/web-music-score/pieces";
 import { createNavigationRepeatEndingDemo } from "demo-pieces/navigation-repeats-endings";
 import { createNavigationDCAlFineDemo } from "demo-pieces/navigation-DC_al_Fine";
 import { createNavigationDCAlCodaDemo } from "demo-pieces/navigation-DC_al_Coda";
@@ -37,9 +37,10 @@ export class DemoPieces {
         let demos: Score.MDocument[] = [];
 
         // Add sample pieces
-        pieces.push(createGreensleeves());
-        pieces.push(createAndanteByDiabelli());
-        pieces.push(createFrereJacques());
+        pieces.push(Pieces.createGreensleeves());
+        pieces.push(Pieces.createAndanteByDiabelli());
+        pieces.push(Pieces.createFrereJacques());
+        pieces.push(Pieces.createCanonInD());
 
         // Add features demos
         demos.push(createNavigationRepeatEndingDemo());
