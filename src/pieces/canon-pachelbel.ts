@@ -21,13 +21,13 @@ export function createCanonInD(): MDocument {
         .setTempo(50, "2n")
 
         .completeRests(0)
-        .addNote(1, ["D3", "F#3", "A3", "D4"], "8n", { stem: "down" })
+        .addNote(1, ["D3", "F#3", "A3", "D4"], "8n")
         .addNote(1, ["A2", "C#3", "E3", "A3"], "8n")
 
         .addMeasure({ showNumber: true })
         .completeRests(0)
         .addNote(1, ["B2", "D3", "F#3", "B3"], "8n")
-        .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n", { stem: "up" })
+        .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n")
 
         .addMeasure()
         .completeRests(0)
@@ -37,7 +37,7 @@ export function createCanonInD(): MDocument {
         .addMeasure({ showNumber: true })
         .completeRests(0)
         .addNote(1, ["G2", "B2", "D3", "G3"], "8n")
-        .addNote(1, ["A2", "C#3", "E3", "A3"], "8n", { stem: "down" })
+        .addNote(1, ["A2", "C#3", "E3", "A3"], "8n")
 
         .addMeasure()
         .addNote(0, ["F#5", "E5"], "2n")
@@ -47,8 +47,8 @@ export function createCanonInD(): MDocument {
 
         .addMeasure({ showNumber: true }) // 6
         .addNote(0, ["D5", "C#5"], "2n")
-        .addNote(1, ["B2", "D3", "F#3", "B3"], "8n", { stem: "down" })
-        .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n", { stem: "up" })
+        .addNote(1, ["B2", "D3", "F#3", "B3"], "8n")
+        .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n")
 
         .addMeasure()
         .addNote(0, ["B4", "A4"], "2n")
@@ -58,7 +58,7 @@ export function createCanonInD(): MDocument {
         .addMeasure({ showNumber: true })
         .addNote(0, ["B4", "C#5"], "2n")
         .addNote(1, ["G2", "B2", "D3", "G3"], "8n")
-        .addNote(1, ["A2", "C#3", "E3", "A3"], "8n", { stem: "down" })
+        .addNote(1, ["A2", "C#3", "E3", "A3"], "8n")
 
         .addMeasure()
         .addChord(0, ["F#5", "D5"], "2n")
@@ -69,8 +69,8 @@ export function createCanonInD(): MDocument {
         .addMeasure({ showNumber: true })
         .addChord(0, ["D5", "B4"], "2n")
         .addChord(0, ["C#5", "A4"], "2n")
-        .addNote(1, ["B2", "D3", "F#3", "B3"], "8n", { stem: "down" })
-        .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n", { stem: "up" })
+        .addNote(1, ["B2", "D3", "F#3", "B3"], "8n")
+        .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n")
         .endRow()
 
         .addMeasure({ showNumber: false }) // 11
@@ -83,7 +83,7 @@ export function createCanonInD(): MDocument {
         .addChord(0, ["B4", "G4"], "2n")
         .addChord(0, ["C#5", "A4"], "2n")
         .addNote(1, ["G2", "B2", "D3", "G3"], "8n")
-        .addNote(1, ["A2", "C#3", "E3", "A3"], "8n", { stem: "down" })
+        .addNote(1, ["A2", "C#3", "E3", "A3"], "8n")
 
         .addMeasure()
         .addNote(0, ["D4", "F#4", "A4", "G4"], "4n")
@@ -120,13 +120,13 @@ export function createCanonInD(): MDocument {
         .addNote(1, ["G2", "A2"], "2n")
 
         .addMeasure()
-        .addNote(0, ["D5", "C#5", "D5", "D4"], "8n", { stem: "up" })
+        .addNote(0, ["D5", "C#5", "D5", "D4"], "8n")
         .addNote(0, ["C#4", "A4", "E4", "F#4"], "8n")
         .addNote(1, ["D3", "A2"], "2n")
 
         .addMeasure({ showNumber: true })
         .addNote(0, ["D4", "D5", "C#5", "B4"], "8n")
-        .addNote(0, ["C#5", "F#5", "A5", "B5"], "8n", { stem: "down" })
+        .addNote(0, ["C#5", "F#5", "A5", "B5"], "8n")
         .addNote(1, ["B2", "F#2"], "2n")
 
         .addMeasure()
@@ -136,7 +136,7 @@ export function createCanonInD(): MDocument {
         .endRow()
 
         .addMeasure({ showNumber: true }) // 24
-        .addNote(0, ["B4", "A4", "G4", "F#4"], "8n", { stem: "up" })
+        .addNote(0, ["B4", "A4", "G4", "F#4"], "8n")
         .addNote(0, ["E4", "G4", "F#4", "E4"], "8n")
         .addNote(1, ["G2", "A2"], "2n")
 
@@ -163,8 +163,8 @@ export function createCanonInD(): MDocument {
 
         // Second page
         .addMeasure({ showNumber: false }) // 29
-        .addNote(0, "F#4", "4n", { stem: "up" })
-        .addNote(0, "F#5", "4n", { stem: "down" })
+        .addNote(0, "F#4", "4n")
+        .addNote(0, "F#5", "4n")
         .addNote(0, "E5", "2n")
         .addNote(1, ["D3", "A2"], "2n")
 
@@ -205,7 +205,7 @@ export function createCanonInD(): MDocument {
         .endRow()
 
         .addMeasure({ showNumber: false }) // 37
-        .addNote(0, "A5", "8n", { stem: "down" })
+        .addNote(0, "A5", "8n")
         .addNote(0, ["F#5", "G5"], "16n")
         .addNote(0, "A5", "8n")
         .addNote(0, ["F#5", "G5"], "16n")
@@ -214,16 +214,16 @@ export function createCanonInD(): MDocument {
         .addNote(1, ["D3", "A2"], "2n")
 
         .addMeasure()
-        .addNote(0, "F#5", "8n", { stem: "down" })
+        .addNote(0, "F#5", "8n")
         .addNote(0, ["D5", "E5"], "16n")
         .addNote(0, "F#5", "8n")
         .addNote(0, ["F#4", "G4"], "16n")
-        .addNote(0, ["A4", "B4", "A4", "G4"], "16n", { stem: "up" })
+        .addNote(0, ["A4", "B4", "A4", "G4"], "16n")
         .addNote(0, ["A4", "F#4", "G4", "A4"], "16n")
         .addNote(1, ["B2", "F#2"], "2n")
 
         .addMeasure({ showNumber: true })
-        .addNote(0, "G4", "8n", { stem: "up" })
+        .addNote(0, "G4", "8n")
         .addNote(0, ["B4", "A4"], "16n")
         .addNote(0, "G4", "8n")
         .addNote(0, ["F#4", "E4"], "16n")
@@ -233,9 +233,9 @@ export function createCanonInD(): MDocument {
         .endRow()
 
         .addMeasure({ showNumber: true }) // 40
-        .addNote(0, "G4", "8n", { stem: "up" })
+        .addNote(0, "G4", "8n")
         .addNote(0, ["B4", "A4"], "16n")
-        .addNote(0, "B4", "8n", { stem: "down" })
+        .addNote(0, "B4", "8n")
         .addNote(0, ["C#5", "D5"], "16n")
         .addNote(0, ["A4", "B4", "C#5", "D5"], "16n")
         .addNote(0, ["E5", "F#5", "G5", "A5"], "16n")
@@ -253,7 +253,7 @@ export function createCanonInD(): MDocument {
         .addMeasure({ showNumber: true })
         .addNote(0, "D5", "8n")
         .addNote(0, ["B4", "C#5"], "16n")
-        .addNote(0, "D5", "8n", { stem: "up" })
+        .addNote(0, "D5", "8n")
         .addNote(0, ["D4", "E4"], "16n")
         .addNote(0, ["F#4", "G4", "F#4", "E4"], "16n")
         .addNote(0, ["F#4", "D5", "C#5", "D5"], "16n")
@@ -261,9 +261,9 @@ export function createCanonInD(): MDocument {
         .endRow()
 
         .addMeasure({ showNumber: false }) // 43
-        .addNote(0, "B4", "8n", { stem: "down" })
+        .addNote(0, "B4", "8n")
         .addNote(0, ["D5", "C#5"], "16n")
-        .addNote(0, "B4", "8n", { stem: "up" })
+        .addNote(0, "B4", "8n")
         .addNote(0, ["A4", "G4"], "16n")
         .addNote(0, ["A4", "G4", "F#4", "G4"], "16n")
         .addNote(0, ["A4", "B4", "C#5", "D5"], "16n")

@@ -250,13 +250,7 @@ export class ObjMeasure extends MusicObject {
         let stemDir = this.useStemDir[voiceId];
 
         if (stemDir === Stem.Auto || stemDir === undefined) {
-            let staff = this.row.getStaff(symbol.ownDiatonicId);
-            if (staff) {
-                return symbol.ownDiatonicId > staff.middleLineDiatonicId ? Stem.Down : Stem.Up;
-            }
-            else {
-                return Stem.Up;
-            }
+            return this.row.getAutoStemDir(symbol.voiceId, symbol.ownDiatonicId);
         }
         else {
             return stemDir;

@@ -102,6 +102,7 @@ export class ObjBeamGroup extends MusicObject {
 
     private readonly type: BeamGroupType;
     private readonly staffObjects: ObjStaffBeamGroup[] = [];
+    public readonly stemDir: Stem.Up | Stem.Down;
 
     private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio & TupletOptions | undefined) {
         super(symbols[0].measure);
@@ -190,6 +191,17 @@ export class ObjBeamGroup extends MusicObject {
                 });
             }
         });
+
+        // Solve stemDir.
+        if (symbols.some(sym => sym.ownStemDir === Stem.Up)) {
+            this.stemDir = Stem.Up;
+        }
+        else if (symbols.some(sym => sym.ownStemDir === Stem.Down)) {
+            this.stemDir = Stem.Down;
+        }
+        else {
+            this.stemDir = this.symbols[0].row.getAutoStemDir(symbols[0].voiceId, symbols.map(sym => sym.ownDiatonicId));
+        }
     }
 
     private get showTupletRatio(): boolean {
@@ -310,10 +322,6 @@ export class ObjBeamGroup extends MusicObject {
 
     getLastSymbol(): RhythmSymbol | undefined {
         return this.symbols[this.symbols.length - 1];
-    }
-
-    get stemDir(): Stem.Up | Stem.Down {
-        return this.symbols[0].ownStemDir;
     }
 
     get color(): string {
