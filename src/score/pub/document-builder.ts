@@ -40,7 +40,7 @@ function isVerseNumber(value: unknown): value is VerseNumber {
 function assertBaseConfig(baseConfig: BaseConfig) {
     assertArg(Utils.Is.isObject(baseConfig), "baseConfig", baseConfig);
     assertArg(Utils.Is.isStringOrUndefined(baseConfig.name), "baseConfig.name", baseConfig.name);
-    assertArg(Utils.Is.isUndefined(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => Utils.Is.isNumber(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
+    assertArg(Utils.Is.isUndefined(baseConfig.voiceIds) || isVoiceId(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
 }
 
 function assertStaffConfig(staffConfig: StaffConfig) {

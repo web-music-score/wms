@@ -272,7 +272,12 @@ export class ObjStaff extends ObjNotationLine {
     }
 
     containsVoiceId(voiceId: number): boolean {
-        return !this.staffConfig.voiceIds || this.staffConfig.voiceIds.includes(voiceId);
+        let voiceIds = Utils.Is.isUndefined(this.staffConfig.voiceIds)
+            ? []
+            : Utils.Is.isArray(this.staffConfig.voiceIds)
+                ? this.staffConfig.voiceIds
+                : [this.staffConfig.voiceIds];
+        return voiceIds.length === 0 || voiceIds.includes(voiceId);
     }
 
     calcTop(): number {
@@ -412,7 +417,12 @@ export class ObjTab extends ObjNotationLine {
     }
 
     containsVoiceId(voiceId: number): boolean {
-        return !this.tabConfig.voiceIds || this.tabConfig.voiceIds.includes(voiceId);
+        let voiceIds = Utils.Is.isUndefined(this.tabConfig.voiceIds)
+            ? []
+            : Utils.Is.isArray(this.tabConfig.voiceIds)
+                ? this.tabConfig.voiceIds
+                : [this.tabConfig.voiceIds];
+        return voiceIds.length === 0 || voiceIds.includes(voiceId);
     }
 
     containsDiatonicId(diatonicId: number): boolean {

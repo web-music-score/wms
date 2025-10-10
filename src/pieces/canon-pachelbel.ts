@@ -11,8 +11,8 @@ export function createCanonInD(): MDocument {
     return new DocumentBuilder()
         .setHeader("Canon in D", "Pachelbel")
         .setScoreConfiguration([
-            { type: "staff", clef: "G", voiceIds: [0] },
-            { type: "staff", clef: "F", voiceIds: [1] }
+            { type: "staff", clef: "G", voiceIds: 0 },
+            { type: "staff", clef: "F", voiceIds: 1 }
         ])
 
         .addMeasure() // 1
