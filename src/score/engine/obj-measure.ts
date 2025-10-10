@@ -1218,21 +1218,24 @@ export class ObjMeasure extends MusicObject {
 
                     beamGroupSize2.forEach(beamGroupSize3 => {
                         let beamGroupTicks = beamGroupSize3 * NoteLengthProps.get("8n").ticks;
+                        let groupEndTicks = groupStartTicks + beamGroupTicks;
 
                         let groupSymbols = symbols.filter(symbol => {
                             let symbolStartTicks = upBeatStartTicks + symbol.col.positionTicks;
-                            let symbolTicks = symbol.rhythmProps.ticks;
-                            return symbolStartTicks >= groupStartTicks && symbolStartTicks + symbolTicks <= groupStartTicks + beamGroupTicks;
+                            let symbolEndTicks = symbolStartTicks + symbol.rhythmProps.ticks;
+                            return symbolStartTicks >= groupStartTicks && symbolEndTicks <= groupEndTicks;
                         });
 
-                        let groupNotesTicks = Utils.Math.sum(groupSymbols.map(sym => sym.rhythmProps.ticks));
+                        let groupSymbolsTicks = Utils.Math.sum(groupSymbols.map(sym => sym.rhythmProps.ticks));
 
                         if (
-                            groupNotesTicks === beamGroupTicks &&
+                            groupSymbolsTicks === beamGroupTicks &&
                             groupSymbols.every(n => n instanceof ObjNoteGroup) &&
                             (groupSymbols.every(n => n.rhythmProps.flagCount === 1) || beamGroupSizeList.length === 0)
                         ) {
-                            beamCreated ||= ObjBeamGroup.createBeam(groupSymbols);
+                            if(ObjBeamGroup.createBeam(groupSymbols)) {
+                                beamCreated = true;
+                            }
                         }
 
                         groupStartTicks += beamGroupTicks;
