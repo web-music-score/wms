@@ -213,7 +213,7 @@ export function createCanonInD(): MDocument {
         .addNote(0, ["D5", "E5", "F#5", "G5"], "16n")
         .addNote(1, ["D3", "A2"], "2n")
 
-        .addMeasure()
+        .addMeasure({ showNumber: true })
         .addNote(0, "F#5", "8n")
         .addNote(0, ["D5", "E5"], "16n")
         .addNote(0, "F#5", "8n")
@@ -222,7 +222,7 @@ export function createCanonInD(): MDocument {
         .addNote(0, ["A4", "F#4", "G4", "A4"], "16n")
         .addNote(1, ["B2", "F#2"], "2n")
 
-        .addMeasure({ showNumber: true })
+        .addMeasure()
         .addNote(0, "G4", "8n")
         .addNote(0, ["B4", "A4"], "16n")
         .addNote(0, "G4", "8n")
