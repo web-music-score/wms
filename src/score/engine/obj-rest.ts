@@ -81,15 +81,19 @@ export class ObjRest extends MusicObject {
         super(col);
 
         let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(this.voiceId));
+        let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
 
-        this.avgDiatonicId = getDiatonicIdFromStaffPos(this.options?.staffPos) ?? (staves.length > 0 ? staves[0].middleLineDiatonicId : Note.getNote("G4").diatonicId);
+        this.avgDiatonicId = getDiatonicIdFromStaffPos(this.options?.staffPos) ?? (
+            staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Note.getNote("G4").diatonicId
+        );
 
         this.avgDiatonicId += (staves.length > 0 && staves[0].isSpace(this.avgDiatonicId)
             ? (this.avgDiatonicId >= staves[0].middleLineDiatonicId ? 1 : -1)
             : 0);
 
-        this.runningDiatonicId = this.avgDiatonicId; // Will be updated.
-        this.runningStemDir = Stem.Up; // Will be updated.
+        // Init with something, will be updated.
+        this.runningDiatonicId = this.avgDiatonicId;
+        this.runningStemDir = Stem.Up;
 
         this.color = options?.color ?? "black";
         this.hide = options?.hide ?? false;

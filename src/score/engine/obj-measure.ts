@@ -215,13 +215,19 @@ export class ObjMeasure extends MusicObject {
         runningArgs ??= [];
 
         getVoiceIds().forEach(voiceId => {
-            let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(voiceId));
-            let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
 
-            let args = runningArgs[voiceId] ?? {
-                diatonicId: staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Note.getNote("G4").diatonicId,
-                stemDir: Stem.Auto,
-                stringNumbers: []
+            const getDefaultDiatonicId = (): number => {
+                let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(voiceId));
+                let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
+                return staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Note.getNote("G4").diatonicId;
+            }
+            const getDefaultStemDir = (): Stem => Stem.Auto;
+            const getDefaultStringNumbers = (): StringNumber[] => [];
+
+            let args = runningArgs[voiceId] ??= {
+                diatonicId: getDefaultDiatonicId(),
+                stemDir: getDefaultStemDir(),
+                stringNumbers: getDefaultStringNumbers()
             }
 
             this.getVoiceSymbols(voiceId).forEach(sym => {
@@ -265,8 +271,6 @@ export class ObjMeasure extends MusicObject {
 
                 sym.updateRunningArguments(args.diatonicId, setStemDir, args.stringNumbers);
             });
-
-            runningArgs[voiceId] = args;
         });
 
         this.getNextMeasure()?.updateRunningArguments(runningArgs);

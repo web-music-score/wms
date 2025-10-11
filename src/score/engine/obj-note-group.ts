@@ -17,7 +17,7 @@ function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggi
     return Utils.Is.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
 }
 
-function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
+function sortNotesAndStrings(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
     let stringArr = Utils.Arr.isArray(strings) ? strings : (strings !== undefined ? [strings] : []);
 
     let noteStringData = notes.map((note, i) => { return { note, string: stringArr[i] } });
@@ -27,8 +27,8 @@ function sortNoteStringData(notes: ReadonlyArray<Note>, strings?: StringNumber |
         .sort((a, b) => Note.compareFunc(a.note, b.note));
 
     return {
-        notes: noteStringData.map(e => e.note),
-        strings: noteStringData.every(e => e.string === undefined) ? undefined : noteStringData.map(e => e.string)
+        sortedNotes: noteStringData.map(e => e.note),
+        sortedStrings: noteStringData.every(e => e.string === undefined) ? undefined : noteStringData.map(e => e.string)
     }
 }
 
@@ -178,17 +178,18 @@ export class ObjNoteGroup extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot create note group object because notes array is empty.");
         }
 
-        let noteStringData = sortNoteStringData(notes, options?.string);
+        let { sortedNotes, sortedStrings } = sortNotesAndStrings(notes, options?.string);
 
-        this.notes = noteStringData.notes;
-        this.setStringsNumbers = noteStringData.strings;
+        this.notes = sortedNotes;
+        this.setStringsNumbers = sortedStrings;
 
         this.minDiatonicId = this.notes[0].diatonicId;
         this.maxDiatonicId = this.notes[this.notes.length - 1].diatonicId;
         this.avgDiatonicId = Math.round((this.minDiatonicId + this.maxDiatonicId) / 2);
 
-        this.runningDiatonicId = Note.getNote("C4").diatonicId; // Will be updated.
-        this.runningStemDir = Stem.Up; // Will be updated.
+        // Init with something, will be updated.
+        this.runningDiatonicId = this.avgDiatonicId;
+        this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
 
         this.color = options?.color ?? "black";
