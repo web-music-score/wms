@@ -86,7 +86,7 @@ export class ObjDocument extends MusicObject {
             let bass = this.curScoreConfig[cfgId + 1];
 
             // Create unique grandId.
-            while(this.curScoreConfig.filter(cfg => cfg.type === "staff").findIndex(cfg => cfg.grandId === grandId) >= 0) {
+            while (this.curScoreConfig.filter(cfg => cfg.type === "staff").findIndex(cfg => cfg.grandId === grandId) >= 0) {
                 grandId += "A";
             }
 
@@ -320,6 +320,9 @@ export class ObjDocument extends MusicObject {
 
         // Recreate beams.
         this.forEachMeasure(m => m.createBeams());
+
+        // Update running parameters
+        this.getFirstMeasure()?.updateRunningArguments();
 
         // Recreate extensions.
         this.forEachMeasure(m => m.createExtensions());

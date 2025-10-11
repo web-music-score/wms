@@ -2,7 +2,7 @@ import { Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps, getTempoString } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, Clef, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions } from "../pub";
 import { Renderer } from "./renderer";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -211,63 +211,65 @@ export class ObjMeasure extends MusicObject {
         return this.passCount;
     }
 
-    updateOwnDiatonicId(voiceId: number, setDiatonicId?: number): number {
-        if (typeof setDiatonicId == "number") {
-            this.useDiatonicId[voiceId] = setDiatonicId;
-        }
-        else if (this.useDiatonicId[voiceId] === undefined) {
-            let prevMeasure = this.getPrevMeasure();
+    updateRunningArguments(runningArgs?: { diatonicId: number, stemDir: Stem, stringNumbers: StringNumber[] }[/* voiceId */]) {
+        runningArgs ??= [];
 
-            if (prevMeasure && prevMeasure.useDiatonicId[voiceId] !== undefined) {
-                this.useDiatonicId[voiceId] = prevMeasure.useDiatonicId[voiceId];
+        getVoiceIds().forEach(voiceId => {
+            let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(voiceId));
+            let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
+
+            let args = runningArgs[voiceId] ?? {
+                diatonicId: staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Note.getNote("G4").diatonicId,
+                stemDir: Stem.Auto,
+                stringNumbers: []
             }
-        }
 
-        let diatonicId = this.useDiatonicId[voiceId];
+            this.getVoiceSymbols(voiceId).forEach(sym => {
+                args.diatonicId = sym.avgDiatonicId;
 
-        if (diatonicId === undefined) {
-            if (this.row.hasStaff) {
-                diatonicId = this.row.getTopStaff().middleLineDiatonicId;
-            }
-            else {
-                diatonicId = Note.getNote("C4").diatonicId;
-            }
-        }
+                if (sym instanceof ObjNoteGroup) {
+                    if (sym.setStringsNumbers) {
+                        args.stringNumbers = sym.setStringsNumbers;
+                    }
 
-        return this.useDiatonicId[voiceId] = Note.validateDiatonicId(diatonicId);
-    }
+                    switch (sym.options?.stem) {
+                        case Stem.Up:
+                        case "up":
+                            args.stemDir = Stem.Up;
+                            break;
+                        case Stem.Down:
+                        case "down":
+                            args.stemDir = Stem.Down;
+                            break;
+                        case Stem.Auto:
+                        case "auto":
+                            args.stemDir = Stem.Auto;
+                            break;
+                    }
+                }
 
-    updateOwnStemDir(symbol: RhythmSymbol, setStemDir?: Stem): Stem.Up | Stem.Down {
-        let { voiceId } = symbol;
+                let beamSymbols = sym.getBeamGroup()?.getSymbols();
+                let setStemDir: Stem.Up | Stem.Down;
 
-        if (setStemDir !== undefined) {
-            this.useStemDir[voiceId] = setStemDir;
-        }
-        else if (this.useStemDir[voiceId] === undefined) {
-            this.useStemDir[voiceId] = this.getPrevMeasure()?.useStemDir[voiceId] ?? Stem.Auto;
-        }
+                if (beamSymbols === undefined) {
+                    setStemDir = args.stemDir === Stem.Auto ? this.row.solveAutoStemDir([sym]) : args.stemDir;
+                }
+                else {
+                    if (sym === beamSymbols[0]) {
+                        setStemDir = args.stemDir === Stem.Auto ? this.row.solveAutoStemDir(beamSymbols) : args.stemDir;
+                    }
+                    else {
+                        setStemDir = beamSymbols[0].stemDir;
+                    }
+                }
 
-        let stemDir = this.useStemDir[voiceId];
+                sym.updateRunningArguments(args.diatonicId, setStemDir, args.stringNumbers);
+            });
 
-        if (stemDir === Stem.Auto || stemDir === undefined) {
-            return this.row.getAutoStemDir(symbol.voiceId, symbol.ownDiatonicId);
-        }
-        else {
-            return stemDir;
-        }
-    }
+            runningArgs[voiceId] = args;
+        });
 
-    updateOwnString(symbol: RhythmSymbol, setString?: StringNumber[]): StringNumber[] {
-        let { voiceId } = symbol;
-
-        if (setString !== undefined) {
-            this.useString[voiceId] = setString;
-        }
-        else if (this.useString[voiceId] === undefined) {
-            this.useString[voiceId] = this.getPrevMeasure()?.useString[voiceId] ?? [];
-        }
-
-        return this.useString[voiceId];
+        this.getNextMeasure()?.updateRunningArguments(runningArgs);
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -1227,7 +1229,7 @@ export class ObjMeasure extends MusicObject {
                             groupSymbols.every(n => n instanceof ObjNoteGroup) &&
                             (groupSymbols.every(n => n.rhythmProps.flagCount === 1) || beamGroupSizeList.length === 0)
                         ) {
-                            if(ObjBeamGroup.createBeam(groupSymbols)) {
+                            if (ObjBeamGroup.createBeam(groupSymbols)) {
                                 beamCreated = true;
                             }
                         }

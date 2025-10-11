@@ -1,12 +1,13 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { Clef, DivRect, getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig, VoiceId } from "../pub";
+import { DivRect, getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { Renderer } from "./renderer";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Utils } from "@tspro/ts-utils-lib";
+import { RhythmSymbol } from "./obj-rhythm-column";
 
 // TODO: Add this to ts-utils-lib.
 function avg(...values: number[]): number {
@@ -207,16 +208,19 @@ export class ObjScoreRow extends MusicObject {
         return this.minWidth;
     }
 
-    getAutoStemDir(voiceId: VoiceId, diatonicId: number | number[]): Stem.Up | Stem.Down {
-        if (Utils.Is.isArray(diatonicId)) {
-            diatonicId = Math.ceil(avg(...diatonicId));
+    solveAutoStemDir(symbols: ReadonlyArray<RhythmSymbol>): Stem.Up | Stem.Down {
+        if (symbols.length === 0) {
+            return Stem.Up;
         }
+        else {
+            let voiceId = symbols[0].voiceId
+            let diatonicId = Math.floor(avg(...symbols.map(sym => sym.avgDiatonicId)));
+            let staves = this.getStaves().filter(staff => staff.containsVoiceId(voiceId) && staff.containsDiatonicId(diatonicId));
 
-        let staves = this.getStaves().filter(staff => staff.containsVoiceId(voiceId) && staff.containsDiatonicId(diatonicId));
-
-        return staves.length > 0
-            ? (diatonicId >= staves[0].middleLineDiatonicId ? Stem.Down : Stem.Up)
-            : Stem.Up;
+            return staves.length > 0
+                ? (diatonicId >= staves[0].middleLineDiatonicId ? Stem.Down : Stem.Up)
+                : Stem.Up;
+        }
     }
 
     requestLayout() {

@@ -7,15 +7,11 @@ import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { BeamGroupType, ObjBeamGroup } from "./obj-beam-group";
+import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
-
-function getStem(stem: Stem | `${Stem}` | undefined): Stem | undefined {
-    return Utils.Is.isEnumValue(stem, Stem) ? stem : undefined;
-}
 
 function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
     return Utils.Is.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -120,7 +116,8 @@ export class ObjTabNoteGroup extends MusicObject {
     constructor(readonly tab: ObjTab, readonly noteGroup: ObjNoteGroup) {
         super(tab);
 
-        tab.addObject(this);
+        // Add in layout, if fretNumbers.length > 0.
+        //tab.addObject(this);
 
         this.mi = new MTabNoteGroup(this);
     }
@@ -148,10 +145,12 @@ export class ObjTabNoteGroup extends MusicObject {
 export class ObjNoteGroup extends MusicObject {
     readonly minDiatonicId: number;
     readonly maxDiatonicId: number;
+    readonly avgDiatonicId: number;
+    readonly setStringsNumbers?: StringNumber[];
 
-    readonly ownDiatonicId: number; // Average diatonicId of notes.
-    readonly ownStemDir: Stem.Up | Stem.Down;
-    readonly ownString: StringNumber[];
+    private runningDiatonicId: number; // Average diatonicId of notes.
+    private runningStemDir: Stem.Up | Stem.Down;
+    private runningStringNumbers: StringNumber[];
 
     readonly color: string;
     readonly staccato: boolean;
@@ -172,7 +171,7 @@ export class ObjNoteGroup extends MusicObject {
 
     readonly mi: MNoteGroup;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength | NoteLengthStr, options?: NoteOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength | NoteLengthStr, readonly options?: NoteOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         if (!Utils.Is.isIntegerGte(notes.length, 1)) {
@@ -182,13 +181,15 @@ export class ObjNoteGroup extends MusicObject {
         let noteStringData = sortNoteStringData(notes, options?.string);
 
         this.notes = noteStringData.notes;
+        this.setStringsNumbers = noteStringData.strings;
 
         this.minDiatonicId = this.notes[0].diatonicId;
         this.maxDiatonicId = this.notes[this.notes.length - 1].diatonicId;
+        this.avgDiatonicId = Math.round((this.minDiatonicId + this.maxDiatonicId) / 2);
 
-        this.ownDiatonicId = this.measure.updateOwnDiatonicId(voiceId, Math.round((this.minDiatonicId + this.maxDiatonicId) / 2));
-        this.ownStemDir = this.measure.updateOwnStemDir(this, getStem(options?.stem));
-        this.ownString = this.measure.updateOwnString(this, noteStringData.strings);
+        this.runningDiatonicId = Note.getNote("C4").diatonicId; // Will be updated.
+        this.runningStemDir = Stem.Up; // Will be updated.
+        this.runningStringNumbers = [];
 
         this.color = options?.color ?? "black";
         this.staccato = options?.staccato ?? false;
@@ -221,12 +222,16 @@ export class ObjNoteGroup extends MusicObject {
         return this.col.row;
     }
 
+    get diatonicId(): number {
+        return this.runningDiatonicId;
+    }
+
     get stemDir(): Stem.Up | Stem.Down {
-        return this.beamGroup ? this.beamGroup.stemDir : this.ownStemDir;
+        return this.runningStemDir;
     }
 
     enableConnective(line: ObjNotationLine): boolean {
-        return line.containsVoiceId(this.voiceId) && (line instanceof ObjTab || line.containsDiatonicId(this.ownDiatonicId));
+        return line.containsVoiceId(this.voiceId) && (line instanceof ObjTab || line.containsDiatonicId(this.runningDiatonicId));
     }
 
     startConnective(connectiveProps: ConnectiveProps) {
@@ -239,6 +244,12 @@ export class ObjNoteGroup extends MusicObject {
 
         this.startConnnectives.push(connectiveProps);
         this.doc.addConnectiveProps(connectiveProps);
+    }
+
+    updateRunningArguments(diatonicId: number, stemDir: Stem.Up | Stem.Down, stringNumbers: StringNumber[]) {
+        this.runningDiatonicId = diatonicId;
+        this.runningStemDir = stemDir;
+        this.runningStringNumbers = stringNumbers;
     }
 
     getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
@@ -393,8 +404,8 @@ export class ObjNoteGroup extends MusicObject {
         }
     }
 
-    getFretNumberString(noteIndex: number): number | undefined {
-        return this.ownString[noteIndex];
+    getFretNumberString(noteIndex: number): StringNumber | undefined {
+        return this.runningStringNumbers[noteIndex];
     }
 
     getFretNumber(tabObj: ObjTabNoteGroup, noteIndex: number): number | undefined {
@@ -589,7 +600,7 @@ export class ObjNoteGroup extends MusicObject {
         this.staffObjects.length = 0;
 
         row.getStaves().forEach(staff => {
-            if (!staff.containsDiatonicId(this.ownDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
+            if (!staff.containsDiatonicId(this.runningDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
                 return;
             }
 
@@ -700,25 +711,26 @@ export class ObjNoteGroup extends MusicObject {
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers
-                if (this.ownString[noteIndex] !== undefined) {
-                    let stringId = this.ownString[noteIndex] - 1;
-                    let fretId = note.chromaticId - tab.getTuningStrings()[stringId].chromaticId;
+                let stringNumber = this.runningStringNumbers[noteIndex];
+                if (Utils.Is.isIntegerBetween(stringNumber, 1, 6)) {
+                    let fretId = note.chromaticId - tab.getTuningStrings()[stringNumber - 1].chromaticId;
                     let color = fretId < 0 ? "red" : "black";
 
                     let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
-                    obj.fretNumbers.push(fretNumber);
-
                     fretNumber.layout(renderer);
 
                     let x = this.col.getRect().centerX;
-                    let y = tab.getStringY(stringId);
+                    let y = tab.getStringY(stringNumber - 1);
 
                     fretNumber.offset(x, y);
+
+                    obj.fretNumbers.push(fretNumber);
                 }
             });
 
             if (obj.fretNumbers.length > 0) {
                 this.tabObjects.push(obj);
+                tab.addObject(obj);
             }
         });
     }

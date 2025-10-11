@@ -102,7 +102,6 @@ export class ObjBeamGroup extends MusicObject {
 
     private readonly type: BeamGroupType;
     private readonly staffObjects: ObjStaffBeamGroup[] = [];
-    public readonly stemDir: Stem.Up | Stem.Down;
 
     private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio & TupletOptions | undefined) {
         super(symbols[0].measure);
@@ -182,26 +181,19 @@ export class ObjBeamGroup extends MusicObject {
 
         // All symbols must be visible (but can be in multiple staves).
         symbols[0].row.getStaves().forEach(staff => {
-            if (staff.getActualStaff(symbols[0].ownDiatonicId) && staff.containsVoiceId(symbols[0].voiceId)) {
+            if (staff.getActualStaff(symbols[0].diatonicId) && staff.containsVoiceId(symbols[0].voiceId)) {
                 symbols.forEach(sym => {
-                    let actualStaff = staff.getActualStaff(sym.ownDiatonicId);
+                    let actualStaff = staff.getActualStaff(sym.diatonicId);
                     if (!actualStaff || !actualStaff.containsVoiceId(sym.voiceId)) {
                         throw new InvalidBeamGroup(this, "Some of beam or tuplet symbols are not visible!");
                     }
                 });
             }
         });
+    }
 
-        // Solve stemDir.
-        if (symbols.some(sym => sym.ownStemDir === Stem.Up)) {
-            this.stemDir = Stem.Up;
-        }
-        else if (symbols.some(sym => sym.ownStemDir === Stem.Down)) {
-            this.stemDir = Stem.Down;
-        }
-        else {
-            this.stemDir = this.symbols[0].row.getAutoStemDir(symbols[0].voiceId, symbols.map(sym => sym.ownDiatonicId));
-        }
+    get stemDir(): Stem.Up | Stem.Down {
+        return this.symbols[0].stemDir;
     }
 
     private get showTupletRatio(): boolean {

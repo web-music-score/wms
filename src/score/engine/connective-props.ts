@@ -68,7 +68,7 @@ export class ConnectiveProps {
         else if (this.noteAnchor === NoteAnchor.Center) {
             let { row } = this.noteGroups[0].measure;
 
-            let diatonicId = this.noteGroups[0].ownDiatonicId;
+            let diatonicId = this.noteGroups[0].runningDiatonicId;
             let staff = row.getStaff(diatonicId);
 
             this.arcDir = !staff || diatonicId < staff.middleLineDiatonicId ? "down" : "up";
