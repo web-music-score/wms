@@ -214,8 +214,9 @@ export class ObjMeasure extends MusicObject {
     updateRunningArguments(runningArgs?: { diatonicId: number, stemDir: Stem, stringNumbers: StringNumber[] }[/* voiceId */]) {
         runningArgs ??= [];
 
-        getVoiceIds().forEach(voiceId => {
+        let numVoices = Utils.Math.sum(getVoiceIds().map(voiceId => this.getVoiceSymbols(voiceId).length > 0 ? 1 : 0));
 
+        getVoiceIds().forEach(voiceId => {
             const getDefaultDiatonicId = (): number => {
                 let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(voiceId));
                 let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
@@ -230,8 +231,15 @@ export class ObjMeasure extends MusicObject {
                 stringNumbers: getDefaultStringNumbers()
             }
 
-            this.getVoiceSymbols(voiceId).forEach(sym => {
-                args.diatonicId = sym.avgDiatonicId;
+            this.getVoiceSymbols(voiceId).forEach((sym, symId, symArr) => {
+                if (sym.setDiatonicId === ObjRest.UndefinedDiatonicId) {
+                    if (numVoices < 2) {
+                        args.diatonicId = ObjRest.UndefinedDiatonicId;
+                    }
+                }
+                else {
+                    args.diatonicId = sym.setDiatonicId;
+                }
 
                 if (sym instanceof ObjNoteGroup) {
                     if (sym.setStringsNumbers) {

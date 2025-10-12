@@ -195,8 +195,11 @@ export class ObjRhythmColumn extends MusicObject {
         this.voiceSymbol[voiceId] = symbol;
 
         if (symbol instanceof ObjRest && !symbol.hide) {
-            this.minDiatonicId = this.minDiatonicId === undefined ? symbol.diatonicId : Math.min(this.minDiatonicId, symbol.diatonicId);
-            this.maxDiatonicId = this.maxDiatonicId === undefined ? symbol.diatonicId : Math.max(this.maxDiatonicId, symbol.diatonicId);
+            this.row.getStaves().forEach(staff => {
+                let diatonicId = symbol.getDiatonicId(staff);
+                this.minDiatonicId = this.minDiatonicId === undefined ? diatonicId : Math.min(this.minDiatonicId, diatonicId);
+                this.maxDiatonicId = this.maxDiatonicId === undefined ? diatonicId : Math.max(this.maxDiatonicId, diatonicId);
+            });
         }
         else if (symbol instanceof ObjNoteGroup) {
             // notes are sorted.
@@ -454,8 +457,9 @@ export class ObjRhythmColumn extends MusicObject {
                         maxDiatonicId = maxDiatonicId === undefined ? symbol.maxDiatonicId : Math.max(maxDiatonicId, symbol.maxDiatonicId);
                     }
                     else if (symbol instanceof ObjRest) {
-                        minDiatonicId = minDiatonicId === undefined ? symbol.diatonicId : Math.min(minDiatonicId, symbol.diatonicId);
-                        maxDiatonicId = maxDiatonicId === undefined ? symbol.diatonicId : Math.max(maxDiatonicId, symbol.diatonicId);
+                        let diatonicId = symbol.getDiatonicId(staff);
+                        minDiatonicId = minDiatonicId === undefined ? diatonicId : Math.min(minDiatonicId, diatonicId);
+                        maxDiatonicId = maxDiatonicId === undefined ? diatonicId : Math.max(maxDiatonicId, diatonicId);
                     }
                 }
             });

@@ -66,7 +66,9 @@ export class ObjRest extends MusicObject {
     readonly oldStyleTriplet: boolean;
     readonly rhythmProps: RhythmProps;
 
-    readonly avgDiatonicId: number;
+    static UndefinedDiatonicId: number = Infinity;
+
+    readonly setDiatonicId: number;
 
     private runningDiatonicId: number; // Staff position of rest.
     private runningStemDir: Stem.Up | Stem.Down;
@@ -80,19 +82,17 @@ export class ObjRest extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLength | NoteLengthStr, readonly options?: RestOptions, tupletRatio?: TupletRatio) {
         super(col);
 
+
+        this.setDiatonicId = getDiatonicIdFromStaffPos(this.options?.staffPos) ?? ObjRest.UndefinedDiatonicId;
+
         let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(this.voiceId));
-        let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
 
-        this.avgDiatonicId = getDiatonicIdFromStaffPos(this.options?.staffPos) ?? (
-            staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Note.getNote("G4").diatonicId
-        );
-
-        this.avgDiatonicId += (staves.length > 0 && staves[0].isSpace(this.avgDiatonicId)
-            ? (this.avgDiatonicId >= staves[0].middleLineDiatonicId ? 1 : -1)
-            : 0);
+        if (this.setDiatonicId !== ObjRest.UndefinedDiatonicId && staves.length > 0 && staves[0].isSpace(this.setDiatonicId)) {
+            this.setDiatonicId += this.setDiatonicId >= staves[0].middleLineDiatonicId ? 1 : -1;
+        }
 
         // Init with something, will be updated.
-        this.runningDiatonicId = this.avgDiatonicId;
+        this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
 
         this.color = options?.color ?? "black";
@@ -128,8 +128,23 @@ export class ObjRest extends MusicObject {
         return this.rhythmProps.noteLength;
     }
 
-    get diatonicId(): number {
-        return this.runningDiatonicId;
+    getDiatonicId(staff?: ObjStaff): number {
+        if (this.runningDiatonicId === ObjRest.UndefinedDiatonicId) {
+            if (staff) {
+                if (NoteLengthProps.equals(this.noteLength, "1n")) {
+                    return staff.middleLineDiatonicId + 2;
+                }
+                else {
+                    return staff.middleLineDiatonicId;  
+                }
+            }
+            else {
+                return Note.getNote("G4").diatonicId;
+            }
+        }
+        else {
+            return this.runningDiatonicId;
+        }
     }
 
     get stemDir(): Stem.Up | Stem.Down {
@@ -229,11 +244,12 @@ export class ObjRest extends MusicObject {
         }
 
         let { unitSize } = renderer;
-        let { runningDiatonicId } = this;
         let { noteSize, dotCount } = this.rhythmProps;
 
         this.row.getStaves().forEach(staff => {
-            if (!staff.containsDiatonicId(runningDiatonicId) || !staff.containsVoiceId(this.voiceId)) {
+            let diatonicId = this.getDiatonicId(staff);
+
+            if (!staff.containsDiatonicId(diatonicId) || !staff.containsVoiceId(this.voiceId)) {
                 return;
             }
 
@@ -250,7 +266,7 @@ export class ObjRest extends MusicObject {
                 obj.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
             }
 
-            obj.offset(0, staff.getDiatonicIdY(runningDiatonicId));
+            obj.offset(0, staff.getDiatonicIdY(diatonicId));
 
             this.staffObjects.push(obj);
         });

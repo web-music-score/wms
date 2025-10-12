@@ -20,6 +20,7 @@ export class ObjConnective extends MusicObject {
     private cp2y = 0;
     private arcHeight = 0;
 
+    private readonly line: ObjNotationLine;
     private readonly leftNoteGroup: ObjNoteGroup;
     private readonly leftNoteId: number;
     private readonly rightNoteGroup?: ObjNoteGroup;
@@ -31,8 +32,10 @@ export class ObjConnective extends MusicObject {
 
     constructor(connectiveProps: ConnectiveProps, line: ObjNotationLine, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number);
     constructor(connectiveProps: ConnectiveProps, line: ObjNotationLine, measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tie: TieType);
-    constructor(readonly connectiveProps: ConnectiveProps, readonly line: ObjNotationLine, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
+    constructor(readonly connectiveProps: ConnectiveProps, line: ObjNotationLine, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
+
+        this.line = this.measure.row.getNotationLines().find(curLine => line.name.length > 0 ? line.name === curLine.name : line.id === curLine.id) ?? line;
 
         this.leftNoteGroup = leftNoteGroup;
         this.leftNoteId = leftNoteId;

@@ -12,6 +12,7 @@ import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
+import { ObjRest } from "./obj-rest";
 
 function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
     return Utils.Is.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -143,9 +144,7 @@ export class ObjTabNoteGroup extends MusicObject {
 }
 
 export class ObjNoteGroup extends MusicObject {
-    readonly minDiatonicId: number;
-    readonly maxDiatonicId: number;
-    readonly avgDiatonicId: number;
+    readonly setDiatonicId: number;
     readonly setStringsNumbers?: StringNumber[];
 
     private runningDiatonicId: number; // Average diatonicId of notes.
@@ -183,12 +182,10 @@ export class ObjNoteGroup extends MusicObject {
         this.notes = sortedNotes;
         this.setStringsNumbers = sortedStrings;
 
-        this.minDiatonicId = this.notes[0].diatonicId;
-        this.maxDiatonicId = this.notes[this.notes.length - 1].diatonicId;
-        this.avgDiatonicId = Math.round((this.minDiatonicId + this.maxDiatonicId) / 2);
+        this.setDiatonicId = Math.round((this.minDiatonicId + this.maxDiatonicId) / 2);
 
         // Init with something, will be updated.
-        this.runningDiatonicId = this.avgDiatonicId;
+        this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
 
@@ -223,7 +220,15 @@ export class ObjNoteGroup extends MusicObject {
         return this.col.row;
     }
 
-    get diatonicId(): number {
+    get minDiatonicId(): number {
+        return this.notes[0].diatonicId;
+    }
+
+    get maxDiatonicId(): number {
+        return this.notes[this.notes.length - 1].diatonicId;
+    }
+
+    getDiatonicId(staff?: ObjStaff): number {
         return this.runningDiatonicId;
     }
 
@@ -248,7 +253,7 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     updateRunningArguments(diatonicId: number, stemDir: Stem.Up | Stem.Down, stringNumbers: StringNumber[]) {
-        this.runningDiatonicId = diatonicId;
+        this.runningDiatonicId = diatonicId === ObjRest.UndefinedDiatonicId ? this.setDiatonicId : diatonicId;
         this.runningStemDir = stemDir;
         this.runningStringNumbers = stringNumbers;
     }
@@ -303,13 +308,11 @@ export class ObjNoteGroup extends MusicObject {
 
     getConnectiveAnchorPoint(connectiveProps: ConnectiveProps, line: ObjNotationLine, noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
         if (line instanceof ObjStaff) {
-            let staff = line;
-
             if (noteIndex < 0 || noteIndex >= this.notes.length) {
                 throw new MusicError(MusicErrorType.Score, "Invalid noteIndex: " + noteIndex);
             }
 
-            let obj = this.staffObjects.find(obj => obj.staff === staff);
+            let obj = this.staffObjects.find(obj => obj.staff === line);
 
             if (!obj || noteIndex < 0 || noteIndex >= obj.noteHeadRects.length) {
                 let r = this.getRect();
@@ -367,15 +370,10 @@ export class ObjNoteGroup extends MusicObject {
                     throw new MusicError(MusicErrorType.Score, "Invalid noteAnchor: " + noteAnchor);
             }
         }
-        else {
-            let tab = line;
+        else if (line instanceof ObjTab) {
+            let fretNumber = this.tabObjects.find(obj => obj.tab === line)?.fretNumbers[noteIndex];
 
-            let obj = this.tabObjects.find(obj => obj.tab === tab);
-
-            let fretNumber = obj?.fretNumbers[noteIndex];
-
-
-            if (!obj || !fretNumber) {
+            if (!fretNumber) {
                 return { x: 0, y: 0 }
             }
 
@@ -386,15 +384,15 @@ export class ObjNoteGroup extends MusicObject {
             let s = 0.9;
 
             if (connectiveProps.connective === Connective.Slide) {
-                let leftFretNumber = connectiveProps.noteGroups[0].getFretNumber(obj, 0);
-                let rightFretNumber = connectiveProps.noteGroups[1].getFretNumber(obj, 0);
+                let leftFretNumber = connectiveProps.noteGroups[0].getFretNumber(line, 0);
+                let rightFretNumber = connectiveProps.noteGroups[1].getFretNumber(line, 0);
                 let slideUp = leftFretNumber === undefined || rightFretNumber === undefined || leftFretNumber <= rightFretNumber;
 
                 if (side === "left") {
-                    y = slideUp ? r.centerY + r.bottomh * s : r.centerY - r.toph * s;
+                    y = (slideUp ? (r.centerY + r.bottomh) : (r.centerY - r.toph)) * s;
                 }
                 else {
-                    y = slideUp ? r.centerY - r.toph * s : r.centerY + r.bottomh * s;
+                    y = (slideUp ? (r.centerY - r.toph) : (r.centerY + r.bottomh)) * s;
                 }
             }
             else {
@@ -403,15 +401,19 @@ export class ObjNoteGroup extends MusicObject {
 
             return { x, y }
         }
+        else {
+            return { x: 0, y: 0 }
+        }
     }
 
     getFretNumberString(noteIndex: number): StringNumber | undefined {
         return this.runningStringNumbers[noteIndex];
     }
 
-    getFretNumber(tabObj: ObjTabNoteGroup, noteIndex: number): number | undefined {
-        let fretNumber = tabObj.fretNumbers[noteIndex];
-        return fretNumber === undefined ? undefined : +fretNumber.getText();
+    getFretNumber(tab: ObjTab, noteIndex: number): number | undefined {
+        let tabObj = this.tabObjects.find(o => o.tab === tab);
+        let fretNumber = tabObj?.fretNumbers[noteIndex];
+        return fretNumber ? parseInt(fretNumber.getText()) : undefined;
     }
 
     private getNextNoteGroup(): ObjNoteGroup | undefined {

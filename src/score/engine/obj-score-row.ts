@@ -8,6 +8,8 @@ import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
+import { ObjRest } from "./obj-rest";
+import { ObjNoteGroup } from "./obj-note-group";
 
 // TODO: Add this to ts-utils-lib.
 function avg(...values: number[]): number {
@@ -213,12 +215,21 @@ export class ObjScoreRow extends MusicObject {
             return Stem.Up;
         }
         else {
-            let voiceId = symbols[0].voiceId
-            let diatonicId = Math.floor(avg(...symbols.map(sym => sym.avgDiatonicId)));
-            let staves = this.getStaves().filter(staff => staff.containsVoiceId(voiceId) && staff.containsDiatonicId(diatonicId));
+            let voiceId = symbols[0].voiceId;
+            let noteGroupDiatonicIds = symbols.filter(sym => sym instanceof ObjNoteGroup).map(n => n.setDiatonicId);
+            let restDiatonicIds = symbols.filter(sym => sym instanceof ObjRest && sym.setDiatonicId !== ObjRest.UndefinedDiatonicId).map(r => r.setDiatonicId);
+
+            if (noteGroupDiatonicIds.length === 0 && restDiatonicIds.length === 0) {
+                return Stem.Up;
+            }
+
+            let diatonicIds = noteGroupDiatonicIds.length > 0 ? noteGroupDiatonicIds : restDiatonicIds;
+            let avgDiatonicId = Math.floor(avg(...diatonicIds));
+
+            let staves = this.getStaves().filter(staff => staff.containsVoiceId(voiceId) && staff.containsDiatonicId(avgDiatonicId));
 
             return staves.length > 0
-                ? (diatonicId >= staves[0].middleLineDiatonicId ? Stem.Down : Stem.Up)
+                ? (avgDiatonicId >= staves[0].middleLineDiatonicId ? Stem.Down : Stem.Up)
                 : Stem.Up;
         }
     }

@@ -4,7 +4,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, NoteAnchor, Stem, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
-import { ObjStaff } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { Utils } from "@tspro/ts-utils-lib";
 
 export class ConnectiveProps {
@@ -42,7 +42,7 @@ export class ConnectiveProps {
         }
     }
 
-    private computeParams() {
+    private computeParams(line: ObjNotationLine) {
         let { stemDir } = this.noteGroups[0];
         let { hasStem } = this.noteGroups[0].rhythmProps;
 
@@ -66,11 +66,8 @@ export class ConnectiveProps {
             }
         }
         else if (this.noteAnchor === NoteAnchor.Center) {
-            let { row } = this.noteGroups[0].measure;
-
-            let diatonicId = this.noteGroups[0].diatonicId;
-            let staff = row.getStaff(diatonicId);
-
+            let staff = line instanceof ObjStaff ? line : undefined;
+            let diatonicId = this.noteGroups[0].getDiatonicId(staff);
             this.arcDir = !staff || diatonicId < staff.middleLineDiatonicId ? "down" : "up";
         }
         else if (this.noteAnchor === NoteAnchor.Above) {
@@ -91,88 +88,93 @@ export class ConnectiveProps {
     }
 
     createConnectives() {
-        this.getStartNoteGroup().collectConnectiveProps();
+        if (this.noteGroups.length === 0) {
+            return;
+        }
 
-        this.computeParams();
+        this.getStartNoteGroup().collectConnectiveProps();
 
         let { connective, span } = this;
 
-        if (connective === Connective.Tie) {
-            if (Utils.Is.isEnumValue(span, TieType)) {
-                let leftNoteGroup = this.noteGroups[0];
-                for (let noteId = 0; noteId < leftNoteGroup.notes.length; noteId++) {
-                    this.createObjConnectiveWithTieType(leftNoteGroup, noteId, span);
-                }
-            }
-            else if (this.noteGroups.length >= 2) {
-                for (let i = 0; i < this.noteGroups.length - 1; i++) {
-                    let leftNoteGroup = this.noteGroups[i];
-                    let rightNoteGroup = this.noteGroups[i + 1];
+        this.noteGroups[0].row.getNotationLines().forEach(line => {
+            this.computeParams(line);
 
-                    leftNoteGroup.notes.forEach((leftNote, leftNoteId) => {
-                        let rightNoteId = rightNoteGroup.notes.findIndex(rightNote => Note.equals(rightNote, leftNote));
-                        if (rightNoteId >= 0) {
-                            this.createObjConnective(leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
-                        }
-                    });
-                }
-            }
-        }
-        else if (connective === Connective.Slur) {
-            if (typeof span === "number" && span >= 2 && this.noteGroups.length === span) {
-                let leftNoteGroup = this.noteGroups[0];
-                let rightNoteGroup = this.noteGroups[this.noteGroups.length - 1];
-
-                this.createObjConnective(leftNoteGroup, 0, rightNoteGroup, 0);
-            }
-        }
-        else if (connective === Connective.Slide) {
-            if (this.noteGroups.length >= 2) {
-                for (let i = 0; i < this.noteGroups.length - 1; i++) {
-                    let leftNoteGroup = this.noteGroups[i];
-                    let rightNoteGroup = this.noteGroups[i + 1];
-
-                    this.createObjConnective(leftNoteGroup, 0, rightNoteGroup, 0);
-                }
-            }
-        }
-    }
-
-    private createObjConnectiveWithTieType(leftNoteGroup: ObjNoteGroup, leftNoteId: number, tieType: TieType) {
-        leftNoteGroup.row.getNotationLines()
-            .filter(line => leftNoteGroup.enableConnective(line))
-            .forEach(line => {
-                if (line instanceof ObjStaff) {
-                    new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
-                }
-                else {
-                    let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
-
-                    if (leftString !== undefined) {
-                        new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+            if (connective === Connective.Tie) {
+                if (Utils.Is.isEnumValue(span, TieType)) {
+                    let leftNoteGroup = this.noteGroups[0];
+                    for (let noteId = 0; noteId < leftNoteGroup.notes.length; noteId++) {
+                        this.createObjConnectiveWithTieType(line, leftNoteGroup, noteId, span);
                     }
                 }
-            });
+                else if (this.noteGroups.length >= 2) {
+                    for (let i = 0; i < this.noteGroups.length - 1; i++) {
+                        let leftNoteGroup = this.noteGroups[i];
+                        let rightNoteGroup = this.noteGroups[i + 1];
+
+                        leftNoteGroup.notes.forEach((leftNote, leftNoteId) => {
+                            let rightNoteId = rightNoteGroup.notes.findIndex(rightNote => Note.equals(rightNote, leftNote));
+                            if (rightNoteId >= 0) {
+                                this.createObjConnective(line, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+                            }
+                        });
+                    }
+                }
+            }
+            else if (connective === Connective.Slur) {
+                if (typeof span === "number" && span >= 2 && this.noteGroups.length === span) {
+                    let leftNoteGroup = this.noteGroups[0];
+                    let rightNoteGroup = this.noteGroups[this.noteGroups.length - 1];
+
+                    this.createObjConnective(line, leftNoteGroup, 0, rightNoteGroup, 0);
+                }
+            }
+            else if (connective === Connective.Slide) {
+                if (this.noteGroups.length >= 2) {
+                    for (let i = 0; i < this.noteGroups.length - 1; i++) {
+                        let leftNoteGroup = this.noteGroups[i];
+                        let rightNoteGroup = this.noteGroups[i + 1];
+
+                        this.createObjConnective(line, leftNoteGroup, 0, rightNoteGroup, 0);
+                    }
+                }
+            }
+
+        });
     }
 
-    private createObjConnective(leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) {
+    private createObjConnectiveWithTieType(line: ObjNotationLine, leftNoteGroup: ObjNoteGroup, leftNoteId: number, tieType: TieType) {
+        if (!leftNoteGroup.enableConnective(line)) {
+            return;
+        }
+        else if (line instanceof ObjStaff) {
+            new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+        }
+        else if (line instanceof ObjTab) {
+            let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
+
+            if (leftString !== undefined) {
+                new ObjConnective(this, line, leftNoteGroup.measure, leftNoteGroup, leftNoteId, tieType);
+            }
+        }
+    }
+
+    private createObjConnective(line: ObjNotationLine, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) {
         const addConnective = (measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, rightNoteGroup: ObjNoteGroup, rightNoteId: number) => {
-            measure.row.getNotationLines()
-                .filter(line => leftNoteGroup.enableConnective(line) && rightNoteGroup.enableConnective(line))
-                .forEach(line => {
-                    if (line instanceof ObjStaff) {
-                        new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
-                    }
-                    else {
-                        let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
-                        let rightString = rightNoteGroup.getFretNumberString(rightNoteId);
+            if (!(leftNoteGroup.enableConnective(line) && rightNoteGroup.enableConnective(line))) {
+                return;
+            }
+            else if (line instanceof ObjStaff) {
+                new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+            }
+            else if (line instanceof ObjTab) {
+                let leftString = leftNoteGroup.getFretNumberString(leftNoteId);
+                let rightString = rightNoteGroup.getFretNumberString(rightNoteId);
 
-                        if (leftString !== undefined && rightString !== undefined &&
-                            (leftString === rightString || this.connective === Connective.Slur)) {
-                            new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
-                        }
-                    }
-                });
+                if (leftString !== undefined && rightString !== undefined &&
+                    (leftString === rightString || this.connective === Connective.Slur)) {
+                    new ObjConnective(this, line, measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
+                }
+            }
         }
 
         if (leftNoteGroup.measure === rightNoteGroup.measure) {

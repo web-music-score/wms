@@ -181,9 +181,9 @@ export class ObjBeamGroup extends MusicObject {
 
         // All symbols must be visible (but can be in multiple staves).
         symbols[0].row.getStaves().forEach(staff => {
-            if (staff.getActualStaff(symbols[0].diatonicId) && staff.containsVoiceId(symbols[0].voiceId)) {
+            if (staff.getActualStaff(symbols[0].getDiatonicId(staff)) && staff.containsVoiceId(symbols[0].voiceId)) {
                 symbols.forEach(sym => {
-                    let actualStaff = staff.getActualStaff(sym.diatonicId);
+                    let actualStaff = staff.getActualStaff(sym.getDiatonicId(staff));
                     if (!actualStaff || !actualStaff.containsVoiceId(sym.voiceId)) {
                         throw new InvalidBeamGroup(this, "Some of beam or tuplet symbols are not visible!");
                     }
