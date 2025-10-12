@@ -11,11 +11,6 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 
-// TODO: Add this to ts-utils-lib.
-function avg(...values: number[]): number {
-    return Utils.Math.sum(values) / values.length;
-}
-
 export class ObjScoreRow extends MusicObject {
     private nextRow?: ObjScoreRow;
 
@@ -73,9 +68,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     findMatchingLine(line: ObjNotationLine): ObjNotationLine | undefined {
-        return line.row === this ? line : this.notationLines.find(curLine => (
-            line.row.notationLines.length === curLine.row.notationLines.length && (line.name.length > 0 && line.name === curLine.name || line.id === curLine.id)
-        ));
+        return line.row === this ? line : this.notationLines.find(curLine => Utils.Obj.deepEqual(line.row.scoreConfig, curLine.row.scoreConfig) && line.id === curLine.id);
     }
 
     getStaves(): ReadonlyArray<ObjStaff> {
@@ -230,7 +223,7 @@ export class ObjScoreRow extends MusicObject {
             }
 
             let diatonicIds = noteGroupDiatonicIds.length > 0 ? noteGroupDiatonicIds : restDiatonicIds;
-            let avgDiatonicId = Math.floor(avg(...diatonicIds));
+            let avgDiatonicId = Math.floor(Utils.Math.avg(...diatonicIds));
 
             let staves = this.getStaves().filter(staff => staff.containsVoiceId(voiceId) && staff.containsDiatonicId(avgDiatonicId));
 
