@@ -3,6 +3,11 @@
 ## [5.3.0] - 2025-10-
 ## Added
 - MeasureOptions with showNumber property.
+- New piece Canon in D by Pachelbel.
+- Single value voiceIds in staff/tab config.
+
+## Fixed
+- Improved auto stem direction.
 
 ## [5.2.0] - 2025-10-10
 ## Fixed
