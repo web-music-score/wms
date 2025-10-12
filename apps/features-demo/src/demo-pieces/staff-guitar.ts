@@ -4,8 +4,8 @@ export function createStaffConfigGuitarDemo() {
     return new Score.DocumentBuilder()
         .setHeader("Staff Config: Guitar (Combined)")
         .setScoreConfiguration([
-            { type: "staff", clef: "G", isOctaveDown: true, voiceIds: [0, 1] },
-            { type: "tab", tuning: "Drop D", voiceIds: [0, 1] }
+            { type: "staff", clef: "G", isOctaveDown: true, voiceId: [0, 1] },
+            { type: "tab", tuning: "Drop D", voiceId: [0, 1] }
         ])
 
         .addMeasure()

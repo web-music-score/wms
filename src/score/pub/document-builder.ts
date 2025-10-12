@@ -40,7 +40,18 @@ function isVerseNumber(value: unknown): value is VerseNumber {
 function assertBaseConfig(baseConfig: BaseConfig) {
     assertArg(Utils.Is.isObject(baseConfig), "baseConfig", baseConfig);
     assertArg(Utils.Is.isStringOrUndefined(baseConfig.name), "baseConfig.name", baseConfig.name);
-    assertArg(Utils.Is.isUndefined(baseConfig.voiceIds) || isVoiceId(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
+    assertArg(Utils.Is.isUndefined(baseConfig.voiceId) || isVoiceId(baseConfig.voiceId) || Utils.Is.isArray(baseConfig.voiceId) && baseConfig.voiceId.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceId", baseConfig.voiceId);
+    // Handle deprecated voiceIds.
+    if (!Utils.Is.isUndefined(baseConfig.voiceIds)) {
+        assertArg(isVoiceId(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
+        console.warn(`Staff/tab config property 'voiceIds' was deprecated and renamed, use 'voiceId' instead.`);
+        let arr = Utils.Arr.toArray(baseConfig.voiceId ?? []);
+        Utils.Arr.toArray(baseConfig.voiceIds).forEach(voiceId => arr.push(voiceId));
+        baseConfig.voiceId = arr;
+    }
+    if (Utils.Is.isArray(baseConfig.voiceId)) {
+        baseConfig.voiceId = Utils.Arr.removeDuplicates(baseConfig.voiceId);
+    }
 }
 
 function assertStaffConfig(staffConfig: StaffConfig) {

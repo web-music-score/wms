@@ -147,7 +147,7 @@ or corresponding string values (e.g. `"treble"`).
     name: "staff1",      // (optional) staff name
     minNote: "C2",       // (optional) min allowed note
     maxNote: "C6",       // (optional) max allowed note
-    voiceIds: [0, 1]     // (optional) only present voices 0 and 1 in this staff
+    voiceId: [0, 1]      // (optional) only present voices 0 and 1 in this staff
 })
 .setScoreConfiguration([
     { type: "staff", clef: "G", grandId: "grand1" },
@@ -162,7 +162,7 @@ or corresponding string values (e.g. `"treble"`).
     type: "tab",
     name: "tab1",
     tuning: ["E2", "A2", "D3", "G3", "B3", "E4"],
-    voiceIds: 4
+    voiceId: 4
 }) // Tab with guitar tuning, present only voiceId 4 in this tab.
 ```
 

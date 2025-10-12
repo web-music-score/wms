@@ -1,7 +1,7 @@
 import { getTuningStrings, Note, validateTuningName } from "@tspro/web-music-score/theory";
 import { ImageAsset, Renderer } from "./renderer";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig } from "../pub";
+import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
@@ -271,13 +271,8 @@ export class ObjStaff extends ObjNotationLine {
         return diatonicId % 2 !== this.middleLineDiatonicId % 2;
     }
 
-    containsVoiceId(voiceId: number): boolean {
-        let voiceIds = Utils.Is.isUndefined(this.staffConfig.voiceIds)
-            ? []
-            : Utils.Is.isArray(this.staffConfig.voiceIds)
-                ? this.staffConfig.voiceIds
-                : [this.staffConfig.voiceIds];
-        return voiceIds.length === 0 || voiceIds.includes(voiceId);
+    containsVoiceId(voiceId: VoiceId): boolean {
+        return Utils.Is.isUndefined(this.staffConfig.voiceId) || Utils.Arr.toArray(this.staffConfig.voiceId).includes(voiceId);
     }
 
     calcTop(): number {
@@ -416,13 +411,8 @@ export class ObjTab extends ObjNotationLine {
         return this.bottom;
     }
 
-    containsVoiceId(voiceId: number): boolean {
-        let voiceIds = Utils.Is.isUndefined(this.tabConfig.voiceIds)
-            ? []
-            : Utils.Is.isArray(this.tabConfig.voiceIds)
-                ? this.tabConfig.voiceIds
-                : [this.tabConfig.voiceIds];
-        return voiceIds.length === 0 || voiceIds.includes(voiceId);
+    containsVoiceId(voiceId: VoiceId): boolean {
+        return Utils.Is.isUndefined(this.tabConfig.voiceId) || Utils.Arr.toArray(this.tabConfig.voiceId).includes(voiceId);
     }
 
     containsDiatonicId(diatonicId: number): boolean {

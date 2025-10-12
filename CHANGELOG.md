@@ -5,6 +5,7 @@
 - MeasureOptions with showNumber property.
 - New piece Canon in D by Pachelbel.
 - Single value voiceIds in staff/tab config.
+- Renamed and deprecated staff/tab config `voiceIds`, use `voiceId` instead.
 
 ## Fixed
 - Improved auto stem direction.

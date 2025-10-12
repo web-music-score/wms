@@ -11,8 +11,8 @@ export function createFrereJacques(): MDocument {
     return new DocumentBuilder()
         .setHeader("Frère Jacques", "Traditional")
         .setScoreConfiguration([
-            { type: "staff", clef: "G", voiceIds: [0] },
-            { type: "staff", clef: "F", voiceIds: [1] }
+            { type: "staff", clef: "G", voiceId: 0 },
+            { type: "staff", clef: "F", voiceId: 1 }
         ])
         .setMeasuresPerRow(2)
 

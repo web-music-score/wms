@@ -28,8 +28,10 @@ export enum Clef {
 export type BaseConfig = {
     /** Name for this staff/tab config. */
     name?: string;
-    /** Voice id(s) that are presented in this staff/tab. */
-    voiceIds?: number | number[];
+    /** Voice id that is presented in this staff/tab. Single value or array.*/
+    voiceId?: VoiceId | VoiceId[];
+    /** @deprecated - Use `voiceId` instead. */
+    voiceIds?: VoiceId | VoiceId[];
 }
 
 /** Staff config to add staff notation line in score configuration. */

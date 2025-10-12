@@ -11,14 +11,14 @@ import { ObjText } from "./obj-text";
 
 export class ObjTabRhythm extends MusicObject {
 
-    private readonly voiceIds: VoiceId[];
+    private readonly voiceId: VoiceId[];
 
     readonly mi: MTabRhythm;
 
     constructor(readonly measure: ObjMeasure, readonly tab: ObjTab) {
         super(measure);
 
-        this.voiceIds = getVoiceIds().filter(voiceId => tab.containsVoiceId(voiceId));
+        this.voiceId = getVoiceIds().filter(voiceId => tab.containsVoiceId(voiceId));
 
         this.rect = new DivRect();
 
@@ -38,7 +38,7 @@ export class ObjTabRhythm extends MusicObject {
 
         let numColsInVoiceId: number[] = getVoiceIds().map(voiceId => Utils.Math.sum(columns.map(col => col.getVoiceSymbol(voiceId) ? 1 : 0)));
 
-        this.voiceIds.sort((a, b) => Utils.Math.cmp(numColsInVoiceId[a], numColsInVoiceId[b]));
+        this.voiceId.sort((a, b) => Utils.Math.cmp(numColsInVoiceId[a], numColsInVoiceId[b]));
 
         this.rect = new DivRect();
     }
@@ -92,7 +92,7 @@ export class ObjTabRhythm extends MusicObject {
         for (let colId = 0; colId < columns.length; colId++) {
             let cur: ObjRhythmColumn = columns[colId];
 
-            let curVoiceSymbol = this.voiceIds.map(voiceId => cur.getVoiceSymbol(voiceId)).find(sym => sym !== undefined);
+            let curVoiceSymbol = this.voiceId.map(voiceId => cur.getVoiceSymbol(voiceId)).find(sym => sym !== undefined);
 
             if (!curVoiceSymbol) {
                 continue;
