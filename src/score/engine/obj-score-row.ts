@@ -72,6 +72,12 @@ export class ObjScoreRow extends MusicObject {
         return this.notationLines;
     }
 
+    findMatchingLine(line: ObjNotationLine): ObjNotationLine | undefined {
+        return line.row === this ? line : this.notationLines.find(curLine => (
+            line.row.notationLines.length === curLine.row.notationLines.length && (line.name.length > 0 && line.name === curLine.name || line.id === curLine.id)
+        ));
+    }
+
     getStaves(): ReadonlyArray<ObjStaff> {
         return this.staves;
     }

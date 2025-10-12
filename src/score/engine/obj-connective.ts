@@ -35,7 +35,7 @@ export class ObjConnective extends MusicObject {
     constructor(readonly connectiveProps: ConnectiveProps, line: ObjNotationLine, readonly measure: ObjMeasure, leftNoteGroup: ObjNoteGroup, leftNoteId: number, ...args: unknown[]) {
         super(measure);
 
-        this.line = this.measure.row.getNotationLines().find(curLine => line.name.length > 0 ? line.name === curLine.name : line.id === curLine.id) ?? line;
+        this.line = this.measure.row.findMatchingLine(line) ?? line;
 
         this.leftNoteGroup = leftNoteGroup;
         this.leftNoteId = leftNoteId;

@@ -25,8 +25,8 @@ export abstract class ObjNotationLine extends MusicObject {
 
     private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
 
-    constructor(parent: MusicObject) {
-        super(parent);
+    constructor(readonly row: ObjScoreRow) {
+        super(row);
     }
 
     addObject(o: NotationLineObject) {
