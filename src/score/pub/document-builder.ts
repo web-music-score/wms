@@ -44,7 +44,7 @@ function assertBaseConfig(baseConfig: BaseConfig) {
     // Handle deprecated voiceIds.
     if (!Utils.Is.isUndefined(baseConfig.voiceIds)) {
         assertArg(isVoiceId(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
-        console.warn(`Staff/tab config property 'voiceIds' was deprecated and renamed, use 'voiceId' instead.`);
+        console.warn(`Staff/tab config property 'voiceIds' is deprecated, use 'voiceId' instead.`);
         let arr = Utils.Arr.toArray(baseConfig.voiceId ?? []);
         Utils.Arr.toArray(baseConfig.voiceIds).forEach(voiceId => arr.push(voiceId));
         baseConfig.voiceId = arr;
@@ -64,7 +64,11 @@ function assertStaffConfig(staffConfig: StaffConfig) {
     assertArg(Utils.Is.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
     assertArg(Utils.Is.isStringOrUndefined(staffConfig.grandId), "staffConfig.grandId", staffConfig.grandId);
     assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isGrand), "staffConfig.isGrand", staffConfig.isGrand);
+    if (!Utils.Is.isUndefined(staffConfig.isGrand)) {
+        console.warn(`Staff config property 'isGrand' is deprecated, use 'grandId' instead.`);
+    }
 }
+
 
 function assertTabConfig(tabConfig: TabConfig) {
     assertBaseConfig(tabConfig);
