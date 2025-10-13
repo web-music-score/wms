@@ -290,6 +290,19 @@ export class ObjDocument extends MusicObject {
         }
     }
 
+    getInstrumentGroupSize(renderer: Renderer): { nameLeft: number, nameRight: number, braceLeft: number, braceRight: number } {
+        let nameWidth = Math.max(0, ...this.rows.map(row => row.getInstrumentNameWidth(renderer)));
+        let hasName = nameWidth > 0;
+        let padding = hasName ? renderer.unitSize : 0;
+        let braceWidth = hasName ? renderer.unitSize * 5 : 0;
+        return {
+            nameLeft: 0,
+            nameRight: nameWidth,
+            braceLeft: nameWidth + padding,
+            braceRight: nameWidth + padding + braceWidth + padding
+        }
+    }
+
     requestLayout() {
         this.needLayout = true;
     }
@@ -338,13 +351,14 @@ export class ObjDocument extends MusicObject {
         this.rows.forEach(row => row.layout(renderer));
 
         // Calculate desired row width
-        let rowWidth = Math.max(
+        let left = this.getInstrumentGroupSize(renderer).braceRight;
+        let right = Math.max(
             DocumentSettings.DocumentMinWidth * unitSize,
             ...this.rows.map(row => 1.4 * row.getMinWidth())
         );
 
         // Stretch row to desired width
-        this.rows.forEach(row => row.layoutWidth(renderer, rowWidth));
+        this.rows.forEach(row => row.layoutWidth(renderer, left, right));
 
         // Layout layout groups
         this.rows.forEach(row => row.layoutLayoutGroups(renderer));
@@ -360,7 +374,7 @@ export class ObjDocument extends MusicObject {
 
         if (this.header) {
             // Layout header with desired width
-            this.header.layoutWidth(renderer, rowWidth);
+            this.header.layoutWidth(renderer, left, right);
 
             this.rect.expandInPlace(this.header.getRect());
         }

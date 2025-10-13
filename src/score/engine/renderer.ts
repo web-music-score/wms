@@ -638,4 +638,34 @@ export class Renderer {
             left + width * 0.5, bottom);
         ctx.stroke();
     }
+
+    drawBrace(rect: DivRect, side: "left" | "right") {
+        let ctx = this.getCanvasContext();
+
+        if (!ctx) {
+            return;
+        }
+
+        let { left, right, width, top, bottom, centerY } = rect;
+
+        if (side === "right") {
+            [left, right, width] = [right, left, -width];
+        }
+
+        ctx.lineWidth = this.lineWidth;
+        ctx.strokeStyle = ctx.fillStyle = "black";
+
+        ctx.beginPath();
+        ctx.moveTo(right, top);
+        ctx.bezierCurveTo(
+            left + width * 0.1, top,
+            left + width * 0.8, centerY,
+            left, centerY);
+        ctx.moveTo(right, bottom);
+        ctx.bezierCurveTo(
+            left + width * 0.1, bottom,
+            left + width * 0.8, centerY,
+            left, centerY);
+        ctx.stroke();
+    }
 }

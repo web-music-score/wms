@@ -3,8 +3,6 @@ import { Renderer } from "./renderer";
 import { ObjText } from "./obj-text";
 import { DivRect, MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
-import { ObjTab } from "./obj-staff-and-tab";
-import { SymbolSet } from "theory/types";
 
 export class ObjHeader extends MusicObject {
     private titleText?: ObjText;
@@ -64,28 +62,28 @@ export class ObjHeader extends MusicObject {
         return [this];
     }
 
-    layoutWidth(renderer: Renderer, width: number) {
+    layoutWidth(renderer: Renderer, left: number, right: number) {
         let top = 0;
 
-        this.rect = new DivRect(0, width, 0, 0);
+        this.rect = new DivRect(left, right, 0, 0);
 
         if (this.titleText) {
             this.titleText.layout(renderer);
-            this.titleText.offset(width / 2, top);
+            this.titleText.offset((left + right) / 2, top);
             top += this.titleText.getRect().height;
             this.rect.expandInPlace(this.titleText.getRect());
         }
 
         if (this.composerText) {
             this.composerText.layout(renderer);
-            this.composerText.offset(width, top)
+            this.composerText.offset(right, top)
             top += this.composerText.getRect().height;
             this.rect.expandInPlace(this.composerText.getRect());
         }
 
         if (this.arrangerText) {
             this.arrangerText.layout(renderer);
-            this.arrangerText.offset(width, top)
+            this.arrangerText.offset(right, top)
             top += this.arrangerText.getRect().height;
             this.rect.expandInPlace(this.arrangerText.getRect());
         }

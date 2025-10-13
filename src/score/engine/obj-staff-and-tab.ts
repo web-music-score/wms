@@ -308,7 +308,7 @@ export class ObjStaff extends ObjNotationLine {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return [this];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     layoutHeight(renderer: Renderer) {
@@ -442,7 +442,7 @@ export class ObjTab extends ObjNotationLine {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return [this];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     layoutHeight(renderer: Renderer) {

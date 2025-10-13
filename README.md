@@ -142,12 +142,13 @@ or corresponding string values (e.g. `"treble"`).
 .setScoreConfiguration({ type: "staff", clef: "F"}) // Staff with bass F-clef.
 .setScoreConfiguration({
     type: "staff",
-    clef: "G",           // G-clef
-    isOctaveDown: false, // (optional) octave down
-    name: "staff1",      // (optional) staff name
-    minNote: "C2",       // (optional) min allowed note
-    maxNote: "C6",       // (optional) max allowed note
-    voiceId: [0, 1]      // (optional) only present voices 0 and 1 in this staff
+    clef: "G",           // G-clef.
+    isOctaveDown: false, // (optional) octave down.
+    name: "staff1",      // (optional) staff name.
+    minNote: "C2",       // (optional) min allowed note.
+    maxNote: "C6",       // (optional) max allowed note.
+    voiceId: [0, 1],     // (optional) only present voices 0 and 1 in this staff.
+    instrument: "Piano"  // (optional) staves/tabs with same instrument are grouped together with left brace.
 })
 .setScoreConfiguration([
     { type: "staff", clef: "G", grandId: "grand1" },
