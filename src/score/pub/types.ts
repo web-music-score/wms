@@ -32,6 +32,8 @@ export type BaseConfig = {
     voiceId?: VoiceId | VoiceId[];
     /** @deprecated - Use `voiceId` instead. */
     voiceIds?: VoiceId | VoiceId[];
+    /** Staves/tabs with same instrument name a re grouped together with left brace. */
+    instrument?: string;
 }
 
 /** Staff config to add staff notation line in score configuration. */

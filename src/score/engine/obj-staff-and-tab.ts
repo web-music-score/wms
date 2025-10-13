@@ -129,6 +129,8 @@ export abstract class ObjNotationLine extends MusicObject {
         }
     }
 
+    abstract getConfig(): StaffConfig | TabConfig;
+
     abstract calcTop(): number;
     abstract calcBottom(): number;
 
@@ -198,6 +200,10 @@ export class ObjStaff extends ObjNotationLine {
 
     get name(): string {
         return this.staffConfig.name ?? "";
+    }
+
+    getConfig(): StaffConfig | TabConfig {
+        return this.staffConfig;
     }
 
     getTopLineY(): number {
@@ -372,6 +378,10 @@ export class ObjTab extends ObjNotationLine {
 
     get name(): string {
         return this.tabConfig.name ?? "";
+    }
+
+    getConfig(): StaffConfig | TabConfig {
+        return this.tabConfig;
     }
 
     getTuningName(): string | undefined {

@@ -52,6 +52,7 @@ function assertBaseConfig(baseConfig: BaseConfig) {
     if (Utils.Is.isArray(baseConfig.voiceId)) {
         baseConfig.voiceId = Utils.Arr.removeDuplicates(baseConfig.voiceId);
     }
+    assertArg(Utils.Is.isStringOrUndefined(baseConfig.instrument), "baseConfig.instrument", baseConfig.instrument);
 }
 
 function assertStaffConfig(staffConfig: StaffConfig) {

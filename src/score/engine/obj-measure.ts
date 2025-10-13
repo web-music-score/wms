@@ -1593,9 +1593,7 @@ export class ObjMeasure extends MusicObject {
 
         const drawLine = (y: number) => renderer.drawLine(left, y, right, y);
 
-        let { row } = this;
-
-        row.getNotationLines().forEach(line => {
+        this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
                     drawLine(line.getDiatonicIdY(p));

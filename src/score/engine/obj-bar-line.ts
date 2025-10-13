@@ -9,8 +9,8 @@ import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
 export class ObjStaffTabBarLine extends MusicObject {
-    public lineRects: DivRect[] = [];
-    public dotRects: DivRect[] = [];
+    public verticalLines: { left: number, width: number }[] = [];
+    public dots: { x: number, y: number, r: number }[] = [];
 
     readonly mi: MStaffTabBarLine;
 
@@ -35,14 +35,15 @@ export class ObjStaffTabBarLine extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.lineRects.forEach(r => r.offsetInPlace(dx, dy));
-        this.dotRects.forEach(r => r.offsetInPlace(dx, dy));
+        this.verticalLines.forEach(l => l.left += dx);
+        this.dots.forEach(d => { d.x += dx; d.y += dy; });
         this.rect.offsetInPlace(dx, dy);
     }
 }
 
 abstract class ObjBarLine extends MusicObject {
     protected staffTabObjects: ObjStaffTabBarLine[] = [];
+    protected staffTabObjectGroups: ObjStaffTabBarLine[][] = [];
     protected barLineType = BarLineType.None;
 
     constructor(readonly measure: ObjMeasure) {
@@ -89,14 +90,14 @@ abstract class ObjBarLine extends MusicObject {
             let lineDotOff: number;
             let top: number, bottom: number;
 
-            const addRect = (left: number, width: number) => {
-                obj.lineRects.push(new DivRect(left, left + width / 2, left + width, top, 0, bottom));
+            const addVerticalLine = (left: number, width: number) => {
+                obj.verticalLines.push({ left, width });
             }
 
-            const addDots = (cx: number) => {
+            const addDotPair = (cx: number) => {
                 for (let i = -1; i <= 1; i += 2) {
                     let y = lineCenterY + i * lineDotOff;
-                    obj.dotRects.push(new DivRect(cx - dotRadius, cx, cx + dotRadius, y - dotRadius, y, y + dotRadius));
+                    obj.dots.push({ x: cx, y, r: dotRadius });
                 }
             }
 
@@ -118,42 +119,46 @@ abstract class ObjBarLine extends MusicObject {
                     break;
                 case BarLineType.Single:
                     obj.setRect(new DivRect(-thinW, 0, 0, top, 0, bottom));
-                    addRect(-thinW, thinW);
+                    addVerticalLine(-thinW, thinW);
                     break;
                 case BarLineType.Double:
                     obj.setRect(new DivRect(-thinW - spaceW - thinW, 0, 0, top, 0, bottom));
-                    addRect(-thinW - spaceW - thinW, thinW);
-                    addRect(-thinW, thinW);
+                    addVerticalLine(-thinW - spaceW - thinW, thinW);
+                    addVerticalLine(-thinW, thinW);
                     break;
                 case BarLineType.EndSong:
                     obj.setRect(new DivRect(-thicW - spaceW - thinW, 0, 0, top, 0, bottom));
-                    addRect(-thinW - spaceW - thicW, thinW);
-                    addRect(-thicW, thicW);
+                    addVerticalLine(-thinW - spaceW - thicW, thinW);
+                    addVerticalLine(-thicW, thicW);
                     break;
                 case BarLineType.StartRepeat:
                     obj.setRect(new DivRect(0, 0, thicW + spaceW + thinW + spaceW + dotW, top, 0, bottom));
-                    addRect(0, thicW);
-                    addRect(thicW + spaceW, thinW);
-                    addDots(thicW + spaceW + thinW + spaceW + dotRadius);
+                    addVerticalLine(0, thicW);
+                    addVerticalLine(thicW + spaceW, thinW);
+                    addDotPair(thicW + spaceW + thinW + spaceW + dotRadius);
                     break;
                 case BarLineType.EndRepeat:
                     obj.setRect(new DivRect(-thicW - spaceW - thinW - spaceW - dotW, 0, 0, top, 0, bottom));
-                    addRect(-thinW - spaceW - thicW, thinW);
-                    addRect(-thicW, thicW);
-                    addDots(-thinW - spaceW - thicW - spaceW - dotRadius);
+                    addVerticalLine(-thinW - spaceW - thicW, thinW);
+                    addVerticalLine(-thicW, thicW);
+                    addDotPair(-thinW - spaceW - thicW - spaceW - dotRadius);
                     break;
                 case BarLineType.EndStartRepeat:
                     obj.setRect(new DivRect(-dotW - spaceW - thinW - spaceW - thicW / 2, 0, thicW / 2 + spaceW + thinW + spaceW + dotW, top, 0, bottom));
-                    addRect(-thicW / 2, thicW);
-                    addRect(-thicW / 2 - spaceW - thinW, thinW);
-                    addRect(thicW / 2 + spaceW, thinW);
-                    addDots(-thicW / 2 - spaceW - thinW - spaceW - dotRadius);
-                    addDots(thicW / 2 + spaceW + thinW + spaceW + dotRadius);
+                    addVerticalLine(-thicW / 2, thicW);
+                    addVerticalLine(-thicW / 2 - spaceW - thinW, thinW);
+                    addVerticalLine(thicW / 2 + spaceW, thinW);
+                    addDotPair(-thicW / 2 - spaceW - thinW - spaceW - dotRadius);
+                    addDotPair(thicW / 2 + spaceW + thinW + spaceW + dotRadius);
                     break;
             }
 
             this.staffTabObjects.push(obj);
         });
+
+        this.staffTabObjectGroups = row.getInstrumentLineGroups().map(lines =>
+            lines.map(line => this.staffTabObjects.find(obj => obj.line === line)).filter(obj => obj !== undefined)
+        );
     }
 
     updateRect() {
@@ -184,9 +189,15 @@ abstract class ObjBarLine extends MusicObject {
 
         ctx.strokeStyle = ctx.fillStyle = "black";
 
-        this.staffTabObjects.forEach(obj => {
-            obj.lineRects.forEach(r => ctx.fillRect(r.left, r.top, r.width, r.height));
-            obj.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
+        this.staffTabObjectGroups.forEach(objs => {
+            if (objs.length > 0) {
+                objs.forEach(obj => obj.dots.forEach(d => renderer.fillCircle(d.x, d.y, d.r)));
+
+                let top = objs[0].getRect().top;
+                let height = objs[objs.length - 1].getRect().bottom - top;
+
+                objs[0].verticalLines.forEach(vline => ctx.fillRect(vline.left, top, vline.width, height));
+            }
         });
     }
 }

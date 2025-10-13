@@ -17,6 +17,7 @@ export class ObjScoreRow extends MusicObject {
     private minWidth = 0;
 
     private readonly notationLines: ReadonlyArray<ObjNotationLine>;
+    private readonly instrumentLineGroups: ReadonlyArray<ReadonlyArray<ObjNotationLine>>;
     private readonly staves: ReadonlyArray<ObjStaff>;
     private readonly tabs: ReadonlyArray<ObjTab>;
 
@@ -32,6 +33,25 @@ export class ObjScoreRow extends MusicObject {
         this.notationLines = this.createNotationLines();
         this.staves = this.notationLines.filter(line => line instanceof ObjStaff);
         this.tabs = this.notationLines.filter(line => line instanceof ObjTab);
+
+        let lineGroups: ObjNotationLine[][] = [];
+
+        for (let i = 0; i < this.notationLines.length; i++) {
+            let line = this.notationLines[i];
+            let prevGroup = lineGroups[lineGroups.length - 1];
+            if (
+                prevGroup === undefined ||
+                prevGroup[0].getConfig().instrument === undefined ||
+                prevGroup[0].getConfig().instrument !== line.getConfig().instrument
+            ) {
+                lineGroups.push([line]);
+            }
+            else {
+                prevGroup.push(line);
+            }
+        }
+
+        this.instrumentLineGroups = lineGroups;
 
         // nextRow of prevRow is this
         if (this.prevRow) {
@@ -65,6 +85,10 @@ export class ObjScoreRow extends MusicObject {
 
     getNotationLines(): ReadonlyArray<ObjNotationLine> {
         return this.notationLines;
+    }
+
+    getInstrumentLineGroups(): ReadonlyArray<ReadonlyArray<ObjNotationLine>> {
+        return this.instrumentLineGroups;
     }
 
     findMatchingLine(line: ObjNotationLine): ObjNotationLine | undefined {

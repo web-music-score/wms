@@ -6,6 +6,7 @@
 - New piece Canon in D by Pachelbel.
 - Single value voiceIds in staff/tab config.
 - Renamed and deprecated staff/tab config `voiceIds`, use `voiceId` instead.
+- Instrument group to staff/tab config.
 
 ## Fixed
 - Improved auto stem direction.
