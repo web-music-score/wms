@@ -1,6 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { DivRect, MEnding, Navigation } from "../pub";
@@ -61,16 +61,16 @@ export class ObjEnding extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         this.rect = new DivRect();
         this.shapeRects = [this.rect.copy()];
     }
 
-    layoutFitToMeasure(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layoutFitToMeasure(ctx: RenderContext) {
+        let { unitSize } = ctx;
         let { measure } = this;
 
-        this.endingText.layout(renderer);
+        this.endingText.layout(ctx);
         let textRect = this.endingText.getRect();
 
         let measureContent = measure.getColumnsContentRect();
@@ -95,20 +95,12 @@ export class ObjEnding extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
-        let { lineWidth } = renderer;
+    draw(ctx: RenderContext) {
         let { rect } = this;
 
-        renderer.drawDebugRect(this.rect);
+        ctx.drawDebugRect(this.rect);
 
-        ctx.strokeStyle = ctx.fillStyle = "black";
-        ctx.lineWidth = lineWidth;
+        ctx.color("black").lineWidth(1);
 
         ctx.beginPath();
         ctx.moveTo(rect.left, rect.bottom);
@@ -121,6 +113,6 @@ export class ObjEnding extends MusicObject {
 
         ctx.stroke();
 
-        this.endingText.draw(renderer);
+        this.endingText.draw(ctx);
     }
 }

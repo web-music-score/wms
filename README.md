@@ -499,7 +499,7 @@ Hint! Bootstrap is used for better visual appearance.
 
 ```js
 // Draw document
-let r = new Score.MRenderer().
+let r = new Score.MRenderContext().
     setCanvas("canvasId").
     setDocument(doc).
     draw();

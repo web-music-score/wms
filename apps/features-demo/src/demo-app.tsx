@@ -49,11 +49,11 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
         const onScoreEvent: Score.ScoreEventListener = (event: Score.ScoreEvent) => {
             if (event instanceof Score.ScoreObjectEvent) {
                 if (event.type === "leave") {
-                    event.renderer.hilightObject(undefined);
+                    event.renderContext.hilightObject(undefined);
                     this.setState({ hoverText: "" });
                 }
                 else {
-                    event.renderer.hilightObject(event.topObject);
+                    event.renderContext.hilightObject(event.topObject);
                     this.setState({ hoverText: event.topObject.name + " Object" });
                 }
             }

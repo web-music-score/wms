@@ -1,5 +1,5 @@
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
 import { DivRect, MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
@@ -62,27 +62,27 @@ export class ObjHeader extends MusicObject {
         return [this];
     }
 
-    layoutWidth(renderer: Renderer, left: number, right: number) {
+    layoutWidth(ctx: RenderContext, left: number, right: number) {
         let top = 0;
 
         this.rect = new DivRect(left, right, 0, 0);
 
         if (this.titleText) {
-            this.titleText.layout(renderer);
+            this.titleText.layout(ctx);
             this.titleText.offset((left + right) / 2, top);
             top += this.titleText.getRect().height;
             this.rect.expandInPlace(this.titleText.getRect());
         }
 
         if (this.composerText) {
-            this.composerText.layout(renderer);
+            this.composerText.layout(ctx);
             this.composerText.offset(right, top)
             top += this.composerText.getRect().height;
             this.rect.expandInPlace(this.composerText.getRect());
         }
 
         if (this.arrangerText) {
-            this.arrangerText.layout(renderer);
+            this.arrangerText.layout(ctx);
             this.arrangerText.offset(right, top)
             top += this.arrangerText.getRect().height;
             this.rect.expandInPlace(this.arrangerText.getRect());
@@ -105,17 +105,17 @@ export class ObjHeader extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
+    draw(ctx: RenderContext) {
         if (this.titleText) {
-            this.titleText.draw(renderer);
+            this.titleText.draw(ctx);
         }
 
         if (this.composerText) {
-            this.composerText.draw(renderer);
+            this.composerText.draw(ctx);
         }
 
         if (this.arrangerText) {
-            this.arrangerText.draw(renderer);
+            this.arrangerText.draw(ctx);
         }
     }
 }

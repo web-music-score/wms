@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
@@ -55,8 +55,8 @@ export class ObjExtensionLine extends MusicObject {
         }
     }
 
-    layoutFitToMeasure(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layoutFitToMeasure(ctx: RenderContext) {
+        let { unitSize } = ctx;
 
         let lineLeft = this.getLineLeft();
         let lineRight = this.getLineRight();
@@ -69,7 +69,7 @@ export class ObjExtensionLine extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         this.rect = new DivRect();
     }
 
@@ -77,28 +77,24 @@ export class ObjExtensionLine extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
+    draw(ctx: RenderContext) {
         let { rect } = this;
 
         if (this.extension.getLineStyle() === "dashed") {
             ctx.setLineDash([7, 3]);
         }
 
-        renderer.drawLine(rect.left, rect.centerY, rect.right, rect.centerY, "black", renderer.lineWidth);
+        ctx.color("black").lineWidth(1);
+
+        ctx.strokeLine(rect.left, rect.centerY, rect.right, rect.centerY);
 
         ctx.setLineDash([]);
 
         // Draw tip end of last line
         let tails = this.extension.getTails();
         if (tails.length > 0 && this === tails[tails.length - 1]) {
-            let tipH = rect.centerY > this.line.getRect().centerY ? -renderer.unitSize : renderer.unitSize;
-            renderer.drawLine(rect.right, rect.centerY, rect.right, rect.centerY + tipH, "black", renderer.lineWidth);
+            let tipH = rect.centerY > this.line.getRect().centerY ? -ctx.unitSize : ctx.unitSize;
+            ctx.strokeLine(rect.right, rect.centerY, rect.right, rect.centerY + tipH);
         }
     }
 }

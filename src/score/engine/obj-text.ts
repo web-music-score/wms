@@ -1,5 +1,5 @@
 import { DivRect, MText } from "../pub";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 
 const DefaultBoxedPadding = 0.5;
@@ -91,17 +91,17 @@ export class ObjText extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         let { scale, anchorX, anchorY, bold, italic } = this;
 
-        let fontSize = renderer.fontSize * scale;
+        let fontSize = ctx.fontSize * scale;
 
         this.font = (italic ? "italic " : "") + (bold ? "bold " : "") + fontSize + "px Times New Roman";
 
-        this.lineWidths = this.textLines.map(text => renderer.getTextWidth(text, this.font));
+        this.lineWidths = this.textLines.map(text => ctx.getTextWidth(text, this.font));
         this.lineHeight = fontSize;
 
-        let p = this.padding * renderer.unitSize;
+        let p = this.padding * ctx.unitSize;
 
         let w = p + Math.max(...this.lineWidths) + p;
         let h = p + this.lineHeight * this.textLines.length + p;
@@ -117,24 +117,16 @@ export class ObjText extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        const ctx = renderer.getCanvasContext();
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.rect);
 
-        if (!ctx) {
-            return;
-        }
-
-        renderer.drawDebugRect(this.rect);
-
-        ctx.lineWidth = renderer.lineWidth;
-        ctx.strokeStyle = ctx.fillStyle = this.color;
-        ctx.font = this.font;
+        ctx.lineWidth(1).font(this.font);
 
         let { rect, padding, lineHeight, lineWidths, anchorX, anchorY, italic } = this;
 
         if (this.bgcolor !== undefined) {
             ctx.save();
-            ctx.fillStyle = this.bgcolor;
+            ctx.fillColor(this.bgcolor ?? "black");
             ctx.beginPath();
             ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
             ctx.fill();
@@ -144,10 +136,12 @@ export class ObjText extends MusicObject {
         let lineCount = this.textLines.length;
         let textHeight = lineCount * lineHeight;
         let fixY = -lineHeight * (italic ? 0.25 : 0.175);
-        let p = padding * renderer.unitSize;
+        let p = padding * ctx.unitSize;
 
         let centerX = (rect.left + p) * (1 - anchorX) + (rect.right - p) * anchorX;
         let centerY = (rect.top + p) * (1 - anchorY) + (rect.bottom - p) * anchorY;
+
+        ctx.color(this.color);
 
         this.textLines.forEach((textLine, i) => {
             let x = centerX - lineWidths[i] * anchorX;

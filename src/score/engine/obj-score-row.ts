@@ -3,7 +3,7 @@ import { ObjMeasure } from "./obj-measure";
 import { DivRect, getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Utils } from "@tspro/ts-utils-lib";
@@ -154,13 +154,13 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    resetLayoutGroups(renderer: Renderer) {
+    resetLayoutGroups(ctx: RenderContext) {
         // Clear resolved position and layout objects
-        this.notationLines.forEach(line => line.resetLayoutGroups(renderer));
+        this.notationLines.forEach(line => line.resetLayoutGroups(ctx));
     }
 
-    layoutLayoutGroups(renderer: Renderer) {
-        this.notationLines.forEach(line => line.layoutLayoutGroups(renderer));
+    layoutLayoutGroups(ctx: RenderContext) {
+        this.notationLines.forEach(line => line.layoutLayoutGroups(ctx));
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -274,7 +274,7 @@ export class ObjScoreRow extends MusicObject {
         }
     }
 
-    getInstrumentNameWidth(renderer: Renderer): number {
+    getInstrumentNameWidth(ctx: RenderContext): number {
         return Math.max(0, ...this.instrumentNames.map(obj => obj ? obj.getRect().width : 0));
     }
 
@@ -285,18 +285,18 @@ export class ObjScoreRow extends MusicObject {
         }
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         if (!this.needLayout) {
             return;
         }
 
         this.requestRectUpdate();
 
-        this.instrumentNames.forEach(obj => obj?.layout(renderer));
+        this.instrumentNames.forEach(obj => obj?.layout(ctx));
 
         this.notationLines.forEach(line => {
             line.removeObjects();
-            line.layoutHeight(renderer);
+            line.layoutHeight(ctx);
         });
 
         // Calc min width
@@ -304,13 +304,13 @@ export class ObjScoreRow extends MusicObject {
 
         // Layout measures
         this.measures.forEach(m => {
-            m.layout(renderer);
+            m.layout(ctx);
             this.minWidth += m.getMinWidth();
             this.minWidth += m.getPostMeasureBreakWidth();
         });
     }
 
-    layoutWidth(renderer: Renderer, left: number, right: number) {
+    layoutWidth(ctx: RenderContext, left: number, right: number) {
         if (!this.needLayout) {
             return;
         }
@@ -318,7 +318,7 @@ export class ObjScoreRow extends MusicObject {
         // left = 0 + instrument name width.
         this.rect = new DivRect(0, right, 0, 0);
 
-        this.notationLines.forEach(line => line.layoutWidth(renderer));
+        this.notationLines.forEach(line => line.layoutWidth(ctx));
 
         // Layout measures width
         let targetColumnsAreaWidth = right - left;
@@ -331,11 +331,11 @@ export class ObjScoreRow extends MusicObject {
 
         let columnsAreaScale = targetColumnsAreaWidth / minColumnsAreaWidth;
 
-        let x = this.doc.getInstrumentGroupSize(renderer).braceRight;
+        let x = this.doc.getInstrumentGroupSize(ctx).braceRight;
 
         this.measures.forEach(m => {
             let newMeasureWidth = m.getSolidAreaWidth() + m.getMinColumnsAreaWidth() * columnsAreaScale;
-            m.layoutWidth(renderer, newMeasureWidth);
+            m.layoutWidth(ctx, newMeasureWidth);
             let r = m.getRect();
             m.offset(x - r.left, -r.centerY);
             x += r.width;
@@ -343,8 +343,8 @@ export class ObjScoreRow extends MusicObject {
         });
 
         this.measures.forEach(m => {
-            m.layoutConnectives(renderer);
-            m.layoutBeams(renderer);
+            m.layoutConnectives(ctx);
+            m.layoutBeams(ctx);
         });
     }
 
@@ -361,8 +361,8 @@ export class ObjScoreRow extends MusicObject {
         this.measures.forEach(m => m.alignStemsToBeams());
     }
 
-    layoutSetNotationLines(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layoutSetNotationLines(ctx: RenderContext) {
+        let { unitSize } = ctx;
 
         for (let i = 1; i < this.notationLines.length; i++) {
             let prev = this.notationLines[i - 1];
@@ -407,9 +407,9 @@ export class ObjScoreRow extends MusicObject {
         this.requestRectUpdate();
     }
 
-    layoutPadding(renderer: Renderer) {
+    layoutPadding(ctx: RenderContext) {
         // Add padding to rect
-        let p = renderer.unitSize / 2;
+        let p = ctx.unitSize / 2;
 
         this.getRect(); // Update this.rect
 
@@ -432,20 +432,16 @@ export class ObjScoreRow extends MusicObject {
         this.instrumentNames.forEach(obj => obj?.offset(dx, dy));
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
-        renderer.drawDebugRect(this.getRect());
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.getRect());
 
         // Set clip rect for this row
         ctx.save();
         let { left, top, width, height } = this.getRect();
         ctx.rect(left, top, width, height);
         ctx.clip();
+
+        ctx.color("black");
 
         // For multiple notation lines draw vertical start line (which is not drawn by measures)
         if (this.getFirstMeasure() && (this.notationLines.length > 1 || this.notationLines[0] instanceof ObjTab)) {
@@ -454,17 +450,17 @@ export class ObjScoreRow extends MusicObject {
             let top = Math.min(...this.notationLines.map(line => line.getTopLineY()));
             let bottom = Math.max(...this.notationLines.map(line => line.getBottomLineY()));
 
-            renderer.drawLine(left, top, left, bottom);
+            ctx.strokeLine(left, top, left, bottom);
         }
 
         // Draw measures
-        this.measures.forEach(m => m.draw(renderer));
+        this.measures.forEach(m => m.draw(ctx));
 
         // Draw notation lines
-        this.notationLines.forEach(m => m.draw(renderer));
+        this.notationLines.forEach(m => m.draw(ctx));
 
         // Draw instrument names
-        let grpSize = this.doc.getInstrumentGroupSize(renderer);
+        let grpSize = this.doc.getInstrumentGroupSize(ctx);
         this.instrumentNames.forEach((obj, i) => {
             let grp = this.instrumentLineGroups[i];
 
@@ -475,11 +471,12 @@ export class ObjScoreRow extends MusicObject {
                     grp[0].getTopLineY(),
                     grp[grp.length - 1].getBottomLineY()
                 );
-                renderer.drawBrace(r, "left");
+                ctx.color("brack").lineWidth(1);
+                ctx.drawBrace(r, "left");
             }
 
             if (obj) {
-                obj.draw(renderer);
+                obj.draw(ctx);
             }
         });
 

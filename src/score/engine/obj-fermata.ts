@@ -1,6 +1,6 @@
 import { DivRect, MFermata, StaffPreset } from "../pub";
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
@@ -36,8 +36,8 @@ export class ObjFermata extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layout(ctx: RenderContext) {
+        let { unitSize } = ctx;
 
         let width = unitSize * 4;
         let height = unitSize * 3;
@@ -49,14 +49,8 @@ export class ObjFermata extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
-        let { lineWidth, unitSize } = renderer;
+    draw(ctx: RenderContext) {
+        let { unitSize } = ctx;
         let upsideDown = this.pos === VerticalPos.Below;
 
         let dy = (upsideDown ? unitSize : -unitSize) * 0.7;
@@ -67,10 +61,9 @@ export class ObjFermata extends MusicObject {
         let bottom = (upsideDown ? this.rect.top : this.rect.bottom) + dy;
         let height = bottom - top;
 
-        renderer.drawDebugRect(this.rect);
+        ctx.drawDebugRect(this.rect);
 
-        ctx.strokeStyle = ctx.fillStyle = this.color;
-        ctx.lineWidth = lineWidth;
+        ctx.color("black").lineWidth(1);
 
         ctx.beginPath();
         ctx.moveTo(left, bottom);
@@ -81,6 +74,6 @@ export class ObjFermata extends MusicObject {
 
         let r = height / 6;
 
-        renderer.fillCircle((left + right) / 2, bottom - r, Math.abs(r));
+        ctx.fillCircle((left + right) / 2, bottom - r, Math.abs(r));
     }
 }

@@ -1,5 +1,5 @@
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { MRenderer } from "./music-interface";
+import { MRenderer, MRenderContext } from "./music-interface";
 import { MScoreRow, MusicInterface } from "./music-objects";
 
 /** Score event type. */
@@ -19,12 +19,19 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     /**
      * Create new score staff position event.
      * @param type - Score event type.
-     * @param renderer - Renderer.
+     * @param renderContext - Render context.
      * @param scoreRow - Score row.
      * @param diatonicId - Diatonic id that was clicked/entered/left.
      */
-    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
+    constructor(type: ScoreEventType, readonly renderContext: MRenderContext, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
+    }
+
+    /**
+     * @deprecated - Provided for legacy support, use renderContext instead.
+     */
+    get renderer(): MRenderer {
+        return this.renderContext;
     }
 }
 
@@ -33,14 +40,22 @@ export class ScoreObjectEvent extends ScoreEvent {
     /**
      * Create new score object event.
      * @param type - Score event type.
-     * @param renderer - Renderer.
+     * @param renderContext - Render context.
      * @param objects - Array of objects, last object in this array is the top object that was clicked/entered/left, previous objects are it's parent objects.
      */
-    constructor(type: ScoreEventType, readonly renderer: MRenderer, readonly objects: MusicInterface[]) {
+    constructor(type: ScoreEventType, readonly renderContext: MRenderContext, readonly objects: MusicInterface[]) {
         super(type);
+
         if (arguments.length === 0) {
             throw new MusicError(MusicErrorType.Score, "Empty array in score object event!");
         }
+    }
+
+    /**
+     * @deprecated - Provided for legacy support, use renderContext instead.
+     */
+    get renderer(): MRenderer {
+        return this.renderContext;
     }
 
     /** Top object getter. */

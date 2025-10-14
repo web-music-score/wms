@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { DivRect, MSpecialText } from "../pub";
@@ -51,13 +51,13 @@ export class ObjSpecialText extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         switch (this.text) {
             case ObjSpecialText.Coda: {
                 let codaSym = this.components[0];
                 let codaText = this.components[1];
-                codaSym.layout(renderer);
-                codaText.layout(renderer);
+                codaSym.layout(ctx);
+                codaText.layout(ctx);
                 codaSym.offset(0, (codaText.getRect().top + codaText.getRect().bottom) / 2);
                 codaText.offset(codaSym.getRect().right, 0);
                 this.rect = new DivRect(
@@ -69,8 +69,8 @@ export class ObjSpecialText extends MusicObject {
             case ObjSpecialText.toCoda: {
                 let toCodaText = this.components[0];
                 let codaSym = this.components[1];
-                toCodaText.layout(renderer);
-                codaSym.layout(renderer);
+                toCodaText.layout(ctx);
+                codaSym.layout(ctx);
                 codaSym.offset(0, (toCodaText.getRect().top + toCodaText.getRect().bottom) / 2);
                 toCodaText.offset(codaSym.getRect().left, 0);
                 this.rect = new DivRect(
@@ -81,7 +81,7 @@ export class ObjSpecialText extends MusicObject {
             }
             default: {
                 let text = this.components[0];
-                text.layout(renderer);
+                text.layout(ctx);
                 this.rect = text.getRect().copy();
                 break;
             }
@@ -94,9 +94,9 @@ export class ObjSpecialText extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        renderer.drawDebugRect(this.rect);
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.rect);
 
-        this.components.forEach(c => c.draw(renderer));
+        this.components.forEach(c => c.draw(ctx));
     }
 }

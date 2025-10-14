@@ -1,7 +1,7 @@
 import { Note, NoteLength, validateNoteLength } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId } from "../pub";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
 import { ObjMeasure, validateVoiceId } from "./obj-measure";
@@ -384,7 +384,7 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    layout(renderer: Renderer, accState: AccidentalState) {
+    layout(ctx: RenderContext, accState: AccidentalState) {
         if (!this.needLayout) {
             return;
         }
@@ -394,7 +394,7 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect = new DivRect();
 
         let { row } = this;
-        let { unitSize } = renderer;
+        let { unitSize } = ctx;
 
         // Set initially column's min width
         let halfMinWidth = this.getMinWidth() * unitSize / 2;
@@ -404,7 +404,7 @@ export class ObjRhythmColumn extends MusicObject {
 
         // Layout voice symbols
         this.voiceSymbol.forEach(symbol => {
-            symbol.layout(renderer, accState);
+            symbol.layout(ctx, accState);
 
             let r = symbol.getRect();
 
@@ -416,7 +416,7 @@ export class ObjRhythmColumn extends MusicObject {
             let arpeggioWidth = 0;
             this.arpeggios = row.getNotationLines().map(line => {
                 let arpeggio = new ObjArpeggio(this, line, this.getArpeggioDir());
-                arpeggio.layout(renderer);
+                arpeggio.layout(ctx);
                 arpeggio.offset(-leftw - arpeggio.getRect().right, line.getRect().centerY - arpeggio.getRect().centerY);
                 arpeggioWidth = Math.max(arpeggioWidth, arpeggio.getRect().width);
                 line.addObject(arpeggio);
@@ -502,29 +502,29 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
+    draw(ctx: RenderContext) {
         // Draw ledger lines
         this.row.getStaves().forEach(staff => {
             let minDiatonicId = this.staffMinDiatonicId.get(staff);
             let maxDiatonicId = this.staffMaxDiatonicId.get(staff);
 
             if (minDiatonicId !== undefined) {
-                renderer.drawLedgerLines(staff, minDiatonicId, this.getRect().centerX);
+                ctx.drawLedgerLines(staff, minDiatonicId, this.getRect().centerX);
             }
 
             if (maxDiatonicId !== undefined) {
-                renderer.drawLedgerLines(staff, maxDiatonicId, this.getRect().centerX);
+                ctx.drawLedgerLines(staff, maxDiatonicId, this.getRect().centerX);
             }
         });
 
         // Draw symbols
         this.voiceSymbol.forEach(symbol => {
             if (symbol) {
-                symbol.draw(renderer);
+                symbol.draw(ctx);
             }
         });
 
         // Draw arpeggios
-        this.arpeggios.forEach(arpeggio => arpeggio.draw(renderer));
+        this.arpeggios.forEach(arpeggio => arpeggio.draw(ctx));
     }
 }

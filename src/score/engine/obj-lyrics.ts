@@ -1,5 +1,5 @@
 import { DivRect, LyricsAlign, LyricsHyphen, LyricsOptions, MLyrics, VerseNumber } from "../pub";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { NoteLength, RhythmProps } from "theory/rhythm";
 import { ObjText } from "./obj-text";
@@ -66,8 +66,8 @@ export class ObjLyrics extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
-        this.text.layout(renderer);
+    layout(ctx: RenderContext) {
+        this.text.layout(ctx);
         this.rect = this.text.getRect().copy();
     }
 
@@ -76,24 +76,21 @@ export class ObjLyrics extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        this.text.draw(renderer);
+    draw(ctx: RenderContext) {
+        this.text.draw(ctx);
 
-        const ctx = renderer.getCanvasContext();
+        if (this.hyphen !== undefined) {
+            ctx.color(this.color).lineWidth(1);
 
-        if (ctx && this.hyphen !== undefined) {
             // Draw hyphen/extender line between this and next lyrics.
             let l = this.getRect();
             let r = this.nextLyricsObject?.getRect();
 
-            let hyphenw = renderer.unitSize * 1.5;
+            let hyphenw = ctx.unitSize * 1.5;
             let maxw = r ? (r.left - l.right) * 0.85 : hyphenw;
             let w = this.hyphen === LyricsHyphen.Hyphen ? Math.min(hyphenw, maxw) : maxw;
 
             if (w > 0) {
-                ctx.lineWidth = renderer.lineWidth;
-                ctx.strokeStyle = ctx.fillStyle = this.color;
-
                 let cx = r ? (r.left + l.right) / 2 : (l.right + w / 0.85)
                 let cy = (l.top + l.bottom) / 2;
 

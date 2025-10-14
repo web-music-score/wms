@@ -1,6 +1,6 @@
 import { Utils, Vec2, Device } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MDocument, DivRect, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderer } from "../pub";
+import { MDocument, DivRect, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
@@ -41,14 +41,13 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
     else return a.length === b.length && a.every((a2, i) => a2 === b[i]);
 }
 
-export class Renderer {
+export class RenderContext {
     readonly devicePixelRatio: number;
 
     readonly fontSize: number;
     readonly unitSize: number;
 
-    readonly lineWidth: number;
-    readonly beamThickness: number;
+    readonly _lineWidth: number;
 
     private scoreEventListener?: ScoreEventListener;
 
@@ -73,12 +72,11 @@ export class Renderer {
     private onMouseLeaveFn: (e: MouseEvent) => void;
     private onTouchEndFn: (e: TouchEvent) => void;
 
-    constructor(private readonly mi: MRenderer) {
+    constructor(private readonly mi: MRenderContext) {
         this.devicePixelRatio = window.devicePixelRatio;
         this.fontSize = Device.FontSize * DocumentSettings.DocumentScale * this.devicePixelRatio;
         this.unitSize = this.fontSize * 0.3;
-        this.lineWidth = this.unitSize * 0.2;
-        this.beamThickness = this.unitSize * 0.8;
+        this._lineWidth = this.unitSize * 0.2;
 
         // Load image assets
         ImageAssets.forEach(asset => {
@@ -102,7 +100,7 @@ export class Renderer {
         this.onTouchEndFn = this.onTouchEnd.bind(this);
     }
 
-    getMusicInterface(): MRenderer {
+    getMusicInterface(): MRenderContext {
         return this.mi;
     }
 
@@ -136,11 +134,11 @@ export class Renderer {
         this.mdoc = mdoc;
 
         if (prevMDoc) {
-            prevMDoc.getMusicObject().setRenderer(undefined);
+            prevMDoc.getMusicObject().setRenderContext(undefined);
         }
 
         if (mdoc) {
-            mdoc.getMusicObject().setRenderer(this);
+            mdoc.getMusicObject().setRenderContext(this);
         }
     }
 
@@ -324,29 +322,31 @@ export class Renderer {
     }
 
     draw() {
-        let { ctx, doc } = this;
+        try {
+            let { doc } = this;
 
-        if (!ctx || !doc) {
-            return;
+            if (doc) {
+                doc.layout();
+
+                this.updateCanvasSize();
+                this.clearCanvas();
+
+                this.drawHilightStaffPosRect();
+                this.drawHilightObjectRect();
+                this.drawPlayCursor();
+
+                doc.drawContent();
+            }
         }
-
-        doc.layout();
-
-        this.updateCanvasSize();
-        this.clearCanvas();
-
-        this.drawHilightStaffPosRect();
-        this.drawHilightObjectRect();
-        this.drawPlayCursor();
-
-        doc.drawContent();
+        catch (err) {
+            console.error("Render failed!", err);
+        }
     }
 
     drawHilightStaffPosRect() {
-        let ctx = this.getCanvasContext();
         let { mousePos, hilightedStaffPos, unitSize } = this;
 
-        if (!ctx || !hilightedStaffPos) {
+        if (!hilightedStaffPos) {
             return;
         }
 
@@ -357,8 +357,8 @@ export class Renderer {
             return;
         }
 
-        ctx.fillStyle = HilightStaffPosRectColor;
-        ctx.fillRect(0, staff.getDiatonicIdY(diatonicId) - unitSize, ctx.canvas.width, 2 * unitSize);
+        this.fillColor(HilightStaffPosRectColor);
+        this.fillRect(staff.row.getRect().left, staff.getDiatonicIdY(diatonicId) - unitSize, staff.row.getRect().width, 2 * unitSize);
 
         if (mousePos !== undefined) {
             this.drawLedgerLines(staff, diatonicId, mousePos.x);
@@ -366,24 +366,23 @@ export class Renderer {
     }
 
     drawHilightObjectRect() {
-        let ctx = this.getCanvasContext();
         let { hilightedObj } = this;
 
-        if (!ctx || !hilightedObj) {
+        if (!hilightedObj) {
             return;
         }
 
         let rect = hilightedObj.getRect();
 
-        ctx.strokeStyle = HilightObjectRectColor;
-        ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+        this.lineColor(HilightObjectRectColor);
+        this.strokeRect(rect.left, rect.top, rect.width, rect.height);
     }
 
     drawPlayCursor() {
-        let { cursorRect: r, lineWidth } = this;
+        let { cursorRect: r } = this;
 
         if (r) {
-            this.drawLine(r.centerX, r.top, r.centerX, r.bottom, PlayPosIndicatorColor, lineWidth * 2);
+            this.color(PlayPosIndicatorColor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
         }
     }
 
@@ -395,92 +394,13 @@ export class Renderer {
         return coord.div(this.devicePixelRatio);
     }
 
-    getCanvasContext(): CanvasRenderingContext2D | undefined {
-        return this.ctx;
-    }
-
     clearCanvas() {
-        let ctx = this.getCanvasContext();
-
-        if (ctx) {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        }
-    }
-
-    getTextWidth(text: string, font: string) {
-        let ctx = this.getCanvasContext();
-        if (ctx) {
-            let savedFont = ctx.font;
-            ctx.font = font;
-            let metrics = ctx.measureText(text);
-            ctx.font = savedFont;
-            return metrics.width;
-        }
-        else {
-            return Utils.Dom.getCanvasTextWidth(text, font);
-        }
+        this.ctx?.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
     drawDebugRect(r: DivRect) {
-        if (!DebugSettings.DrawDebugRects) {
-            return;
-        }
-
-        let ctx = this.getCanvasContext();
-
-        if (ctx) {
-            ctx.lineWidth = 1;
-            ctx.strokeStyle = "red";
-            ctx.beginPath();
-            ctx.rect(r.left, r.top, r.right - r.left, r.bottom - r.top);
-            ctx.stroke();
-        }
-    }
-
-    fillCircle(x: number, y: number, radius: number, color?: string) {
-        let ctx = this.getCanvasContext();
-
-        if (ctx) {
-            if (color !== undefined) {
-                ctx.fillStyle = color;
-            }
-
-            ctx.beginPath();
-            ctx.arc(x, y, radius, 0, 2 * Math.PI);
-            ctx.fill();
-        }
-    }
-
-    drawLine(startX: number, startY: number, endX: number, endY: number, color?: string, lineWidth?: number) {
-        let ctx = this.getCanvasContext();
-
-        if (ctx) {
-            ctx.strokeStyle = color ?? "black";
-            ctx.lineWidth = lineWidth ?? this.lineWidth;
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            ctx.lineTo(endX, endY);
-            ctx.stroke();
-        }
-    }
-
-    drawPartialLine(startX: number, startY: number, endX: number, endY: number, startT: number, endT: number, color?: string, lineWidth?: number) {
-        let ctx = this.getCanvasContext();
-
-        if (ctx) {
-            let x1 = startX + (endX - startX) * startT;
-            let y1 = startY + (endY - startY) * startT;
-
-            let x2 = startX + (endX - startX) * endT;
-            let y2 = startY + (endY - startY) * endT;
-
-            ctx.strokeStyle = color ?? "black";
-            ctx.lineWidth = lineWidth ?? this.lineWidth;
-
-            ctx.beginPath();
-            ctx.moveTo(x1, y1);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
+        if (DebugSettings.DrawDebugRects) {
+            this.color("red").lineWidth(1).strokeRect(r.left, r.top, r.width, r.height);
         }
     }
 
@@ -493,7 +413,7 @@ export class Renderer {
             for (let lineDiatonicId = staff.topLineDiatonicId + 2; lineDiatonicId <= diatonicId; lineDiatonicId += 2) {
                 if (staff.containsDiatonicId(lineDiatonicId)) {
                     let y = staff.getDiatonicIdY(lineDiatonicId);
-                    this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
+                    this.strokeLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
                 }
             }
         }
@@ -501,7 +421,7 @@ export class Renderer {
             for (let lineDiatonicId = staff.bottomLineDiatonicId - 2; lineDiatonicId >= diatonicId; lineDiatonicId -= 2) {
                 if (staff.containsDiatonicId(lineDiatonicId)) {
                     let y = staff.getDiatonicIdY(lineDiatonicId);
-                    this.drawLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
+                    this.strokeLine(x - ledgerLineWidth / 2, y, x + ledgerLineWidth / 2, y);
                 }
             }
         }
@@ -545,127 +465,270 @@ export class Renderer {
         return new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
     }
 
-    drawRest(restSize: number, x: number, y: number, color: string) {
-        let ctx = this.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
-        let { unitSize, lineWidth } = this;
+    drawRest(restSize: number, x: number, y: number) {
+        let { unitSize } = this;
         let { flagCount } = NoteLengthProps.get(validateNoteLength(restSize + "n"));
 
-        ctx.strokeStyle = ctx.fillStyle = color;
-        ctx.lineWidth = lineWidth;
-
         if (NoteLengthProps.equals(restSize, NoteLength.Whole)) {
-            ctx.fillRect(x - unitSize, y, unitSize * 2, unitSize);
+            this.fillRect(x - unitSize, y, unitSize * 2, unitSize);
         }
         else if (NoteLengthProps.equals(restSize, NoteLength.Half)) {
-            ctx.fillRect(x - unitSize, y - unitSize, unitSize * 2, unitSize);
+            this.fillRect(x - unitSize, y - unitSize, unitSize * 2, unitSize);
         }
         else if (NoteLengthProps.equals(restSize, NoteLength.Quarter)) {
-            ctx.beginPath();
+            this.beginPath();
             // Upper part
-            ctx.moveTo(x - unitSize * 0.6, y - unitSize * 3.2);
-            ctx.lineTo(x + unitSize * 0.7, y - unitSize * 1.5);
-            ctx.quadraticCurveTo(
+            this.moveTo(x - unitSize * 0.6, y - unitSize * 3.2);
+            this.lineTo(x + unitSize * 0.7, y - unitSize * 1.5);
+            this.quadraticCurveTo(
                 x - unitSize * 0.8, y - unitSize * 0.5,
                 x + unitSize * 1, y + unitSize * 1.5
             );
-            ctx.lineTo(x - unitSize * 1, y - unitSize * 0.75);
-            ctx.quadraticCurveTo(
+            this.lineTo(x - unitSize * 1, y - unitSize * 0.75);
+            this.quadraticCurveTo(
                 x + unitSize * 0.2, y - unitSize * 1.5,
                 x - unitSize * 0.6, y - unitSize * 3.2
             );
             // Lower part
-            ctx.moveTo(x + unitSize * 1, y + unitSize * 1.5);
-            ctx.quadraticCurveTo(
+            this.moveTo(x + unitSize * 1, y + unitSize * 1.5);
+            this.quadraticCurveTo(
                 x - unitSize * 0.8, y + unitSize * 1,
                 x - unitSize * 0.2, y + unitSize * 2.8
             );
-            ctx.bezierCurveTo(
+            this.bezierCurveTo(
                 x - unitSize * 1.8, y + unitSize * 1.5,
                 x - unitSize * 0.6, y - unitSize * 0.2,
                 x + unitSize * 0.9, y + unitSize * 1.5
             );
-            ctx.fill();
-            ctx.stroke();
+            this.fill();
+            this.stroke();
         }
         else if (flagCount > 0) {
             let adj = 1 - flagCount % 2;
             let fx = (p: number) => x + (-p * 0.25 + 0.5) * unitSize;
             let fy = (p: number) => y + (p + adj) * unitSize;
 
-            ctx.beginPath();
-            ctx.moveTo(fx(1 + flagCount), fy(1 + flagCount));
-            ctx.lineTo(fx(-0.5 - flagCount), fy(-0.5 - flagCount));
-            ctx.stroke();
+            this.beginPath();
+            this.moveTo(fx(1 + flagCount), fy(1 + flagCount));
+            this.lineTo(fx(-0.5 - flagCount), fy(-0.5 - flagCount));
+            this.stroke();
 
             for (let i = 0; i < flagCount; i++) {
                 let t = flagCount - i * 2;
-                ctx.beginPath();
-                ctx.moveTo(fx(t - 2.5), fy(t - 2.5));
-                ctx.quadraticCurveTo(
+                this.beginPath();
+                this.moveTo(fx(t - 2.5), fy(t - 2.5));
+                this.quadraticCurveTo(
                     fx(t - 0.5) + unitSize * 0.25, fy(t - 1.5),
                     fx(t - 1.5) - unitSize * 1.5, fy(t - 1.5));
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(fx(t - 2) - unitSize * 1.5, fy(t - 2), unitSize * 0.5, 0, Math.PI * 2);
-                ctx.fill();
+                this.stroke();
+                this.beginPath();
+                this.arc(fx(t - 2) - unitSize * 1.5, fy(t - 2), unitSize * 0.5, 0, Math.PI * 2);
+                this.fill();
             }
         }
     }
 
     drawFlag(rect: DivRect, dir: "up" | "down") {
-        let ctx = this.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
         let left = rect.left;
         let right = rect.right;
         let width = right - left;
         let top = dir === "up" ? rect.top : rect.bottom;
         let bottom = dir === "up" ? rect.bottom : rect.top;
 
-        ctx.beginPath();
-        ctx.moveTo(left, top);
-        ctx.bezierCurveTo(
+        this.beginPath();
+        this.moveTo(left, top);
+        this.bezierCurveTo(
             left, top * 0.75 + bottom * 0.25,
             left + width * 1.5, top * 0.5 + bottom * 0.5,
             left + width * 0.5, bottom);
-        ctx.stroke();
+        this.stroke();
+    }
+
+    color(color: string): RenderContext {
+        if (this.ctx) this.ctx.strokeStyle = this.ctx.fillStyle = color;
+        return this;
+    }
+
+    lineColor(color: string): RenderContext {
+        if (this.ctx) this.ctx.strokeStyle = color;
+        return this;
+    }
+
+    fillColor(color: string): RenderContext {
+        if (this.ctx) this.ctx.fillStyle = color;
+        return this;
+
+    }
+
+    lineWidth(lineWidth?: number): RenderContext {
+        if (this.ctx) this.ctx.lineWidth = this._lineWidth * (lineWidth ?? 1)
+        return this;
+    }
+
+    font(font: string): RenderContext {
+        if (this.ctx) this.ctx.font = font;
+        return this;
+    }
+
+    beginPath(): RenderContext {
+        if (this.ctx) this.ctx.beginPath();
+        return this;
+    }
+
+    stroke(): RenderContext {
+        if (this.ctx) this.ctx.stroke();
+        return this;
+    }
+
+    fill(): RenderContext {
+        if (this.ctx) this.ctx.fill();
+        return this;
+    }
+
+    moveTo(x: number, y: number): RenderContext {
+        if (this.ctx) this.ctx.moveTo(x, y);
+        return this;
+    }
+
+    lineTo(x: number, y: number): RenderContext {
+        if (this.ctx) this.ctx.lineTo(x, y);
+        return this;
+    }
+
+    bezierCurveTo(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): RenderContext {
+        if (this.ctx) this.ctx.bezierCurveTo(x1, y1, x2, y2, x3, y3);
+        return this;
+    }
+
+    quadraticCurveTo(x1: number, y1: number, x2: number, y2: number): RenderContext {
+        if (this.ctx) this.ctx.quadraticCurveTo(x1, y1, x2, y2);
+        return this;
+    }
+
+    fillRect(x: number, y: number, w: number, h: number): RenderContext {
+        if (this.ctx) this.ctx.fillRect(x, y, w, h);
+        return this;
+    }
+
+    setLineDash(pattern: number[]): RenderContext {
+        if (this.ctx) this.ctx.setLineDash(pattern);
+        return this;
+    }
+
+    drawImage(img: CanvasImageSource, x: number, y: number, w: number, h: number): RenderContext {
+        if (this.ctx) this.ctx.drawImage(img, x, y, w, h);
+        return this;
+    }
+
+    ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number): RenderContext {
+        if (this.ctx) this.ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
+        return this;
+    }
+
+    clip(): RenderContext {
+        if (this.ctx) this.ctx.clip();
+        return this;
+    }
+
+    save(): RenderContext {
+        if (this.ctx) this.ctx.save();
+        return this;
+    }
+
+    restore(): RenderContext {
+        if (this.ctx) this.ctx.restore();
+        return this;
+    }
+
+    rect(x: number, y: number, w: number, h: number): RenderContext {
+        if (this.ctx) this.ctx.rect(x, y, w, h);
+        return this;
+    }
+
+    scale(x: number, y: number): RenderContext {
+        if (this.ctx) this.ctx.scale(x, y);
+        return this;
+    }
+
+    strokeRect(x: number, y: number, w: number, h: number): RenderContext {
+        if (this.ctx) this.ctx.strokeRect(x, y, w, h);
+        return this;
+    }
+
+    fillText(text: string, x: number, y: number): RenderContext {
+        if (this.ctx) this.ctx.fillText(text, x, y);
+        return this;
+    }
+
+    getTextWidth(text: string, font: string) {
+        if (this.ctx) {
+            let savedFont = this.ctx.font;
+            this.ctx.font = font;
+            let metrics = this.ctx.measureText(text);
+            this.ctx.font = savedFont;
+            return metrics.width;
+        }
+        else {
+            return Utils.Dom.getCanvasTextWidth(text, font);
+        }
+    }
+
+    arc(x: number, y: number, radius: number, startRadians: number, endRadians: number) {
+        this.ctx?.arc(x, y, radius, startRadians, endRadians);
+    }
+
+    fillCircle(x: number, y: number, radius: number) {
+        if (this.ctx) {
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+            this.ctx.fill();
+        }
+    }
+
+    strokeLine(startX: number, startY: number, endX: number, endY: number) {
+        if (this.ctx) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(startX, startY);
+            this.ctx.lineTo(endX, endY);
+            this.ctx.stroke();
+        }
+    }
+
+    strokePartialLine(startX: number, startY: number, endX: number, endY: number, startT: number, endT: number) {
+        let x1 = startX + (endX - startX) * startT;
+        let y1 = startY + (endY - startY) * startT;
+
+        let x2 = startX + (endX - startX) * endT;
+        let y2 = startY + (endY - startY) * endT;
+
+        if (this.ctx) {
+            this.ctx.beginPath();
+            this.ctx.moveTo(x1, y1);
+            this.ctx.lineTo(x2, y2);
+            this.ctx.stroke();
+        }
     }
 
     drawBrace(rect: DivRect, side: "left" | "right") {
-        let ctx = this.getCanvasContext();
+        if (this.ctx) {
+            let { left, right, width, top, bottom, centerY } = rect;
 
-        if (!ctx) {
-            return;
+            if (side === "right") {
+                [left, right, width] = [right, left, -width];
+            }
+
+            this.ctx.beginPath();
+            this.ctx.moveTo(right, top);
+            this.ctx.bezierCurveTo(
+                left + width * 0.1, top,
+                left + width * 0.8, centerY,
+                left, centerY);
+            this.ctx.moveTo(right, bottom);
+            this.ctx.bezierCurveTo(
+                left + width * 0.1, bottom,
+                left + width * 0.8, centerY,
+                left, centerY);
+            this.ctx.stroke();
         }
-
-        let { left, right, width, top, bottom, centerY } = rect;
-
-        if (side === "right") {
-            [left, right, width] = [right, left, -width];
-        }
-
-        ctx.lineWidth = this.lineWidth;
-        ctx.strokeStyle = ctx.fillStyle = "black";
-
-        ctx.beginPath();
-        ctx.moveTo(right, top);
-        ctx.bezierCurveTo(
-            left + width * 0.1, top,
-            left + width * 0.8, centerY,
-            left, centerY);
-        ctx.moveTo(right, bottom);
-        ctx.bezierCurveTo(
-            left + width * 0.1, bottom,
-            left + width * 0.8, centerY,
-            left, centerY);
-        ctx.stroke();
     }
 }

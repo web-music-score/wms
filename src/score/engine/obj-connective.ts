@@ -1,6 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
@@ -68,8 +68,8 @@ export class ObjConnective extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layout(ctx: RenderContext) {
+        let { unitSize } = ctx;
         let { measure, line, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId, connectiveProps } = this;
         let { noteAnchor, arcDir } = connectiveProps;
         let { row } = measure;
@@ -172,13 +172,7 @@ export class ObjConnective extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
+    draw(ctx: RenderContext) {
         if (this.rightNoteGroup === undefined) { /* Draw */ }
         else if (this.leftNoteGroup.measure === this.rightNoteGroup.measure) { /* Draw */ }
         else if (this.leftNoteGroup.row.getNextRow() === this.rightNoteGroup.row) { /* Draw */ }
@@ -186,15 +180,14 @@ export class ObjConnective extends MusicObject {
         else { return; }
 
         let { rect } = this;
-        let { lineWidth } = renderer;
+        let { _lineWidth } = ctx;
 
-        renderer.drawDebugRect(rect);
+        ctx.drawDebugRect(rect);
 
-        let t = lineWidth * 1.5;
-        let s = lineWidth * 0.25;
+        let t = _lineWidth * 1.5;
+        let s = _lineWidth * 0.25;
 
-        ctx.strokeStyle = ctx.fillStyle = "black";
-        ctx.lineWidth = lineWidth;
+        ctx.color("black").lineWidth(1);
 
         if (this.arcHeight === 0) {
             ctx.beginPath();

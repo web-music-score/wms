@@ -1,7 +1,7 @@
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
@@ -135,7 +135,7 @@ export class ObjRest extends MusicObject {
                     return staff.middleLineDiatonicId + 2;
                 }
                 else {
-                    return staff.middleLineDiatonicId;  
+                    return staff.middleLineDiatonicId;
                 }
             }
             else {
@@ -235,7 +235,7 @@ export class ObjRest extends MusicObject {
 
     updateAccidentalState(accState: AccidentalState) { }
 
-    layout(renderer: Renderer, accState: AccidentalState) {
+    layout(ctx: RenderContext, accState: AccidentalState) {
         this.requestRectUpdate();
         this.staffObjects.length = 0;
 
@@ -243,7 +243,7 @@ export class ObjRest extends MusicObject {
             return;
         }
 
-        let { unitSize } = renderer;
+        let { unitSize } = ctx;
         let { noteSize, dotCount } = this.rhythmProps;
 
         this.row.getStaves().forEach(staff => {
@@ -255,7 +255,7 @@ export class ObjRest extends MusicObject {
 
             let obj = new ObjStaffRest(staff, this);
 
-            obj.restRect = renderer.getRestRect(noteSize);
+            obj.restRect = ctx.getRestRect(noteSize);
 
             for (let i = 0; i < dotCount; i++) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
@@ -291,21 +291,16 @@ export class ObjRest extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx || this.staffObjects.length === 0) {
+    draw(ctx: RenderContext) {
+        if (this.staffObjects.length === 0) {
             return;
         }
 
-        renderer.drawDebugRect(this.getRect());
+        ctx.drawDebugRect(this.getRect());
 
-        let { lineWidth } = renderer;
-        let { color } = this;
         let { noteSize } = this.rhythmProps;
 
-        ctx.strokeStyle = ctx.fillStyle = color;
-        ctx.lineWidth = lineWidth;
+        ctx.color(this.color).lineWidth(1);
 
         this.staffObjects.forEach(obj => {
             let { dotRects, restRect } = obj;
@@ -313,11 +308,9 @@ export class ObjRest extends MusicObject {
             let x = restRect.centerX;
             let y = restRect.centerY;
 
-            renderer.drawRest(noteSize, x, y, color);
+            ctx.drawRest(noteSize, x, y);
 
-            dotRects.forEach(r => {
-                renderer.fillCircle(r.centerX, r.centerY, r.width / 2);
-            });
+            dotRects.forEach(r => ctx.fillCircle(r.centerX, r.centerY, r.width / 2));
         });
     }
 }

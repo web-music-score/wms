@@ -1,5 +1,5 @@
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, DivRect, MusicInterface, MStaffTabBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
@@ -67,17 +67,17 @@ abstract class ObjBarLine extends MusicObject {
         return [this];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         this.requestRectUpdate();
         this.staffTabObjects.length = 0;
 
         this.barLineType = this.solveBarLineType();
 
-        let { unitSize, lineWidth } = renderer;
+        let { unitSize, _lineWidth } = ctx;
         let { measure, barLineType } = this;
         let { row } = measure;
 
-        let thinW = lineWidth;
+        let thinW = _lineWidth;
         let thicW = 0.7 * unitSize;
         let spaceW = 0.7 * unitSize;
         let dotW = DocumentSettings.DotSize * unitSize;
@@ -178,20 +178,18 @@ abstract class ObjBarLine extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(renderer: Renderer) {
-        const ctx = renderer.getCanvasContext();
-
-        if (!ctx || this.barLineType === BarLineType.None) {
+    draw(ctx: RenderContext) {
+        if (this.barLineType === BarLineType.None) {
             return;
         }
 
-        renderer.drawDebugRect(this.getRect());
+        ctx.drawDebugRect(this.getRect());
 
-        ctx.strokeStyle = ctx.fillStyle = "black";
+        ctx.color("black");
 
         this.staffTabObjectGroups.forEach(objs => {
             if (objs.length > 0) {
-                objs.forEach(obj => obj.dots.forEach(d => renderer.fillCircle(d.x, d.y, d.r)));
+                objs.forEach(obj => obj.dots.forEach(d => ctx.fillCircle(d.x, d.y, d.r)));
 
                 let top = objs[0].getRect().top;
                 let height = objs[objs.length - 1].getRect().bottom - top;

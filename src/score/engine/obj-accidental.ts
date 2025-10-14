@@ -1,6 +1,6 @@
 import { Accidental } from "@tspro/web-music-score/theory";
 import { DivRect, MAccidental } from "../pub";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -19,8 +19,8 @@ export class ObjAccidental extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layout(ctx: RenderContext) {
+        let { unitSize } = ctx;
 
         switch (this.accidental) {
             case -2:
@@ -47,35 +47,27 @@ export class ObjAccidental extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.rect);
 
-        if (!ctx) {
-            return;
-        }
-
-        renderer.drawDebugRect(this.rect);
-
-        let { unitSize, lineWidth } = renderer;
+        let { unitSize } = ctx;
         let { accidental } = this;
 
         let x = this.rect.centerX;
         let y = this.rect.centerY;
 
-        ctx.strokeStyle = ctx.fillStyle = this.color;
+        ctx.color(this.color);
 
-        function draw_b(x: number, y: number) {
-            if (ctx) {
-                ctx.lineWidth = lineWidth;
-                ctx.beginPath();
-                ctx.moveTo(x - unitSize * 0.75, y - unitSize * 4);
-                ctx.lineTo(x - unitSize * 0.75, y + unitSize * 1.1);
-                ctx.bezierCurveTo(
+        const draw_b = (x: number, y: number) => {
+            ctx.lineWidth(1)
+                .beginPath()
+                .moveTo(x - unitSize * 0.75, y - unitSize * 4)
+                .lineTo(x - unitSize * 0.75, y + unitSize * 1.1)
+                .bezierCurveTo(
                     x + unitSize * 0.75, y - unitSize * 0,
                     x + unitSize * 0.75, y - unitSize * 2.2,
-                    x - unitSize * 0.75, y - unitSize * 0.5);
-                ctx.stroke();
-            }
+                    x - unitSize * 0.75, y - unitSize * 0.5)
+                .stroke();
         }
 
         if (accidental === -2) {
@@ -89,51 +81,51 @@ export class ObjAccidental extends MusicObject {
         }
         if (accidental === 0) {
             // neutral
-            ctx.beginPath();
-            ctx.lineWidth = lineWidth;
-            ctx.moveTo(x - unitSize * 0.5, y - unitSize * 2.2);
-            ctx.lineTo(x - unitSize * 0.5, y + unitSize * 1);
-            ctx.moveTo(x + unitSize * 0.5, y + unitSize * 2.2);
-            ctx.lineTo(x + unitSize * 0.5, y - unitSize * 1);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.lineWidth = lineWidth * 2;
-            ctx.moveTo(x - unitSize * 0.5, y + unitSize * 1);
-            ctx.lineTo(x + unitSize * 0.5, y + unitSize * 0.6);
-            ctx.moveTo(x + unitSize * 0.5, y - unitSize * 1);
-            ctx.lineTo(x - unitSize * 0.5, y - unitSize * 0.6);
-            ctx.stroke();
+            ctx.beginPath()
+                .lineWidth(1)
+                .moveTo(x - unitSize * 0.5, y - unitSize * 2.2)
+                .lineTo(x - unitSize * 0.5, y + unitSize * 1)
+                .moveTo(x + unitSize * 0.5, y + unitSize * 2.2)
+                .lineTo(x + unitSize * 0.5, y - unitSize * 1)
+                .stroke()
+                .beginPath()
+                .lineWidth(2)
+                .moveTo(x - unitSize * 0.5, y + unitSize * 1)
+                .lineTo(x + unitSize * 0.5, y + unitSize * 0.6)
+                .moveTo(x + unitSize * 0.5, y - unitSize * 1)
+                .lineTo(x - unitSize * 0.5, y - unitSize * 0.6)
+                .stroke();
         }
         else if (accidental === 1) {
             // #
-            ctx.lineWidth = lineWidth;
-            ctx.beginPath();
-            ctx.moveTo(x - unitSize * 0.3, y - unitSize * 1.6);
-            ctx.lineTo(x - unitSize * 0.3, y + unitSize * 2);
-            ctx.moveTo(x + unitSize * 0.3, y - unitSize * 2);
-            ctx.lineTo(x + unitSize * 0.3, y + unitSize * 1.6);
-            ctx.stroke();
-            ctx.lineWidth = lineWidth * 2;
-            ctx.beginPath();
-            ctx.moveTo(x - unitSize * 0.75, y - unitSize * 0.5);
-            ctx.lineTo(x + unitSize * 0.75, y - unitSize * 0.9);
-            ctx.moveTo(x - unitSize * 0.75, y + unitSize * 0.9);
-            ctx.lineTo(x + unitSize * 0.75, y + unitSize * 0.5);
-            ctx.stroke();
+            ctx.lineWidth(1)
+                .beginPath()
+                .moveTo(x - unitSize * 0.3, y - unitSize * 1.6)
+                .lineTo(x - unitSize * 0.3, y + unitSize * 2)
+                .moveTo(x + unitSize * 0.3, y - unitSize * 2)
+                .lineTo(x + unitSize * 0.3, y + unitSize * 1.6)
+                .stroke()
+                .lineWidth(2)
+                .beginPath()
+                .moveTo(x - unitSize * 0.75, y - unitSize * 0.5)
+                .lineTo(x + unitSize * 0.75, y - unitSize * 0.9)
+                .moveTo(x - unitSize * 0.75, y + unitSize * 0.9)
+                .lineTo(x + unitSize * 0.75, y + unitSize * 0.5)
+                .stroke();
         }
         else if (accidental === 2) {
             // x
-            ctx.lineWidth = lineWidth;
-            ctx.beginPath();
-            ctx.moveTo(x - unitSize * 0.75, y - unitSize * 0.75);
-            ctx.lineTo(x + unitSize * 0.75, y + unitSize * 0.75);
-            ctx.moveTo(x - unitSize * 0.75, y + unitSize * 0.75);
-            ctx.lineTo(x + unitSize * 0.75, y - unitSize * 0.75);
-            ctx.stroke();
-            ctx.fillRect(x - unitSize * 1, y - unitSize * 1, unitSize * 0.7, unitSize * 0.7);
-            ctx.fillRect(x + unitSize * 0.3, y - unitSize * 1, unitSize * 0.7, unitSize * 0.7);
-            ctx.fillRect(x - unitSize * 1, y + unitSize * 0.3, unitSize * 0.7, unitSize * 0.7);
-            ctx.fillRect(x + unitSize * 0.3, y + unitSize * 0.3, unitSize * 0.7, unitSize * 0.7);
+            ctx.lineWidth(1)
+                .beginPath()
+                .moveTo(x - unitSize * 0.75, y - unitSize * 0.75)
+                .lineTo(x + unitSize * 0.75, y + unitSize * 0.75)
+                .moveTo(x - unitSize * 0.75, y + unitSize * 0.75)
+                .lineTo(x + unitSize * 0.75, y - unitSize * 0.75)
+                .stroke()
+                .fillRect(x - unitSize * 1, y - unitSize * 1, unitSize * 0.7, unitSize * 0.7)
+                .fillRect(x + unitSize * 0.3, y - unitSize * 1, unitSize * 0.7, unitSize * 0.7)
+                .fillRect(x - unitSize * 1, y + unitSize * 0.3, unitSize * 0.7, unitSize * 0.7)
+                .fillRect(x + unitSize * 0.3, y + unitSize * 0.3, unitSize * 0.7, unitSize * 0.7);
         }
     }
 }

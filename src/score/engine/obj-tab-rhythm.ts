@@ -1,5 +1,5 @@
 import { DivRect, getVoiceIds, MTabRhythm, VoiceId } from "../pub";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
 import { ObjTab } from "./obj-staff-and-tab";
@@ -33,7 +33,7 @@ export class ObjTabRhythm extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         let columns = this.measure.getColumns();
 
         let numColsInVoiceId: number[] = getVoiceIds().map(voiceId => Utils.Math.sum(columns.map(col => col.getVoiceSymbol(voiceId) ? 1 : 0)));
@@ -47,8 +47,8 @@ export class ObjTabRhythm extends MusicObject {
         return this.measure.getBeamGroups().some(beamGroup => beamGroup.isTuplet());
     }
 
-    layoutFitToMeasure(renderer: Renderer) {
-        let { unitSize, fontSize } = renderer;
+    layoutFitToMeasure(ctx: RenderContext) {
+        let { unitSize, fontSize } = ctx;
         let { measure } = this;
         let { left, right } = measure.getColumnsContentRect();
         let stemHeight = unitSize * 5;
@@ -68,16 +68,12 @@ export class ObjTabRhythm extends MusicObject {
     // Keep non-static
     private readonly tupletPartsTextObjMap = new Map<string, ObjText>();
 
-    draw(renderer: Renderer) {
-        const ctx = renderer.getCanvasContext();
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.rect);
 
-        if (!ctx) {
-            return;
-        }
+        ctx.color("black").lineWidth(1)
 
-        renderer.drawDebugRect(this.rect);
-
-        let { unitSize, lineWidth, fontSize } = renderer;
+        let { unitSize, fontSize } = ctx;
 
         let flagSize = unitSize;
         let dotSpace = unitSize;
@@ -107,18 +103,20 @@ export class ObjTabRhythm extends MusicObject {
                 let colX = sym.col.getRect().centerX;
                 if (sym instanceof ObjNoteGroup) {
                     if (sym.rhythmProps.noteSize >= 2) {
-                        let stemThickness = sym.rhythmProps.noteSize === 4 ? lineWidth * 2 : lineWidth;
-                        renderer.drawLine(colX, stemBottom, colX, stemTop, "black", stemThickness);
+                        ctx.lineWidth(sym.rhythmProps.noteSize === 4 ? 2 : 1);
+                        ctx.strokeLine(colX, stemBottom, colX, stemTop)
                     }
+
+                    ctx.lineWidth(1);
 
                     if (symbols.length === 1) {
                         for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
-                            renderer.drawFlag(new DivRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), "up");
+                            ctx.drawFlag(new DivRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), "up");
                         }
                     }
 
                     for (let i = 0; i < sym.rhythmProps.dotCount; i++) {
-                        renderer.fillCircle(colX + dotSpace * (i + 1), stemBottom - dotWidth, dotWidth);
+                        ctx.fillCircle(colX + dotSpace * (i + 1), stemBottom - dotWidth, dotWidth);
                     }
                 }
                 else if (sym instanceof ObjRest) {
@@ -127,12 +125,12 @@ export class ObjTabRhythm extends MusicObject {
                     let scale = 0.65;
                     ctx.save();
                     ctx.scale(scale, scale);
-                    renderer.drawRest(sym.rhythmProps.noteSize, cx / scale, cy / scale, "black");
+                    ctx.drawRest(sym.rhythmProps.noteSize, cx / scale, cy / scale);
                     ctx.restore();
 
                     for (let i = 0; i < sym.rhythmProps.dotCount; i++) {
                         cx += dotSpace * 1.5;
-                        renderer.fillCircle(cx, cy + dotSpace, dotWidth);
+                        ctx.fillCircle(cx, cy + dotSpace, dotWidth);
                     }
                 }
 
@@ -144,18 +142,23 @@ export class ObjTabRhythm extends MusicObject {
                     let leftBeamCount = left.hasTuplet() ? 1 : left instanceof ObjNoteGroup ? left.getRightBeamCount() : 1;
                     let rightBeamCount = right.hasTuplet() ? 1 : right instanceof ObjNoteGroup ? right.getLeftBeamCount() : 1;
                     let maxBeamCount = Math.max(leftBeamCount, rightBeamCount);
+
+                    ctx.lineWidth(2);
+
                     for (let i = 0; i < maxBeamCount; i++) {
                         let leftT = rightBeamCount > leftBeamCount && i >= leftBeamCount ? 0.75 : 0;
                         let rightT = leftBeamCount > rightBeamCount && i >= rightBeamCount ? 0.25 : 1;
-                        renderer.drawPartialLine(leftX, stemTop + i * flagSize, rightX, stemTop + i * flagSize, leftT, rightT, "black", lineWidth * 2);
+                        ctx.strokePartialLine(leftX, stemTop + i * flagSize, rightX, stemTop + i * flagSize, leftT, rightT);
                     }
 
+                    ctx.lineWidth(1);
+
                     for (let i = 0; i < left.rhythmProps.dotCount; i++) {
-                        renderer.fillCircle(leftX + dotSpace * (i + 1), stemBottom - dotWidth, dotWidth);
+                        ctx.fillCircle(leftX + dotSpace * (i + 1), stemBottom - dotWidth, dotWidth);
                     }
 
                     for (let i = 0; i < right.rhythmProps.dotCount; i++) {
-                        renderer.fillCircle(rightX + dotSpace * (i + 1), stemBottom - dotWidth, dotWidth);
+                        ctx.fillCircle(rightX + dotSpace * (i + 1), stemBottom - dotWidth, dotWidth);
                     }
                 }
 
@@ -166,11 +169,11 @@ export class ObjTabRhythm extends MusicObject {
                     let textObj = this.tupletPartsTextObjMap.get(text);
                     if (!textObj) {
                         this.tupletPartsTextObjMap.set(text, textObj = new ObjText(this, { text, scale: 0.75 }, 0.5, 0.5));
-                        textObj.layout(renderer);
+                        textObj.layout(ctx);
                     }
                     textObj.offset(-textObj.getRect().centerX, -textObj.getRect().centerY);
                     textObj.offset(cx, stemTop - fontSize / 2);
-                    textObj.draw(renderer);
+                    textObj.draw(ctx);
                 }
 
                 if (symbols.length > 1) {

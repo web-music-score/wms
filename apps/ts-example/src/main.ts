@@ -7,7 +7,7 @@ import { createFrereJacques } from "@tspro/web-music-score/pieces";
 
 let doc = createFrereJacques();
 
-new Score.MRenderer().
+new Score.MRenderContext().
     setCanvas("scoreCanvas").
     setDocument(doc).
     draw();

@@ -1,7 +1,7 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
@@ -498,8 +498,8 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
-    getStemHeight(renderer: Renderer) {
-        let { unitSize } = renderer;
+    getStemHeight(ctx: RenderContext) {
+        let { unitSize } = ctx;
         let { flagCount, hasStem } = this.rhythmProps;
 
         if (hasStem) {
@@ -588,10 +588,10 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
-    layout(renderer: Renderer, accState: AccidentalState) {
+    layout(ctx: RenderContext, accState: AccidentalState) {
         this.requestRectUpdate();
 
-        let { unitSize } = renderer;
+        let { unitSize } = ctx;
         let { row, stemDir } = this;
         let { dotCount, flagCount, hasStem } = this.rhythmProps;
 
@@ -634,7 +634,7 @@ export class ObjNoteGroup extends MusicObject {
                 if (accState.needAccidental(note)) {
                     let acc = obj.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
                     if (acc) {
-                        acc.layout(renderer);
+                        acc.layout(ctx);
                         acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
                     }
                     noteStaff.addObject(acc);
@@ -673,7 +673,7 @@ export class ObjNoteGroup extends MusicObject {
             let bottomNoteY = obj.noteHeadRects[0].centerY;
             let topNoteY = obj.noteHeadRects[obj.noteHeadRects.length - 1].centerY;
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
-            let stemHeight = this.getStemHeight(renderer);
+            let stemHeight = this.getStemHeight(ctx);
             let stemTipY = stemDir === Stem.Up ? topNoteY - stemHeight : bottomNoteY + stemHeight;
             let stemBaseY = stemDir === Stem.Up ? bottomNoteY : topNoteY;
 
@@ -720,7 +720,7 @@ export class ObjNoteGroup extends MusicObject {
                     let color = fretId < 0 ? "red" : "black";
 
                     let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
-                    fretNumber.layout(renderer);
+                    fretNumber.layout(ctx);
 
                     let x = this.col.getRect().centerX;
                     let y = tab.getStringY(stringNumber - 1);
@@ -769,25 +769,18 @@ export class ObjNoteGroup extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(renderer: Renderer) {
-        const ctx = renderer.getCanvasContext();
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.getRect());
 
-        if (!ctx) {
-            return;
-        }
-
-        renderer.drawDebugRect(this.getRect());
-
-        let { lineWidth } = renderer;
-        let { color, stemDir } = this;
+        let { stemDir } = this;
         let { isSolidNoteHead } = this.rhythmProps;
 
         this.staffObjects.forEach(obj => {
             // Draw accidentals
-            obj.accidentals.forEach(d => d.draw(renderer));
+            obj.accidentals.forEach(d => d.draw(ctx));
 
-            ctx.strokeStyle = ctx.fillStyle = color;
-            ctx.lineWidth = lineWidth;
+            ctx.color(this.color);
+            ctx.lineWidth(1);
 
             // Draw note heads
             obj.noteHeadRects.forEach(r => {
@@ -803,7 +796,7 @@ export class ObjNoteGroup extends MusicObject {
                     }
                     else {
                         ctx.beginPath();
-                        ctx.lineWidth = lineWidth * 2.5;
+                        ctx.lineWidth(2.5);
                         ctx.moveTo(r.centerX, r.top);
                         ctx.lineTo(r.right, r.centerY);
                         ctx.moveTo(r.left, r.centerY);
@@ -811,7 +804,7 @@ export class ObjNoteGroup extends MusicObject {
                         ctx.stroke();
 
                         ctx.beginPath();
-                        ctx.lineWidth = lineWidth;
+                        ctx.lineWidth(1);
                         ctx.moveTo(r.right, r.centerY);
                         ctx.lineTo(r.centerX, r.bottom);
                         ctx.moveTo(r.centerX, r.top);
@@ -833,7 +826,7 @@ export class ObjNoteGroup extends MusicObject {
             });
 
             // Draw dots
-            obj.dotRects.forEach(r => renderer.fillCircle(r.centerX, r.centerY, r.width / 2));
+            obj.dotRects.forEach(r => ctx.fillCircle(r.centerX, r.centerY, r.width / 2));
 
             // Draw stem
             if (obj.stemTip && obj.stemBase) {
@@ -844,11 +837,11 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             // Draw flags
-            obj.flagRects.forEach(rect => renderer.drawFlag(rect, stemDir === Stem.Up ? "up" : "down"));
+            obj.flagRects.forEach(rect => ctx.drawFlag(rect, stemDir === Stem.Up ? "up" : "down"));
         });
 
         // Draw tab fret numbers
-        this.tabObjects.forEach(obj => obj.fretNumbers.forEach(fn => fn.draw(renderer)));
+        this.tabObjects.forEach(obj => obj.fretNumbers.forEach(fn => fn.draw(ctx)));
     }
 
     getDotVerticalDisplacement(staff: ObjStaff, diatonicId: number, stemDir: Stem) {

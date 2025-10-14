@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
@@ -14,7 +14,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
 
-    private renderer?: Renderer;
+    private ctx?: RenderContext;
 
     private readonly rows: ObjScoreRow[] = [];
     private readonly measures: ObjMeasure[] = [];
@@ -159,21 +159,21 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.push(connectiveProps);
     }
 
-    setRenderer(renderer?: Renderer) {
-        if (this.renderer === renderer) {
+    setRenderContext(ctx?: RenderContext) {
+        if (this.ctx === ctx) {
             return;
         }
 
-        let prevRenderer = this.renderer;
+        let prevCtx = this.ctx;
 
-        this.renderer = renderer;
+        this.ctx = ctx;
 
-        if (prevRenderer) {
-            prevRenderer.setDocument(undefined);
+        if (prevCtx) {
+            prevCtx.setDocument(undefined);
         }
 
-        if (renderer) {
-            renderer.setDocument(this.mi);
+        if (ctx) {
+            ctx.setDocument(this.mi);
         }
 
         this.requestFullLayout();
@@ -285,16 +285,16 @@ export class ObjDocument extends MusicObject {
     }
 
     updateCursorRect(cursorRect?: DivRect) {
-        if (this.renderer) {
-            this.renderer.updateCursorRect(cursorRect);
+        if (this.ctx) {
+            this.ctx.updateCursorRect(cursorRect);
         }
     }
 
-    getInstrumentGroupSize(renderer: Renderer): { nameLeft: number, nameRight: number, braceLeft: number, braceRight: number } {
-        let nameWidth = Math.max(0, ...this.rows.map(row => row.getInstrumentNameWidth(renderer)));
+    getInstrumentGroupSize(ctx: RenderContext): { nameLeft: number, nameRight: number, braceLeft: number, braceRight: number } {
+        let nameWidth = Math.max(0, ...this.rows.map(row => row.getInstrumentNameWidth(ctx)));
         let hasName = nameWidth > 0;
-        let padding = hasName ? renderer.unitSize : 0;
-        let braceWidth = hasName ? renderer.unitSize * 5 : 0;
+        let padding = hasName ? ctx.unitSize : 0;
+        let braceWidth = hasName ? ctx.unitSize * 5 : 0;
         return {
             nameLeft: 0,
             nameRight: nameWidth,
@@ -323,13 +323,13 @@ export class ObjDocument extends MusicObject {
             return;
         }
 
-        const { renderer } = this;
+        const { ctx } = this;
 
-        if (!renderer) {
+        if (!ctx) {
             return;
         }
 
-        let { unitSize } = renderer;
+        let { unitSize } = ctx;
 
         // Recreate beams.
         this.forEachMeasure(m => m.createBeams());
@@ -345,36 +345,36 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.forEach(props => props.createConnectives());
 
         // Reset layout groups
-        this.rows.forEach(row => row.resetLayoutGroups(renderer));
+        this.rows.forEach(row => row.resetLayoutGroups(ctx));
 
         // Layout rows
-        this.rows.forEach(row => row.layout(renderer));
+        this.rows.forEach(row => row.layout(ctx));
 
         // Calculate desired row width
-        let left = this.getInstrumentGroupSize(renderer).braceRight;
+        let left = this.getInstrumentGroupSize(ctx).braceRight;
         let right = Math.max(
             DocumentSettings.DocumentMinWidth * unitSize,
             ...this.rows.map(row => 1.4 * row.getMinWidth())
         );
 
         // Stretch row to desired width
-        this.rows.forEach(row => row.layoutWidth(renderer, left, right));
+        this.rows.forEach(row => row.layoutWidth(ctx, left, right));
 
         // Layout layout groups
-        this.rows.forEach(row => row.layoutLayoutGroups(renderer));
+        this.rows.forEach(row => row.layoutLayoutGroups(ctx));
 
         // Position notation lines
-        this.rows.forEach(row => row.layoutSetNotationLines(renderer));
+        this.rows.forEach(row => row.layoutSetNotationLines(ctx));
 
         // Add padding to rows
-        this.rows.forEach(row => row.layoutPadding(renderer));
+        this.rows.forEach(row => row.layoutPadding(ctx));
 
         // Set document rect and set row positions
         this.rect = new DivRect();
 
         if (this.header) {
             // Layout header with desired width
-            this.header.layoutWidth(renderer, left, right);
+            this.header.layoutWidth(ctx, left, right);
 
             this.rect.expandInPlace(this.header.getRect());
         }
@@ -392,16 +392,16 @@ export class ObjDocument extends MusicObject {
     }
 
     drawContent() {
-        const { renderer } = this;
+        const { ctx } = this;
 
-        if (!renderer) {
+        if (!ctx) {
             return;
         }
 
-        this.rows.forEach(row => row.draw(renderer));
+        this.rows.forEach(row => row.draw(ctx));
 
         if (this.header) {
-            this.header.draw(renderer);
+            this.header.draw(ctx);
         }
     }
 

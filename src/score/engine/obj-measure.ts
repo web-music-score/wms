@@ -3,7 +3,7 @@ import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeyS
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions } from "../pub";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
@@ -1322,7 +1322,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         if (!this.needLayout) {
             return;
         }
@@ -1331,7 +1331,7 @@ export class ObjMeasure extends MusicObject {
 
         this.requestRectUpdate();
 
-        let { unitSize } = renderer;
+        let { unitSize } = ctx;
 
         this.postMeasureBreakWidth = this.hasPostMeasureBreak()
             ? DocumentSettings.PostMeasureBreakWidth * unitSize
@@ -1358,13 +1358,13 @@ export class ObjMeasure extends MusicObject {
 
                 signature.staff.addObject(signature);
 
-                signature.updateClefImage(renderer, showClef);
+                signature.updateClefImage(ctx, showClef);
                 signature.updateMeasureNumber(showMeasureNumber && lineId === 0);
                 signature.updateKeySignature(showKeySignature);
                 signature.updateTimeSignature(showTimeSignature);
                 signature.updateTempo(showTempo && lineId === 0);
 
-                signature.layout(renderer);
+                signature.layout(ctx);
 
                 this.signatures.push(signature);
             }
@@ -1379,7 +1379,7 @@ export class ObjMeasure extends MusicObject {
                 signature.updateTimeSignature(showTimeSignature);
                 signature.updateTempo(showTempo && lineId === 0);
 
-                signature.layout(renderer);
+                signature.layout(ctx);
 
                 this.signatures.push(signature);
             }
@@ -1393,7 +1393,7 @@ export class ObjMeasure extends MusicObject {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
                     let obj = new ObjText(this, { text: note, scale: 0.8 }, 1, 0.5);
 
-                    obj.layout(renderer);
+                    obj.layout(ctx);
                     obj.offset(this.tabStringNotesWidth * 0.8, tab.getStringY(stringId));
 
                     this.tabStringNotes.push(obj);
@@ -1403,22 +1403,22 @@ export class ObjMeasure extends MusicObject {
         }
 
         // Layout measure start object
-        this.barLineLeft.layout(renderer);
+        this.barLineLeft.layout(ctx);
 
         // Layout columns
         const accState = new AccidentalState(this);
-        this.columns.forEach(col => col.layout(renderer, accState));
+        this.columns.forEach(col => col.layout(ctx, accState));
 
         // Layout measure end object
-        this.barLineRight.layout(renderer);
+        this.barLineRight.layout(ctx);
 
         if (this.endRepeatPlayCountText) {
-            this.endRepeatPlayCountText.layout(renderer);
+            this.endRepeatPlayCountText.layout(ctx);
         }
 
-        this.layoutObjects.forEach(layoutObj => layoutObj.layout(renderer));
+        this.layoutObjects.forEach(layoutObj => layoutObj.layout(ctx));
 
-        let padding = renderer.unitSize;
+        let padding = ctx.unitSize;
 
         // Calculated width members
         this.leftSolidAreaWidth =
@@ -1434,7 +1434,7 @@ export class ObjMeasure extends MusicObject {
         this.minColumnsAreaWidth = Math.max(this.minColumnsAreaWidth, ObjMeasure.MinFlexContentWidth * unitSize);
     }
 
-    layoutWidth(renderer: Renderer, width: number) {
+    layoutWidth(ctx: RenderContext, width: number) {
         if (!this.needLayout) {
             return;
         }
@@ -1482,28 +1482,28 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    layoutConnectives(renderer: Renderer) {
+    layoutConnectives(ctx: RenderContext) {
         if (!this.needLayout) {
             return;
         }
 
         // Layout connectives
         this.connectives.forEach(connective => {
-            connective.layout(renderer);
+            connective.layout(ctx);
 
             this.rect.top = Math.min(this.rect.top, connective.getRect().top);
             this.rect.bottom = Math.max(this.rect.bottom, connective.getRect().bottom);
         });
     }
 
-    layoutBeams(renderer: Renderer) {
+    layoutBeams(ctx: RenderContext) {
         if (!this.needLayout) {
             return;
         }
 
         // Layout Beams
         this.beamGroups.forEach(beamGroup => {
-            beamGroup.layout(renderer);
+            beamGroup.layout(ctx);
 
             this.rect.top = Math.min(this.rect.top, beamGroup.getRect().top);
             this.rect.bottom = Math.max(this.rect.bottom, beamGroup.getRect().bottom);
@@ -1584,14 +1584,16 @@ export class ObjMeasure extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(renderer: Renderer) {
-        renderer.drawDebugRect(this.getRect());
+    draw(ctx: RenderContext) {
+        ctx.drawDebugRect(this.getRect());
 
         // Draw staff lines
         let left = this.getStaffLineLeft();
         let right = this.getStaffLineRight();
 
-        const drawLine = (y: number) => renderer.drawLine(left, y, right, y);
+        ctx.color("black").lineWidth(1);
+
+        const drawLine = (y: number) => ctx.strokeLine(left, y, right, y);
 
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
@@ -1606,24 +1608,24 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
-        this.signatures.forEach(signature => signature.draw(renderer));
+        this.signatures.forEach(signature => signature.draw(ctx));
 
-        this.tabStringNotes.forEach(obj => obj.draw(renderer));
+        this.tabStringNotes.forEach(obj => obj.draw(ctx));
 
-        this.barLineLeft.draw(renderer);
+        this.barLineLeft.draw(ctx);
 
-        this.columns.forEach(col => col.draw(renderer));
+        this.columns.forEach(col => col.draw(ctx));
 
-        this.barLineRight.draw(renderer);
+        this.barLineRight.draw(ctx);
 
         if (this.endRepeatPlayCountText) {
-            this.endRepeatPlayCountText.draw(renderer);
+            this.endRepeatPlayCountText.draw(ctx);
         }
 
-        this.connectives.forEach(connective => connective.draw(renderer));
+        this.connectives.forEach(connective => connective.draw(ctx));
 
-        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(renderer));
+        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(ctx));
 
-        this.beamGroups.forEach(beam => beam.draw(renderer));
+        this.beamGroups.forEach(beam => beam.draw(ctx));
     }
 }

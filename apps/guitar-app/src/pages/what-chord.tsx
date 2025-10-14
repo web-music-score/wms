@@ -114,7 +114,7 @@ export class WhatChord extends React.Component<WhatChordProps, WhatChordState> {
 
             let obj = event.findObject(obj => obj instanceof Score.MNoteGroup);
 
-            event.renderer.hilightObject(obj);
+            event.renderContext.hilightObject(obj);
 
             if (event.type === "click") {
                 if (obj instanceof Score.MNoteGroup && obj.getNotes().length === 1) {

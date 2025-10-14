@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
@@ -101,12 +101,12 @@ export class LayoutObjectWrapper {
         return this.positionResolved;
     }
 
-    resolveClosestToStaffY(renderer: Renderer): number {
+    resolveClosestToStaffY(ctx: RenderContext): number {
         let { musicObj, measure, verticalPos, line } = this;
 
         let lineTop = line.getTopLineY();
         let lineBottom = line.getBottomLineY();
-        let linePadding = renderer.unitSize * 2;
+        let linePadding = ctx.unitSize * 2;
 
         let y = verticalPos === VerticalPos.Below
             ? lineBottom + linePadding + musicObj.getRect().toph
@@ -141,7 +141,7 @@ export class LayoutObjectWrapper {
         }
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         this.line.addObject(this);
     }
 
@@ -185,11 +185,11 @@ export class LayoutGroup {
         });
     }
 
-    clearPositionAndLayout(renderer: Renderer) {
+    clearPositionAndLayout(ctx: RenderContext) {
         this.layoutObjectTable.forEach(layoutObjects => {
             layoutObjects.forEach(layoutObj => {
                 layoutObj.clearPositionResolved();
-                layoutObj.musicObj.layout(renderer);
+                layoutObj.musicObj.layout(ctx);
             });
         });
     }

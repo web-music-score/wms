@@ -1,6 +1,6 @@
 import { Arpeggio, DivRect, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 
@@ -28,8 +28,8 @@ export class ObjArpeggio extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
-        let { unitSize } = renderer;
+    layout(ctx: RenderContext) {
+        let { unitSize } = ctx;
 
         this.topArrowHeight = this.arpeggioDir === Arpeggio.Up ? unitSize : 0;
         this.bottomArrowHeight = this.arpeggioDir === Arpeggio.Down ? unitSize : 0;
@@ -50,22 +50,15 @@ export class ObjArpeggio extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
-        let { lineWidth } = renderer;
+    draw(ctx: RenderContext) {
         let { rect, topArrowHeight, bottomArrowHeight } = this;
 
-        renderer.drawDebugRect(this.rect);
+        ctx.drawDebugRect(this.rect);
 
-        ctx.strokeStyle = ctx.fillStyle = this.color;
-        ctx.lineWidth = lineWidth * 2;
-
+        ctx.color(this.color);
+        ctx.lineWidth(2);
         ctx.beginPath();
+
         for (let i = 0, y = rect.top + topArrowHeight; i < this.numCycles; i++, y += this.cycleHeight) {
             ctx.moveTo(rect.centerX, y);
             ctx.quadraticCurveTo(rect.left, y + this.cycleHeight / 4, rect.centerX, y + this.cycleHeight / 2);

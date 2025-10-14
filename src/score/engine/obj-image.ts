@@ -1,4 +1,4 @@
-import { Renderer } from "./renderer";
+import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { DivRect, MImage } from "../pub";
 
@@ -18,9 +18,9 @@ export class ObjImage extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(renderer: Renderer) {
+    layout(ctx: RenderContext) {
         let { anchorX, anchorY, image, imageScale } = this;
-        let { unitSize } = renderer;
+        let { unitSize } = ctx;
 
         try {
             let w = image.naturalWidth * imageScale * unitSize;
@@ -38,22 +38,9 @@ export class ObjImage extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(renderer: Renderer) {
-        let ctx = renderer.getCanvasContext();
-
-        if (!ctx) {
-            return;
-        }
-
+    draw(ctx: RenderContext) {
         let r = this.rect;
-
-        renderer.drawDebugRect(r);
-
-        try {
-            ctx.drawImage(this.image, r.centerX - r.leftw, r.centerY - r.toph, r.width, r.height);
-        }
-        catch (err) {
-            // Image was not read?
-        }
+        ctx.drawDebugRect(r);
+        ctx.drawImage(this.image, r.centerX - r.leftw, r.centerY - r.toph, r.width, r.height);
     }
 }

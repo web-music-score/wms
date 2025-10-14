@@ -26,6 +26,7 @@ export const DocumentSettings = {
 
     BeamSeparation: 1.25,
     BeamAngleFactor: 0.5,
+    BeamThickness: 4,
 
     RestDotSpace: 0.5,
 

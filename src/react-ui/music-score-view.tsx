@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MDocument, MRenderer, ScoreEventListener } from "@tspro/web-music-score/score";
+import { MDocument, MRenderContext, ScoreEventListener } from "@tspro/web-music-score/score";
 
 export interface MusicScoreViewProps {
     doc: MDocument;
@@ -28,32 +28,32 @@ export interface MusicScoreViewProps {
  */
 export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
 
-    renderer: MRenderer;
+    private readonly ctx: MRenderContext;
 
     constructor(props: MusicScoreViewProps) {
         super(props);
 
-        this.renderer = new MRenderer();
+        this.ctx = new MRenderContext();
 
-        this.renderer.setDocument(props.doc);
+        this.ctx.setDocument(props.doc);
 
         if (props.onScoreEvent) {
-            this.renderer.setScoreEventListener(props.onScoreEvent);
+            this.ctx.setScoreEventListener(props.onScoreEvent);
         }
     }
 
     componentDidUpdate(prevProps: Readonly<MusicScoreViewProps>, prevState: Readonly<{}>): void {
         if (prevProps.doc !== this.props.doc) {
-            this.renderer.setDocument(this.props.doc);
-            this.renderer.draw();
+            this.ctx.setDocument(this.props.doc);
+            this.ctx.draw();
         }
     }
 
     render() {
         const setCanvas = (canvas: HTMLCanvasElement | null) => {
             if (canvas) {
-                this.renderer.setCanvas(canvas);
-                this.renderer.draw();
+                this.ctx.setCanvas(canvas);
+                this.ctx.draw();
             }
         }
 

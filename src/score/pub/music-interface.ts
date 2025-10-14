@@ -2,7 +2,7 @@ import * as Audio from "@tspro/web-music-score/audio";
 import { Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "./div-rect";
 import { Player } from "../engine/player";
-import { Renderer } from "../engine/renderer";
+import { RenderContext } from "../engine/render-context";
 import { PlayStateChangeListener } from "./types";
 import { ScoreEventListener } from "./event";
 import { PlayState } from "./types";
@@ -92,40 +92,40 @@ export class MPlayer {
     }
 }
 
-/** Renderer class. */
-export class MRenderer {
-    private readonly renderer: Renderer;
+/** Render context class. */
+export class MRenderContext {
+    private readonly ctx: RenderContext;
 
     /**
-     * Create new renderer instance.
+     * Create new render context instance.
      */
     constructor() {
-        this.renderer = new Renderer(this);
+        this.ctx = new RenderContext(this);
     }
 
     /**
-     * Attach music document to this renderer.
+     * Attach music document to this render context.
      * @param doc - Music document.
-     * @returns - This renderer instance.
+     * @returns - This render context instance.
      */
-    setDocument(doc?: MDocument): MRenderer {
+    setDocument(doc?: MDocument): MRenderContext {
         assertArg(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
 
-        this.renderer.setDocument(doc);
+        this.ctx.setDocument(doc);
         return this;
     }
 
     /**
-     * Set target canvas html element for this renderer.
+     * Set target canvas html element for this render context.
      * @param canvas - HTML canvas element or element id.
-     * @returns - This renderer instance.
+     * @returns - This render context instance.
      */
-    setCanvas(canvas: HTMLCanvasElement | string): MRenderer {
+    setCanvas(canvas: HTMLCanvasElement | string): MRenderContext {
 
         canvas = require_t(Utils.Dom.getCanvas(canvas), typeof canvas === "string"
-            ? "Cannot set renderer canvas because invalid canvas id: " + canvas
-            : "Cannot set renderer canvas because given canvas is undefined.");
-        this.renderer.setCanvas(canvas);
+            ? "Cannot set render canvas because invalid canvas id: " + canvas
+            : "Cannot set render canvas because given canvas is undefined.");
+        this.ctx.setCanvas(canvas);
         return this;
     }
 
@@ -135,7 +135,7 @@ export class MRenderer {
      */
     setScoreEventListener(scoreEventListener: ScoreEventListener) {
         assertArg(Utils.Is.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
-        this.renderer.setScoreEventListener(scoreEventListener);
+        this.ctx.setScoreEventListener(scoreEventListener);
     }
 
     /**
@@ -143,7 +143,7 @@ export class MRenderer {
      * @param obj - Music object or undefined to remove hilighting.
      */
     hilightObject(obj?: MusicInterface) {
-        this.renderer.hilightObject(obj?.getMusicObject());
+        this.ctx.hilightObject(obj?.getMusicObject());
     }
 
     /**
@@ -151,7 +151,7 @@ export class MRenderer {
      * @param staffPos - Staff position (score row and diatonic id) or undefined to remove hilighting.
      */
     hilightStaffPos(staffPos?: { scoreRow: MScoreRow, diatonicId: number }) {
-        this.renderer.hilightStaffPos(staffPos ? {
+        this.ctx.hilightStaffPos(staffPos ? {
             scoreRow: staffPos.scoreRow.getMusicObject(),
             diatonicId: staffPos.diatonicId
         } : undefined);
@@ -162,14 +162,19 @@ export class MRenderer {
      */
     draw() {
         try {
-            this.renderer.draw();
+            this.ctx.draw();
         }
-        catch (e) {
-            console.log("Draw failed in music renderer.");
-            console.log(e);
+        catch (err) {
+            console.log("Draw failed in music render context!", err);
         }
     }
 }
+
+/**
+ * Renderer class.
+ * @deprecated - Use MRenderContext instead.
+ * */
+export class MRenderer extends MRenderContext { }
 
 /** Playback buttons helper class. */
 export class MPlaybackButtons {
