@@ -231,7 +231,7 @@ export class ObjStaffSignature extends MusicObject {
 
         if (this.measureNumber) {
             this.measureNumber.layout(ctx);
-            let y = this.clefImage ? this.clefImage.getRect().top : staff.getTopLineY();
+            let y = Math.min(staff.getTopLineY(), this.clefImage ? this.clefImage.getRect().top : staff.getTopLineY());
             this.measureNumber.offset(0, y);
             this.rect.expandInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
