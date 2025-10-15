@@ -3,7 +3,7 @@
     "version": "5.2.0",
     "private": true,
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.11.0",
+        "@tspro/ts-utils-lib": "^1.12.0",
         "@tspro/web-music-score": "^5.2.0",
         "bootstrap": "^5.3.7",
         "core-js": "^3.43.0",
