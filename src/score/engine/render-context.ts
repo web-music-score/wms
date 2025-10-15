@@ -5,12 +5,12 @@ import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import TrebleClefPng from "./assets/treble-clef.png";
-import BassClefPng from "./assets/bass-clef.png";
+import F_clef_png from "./assets/F-clef.png";
+import G_clef_png from "./assets/G-clef.png";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "theory/rhythm";
 
-export enum ImageAsset { TrebleClefPng, BassClefPng }
+export enum ImageAsset { G_Clef, F_Clef }
 
 const HilightStaffPosRectColor = "#55cc55";
 const HilightObjectRectColor = "#55cc55";
@@ -23,8 +23,8 @@ type ImageAssetData = {
 }
 
 const ImageAssets = new Map<ImageAsset, ImageAssetData>([
-    [ImageAsset.TrebleClefPng, { src: TrebleClefPng }],
-    [ImageAsset.BassClefPng, { src: BassClefPng }]
+    [ImageAsset.G_Clef, { src: F_clef_png }],
+    [ImageAsset.F_Clef, { src: G_clef_png }]
 ]);
 
 type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }

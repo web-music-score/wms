@@ -168,12 +168,12 @@ export class ObjStaff extends ObjNotationLine {
         const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
 
         if (staffConfig.clef === Clef.G) {
-            this.clefImageAsset = ImageAsset.TrebleClefPng;
+            this.clefImageAsset = ImageAsset.G_Clef;
             this.clefLineDiatonicId = getDiatonicId("G4", staffConfig.isOctaveDown === true);
             this.middleLineDiatonicId = this.clefLineDiatonicId + 2;
         }
         else if (staffConfig.clef === Clef.F) {
-            this.clefImageAsset = ImageAsset.BassClefPng;
+            this.clefImageAsset = ImageAsset.F_Clef;
             this.clefLineDiatonicId = getDiatonicId("F3", staffConfig.isOctaveDown === true);
             this.middleLineDiatonicId = this.clefLineDiatonicId - 2;
         }
