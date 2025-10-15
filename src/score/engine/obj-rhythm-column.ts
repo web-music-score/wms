@@ -13,6 +13,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { LyricsContainer } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
+import { Map3 } from "@tspro/ts-utils-lib";
 
 type NoteHeadDisplacementData = {
     noteGroup: ObjNoteGroup,
@@ -46,7 +47,7 @@ export type RhythmSymbol = ObjNoteGroup | ObjRest;
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
 
-    private readonly lyricsContainerCache = new Map<ObjNotationLine, Map<VerticalPos, Map<VerseNumber, LyricsContainer>>>();
+    private readonly lyricsContainerCache = new Map3<VerseNumber, ObjNotationLine, VerticalPos, LyricsContainer>();
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
@@ -227,22 +228,10 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getLyricsContainer(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos, lyricsLength?: NoteLength): LyricsContainer | undefined {
-        let vposMap = this.lyricsContainerCache.get(line);
+        let lyricsContainer = this.lyricsContainerCache.get(verse, line, vpos);
 
-        if (vposMap === undefined) {
-            this.lyricsContainerCache.set(line, vposMap = new Map());
-        }
-
-        let verseMap = vposMap.get(vpos);
-
-        if (verseMap === undefined) {
-            vposMap.set(vpos, verseMap = new Map());
-        }
-
-        let lyricsContainer = verseMap.get(verse);
-
-        if (lyricsContainer === undefined && lyricsLength !== undefined) {
-            verseMap.set(verse, lyricsContainer = new LyricsContainer(this, validateNoteLength(lyricsLength)));
+        if (!lyricsContainer && lyricsLength !== undefined) {
+            this.lyricsContainerCache.set(verse, line, vpos, lyricsContainer = new LyricsContainer(this, validateNoteLength(lyricsLength)));
         }
 
         return lyricsContainer;

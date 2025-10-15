@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Map3, Utils } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps, getTempoString } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -125,10 +125,6 @@ export class ObjMeasure extends MusicObject {
     private minColumnsAreaWidth = 0;
     private rightSolidAreaWidth = 0;
 
-    private useDiatonicId: (number | undefined)[/* voiceId */] = [];
-    private useStemDir: (Stem | undefined)[/* voiceId */] = [];
-    private useString: (StringNumber[] | undefined)[/* voiceId */] = [];
-
     private voiceSymbols: RhythmSymbol[/* voiceId */][] = [];
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
@@ -150,7 +146,7 @@ export class ObjMeasure extends MusicObject {
     private endRepeatPlayCountText?: ObjText;
 
     private staticObjectsCache = new Map<ObjNotationLine, MusicObject[]>();
-    private lyricsObjectsCache = new Map<ObjNotationLine, Map<VerticalPos, Map<VerseNumber, ObjLyrics[]>>>();
+    private lyricsObjectsCache = new Map3<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>();
 
     readonly mi: MMeasure;
 
@@ -1026,25 +1022,13 @@ export class ObjMeasure extends MusicObject {
     }
 
     private getLyricsObjects(line: ObjNotationLine, vpos: VerticalPos, verse: VerseNumber): ObjLyrics[] {
-        let vposMap = this.lyricsObjectsCache.get(line);
+        let lyricsObjs = this.lyricsObjectsCache.get(line, vpos, verse);
 
-        if (vposMap === undefined) {
-            this.lyricsObjectsCache.set(line, vposMap = new Map());
+        if (!lyricsObjs) {
+            this.lyricsObjectsCache.set(line, vpos, verse, lyricsObjs = []);
         }
 
-        let verseMap = vposMap.get(vpos);
-
-        if (verseMap === undefined) {
-            vposMap.set(vpos, verseMap = new Map());
-        }
-
-        let lyricsArr = verseMap.get(verse);
-
-        if (lyricsArr === undefined) {
-            verseMap.set(verse, lyricsArr = []);
-        }
-
-        return lyricsArr;
+        return lyricsObjs;
     }
 
     getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
