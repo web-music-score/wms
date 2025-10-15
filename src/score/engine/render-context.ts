@@ -23,8 +23,8 @@ type ImageAssetData = {
 }
 
 const ImageAssets = new Map<ImageAsset, ImageAssetData>([
-    [ImageAsset.G_Clef, { src: F_clef_png }],
-    [ImageAsset.F_Clef, { src: G_clef_png }]
+    [ImageAsset.G_Clef, { src: G_clef_png }],
+    [ImageAsset.F_Clef, { src: F_clef_png }]
 ]);
 
 type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
