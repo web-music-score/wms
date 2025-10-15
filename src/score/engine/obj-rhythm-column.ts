@@ -1,4 +1,4 @@
-import { Note, NoteLength, validateNoteLength } from "@tspro/web-music-score/theory";
+import { Note } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId } from "../pub";
 import { RenderContext } from "./render-context";
@@ -11,7 +11,7 @@ import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
-import { LyricsContainer } from "./obj-lyrics";
+import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
 import { Map3 } from "@tspro/ts-utils-lib";
 
@@ -47,7 +47,7 @@ export type RhythmSymbol = ObjNoteGroup | ObjRest;
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
 
-    private readonly lyricsContainerCache = new Map3<VerseNumber, ObjNotationLine, VerticalPos, LyricsContainer>();
+    private readonly lyricsObject = new Map3<VerseNumber, ObjNotationLine, VerticalPos, ObjLyrics>();
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
@@ -227,14 +227,12 @@ export class ObjRhythmColumn extends MusicObject {
         return this.voiceSymbol[voiceId];
     }
 
-    getLyricsContainer(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos, lyricsLength?: NoteLength): LyricsContainer | undefined {
-        let lyricsContainer = this.lyricsContainerCache.get(verse, line, vpos);
+    getLyricsObject(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos): ObjLyrics | undefined {
+        return this.lyricsObject.get(verse, line, vpos);
+    }
 
-        if (!lyricsContainer && lyricsLength !== undefined) {
-            this.lyricsContainerCache.set(verse, line, vpos, lyricsContainer = new LyricsContainer(this, validateNoteLength(lyricsLength)));
-        }
-
-        return lyricsContainer;
+    addLyricsObject(lyricsObj: ObjLyrics) {
+        this.lyricsObject.set(lyricsObj.verse, lyricsObj.line, lyricsObj.vpos, lyricsObj);
     }
 
     getMinWidth() {

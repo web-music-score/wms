@@ -1,5 +1,5 @@
 import { Map3, Utils } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps, getTempoString } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions } from "../pub";
@@ -904,19 +904,18 @@ export class ObjMeasure extends MusicObject {
     addLyrics(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string, lyricsOptions: LyricsOptions) {
         this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
             let col = this.getRhythmColumn({ verse, line, vpos });
-            let lyricsContainer = col.getLyricsContainer(verse, line, vpos, validateNoteLength(lyricsLength));
 
-            if (lyricsContainer) {
-                let lyricsObj = new ObjLyrics(col, verse, line, vpos, lyricsText, lyricsOptions);
+            let lyricsObj = new ObjLyrics(col, verse, line, vpos, validateNoteLength(lyricsLength), lyricsText, lyricsOptions);
 
-                let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
-                lyricsArr.push(lyricsObj);
-                lyricsArr.sort((a, b) => Utils.Math.cmp(a.col.positionTicks, b.col.positionTicks));
+            col.addLyricsObject(lyricsObj);
 
-                lyricsContainer.addLyricsObject(lyricsObj);
+            let lyricsArr = this.getLyricsObjects(line, vpos, verse);
+            lyricsArr.push(lyricsObj);
+            lyricsArr.sort((a, b) => Utils.Math.cmp(a.col.positionTicks, b.col.positionTicks));
 
-                this.addLayoutObject(lyricsObj, line, getVerseLayoutGroupId(verse), vpos);
-            }
+            lyricsObj.measure.getPrevLyricsObject(lyricsObj)?.setNextLyricsObject(lyricsObj);
+
+            this.addLayoutObject(lyricsObj, line, getVerseLayoutGroupId(verse), vpos);
 
             this.lastAddedRhythmColumn = col;
         });
@@ -935,7 +934,7 @@ export class ObjMeasure extends MusicObject {
             let col = this.columns[i];
             let symbol = typeof arg === "number"
                 ? col.getVoiceSymbol(arg)
-                : col.getLyricsContainer(arg.verse, arg.line, arg.vpos);
+                : col.getLyricsObject(arg.verse, arg.line, arg.vpos);
 
             if (symbol) {
                 positionTicks = col.positionTicks + symbol.rhythmProps.ticks;
@@ -1032,7 +1031,8 @@ export class ObjMeasure extends MusicObject {
     }
 
     getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
-        let lyricsArr = this.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
+        let { line, verse, vpos } = lyricsObj;
+        let lyricsArr = this.getLyricsObjects(line, vpos, verse);
 
         let i = lyricsArr.indexOf(lyricsObj);
 
@@ -1040,7 +1040,7 @@ export class ObjMeasure extends MusicObject {
             return lyricsArr[i - 1];
         }
         else if (i === 0) {
-            let lyricsArr = lyricsObj.measure.getPrevMeasure()?.getLyricsObjects(lyricsObj.line, lyricsObj.vpos, lyricsObj.verse);
+            let lyricsArr = lyricsObj.measure.getPrevMeasure()?.getLyricsObjects(line, vpos, verse);
             if (lyricsArr && lyricsArr.length > 0) {
                 return lyricsArr[lyricsArr.length - 1];
             }

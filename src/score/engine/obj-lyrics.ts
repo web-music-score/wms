@@ -9,22 +9,10 @@ import { VerticalPos } from "./layout-object";
 import { Utils } from "@tspro/ts-utils-lib";
 import { ObjMeasure } from "./obj-measure";
 
-export class LyricsContainer {
-    readonly lyricsObjects: ObjLyrics[] = [];
-    readonly rhythmProps: RhythmProps;
-
-    constructor(readonly col: ObjRhythmColumn, lyricsLength: NoteLength) {
-        this.rhythmProps = RhythmProps.get(lyricsLength);
-    }
-
-    addLyricsObject(lyricsObj: ObjLyrics) {
-        this.lyricsObjects.push(lyricsObj);
-        lyricsObj.measure.getPrevLyricsObject(lyricsObj)?.setNextLyricsObject(lyricsObj);
-    }
-}
-
 export class ObjLyrics extends MusicObject {
     private nextLyricsObject?: ObjLyrics;
+
+    readonly rhythmProps: RhythmProps;
 
     private readonly color: string = "black";
     private readonly hyphen?: LyricsHyphen;
@@ -32,8 +20,10 @@ export class ObjLyrics extends MusicObject {
 
     readonly mi: MLyrics;
 
-    constructor(readonly col: ObjRhythmColumn, readonly verse: VerseNumber, readonly line: ObjNotationLine, readonly vpos: VerticalPos, lyricsText: string, lyricsOptions?: LyricsOptions) {
+    constructor(readonly col: ObjRhythmColumn, readonly verse: VerseNumber, readonly line: ObjNotationLine, readonly vpos: VerticalPos, lyricsLength: NoteLength, lyricsText: string, lyricsOptions?: LyricsOptions) {
         super(col);
+
+        this.rhythmProps = RhythmProps.get(lyricsLength);
 
         let halign = lyricsOptions?.align === LyricsAlign.Left ? 0 : lyricsOptions?.align === LyricsAlign.Right ? 1 : 0.5;
 
