@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.3.0] - 2025-10-
+## [5.3.0] - 2025-10-16
 ## Added
 - MeasureOptions with showNumber property.
 - New piece Canon in D by Pachelbel.
