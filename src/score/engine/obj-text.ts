@@ -135,7 +135,7 @@ export class ObjText extends MusicObject {
 
         let lineCount = this.textLines.length;
         let textHeight = lineCount * lineHeight;
-        let fixY = -lineHeight * (italic ? 0.25 : 0.175);
+        let fixY = -lineHeight * (italic ? 0.25 : 0.2);
         let p = padding * ctx.unitSize;
 
         let centerX = (rect.left + p) * (1 - anchorX) + (rect.right - p) * anchorX;
