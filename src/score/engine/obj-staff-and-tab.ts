@@ -23,7 +23,7 @@ export abstract class ObjNotationLine extends MusicObject {
     public abstract readonly id: number;
     public abstract readonly name: string;
 
-    private layoutGroups: LayoutGroup[/* LayoutGroupOrder */] = [];
+    private layoutGroups = new Map<LayoutGroupId, LayoutGroup>();
 
     constructor(readonly row: ObjScoreRow) {
         super(row);
@@ -38,10 +38,10 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
-        let layoutGroup = this.layoutGroups[lauoutGroupId];
+        let layoutGroup = this.layoutGroups.get(lauoutGroupId);
 
         if (!layoutGroup) {
-            layoutGroup = this.layoutGroups[lauoutGroupId] = new LayoutGroup(lauoutGroupId);
+            this.layoutGroups.set(lauoutGroupId, layoutGroup = new LayoutGroup(lauoutGroupId));
         }
 
         return layoutGroup;
@@ -50,18 +50,14 @@ export abstract class ObjNotationLine extends MusicObject {
     resetLayoutGroups(ctx: RenderContext) {
         // Clear resolved position and layout objects
         this.layoutGroups.forEach(layoutGroup => {
-            if (layoutGroup) {
-                layoutGroup.clearPositionAndLayout(ctx);
-            }
+            layoutGroup.clearPositionAndLayout(ctx);
         });
     }
 
     layoutLayoutGroups(ctx: RenderContext) {
         this.layoutGroups.forEach(layoutGroup => {
-            if (layoutGroup) {
-                this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Above);
-                this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Below);
-            }
+            this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Above);
+            this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Below);
         });
     }
 
