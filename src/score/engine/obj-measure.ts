@@ -1021,13 +1021,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     private getLyricsObjects(line: ObjNotationLine, vpos: VerticalPos, verse: VerseNumber): ObjLyrics[] {
-        let lyricsObjs = this.lyricsObjectsCache.get(line, vpos, verse);
-
-        if (!lyricsObjs) {
-            this.lyricsObjectsCache.set(line, vpos, verse, lyricsObjs = []);
-        }
-
-        return lyricsObjs;
+        return this.lyricsObjectsCache.getOrCreate(line, vpos, verse, () => []);
     }
 
     getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
