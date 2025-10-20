@@ -1,4 +1,4 @@
-import { Map3, Utils } from "@tspro/ts-utils-lib";
+import { IndexArray, Map3, Utils, asMulti } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -125,7 +125,7 @@ export class ObjMeasure extends MusicObject {
     private minColumnsAreaWidth = 0;
     private rightSolidAreaWidth = 0;
 
-    private voiceSymbols: RhythmSymbol[/* voiceId */][] = [];
+    private voiceSymbols = asMulti(new IndexArray<RhythmSymbol[]>);
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
     private lastAddedRhythmSymbol?: RhythmSymbol;
@@ -145,8 +145,8 @@ export class ObjMeasure extends MusicObject {
     private endRepeatPlayCount: number = 2; // play twice.
     private endRepeatPlayCountText?: ObjText;
 
-    private staticObjectsCache = new Map<ObjNotationLine, MusicObject[]>();
-    private lyricsObjectsCache = new Map3<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>();
+    private staticObjectsCache = new Map<ObjNotationLine, MusicObject[]>();                          // TODO: asMulti(...)
+    private lyricsObjectsCache = new Map3<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>(); // TODO: asMulti(...)
 
     readonly mi: MMeasure;
 
@@ -873,8 +873,7 @@ export class ObjMeasure extends MusicObject {
 
         col.setVoiceSymbol(voiceId, symbol);
 
-        this.voiceSymbols[voiceId] ??= [];
-        this.voiceSymbols[voiceId].push(symbol);
+        this.voiceSymbols.add(voiceId, symbol);
 
         if (symbol.oldStyleTriplet) {
             this.createOldStyleTriplets(voiceId);
@@ -1244,9 +1243,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     getVoiceSymbols(voiceId: VoiceId): ReadonlyArray<RhythmSymbol> {
-        validateVoiceId(voiceId);
-        this.voiceSymbols[voiceId] ??= [];
-        return this.voiceSymbols[voiceId];
+        return this.voiceSymbols.getAll(voiceId);
     }
 
     completeRests(voiceId?: VoiceId | VoiceId[]) {

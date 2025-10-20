@@ -168,6 +168,8 @@ export class ObjNoteGroup extends MusicObject {
     private readonly staffObjects: ObjStaffNoteGroup[] = [];
     private readonly tabObjects: ObjTabNoteGroup[] = [];
 
+    private isNoteDisplaced: boolean[];
+
     readonly mi: MNoteGroup;
 
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength | NoteLengthStr, readonly options?: NoteOptions, tupletRatio?: TupletRatio) {
@@ -181,6 +183,8 @@ export class ObjNoteGroup extends MusicObject {
 
         this.notes = sortedNotes;
         this.setStringsNumbers = sortedStrings;
+
+        this.isNoteDisplaced = this.notes.map(() => false);
 
         this.setDiatonicId = Math.round((this.minDiatonicId + this.maxDiatonicId) / 2);
 
@@ -234,6 +238,11 @@ export class ObjNoteGroup extends MusicObject {
 
     get stemDir(): Stem.Up | Stem.Down {
         return this.runningStemDir;
+    }
+
+    setNoteDisplacement(note: Note, isDisplaced: boolean) {
+        let i = this.notes.indexOf(note);
+        if (i >= 0) this.isNoteDisplaced[i] = isDisplaced;
     }
 
     enableConnective(line: ObjNotationLine): boolean {
@@ -617,7 +626,7 @@ export class ObjNoteGroup extends MusicObject {
                 let isTopNote = noteIndex === this.notes.length - 1;
 
                 let noteStaff = staff.getActualStaff(note.diatonicId) ?? staff;
-                let noteX = this.col.getNoteHeadDisplacement(this, note) * noteHeadWidth;
+                let noteX = this.isNoteDisplaced[noteIndex] ? noteHeadWidth * (stemDir === Stem.Down ? -1 : 1) : 0;
                 let noteY = noteStaff.getDiatonicIdY(note.diatonicId);
                 let isNoteOnLine = noteStaff.isLine(note.diatonicId);
 

@@ -50,7 +50,7 @@ export abstract class ObjNotationLine extends MusicObject {
     resetLayoutGroups(ctx: RenderContext) {
         // Clear resolved position and layout objects
         this.layoutGroups.forEach(layoutGroup => {
-            layoutGroup.clearPositionAndLayout(ctx);
+            layoutGroup.layout(ctx);
         });
     }
 

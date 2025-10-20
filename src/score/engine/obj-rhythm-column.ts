@@ -13,27 +13,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
-import { Map3 } from "@tspro/ts-utils-lib";
-
-type NoteHeadDisplacementData = {
-    noteGroup: ObjNoteGroup,
-    note: Note,
-    displacement?: -1 | 0 | 1
-}
-
-const noteHeadDataCompareFunc = (a: NoteHeadDisplacementData, b: NoteHeadDisplacementData) => {
-    let cmp = Note.compareFunc(a.note, b.note);
-
-    if (cmp === 0) {
-        cmp = a.noteGroup.stemDir === b.noteGroup.stemDir
-            ? 0
-            : a.noteGroup.stemDir === Stem.Up
-                ? 1
-                : -1;
-    }
-
-    return cmp;
-}
+import { IndexArray, Map2, Map3 } from "@tspro/ts-utils-lib";
 
 export type ScorePlayerNote = {
     note: Note,
@@ -45,7 +25,7 @@ export type ScorePlayerNote = {
 export type RhythmSymbol = ObjNoteGroup | ObjRest;
 
 export class ObjRhythmColumn extends MusicObject {
-    private readonly voiceSymbol: RhythmSymbol[/* voiceId */] = [];
+    private readonly voiceSymbol = new IndexArray<RhythmSymbol>();
 
     private readonly lyricsObject = new Map3<VerseNumber, ObjNotationLine, VerticalPos, ObjLyrics>();
 
@@ -56,8 +36,6 @@ export class ObjRhythmColumn extends MusicObject {
 
     private arpeggioDir: Arpeggio | undefined;
     private arpeggios: ObjArpeggio[] = [];
-
-    private noteHeadDisplacements: NoteHeadDisplacementData[] = [];
 
     private readonly playerProps: PlayerColumnProps;
 
@@ -134,10 +112,8 @@ export class ObjRhythmColumn extends MusicObject {
         let staticObjects: MusicObject[] = [];
 
         this.voiceSymbol.forEach(symbol => {
-            if (symbol) {
-                symbol.getRect(); // Update rect
-                symbol.getStaticObjects(line).forEach(obj => staticObjects.push(obj));
-            }
+            symbol.getRect(); // Update rect
+            symbol.getStaticObjects(line).forEach(obj => staticObjects.push(obj));
         });
 
         this.arpeggios.forEach(arpeggio => {
@@ -163,12 +139,10 @@ export class ObjRhythmColumn extends MusicObject {
             return [];
         }
 
-        for (let i = 0; i < this.voiceSymbol.length; i++) {
-            if (this.voiceSymbol[i]) {
-                let arr = this.voiceSymbol[i].pick(x, y);
-                if (arr.length > 0) {
-                    return [this, ...arr];
-                }
+        for (const symbol of this.voiceSymbol.values()) {
+            let arr = symbol.pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
             }
         }
 
@@ -193,7 +167,7 @@ export class ObjRhythmColumn extends MusicObject {
     setVoiceSymbol(voiceId: VoiceId, symbol: RhythmSymbol) {
         validateVoiceId(voiceId);
 
-        this.voiceSymbol[voiceId] = symbol;
+        this.voiceSymbol.set(voiceId, symbol);
 
         if (symbol instanceof ObjRest && !symbol.hide) {
             this.row.getStaves().forEach(staff => {
@@ -216,7 +190,7 @@ export class ObjRhythmColumn extends MusicObject {
                 this.arpeggioDir = symbol.arpeggio;
             }
 
-            this.setupNoteHeadDisplacements();
+            this.updateNoteDisplacements();
         }
 
         this.requestLayout();
@@ -224,7 +198,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getVoiceSymbol(voiceId: VoiceId): RhythmSymbol | undefined {
-        return this.voiceSymbol[voiceId];
+        return this.voiceSymbol.get(voiceId);
     }
 
     getLyricsObject(verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos): ObjLyrics | undefined {
@@ -236,7 +210,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getMinWidth() {
-        let maxNoteSize = Math.max(...this.voiceSymbol.map(s => s.rhythmProps.noteSize));
+        let maxNoteSize = Math.max(...this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize));
 
         let w = DocumentSettings.NoteHeadWidth;
 
@@ -248,70 +222,66 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    setupNoteHeadDisplacements() {
-        this.noteHeadDisplacements = [];
+    updateNoteDisplacements() {
+        type NoteHeadDisplacement = {
+            noteGroup: ObjNoteGroup,
+            note: Note,
+            isDisplaced?: boolean
+        }
+
+        let data: NoteHeadDisplacement[] = [];
 
         this.voiceSymbol.forEach(symbol => {
             if (symbol instanceof ObjNoteGroup) {
                 symbol.notes.forEach(note => {
-                    this.noteHeadDisplacements.push({ noteGroup: symbol, note });
+                    symbol.setNoteDisplacement(note, false);
+                    data.push({ noteGroup: symbol, note });
                 });
             }
         });
 
-        this.noteHeadDisplacements.sort(noteHeadDataCompareFunc);
+        const noteHeadDataCompareFunc = (a: NoteHeadDisplacement, b: NoteHeadDisplacement) => {
+            let cmp = Note.compareFunc(a.note, b.note);
+            return cmp === 0
+                ? a.noteGroup.stemDir === b.noteGroup.stemDir ? 0 : a.noteGroup.stemDir === Stem.Up ? 1 : -1
+                : cmp;
+        }
 
-        if (this.noteHeadDisplacements.length < 2) {
+        data.sort(noteHeadDataCompareFunc);
+
+        if (data.length < 2) {
             return;
         }
 
-        for (let i = 0; i < this.noteHeadDisplacements.length; i++) {
-            let cur = this.noteHeadDisplacements[i];
-            let next = this.noteHeadDisplacements[i + 1];
+        for (let i = 0; i < data.length; i++) {
+            let cur = data[i];
+            let next = data[i + 1];
 
             if (next && cur.note.diatonicId === next.note.diatonicId) {
-                cur.displacement = next.displacement = 0;
+                cur.isDisplaced = next.isDisplaced = false;
             }
         }
 
-        for (let i = 0; i < this.noteHeadDisplacements.length; i++) {
-            let prev = this.noteHeadDisplacements[i - 1];
-            let cur = this.noteHeadDisplacements[i];
-            let next = this.noteHeadDisplacements[i + 1];
+        for (let i = 0; i < data.length; i++) {
+            let prev = data[i - 1];
+            let cur = data[i];
+            let next = data[i + 1];
 
-            if (cur.displacement !== undefined) {
-                continue;
-            }
-
-            let d: -1 | 1 = cur.noteGroup.stemDir === Stem.Down ? -1 : 1;
-
-            if (prev && cur.note.diatonicId - prev.note.diatonicId <= 1) {
-                cur.displacement = prev.displacement === 0 ? d : 0;
-            }
-            else if (next && next.note.diatonicId - cur.note.diatonicId <= 1) {
-                cur.displacement = next.displacement === 0 ? d : 0;
+            if (cur.isDisplaced === undefined) {
+                if (prev && cur.note.diatonicId - prev.note.diatonicId <= 1) {
+                    cur.isDisplaced = !prev.isDisplaced;
+                }
+                else if (next && next.note.diatonicId - cur.note.diatonicId <= 1) {
+                    cur.isDisplaced = !next.isDisplaced;
+                }
             }
         }
-    }
 
-    getNoteHeadDisplacement(noteGroup: ObjNoteGroup, note: Note): -1 | 0 | 1 {
-        let data = this.noteHeadDisplacements.find(d => d.noteGroup === noteGroup && Note.equals(d.note, note));
-
-        if (data?.displacement !== undefined) {
-            return data.displacement;
-        }
-        else {
-            return 0;
-        }
+        data.forEach(el => el.noteGroup.setNoteDisplacement(el.note, el.isDisplaced ?? false));
     }
 
     isEmpty(): boolean {
-        for (let i = 0; i < this.voiceSymbol.length; i++) {
-            if (this.voiceSymbol[i] !== undefined && !this.voiceSymbol[i].isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.voiceSymbol.size === 0 || this.voiceSymbol.every(symbol => symbol.isEmpty());
     }
 
     getPlayerNotes() {
@@ -473,7 +443,7 @@ export class ObjRhythmColumn extends MusicObject {
 
     updateRect() {
         this.shapeRects = [
-            ...this.voiceSymbol.filter(s => !!s).map(s => s.getRect().copy()),
+            ...this.voiceSymbol.filter(s => !!s).mapToArray(s => s.getRect().copy()),
             ...this.arpeggios.map(a => a.getRect().copy())
         ];
 
@@ -483,7 +453,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.voiceSymbol.forEach(symbol => symbol?.offset(dx, 0));
+        this.voiceSymbol.forEach(symbol => symbol.offset(dx, 0));
         this.arpeggios.forEach(arpeggio => arpeggio.offset(dx, 0));
         this.shapeRects.forEach(r => r.offsetInPlace(dx, dy));
         this.rect.offsetInPlace(dx, dy);
@@ -505,11 +475,7 @@ export class ObjRhythmColumn extends MusicObject {
         });
 
         // Draw symbols
-        this.voiceSymbol.forEach(symbol => {
-            if (symbol) {
-                symbol.draw(ctx);
-            }
-        });
+        this.voiceSymbol.forEach(symbol => symbol.draw(ctx));
 
         // Draw arpeggios
         this.arpeggios.forEach(arpeggio => arpeggio.draw(ctx));

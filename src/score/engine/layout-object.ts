@@ -12,6 +12,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
+import { asMulti, IndexArray } from "@tspro/ts-utils-lib";
 
 export enum LayoutGroupId {
     TabRhythm,
@@ -89,7 +90,7 @@ export class LayoutObjectWrapper {
         this.layoutGroup.add(this);
     }
 
-    clearPositionResolved() {
+    resetPositionResolved() {
         this.positionResolved = false;
     }
 
@@ -155,42 +156,33 @@ export class LayoutObjectWrapper {
 }
 
 export class LayoutGroup {
-    private readonly layoutObjectTable: LayoutObjectWrapper[/* VerticalPos */][/* Object Array */] = [];
+    // key = VerticalPos
+    private readonly layoutObject = asMulti(new IndexArray<LayoutObjectWrapper[]>());
 
     readonly rowAlign: boolean
     readonly widensColumn: boolean;
 
     constructor(readonly layoutGroupId: number) {
-        this.layoutObjectTable[VerticalPos.Above] = [];
-        this.layoutObjectTable[VerticalPos.Below] = [];
-
         this.rowAlign = RowAlignList.indexOf(layoutGroupId) >= 0;
         this.widensColumn = WidenColumnList.indexOf(layoutGroupId) >= 0;
     }
 
     getLayoutObjects(verticalPos: VerticalPos): Readonly<LayoutObjectWrapper[]> {
-        return this.layoutObjectTable[verticalPos];
+        return this.layoutObject.getAll(verticalPos);
     }
 
     add(layoutObj: LayoutObjectWrapper) {
-        this.layoutObjectTable[layoutObj.verticalPos].push(layoutObj);
+        this.layoutObject.add(layoutObj.verticalPos, layoutObj);
     }
 
     remove(layoutObj: LayoutObjectWrapper) {
-        this.layoutObjectTable.forEach(layoutObjects => {
-            let i = layoutObjects.indexOf(layoutObj);
-            if (i >= 0) {
-                layoutObjects.splice(i, 1);
-            }
-        });
+        this.layoutObject.remove(layoutObj.verticalPos, layoutObj);
     }
 
-    clearPositionAndLayout(ctx: RenderContext) {
-        this.layoutObjectTable.forEach(layoutObjects => {
-            layoutObjects.forEach(layoutObj => {
-                layoutObj.clearPositionResolved();
-                layoutObj.musicObj.layout(ctx);
-            });
-        });
+    layout(ctx: RenderContext) {
+        for (const w of this.layoutObject.values()) {
+            w.resetPositionResolved();
+            w.musicObj.layout(ctx);
+        }
     }
 }
