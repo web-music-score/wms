@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.3.1] - 2025-10-
+### Fixed
+- Improved note displacement when notes are close to each other.
+
 ## [5.3.0] - 2025-10-16
 ## Added
 - MeasureOptions with showNumber property.
