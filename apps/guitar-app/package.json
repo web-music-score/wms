@@ -5,7 +5,7 @@
     "license": "MIT",
     "private": true,
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.15.0",
+        "@tspro/ts-utils-lib": "^1.16.0",
         "@tspro/web-music-score": "^5.3.0",
         "bootstrap": "^5.3.7",
         "core-js": "^3.43.0",
