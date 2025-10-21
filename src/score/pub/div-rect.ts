@@ -1,15 +1,14 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /**
- * DivRect class, left, top, right, bottom rectangle divided into four sections by centerX, centerY.
+ * DivRect class, left, top, right, bottom rectangle divided into four sections by anchorX, anchorY.
  */
 export class DivRect {
     left: number;
-    centerX: number;
+    anchorX: number;
     right: number;
     top: number;
-    centerY: number;
+    anchorY: number;
     bottom: number;
 
     /**
@@ -19,7 +18,7 @@ export class DivRect {
 
     /**
      * Create rectangle with left, right, top, bottom.
-     * Properties centerX and centerY will be centered in the middle.
+     * Properties anchorX and anchorY will be centered in the middle.
      * 
      * @param left - Left coordinate.
      * @param right - Right coordinate.
@@ -32,37 +31,37 @@ export class DivRect {
      * Create rectangle with full arguments.
      * 
      * @param left - Left coordinate.
-     * @param centerX - Center x-coordinate.
+     * @param anchorX - Center x-coordinate.
      * @param right - Right coordinate.
      * @param top - Top coordinate.
-     * @param centerY - Center y-coordinate.
+     * @param anchorY - Center y-coordinate.
      * @param bottom - Bottom coordinate.
      */
-    constructor(left: number, centerX: number, right: number, top: number, centerY: number, bottom: number);
+    constructor(left: number, anchorX: number, right: number, top: number, anchorY: number, bottom: number);
 
     constructor(...args: unknown[]) {
         if (args.length === 6) {
             this.left = args[0] as number;
-            this.centerX = args[1] as number;
+            this.anchorX = args[1] as number;
             this.right = args[2] as number;
             this.top = args[3] as number;
-            this.centerY = args[4] as number;
+            this.anchorY = args[4] as number;
             this.bottom = args[5] as number;
         }
         else if (args.length === 4) {
             this.left = args[0] as number;
             this.right = args[1] as number;
-            this.centerX = (this.left + this.right) / 2;
+            this.anchorX = (this.left + this.right) / 2;
             this.top = args[2] as number;
             this.bottom = args[3] as number;
-            this.centerY = (this.top + this.bottom) / 2;
+            this.anchorY = (this.top + this.bottom) / 2;
         }
         else if (args.length === 0) {
-            this.left = this.centerX = this.right = 0;
-            this.top = this.centerY = this.bottom = 0;
+            this.left = this.anchorX = this.right = 0;
+            this.top = this.anchorY = this.bottom = 0;
         }
         else {
-            throw new MusicError(MusicErrorType.InvalidArg, `Invalid DivRect args: ${args}`);
+            throw new TypeError(`Invalid DivRect args: ${args}`);
         }
     }
 
@@ -71,7 +70,7 @@ export class DivRect {
      * 
      * @param left - Left coordinate.
      * @param top - Top coordinate.
-     * @param width - With.
+     * @param width - Width.
      * @param height - Height.
      * @returns - DivRect.
      */
@@ -80,7 +79,7 @@ export class DivRect {
     }
 
     /**
-     * Create rect from centerX, centerY, width, height arguments.
+     * Create rect from anchorX, anchorY, width, height arguments.
      * 
      * @param centerX - Center x-coordinate.
      * @param centerY - Center y-coordinate.
@@ -89,7 +88,14 @@ export class DivRect {
      * @returns - DivRect.
      */
     static createCentered(centerX: number, centerY: number, width: number, height: number): DivRect {
-        return new DivRect(centerX - width / 2, centerX + width / 2, centerY - height / 2, centerY + height / 2);
+        return new DivRect(
+            centerX - width / 2,
+            centerX,
+            centerX + width / 2,
+            centerY - height / 2,
+            centerY,
+            centerY + height / 2
+        );
     }
 
     /**
@@ -103,6 +109,26 @@ export class DivRect {
      */
     static createSections(leftw: number, rightw: number, toph: number, bottomh: number): DivRect {
         return new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+    }
+
+    /** @deprecated - Renamed to anchorX. */
+    get centerX() {
+        return this.anchorX;
+    }
+
+    /** @deprecated - Renamed to anchorX. */
+    set centerX(x: number) {
+        this.anchorX = x;
+    }
+
+    /** @deprecated - Renamed to anchorY. */
+    get centerY() {
+        return this.anchorY;
+    }
+
+    /** @deprecated - Renamed to anchorY. */
+    set centerY(y: number) {
+        this.anchorY = y;
     }
 
     /**
@@ -123,28 +149,28 @@ export class DivRect {
      * Left section width getter.
      */
     get leftw() {
-        return this.centerX - this.left;
+        return this.anchorX - this.left;
     }
 
     /**
      * Right section width getter.
      */
     get rightw() {
-        return this.right - this.centerX;
+        return this.right - this.anchorX;
     }
 
     /**
      * Top section height getter.
      */
     get toph() {
-        return this.centerY - this.top;
+        return this.anchorY - this.top;
     }
 
     /**
      * Bottom section height getter.
      */
     get bottomh() {
-        return this.bottom - this.centerY;
+        return this.bottom - this.anchorY;
     }
 
     /**
@@ -181,7 +207,7 @@ export class DivRect {
     }
 
     /**
-     * Check if this Rect equals with given Rect.
+     * Check if given rects are equal.
      * @param a - DivRect a.
      * @param b - DivRect b.
      * @returns - True/false.
@@ -195,12 +221,21 @@ export class DivRect {
             return false;
         }
         else {
-            return a === b || a.left === b.left && a.centerX === b.centerX && a.right === b.right && a.top === b.top && a.centerY === b.centerY && a.bottom === b.bottom;
+            return a === b || a.left === b.left && a.anchorX === b.anchorX && a.right === b.right && a.top === b.top && a.anchorY === b.anchorY && a.bottom === b.bottom;
         }
     }
 
     /**
-     * Check if edges of given rects equal, ignoring centerX and centerY.
+     * Check if this rect equals with another rect.
+     * @param other - The other rect.
+     * @returns - True/false.
+     */
+    equals(other: DivRect): boolean {
+        return DivRect.equals(this, other);
+    }
+
+    /**
+     * Check if edges of given rects are equal, ignoring anchorX and anchorY.
      * 
      * @param a - DivRect a.
      * @param b - DivRect b.
@@ -219,6 +254,16 @@ export class DivRect {
         }
     }
 
+    /**
+     * Check if edges of this Rect equals with given Rect, ignoring anchorX and anchorY.
+     * 
+     * @param other - The other DivRect.
+     * @returns - True/false.
+     */
+    equalsEdges(other: DivRect): boolean {
+        return DivRect.equalsEdges(this, other);
+    }
+
     /** @deprecated - Use `DivRect.equalsEdges()` instead. */
     static equalsFrame(a: DivRect | null | undefined, b: DivRect | null | undefined): boolean {
         return DivRect.equalsEdges(a, b);
@@ -230,7 +275,7 @@ export class DivRect {
      * @returns - Duplicate.
      */
     copy(): DivRect {
-        return new DivRect(this.left, this.centerX, this.right, this.top, this.centerY, this.bottom);
+        return new DivRect(this.left, this.anchorX, this.right, this.top, this.anchorY, this.bottom);
     }
 
     /**
@@ -242,10 +287,10 @@ export class DivRect {
      */
     offsetInPlace(dx: number, dy: number): DivRect {
         this.left += dx;
-        this.centerX += dx;
+        this.anchorX += dx;
         this.right += dx;
         this.top += dy;
-        this.centerY += dy;
+        this.anchorY += dy;
         this.bottom += dy;
         return this;
     }
@@ -294,10 +339,10 @@ export class DivRect {
     clipInPlace(clipRect: DivRect): DivRect {
         this.left = Math.max(this.left, clipRect.left);
         this.right = Math.min(this.right, clipRect.right);
-        this.centerX = Utils.Math.clamp(this.centerX, this.left, this.right);
+        this.anchorX = Utils.Math.clamp(this.anchorX, this.left, this.right);
         this.top = Math.max(this.top, clipRect.top);
         this.bottom = Math.min(this.bottom, clipRect.bottom);
-        this.centerY = Utils.Math.clamp(this.centerY, this.top, this.bottom);
+        this.anchorY = Utils.Math.clamp(this.anchorY, this.top, this.bottom);
         return this;
     }
 
@@ -312,7 +357,7 @@ export class DivRect {
     }
 
     /**
-     * Scale Rect. Anchor pos is (centerX, centerY). Modifies this Rect.
+     * Scale Rect. Anchor pos is (anchorX, anchorY). Modifies this Rect.
      * 
      * @param scaleX - Scale x-amount.
      * @param scaleY - Scale y-amount. If undefined then scale x-amount is used.
@@ -321,15 +366,15 @@ export class DivRect {
     scaleInPlace(scaleX: number, scaleY?: number): DivRect {
         scaleY = scaleY ?? scaleX;
 
-        this.left = this.centerX - this.leftw * scaleX;
-        this.right = this.centerX + this.rightw * scaleX;
-        this.top = this.centerY - this.toph * scaleY;
-        this.bottom = this.centerY + this.bottomh * scaleY;
+        this.left = this.anchorX - this.leftw * scaleX;
+        this.right = this.anchorX + this.rightw * scaleX;
+        this.top = this.anchorY - this.toph * scaleY;
+        this.bottom = this.anchorY + this.bottomh * scaleY;
         return this;
     }
 
     /**
-     * Scale Rect. Anchor pos is (centerX, centerY). Immutable, returns modified copy.
+     * Scale Rect. Anchor pos is (anchorX, anchorY). Immutable, returns modified copy.
      * 
      * @param scaleX - Scale x-amount.
      * @param scaleY - Scale y-amount. If undefined then scale x-amount is used.
