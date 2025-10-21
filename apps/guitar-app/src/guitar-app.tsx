@@ -152,7 +152,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
 
     updateWindowRect() {
         let windowRect = new Score.DivRect(0, Utils.Dom.getWidth(window), 0, Utils.Dom.getHeight(window));
-        if (this._isMounted && !Score.DivRect.equalsFrame(windowRect, this.state.windowRect)) {
+        if (this._isMounted && !Score.DivRect.equalsEdges(windowRect, this.state.windowRect)) {
             this.setState({ windowRect });
         }
     }
