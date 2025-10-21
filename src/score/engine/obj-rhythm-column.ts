@@ -108,24 +108,6 @@ export class ObjRhythmColumn extends MusicObject {
         return this.shapeRects;
     }
 
-    getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
-        let staticObjects: MusicObject[] = [];
-
-        this.voiceSymbol.forEach(symbol => {
-            symbol.getRect(); // Update rect
-            symbol.getStaticObjects(line).forEach(obj => staticObjects.push(obj));
-        });
-
-        this.arpeggios.forEach(arpeggio => {
-            if (arpeggio.line === line) {
-                arpeggio.getRect(); // Update rect
-                staticObjects.push(arpeggio);
-            }
-        });
-
-        return staticObjects;
-    }
-
     get doc() {
         return this.measure.doc;
     }
@@ -377,6 +359,7 @@ export class ObjRhythmColumn extends MusicObject {
                 arpeggio.offset(-leftw - arpeggio.getRect().right, line.getRect().centerY - arpeggio.getRect().centerY);
                 arpeggioWidth = Math.max(arpeggioWidth, arpeggio.getRect().width);
                 line.addObject(arpeggio);
+                this.measure.addStaticObject(line, arpeggio);
                 return arpeggio;
             });
             leftw += arpeggioWidth;

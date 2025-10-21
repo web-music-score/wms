@@ -269,6 +269,7 @@ export class ObjRest extends MusicObject {
             obj.offset(0, staff.getDiatonicIdY(diatonicId));
 
             this.staffObjects.push(obj);
+            this.measure.addStaticObject(staff, obj);
         });
     }
 

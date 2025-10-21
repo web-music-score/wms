@@ -1,4 +1,4 @@
-import { IndexArray, Map3, Utils, asMulti } from "@tspro/ts-utils-lib";
+import { IndexArray, Map1, Map3, Utils, asMulti } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -145,8 +145,8 @@ export class ObjMeasure extends MusicObject {
     private endRepeatPlayCount: number = 2; // play twice.
     private endRepeatPlayCountText?: ObjText;
 
-    private staticObjectsCache = new Map<ObjNotationLine, MusicObject[]>();                          // TODO: asMulti(...)
-    private lyricsObjectsCache = new Map3<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>(); // TODO: asMulti(...)
+    private staticObjectsCache = new Map1<ObjNotationLine, MusicObject[]>();
+    private lyricsObjectsCache = new Map3<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>();
 
     readonly mi: MMeasure;
 
@@ -908,7 +908,8 @@ export class ObjMeasure extends MusicObject {
 
             col.addLyricsObject(lyricsObj);
 
-            let lyricsArr = this.getLyricsObjects(line, vpos, verse);
+            let lyricsArr = this.lyricsObjectsCache.getOrCreate(line, vpos, verse, []);
+
             lyricsArr.push(lyricsObj);
             lyricsArr.sort((a, b) => Utils.Math.cmp(a.col.positionTicks, b.col.positionTicks));
 
@@ -1019,13 +1020,10 @@ export class ObjMeasure extends MusicObject {
         return this.barLineRight.getRect().centerX;
     }
 
-    private getLyricsObjects(line: ObjNotationLine, vpos: VerticalPos, verse: VerseNumber): ObjLyrics[] {
-        return this.lyricsObjectsCache.getOrCreate(line, vpos, verse, () => []);
-    }
-
     getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
         let { line, verse, vpos } = lyricsObj;
-        let lyricsArr = this.getLyricsObjects(line, vpos, verse);
+
+        let lyricsArr = this.lyricsObjectsCache.getOrDefault(line, vpos, verse, []);
 
         let i = lyricsArr.indexOf(lyricsObj);
 
@@ -1033,7 +1031,7 @@ export class ObjMeasure extends MusicObject {
             return lyricsArr[i - 1];
         }
         else if (i === 0) {
-            let lyricsArr = lyricsObj.measure.getPrevMeasure()?.getLyricsObjects(line, vpos, verse);
+            let lyricsArr = lyricsObj.measure.getPrevMeasure()?.lyricsObjectsCache.get(line, vpos, verse);
             if (lyricsArr && lyricsArr.length > 0) {
                 return lyricsArr[lyricsArr.length - 1];
             }
@@ -1043,19 +1041,22 @@ export class ObjMeasure extends MusicObject {
     }
 
     getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
-        let staticObjects = this.staticObjectsCache.get(line);
-
-        if (!staticObjects) {
-            staticObjects = [];
-            this.getColumns().forEach(col => col.getStaticObjects(line).forEach(obj => staticObjects?.push(obj)));
-            this.staticObjectsCache.set(line, staticObjects);
-        }
-
         let layoutObjects = this.layoutObjects
             .filter(layoutObj => layoutObj.line === line && layoutObj.isPositionResolved())
             .map(layoutObj => layoutObj.musicObj);
 
-        return layoutObjects.length > 0 ? [...staticObjects, ...layoutObjects] : staticObjects;
+        let staticObjects = layoutObjects.length > 0
+            ? [...this.staticObjectsCache.getOrDefault(line, []), ...layoutObjects]
+            : this.staticObjectsCache.getOrDefault(line, []);
+
+        // Update rects.
+        staticObjects.forEach(obj => obj.getRect());
+
+        return staticObjects;
+    }
+
+    addStaticObject(line: ObjNotationLine, staticObj: MusicObject) {
+        this.staticObjectsCache.getOrCreate(line, []).push(staticObj);
     }
 
     removeLayoutObjects(musicObj: MusicObject) {

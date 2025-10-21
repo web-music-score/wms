@@ -267,24 +267,6 @@ export class ObjNoteGroup extends MusicObject {
         this.runningStringNumbers = stringNumbers;
     }
 
-    getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
-        let staticObjects: MusicObject[] = [];
-
-        this.staffObjects.forEach(obj => {
-            if (obj.staff === line) {
-                staticObjects.push(obj);
-            }
-        });
-
-        this.tabObjects.forEach(obj => {
-            if (obj.tab === line) {
-                staticObjects.push(obj);
-            }
-        });
-
-        return staticObjects;
-    }
-
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {
             return [];
@@ -710,6 +692,7 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             this.staffObjects.push(obj);
+            this.measure.addStaticObject(staff, obj);
         });
 
         this.tabObjects.length = 0;
@@ -743,6 +726,7 @@ export class ObjNoteGroup extends MusicObject {
             if (obj.fretNumbers.length > 0) {
                 this.tabObjects.push(obj);
                 tab.addObject(obj);
+                this.measure.addStaticObject(tab, obj);
             }
         });
     }
