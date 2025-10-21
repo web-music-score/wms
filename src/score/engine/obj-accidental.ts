@@ -53,8 +53,8 @@ export class ObjAccidental extends MusicObject {
         let { unitSize } = ctx;
         let { accidental } = this;
 
-        let x = this.rect.centerX;
-        let y = this.rect.centerY;
+        let x = this.rect.anchorX;
+        let y = this.rect.anchorY;
 
         ctx.color(this.color);
 

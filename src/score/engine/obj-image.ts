@@ -41,6 +41,6 @@ export class ObjImage extends MusicObject {
     draw(ctx: RenderContext) {
         let r = this.rect;
         ctx.drawDebugRect(r);
-        ctx.drawImage(this.image, r.centerX - r.leftw, r.centerY - r.toph, r.width, r.height);
+        ctx.drawImage(this.image, r.anchorX - r.leftw, r.anchorY - r.toph, r.width, r.height);
     }
 }

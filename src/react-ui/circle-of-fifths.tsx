@@ -115,8 +115,8 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
 
             let dx = Math.sin(rad);
             let dy = -Math.cos(rad);
-            let x = circleRect.centerX + dx * circleRect.width / 2;
-            let y = circleRect.centerY + dy * circleRect.height / 2;
+            let x = circleRect.anchorX + dx * circleRect.width / 2;
+            let y = circleRect.anchorY + dy * circleRect.height / 2;
 
             // Add marker
             components.push(<div key={"m" + i} style={{

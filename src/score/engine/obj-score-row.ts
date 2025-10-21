@@ -198,7 +198,7 @@ export class ObjScoreRow extends MusicObject {
         let firstMeasure = this.getFirstMeasure();
         let left = firstMeasure ? firstMeasure.getColumnsContentRect().left : r.left;
 
-        return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.centerY, r.bottom);
+        return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.anchorY, r.bottom);
     }
 
     getDiatonicIdAt(y: number): number | undefined {
@@ -337,7 +337,7 @@ export class ObjScoreRow extends MusicObject {
             let newMeasureWidth = m.getSolidAreaWidth() + m.getMinColumnsAreaWidth() * columnsAreaScale;
             m.layoutWidth(ctx, newMeasureWidth);
             let r = m.getRect();
-            m.offset(x - r.left, -r.centerY);
+            m.offset(x - r.left, -r.anchorY);
             x += r.width;
             x += m.getPostMeasureBreakWidth();
         });
@@ -397,7 +397,7 @@ export class ObjScoreRow extends MusicObject {
             if (obj && grp.length > 0) {
                 obj.offset(
                     -obj.getRect().left,
-                    -obj.getRect().centerY + (grp[0].getRect().top + grp[grp.length - 1].getRect().bottom) / 2
+                    -obj.getRect().anchorY + (grp[0].getRect().top + grp[grp.length - 1].getRect().bottom) / 2
                 );
             }
         });

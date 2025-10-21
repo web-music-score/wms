@@ -224,7 +224,7 @@ export class ObjStaffSignature extends MusicObject {
             if (this.eightBelowClef) {
                 let r = this.clefImage.getRect();
                 this.eightBelowClef.layout(ctx);
-                this.eightBelowClef.offset(r.left + r.width / 2, Math.max(r.centerY + r.height * 0.3, staff.getBottomLineY()));
+                this.eightBelowClef.offset(r.left + r.width / 2, Math.max(r.anchorY + r.height * 0.3, staff.getBottomLineY()));
                 this.rect.expandInPlace(this.eightBelowClef.getRect());
             }
         }
@@ -443,12 +443,12 @@ export class ObjTabSignature extends MusicObject {
         let tsWidth = Math.max(this.beatCountText?.getRect().width ?? 0, this.beatSizeText?.getRect().width ?? 0);
 
         if (this.beatCountText) {
-            this.beatCountText.offset(0 + tsWidth / 2 + paddingX, tab.getRect().centerY - this.beatCountText.getRect().bottomh);
+            this.beatCountText.offset(0 + tsWidth / 2 + paddingX, tab.getRect().anchorY - this.beatCountText.getRect().bottomh);
             this.rect.expandInPlace(this.beatCountText.getRect());
         }
 
         if (this.beatSizeText) {
-            this.beatSizeText.offset(0 + tsWidth / 2 + paddingX, tab.getRect().centerY + this.beatSizeText.getRect().toph);
+            this.beatSizeText.offset(0 + tsWidth / 2 + paddingX, tab.getRect().anchorY + this.beatSizeText.getRect().toph);
             this.rect.expandInPlace(this.beatSizeText.getRect());
         }
 

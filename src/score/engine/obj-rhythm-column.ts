@@ -356,7 +356,7 @@ export class ObjRhythmColumn extends MusicObject {
             this.arpeggios = row.getNotationLines().map(line => {
                 let arpeggio = new ObjArpeggio(this, line, this.getArpeggioDir());
                 arpeggio.layout(ctx);
-                arpeggio.offset(-leftw - arpeggio.getRect().right, line.getRect().centerY - arpeggio.getRect().centerY);
+                arpeggio.offset(-leftw - arpeggio.getRect().right, line.getRect().anchorY - arpeggio.getRect().anchorY);
                 arpeggioWidth = Math.max(arpeggioWidth, arpeggio.getRect().width);
                 line.addObject(arpeggio);
                 this.measure.addStaticObject(line, arpeggio);
@@ -382,7 +382,7 @@ export class ObjRhythmColumn extends MusicObject {
         this.voiceSymbol.forEach(symbol => symbol.updateAccidentalState(accState));
 
         this.rect.left = -leftw;
-        this.rect.centerX = 0;
+        this.rect.anchorX = 0;
         this.rect.right = rightw;
 
         // Find min/max diatonicId for each staff.
@@ -432,7 +432,7 @@ export class ObjRhythmColumn extends MusicObject {
 
         this.rect.top = Math.min(...this.shapeRects.map(r => r.top));
         this.rect.bottom = Math.max(...this.shapeRects.map(r => r.bottom));
-        this.rect.centerY = (this.rect.top + this.rect.bottom) / 2;
+        this.rect.anchorY = (this.rect.top + this.rect.bottom) / 2;
     }
 
     offset(dx: number, dy: number) {
@@ -449,11 +449,11 @@ export class ObjRhythmColumn extends MusicObject {
             let maxDiatonicId = this.staffMaxDiatonicId.get(staff);
 
             if (minDiatonicId !== undefined) {
-                ctx.drawLedgerLines(staff, minDiatonicId, this.getRect().centerX);
+                ctx.drawLedgerLines(staff, minDiatonicId, this.getRect().anchorX);
             }
 
             if (maxDiatonicId !== undefined) {
-                ctx.drawLedgerLines(staff, maxDiatonicId, this.getRect().centerX);
+                ctx.drawLedgerLines(staff, maxDiatonicId, this.getRect().anchorX);
             }
         });
 

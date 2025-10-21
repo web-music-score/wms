@@ -31,7 +31,7 @@ export class ObjExtensionLine extends MusicObject {
 
     private getLineLeft(): number {
         if (this.leftObj instanceof ObjBarLineLeft) {
-            return this.leftObj.getRect().centerX;
+            return this.leftObj.getRect().anchorX;
         }
         else {
             return this.leftObj.getRect().right;
@@ -51,7 +51,7 @@ export class ObjExtensionLine extends MusicObject {
             }
         }
         else { // ObjBarLineRight
-            return this.rightObj.getRect().centerX;
+            return this.rightObj.getRect().anchorX;
         }
     }
 
@@ -86,15 +86,15 @@ export class ObjExtensionLine extends MusicObject {
 
         ctx.color("black").lineWidth(1);
 
-        ctx.strokeLine(rect.left, rect.centerY, rect.right, rect.centerY);
+        ctx.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);
 
         ctx.setLineDash([]);
 
         // Draw tip end of last line
         let tails = this.extension.getTails();
         if (tails.length > 0 && this === tails[tails.length - 1]) {
-            let tipH = rect.centerY > this.line.getRect().centerY ? -ctx.unitSize : ctx.unitSize;
-            ctx.strokeLine(rect.right, rect.centerY, rect.right, rect.centerY + tipH);
+            let tipH = rect.anchorY > this.line.getRect().anchorY ? -ctx.unitSize : ctx.unitSize;
+            ctx.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
         }
     }
 }

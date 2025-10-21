@@ -979,8 +979,8 @@ export class ObjMeasure extends MusicObject {
     // Get content rect excluding signature
     getColumnsContentRect() {
         return new DivRect(
-            this.barLineLeft.getRect().centerX,
-            this.barLineRight.getRect().centerX,
+            this.barLineLeft.getRect().anchorX,
+            this.barLineRight.getRect().anchorX,
             this.getRect().top,
             this.getRect().bottom);
     }
@@ -1017,7 +1017,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     getStaffLineRight() {
-        return this.barLineRight.getRect().centerX;
+        return this.barLineRight.getRect().anchorX;
     }
 
     getPrevLyricsObject(lyricsObj: ObjLyrics): ObjLyrics | undefined {
@@ -1418,23 +1418,23 @@ export class ObjMeasure extends MusicObject {
         width = Math.max(width, this.getMinWidth());
 
         this.rect = new DivRect();
-        this.rect.centerX = this.rect.left + width / 2;
+        this.rect.anchorX = this.rect.left + width / 2;
         this.rect.right = this.rect.left + width;
 
         let rect: DivRect;
 
         this.signatures.forEach(signature => {
             rect = signature.getRect();
-            signature.offset(this.rect.left + this.tabStringNotesWidth - rect.left, -rect.centerY);
+            signature.offset(this.rect.left + this.tabStringNotesWidth - rect.left, -rect.anchorY);
         });
 
         let signaturesWidth = Math.max(0, ...this.signatures.map(signature => signature.getRect().width));
 
         rect = this.barLineLeft.getRect();
-        this.barLineLeft.offset(this.rect.left + this.tabStringNotesWidth + signaturesWidth - rect.left, -rect.centerY);
+        this.barLineLeft.offset(this.rect.left + this.tabStringNotesWidth + signaturesWidth - rect.left, -rect.anchorY);
 
         rect = this.barLineRight.getRect();
-        this.barLineRight.offset(this.rect.right - rect.right, -rect.centerY);
+        this.barLineRight.offset(this.rect.right - rect.right, -rect.anchorY);
 
         if (this.endRepeatPlayCountText) {
             this.endRepeatPlayCountText.offset(this.barLineRight.getRect().left, this.barLineRight.getRect().top);
@@ -1452,8 +1452,8 @@ export class ObjMeasure extends MusicObject {
 
         this.columns.forEach(col => {
             rect = col.getRect();
-            let columnCenterX = columnLeft + rect.leftw * columnScale;
-            col.offset(columnCenterX - rect.centerX, -rect.centerY);
+            let columnAnchorX = columnLeft + rect.leftw * columnScale;
+            col.offset(columnAnchorX - rect.anchorX, -rect.anchorY);
             columnLeft += rect.width * columnScale;
         });
     }

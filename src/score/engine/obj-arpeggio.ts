@@ -60,15 +60,15 @@ export class ObjArpeggio extends MusicObject {
         ctx.beginPath();
 
         for (let i = 0, y = rect.top + topArrowHeight; i < this.numCycles; i++, y += this.cycleHeight) {
-            ctx.moveTo(rect.centerX, y);
-            ctx.quadraticCurveTo(rect.left, y + this.cycleHeight / 4, rect.centerX, y + this.cycleHeight / 2);
-            ctx.quadraticCurveTo(rect.right, y + this.cycleHeight * 3 / 4, rect.centerX, y + this.cycleHeight);
+            ctx.moveTo(rect.anchorX, y);
+            ctx.quadraticCurveTo(rect.left, y + this.cycleHeight / 4, rect.anchorX, y + this.cycleHeight / 2);
+            ctx.quadraticCurveTo(rect.right, y + this.cycleHeight * 3 / 4, rect.anchorX, y + this.cycleHeight);
         }
         ctx.stroke();
 
         if (topArrowHeight > 0) {
             ctx.beginPath();
-            ctx.moveTo(rect.centerX, rect.top);
+            ctx.moveTo(rect.anchorX, rect.top);
             ctx.lineTo(rect.right, rect.top + topArrowHeight);
             ctx.lineTo(rect.left, rect.top + topArrowHeight);
             ctx.fill();
@@ -76,7 +76,7 @@ export class ObjArpeggio extends MusicObject {
 
         if (bottomArrowHeight > 0) {
             ctx.beginPath();
-            ctx.moveTo(rect.centerX, rect.bottom);
+            ctx.moveTo(rect.anchorX, rect.bottom);
             ctx.lineTo(rect.left, rect.bottom - bottomArrowHeight);
             ctx.lineTo(rect.right, rect.bottom - bottomArrowHeight);
             ctx.fill();

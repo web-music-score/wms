@@ -74,17 +74,17 @@ export class ObjText extends MusicObject {
     updateAnchorX(anchorX: number) {
         this.anchorX = anchorX;
         let { width } = this.rect;
-        // this.rect.centerX does not move
-        this.rect.left = this.rect.centerX - width * anchorX;
-        this.rect.right = this.rect.centerX + width * (1 - anchorX);
+        // this.rect.anchorX does not move
+        this.rect.left = this.rect.anchorX - width * anchorX;
+        this.rect.right = this.rect.anchorX + width * (1 - anchorX);
     }
 
     updateAnchorY(anchorY: number) {
         this.anchorY = anchorY;
         let { height } = this.rect;
-        // this.rect.centerY does not move
-        this.rect.top = this.rect.centerY - height * anchorY;
-        this.rect.bottom = this.rect.centerY + height * (1 - anchorY);
+        // this.rect.anchorY does not move
+        this.rect.top = this.rect.anchorY - height * anchorY;
+        this.rect.bottom = this.rect.anchorY + height * (1 - anchorY);
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -138,14 +138,14 @@ export class ObjText extends MusicObject {
         let fixY = -lineHeight * (italic ? 0.25 : 0.2);
         let p = padding * ctx.unitSize;
 
-        let centerX = (rect.left + p) * (1 - anchorX) + (rect.right - p) * anchorX;
-        let centerY = (rect.top + p) * (1 - anchorY) + (rect.bottom - p) * anchorY;
+        let aX = (rect.left + p) * (1 - anchorX) + (rect.right - p) * anchorX;
+        let aY = (rect.top + p) * (1 - anchorY) + (rect.bottom - p) * anchorY;
 
         ctx.color(this.color);
 
         this.textLines.forEach((textLine, i) => {
-            let x = centerX - lineWidths[i] * anchorX;
-            let y = centerY - textHeight * anchorY + lineHeight * (i + 1) + fixY;
+            let x = aX - lineWidths[i] * anchorX;
+            let y = aY - textHeight * anchorY + lineHeight * (i + 1) + fixY;
             ctx.fillText(textLine, x, y);
         });
 

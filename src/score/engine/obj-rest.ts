@@ -199,9 +199,9 @@ export class ObjRest extends MusicObject {
     getBeamCoords(): ({ staff: ObjStaff, x: number, y: number, stemHeight: number } | undefined)[] {
         return this.staffObjects.map(obj => {
             let staff = obj.staff;
-            let x = obj.getRect().centerX;
+            let x = obj.getRect().anchorX;
             let y = this.stemDir === Stem.Up ? obj.getRect().top : obj.getRect().bottom;
-            let stemHeight = Math.abs(obj.getRect().centerY - y);
+            let stemHeight = Math.abs(obj.getRect().anchorY - y);
             return { staff, x, y, stemHeight }
         });
     }
@@ -306,12 +306,9 @@ export class ObjRest extends MusicObject {
         this.staffObjects.forEach(obj => {
             let { dotRects, restRect } = obj;
 
-            let x = restRect.centerX;
-            let y = restRect.centerY;
+            ctx.drawRest(noteSize, restRect.anchorX, restRect.anchorY);
 
-            ctx.drawRest(noteSize, x, y);
-
-            dotRects.forEach(r => ctx.fillCircle(r.centerX, r.centerY, r.width / 2));
+            dotRects.forEach(r => ctx.fillCircle(r.anchorX, r.anchorY, r.width / 2));
         });
     }
 }

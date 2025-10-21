@@ -382,7 +382,7 @@ export class RenderContext {
         let { cursorRect: r } = this;
 
         if (r) {
-            this.color(PlayPosIndicatorColor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+            this.color(PlayPosIndicatorColor).lineWidth(2).strokeLine(r.anchorX, r.top, r.anchorX, r.bottom);
         }
     }
 
@@ -711,7 +711,7 @@ export class RenderContext {
 
     drawBrace(rect: DivRect, side: "left" | "right") {
         if (this.ctx) {
-            let { left, right, width, top, bottom, centerY } = rect;
+            let { left, right, width, top, bottom, anchorY } = rect;
 
             if (side === "right") {
                 [left, right, width] = [right, left, -width];
@@ -721,13 +721,13 @@ export class RenderContext {
             this.ctx.moveTo(right, top);
             this.ctx.bezierCurveTo(
                 left + width * 0.1, top,
-                left + width * 0.8, centerY,
-                left, centerY);
+                left + width * 0.8, anchorY,
+                left, anchorY);
             this.ctx.moveTo(right, bottom);
             this.ctx.bezierCurveTo(
                 left + width * 0.1, bottom,
-                left + width * 0.8, centerY,
-                left, centerY);
+                left + width * 0.8, anchorY,
+                left, anchorY);
             this.ctx.stroke();
         }
     }

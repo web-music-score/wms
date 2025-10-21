@@ -123,8 +123,8 @@ export class LayoutObjectWrapper {
                 staticShapeRects.forEach(staticR => {
                     if (DivRect.overlapX(objR, staticR)) {
                         y = verticalPos === VerticalPos.Below
-                            ? Math.max(y, staticR.bottom + objR.toph + objR.centerY)
-                            : Math.min(y, staticR.top - objR.bottomh - objR.centerY);
+                            ? Math.max(y, staticR.bottom + objR.toph + objR.anchorY)
+                            : Math.min(y, staticR.top - objR.bottomh - objR.anchorY);
                     }
                 });
             });

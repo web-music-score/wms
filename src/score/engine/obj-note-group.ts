@@ -88,9 +88,9 @@ export class ObjStaffNoteGroup extends MusicObject {
         let bottomNoteRect = this.noteHeadRects[0];
         let topNoteRect = this.noteHeadRects[this.noteHeadRects.length - 1];
 
-        if (this.prevTopNoteY !== topNoteRect.centerY || this.prevBottomNoteY !== bottomNoteRect.centerY) {
-            this.prevTopNoteY = topNoteRect.centerY;
-            this.prevBottomNoteY = bottomNoteRect.centerY;
+        if (this.prevTopNoteY !== topNoteRect.anchorY || this.prevBottomNoteY !== bottomNoteRect.anchorY) {
+            this.prevTopNoteY = topNoteRect.anchorY;
+            this.prevBottomNoteY = bottomNoteRect.anchorY;
             this.requestRectUpdate();
         }
 
@@ -307,7 +307,7 @@ export class ObjNoteGroup extends MusicObject {
 
             if (!obj || noteIndex < 0 || noteIndex >= obj.noteHeadRects.length) {
                 let r = this.getRect();
-                return { x: r.centerX, y: r.bottom }
+                return { x: r.anchorX, y: r.bottom }
             }
 
             let noteHeadRect = obj.noteHeadRects[noteIndex];
@@ -317,8 +317,8 @@ export class ObjNoteGroup extends MusicObject {
             let stemSide: "left" | "right" | undefined = !hasStem ? undefined : (stemDir === Stem.Up ? "right" : "left");
 
             let padding = noteHeadRect.height / 2;
-            let centerX = noteHeadRect.centerX;
-            let centerY = noteHeadRect.centerY;
+            let anchorX = noteHeadRect.anchorX;
+            let anchorY = noteHeadRect.anchorY;
             let leftX = noteHeadRect.left - padding;
             let rightX = noteHeadRect.right + padding;
             let aboveY = noteHeadRect.top - padding;
@@ -334,29 +334,29 @@ export class ObjNoteGroup extends MusicObject {
 
             switch (noteAnchor) {
                 case NoteAnchor.Center:
-                    return side === "left" ? { x: rightX, y: centerY } : { x: leftX, y: centerY };
+                    return side === "left" ? { x: rightX, y: anchorY } : { x: leftX, y: anchorY };
                 case NoteAnchor.Above:
                     if (!hasStem || stemDir === Stem.Down) {
-                        return { x: centerX, y: aboveY }
+                        return { x: anchorX, y: aboveY }
                     }
                     else {
                         return {
-                            x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : centerX),
+                            x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : anchorX),
                             y: aboveY
                         }
                     }
                 case NoteAnchor.Below:
                     if (!hasStem || stemDir === Stem.Up) {
-                        return { x: centerX, y: belowY }
+                        return { x: anchorX, y: belowY }
                     }
                     else {
                         return {
-                            x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : centerX),
+                            x: side === "left" && stemSide === "right" ? rightX : (side === "right" && stemSide === "left" ? leftX : anchorX),
                             y: belowY
                         }
                     }
                 case NoteAnchor.StemTip:
-                    return { x: centerX, y: stemTip!.centerY + (stemDir === Stem.Up ? -padding : padding) }
+                    return { x: anchorX, y: stemTip!.anchorY + (stemDir === Stem.Up ? -padding : padding) }
                 default:
                     throw new MusicError(MusicErrorType.Score, "Invalid noteAnchor: " + noteAnchor);
             }
@@ -380,14 +380,14 @@ export class ObjNoteGroup extends MusicObject {
                 let slideUp = leftFretNumber === undefined || rightFretNumber === undefined || leftFretNumber <= rightFretNumber;
 
                 if (side === "left") {
-                    y = (slideUp ? (r.centerY + r.bottomh) : (r.centerY - r.toph)) * s;
+                    y = (slideUp ? (r.anchorY + r.bottomh) : (r.anchorY - r.toph)) * s;
                 }
                 else {
-                    y = (slideUp ? (r.centerY - r.toph) : (r.centerY + r.bottomh)) * s;
+                    y = (slideUp ? (r.anchorY - r.toph) : (r.anchorY + r.bottomh)) * s;
                 }
             }
             else {
-                y = r.centerY + r.bottomh * s;
+                y = r.anchorY + r.bottomh * s;
             }
 
             return { x, y }
@@ -482,9 +482,9 @@ export class ObjNoteGroup extends MusicObject {
     getBeamCoords(): ({ staff: ObjStaff, x: number, y: number, stemHeight: number } | undefined)[] {
         return this.staffObjects.map(obj => {
             let staff = obj.staff;
-            let x = obj.stemTip?.centerX ?? obj.noteHeadRects[0].centerX;
-            let y = obj.stemTip?.centerY ?? (this.stemDir === Stem.Up ? obj.getRect().top : obj.getRect().bottom);
-            let stemHeight = this.stemDir === Stem.Up ? Math.abs(obj.noteHeadRects[0].centerY - y) : Math.abs(obj.noteHeadRects[obj.noteHeadRects.length - 1].centerY - y);
+            let x = obj.stemTip?.anchorX ?? obj.noteHeadRects[0].anchorX;
+            let y = obj.stemTip?.anchorY ?? (this.stemDir === Stem.Up ? obj.getRect().top : obj.getRect().bottom);
+            let stemHeight = this.stemDir === Stem.Up ? Math.abs(obj.noteHeadRects[0].anchorY - y) : Math.abs(obj.noteHeadRects[obj.noteHeadRects.length - 1].anchorY - y);
             return { staff, x, y, stemHeight }
         });
     }
@@ -661,8 +661,8 @@ export class ObjNoteGroup extends MusicObject {
             });
 
             // Calculate stem
-            let bottomNoteY = obj.noteHeadRects[0].centerY;
-            let topNoteY = obj.noteHeadRects[obj.noteHeadRects.length - 1].centerY;
+            let bottomNoteY = obj.noteHeadRects[0].anchorY;
+            let topNoteY = obj.noteHeadRects[obj.noteHeadRects.length - 1].anchorY;
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
             let stemHeight = this.getStemHeight(ctx);
             let stemTipY = stemDir === Stem.Up ? topNoteY - stemHeight : bottomNoteY + stemHeight;
@@ -714,7 +714,7 @@ export class ObjNoteGroup extends MusicObject {
                     let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
                     fretNumber.layout(ctx);
 
-                    let x = this.col.getRect().centerX;
+                    let x = this.col.getRect().anchorX;
                     let y = tab.getStringY(stringNumber - 1);
 
                     fretNumber.offset(x, y);
@@ -750,8 +750,8 @@ export class ObjNoteGroup extends MusicObject {
     setStemTipY(staff: ObjStaff, stemTipY: number) {
         let obj = this.staffObjects.find(obj => obj.staff === staff);
 
-        if (this.hasBeamCount() && obj?.stemTip && stemTipY !== obj.stemTip.centerY) {
-            obj.stemTip.top = obj.stemTip.centerY = obj.stemTip.bottom = stemTipY;
+        if (this.hasBeamCount() && obj?.stemTip && stemTipY !== obj.stemTip.anchorY) {
+            obj.stemTip.top = obj.stemTip.anchorY = obj.stemTip.bottom = stemTipY;
             this.requestRectUpdate();
         }
     }
@@ -780,34 +780,34 @@ export class ObjNoteGroup extends MusicObject {
                 if (this.diamond) {
                     if (isSolidNoteHead) {
                         ctx.beginPath();
-                        ctx.moveTo(r.centerX, r.top);
-                        ctx.lineTo(r.right, r.centerY);
-                        ctx.lineTo(r.centerX, r.bottom);
-                        ctx.lineTo(r.left, r.centerY);
-                        ctx.lineTo(r.centerX, r.top);
+                        ctx.moveTo(r.anchorX, r.top);
+                        ctx.lineTo(r.right, r.anchorY);
+                        ctx.lineTo(r.anchorX, r.bottom);
+                        ctx.lineTo(r.left, r.anchorY);
+                        ctx.lineTo(r.anchorX, r.top);
                         ctx.fill();
                     }
                     else {
                         ctx.beginPath();
                         ctx.lineWidth(2.5);
-                        ctx.moveTo(r.centerX, r.top);
-                        ctx.lineTo(r.right, r.centerY);
-                        ctx.moveTo(r.left, r.centerY);
-                        ctx.lineTo(r.centerX, r.bottom);
+                        ctx.moveTo(r.anchorX, r.top);
+                        ctx.lineTo(r.right, r.anchorY);
+                        ctx.moveTo(r.left, r.anchorY);
+                        ctx.lineTo(r.anchorX, r.bottom);
                         ctx.stroke();
 
                         ctx.beginPath();
                         ctx.lineWidth(1);
-                        ctx.moveTo(r.right, r.centerY);
-                        ctx.lineTo(r.centerX, r.bottom);
-                        ctx.moveTo(r.centerX, r.top);
-                        ctx.lineTo(r.left, r.centerY);
+                        ctx.moveTo(r.right, r.anchorY);
+                        ctx.lineTo(r.anchorX, r.bottom);
+                        ctx.moveTo(r.anchorX, r.top);
+                        ctx.lineTo(r.left, r.anchorY);
                         ctx.stroke();
                     }
                 }
                 else {
                     ctx.beginPath();
-                    ctx.ellipse(r.centerX, r.centerY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
+                    ctx.ellipse(r.anchorX, r.anchorY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
 
                     if (isSolidNoteHead) {
                         ctx.fill();
@@ -819,13 +819,13 @@ export class ObjNoteGroup extends MusicObject {
             });
 
             // Draw dots
-            obj.dotRects.forEach(r => ctx.fillCircle(r.centerX, r.centerY, r.width / 2));
+            obj.dotRects.forEach(r => ctx.fillCircle(r.anchorX, r.anchorY, r.width / 2));
 
             // Draw stem
             if (obj.stemTip && obj.stemBase) {
                 ctx.beginPath();
-                ctx.moveTo(obj.stemBase.centerX, obj.stemBase.centerY);
-                ctx.lineTo(obj.stemTip.centerX, obj.stemTip.centerY);
+                ctx.moveTo(obj.stemBase.anchorX, obj.stemBase.anchorY);
+                ctx.lineTo(obj.stemTip.anchorX, obj.stemTip.anchorY);
                 ctx.stroke();
             }
 

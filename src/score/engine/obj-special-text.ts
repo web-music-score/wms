@@ -61,8 +61,8 @@ export class ObjSpecialText extends MusicObject {
                 codaSym.offset(0, (codaText.getRect().top + codaText.getRect().bottom) / 2);
                 codaText.offset(codaSym.getRect().right, 0);
                 this.rect = new DivRect(
-                    codaSym.getRect().left, codaSym.getRect().centerX, codaText.getRect().right,
-                    codaText.getRect().top, codaText.getRect().centerY, codaText.getRect().bottom
+                    codaSym.getRect().left, codaSym.getRect().anchorX, codaText.getRect().right,
+                    codaText.getRect().top, codaText.getRect().anchorY, codaText.getRect().bottom
                 );
                 break;
             }
@@ -74,8 +74,8 @@ export class ObjSpecialText extends MusicObject {
                 codaSym.offset(0, (toCodaText.getRect().top + toCodaText.getRect().bottom) / 2);
                 toCodaText.offset(codaSym.getRect().left, 0);
                 this.rect = new DivRect(
-                    toCodaText.getRect().left, codaSym.getRect().centerX, codaSym.getRect().right,
-                    toCodaText.getRect().top, toCodaText.getRect().centerY, toCodaText.getRect().bottom
+                    toCodaText.getRect().left, codaSym.getRect().anchorX, codaSym.getRect().right,
+                    toCodaText.getRect().top, toCodaText.getRect().anchorY, toCodaText.getRect().bottom
                 );
                 break;
             }

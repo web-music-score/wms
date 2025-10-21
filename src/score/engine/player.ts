@@ -538,7 +538,7 @@ export class Player {
 
         let measure = col.measure;
 
-        let x = col.getRect().centerX;
+        let x = col.getRect().anchorX;
         let top = measure.row.getRect().top;
         let bottom = measure.row.getRect().bottom;
 

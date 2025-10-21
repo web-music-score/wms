@@ -54,10 +54,10 @@ export class ObjTabRhythm extends MusicObject {
         let stemHeight = unitSize * 5;
 
         this.rect.left = left;
-        this.rect.centerX = (left + right) / 2;
+        this.rect.anchorX = (left + right) / 2;
         this.rect.right = right;
         this.rect.top = this.hasTuplets() ? -fontSize : 0;
-        this.rect.centerY = 0; // Center line is at stem top, under the tuplet number.
+        this.rect.anchorY = 0; // Center line is at stem top, under the tuplet number.
         this.rect.bottom = stemHeight;
     }
 
@@ -78,9 +78,9 @@ export class ObjTabRhythm extends MusicObject {
         let flagSize = unitSize;
         let dotSpace = unitSize;
         let dotWidth = unitSize * 0.25;
-        let { bottom, centerY } = this.getRect();
+        let { bottom, anchorY } = this.getRect();
 
-        let stemTop = centerY;
+        let stemTop = anchorY;
         let stemBottom = bottom;
 
         let columns = this.measure.getColumns();
@@ -100,7 +100,7 @@ export class ObjTabRhythm extends MusicObject {
             for (let j = 0; j < symbols.length; j++) {
                 let sym = symbols[j];
                 let nextSym = symbols[j + 1];
-                let colX = sym.col.getRect().centerX;
+                let colX = sym.col.getRect().anchorX;
                 if (sym instanceof ObjNoteGroup) {
                     if (sym.rhythmProps.noteSize >= 2) {
                         ctx.lineWidth(sym.rhythmProps.noteSize === 4 ? 2 : 1);
@@ -137,8 +137,8 @@ export class ObjTabRhythm extends MusicObject {
                 if (nextSym) {
                     let left = sym;
                     let right = nextSym;
-                    let leftX = left.col.getRect().centerX;
-                    let rightX = right.col.getRect().centerX;
+                    let leftX = left.col.getRect().anchorX;
+                    let rightX = right.col.getRect().anchorX;
                     let leftBeamCount = left.hasTuplet() ? 1 : left instanceof ObjNoteGroup ? left.getRightBeamCount() : 1;
                     let rightBeamCount = right.hasTuplet() ? 1 : right instanceof ObjNoteGroup ? right.getLeftBeamCount() : 1;
                     let maxBeamCount = Math.max(leftBeamCount, rightBeamCount);
@@ -164,14 +164,14 @@ export class ObjTabRhythm extends MusicObject {
 
                 if (beamGroup && beamGroup.isTuplet()) {
                     // Add tuplet number
-                    let cx = (symbols[0].col.getRect().centerX + symbols[symbols.length - 1].col.getRect().centerX) / 2;
+                    let cx = (symbols[0].col.getRect().anchorX + symbols[symbols.length - 1].col.getRect().anchorX) / 2;
                     let text = beamGroup.getTupletRatioText();
                     let textObj = this.tupletPartsTextObjMap.get(text);
                     if (!textObj) {
                         this.tupletPartsTextObjMap.set(text, textObj = new ObjText(this, { text, scale: 0.75 }, 0.5, 0.5));
                         textObj.layout(ctx);
                     }
-                    textObj.offset(-textObj.getRect().centerX, -textObj.getRect().centerY);
+                    textObj.offset(-textObj.getRect().anchorX, -textObj.getRect().anchorY);
                     textObj.offset(cx, stemTop - fontSize / 2);
                     textObj.draw(ctx);
                 }
