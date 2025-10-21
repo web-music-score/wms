@@ -1,4 +1,4 @@
-import { Utils, Vec2, Device } from "@tspro/ts-utils-lib";
+import { Utils, Vec, Device } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
 import { MDocument, DivRect, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
@@ -57,7 +57,7 @@ export class RenderContext {
     private mdoc?: MDocument;
 
     private cursorRect?: DivRect;
-    private mousePos?: Vec2; // Mouse coord in document space
+    private mousePos?: Vec; // Mouse coord in document space
 
     private curStaffPos?: StaffPos;
     private curObjects?: MusicObject[];
@@ -172,8 +172,8 @@ export class RenderContext {
         return this.scoreEventListener !== undefined;
     }
 
-    getMousePos(e: MouseEvent): Vec2 {
-        return new Vec2(e.offsetX, e.offsetY);
+    getMousePos(e: MouseEvent): Vec {
+        return new Vec(e.offsetX, e.offsetY);
     }
 
     private updateCurStaffPos(staffPos: StaffPos | undefined, click: boolean): boolean {
@@ -386,11 +386,11 @@ export class RenderContext {
         }
     }
 
-    txFromScreenCoord(screenCoord: Vec2) {
+    txFromScreenCoord(screenCoord: Vec) {
         return screenCoord.mul(this.devicePixelRatio);
     }
 
-    txToScreenCoord(coord: Vec2) {
+    txToScreenCoord(coord: Vec) {
         return coord.div(this.devicePixelRatio);
     }
 
