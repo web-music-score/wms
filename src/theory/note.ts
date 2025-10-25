@@ -1,4 +1,4 @@
-import { Guard } from "@tspro/ts-utils-lib";
+import { Guard, Map1 } from "@tspro/ts-utils-lib";
 import { PitchNotation, SymbolSet } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -49,8 +49,8 @@ const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 
 /** Note class. */
 export class Note {
-    private static noteByNameCache = new Map<string, Note>();
-    private static chromaticNoteCache = new Map<number, Note>();
+    private static noteCache = new Map1<string, Note>();
+    private static chromaticNoteCache = new Map1<number, Note>();
 
     /** Diatonic class */
     readonly diatonicClass: number;
@@ -171,24 +171,17 @@ export class Note {
      * @returns - Note.
      */
     static getNote(noteName: string): Note {
-        let note = this.noteByNameCache.get(noteName);
-
-        if (note === undefined) {
+        return this.noteCache.getOrCreate(noteName, () => {
             let p = Note.parseNote(noteName);
 
-            if (!p) {
-                throw new MusicError(MusicErrorType.Note, `Invalid noteName: ${noteName}`);
-            }
-            if (p.octave === undefined) {
-                throw new MusicError(MusicErrorType.Note, `Octave is required for note.`);
-            }
+            if (!p)
+                throw new MusicError(MusicErrorType.Note, `Invalid note "${noteName}".`);
 
-            note = new Note(p.noteLetter, p.accidental, p.octave);
+            if (p.octave === undefined)
+                throw new MusicError(MusicErrorType.Note, `Invalid note "${noteName}" (missing octave).`);
 
-            this.noteByNameCache.set(noteName, note);
-        }
-
-        return note;
+            return new Note(p.noteLetter, p.accidental, p.octave);
+        });
     }
 
     /**
@@ -202,31 +195,26 @@ export class Note {
     }
 
     /**
+     * Validate given note name.
+     * @param noteName - Note name.
+     * @returns - True or throws.
+     */
+    static validateNote(noteName: string): true {
+        if (this.isNote(noteName)) return true;
+        throw new MusicError(MusicErrorType.Note, `Invalid note "${noteName}"`);
+    }
+
+    /**
      * Get chromatic note. There are number of alternatives, this function uses simple logic to choose one.
      * @param chromaticId - Chromatic id.
      * @returns - Note.
      */
     static getChromaticNote(chromaticId: number): Note {
-        let note = this.chromaticNoteCache.get(chromaticId);
-
-        if (note === undefined) {
+        return this.chromaticNoteCache.getOrCreate(chromaticId, () => {
             const NoteNameList = ["C/B#", "C#/Db", "D", "D#/Eb", "E/Fb", "F/E#", "F#/Gb", "G", "G#/Ab", "A", "A#/Bb", "B/Cb"];
             let noteName = NoteNameList[Note.getChromaticClass(chromaticId)].split("/")[0] + Note.getOctaveFromChromaticId(chromaticId);
-            let p = Note.parseNote(noteName);
-
-            if (!p) {
-                throw new MusicError(MusicErrorType.Note, `Invalid noteName: ${noteName}`);
-            }
-            if (p.octave === undefined) {
-                throw new MusicError(MusicErrorType.Note, `Octave is required for note.`);
-            }
-
-            note = new Note(p.noteLetter, p.accidental, p.octave);
-
-            this.chromaticNoteCache.set(chromaticId, note);
-        }
-
-        return note;
+            return Note.getNote(noteName);
+        });
     }
 
     /**
