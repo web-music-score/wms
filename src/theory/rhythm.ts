@@ -94,12 +94,21 @@ export enum NoteLength {
 export type NoteLengthStr = `${NoteLength}`;
 
 /**
+ * Test if given argument is note length.
+ * @param noteLength - Note length to validate.
+ * @returns - True/false.
+ */
+export function isNoteLength(noteLength: unknown): noteLength is NoteLength {
+    return Guard.isEnumValue(noteLength, NoteLength);
+}
+
+/**
  * Validate if given argument is note length.
  * @param noteLength - Note length to validate.
  * @returns - Valid note length or throws.
  */
 export function validateNoteLength(noteLength: unknown): NoteLength {
-    if (Guard.isEnumValue(noteLength, NoteLength)) {
+    if (isNoteLength(noteLength)) {
         return noteLength;
     }
     else {
@@ -215,13 +224,26 @@ export interface TupletRatio {
 }
 
 /**
+ * Test if given argument is tuplet ratio.
+ * @param tupletRatio - Tuplet ratio to validate.
+ * @returns - True/false.
+ */
+export function isTupletRatio(tupletRatio: unknown): tupletRatio is TupletRatio {
+    return (
+        Guard.isObject(tupletRatio) &&
+        Guard.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioValue) &&
+        Guard.isIntegerBetween(tupletRatio.inTimeOf, 2, MaxTupletRatioValue)
+    );
+}
+
+/**
  * Validate if given argument is tuplet ratio.
  * @param tupletRatio - Tuplet ratio to validate.
  * @returns - Valid tuplet ratio or throws.
  */
 export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
-    if (Guard.isObject(tupletRatio) && Guard.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioValue) && Guard.isIntegerBetween(tupletRatio.inTimeOf, 2, MaxTupletRatioValue)) {
-        return tupletRatio as unknown as TupletRatio;
+    if (isTupletRatio(tupletRatio)) {
+        return tupletRatio;
     }
     else {
         throw new MusicError(MusicErrorType.Note, `Invalid tupletRatio ${JSON.stringify(tupletRatio)}`);

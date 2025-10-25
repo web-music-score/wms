@@ -21,7 +21,7 @@ import { Guard } from "@tspro/ts-utils-lib";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { PlayStateChangeListener, VoiceId, getVoiceIds } from "./types";
+import { PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
 import { MPlayer } from "./music-interface";
@@ -32,10 +32,6 @@ function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
         throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
     }
-}
-
-function isVoiceId(value: unknown): value is VoiceId {
-    return Guard.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
 }
 
 function getNotationLine(line: ObjNotationLine): MStaff | MTab {
