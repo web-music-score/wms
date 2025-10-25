@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "@tspro/web-music-score/theory";
@@ -13,18 +13,6 @@ function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
         throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
     }
-}
-
-function isVoiceId(value: unknown): value is VoiceId {
-    return Guard.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
-}
-
-function isStringNumber(value: unknown): value is StringNumber {
-    return Guard.isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
-}
-
-function isVerseNumber(value: unknown): value is VerseNumber {
-    return Guard.isNumber(value) && (<number[]>getVerseNumbers()).indexOf(value) >= 0;
 }
 
 function assertBaseConfig(baseConfig: BaseConfig) {
@@ -85,6 +73,7 @@ function assertNoteOptions(noteOptions: NoteOptions) {
     assertArg((
         Guard.isUndefined(noteOptions.string) ||
         isStringNumber(noteOptions.string) ||
+        Guard.isEmptyArray(noteOptions.string) ||
         Guard.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => isStringNumber(string))
     ), "noteOptions.string", noteOptions.string);
 

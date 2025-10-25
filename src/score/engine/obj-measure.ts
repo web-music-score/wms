@@ -2,7 +2,7 @@ import { Guard, IndexArray, Map1, Map3, Utils, asMulti } from "@tspro/ts-utils-l
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -33,24 +33,6 @@ type AlterTempo = {
     options?: {
         beatLength: NoteLength,
         dotCount?: number
-    }
-}
-
-export function validateVoiceId(voiceId: unknown): VoiceId {
-    if (typeof voiceId === "number" && (<number[]>getVoiceIds()).indexOf(voiceId) < 0) {
-        throw new MusicError(MusicErrorType.Score, "Invalid voiceId: " + voiceId);
-    }
-    else {
-        return voiceId as VoiceId;
-    }
-}
-
-export function validateVerseNumber(verse: number): VerseNumber {
-    if (typeof verse === "number" && (<number[]>getVerseNumbers()).indexOf(verse) < 0) {
-        throw new MusicError(MusicErrorType.Score, "Invalid lyrics verse: " + verse);
-    }
-    else {
-        return verse as VerseNumber;
     }
 }
 

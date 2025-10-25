@@ -1,10 +1,10 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId } from "../pub";
+import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
-import { ObjMeasure, validateVoiceId } from "./obj-measure";
+import { ObjMeasure } from "./obj-measure";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";

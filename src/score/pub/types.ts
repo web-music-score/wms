@@ -1,4 +1,6 @@
+import { Guard } from "@tspro/ts-utils-lib";
 import { Note } from "@tspro/web-music-score/theory";
+import { MusicError, MusicErrorType } from "core/error";
 
 /** Staff preset values for score configuration. */
 export enum StaffPreset {
@@ -76,6 +78,19 @@ export function getVoiceIds(): ReadonlyArray<VoiceId> {
     return [0, 1, 2, 3];
 }
 
+export function isVoiceId(voiceId: unknown): voiceId is VoiceId {
+    return Guard.isIncluded(voiceId, getVoiceIds());
+}
+
+export function validateVoiceId(voiceId: unknown): VoiceId {
+    if (isVoiceId(voiceId)) {
+        return voiceId;
+    }
+    else {
+        throw new MusicError(MusicErrorType.Score, `Voice id ${voiceId} is invalid!`);
+    }
+}
+
 /** Strng number. */
 export type StringNumber = 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -84,12 +99,38 @@ export function getStringNumbers(): ReadonlyArray<StringNumber> {
     return [1, 2, 3, 4, 5, 6];
 }
 
+export function isStringNumber(stringNum: unknown): stringNum is VerseNumber {
+    return Guard.isIncluded(stringNum, getStringNumbers());
+}
+
+export function validateStringNumber(stringNum: unknown): VerseNumber {
+    if (isStringNumber(stringNum)) {
+        return stringNum;
+    }
+    else {
+        throw new MusicError(MusicErrorType.Score, `String number ${stringNum} is invalid!`);
+    }
+}
+
 /** Verse number. */
 export type VerseNumber = 1 | 2 | 3;
 
 /** Get supported verse numbers. Returns [1, 2, 3]. */
 export function getVerseNumbers(): ReadonlyArray<VerseNumber> {
     return [1, 2, 3];
+}
+
+export function isVerseNumber(verse: unknown): verse is VerseNumber {
+    return Guard.isIncluded(verse, getVerseNumbers());
+}
+
+export function validateVerseNumber(verseNum: unknown): VerseNumber {
+    if (isVerseNumber(verseNum)) {
+        return verseNum;
+    }
+    else {
+        throw new MusicError(MusicErrorType.Score, `Verse number ${verseNum} is invalid!`);
+    }
 }
 
 /** Stem direction enum. */
