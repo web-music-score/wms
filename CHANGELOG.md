@@ -1,8 +1,15 @@
 # Changelog
 
 ## [5.3.1] - 2025-10-
+### Added
+- isVoiceId(), isStringNumber() and isVerseNumber().
+- Note.isNote().
+
 ### Fixed
 - Improved note displacement when notes are close to each other.
+
+### Changed
+- Many updates with new ts-utils-lib versions.
 
 ## [5.3.0] - 2025-10-16
 ## Added
