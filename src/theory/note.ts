@@ -192,6 +192,16 @@ export class Note {
     }
 
     /**
+     * Test if given note name valid.
+     * @param noteName - Note name.
+     * @returns - True/false.
+     */
+    static isNote(noteName: string): boolean {
+        let p = Note.parseNote(noteName);
+        return p !== undefined && p.octave !== undefined;
+    }
+
+    /**
      * Get chromatic note. There are number of alternatives, this function uses simple logic to choose one.
      * @param chromaticId - Chromatic id.
      * @returns - Note.

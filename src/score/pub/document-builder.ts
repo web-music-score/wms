@@ -15,16 +15,6 @@ function assertArg(condition: boolean, argName: string, argValue: unknown) {
     }
 }
 
-function isNote(note: string): boolean {
-    if (typeof note !== "string") {
-        return false;
-    }
-    else {
-        let p = Note.parseNote(note);
-        return p !== undefined && p.octave !== undefined;
-    }
-}
-
 function isVoiceId(value: unknown): value is VoiceId {
     return Guard.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
 }
@@ -61,8 +51,8 @@ function assertStaffConfig(staffConfig: StaffConfig) {
     assertArg(staffConfig.type === "staff", "staffConfig.type", staffConfig.type);
     assertArg(Guard.isEnumValue(staffConfig.clef, Clef), "staffConfig.clef", staffConfig.clef);
     assertArg(Guard.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
-    assertArg(Guard.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
-    assertArg(Guard.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
+    assertArg(Guard.isUndefined(staffConfig.minNote) || Note.isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
+    assertArg(Guard.isUndefined(staffConfig.maxNote) || Note.isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
     assertArg(Guard.isStringOrUndefined(staffConfig.grandId), "staffConfig.grandId", staffConfig.grandId);
     assertArg(Guard.isBooleanOrUndefined(staffConfig.isGrand), "staffConfig.isGrand", staffConfig.isGrand);
     if (!Guard.isUndefined(staffConfig.isGrand)) {
@@ -79,7 +69,7 @@ function assertTabConfig(tabConfig: TabConfig) {
         assertArg(TuningNameList.includes(tabConfig.tuning), "tabConfig.tuning", tabConfig.tuning);
     }
     else if (Guard.isArray(tabConfig.tuning)) {
-        assertArg(tabConfig.tuning.length === getStringNumbers().length && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
+        assertArg(tabConfig.tuning.length === getStringNumbers().length && tabConfig.tuning.every(s => Note.isNote(s)), "tabConfig.tuning", tabConfig.tuning);
     }
 }
 
