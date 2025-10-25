@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
@@ -18,7 +18,7 @@ export function getNavigationString(navigation: Navigation): string {
 }
 
 export function isDynamicsText(text: string): text is `${DynamicsAnnotation}` {
-    return Utils.Is.isEnumValue(text, DynamicsAnnotation);
+    return Guard.isEnumValue(text, DynamicsAnnotation);
 }
 
 export function getDynamicsVolume(text: string): number | undefined {
@@ -32,14 +32,14 @@ export function getDynamicsVolume(text: string): number | undefined {
 }
 
 export function isTempoText(text: string): text is `${TempoAnnotation}` {
-    return Utils.Is.isEnumValue(text, TempoAnnotation);
+    return Guard.isEnumValue(text, TempoAnnotation);
 }
 
 export function getAnnotation(text: string): Annotation | undefined {
-    if (Utils.Is.isEnumValue(text, DynamicsAnnotation)) {
+    if (Guard.isEnumValue(text, DynamicsAnnotation)) {
         return Annotation.Dynamics;
     }
-    else if (Utils.Is.isEnumValue(text, TempoAnnotation)) {
+    else if (Guard.isEnumValue(text, TempoAnnotation)) {
         return Annotation.Tempo;
     }
     else {

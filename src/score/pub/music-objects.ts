@@ -17,7 +17,7 @@ import { ObjRhythmColumn } from "../engine/obj-rhythm-column";
 import { ObjScoreRow } from "../engine/obj-score-row";
 import { ObjStaffSignature, ObjTabSignature } from "../engine/obj-signature";
 import { ObjText } from "../engine/obj-text";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
@@ -35,7 +35,7 @@ function assertArg(condition: boolean, argName: string, argValue: unknown) {
 }
 
 function isVoiceId(value: unknown): value is VoiceId {
-    return Utils.Is.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
+    return Guard.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
 }
 
 function getNotationLine(line: ObjNotationLine): MStaff | MTab {
@@ -240,7 +240,7 @@ export class MDocument extends MusicInterface {
      * @returns - Player instance.
      */
     play(playStateChangeListener?: PlayStateChangeListener): MPlayer {
-        assertArg(Utils.Is.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
+        assertArg(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
         return new MPlayer(this, playStateChangeListener).play();
     }
 }
@@ -274,7 +274,7 @@ export class MEnding extends MusicInterface {
      * @returns - Boolean whether this ending has asked passage number.
      */
     hasPassage(passage: number): boolean {
-        assertArg(Utils.Is.isIntegerGte(passage, 1), "passage", passage);
+        assertArg(Guard.isIntegerGte(passage, 1), "passage", passage);
         return this.obj.hasPassage(passage);
     }
 }

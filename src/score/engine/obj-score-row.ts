@@ -6,7 +6,7 @@ import { ObjDocument } from "./obj-document";
 import { RenderContext } from "./render-context";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
@@ -55,7 +55,7 @@ export class ObjScoreRow extends MusicObject {
         this.instrumentLineGroups = lineGroups;
 
         this.instrumentNames = this.instrumentLineGroups.map(lines => {
-            return lines.length > 0 && Utils.Is.isNonEmptyString(lines[0].getConfig().instrument)
+            return lines.length > 0 && Guard.isNonEmptyString(lines[0].getConfig().instrument)
                 ? new ObjText(this, String(lines[0].getConfig().instrument), 0, 0.5)
                 : undefined;
         });
@@ -101,7 +101,7 @@ export class ObjScoreRow extends MusicObject {
     findMatchingLine(line: ObjNotationLine): ObjNotationLine | undefined {
         return line.row === this ? line : this.notationLines.find(curLine =>
             Utils.Obj.deepEqual(line.row.scoreConfig, curLine.row.scoreConfig) && line.id === curLine.id ||
-            Utils.Is.isNonEmptyString(line.getConfig().name) && line.getConfig().name === curLine.getConfig().name && line.getConfig().type === curLine.getConfig().type
+            Guard.isNonEmptyString(line.getConfig().name) && line.getConfig().name === curLine.getConfig().name && line.getConfig().type === curLine.getConfig().type
         );
     }
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "@tspro/web-music-score/score";
 import { Handedness } from "@tspro/web-music-score/theory";
 import { GuitarContext, FretPosition } from "./guitar-context";
@@ -17,7 +17,7 @@ const t_table = [0, /* nut */
 ];
 
 function fret_t(fretId: number) {
-    if (!Utils.Is.isInteger(fretId) || fretId < 0 || fretId > t_table.length - 1) {
+    if (!Guard.isInteger(fretId) || fretId < 0 || fretId > t_table.length - 1) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid fretId: ${fretId}`);
     }
     else {

@@ -5,7 +5,7 @@ import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "..
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -274,7 +274,7 @@ export class ObjStaff extends ObjNotationLine {
     }
 
     containsVoiceId(voiceId: VoiceId): boolean {
-        return Utils.Is.isUndefined(this.staffConfig.voiceId) || Utils.Arr.toArray(this.staffConfig.voiceId).includes(voiceId);
+        return Guard.isUndefined(this.staffConfig.voiceId) || Utils.Arr.toArray(this.staffConfig.voiceId).includes(voiceId);
     }
 
     calcTop(): number {
@@ -352,7 +352,7 @@ export class ObjTab extends ObjNotationLine {
     constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig, readonly id: number) {
         super(row);
 
-        if (Utils.Is.isArray(tabConfig.tuning)) {
+        if (Guard.isArray(tabConfig.tuning)) {
             this.tuningName = undefined;
             this.tuningStrings = tabConfig.tuning.map(noteName => Note.getNote(noteName)).reverse();
         }
@@ -418,7 +418,7 @@ export class ObjTab extends ObjNotationLine {
     }
 
     containsVoiceId(voiceId: VoiceId): boolean {
-        return Utils.Is.isUndefined(this.tabConfig.voiceId) || Utils.Arr.toArray(this.tabConfig.voiceId).includes(voiceId);
+        return Guard.isUndefined(this.tabConfig.voiceId) || Utils.Arr.toArray(this.tabConfig.voiceId).includes(voiceId);
     }
 
     containsDiatonicId(diatonicId: number): boolean {

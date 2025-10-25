@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
@@ -45,7 +45,7 @@ export class ObjConnective extends MusicObject {
             this.rightNoteId = args[1];
             this.tieType = undefined;
         }
-        else if (Utils.Is.isEnumValue(args[0], TieType)) {
+        else if (Guard.isEnumValue(args[0], TieType)) {
             this.rightNoteGroup = undefined;
             this.rightNoteId = undefined;
             this.tieType = args[0];

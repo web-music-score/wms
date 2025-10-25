@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 /** Symbol set enum. */
@@ -29,7 +29,7 @@ export const DefaultPitchNotation = PitchNotation.Scientific;
  * @returns - Valid pitch notation or throws.
  */
 export function validatePitchNotation(pn: unknown): PitchNotation {
-    if (Utils.Is.isEnumValue(pn, PitchNotation)) {
+    if (Guard.isEnumValue(pn, PitchNotation)) {
         return pn;
     }
     else {
@@ -68,7 +68,7 @@ export const GuitarNoteLabelList: ReadonlyArray<GuitarNoteLabel> = Utils.Enum.ge
  * @returns - Valid guitar note label or throws.
  */
 export function validateGuitarNoteLabel(label: unknown): GuitarNoteLabel {
-    if (Utils.Is.isEnumValue(label, GuitarNoteLabel)) {
+    if (Guard.isEnumValue(label, GuitarNoteLabel)) {
         return label;
     }
     else {

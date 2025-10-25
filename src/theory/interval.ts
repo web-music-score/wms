@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -130,7 +130,7 @@ export function validateIntervalQuality(q: unknown): IntervalQuality {
 }
 
 function formatQuantity(q: number) {
-    if (!Utils.Is.isIntegerGte(q, 1)) {
+    if (!Guard.isIntegerGte(q, 1)) {
         throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quantity: ${q}`);
     }
     else {

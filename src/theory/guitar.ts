@@ -1,4 +1,4 @@
-import { Utils, LRUCache } from "@tspro/ts-utils-lib";
+import { Guard, LRUCache } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
@@ -20,7 +20,7 @@ export const DefaultHandedness = Handedness.RightHanded;
  * @returns - Guitar handedness if valid, else throws.
  */
 export function validateHandedness(h: unknown): Handedness {
-    if (Utils.Is.isEnumValue(h, Handedness)) {
+    if (Guard.isEnumValue(h, Handedness)) {
         return h;
     }
     else {
@@ -75,7 +75,7 @@ export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {
 
         tuningStrings = tuningData.strings.slice().reverse().map(noteName => Note.getNote(noteName));
 
-        if (!Utils.Is.isIntegerEq(tuningStrings.length, 6)) {
+        if (!Guard.isIntegerEq(tuningStrings.length, 6)) {
             throw new MusicError(MusicErrorType.Unknown, `Tuning has ${tuningStrings.length} strings.`);
         }
 

@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 const MaxTupletRatioValue = 12;
@@ -99,7 +99,7 @@ export type NoteLengthStr = `${NoteLength}`;
  * @returns - Valid note length or throws.
  */
 export function validateNoteLength(noteLength: unknown): NoteLength {
-    if (Utils.Is.isEnumValue(noteLength, NoteLength)) {
+    if (Guard.isEnumValue(noteLength, NoteLength)) {
         return noteLength;
     }
     else {
@@ -175,7 +175,7 @@ export class NoteLengthProps {
      */
     static create(noteLength: NoteLength | NoteLengthStr | string | number, dotCount: number = 0): NoteLengthProps {
         let noteSize = typeof noteLength === "number" ? noteLength : this.get(noteLength).noteSize;
-        return this.get(noteSize + (Utils.Is.isIntegerGte(dotCount, 1) ? ".".repeat(dotCount) : "n"));
+        return this.get(noteSize + (Guard.isIntegerGte(dotCount, 1) ? ".".repeat(dotCount) : "n"));
     }
 
     /**
@@ -220,7 +220,7 @@ export interface TupletRatio {
  * @returns - Valid tuplet ratio or throws.
  */
 export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
-    if (Utils.Is.isObject(tupletRatio) && Utils.Is.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioValue) && Utils.Is.isIntegerBetween(tupletRatio.inTimeOf, 2, MaxTupletRatioValue)) {
+    if (Guard.isObject(tupletRatio) && Guard.isIntegerBetween(tupletRatio.parts, 2, MaxTupletRatioValue) && Guard.isIntegerBetween(tupletRatio.inTimeOf, 2, MaxTupletRatioValue)) {
         return tupletRatio as unknown as TupletRatio;
     }
     else {
@@ -269,7 +269,7 @@ export class RhythmProps {
         this.hasStem = p.hasStem;
         this.isSolidNoteHead = p.isSolid;
 
-        if (Utils.Is.isObject(tupletRatio)) {
+        if (Guard.isObject(tupletRatio)) {
             this.tupletRatio = validateTupletRatio(tupletRatio);
         }
         else if (p.isTriplet) {

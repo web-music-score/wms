@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
@@ -22,7 +22,7 @@ function parseDegree(degree: number | string): { deg: number, acc: number } {
     let acc = Note.getAccidental(m[1] ?? "") ?? 0;
     let deg = +m[2];
 
-    if (!Utils.Is.isInteger(acc) || acc < -2 || acc > 2 || !Utils.Is.isInteger(deg) || deg < 1) {
+    if (!Guard.isInteger(acc) || acc < -2 || acc > 2 || !Guard.isInteger(deg) || deg < 1) {
         throw new MusicError(MusicErrorType.KeySignature, `Invalid degree: ${degree}`);
     }
     else {
@@ -79,7 +79,7 @@ export class KeySignature {
      * @param mode - Mode: Ionian/Major = 1, Dorian = 2, ..., Locrian = 7
      */
     protected constructor(readonly tonic: string, readonly mode: Mode) {
-        if (!Utils.Is.isEnumValue(mode, Mode)) {
+        if (!Guard.isEnumValue(mode, Mode)) {
             throw new MusicError(MusicErrorType.KeySignature, `Invalid mode: ${mode}`);
         }
 

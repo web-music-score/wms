@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { NoteLength, NoteLengthProps } from "./rhythm";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -68,21 +68,21 @@ export class TimeSignature {
     constructor(...args: unknown[]) {
         let beamGrouping: BeamGrouping | undefined;
 
-        if (Utils.Is.isEnumValue(args[0], TimeSignatures)) {
+        if (Guard.isEnumValue(args[0], TimeSignatures)) {
             let parts = args[0].split("/");
 
             this.beatCount = +parts[0];
             this.beatSize = +parts[1];
 
-            if (Utils.Is.isEnumValue(args[1], BeamGrouping)) {
+            if (Guard.isEnumValue(args[1], BeamGrouping)) {
                 beamGrouping = args[1];
             }
         }
-        else if (Utils.Is.isIntegerGte(args[0], 2) && Utils.Is.isIntegerGte(args[1], 2)) {
+        else if (Guard.isIntegerGte(args[0], 2) && Guard.isIntegerGte(args[1], 2)) {
             this.beatCount = args[0];
             this.beatSize = args[1];
 
-            if (Utils.Is.isEnumValue(args[2], BeamGrouping)) {
+            if (Guard.isEnumValue(args[2], BeamGrouping)) {
                 beamGrouping = args[2];
             }
         }
@@ -90,10 +90,10 @@ export class TimeSignature {
             throw new MusicError(MusicErrorType.Timesignature, `Invalid args: ${args}`);
         }
 
-        if (!Utils.Is.isIntegerGte(this.beatCount, 1)) {
+        if (!Guard.isIntegerGte(this.beatCount, 1)) {
             throw new MusicError(MusicErrorType.Timesignature, `Invalid beatCount: ${this.beatCount}`);
         }
-        else if (!Utils.Is.isIntegerGte(this.beatSize, 1)) {
+        else if (!Guard.isIntegerGte(this.beatSize, 1)) {
             throw new MusicError(MusicErrorType.Timesignature, `Invalid beatSize: ${this.beatSize}`);
         }
 
@@ -115,7 +115,7 @@ export class TimeSignature {
             this.beamGroupSizes = [[3]];
         }
         else if (this.is(5, 8)) {
-            if (!Utils.Is.isUndefined(beamGrouping) && beamGrouping !== BeamGrouping._2_3 && beamGrouping !== BeamGrouping._3_2) {
+            if (!Guard.isUndefined(beamGrouping) && beamGrouping !== BeamGrouping._2_3 && beamGrouping !== BeamGrouping._3_2) {
                 throw new MusicError(MusicErrorType.Timesignature, `Invalid beam grouping "${beamGrouping}" for time signature "${this.toString()}".`);
             }
             else {
@@ -127,7 +127,7 @@ export class TimeSignature {
             this.beamGroupSizes = [[3], [3]];
         }
         else if (this.is(7, 8)) {
-            if (!Utils.Is.isUndefined(beamGrouping) && beamGrouping !== BeamGrouping._2_2_3 && beamGrouping !== BeamGrouping._3_2_2) {
+            if (!Guard.isUndefined(beamGrouping) && beamGrouping !== BeamGrouping._2_2_3 && beamGrouping !== BeamGrouping._3_2_2) {
                 throw new MusicError(MusicErrorType.Timesignature, `Invalid beam grouping "${beamGrouping}" for time signature "${this.toString()}".`);
             }
             else {

@@ -1,5 +1,5 @@
 import * as Audio from "@tspro/web-music-score/audio";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "./div-rect";
 import { Player } from "../engine/player";
 import { RenderContext } from "../engine/render-context";
@@ -37,7 +37,7 @@ export class MPlayer {
      */
     constructor(doc: MDocument, playStateChangeListener?: PlayStateChangeListener) {
         assertArg(doc instanceof MDocument, "doc", doc);
-        assertArg(Utils.Is.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
+        assertArg(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
 
         this.player = new Player();
 
@@ -109,7 +109,7 @@ export class MRenderContext {
      * @returns - This render context instance.
      */
     setDocument(doc?: MDocument): MRenderContext {
-        assertArg(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+        assertArg(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
 
         this.ctx.setDocument(doc);
         return this;
@@ -134,7 +134,7 @@ export class MRenderContext {
      * @param scoreEventListener - Score event listener.
      */
     setScoreEventListener(scoreEventListener: ScoreEventListener) {
-        assertArg(Utils.Is.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
+        assertArg(Guard.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
         this.ctx.setScoreEventListener(scoreEventListener);
     }
 
@@ -214,7 +214,7 @@ export class MPlaybackButtons {
      * @returns 
      */
     setDocument(doc?: MDocument): MPlaybackButtons {
-        assertArg(Utils.Is.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+        assertArg(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
 
         this.onStop();
 
@@ -269,7 +269,7 @@ export class MPlaybackButtons {
      * @returns - This playback buttons class instance.
      */
     setPlayButton(btn: HTMLButtonElement | string, btnLabel?: string): MPlaybackButtons {
-        assertArg(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
+        assertArg(Guard.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
 
         MPlaybackButtons.removeOnClickListeners(this.playButton, this.onPlay);
 
@@ -291,7 +291,7 @@ export class MPlaybackButtons {
      * @returns - This playback buttons class instance.
      */
     setStopButton(btn: HTMLButtonElement | string, btnLabel?: string): MPlaybackButtons {
-        assertArg(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
+        assertArg(Guard.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
 
         MPlaybackButtons.removeOnClickListeners(this.stopButton, this.onStop);
 
@@ -314,8 +314,8 @@ export class MPlaybackButtons {
      * @returns - This playback buttons class instance.
      */
     setPlayStopButton(btn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): MPlaybackButtons {
-        assertArg(Utils.Is.isStringOrUndefined(playLabel), "playLabel", playLabel);
-        assertArg(Utils.Is.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
+        assertArg(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
+        assertArg(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
         MPlaybackButtons.removeOnClickListeners(this.playStopButton, this.onPlayStop);
 
@@ -338,7 +338,7 @@ export class MPlaybackButtons {
      * @returns - This playback buttons class instance.
      */
     setPauseButton(btn: HTMLButtonElement | string, btnLabel?: string): MPlaybackButtons {
-        assertArg(Utils.Is.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
+        assertArg(Guard.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
 
         MPlaybackButtons.removeOnClickListeners(this.pauseButton, this.onPause);
 
@@ -374,7 +374,7 @@ export class MPlaybackButtons {
     }
 
     private static addOnClickListener(btn: HTMLButtonElement, onClick: () => void) {
-        assertArg(Utils.Is.isFunction(onClick), "onClick", onClick);
+        assertArg(Guard.isFunction(onClick), "onClick", onClick);
 
         btn.addEventListener("click", onClick);
 

@@ -1,4 +1,4 @@
-import { IndexArray, Map1, Map3, Utils, asMulti } from "@tspro/ts-utils-lib";
+import { Guard, IndexArray, Map1, Map3, Utils, asMulti } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -58,7 +58,7 @@ function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLength
     if (typeof extensionLength === "string") {
         extensionLength = [extensionLength];
     }
-    if (Utils.Is.isArray(extensionLength)) {
+    if (Guard.isArray(extensionLength)) {
         let totalTicks = 0;
         for (let i = 0; i < extensionLength.length;) {
             let str = extensionLength[i];
@@ -405,7 +405,7 @@ export class ObjMeasure extends MusicObject {
         else if (args[0] instanceof Scale) {
             this.alterKeySignature = args[0];
         }
-        else if (Utils.Is.isNonEmptyString(args[0])) {
+        else if (Guard.isNonEmptyString(args[0])) {
             if (args.length === 1) {
                 this.alterKeySignature = getScale(args[0]);
             }
@@ -556,7 +556,7 @@ export class ObjMeasure extends MusicObject {
                     if (grp && !prevGroups.includes(staffTabOrGroup)) {
                         let curGroups = [...prevGroups, staffTabOrGroup];
 
-                        (Utils.Is.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups])
+                        (Guard.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups])
                             .forEach(staffTabOrGroup => {
                                 switch (grp.verticalPosition) {
                                     case VerticalPosition.Above:
@@ -591,7 +591,7 @@ export class ObjMeasure extends MusicObject {
                 addToStaffTabOrGroup(0, defaultVerticalPos);
             }
         }
-        else if (Utils.Is.isArray(staffTabOrGroups)) {
+        else if (Guard.isArray(staffTabOrGroups)) {
             staffTabOrGroups.forEach(staffTabOrGroup => addToStaffTabOrGroup(staffTabOrGroup, defaultVerticalPos));
         }
         else {
@@ -688,7 +688,7 @@ export class ObjMeasure extends MusicObject {
                 if (args.length === 0) {
                     this.endRepeatPlayCount = 2;
                 }
-                else if (Utils.Is.isIntegerGte(args[0], 2)) {
+                else if (Guard.isIntegerGte(args[0], 2)) {
                     this.endRepeatPlayCount = args[0];
                 }
                 else {
@@ -788,17 +788,17 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (connective === Connective.Tie) {
-            let tieSpan = Utils.Is.isInteger(args[0]) || Utils.Is.isEnumValue(args[0], TieType) ? args[0] : 2;
-            let noteAnchor = Utils.Is.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
+            let tieSpan = Guard.isInteger(args[0]) || Guard.isEnumValue(args[0], TieType) ? args[0] : 2;
+            let noteAnchor = Guard.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
             anchor.startConnective(new ConnectiveProps(Connective.Tie, tieSpan, noteAnchor, anchor));
         }
         else if (connective === Connective.Slur) {
-            let slurSpan = Utils.Is.isInteger(args[0]) ? args[0] : 2;
-            let noteAnchor = Utils.Is.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
+            let slurSpan = Guard.isInteger(args[0]) ? args[0] : 2;
+            let noteAnchor = Guard.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
             anchor.startConnective(new ConnectiveProps(Connective.Slur, slurSpan, noteAnchor, anchor));
         }
         else if (connective === Connective.Slide) {
-            let noteAnchor = Utils.Is.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
+            let noteAnchor = Guard.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
             anchor.startConnective(new ConnectiveProps(Connective.Slide, 2, noteAnchor, anchor));
         }
     }
@@ -1259,7 +1259,7 @@ export class ObjMeasure extends MusicObject {
             }
             return;
         }
-        else if (Utils.Is.isArray(voiceId)) {
+        else if (Guard.isArray(voiceId)) {
             // Complete rests for given voices.
             voiceId.forEach(id => this.completeRests(id));
             return;

@@ -5,7 +5,7 @@ import { Connective, NoteAnchor, Stem, TieType } from "../pub/types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
 import { ObjNotationLine, ObjStaff, ObjTab } from "./obj-staff-and-tab";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
@@ -100,7 +100,7 @@ export class ConnectiveProps {
             this.computeParams(line);
 
             if (connective === Connective.Tie) {
-                if (Utils.Is.isEnumValue(span, TieType)) {
+                if (Guard.isEnumValue(span, TieType)) {
                     let leftNoteGroup = this.noteGroups[0];
                     for (let noteId = 0; noteId < leftNoteGroup.notes.length; noteId++) {
                         this.createObjConnectiveWithTieType(line, leftNoteGroup, noteId, span);

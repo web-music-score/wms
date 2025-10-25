@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
@@ -17,10 +17,10 @@ export class ObjEnding extends MusicObject {
 
         this.mi = new MEnding(this);
 
-        if (!Utils.Is.isIntegerGte(passages.length, 1)) {
+        if (!Guard.isIntegerGte(passages.length, 1)) {
             throw new MusicError(MusicErrorType.Score, "Passages is empty.");
         }
-        else if (!this.passages.every(p => Utils.Is.isIntegerGte(p, 1))) {
+        else if (!this.passages.every(p => Guard.isIntegerGte(p, 1))) {
             throw new MusicError(MusicErrorType.Score, "Invalid passages: " + this.passages);
         }
 

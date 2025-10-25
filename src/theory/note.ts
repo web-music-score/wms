@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { PitchNotation, SymbolSet } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -428,7 +428,7 @@ export class Note {
      * @returns - Valid diatonic id or throws.
      */
     static validateDiatonicId(diatonicId: unknown): number {
-        if (Utils.Is.isInteger(diatonicId)) {
+        if (Guard.isInteger(diatonicId)) {
             return diatonicId;
         }
         else {
@@ -442,7 +442,7 @@ export class Note {
      * @returns - Valid diatonic class or throws.
      */
     static validateDiatonicClass(diatonicClass: unknown): number {
-        if (Utils.Is.isIntegerBetween(diatonicClass, 0, 6)) {
+        if (Guard.isIntegerBetween(diatonicClass, 0, 6)) {
             return diatonicClass;
         }
         else {
@@ -456,7 +456,7 @@ export class Note {
      * @returns - Valid chromatic id, or throws.
      */
     static validateChromaticId(chromaticId: unknown): number {
-        if (Utils.Is.isInteger(chromaticId)) {
+        if (Guard.isInteger(chromaticId)) {
             return chromaticId;
         }
         else {
@@ -470,7 +470,7 @@ export class Note {
      * @returns - Valid chromatic class, or throws.
      */
     static validatechromaticClass(chromaticClass: unknown): number {
-        if (Utils.Is.isIntegerBetween(chromaticClass, 0, 11)) {
+        if (Guard.isIntegerBetween(chromaticClass, 0, 11)) {
             return chromaticClass;
         }
         else {
@@ -498,7 +498,7 @@ export class Note {
      * @returns - Valid octave or throws.
      */
     static validateOctave(octave: number): number {
-        if (Utils.Is.isInteger(octave)) {
+        if (Guard.isInteger(octave)) {
             return octave;
         }
         else {
@@ -512,7 +512,7 @@ export class Note {
      * @returns - Valid accidental or thorws.
      */
     static validateAccidental(acc: unknown): Accidental {
-        if (Utils.Is.isIntegerBetween(acc, -2, 2)) {
+        if (Guard.isIntegerBetween(acc, -2, 2)) {
             return acc as Accidental;
         }
         else {

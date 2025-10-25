@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, getVerseNumbers, getVoiceIds, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
@@ -26,46 +26,46 @@ function isNote(note: string): boolean {
 }
 
 function isVoiceId(value: unknown): value is VoiceId {
-    return Utils.Is.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
+    return Guard.isNumber(value) && (<number[]>getVoiceIds()).indexOf(value) >= 0;
 }
 
 function isStringNumber(value: unknown): value is StringNumber {
-    return Utils.Is.isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
+    return Guard.isNumber(value) && (<number[]>getStringNumbers()).indexOf(value) >= 0;
 }
 
 function isVerseNumber(value: unknown): value is VerseNumber {
-    return Utils.Is.isNumber(value) && (<number[]>getVerseNumbers()).indexOf(value) >= 0;
+    return Guard.isNumber(value) && (<number[]>getVerseNumbers()).indexOf(value) >= 0;
 }
 
 function assertBaseConfig(baseConfig: BaseConfig) {
-    assertArg(Utils.Is.isObject(baseConfig), "baseConfig", baseConfig);
-    assertArg(Utils.Is.isStringOrUndefined(baseConfig.name), "baseConfig.name", baseConfig.name);
-    assertArg(Utils.Is.isUndefined(baseConfig.voiceId) || isVoiceId(baseConfig.voiceId) || Utils.Is.isArray(baseConfig.voiceId) && baseConfig.voiceId.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceId", baseConfig.voiceId);
+    assertArg(Guard.isObject(baseConfig), "baseConfig", baseConfig);
+    assertArg(Guard.isStringOrUndefined(baseConfig.name), "baseConfig.name", baseConfig.name);
+    assertArg(Guard.isUndefined(baseConfig.voiceId) || isVoiceId(baseConfig.voiceId) || Guard.isArray(baseConfig.voiceId) && baseConfig.voiceId.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceId", baseConfig.voiceId);
     // Handle deprecated voiceIds.
-    if (!Utils.Is.isUndefined(baseConfig.voiceIds)) {
-        assertArg(isVoiceId(baseConfig.voiceIds) || Utils.Is.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
+    if (!Guard.isUndefined(baseConfig.voiceIds)) {
+        assertArg(isVoiceId(baseConfig.voiceIds) || Guard.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)), "baseConfig.voiceIds", baseConfig.voiceIds);
         console.warn(`Staff/tab config property 'voiceIds' is deprecated, use 'voiceId' instead.`);
         let arr = Utils.Arr.toArray(baseConfig.voiceId ?? []);
         Utils.Arr.toArray(baseConfig.voiceIds).forEach(voiceId => arr.push(voiceId));
         baseConfig.voiceId = arr;
     }
-    if (Utils.Is.isArray(baseConfig.voiceId)) {
+    if (Guard.isArray(baseConfig.voiceId)) {
         baseConfig.voiceId = Utils.Arr.removeDuplicates(baseConfig.voiceId);
     }
-    assertArg(Utils.Is.isStringOrUndefined(baseConfig.instrument), "baseConfig.instrument", baseConfig.instrument);
+    assertArg(Guard.isStringOrUndefined(baseConfig.instrument), "baseConfig.instrument", baseConfig.instrument);
 }
 
 function assertStaffConfig(staffConfig: StaffConfig) {
     assertBaseConfig(staffConfig);
-    assertArg(Utils.Is.isObject(staffConfig), "staffConfig", staffConfig);
+    assertArg(Guard.isObject(staffConfig), "staffConfig", staffConfig);
     assertArg(staffConfig.type === "staff", "staffConfig.type", staffConfig.type);
-    assertArg(Utils.Is.isEnumValue(staffConfig.clef, Clef), "staffConfig.clef", staffConfig.clef);
-    assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
-    assertArg(Utils.Is.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
-    assertArg(Utils.Is.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
-    assertArg(Utils.Is.isStringOrUndefined(staffConfig.grandId), "staffConfig.grandId", staffConfig.grandId);
-    assertArg(Utils.Is.isBooleanOrUndefined(staffConfig.isGrand), "staffConfig.isGrand", staffConfig.isGrand);
-    if (!Utils.Is.isUndefined(staffConfig.isGrand)) {
+    assertArg(Guard.isEnumValue(staffConfig.clef, Clef), "staffConfig.clef", staffConfig.clef);
+    assertArg(Guard.isBooleanOrUndefined(staffConfig.isOctaveDown), "staffConfig.isOctaveDown", staffConfig.isOctaveDown);
+    assertArg(Guard.isUndefined(staffConfig.minNote) || isNote(staffConfig.minNote), "staffConfig.minNote", staffConfig.minNote);
+    assertArg(Guard.isUndefined(staffConfig.maxNote) || isNote(staffConfig.maxNote), "staffConfig.maxNote", staffConfig.maxNote);
+    assertArg(Guard.isStringOrUndefined(staffConfig.grandId), "staffConfig.grandId", staffConfig.grandId);
+    assertArg(Guard.isBooleanOrUndefined(staffConfig.isGrand), "staffConfig.isGrand", staffConfig.isGrand);
+    if (!Guard.isUndefined(staffConfig.isGrand)) {
         console.warn(`Staff config property 'isGrand' is deprecated, use 'grandId' instead.`);
     }
 }
@@ -73,83 +73,71 @@ function assertStaffConfig(staffConfig: StaffConfig) {
 
 function assertTabConfig(tabConfig: TabConfig) {
     assertBaseConfig(tabConfig);
-    assertArg(Utils.Is.isObject(tabConfig), "tabConfig", tabConfig);
+    assertArg(Guard.isObject(tabConfig), "tabConfig", tabConfig);
     assertArg(tabConfig.type === "tab", "tabConfig.type", tabConfig.type);
-    if (Utils.Is.isString(tabConfig.tuning)) {
+    if (Guard.isString(tabConfig.tuning)) {
         assertArg(TuningNameList.includes(tabConfig.tuning), "tabConfig.tuning", tabConfig.tuning);
     }
-    else if (Utils.Is.isArray(tabConfig.tuning)) {
+    else if (Guard.isArray(tabConfig.tuning)) {
         assertArg(tabConfig.tuning.length === getStringNumbers().length && tabConfig.tuning.every(s => isNote(s)), "tabConfig.tuning", tabConfig.tuning);
     }
 }
 
 function assertNoteOptions(noteOptions: NoteOptions) {
-    assertArg(Utils.Is.isObject(noteOptions), "noteOptions", noteOptions);
-    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.dotted) || Utils.Is.isIntegerGte(noteOptions.dotted, 0), "noteOptions.dotted", noteOptions.dotted);
-    assertArg(Utils.Is.isEnumValueOrUndefined(noteOptions.stem, Stem), "noteOptions.stem", noteOptions.stem);
-    assertArg(Utils.Is.isStringOrUndefined(noteOptions.color), "noteOptions.color", noteOptions.color);
-    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.arpeggio) || Utils.Is.isEnumValue(noteOptions.arpeggio, Arpeggio), "noteOptions.arpeggio", noteOptions.arpeggio);
-    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.staccato), "noteOptions.staccato", noteOptions.staccato);
-    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.diamond), "noteOptions.diamond", noteOptions.diamond);
-    assertArg(Utils.Is.isBooleanOrUndefined(noteOptions.triplet), "noteOptions.triplet", noteOptions.triplet);
+    assertArg(Guard.isObject(noteOptions), "noteOptions", noteOptions);
+    assertArg(Guard.isBooleanOrUndefined(noteOptions.dotted) || Guard.isIntegerGte(noteOptions.dotted, 0), "noteOptions.dotted", noteOptions.dotted);
+    assertArg(Guard.isEnumValueOrUndefined(noteOptions.stem, Stem), "noteOptions.stem", noteOptions.stem);
+    assertArg(Guard.isStringOrUndefined(noteOptions.color), "noteOptions.color", noteOptions.color);
+    assertArg(Guard.isBooleanOrUndefined(noteOptions.arpeggio) || Guard.isEnumValue(noteOptions.arpeggio, Arpeggio), "noteOptions.arpeggio", noteOptions.arpeggio);
+    assertArg(Guard.isBooleanOrUndefined(noteOptions.staccato), "noteOptions.staccato", noteOptions.staccato);
+    assertArg(Guard.isBooleanOrUndefined(noteOptions.diamond), "noteOptions.diamond", noteOptions.diamond);
+    assertArg(Guard.isBooleanOrUndefined(noteOptions.triplet), "noteOptions.triplet", noteOptions.triplet);
     assertArg((
-        Utils.Is.isUndefined(noteOptions.string) ||
+        Guard.isUndefined(noteOptions.string) ||
         isStringNumber(noteOptions.string) ||
-        Utils.Is.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => isStringNumber(string))
+        Guard.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => isStringNumber(string))
     ), "noteOptions.string", noteOptions.string);
 
-    assertArg(Utils.Is.isUndefined((noteOptions as any).tieSpan), "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
-    assertArg(Utils.Is.isUndefined((noteOptions as any).slurSpan), "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
+    assertArg(Guard.isUndefined((noteOptions as any).tieSpan), "NoteOptions.tieSpan was removed. Use addConnective(\"tie\", tieSpan)", "");
+    assertArg(Guard.isUndefined((noteOptions as any).slurSpan), "NoteOptions.slurSpan was removed. Use addConnective(\"slur\", slurSpan)", "");
 }
 
 function assertRestOptions(restOptions: RestOptions) {
-    assertArg(Utils.Is.isObject(restOptions), "restOptions", restOptions);
-    assertArg(Utils.Is.isBooleanOrUndefined(restOptions.dotted) || Utils.Is.isIntegerGte(restOptions.dotted, 0), "restOptions.dotted", restOptions.dotted);
-    assertArg(Utils.Is.isStringOrUndefined(restOptions.staffPos) || Utils.Is.isInteger(restOptions.staffPos) || restOptions.staffPos instanceof Note, "restOptions.staffPos", restOptions.staffPos);
-    assertArg(Utils.Is.isStringOrUndefined(restOptions.color), "restOptions.color", restOptions.color);
-    assertArg(Utils.Is.isBooleanOrUndefined(restOptions.hide), "restOptions.hide", restOptions.hide);
-    assertArg(Utils.Is.isBooleanOrUndefined(restOptions.triplet), "restOptions.triplet", restOptions.triplet);
+    assertArg(Guard.isObject(restOptions), "restOptions", restOptions);
+    assertArg(Guard.isBooleanOrUndefined(restOptions.dotted) || Guard.isIntegerGte(restOptions.dotted, 0), "restOptions.dotted", restOptions.dotted);
+    assertArg(Guard.isStringOrUndefined(restOptions.staffPos) || Guard.isInteger(restOptions.staffPos) || restOptions.staffPos instanceof Note, "restOptions.staffPos", restOptions.staffPos);
+    assertArg(Guard.isStringOrUndefined(restOptions.color), "restOptions.color", restOptions.color);
+    assertArg(Guard.isBooleanOrUndefined(restOptions.hide), "restOptions.hide", restOptions.hide);
+    assertArg(Guard.isBooleanOrUndefined(restOptions.triplet), "restOptions.triplet", restOptions.triplet);
 }
 
 function assertLyricsOptions(lyricsOptions: LyricsOptions) {
-    assertArg(Utils.Is.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
-    assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
-    assertArg(Utils.Is.isEnumValueOrUndefined(lyricsOptions.hyphen, LyricsHyphen), "lyricsOptions.hyphen", lyricsOptions.hyphen);
+    assertArg(Guard.isObject(lyricsOptions), "lyricsOptions", lyricsOptions);
+    assertArg(Guard.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign), "lyricsOptions.align", lyricsOptions.align);
+    assertArg(Guard.isEnumValueOrUndefined(lyricsOptions.hyphen, LyricsHyphen), "lyricsOptions.hyphen", lyricsOptions.hyphen);
 }
 
 function assertMeasureOptions(measureOptions: MeasureOptions) {
-    assertArg(Utils.Is.isObject(measureOptions), "measureOptions", measureOptions);
-    assertArg(Utils.Is.isBooleanOrUndefined(measureOptions.showNumber), "measureOptions.showNumber", measureOptions.showNumber);
+    assertArg(Guard.isObject(measureOptions), "measureOptions", measureOptions);
+    assertArg(Guard.isBooleanOrUndefined(measureOptions.showNumber), "measureOptions.showNumber", measureOptions.showNumber);
 }
 
 function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {
     assertArg(
-        Utils.Is.isStringOrUndefined(staffTabOrGroups) || Utils.Is.isIntegerGte(staffTabOrGroups, 0) ||
-        Utils.Is.isNonEmptyArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
-            Utils.Is.isString(staffTabOrGroup) || Utils.Is.isIntegerGte(staffTabOrGroup, 0)
+        Guard.isStringOrUndefined(staffTabOrGroups) || Guard.isIntegerGte(staffTabOrGroups, 0) ||
+        Guard.isNonEmptyArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
+            Guard.isString(staffTabOrGroup) || Guard.isIntegerGte(staffTabOrGroup, 0)
         )
         , "staffTabOrGroup", staffTabOrGroups
     );
 }
 
 function isNoteLength(noteLen: unknown): noteLen is NoteLength {
-    try {
-        validateNoteLength(noteLen);
-        return true;
-    }
-    catch (e) {
-        return false;
-    }
+    return !Guard.isThrowing(() => validateNoteLength(noteLen));
 }
 
 function isTupletRatio(tupletRatio: unknown): tupletRatio is TupletRatio {
-    try {
-        validateTupletRatio(tupletRatio);
-        return true;
-    }
-    catch (e) {
-        return false;
-    }
+    return !Guard.isThrowing(() => validateTupletRatio(tupletRatio));
 }
 
 /** Tuplet builder type. */
@@ -242,24 +230,24 @@ export class DocumentBuilder {
      */
     setScoreConfiguration(config: ScoreConfiguration): DocumentBuilder;
     setScoreConfiguration(config: StaffPreset | `${StaffPreset}` | ScoreConfiguration): DocumentBuilder {
-        if (Utils.Is.isEnumValue(config, StaffPreset)) {
+        if (Guard.isEnumValue(config, StaffPreset)) {
             // Ok
             this.doc.setScoreConfiguration(config);
         }
-        else if (Utils.Is.isObject(config) && config.type === "staff") {
+        else if (Guard.isObject(config) && config.type === "staff") {
             assertStaffConfig(config);
             this.doc.setScoreConfiguration(config);
         }
-        else if (Utils.Is.isObject(config) && config.type === "tab") {
+        else if (Guard.isObject(config) && config.type === "tab") {
             assertTabConfig(config);
             this.doc.setScoreConfiguration(config);
         }
-        else if (Utils.Is.isNonEmptyArray(config)) {
+        else if (Guard.isNonEmptyArray(config)) {
             config.forEach(c => {
-                if (Utils.Is.isObject(c) && c.type === "staff") {
+                if (Guard.isObject(c) && c.type === "staff") {
                     assertStaffConfig(c);
                 }
-                else if (Utils.Is.isObject(c) && c.type === "tab") {
+                else if (Guard.isObject(c) && c.type === "tab") {
                     assertTabConfig(c);
                 }
                 else {
@@ -297,9 +285,9 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     setHeader(title?: string, composer?: string, arranger?: string): DocumentBuilder {
-        assertArg(Utils.Is.isStringOrUndefined(title), "title", title);
-        assertArg(Utils.Is.isStringOrUndefined(composer), "composer", composer);
-        assertArg(Utils.Is.isStringOrUndefined(arranger), "arranger", arranger);
+        assertArg(Guard.isStringOrUndefined(title), "title", title);
+        assertArg(Guard.isStringOrUndefined(composer), "composer", composer);
+        assertArg(Guard.isStringOrUndefined(arranger), "arranger", arranger);
         this.doc.setHeader(title, composer, arranger);
         return this;
     }
@@ -310,7 +298,7 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     setMeasuresPerRow(measuresPerRow: number): DocumentBuilder {
-        assertArg(Utils.Is.isIntegerGte(measuresPerRow, 1) || Utils.Is.isPosInfinity(measuresPerRow), "measuresPerRow", measuresPerRow);
+        assertArg(Guard.isIntegerGte(measuresPerRow, 1) || Guard.isPosInfinity(measuresPerRow), "measuresPerRow", measuresPerRow);
         this.doc.setMeasuresPerRow(measuresPerRow);
         return this;
     }
@@ -356,7 +344,7 @@ export class DocumentBuilder {
         assertArg((
             args[0] instanceof Scale ||
             args[0] instanceof KeySignature ||
-            Utils.Is.isNonEmptyString(args[0]) && (args.length === 1 || Utils.Is.isEnumValue(args[1], ScaleType))
+            Guard.isNonEmptyString(args[0]) && (args.length === 1 || Guard.isEnumValue(args[1], ScaleType))
         ), "keySignature", args);
         this.getMeasure().setKeySignature(...args);
         return this;
@@ -387,10 +375,10 @@ export class DocumentBuilder {
         if (args[0] instanceof TimeSignature) {
             this.getMeasure().setTimeSignature(args[0]);
         }
-        else if (Utils.Is.isEnumValue(args[0], TimeSignatures) && Utils.Is.isEnumValueOrUndefined(args[1], BeamGrouping)) {
+        else if (Guard.isEnumValue(args[0], TimeSignatures) && Guard.isEnumValueOrUndefined(args[1], BeamGrouping)) {
             this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1]));
         }
-        else if (Utils.Is.isIntegerGte(args[0], 1) && Utils.Is.isIntegerGte(args[1], 1) && Utils.Is.isEnumValueOrUndefined(args[2], BeamGrouping)) {
+        else if (Guard.isIntegerGte(args[0], 1) && Guard.isIntegerGte(args[1], 1) && Guard.isEnumValueOrUndefined(args[2], BeamGrouping)) {
             this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1], args[2]));
         }
         else {
@@ -422,13 +410,13 @@ export class DocumentBuilder {
      */
     setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr, dotted: boolean | number): DocumentBuilder;
     setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr, dotted?: boolean | number): DocumentBuilder {
-        assertArg(Utils.Is.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
+        assertArg(Guard.isIntegerGte(beatsPerMinute, 1), "beatsPerMinute", beatsPerMinute);
         if (beatLength === undefined) {
-            assertArg(Utils.Is.isUndefined(dotted), "dotted", dotted);
+            assertArg(Guard.isUndefined(dotted), "dotted", dotted);
         }
         else {
-            assertArg(Utils.Is.isEnumValue(beatLength, NoteLength) || isNoteLength(beatLength), "beatLength", beatLength);
-            assertArg(Utils.Is.isBooleanOrUndefined(dotted) || Utils.Is.isIntegerGte(dotted, 0), "dotted", dotted);
+            assertArg(isNoteLength(beatLength), "beatLength", beatLength);
+            assertArg(Guard.isBooleanOrUndefined(dotted) || Guard.isIntegerGte(dotted, 0), "dotted", dotted);
         }
         this.getMeasure().setTempo(beatsPerMinute, beatLength, dotted);
         return this;
@@ -445,16 +433,16 @@ export class DocumentBuilder {
     addNote(voiceId: VoiceId, note: Note | string | (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
         assertArg(
-            note instanceof Note || Utils.Is.isNonEmptyString(note) ||
-            Utils.Is.isArray(note) && note.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)),
+            note instanceof Note || Guard.isNonEmptyString(note) ||
+            Guard.isArray(note) && note.every(note => note instanceof Note || Guard.isNonEmptyString(note)),
             "note", note);
-        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
+        assertArg(isNoteLength(noteLength), "noteLength", noteLength);
         noteOptions ??= {}
         assertNoteOptions(noteOptions);
-        if (Utils.Is.isArray(note)) {
+        if (Guard.isArray(note)) {
             let string = noteOptions.string;
             note.forEach((note, noteId) => {
-                noteOptions.string = Utils.Is.isArray(string) ? string[noteId] : string;
+                noteOptions.string = Guard.isArray(string) ? string[noteId] : string;
                 this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions);
             });
         }
@@ -474,8 +462,8 @@ export class DocumentBuilder {
      */
     addChord(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
-        assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
+        assertArg(Guard.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Guard.isNonEmptyString(note)), "notes", notes);
+        assertArg(isNoteLength(noteLength), "noteLength", noteLength);
         noteOptions ??= {}
         assertNoteOptions(noteOptions);
         this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptions);
@@ -491,7 +479,7 @@ export class DocumentBuilder {
      */
     addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, restOptions?: RestOptions): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLength(restLength), "restLength", restLength);
+        assertArg(isNoteLength(restLength), "restLength", restLength);
         restOptions ??= {}
         assertRestOptions(restOptions);
         this.getMeasure().addRest(voiceId, restLength, restOptions);
@@ -515,25 +503,25 @@ export class DocumentBuilder {
      */
     addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, tupletBuilder: (notes: TupletBuilder) => void): DocumentBuilder {
         assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-        assertArg(Utils.Is.isFunction(tupletBuilder), "tupletBuilder", tupletBuilder);
-        assertArg(isTupletRatio(tupletRatio) && Utils.Is.isBooleanOrUndefined(tupletRatio.showRatio), "tupletRatio", tupletRatio);
+        assertArg(Guard.isFunction(tupletBuilder), "tupletBuilder", tupletBuilder);
+        assertArg(isTupletRatio(tupletRatio) && Guard.isBooleanOrUndefined(tupletRatio.showRatio), "tupletRatio", tupletRatio);
 
         let tupletSymbols: RhythmSymbol[] = [];
 
         const helper: TupletBuilder = {
             addNote: (note, noteLength, noteOptions) => {
                 assertArg(
-                    note instanceof Note || Utils.Is.isNonEmptyString(note) ||
-                    Utils.Is.isArray(note) && note.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)),
+                    note instanceof Note || Guard.isNonEmptyString(note) ||
+                    Guard.isArray(note) && note.every(note => note instanceof Note || Guard.isNonEmptyString(note)),
                     "note", note);
-                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
+                assertArg(isNoteLength(noteLength), "noteLength", noteLength);
                 noteOptions ??= {}
                 delete noteOptions.triplet;
                 assertNoteOptions(noteOptions);
-                if (Utils.Is.isArray(note)) {
+                if (Guard.isArray(note)) {
                     let string = noteOptions.string;
                     note.forEach((note, noteId) => {
-                        noteOptions.string = Utils.Is.isArray(string) ? string[noteId] : string;
+                        noteOptions.string = Guard.isArray(string) ? string[noteId] : string;
                         let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions, tupletRatio);
                         tupletSymbols.push(s);
                     });
@@ -545,8 +533,8 @@ export class DocumentBuilder {
                 return helper;
             },
             addChord: (notes, noteLength, noteOptions) => {
-                assertArg(Utils.Is.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Utils.Is.isNonEmptyString(note)), "notes", notes);
-                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
+                assertArg(Guard.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Guard.isNonEmptyString(note)), "notes", notes);
+                assertArg(isNoteLength(noteLength), "noteLength", noteLength);
                 noteOptions ??= {}
                 delete noteOptions.triplet;
                 assertNoteOptions(noteOptions);
@@ -555,7 +543,7 @@ export class DocumentBuilder {
                 return helper;
             },
             addRest: (restLength, restOptions) => {
-                assertArg(Utils.Is.isEnumValue(restLength, NoteLength) || isNoteLength(restLength), "restLength", restLength);
+                assertArg(isNoteLength(restLength), "restLength", restLength);
                 restOptions ??= {}
                 delete restOptions.triplet;
                 assertRestOptions(restOptions);
@@ -577,8 +565,8 @@ export class DocumentBuilder {
     private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(isVerseNumber(verse), "verse", verse);
-        assertArg(Utils.Is.isEnumValue(lyricsLength, NoteLength), "lyricsLength", lyricsLength);
-        assertArg(Utils.Is.isString(lyricsText) || Utils.Is.isArray(lyricsText) && lyricsText.every(text => Utils.Is.isString(text)), "lyricsText", lyricsText);
+        assertArg(Guard.isEnumValue(lyricsLength, NoteLength), "lyricsLength", lyricsLength);
+        assertArg(Guard.isString(lyricsText) || Guard.isArray(lyricsText) && lyricsText.every(text => Guard.isString(text)), "lyricsText", lyricsText);
 
         lyricsOptions ??= {}
 
@@ -591,7 +579,7 @@ export class DocumentBuilder {
             lyricsOptions.align ??= this.currentLyricsAlign;
         }
 
-        if (Utils.Is.isArray(lyricsText)) {
+        if (Guard.isArray(lyricsText)) {
             lyricsText.forEach(text => this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, text, lyricsOptions));
         }
         else {
@@ -628,7 +616,7 @@ export class DocumentBuilder {
 
     private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata | `${Fermata}`): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
-        assertArg(Utils.Is.isEnumValue(fermata, Fermata), "fermata", fermata);
+        assertArg(Guard.isEnumValue(fermata, Fermata), "fermata", fermata);
         this.getMeasure().addFermata(staffTabOrGroups, fermata as Fermata);
         return this;
     }
@@ -654,12 +642,12 @@ export class DocumentBuilder {
 
     private addNavigationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
-        assertArg(Utils.Is.isEnumValue(navigation, Navigation), "navigation", navigation);
+        assertArg(Guard.isEnumValue(navigation, Navigation), "navigation", navigation);
         if (navigation === Navigation.EndRepeat && args.length > 0) {
-            assertArg(Utils.Is.isIntegerGte(args[0], 1), "playCount", args[0]);
+            assertArg(Guard.isIntegerGte(args[0], 1), "playCount", args[0]);
         }
         else if (navigation === Navigation.Ending && args.length > 0) {
-            assertArg(args.every(passage => Utils.Is.isIntegerGte(passage, 1)), "passages", args);
+            assertArg(args.every(passage => Guard.isIntegerGte(passage, 1)), "passages", args);
         }
         this.getMeasure().addNavigation(staffTabOrGroups, navigation as Navigation, ...args);
         return this;
@@ -724,8 +712,8 @@ export class DocumentBuilder {
         }
 
         assertStaffTabOrGRoups(staffTabOrGroups);
-        assertArg(Utils.Is.isEnumValue(annotation, Annotation), "annotation", annotation);
-        assertArg(Utils.Is.isNonEmptyString(text), "text", text);
+        assertArg(Guard.isEnumValue(annotation, Annotation), "annotation", annotation);
+        assertArg(Guard.isNonEmptyString(text), "text", text);
         this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Annotation, text);
         return this;
     }
@@ -778,8 +766,8 @@ export class DocumentBuilder {
 
     private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
-        assertArg(Utils.Is.isEnumValue(label, Label), "label", label);
-        assertArg(Utils.Is.isNonEmptyString(text), "text", text);
+        assertArg(Guard.isEnumValue(label, Label), "label", label);
+        assertArg(Guard.isNonEmptyString(text), "text", text);
         this.getMeasure().addLabel(staffTabOrGroups, label as Label, text);
         return this;
     }
@@ -829,24 +817,24 @@ export class DocumentBuilder {
      */
     addConnective(connective: Connective.Slide | `${Connective.Slide}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
     addConnective(connective: Connective | `${Connective}`, ...args: unknown[]): DocumentBuilder {
-        assertArg(Utils.Is.isEnumValue(connective, Connective), "connective", connective);
+        assertArg(Guard.isEnumValue(connective, Connective), "connective", connective);
 
         if (connective === Connective.Tie) {
-            assertArg(Utils.Is.isIntegerOrUndefined(args[0]) || Utils.Is.isEnumValue(args[0], TieType), "tieSpan", args[0]);
-            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
+            assertArg(Guard.isIntegerOrUndefined(args[0]) || Guard.isEnumValue(args[0], TieType), "tieSpan", args[0]);
+            assertArg(Guard.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let tieSpan = args[0] as number | TieType | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
             this.getMeasure().addConnective(connective as Connective.Tie, tieSpan, noteAnchor);
         }
         else if (connective === Connective.Slur) {
-            assertArg(Utils.Is.isIntegerOrUndefined(args[0]), "slurSpan", args[0]);
-            assertArg(Utils.Is.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
+            assertArg(Guard.isIntegerOrUndefined(args[0]), "slurSpan", args[0]);
+            assertArg(Guard.isEnumValueOrUndefined(args[1], NoteAnchor), "noteAnchor", args[1]);
             let slurSpan = args[0] as number | undefined;
             let noteAnchor = args[1] as NoteAnchor | undefined;
             this.getMeasure().addConnective(connective as Connective.Slur, slurSpan, noteAnchor);
         }
         else if (connective === Connective.Slide) {
-            assertArg(Utils.Is.isEnumValueOrUndefined(args[0], NoteAnchor), "noteAnchor", args[0]);
+            assertArg(Guard.isEnumValueOrUndefined(args[0], NoteAnchor), "noteAnchor", args[0]);
             let noteAnchor = args[0] as NoteAnchor | undefined;
             this.getMeasure().addConnective(connective as Connective.Slide, noteAnchor);
         }
@@ -867,20 +855,20 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     addExtension(extensionBuilder?: (ext: ExtensionBuilder) => void): DocumentBuilder {
-        assertArg(Utils.Is.isFunctionOrUndefined(extensionBuilder), "addExtension() has new usage, for e.g. addExtension(ext => ext.measures(2)). Please refer to README or API Reference.", extensionBuilder);
+        assertArg(Guard.isFunctionOrUndefined(extensionBuilder), "addExtension() has new usage, for e.g. addExtension(ext => ext.measures(2)). Please refer to README or API Reference.", extensionBuilder);
 
         let ticks: number = 0;
         let visible: boolean = true;
 
         const helper: ExtensionBuilder = {
             notes: (noteLength, noteCount) => {
-                assertArg(Utils.Is.isEnumValue(noteLength, NoteLength) || isNoteLength(noteLength), "noteLength", noteLength);
-                assertArg(Utils.Is.isUndefined(noteCount) || Utils.Is.isNumber(noteCount) && noteCount >= 0, "noteCount", noteCount);
+                assertArg(isNoteLength(noteLength), "noteLength", noteLength);
+                assertArg(Guard.isUndefined(noteCount) || Guard.isNumber(noteCount) && noteCount >= 0, "noteCount", noteCount);
                 ticks += RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
                 return helper;
             },
             measures: (measureCount) => {
-                assertArg(Utils.Is.isNumber(measureCount) && measureCount >= 1, "measureCount", measureCount);
+                assertArg(Guard.isNumber(measureCount) && measureCount >= 1, "measureCount", measureCount);
                 ticks += this.getMeasure().getMeasureTicks() * measureCount;
                 return helper;
             },
@@ -913,13 +901,13 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPosition | `${VerticalPosition}` = VerticalPosition.Auto): DocumentBuilder {
-        assertArg(Utils.Is.isNonEmptyString(groupName), "groupName", groupName);
+        assertArg(Guard.isNonEmptyString(groupName), "groupName", groupName);
         assertArg(
-            Utils.Is.isNonEmptyString(staffsTabsAndGroups) || Utils.Is.isIntegerGte(staffsTabsAndGroups, 0) ||
-            Utils.Is.isNonEmptyArray(staffsTabsAndGroups) && staffsTabsAndGroups.every(line => Utils.Is.isNonEmptyString(line) || Utils.Is.isIntegerGte(line, 0)),
+            Guard.isNonEmptyString(staffsTabsAndGroups) || Guard.isIntegerGte(staffsTabsAndGroups, 0) ||
+            Guard.isNonEmptyArray(staffsTabsAndGroups) && staffsTabsAndGroups.every(line => Guard.isNonEmptyString(line) || Guard.isIntegerGte(line, 0)),
             "staffsTabsAndGroups", staffsTabsAndGroups
         );
-        assertArg(Utils.Is.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
+        assertArg(Guard.isEnumValue(verticalPosition, VerticalPosition), "verticalPosition", verticalPosition);
         this.doc.addStaffGroup(groupName, staffsTabsAndGroups, verticalPosition as VerticalPosition);
         return this;
     }
@@ -957,7 +945,7 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     completeRests(voiceId?: VoiceId | VoiceId[]): DocumentBuilder {
-        assertArg(Utils.Is.isUndefined(voiceId) || isVoiceId(voiceId) || Utils.Is.isArray(voiceId) && voiceId.every(id => isVoiceId(id)), "voiceId", voiceId);
+        assertArg(Guard.isUndefined(voiceId) || isVoiceId(voiceId) || Guard.isArray(voiceId) && voiceId.every(id => isVoiceId(id)), "voiceId", voiceId);
         this.getMeasure().completeRests(voiceId);
         return this;
     }
@@ -970,8 +958,8 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     addScaleArpeggio(scale: Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
-        assertArg(Utils.Is.isNonEmptyString(bottomNote), "bottomNote", bottomNote);
-        assertArg(Utils.Is.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
+        assertArg(Guard.isNonEmptyString(bottomNote), "bottomNote", bottomNote);
+        assertArg(Guard.isIntegerGte(numOctaves, 1), "numOctaves", numOctaves);
 
         let ts = this.getMeasure().getTimeSignature();
         let notes = scale.getScaleNotes(bottomNote, numOctaves);

@@ -6,7 +6,7 @@ import { ObjText } from "./obj-text";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { VerticalPos } from "./layout-object";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { ObjMeasure } from "./obj-measure";
 
 export class ObjLyrics extends MusicObject {
@@ -27,7 +27,7 @@ export class ObjLyrics extends MusicObject {
 
         let halign = lyricsOptions?.align === LyricsAlign.Left ? 0 : lyricsOptions?.align === LyricsAlign.Right ? 1 : 0.5;
 
-        this.hyphen = Utils.Is.isEnumValue(lyricsOptions?.hyphen, LyricsHyphen) ? lyricsOptions?.hyphen : undefined;
+        this.hyphen = Guard.isEnumValue(lyricsOptions?.hyphen, LyricsHyphen) ? lyricsOptions?.hyphen : undefined;
 
         this.text = new ObjText(this, { text: lyricsText, color: this.color, scale: 0.8 }, halign, 0);
 

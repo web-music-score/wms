@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
@@ -15,7 +15,7 @@ import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
 
 function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
-    return Utils.Is.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
+    return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
 }
 
 function sortNotesAndStrings(notes: ReadonlyArray<Note>, strings?: StringNumber | StringNumber[]) {
@@ -175,7 +175,7 @@ export class ObjNoteGroup extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength | NoteLengthStr, readonly options?: NoteOptions, tupletRatio?: TupletRatio) {
         super(col);
 
-        if (!Utils.Is.isIntegerGte(notes.length, 1)) {
+        if (!Guard.isIntegerGte(notes.length, 1)) {
             throw new MusicError(MusicErrorType.Score, "Cannot create note group object because notes array is empty.");
         }
 
@@ -707,7 +707,7 @@ export class ObjNoteGroup extends MusicObject {
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers
                 let stringNumber = this.runningStringNumbers[noteIndex];
-                if (Utils.Is.isIntegerBetween(stringNumber, 1, 6)) {
+                if (Guard.isIntegerBetween(stringNumber, 1, 6)) {
                     let fretId = note.chromaticId - tab.getTuningStrings()[stringNumber - 1].chromaticId;
                     let color = fretId < 0 ? "red" : "black";
 

@@ -2,7 +2,7 @@ import { Note, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
 import { init as initCore, MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Synthesizer } from "@tspro/web-music-score/audio-synth";
 import { Instrument, linearToDecibels } from "./instrument";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 
 export { Instrument, linearToDecibels }
 
@@ -53,13 +53,13 @@ export function getCurrentInstrument(): string {
  * @param instrument - Object that implements Instrument interface. Can be single instrument or array of instruments.
  */
 export function addInstrument(instrument: Instrument | Instrument[]): void {
-    (Utils.Is.isArray(instrument) ? instrument : [instrument])
+    (Guard.isArray(instrument) ? instrument : [instrument])
         .forEach(instr => {
             if (
                 !Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) ||
-                !Utils.Is.isFunction(instr.getName) ||
-                !Utils.Is.isFunction(instr.playNote) ||
-                !Utils.Is.isFunction(instr.stop)
+                !Guard.isFunction(instr.getName) ||
+                !Guard.isFunction(instr.playNote) ||
+                !Guard.isFunction(instr.stop)
             ) {
                 throw new MusicError(MusicErrorType.Audio, "Invalid instrument object: " + instr);
             }

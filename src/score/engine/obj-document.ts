@@ -7,7 +7,7 @@ import { Clef, DivRect, MDocument, MeasureOptions, ScoreConfiguration, StaffConf
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -44,7 +44,7 @@ export class ObjDocument extends MusicObject {
     }
 
     setScoreConfiguration(config: StaffPreset | ScoreConfiguration) {
-        if (Utils.Is.isEnumValue(config, StaffPreset)) {
+        if (Guard.isEnumValue(config, StaffPreset)) {
             switch (config) {
                 default:
                 case StaffPreset.Treble:
@@ -73,7 +73,7 @@ export class ObjDocument extends MusicObject {
                     break;
             }
         }
-        else if (Utils.Is.isArray(config)) {
+        else if (Guard.isArray(config)) {
             this.curScoreConfig = config;
         }
         else {

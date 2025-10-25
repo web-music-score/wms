@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
@@ -172,7 +172,7 @@ export class Scale extends KeySignature {
      * @returns - Array of scale notes.
      */
     getScaleNotes(bottomNote: string, numOctaves: number): ReadonlyArray<Note> {
-        if (!Utils.Is.isIntegerGte(numOctaves, 1)) {
+        if (!Guard.isIntegerGte(numOctaves, 1)) {
             throw new MusicError(MusicErrorType.Scale, `Invalid numOctaves: ${numOctaves}`);
         }
 
@@ -496,7 +496,7 @@ export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFac
  * @returns - Scale type if given argument was valid scale type, or throws.
  */
 export function validateScaleType(scaleType: unknown): ScaleType {
-    if (Utils.Is.isEnumValue(scaleType, ScaleType)) {
+    if (Guard.isEnumValue(scaleType, ScaleType)) {
         return scaleType;
     }
     else {
