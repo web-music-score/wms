@@ -5,7 +5,7 @@ import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "..
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -23,7 +23,7 @@ export abstract class ObjNotationLine extends MusicObject {
     public abstract readonly id: number;
     public abstract readonly name: string;
 
-    private layoutGroups = new Map<LayoutGroupId, LayoutGroup>();
+    private layoutGroups = new UniMap<LayoutGroupId, LayoutGroup>();
 
     constructor(readonly row: ObjScoreRow) {
         super(row);
@@ -38,13 +38,7 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
-        let layoutGroup = this.layoutGroups.get(lauoutGroupId);
-
-        if (!layoutGroup) {
-            this.layoutGroups.set(lauoutGroupId, layoutGroup = new LayoutGroup(lauoutGroupId));
-        }
-
-        return layoutGroup;
+        return this.layoutGroups.getOrCreate(lauoutGroupId, () => new LayoutGroup(lauoutGroupId));
     }
 
     resetLayoutGroups(ctx: RenderContext) {

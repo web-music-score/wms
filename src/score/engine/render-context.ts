@@ -1,4 +1,4 @@
-import { Utils, Vec, Device } from "@tspro/ts-utils-lib";
+import { Utils, Vec, Device, UniMap } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
 import { MDocument, DivRect, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
@@ -22,7 +22,7 @@ type ImageAssetData = {
     img?: HTMLImageElement
 }
 
-const ImageAssets = new Map<ImageAsset, ImageAssetData>([
+const ImageAssets = new UniMap<ImageAsset, ImageAssetData>([
     [ImageAsset.G_Clef, { src: G_clef_png }],
     [ImageAsset.F_Clef, { src: F_clef_png }]
 ]);
@@ -111,7 +111,7 @@ export class RenderContext {
     private finishImageAsset(asset: ImageAssetData) {
         asset.finished = true;
 
-        let allFinished = Array.from(ImageAssets).every(asset => asset[1].finished === true);
+        let allFinished = ImageAssets.every(asset => asset.finished === true);
 
         if (allFinished) {
             this.onLoad();

@@ -106,7 +106,7 @@
         "package.json"
     ],
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.19.1",
+        "@tspro/ts-utils-lib": "^1.20.0",
         "tone": "^15.1.22"
     },
     "peerDependencies": {

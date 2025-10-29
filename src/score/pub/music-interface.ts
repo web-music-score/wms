@@ -1,5 +1,5 @@
 import * as Audio from "@tspro/web-music-score/audio";
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, UniMap, ValueSet, Utils } from "@tspro/ts-utils-lib";
 import { DivRect } from "./div-rect";
 import { Player } from "../engine/player";
 import { RenderContext } from "../engine/render-context";
@@ -26,7 +26,7 @@ function require_t<T>(t: T | undefined | null, message?: string): T {
 
 /** Music player class. */
 export class MPlayer {
-    private static currentlyPlaying = new Set<MPlayer>();
+    private static currentlyPlaying = new ValueSet<MPlayer>();
 
     private readonly player: Player;
 
@@ -353,33 +353,29 @@ export class MPlaybackButtons {
         return this;
     }
 
-    private static savedOnClickListeners = new Map<HTMLButtonElement, (() => void)[]>();
+    private static savedOnClickListeners = new UniMap<HTMLButtonElement, (() => void)[]>();
 
-    private static removeOnClickListeners(btn: HTMLButtonElement | undefined, onClick: (() => void) | "all") {
-        if (btn) {
-            let savedListeners = this.savedOnClickListeners.get(btn) || [];
-            let remainingListeners: (() => void)[] = [];
+    private static removeOnClickListeners(btn: HTMLButtonElement | undefined, onClickListener: (() => void) | "all") {
+        if (!btn) return;
 
-            savedListeners.forEach(l => {
-                if (onClick === l || onClick === "all") {
-                    btn.removeEventListener("click", l);
-                }
-                else {
-                    remainingListeners.push(l);
-                }
-            });
+        let curListeners = this.savedOnClickListeners.getOrDefault(btn, []);
 
-            this.savedOnClickListeners.set(btn, remainingListeners);
-        }
+        curListeners = curListeners.filter(listener => {
+            if (onClickListener === listener || onClickListener === "all") {
+                btn.removeEventListener("click", listener);
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+
+        this.savedOnClickListeners.set(btn, curListeners);
     }
 
-    private static addOnClickListener(btn: HTMLButtonElement, onClick: () => void) {
-        assertArg(Guard.isFunction(onClick), "onClick", onClick);
-
-        btn.addEventListener("click", onClick);
-
-        let clickListeners = this.savedOnClickListeners.get(btn) || [];
-
-        this.savedOnClickListeners.set(btn, [...clickListeners, onClick]);
+    private static addOnClickListener(btn: HTMLButtonElement, onClickListener: () => void) {
+        assertArg(Guard.isFunction(onClickListener), "onClick", onClickListener);
+        btn.addEventListener("click", onClickListener);
+        this.savedOnClickListeners.getOrCreate(btn, []).push(onClickListener);
     }
 }

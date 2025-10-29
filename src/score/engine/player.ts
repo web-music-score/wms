@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { UniMap, Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-music-score/theory";
 import * as Audio from "@tspro/web-music-score/audio";
 import { ObjDocument } from "./obj-document";
@@ -276,11 +276,11 @@ export class Player {
         let curSpeed = 1;
         let curVolume = getDefaultVolume();
 
-        let speedMap = new Map<ObjRhythmColumn, number[]>();
-        let volumeMap = new Map<ObjRhythmColumn, number[]>();
+        let speedMap = new UniMap<ObjRhythmColumn, number[]>();
+        let volumeMap = new UniMap<ObjRhythmColumn, number[]>();
 
-        const pushSpeed = (col: ObjRhythmColumn, speed: number) => speedMap.set(col, [...(speedMap.get(col) ?? []), speed]);
-        const pushVolume = (col: ObjRhythmColumn, volume: number) => volumeMap.set(col, [...(volumeMap.get(col) ?? []), volume]);
+        const pushSpeed = (col: ObjRhythmColumn, speed: number) => speedMap.getOrCreate(col, []).push(speed);
+        const pushVolume = (col: ObjRhythmColumn, volume: number) => volumeMap.getOrCreate(col, []).push(volume);
 
         this.playerColumnSequence.forEach(col => {
             if (!(col instanceof ObjRhythmColumn)) {
@@ -355,12 +355,12 @@ export class Player {
                 }
             });
 
-            let speedArr = speedMap.get(col) ?? [];
+            let speedArr = speedMap.getOrDefault(col, []);
             if (speedArr.length > 0) {
                 curSpeed = Utils.Math.sum(speedArr) / speedArr.length;
             }
 
-            let volumeArr = volumeMap.get(col) ?? []
+            let volumeArr = volumeMap.getOrDefault(col, []);
             if (volumeArr.length > 0) {
                 curVolume = Utils.Math.sum(volumeArr) / volumeArr.length;
             }

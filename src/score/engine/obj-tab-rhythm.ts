@@ -4,7 +4,7 @@ import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
 import { ObjTab } from "./obj-staff-and-tab";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { Utils } from "@tspro/ts-utils-lib";
+import { UniMap, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjText } from "./obj-text";
@@ -66,7 +66,7 @@ export class ObjTabRhythm extends MusicObject {
     }
 
     // Keep non-static
-    private readonly tupletPartsTextObjMap = new Map<string, ObjText>();
+    private readonly tupletPartsTextObjMap = new UniMap<string, ObjText>();
 
     draw(ctx: RenderContext) {
         ctx.drawDebugRect(this.rect);

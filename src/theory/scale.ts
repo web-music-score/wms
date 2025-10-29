@@ -1,4 +1,4 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, UniMap, SignedIndexArray, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
@@ -265,7 +265,7 @@ export class Scale extends KeySignature {
         }
     }
 
-    private preferredChromaticNoteCache = new Map<number, Note>();
+    private preferredChromaticIdNoteCache = new SignedIndexArray<Note>(); // Can it be negative case?
 
     /**
      * Get preferred chromatic note from given chromatic id.
@@ -275,7 +275,7 @@ export class Scale extends KeySignature {
     getPreferredChromaticNote(chromaticId: number): Note {
         Note.validateChromaticId(chromaticId);
 
-        let note = this.preferredChromaticNoteCache.get(chromaticId);
+        let note = this.preferredChromaticIdNoteCache.get(chromaticId);
         if (note) {
             return note;
         }
@@ -297,7 +297,7 @@ export class Scale extends KeySignature {
 
         note = scaleNotes.find(note2 => Note.getChromaticClass(chromaticId) === note2.chromaticClass);
         if (note) {
-            this.preferredChromaticNoteCache.set(chromaticId, note);
+            this.preferredChromaticIdNoteCache.set(chromaticId, note);
             return note;
         }
 
@@ -314,7 +314,7 @@ export class Scale extends KeySignature {
             for (let diatonicId = Math.max(0, diatonicIdStart); diatonicId <= diatonicIdEnd; diatonicId++) {
                 note = new Note(diatonicId, acc);
                 if (chromaticId === note.chromaticId) {
-                    this.preferredChromaticNoteCache.set(chromaticId, note);
+                    this.preferredChromaticIdNoteCache.set(chromaticId, note);
                     return note;
                 }
             }
@@ -322,7 +322,7 @@ export class Scale extends KeySignature {
 
         // Final method (if ever occurs).
         note = Note.getChromaticNote(chromaticId);
-        this.preferredChromaticNoteCache.set(chromaticId, note);
+        this.preferredChromaticIdNoteCache.set(chromaticId, note);
         return note;
     }
 }
@@ -467,7 +467,7 @@ export function getScaleFactoryList(): ReadonlyArray<ScaleFactory | string> {
     return ScaleFactoryList;
 }
 
-const ScaleFactoryMap = new Map<ScaleType | `${ScaleType}`, ScaleFactory>();
+const ScaleFactoryMap = new UniMap<ScaleType | `${ScaleType}`, ScaleFactory>();
 
 ScaleFactoryList.forEach(factory => {
     if (factory instanceof ScaleFactory) {

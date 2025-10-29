@@ -1,4 +1,4 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, IndexArray, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 const MaxTupletRatioValue = 12;
@@ -161,7 +161,7 @@ export class NoteLengthProps {
         }
     }
 
-    private static cache = new Map<NoteLength | NoteLengthStr | string, NoteLengthProps>();
+    private static cache = new UniMap<NoteLength | NoteLengthStr | string, NoteLengthProps>();
 
     /**
      * Get note length props.
@@ -169,11 +169,7 @@ export class NoteLengthProps {
      * @returns - Note length props.
      */
     static get(noteLength: NoteLength | NoteLengthStr | string): NoteLengthProps {
-        let p = this.cache.get(noteLength);
-        if (!p) {
-            this.cache.set(noteLength, p = new NoteLengthProps(noteLength));
-        }
-        return p;
+        return this.cache.getOrCreate(noteLength, () => new NoteLengthProps(noteLength));
     }
 
     /**
@@ -317,7 +313,7 @@ export class RhythmProps {
         }
     }
 
-    private static NoteSymbolMap = new Map<number, string>([[1, "𝅝"], [2, "𝅗𝅥"], [4, "𝅘𝅥"], [8, "𝅘𝅥𝅮"], [16, "𝅘𝅥𝅯"], [32, "𝅘𝅥𝅰"], [64, "𝅘𝅥𝅱"], [128, "𝅘𝅥𝅲"]]);
+    private static NoteSymbolMap = new IndexArray<string>([[1, "𝅝"], [2, "𝅗𝅥"], [4, "𝅘𝅥"], [8, "𝅘𝅥𝅮"], [16, "𝅘𝅥𝅯"], [32, "𝅘𝅥𝅰"], [64, "𝅘𝅥𝅱"], [128, "𝅘𝅥𝅲"]]);
 
     /**
      * Get string presentation of rhythm props.
@@ -329,7 +325,7 @@ export class RhythmProps {
         return sym ? (sym + dots) : ("" + this.noteSize + (dots.length > 0 ? dots : "n"));
     }
 
-    private static cache = new Map<NoteLength | NoteLengthStr, RhythmProps>();
+    private static cache = new UniMap<NoteLength | NoteLengthStr, RhythmProps>();
 
     /**
      * Get rhythm props with given arguments.
@@ -343,11 +339,7 @@ export class RhythmProps {
             return new RhythmProps(noteLength, dotCount, tupletRatio);
         }
         else {
-            let rhythmProps = this.cache.get(noteLength);
-            if (!rhythmProps) {
-                this.cache.set(noteLength, rhythmProps = new RhythmProps(noteLength));
-            }
-            return rhythmProps;
+            return this.cache.getOrCreate(noteLength, () => new RhythmProps(noteLength));
         }
     }
 

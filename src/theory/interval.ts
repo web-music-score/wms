@@ -1,4 +1,4 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -15,7 +15,7 @@ export type IntervalQuality =
     | "diminished"
     | "doubly diminished";
 
-const IntervalQualityAbbrMap = new Map<IntervalQuality, string>([
+const IntervalQualityAbbrMap = new UniMap<IntervalQuality, string>([
     ["Major", "M"],
     ["minor", "m"],
     ["Perfect", "P"],
@@ -217,7 +217,7 @@ export class Interval {
      */
     toAbbrString(): string {
         let direction = this.direction === "Descending" ? "↓" : "";
-        let quality = IntervalQualityAbbrMap.get(this.quality) ?? "?";
+        let quality = IntervalQualityAbbrMap.getOrDefault(this.quality, "?");
         let quantity = this.quantity;
 
         return direction + quality + quantity;

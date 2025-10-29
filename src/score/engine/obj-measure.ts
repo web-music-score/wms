@@ -1,4 +1,4 @@
-import { Guard, IndexArray, Map1, Map3, Utils, asMulti } from "@tspro/ts-utils-lib";
+import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -121,14 +121,14 @@ export class ObjMeasure extends MusicObject {
 
     private needBeamsUpdate = true;
 
-    private navigationSet = new Set<Navigation>();
+    private navigationSet = new ValueSet<Navigation>();
     private isEndSong: boolean = false;
     private isEndSection: boolean = false;
     private endRepeatPlayCount: number = 2; // play twice.
     private endRepeatPlayCountText?: ObjText;
 
-    private staticObjectsCache = new Map1<ObjNotationLine, MusicObject[]>();
-    private lyricsObjectsCache = new Map3<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>();
+    private staticObjectsCache = new UniMap<ObjNotationLine, MusicObject[]>();
+    private lyricsObjectsCache = new TriMap<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>();
 
     readonly mi: MMeasure;
 

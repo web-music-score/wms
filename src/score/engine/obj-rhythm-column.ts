@@ -13,7 +13,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
-import { IndexArray, Map2, Map3 } from "@tspro/ts-utils-lib";
+import { IndexArray, UniMap, TriMap } from "@tspro/ts-utils-lib";
 
 export type ScorePlayerNote = {
     note: Note,
@@ -27,12 +27,12 @@ export type RhythmSymbol = ObjNoteGroup | ObjRest;
 export class ObjRhythmColumn extends MusicObject {
     private readonly voiceSymbol = new IndexArray<RhythmSymbol>();
 
-    private readonly lyricsObject = new Map3<VerseNumber, ObjNotationLine, VerticalPos, ObjLyrics>();
+    private readonly lyricsObject = new TriMap<VerseNumber, ObjNotationLine, VerticalPos, ObjLyrics>();
 
     private minDiatonicId?: number;
     private maxDiatonicId?: number;
-    private staffMinDiatonicId = new Map<ObjStaff, number>();
-    private staffMaxDiatonicId = new Map<ObjStaff, number>();
+    private staffMinDiatonicId = new UniMap<ObjStaff, number>();
+    private staffMaxDiatonicId = new UniMap<ObjStaff, number>();
 
     private arpeggioDir: Arpeggio | undefined;
     private arpeggios: ObjArpeggio[] = [];

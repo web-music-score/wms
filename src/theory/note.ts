@@ -1,4 +1,4 @@
-import { Guard, Map1 } from "@tspro/ts-utils-lib";
+import { Guard, UniMap } from "@tspro/ts-utils-lib";
 import { PitchNotation, SymbolSet } from "./types";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -49,8 +49,8 @@ const NoteNameRegex = /^([A-G])((?:bb|𝄫|♭|b|#|♯|x|𝄪)?)?(-?\d+)?$/;
 
 /** Note class. */
 export class Note {
-    private static noteCache = new Map1<string, Note>();
-    private static chromaticNoteCache = new Map1<number, Note>();
+    private static noteCache = new UniMap<string, Note>();
+    private static chromaticNoteCache = new UniMap<number, Note>();
 
     /** Diatonic class */
     readonly diatonicClass: number;

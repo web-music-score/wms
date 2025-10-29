@@ -1,4 +1,4 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { IndexArray, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";
@@ -22,24 +22,16 @@ const OkayRootNoteList: ReadonlyArray<Note> = [
     "B", "Cb"
 ].map(noteName => Note.getNote(noteName + "0"));
 
-const okayRootNoteCache = new Map<number, Note>();
+const okayRootNoteCache = new IndexArray<Note>();
 
 function getOkayRootNote(wantedRootNote: Note): Note {
-    let cacheKey = wantedRootNote.chromaticClass;
-
-    let rootNote = okayRootNoteCache.get(cacheKey);
-
-    if (!rootNote) {
-        rootNote = OkayRootNoteList.find(note => isEqualNote(note, wantedRootNote));
-
+    return okayRootNoteCache.getOrCreate(wantedRootNote.chromaticClass, () => {
+        let rootNote = OkayRootNoteList.find(note => isEqualNote(note, wantedRootNote));
         if (!rootNote) {
             throw new MusicError(MusicErrorType.InvalidArg, `Invalid chord root note: ${wantedRootNote.formatOmitOctave(SymbolSet.Unicode)}`);
         }
-
-        okayRootNoteCache.set(cacheKey, rootNote);
-    }
-
-    return rootNote;
+        return rootNote;
+    });
 }
 
 function getChordNoteByDegree(chordRootNote: Note, degree: Degree) {

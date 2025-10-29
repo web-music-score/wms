@@ -7,7 +7,7 @@ import { Clef, DivRect, MDocument, MeasureOptions, ScoreConfiguration, StaffConf
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
-import { Guard } from "@tspro/ts-utils-lib";
+import { Guard, UniMap } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -29,7 +29,7 @@ export class ObjDocument extends MusicObject {
 
     private allConnectiveProps: ConnectiveProps[] = [];
 
-    private staffGroups = new Map<string, StaffGroup>();
+    private staffGroups = new UniMap<string, StaffGroup>();
 
     private readonly mi: MDocument;
 
