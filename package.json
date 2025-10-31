@@ -106,7 +106,7 @@
         "package.json"
     ],
     "dependencies": {
-        "@tspro/ts-utils-lib": "^1.20.0",
+        "@tspro/ts-utils-lib": "^2.0.0",
         "tone": "^15.1.22"
     },
     "peerDependencies": {
@@ -128,8 +128,9 @@
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",
-        "build:dev (all workspaces)": "npm run build && npm run build:dev --workspaces --if-present",
-        "build:prod (all workspaces)": "npm run build && npm run build:prod --workspaces --if-present",
+        "build:all": "npm run build && npm run build:prod --workspaces --if-present",
+        "start:features-demo": "npm run start --workspace features-demo",
+        "start:guitar-app": "npm run start --workspace guitar-app",
         "docs": "typedoc"
     }
 }

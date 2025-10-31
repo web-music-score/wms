@@ -24,7 +24,7 @@ function sortNotesAndStrings(notes: ReadonlyArray<Note>, strings?: StringNumber 
     let noteStringData = notes.map((note, i) => { return { note, string: stringArr[i] } });
 
     noteStringData = Utils.Arr
-        .removeDuplicatesCmp(noteStringData, (a, b) => Note.equals(a.note, b.note))
+        .removeDuplicates(noteStringData, (a, b) => Note.equals(a.note, b.note))
         .sort((a, b) => Note.compareFunc(a.note, b.note));
 
     return {

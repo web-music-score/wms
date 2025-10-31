@@ -2,7 +2,7 @@ import * as React from "react";
 import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import { Utils } from "@tspro/ts-utils-lib";
+import { UniMap, Utils } from "@tspro/ts-utils-lib";
 import * as Audio from "@tspro/web-music-score/audio";
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
@@ -30,7 +30,7 @@ interface GuitarScalesProps {
 interface GuitarScalesState {
     guitarCtx: ScoreUI.GuitarContext;
     selectedFretPos?: ScoreUI.FretPosition;
-    variants: Map<string, ScaleVariant>;
+    variants: UniMap<string, ScaleVariant>;
     variantName: string;
 }
 
@@ -66,7 +66,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
     createVariants(guitarCtx: ScoreUI.GuitarContext, variantName: string) {
         let openStringChromaticId = [0, 1, 2, 3, 4, 5].map(stringId => guitarCtx.getStringTuning(stringId).chromaticId);
 
-        let variants = new Map<string, ScaleVariant>();
+        let variants = new UniMap<string, ScaleVariant>();
 
         function saveVariant(position: number, fretPositions: ScoreUI.FretPosition[]) {
             let v = new ScaleVariant(position, fretPositions);
@@ -128,7 +128,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
         }
 
         if (!variants.has(variantName)) {
-            variantName = Utils.Map.getMapKeys(variants)[0] ?? "";
+            variantName = variants.keysArray()[0] ?? "";
         }
 
         return { variants, variantName }
@@ -200,7 +200,7 @@ export class GuitarScales extends React.Component<GuitarScalesProps, GuitarScale
             this.setState({ variantName, selectedFretPos: undefined });
         }
 
-        let variantNames = Utils.Map.getMapKeys(variants);
+        let variantNames = variants.keysArray();
 
         let builder = new Score.DocumentBuilder()
             .setScoreConfiguration(Score.StaffPreset.GuitarTreble)

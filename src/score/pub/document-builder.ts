@@ -54,7 +54,7 @@ function assertStaffConfig(staffConfig: StaffConfig) {
 
     assertArg(
         Guard.isObject(staffConfig),
-        Guard.isEqual(staffConfig.type, "staff"),
+        Guard.isStrictEqual(staffConfig.type, "staff"),
         Guard.isEnumValue(staffConfig.clef, Clef),
         Guard.isBooleanOrUndefined(staffConfig.isOctaveDown),
         Guard.isUndefined(staffConfig.minNote) || Note.isNote(staffConfig.minNote),
@@ -73,11 +73,11 @@ function assertTabConfig(tabConfig: TabConfig) {
 
     assertArg(
         Guard.isObject(tabConfig),
-        Guard.isEqual(tabConfig.type, "tab"),
+        Guard.isStrictEqual(tabConfig.type, "tab"),
         (
             Guard.isUndefined(tabConfig.tuning) ||
             Guard.isString(tabConfig.tuning) && Guard.isIncluded(tabConfig.tuning, TuningNameList) ||
-            Guard.isArray(tabConfig.tuning) && Guard.isEqual(tabConfig.tuning.length, getStringNumbers().length && tabConfig.tuning.every(s => Note.isNote(s)))
+            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, getStringNumbers().length && tabConfig.tuning.every(s => Note.isNote(s)))
         )
     );
 }
@@ -700,8 +700,8 @@ export class DocumentBuilder {
     private addNavigationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         assertArg(
-            Guard.isEqual(navigation, Navigation.EndRepeat) && Guard.isEqual(args.length, 1) ||
-            Guard.isEqual(navigation, Navigation.Ending) && Guard.isIntegerGte(args.length, 1) && args.every(passage => Guard.isIntegerGte(passage, 1)) ||
+            Guard.isStrictEqual(navigation, Navigation.EndRepeat) && Guard.isStrictEqual(args.length, 1) ||
+            Guard.isStrictEqual(navigation, Navigation.Ending) && Guard.isIntegerGte(args.length, 1) && args.every(passage => Guard.isIntegerGte(passage, 1)) ||
             Guard.isEnumValue(navigation, Navigation) && Guard.isEmptyArray(args)
         );
 

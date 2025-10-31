@@ -43,7 +43,7 @@ function getChordNoteByDegree(chordRootNote: Note, degree: Degree) {
 }
 
 function removeNoteDuplicates(notes: ReadonlyArray<Note>): Note[] {
-    return Utils.Arr.removeDuplicatesCmp(notes, isEqualNote);
+    return Utils.Arr.removeDuplicates(notes, isEqualNote);
 }
 
 /** Chord info type. */
