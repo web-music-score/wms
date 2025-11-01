@@ -60,8 +60,8 @@ const Score = require("@tspro/web-music-score/score");
 
 ## Browser Modules
 
-This lib can be used in browser via unpkg CDN using iife bundle. It declares
-global name `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`,
+IIFE bundle for browser use is available via `unpkg` and `jsdeliv` cdn's. This bundle
+declares global name `WebMusicScore` that contains `Core`, `Audio`, `Theory`, `Score`,
 and `Pieces` as corresponding subpath modules.
 
 React module `react-ui` is not included available for browser usage.
@@ -72,11 +72,13 @@ React module `react-ui` is not included available for browser usage.
     that if something breaks between versions then your web site does not stop working.
 -->
 <script src="https://unpkg.com/@tspro/web-music-score@5.3.0/dist/iife/index.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tspro/web-music-score@5.3.0/dist/iife/index.global.js"></script>
 
 <!--
     Classical guitar now also available for browser module.
 -->
 <script src="https://unpkg.com/@tspro/web-music-score@5.3.0/dist/iife/audio-cg.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tspro/web-music-score@5.3.0/dist/iife/audio-cg.global.js"></script>
 
 <script>
     // The lib is available via global name WebMusicScore.
