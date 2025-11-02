@@ -74,10 +74,15 @@ export abstract class ObjNotationLine extends MusicObject {
 
         layoutObjArr.forEach(layoutObj => {
             let y = layoutObj.resolveClosestToStaffY(ctx);
+            let p = layoutObj.layoutGroup.getPadding(ctx);
+
+            y += layoutObj.verticalPos === VerticalPos.Below ? p : -p;
+
+            rowY ??= y;
 
             rowY = layoutObj.verticalPos === VerticalPos.Below
-                ? Math.max(y, rowY ?? y)
-                : Math.min(y, rowY ?? y);
+                ? Math.max(y, rowY)
+                : Math.min(y, rowY);
         });
 
         layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));

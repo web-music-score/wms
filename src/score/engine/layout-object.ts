@@ -185,4 +185,8 @@ export class LayoutGroup {
             w.musicObj.layout(ctx);
         }
     }
+
+    getPadding(ctx: RenderContext) {
+        return ctx.unitSize * 1;
+    }
 }
