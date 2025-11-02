@@ -47,7 +47,7 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     layoutLayoutGroups(ctx: RenderContext) {
-        // Layout in correct order of LayoutGroupId
+        // Layout in correct order of LayoutGroupId values.
         for (const groupId of Utils.Enum.getEnumValues(LayoutGroupId)) {
             const layoutGroup = this.getLayoutGroup(groupId);
             if (layoutGroup) {
@@ -69,23 +69,22 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObj.setPositionResolved();
     }
 
-    private alignObjectsY(ctx: RenderContext, layoutObjArr: LayoutObjectWrapper[]) {
-        layoutObjArr = layoutObjArr.filter(layoutObj => !layoutObj.isPositionResolved());
+    private alignObjectsY(ctx: RenderContext, layoutObjects: LayoutObjectWrapper[], verticalPos: VerticalPos) {
+        const layoutObjArr = layoutObjects.filter(obj => !obj.isPositionResolved() && obj.verticalPos === verticalPos);
 
-        let rowY: number | undefined;
+        if (layoutObjArr.length === 0)
+            return;
 
-        layoutObjArr.forEach(layoutObj => {
-            let y = layoutObj.resolveClosestToStaffY(ctx);
-            let p = layoutObj.layoutGroup.getPadding(ctx);
+        const vdir = verticalPos === VerticalPos.Below ? 1 : -1;
 
-            y += layoutObj.verticalPos === VerticalPos.Below ? p : -p;
-
-            rowY ??= y;
-
-            rowY = layoutObj.verticalPos === VerticalPos.Below
-                ? Math.max(y, rowY)
-                : Math.min(y, rowY);
+        let yArr = layoutObjArr.map(layoutObj => {
+            return layoutObj.resolveClosestToStaffY(ctx) +
+                layoutObj.layoutGroup.getPadding(ctx) * vdir;
         });
+
+        const rowY = verticalPos === VerticalPos.Below
+            ? Math.max(...yArr)
+            : Math.min(...yArr);
 
         layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
     }
@@ -108,7 +107,7 @@ export abstract class ObjNotationLine extends MusicObject {
 
         if (layoutGroup.rowAlign) {
             // Resolve row-aligned objects
-            this.alignObjectsY(ctx, rowLayoutObjs);
+            this.alignObjectsY(ctx, rowLayoutObjs, verticalPos);
         }
         else {
             // Resolve non-row-aligned objects
@@ -117,10 +116,10 @@ export abstract class ObjNotationLine extends MusicObject {
                 if (link && link.getHead() === layoutObj.musicObj) {
                     let objectParts = [link.getHead(), ...link.getTails()];
                     let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                    this.alignObjectsY(ctx, layoutObjs);
+                    this.alignObjectsY(ctx, layoutObjs, verticalPos);
                 }
                 else {
-                    this.alignObjectsY(ctx, [layoutObj]);
+                    this.alignObjectsY(ctx, [layoutObj], verticalPos);
                 }
             });
         }
