@@ -12,7 +12,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
-import { asMulti, IndexArray } from "@tspro/ts-utils-lib";
+import { asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
 
 export enum LayoutGroupId {
     TabRhythm,
@@ -28,22 +28,19 @@ export enum LayoutGroupId {
     LyricsVerse3
 }
 
-const WidenColumnList = [
-    LayoutGroupId.NoteLabel,
-    LayoutGroupId.ChordLabel
-];;
-
-const RowAlignList = [
-    LayoutGroupId.TabRhythm,
-    LayoutGroupId.Navigation,
-    LayoutGroupId.Ending,
-    LayoutGroupId.TempoAnnotation,
-    LayoutGroupId.DynamicsAnnotation,
-    LayoutGroupId.ChordLabel,
-    LayoutGroupId.LyricsVerse1,
-    LayoutGroupId.LyricsVerse2,
-    LayoutGroupId.LyricsVerse3
-];
+const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { widen?: boolean, rowAlign?: boolean, padding?: number }>([
+    [LayoutGroupId.TabRhythm, { rowAlign: true }],
+    [LayoutGroupId.Fermata, {}],
+    [LayoutGroupId.NoteLabel, { widen: true }],
+    [LayoutGroupId.Navigation, { rowAlign: true }],
+    [LayoutGroupId.Ending, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.TempoAnnotation, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.DynamicsAnnotation, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.ChordLabel, { widen: true, rowAlign: true }],
+    [LayoutGroupId.LyricsVerse1, { rowAlign: true }],
+    [LayoutGroupId.LyricsVerse2, { rowAlign: true }],
+    [LayoutGroupId.LyricsVerse3, { rowAlign: true }],
+]);
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
     while (p) {
@@ -161,10 +158,12 @@ export class LayoutGroup {
 
     readonly rowAlign: boolean
     readonly widensColumn: boolean;
+    readonly padding: number;
 
     constructor(readonly layoutGroupId: number) {
-        this.rowAlign = RowAlignList.indexOf(layoutGroupId) >= 0;
-        this.widensColumn = WidenColumnList.indexOf(layoutGroupId) >= 0;
+        this.rowAlign = LayoutGroupIdAttrs.get(layoutGroupId)?.rowAlign === true;
+        this.widensColumn = LayoutGroupIdAttrs.get(layoutGroupId)?.widen === true;
+        this.padding = LayoutGroupIdAttrs.get(layoutGroupId)?.padding ?? 0;
     }
 
     getLayoutObjects(verticalPos: VerticalPos): Readonly<LayoutObjectWrapper[]> {
@@ -187,6 +186,6 @@ export class LayoutGroup {
     }
 
     getPadding(ctx: RenderContext) {
-        return ctx.unitSize * 1;
+        return this.padding * ctx.unitSize;
     }
 }
