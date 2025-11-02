@@ -33,7 +33,7 @@ const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { widen?: boolean, rowAlign
     [LayoutGroupId.Fermata, {}],
     [LayoutGroupId.NoteLabel, { widen: true }],
     [LayoutGroupId.Navigation, { rowAlign: true }],
-    [LayoutGroupId.Ending, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Ending, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.TempoAnnotation, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.DynamicsAnnotation, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.ChordLabel, { widen: true, rowAlign: true }],
