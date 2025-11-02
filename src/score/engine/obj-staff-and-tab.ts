@@ -43,16 +43,18 @@ export abstract class ObjNotationLine extends MusicObject {
 
     resetLayoutGroups(ctx: RenderContext) {
         // Clear resolved position and layout objects
-        this.layoutGroups.forEach(layoutGroup => {
-            layoutGroup.layout(ctx);
-        });
+        this.layoutGroups.forEach(layoutGroup => layoutGroup.layout(ctx));
     }
 
     layoutLayoutGroups(ctx: RenderContext) {
-        this.layoutGroups.forEach(layoutGroup => {
-            this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Above);
-            this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Below);
-        });
+        // Layout in correct order of LayoutGroupId
+        for (const groupId of Utils.Enum.getEnumValues(LayoutGroupId)) {
+            const layoutGroup = this.getLayoutGroup(groupId);
+            if (layoutGroup) {
+                this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Above);
+                this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Below);
+            }
+        }
     }
 
     private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
