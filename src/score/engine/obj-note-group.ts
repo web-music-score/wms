@@ -753,6 +753,7 @@ export class ObjNoteGroup extends MusicObject {
         if (this.hasBeamCount() && obj?.stemTip && stemTipY !== obj.stemTip.anchorY) {
             obj.stemTip.top = obj.stemTip.anchorY = obj.stemTip.bottom = stemTipY;
             this.requestRectUpdate();
+            this.col.requestRectUpdate();
         }
     }
 
