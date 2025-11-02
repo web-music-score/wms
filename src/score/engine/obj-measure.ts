@@ -1438,6 +1438,25 @@ export class ObjMeasure extends MusicObject {
             col.offset(columnAnchorX - rect.anchorX, -rect.anchorY);
             columnLeft += rect.width * columnScale;
         });
+
+        // Reposition rest
+        getVoiceIds().forEach(voiceId => {
+            const symbols = this.getVoiceSymbols(voiceId);
+
+            const onlyRest = symbols.length === 1 && symbols[0] instanceof ObjRest ? symbols[0] : undefined;
+            if (!onlyRest) return;
+
+            const isOnlySymbolInCol = getVoiceIds()
+                .map(voiceId => onlyRest.col.getVoiceSymbol(voiceId))
+                .filter(sym => sym !== undefined && sym !== onlyRest)
+                .length === 0;
+
+            if (isOnlySymbolInCol) return;
+
+            // Now relocate onlyRest middle of measure
+            const r = this.getColumnsContentRect();
+            onlyRest.offset((r.left + r.right) / 2 - onlyRest.getRect().anchorX, 0);
+        });
     }
 
     layoutConnectives(ctx: RenderContext) {

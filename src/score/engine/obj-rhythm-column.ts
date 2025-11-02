@@ -117,14 +117,28 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
+        // Rests can be repositioned outside column bounds.
+        for (let i = 0; i < this.voiceSymbol.length; i++) {
+            let sym = this.voiceSymbol.get(i);
+            if (sym instanceof ObjRest) {
+                let arr = sym.pick(x, y);
+                if (arr.length > 0) {
+                    return [this, ...arr];
+                }
+            }
+        }
+
         if (!this.getRect().contains(x, y)) {
             return [];
         }
 
-        for (const symbol of this.voiceSymbol.values()) {
-            let arr = symbol.pick(x, y);
-            if (arr.length > 0) {
-                return [this, ...arr];
+        for (let i = 0; i < this.voiceSymbol.length; i++) {
+            let sym = this.voiceSymbol.get(i);
+            if (sym instanceof ObjNoteGroup) {
+                let arr = sym.pick(x, y);
+                if (arr.length > 0) {
+                    return [this, ...arr];
+                }
             }
         }
 
