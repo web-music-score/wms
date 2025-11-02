@@ -1,9 +1,10 @@
 # Changelog
 
-## [5.3.1] - 2025-10-
+## [5.4.0] - 2025-11-
 ### Added
 - isVoiceId(), isStringNumber() and isVerseNumber().
 - Note.isNote().
+- Draw rest that is only symbol in voiceId in the middle of measure.
 
 ### Fixed
 - Improved note displacement when notes are close to each other.
