@@ -6,7 +6,7 @@ import { ObjText } from "./obj-text";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { VerticalPos } from "./layout-object";
-import { AnchoredRect, Guard } from "@tspro/ts-utils-lib";
+import { Guard } from "@tspro/ts-utils-lib";
 import { ObjMeasure } from "./obj-measure";
 
 export class ObjLyrics extends MusicObject {
