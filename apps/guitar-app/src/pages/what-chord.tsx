@@ -6,6 +6,7 @@ import * as Audio from "@tspro/web-music-score/audio";
 import * as Score from "@tspro/web-music-score/score";
 import * as Theory from "@tspro/web-music-score/theory";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import { Rect } from "@tspro/ts-utils-lib";
 
 const tdStyle: React.CSSProperties = {
     paddingLeft: "1em",
@@ -18,7 +19,7 @@ type FrettingPos = number | "mute";
 
 interface WhatChordProps {
     app: GuitarApp;
-    windowRect: Score.DivRect;
+    windowRect: Rect;
 }
 
 interface WhatChordState {

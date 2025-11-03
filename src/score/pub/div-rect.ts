@@ -1,7 +1,7 @@
 import { Utils } from "@tspro/ts-utils-lib";
 
 /**
- * @deprecated - Use `AnchoredRect` from `@tspro/ts-utils-lib` instead. This is left here until next major version.
+ * @deprecated - Will be removed in `v6.0.0`. Use `AnchoredRect` from `@tspro/ts-utils-lib` instead.
  * 
  * DivRect class, left, top, right, bottom rectangle divided into four sections by anchorX, anchorY.
  */

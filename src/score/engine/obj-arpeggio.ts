@@ -1,8 +1,9 @@
-import { Arpeggio, DivRect, MArpeggio } from "../pub";
+import { Arpeggio, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
+import { ObjNotationLine } from "./obj-staff-and-tab";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjArpeggio extends MusicObject {
     private topArrowHeight: number = 0;
@@ -43,7 +44,7 @@ export class ObjArpeggio extends MusicObject {
         let width = unitSize * 2;
         let height = this.numCycles * this.cycleHeight;
 
-        this.rect = new DivRect(-width / 2, width / 2, -height / 2 - this.topArrowHeight, height / 2 + this.bottomArrowHeight);
+        this.rect = new AnchoredRect(-width / 2, width / 2, -height / 2 - this.topArrowHeight, height / 2 + this.bottomArrowHeight);
     }
 
     offset(dx: number, dy: number) {

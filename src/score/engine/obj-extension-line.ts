@@ -4,8 +4,9 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
 import { ObjMeasure } from "./obj-measure";
 import { Extension } from "./extension";
-import { DivRect, MExtensionLine } from "../pub";
+import { MExtensionLine } from "../pub";
 import { ObjNotationLine } from "./obj-staff-and-tab";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export type ExtensionLineLeftObj = ObjBarLineLeft | MusicObject;
 export type ExtensionLineRightObj = ObjRhythmColumn | ObjBarLineRight;
@@ -62,7 +63,7 @@ export class ObjExtensionLine extends MusicObject {
         let lineRight = this.getLineRight();
         let lineRectH = unitSize;
 
-        this.rect = new DivRect(lineLeft, lineRight, -lineRectH / 2, lineRectH / 2);
+        this.rect = new AnchoredRect(lineLeft, lineRight, -lineRectH / 2, lineRectH / 2);
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -70,7 +71,7 @@ export class ObjExtensionLine extends MusicObject {
     }
 
     layout(ctx: RenderContext) {
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
     }
 
     offset(dx: number, dy: number) {

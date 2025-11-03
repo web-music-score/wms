@@ -1,6 +1,7 @@
-import { DivRect, MText } from "../pub";
+import { MText } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 const DefaultBoxedPadding = 0.5;
 
@@ -58,7 +59,7 @@ export class ObjText extends MusicObject {
             this.textLines = [""];
         }
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         this.mi = new MText(this);
     }
@@ -110,7 +111,7 @@ export class ObjText extends MusicObject {
             h = w = Math.max(h, w);
         }
 
-        this.rect = DivRect.createSections(w * anchorX, w * (1 - anchorX), h * anchorY, h * (1 - anchorY));
+        this.rect = AnchoredRect.createSections(w * anchorX, w * (1 - anchorX), h * anchorY, h * (1 - anchorY));
     }
 
     offset(dx: number, dy: number) {
@@ -156,12 +157,8 @@ export class ObjText extends MusicObject {
                 break;
             case "circle":
             case "ellipse":
-                let x = (rect.left + rect.right) / 2;
-                let y = (rect.top + rect.bottom) / 2;
-                let rx = (rect.right - rect.left) / 2;
-                let ry = (rect.bottom - rect.top) / 2;
                 ctx.beginPath();
-                ctx.ellipse(x, y, rx, ry, 0, 0, 2 * Math.PI);
+                ctx.ellipse(rect.centerX, rect.centerY, rect.width / 2, rect.height / 2, 0, 0, 2 * Math.PI);
                 ctx.stroke();
                 break;
         }

@@ -1,14 +1,14 @@
-import { Guard } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, MEnding, Navigation } from "../pub";
+import { MEnding, Navigation } from "../pub";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
 export class ObjEnding extends MusicObject {
     private endingText: ObjText;
-    private shapeRects: DivRect[] = [];
+    private shapeRects: AnchoredRect[] = [];
 
     readonly mi: MEnding;
 
@@ -36,7 +36,7 @@ export class ObjEnding extends MusicObject {
         return this.mi;
     }
 
-    getShapeRects(): DivRect[] {
+    getShapeRects(): AnchoredRect[] {
         return this.shapeRects;
     }
 
@@ -62,8 +62,8 @@ export class ObjEnding extends MusicObject {
     }
 
     layout(ctx: RenderContext) {
-        this.rect = new DivRect();
-        this.shapeRects = [this.rect.copy()];
+        this.rect = new AnchoredRect();
+        this.shapeRects = [this.rect.clone()];
     }
 
     layoutFitToMeasure(ctx: RenderContext) {
@@ -77,15 +77,15 @@ export class ObjEnding extends MusicObject {
 
         let endingHeight = textRect.height;
 
-        this.rect = new DivRect(measureContent.left + unitSize, measureContent.right - unitSize, -endingHeight, 0);
+        this.rect = new AnchoredRect(measureContent.left + unitSize, measureContent.right - unitSize, -endingHeight, 0);
 
         this.endingText.offset(this.rect.left + unitSize / 2, this.rect.bottom);
 
         this.shapeRects = [
-            new DivRect(this.rect.left, this.rect.left + 1, this.rect.top, this.rect.bottom),
-            new DivRect(this.rect.left, this.rect.right, this.rect.top, this.rect.top + 1),
-            new DivRect(this.rect.right - 1, this.rect.right, this.rect.top, this.rect.bottom),
-            this.endingText.getRect().copy()
+            new AnchoredRect(this.rect.left, this.rect.left + 1, this.rect.top, this.rect.bottom),
+            new AnchoredRect(this.rect.left, this.rect.right, this.rect.top, this.rect.top + 1),
+            new AnchoredRect(this.rect.right - 1, this.rect.right, this.rect.top, this.rect.bottom),
+            this.endingText.getRect().clone()
         ];
     }
 

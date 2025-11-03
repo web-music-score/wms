@@ -1,6 +1,5 @@
 import * as Audio from "@tspro/web-music-score/audio";
-import { Guard, UniMap, ValueSet, Utils } from "@tspro/ts-utils-lib";
-import { DivRect } from "./div-rect";
+import { Guard, UniMap, ValueSet, Utils, Rect } from "@tspro/ts-utils-lib";
 import { Player } from "../engine/player";
 import { RenderContext } from "../engine/render-context";
 import { PlayStateChangeListener } from "./types";
@@ -42,7 +41,9 @@ export class MPlayer {
         this.player = new Player();
 
         this.player.setDocument(doc.getMusicObject());
-        this.player.setCursorPositionChangeListener((cursorRect?: DivRect) => doc.getMusicObject().updateCursorRect(cursorRect));
+        this.player.setCursorPositionChangeListener((cursorRect?: Rect) => {
+            doc.getMusicObject().updateCursorRect(cursorRect);
+        });
 
         if (playStateChangeListener) {
             this.player.setPlayStateChnageListener(playStateChangeListener);

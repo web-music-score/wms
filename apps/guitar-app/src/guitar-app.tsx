@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { CAGEDScales, ChooseScale, ChooseScaleCircle, ChooseTuning, DiatonicChords, FrontPage, GuitarScales, Intervals, PlayNotes, WhatChord } from "./pages";
-import { Cookies, Utils } from "@tspro/ts-utils-lib";
+import { Cookies, Rect, Utils } from "@tspro/ts-utils-lib";
 import * as Audio from "@tspro/web-music-score/audio";
 import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
 import * as Theory from "@tspro/web-music-score/theory";
@@ -43,7 +43,7 @@ export enum Page {
 }
 
 interface GuitarAppState {
-    windowRect: Score.DivRect;
+    windowRect: Rect;
     currentPage: string;
     instrument: string;
     guitarCtx: ScoreUI.GuitarContext;
@@ -121,7 +121,7 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
 
         Audio.useInstrument(instrument);
 
-        let windowRect = new Score.DivRect();
+        let windowRect = new Rect();
 
         let guitarCtx = new ScoreUI.GuitarContext(tuningName, scale, handedness, pitchNotation, guitarNoteLabel);
 
@@ -151,8 +151,8 @@ export class GuitarApp extends React.Component<{}, GuitarAppState> {
     }
 
     updateWindowRect() {
-        let windowRect = new Score.DivRect(0, Utils.Dom.getWidth(window), 0, Utils.Dom.getHeight(window));
-        if (this._isMounted && !Score.DivRect.equalsEdges(windowRect, this.state.windowRect)) {
+        let windowRect = new Rect(0, 0, Utils.Dom.getWidth(window), Utils.Dom.getHeight(window));
+        if (this._isMounted && !windowRect.equals(this.state.windowRect)) {
             this.setState({ windowRect });
         }
     }

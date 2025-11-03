@@ -1,4 +1,4 @@
-import { DivRect, LyricsAlign, LyricsHyphen, LyricsOptions, MLyrics, VerseNumber } from "../pub";
+import { LyricsAlign, LyricsHyphen, LyricsOptions, MLyrics, VerseNumber } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { NoteLength, RhythmProps } from "theory/rhythm";
@@ -6,7 +6,7 @@ import { ObjText } from "./obj-text";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { VerticalPos } from "./layout-object";
-import { Guard } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard } from "@tspro/ts-utils-lib";
 import { ObjMeasure } from "./obj-measure";
 
 export class ObjLyrics extends MusicObject {
@@ -31,7 +31,7 @@ export class ObjLyrics extends MusicObject {
 
         this.text = new ObjText(this, { text: lyricsText, color: this.color, scale: 0.8 }, halign, 0);
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         this.mi = new MLyrics(this);
     }
@@ -58,7 +58,7 @@ export class ObjLyrics extends MusicObject {
 
     layout(ctx: RenderContext) {
         this.text.layout(ctx);
-        this.rect = this.text.getRect().copy();
+        this.rect = this.text.getRect().clone();
     }
 
     offset(dx: number, dy: number) {
@@ -82,7 +82,7 @@ export class ObjLyrics extends MusicObject {
 
             if (w > 0) {
                 let cx = r ? (r.left + l.right) / 2 : (l.right + w / 0.85)
-                let cy = (l.top + l.bottom) / 2;
+                let cy = l.centerY / 2;
 
                 ctx.moveTo(cx - w / 2, cy);
                 ctx.lineTo(cx + w / 2, cy);

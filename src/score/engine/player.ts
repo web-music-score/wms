@@ -1,15 +1,15 @@
-import { UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-music-score/theory";
 import * as Audio from "@tspro/web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAnnotation, TempoAnnotation } from "../pub";
+import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAnnotation, TempoAnnotation } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension } from "./extension";
 import { getDynamicsVolume } from "./element-data";
 
-export type CursorPositionChangeListener = (cursorRect: DivRect | undefined) => void;
+export type CursorPositionChangeListener = (cursorRect: Rect | undefined) => void;
 
 const AccelerandoSpeedMul = 2;
 const RitardandoSpeedDiv = 2;
@@ -525,7 +525,7 @@ export class Player {
         return this.playPos;
     }
 
-    getCursorRect(): DivRect | undefined {
+    getCursorRect(): Rect | undefined {
         if (this.playPos === undefined) {
             return undefined;
         }
@@ -539,9 +539,8 @@ export class Player {
         let measure = col.measure;
 
         let x = col.getRect().anchorX;
-        let top = measure.row.getRect().top;
-        let bottom = measure.row.getRect().bottom;
+        let { top, height } = measure.row.getRect();
 
-        return new DivRect(x, x, top, bottom);
+        return new Rect(x, top, 0, height);
     }
 }

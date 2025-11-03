@@ -2,7 +2,7 @@ import * as React from "react";
 import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import { UniMap, Utils } from "@tspro/ts-utils-lib";
+import { Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import * as Audio from "@tspro/web-music-score/audio";
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
@@ -24,7 +24,7 @@ class ScaleVariant {
 
 interface GuitarScalesProps {
     app: GuitarApp;
-    windowRect: Score.DivRect;
+    windowRect: Rect;
 }
 
 interface GuitarScalesState {

@@ -1,5 +1,5 @@
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
-import { DivRect, MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
+import { MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
@@ -8,6 +8,7 @@ import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
     if (typeof staffPos === "number") {
@@ -26,8 +27,8 @@ function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined)
 }
 
 export class ObjStaffRest extends MusicObject {
-    public restRect = new DivRect();
-    public dotRects: DivRect[] = [];
+    public restRect = new AnchoredRect();
+    public dotRects: AnchoredRect[] = [];
 
     readonly mi: MStaffRest;
 
@@ -55,7 +56,7 @@ export class ObjStaffRest extends MusicObject {
     }
 
     updateRect(): void {
-        this.rect = this.restRect.copy();
+        this.rect = this.restRect.clone();
         this.dotRects.forEach(r => this.rect.expandInPlace(r));
     }
 }
@@ -263,7 +264,7 @@ export class ObjRest extends MusicObject {
                 let dotX = obj.restRect.rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
                 let dotY = this.getRestDotVerticalDisplacement(noteSize) * unitSize;
 
-                obj.dotRects.push(DivRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                obj.dotRects.push(AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth));
             }
 
             obj.offset(0, staff.getDiatonicIdY(diatonicId));
@@ -275,10 +276,10 @@ export class ObjRest extends MusicObject {
 
     updateRect() {
         if (this.staffObjects.length === 0) {
-            this.rect = new DivRect();
+            this.rect = new AnchoredRect();
         }
         else {
-            this.rect = this.staffObjects[0].getRect().copy();
+            this.rect = this.staffObjects[0].getRect().clone();
             if (this.staffObjects.length > 1) {
                 for (let i = 1; i < this.staffObjects.length; i++) {
                     this.rect.expandInPlace(this.staffObjects[i].getRect());

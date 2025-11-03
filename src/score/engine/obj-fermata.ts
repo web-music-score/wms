@@ -1,9 +1,10 @@
-import { DivRect, MFermata, StaffPreset } from "../pub";
+import { MFermata } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjFermata extends MusicObject {
     private color = "black";
@@ -42,7 +43,7 @@ export class ObjFermata extends MusicObject {
         let width = unitSize * 4;
         let height = unitSize * 3;
 
-        this.rect = new DivRect(-width / 2, width / 2, -height, 0);
+        this.rect = new AnchoredRect(-width / 2, width / 2, -height, 0);
     }
 
     offset(dx: number, dy: number) {

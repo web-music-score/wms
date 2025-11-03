@@ -1,5 +1,5 @@
 import { Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
-import { Clef, DivRect, MStaffSignature, MTabSignature } from "../pub";
+import { Clef, MStaffSignature, MTabSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjImage } from "./obj-image";
@@ -8,6 +8,7 @@ import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjStaffSignature extends MusicObject {
     private clefImage?: ObjImage;
@@ -212,7 +213,7 @@ export class ObjStaffSignature extends MusicObject {
 
         let x = 0;
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         if (this.clefImage) {
             x += paddingX;
@@ -224,7 +225,7 @@ export class ObjStaffSignature extends MusicObject {
             if (this.eightBelowClef) {
                 let r = this.clefImage.getRect();
                 this.eightBelowClef.layout(ctx);
-                this.eightBelowClef.offset(r.left + r.width / 2, Math.max(r.anchorY + r.height * 0.3, staff.getBottomLineY()));
+                this.eightBelowClef.offset(r.centerX, Math.max(r.anchorY + r.height * 0.3, staff.getBottomLineY()));
                 this.rect.expandInPlace(this.eightBelowClef.getRect());
             }
         }
@@ -428,7 +429,7 @@ export class ObjTabSignature extends MusicObject {
         let x = 0;
         let topLineY = tab.getTopLineY();
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         if (this.measureNumber) {
             this.measureNumber.layout(ctx);

@@ -1,6 +1,7 @@
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
-import { DivRect, MImage } from "../pub";
+import { MImage } from "../pub";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjImage extends MusicObject {
     readonly mi: MImage;
@@ -26,11 +27,11 @@ export class ObjImage extends MusicObject {
             let w = image.naturalWidth * imageScale * unitSize;
             let h = image.naturalHeight * imageScale * unitSize;
 
-            this.rect = DivRect.createSections(w * anchorX, w * (1 - anchorX), h * anchorY, h * (1 - anchorY));
+            this.rect = AnchoredRect.createSections(w * anchorX, w * (1 - anchorX), h * anchorY, h * (1 - anchorY));
         }
         catch (err) {
             // Image was not ready?
-            this.rect = new DivRect();
+            this.rect = new AnchoredRect();
         }
     }
 

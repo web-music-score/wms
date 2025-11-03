@@ -3,11 +3,11 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, DivRect, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
+import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
-import { Guard, UniMap } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, UniMap } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -284,7 +284,7 @@ export class ObjDocument extends MusicObject {
         this.measures.forEach(m => m.resetPassCount());
     }
 
-    updateCursorRect(cursorRect?: DivRect) {
+    updateCursorRect(cursorRect?: Rect) {
         if (this.ctx) {
             this.ctx.updateCursorRect(cursorRect);
         }
@@ -370,7 +370,7 @@ export class ObjDocument extends MusicObject {
         this.rows.forEach(row => row.layoutPadding(ctx));
 
         // Set document rect and set row positions
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         if (this.header) {
             // Layout header with desired width

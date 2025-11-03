@@ -1,4 +1,4 @@
-import { DivRect, VerticalPosition } from "../pub";
+import { VerticalPosition } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjFermata } from "./obj-fermata";
@@ -12,7 +12,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
-import { asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
+import { AnchoredRect, asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
 
 export enum LayoutGroupId {
     TabRhythm,
@@ -118,7 +118,7 @@ export class LayoutObjectWrapper {
 
             objShapeRects.forEach(objR => {
                 staticShapeRects.forEach(staticR => {
-                    if (DivRect.overlapX(objR, staticR)) {
+                    if (AnchoredRect.overlapX(objR, staticR)) {
                         y = verticalPos === VerticalPos.Below
                             ? Math.max(y, staticR.bottom + objR.toph + objR.anchorY)
                             : Math.min(y, staticR.top - objR.bottomh - objR.anchorY);
@@ -147,7 +147,7 @@ export class LayoutObjectWrapper {
         this.musicObj.offset(dx, dy);
     }
 
-    getRect(): DivRect {
+    getRect(): AnchoredRect {
         return this.musicObj.getRect();
     }
 }

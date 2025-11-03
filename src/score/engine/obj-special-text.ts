@@ -1,7 +1,8 @@
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
-import { DivRect, MSpecialText } from "../pub";
+import { MSpecialText } from "../pub";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjSpecialText extends MusicObject {
     public static toCoda = "𝄌 toCoda";
@@ -58,9 +59,9 @@ export class ObjSpecialText extends MusicObject {
                 let codaText = this.components[1];
                 codaSym.layout(ctx);
                 codaText.layout(ctx);
-                codaSym.offset(0, (codaText.getRect().top + codaText.getRect().bottom) / 2);
+                codaSym.offset(0, codaText.getRect().centerY);
                 codaText.offset(codaSym.getRect().right, 0);
-                this.rect = new DivRect(
+                this.rect = new AnchoredRect(
                     codaSym.getRect().left, codaSym.getRect().anchorX, codaText.getRect().right,
                     codaText.getRect().top, codaText.getRect().anchorY, codaText.getRect().bottom
                 );
@@ -71,9 +72,9 @@ export class ObjSpecialText extends MusicObject {
                 let codaSym = this.components[1];
                 toCodaText.layout(ctx);
                 codaSym.layout(ctx);
-                codaSym.offset(0, (toCodaText.getRect().top + toCodaText.getRect().bottom) / 2);
+                codaSym.offset(0, toCodaText.getRect().centerY);
                 toCodaText.offset(codaSym.getRect().left, 0);
-                this.rect = new DivRect(
+                this.rect = new AnchoredRect(
                     toCodaText.getRect().left, codaSym.getRect().anchorX, codaSym.getRect().right,
                     toCodaText.getRect().top, toCodaText.getRect().anchorY, toCodaText.getRect().bottom
                 );
@@ -82,7 +83,7 @@ export class ObjSpecialText extends MusicObject {
             default: {
                 let text = this.components[0];
                 text.layout(ctx);
-                this.rect = text.getRect().copy();
+                this.rect = text.getRect().clone();
                 break;
             }
         }

@@ -1,8 +1,9 @@
 import { Accidental } from "@tspro/web-music-score/theory";
-import { DivRect, MAccidental } from "../pub";
+import { MAccidental } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
@@ -24,19 +25,19 @@ export class ObjAccidental extends MusicObject {
 
         switch (this.accidental) {
             case -2:
-                this.rect = DivRect.createSections(unitSize * 1.25, unitSize * 1.25, unitSize * 4, unitSize * 1.2);
+                this.rect = AnchoredRect.createSections(unitSize * 1.25, unitSize * 1.25, unitSize * 4, unitSize * 1.2);
                 break;
             case -1:
-                this.rect = DivRect.createSections(unitSize * 0.75, unitSize * 0.75, unitSize * 4, unitSize * 1.2);
+                this.rect = AnchoredRect.createSections(unitSize * 0.75, unitSize * 0.75, unitSize * 4, unitSize * 1.2);
                 break;
             case 0:
-                this.rect = DivRect.createSections(unitSize * 0.75, unitSize * 0.75, unitSize * 2.2, unitSize * 2.2);
+                this.rect = AnchoredRect.createSections(unitSize * 0.75, unitSize * 0.75, unitSize * 2.2, unitSize * 2.2);
                 break;
             case 1:
-                this.rect = DivRect.createSections(unitSize * 0.75, unitSize * 0.75, unitSize * 2, unitSize * 2);
+                this.rect = AnchoredRect.createSections(unitSize * 0.75, unitSize * 0.75, unitSize * 2, unitSize * 2);
                 break;
             case 2:
-                this.rect = DivRect.createSections(unitSize * 1, unitSize * 1, unitSize * 1, unitSize * 1);
+                this.rect = AnchoredRect.createSections(unitSize * 1, unitSize * 1, unitSize * 1, unitSize * 1);
                 break;
             default:
                 throw new MusicError(MusicErrorType.Score, "Invalid accidental value: " + this.accidental);

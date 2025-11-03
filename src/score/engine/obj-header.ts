@@ -1,8 +1,9 @@
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
-import { DivRect, MHeader } from "../pub";
+import { MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjHeader extends MusicObject {
     private titleText?: ObjText;
@@ -65,7 +66,7 @@ export class ObjHeader extends MusicObject {
     layoutWidth(ctx: RenderContext, left: number, right: number) {
         let top = 0;
 
-        this.rect = new DivRect(left, right, 0, 0);
+        this.rect = new AnchoredRect(left, right, 0, 0);
 
         if (this.titleText) {
             this.titleText.layout(ctx);

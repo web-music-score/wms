@@ -1,6 +1,6 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, DivRect, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId } from "../pub";
+import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
@@ -13,7 +13,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
-import { IndexArray, UniMap, TriMap } from "@tspro/ts-utils-lib";
+import { IndexArray, UniMap, TriMap, AnchoredRect } from "@tspro/ts-utils-lib";
 
 export type ScorePlayerNote = {
     note: Note,
@@ -41,7 +41,7 @@ export class ObjRhythmColumn extends MusicObject {
 
     private needLayout = true;
 
-    private shapeRects: DivRect[] = [];
+    private shapeRects: AnchoredRect[] = [];
 
     readonly mi: MRhythmColumn;
 
@@ -103,7 +103,7 @@ export class ObjRhythmColumn extends MusicObject {
         return Math.max(0, nextPositionTicks - curPositionTicks);
     }
 
-    getShapeRects(): DivRect[] {
+    getShapeRects(): AnchoredRect[] {
         this.getRect(); // executes this.updateRect() if required, which sets this.shapeRects.
         return this.shapeRects;
     }
@@ -345,7 +345,7 @@ export class ObjRhythmColumn extends MusicObject {
 
         this.requestRectUpdate();
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         let { row } = this;
         let { unitSize } = ctx;
@@ -441,8 +441,8 @@ export class ObjRhythmColumn extends MusicObject {
 
     updateRect() {
         this.shapeRects = [
-            ...this.voiceSymbol.filter(s => !!s).mapToArray(s => s.getRect().copy()),
-            ...this.arpeggios.map(a => a.getRect().copy())
+            ...this.voiceSymbol.filter(s => !!s).mapToArray(s => s.getRect().clone()),
+            ...this.arpeggios.map(a => a.getRect().clone())
         ];
 
         this.rect.top = Math.min(...this.shapeRects.map(r => r.top));

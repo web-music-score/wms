@@ -1,10 +1,10 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
-import { MConnective, DivRect, TieType, Connective } from "../pub";
+import { MConnective, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
@@ -150,7 +150,7 @@ export class ObjConnective extends MusicObject {
         this.cp2x = lx * 0.3 + rx * 0.7 + nx * this.arcHeight;
         this.cp2y = ly * 0.3 + ry * 0.7 + ny * this.arcHeight;
 
-        this.rect = new DivRect(
+        this.rect = new AnchoredRect(
             Math.min(this.lx, this.cp1x, this.cp2x, this.rx),
             Math.max(this.lx, this.cp1x, this.cp2x, this.rx),
             Math.min(this.ly, this.cp1y, this.cp2y, this.ry),

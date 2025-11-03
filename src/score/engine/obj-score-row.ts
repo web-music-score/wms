@@ -1,12 +1,12 @@
 import { Note } from "@tspro/web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
-import { DivRect, getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig } from "../pub";
+import { getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { RenderContext } from "./render-context";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
@@ -192,13 +192,13 @@ export class ObjScoreRow extends MusicObject {
         return [this];
     }
 
-    getConnectivesContentRect(): DivRect {
+    getConnectivesContentRect(): AnchoredRect {
         let r = this.getRect();
 
         let firstMeasure = this.getFirstMeasure();
         let left = firstMeasure ? firstMeasure.getColumnsContentRect().left : r.left;
 
-        return new DivRect(left, (left + r.right) / 2, r.right, r.top, r.anchorY, r.bottom);
+        return new AnchoredRect(left, (left + r.right) / 2, r.right, r.top, r.anchorY, r.bottom);
     }
 
     getDiatonicIdAt(y: number): number | undefined {
@@ -316,7 +316,7 @@ export class ObjScoreRow extends MusicObject {
         }
 
         // left = 0 + instrument name width.
-        this.rect = new DivRect(0, right, 0, 0);
+        this.rect = new AnchoredRect(0, right, 0, 0);
 
         this.notationLines.forEach(line => line.layoutWidth(ctx));
 
@@ -354,7 +354,7 @@ export class ObjScoreRow extends MusicObject {
         let top = this.measures.length > 0 ? Math.min(...this.measures.map(m => m.getRect().top)) : 0;
         let bottom = this.measures.length > 0 ? Math.max(...this.measures.map(m => m.getRect().bottom)) : 0;
 
-        this.rect = new DivRect(left, right, top, bottom);
+        this.rect = new AnchoredRect(left, right, top, bottom);
     }
 
     alignStemsToBeams() {
@@ -463,7 +463,7 @@ export class ObjScoreRow extends MusicObject {
             let grp = this.instrumentLineGroups[i];
 
             if (grp.length > 1) {
-                let r = new DivRect(
+                let r = new AnchoredRect(
                     grpSize.braceLeft,
                     grpSize.braceRight,
                     grp[0].getTopLineY(),

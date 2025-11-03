@@ -1,8 +1,8 @@
-import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti } from "@tspro/ts-utils-lib";
+import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRect } from "@tspro/ts-utils-lib";
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, DivRect, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -960,7 +960,7 @@ export class ObjMeasure extends MusicObject {
 
     // Get content rect excluding signature
     getColumnsContentRect() {
-        return new DivRect(
+        return new AnchoredRect(
             this.barLineLeft.getRect().anchorX,
             this.barLineRight.getRect().anchorX,
             this.getRect().top,
@@ -1399,11 +1399,11 @@ export class ObjMeasure extends MusicObject {
 
         width = Math.max(width, this.getMinWidth());
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
         this.rect.anchorX = this.rect.left + width / 2;
         this.rect.right = this.rect.left + width;
 
-        let rect: DivRect;
+        let rect: AnchoredRect;
 
         this.signatures.forEach(signature => {
             rect = signature.getRect();
@@ -1439,7 +1439,7 @@ export class ObjMeasure extends MusicObject {
             columnLeft += rect.width * columnScale;
         });
 
-        // Reposition rest
+        // Reposition lonely rest in the middle of measure.
         getVoiceIds().forEach(voiceId => {
             const symbols = this.getVoiceSymbols(voiceId);
 
@@ -1455,7 +1455,7 @@ export class ObjMeasure extends MusicObject {
 
             // Now relocate onlyRest middle of measure
             const r = this.getColumnsContentRect();
-            onlyRest.offset((r.left + r.right) / 2 - onlyRest.getRect().anchorX, 0);
+            onlyRest.offset(r.centerX - onlyRest.getRect().anchorX, 0);
         });
     }
 

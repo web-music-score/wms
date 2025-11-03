@@ -1,18 +1,18 @@
 import { getTuningStrings, Note, validateTuningName } from "@tspro/web-music-score/theory";
 import { ImageAsset, RenderContext } from "./render-context";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Clef, DivRect, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
+import { Clef, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
-import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 
 type NotationLineObject = {
-    getRect: () => DivRect,
+    getRect: () => AnchoredRect,
     offset?: (dx: number, dy: number) => void
     offsetInPlace?: (dx: number, dy: number) => void
 }
@@ -315,7 +315,7 @@ export class ObjStaff extends ObjNotationLine {
         this.topLineY = -h / 2;
         this.bottomLineY = h / 2;
 
-        this.rect = new DivRect(0, 0, this.topLineY, this.bottomLineY);
+        this.rect = new AnchoredRect(0, 0, this.topLineY, this.bottomLineY);
     }
 
     layoutWidth(ctx: RenderContext) {
@@ -449,7 +449,7 @@ export class ObjTab extends ObjNotationLine {
         this.top = -h / 2;
         this.bottom = h / 2;
 
-        this.rect = new DivRect(0, 0, this.top, this.bottom);
+        this.rect = new AnchoredRect(0, 0, this.top, this.bottom);
     }
 
     layoutWidth(ctx: RenderContext) {

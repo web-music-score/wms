@@ -2,10 +2,9 @@ import * as React from "react";
 import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import { Utils } from "@tspro/ts-utils-lib";
+import { Rect, Utils } from "@tspro/ts-utils-lib";
 import * as Audio from "@tspro/web-music-score/audio";
 import * as Theory from "@tspro/web-music-score/theory";
-import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
 
 const LowestNote = "E2";
@@ -40,7 +39,7 @@ enum PositionName {
 
 interface CAGEDScalesProps {
     app: GuitarApp;
-    windowRect: Score.DivRect;
+    windowRect: Rect;
 }
 
 interface CAGEDScalesState {

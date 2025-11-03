@@ -1,10 +1,11 @@
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjMeasure } from "./obj-measure";
-import { MBarLineRight, MBarLineLeft, Navigation, DivRect, MusicInterface, MStaffTabBarLine } from "../pub";
+import { MBarLineRight, MBarLineLeft, Navigation, MusicInterface, MStaffTabBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
@@ -30,7 +31,7 @@ export class ObjStaffTabBarLine extends MusicObject {
         return this.getRect().contains(x, y) ? [this] : [];
     }
 
-    setRect(r: DivRect) {
+    setRect(r: AnchoredRect) {
         this.rect = r;
     }
 
@@ -115,36 +116,36 @@ abstract class ObjBarLine extends MusicObject {
 
             switch (barLineType) {
                 case BarLineType.None:
-                    obj.setRect(new DivRect(0, 0, 0, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(0, 0, 0, top, 0, bottom));
                     break;
                 case BarLineType.Single:
-                    obj.setRect(new DivRect(-thinW, 0, 0, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(-thinW, 0, 0, top, 0, bottom));
                     addVerticalLine(-thinW, thinW);
                     break;
                 case BarLineType.Double:
-                    obj.setRect(new DivRect(-thinW - spaceW - thinW, 0, 0, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(-thinW - spaceW - thinW, 0, 0, top, 0, bottom));
                     addVerticalLine(-thinW - spaceW - thinW, thinW);
                     addVerticalLine(-thinW, thinW);
                     break;
                 case BarLineType.EndSong:
-                    obj.setRect(new DivRect(-thicW - spaceW - thinW, 0, 0, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(-thicW - spaceW - thinW, 0, 0, top, 0, bottom));
                     addVerticalLine(-thinW - spaceW - thicW, thinW);
                     addVerticalLine(-thicW, thicW);
                     break;
                 case BarLineType.StartRepeat:
-                    obj.setRect(new DivRect(0, 0, thicW + spaceW + thinW + spaceW + dotW, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(0, 0, thicW + spaceW + thinW + spaceW + dotW, top, 0, bottom));
                     addVerticalLine(0, thicW);
                     addVerticalLine(thicW + spaceW, thinW);
                     addDotPair(thicW + spaceW + thinW + spaceW + dotRadius);
                     break;
                 case BarLineType.EndRepeat:
-                    obj.setRect(new DivRect(-thicW - spaceW - thinW - spaceW - dotW, 0, 0, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(-thicW - spaceW - thinW - spaceW - dotW, 0, 0, top, 0, bottom));
                     addVerticalLine(-thinW - spaceW - thicW, thinW);
                     addVerticalLine(-thicW, thicW);
                     addDotPair(-thinW - spaceW - thicW - spaceW - dotRadius);
                     break;
                 case BarLineType.EndStartRepeat:
-                    obj.setRect(new DivRect(-dotW - spaceW - thinW - spaceW - thicW / 2, 0, thicW / 2 + spaceW + thinW + spaceW + dotW, top, 0, bottom));
+                    obj.setRect(new AnchoredRect(-dotW - spaceW - thinW - spaceW - thicW / 2, 0, thicW / 2 + spaceW + thinW + spaceW + dotW, top, 0, bottom));
                     addVerticalLine(-thicW / 2, thicW);
                     addVerticalLine(-thicW / 2 - spaceW - thinW, thinW);
                     addVerticalLine(thicW / 2 + spaceW, thinW);
@@ -163,13 +164,13 @@ abstract class ObjBarLine extends MusicObject {
 
     updateRect() {
         if (this.staffTabObjects.length > 0) {
-            this.rect = this.staffTabObjects[0].getRect().copy();
+            this.rect = this.staffTabObjects[0].getRect().clone();
             for (let i = 1; i < this.staffTabObjects.length; i++) {
                 this.rect.expandInPlace(this.staffTabObjects[i].getRect());
             }
         }
         else {
-            this.rect = new DivRect();
+            this.rect = new AnchoredRect();
         }
     }
 

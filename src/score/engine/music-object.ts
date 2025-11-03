@@ -1,4 +1,5 @@
-import { DivRect, MusicInterface } from "../pub";
+import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { MusicInterface } from "../pub";
 import { LayoutObjectWrapper } from "./layout-object";
 
 export class MusicObjectLink {
@@ -43,7 +44,7 @@ export abstract class MusicObject {
         return this.parent;
     }
 
-    protected rect = new DivRect();
+    protected rect = new AnchoredRect();
     private needRectUpdate = true;
 
     requestRectUpdate() {
@@ -52,7 +53,7 @@ export abstract class MusicObject {
 
     updateRect() { }
 
-    getRect(): DivRect {
+    getRect(): AnchoredRect {
         if (this.needRectUpdate) {
             this.updateRect();
             this.needRectUpdate = false;
@@ -67,7 +68,7 @@ export abstract class MusicObject {
      * 
      * @returns Array of rects.
      */
-    getShapeRects(): DivRect[] {
+    getShapeRects(): AnchoredRect[] {
         return [this.rect];
     }
 

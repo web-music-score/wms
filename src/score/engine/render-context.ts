@@ -1,6 +1,6 @@
-import { Utils, Vec, Device, UniMap } from "@tspro/ts-utils-lib";
+import { Utils, Vec, Device, UniMap, AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MDocument, DivRect, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
+import { MDocument, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
@@ -56,7 +56,7 @@ export class RenderContext {
 
     private mdoc?: MDocument;
 
-    private cursorRect?: DivRect;
+    private cursorRect?: Rect;
     private mousePos?: Vec; // Mouse coord in document space
 
     private curStaffPos?: StaffPos;
@@ -297,7 +297,7 @@ export class RenderContext {
         this.hilightedStaffPos = staffPos;
     }
 
-    updateCursorRect(cursorRect: DivRect | undefined) {
+    updateCursorRect(cursorRect: Rect | undefined) {
         this.cursorRect = cursorRect;
         this.draw();
     }
@@ -382,7 +382,7 @@ export class RenderContext {
         let { cursorRect: r } = this;
 
         if (r) {
-            this.color(PlayPosIndicatorColor).lineWidth(2).strokeLine(r.anchorX, r.top, r.anchorX, r.bottom);
+            this.color(PlayPosIndicatorColor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
         }
     }
 
@@ -398,7 +398,7 @@ export class RenderContext {
         this.ctx?.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     }
 
-    drawDebugRect(r: DivRect) {
+    drawDebugRect(r: AnchoredRect | Rect) {
         if (DebugSettings.DrawDebugRects) {
             this.color("red").lineWidth(1).strokeRect(r.left, r.top, r.width, r.height);
         }
@@ -427,7 +427,7 @@ export class RenderContext {
         }
     }
 
-    getRestRect(restSize: number): DivRect {
+    getRestRect(restSize: number): AnchoredRect {
         let { unitSize } = this;
         let { flagCount } = NoteLengthProps.get(validateNoteLength(restSize + "n"));
 
@@ -462,7 +462,7 @@ export class RenderContext {
             bottomh = unitSize * (1 + flagCount + adj);
         }
 
-        return new DivRect(-leftw, 0, rightw, -toph, 0, bottomh);
+        return new AnchoredRect(-leftw, 0, rightw, -toph, 0, bottomh);
     }
 
     drawRest(restSize: number, x: number, y: number) {
@@ -528,7 +528,7 @@ export class RenderContext {
         }
     }
 
-    drawFlag(rect: DivRect, dir: "up" | "down") {
+    drawFlag(rect: Rect | AnchoredRect, dir: "up" | "down") {
         let left = rect.left;
         let right = rect.right;
         let width = right - left;
@@ -709,7 +709,7 @@ export class RenderContext {
         }
     }
 
-    drawBrace(rect: DivRect, side: "left" | "right") {
+    drawBrace(rect: AnchoredRect, side: "left" | "right") {
         if (this.ctx) {
             let { left, right, width, top, bottom, anchorY } = rect;
 

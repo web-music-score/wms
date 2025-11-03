@@ -1,8 +1,8 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
-import { DivRect, MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId } from "../pub";
+import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -34,12 +34,12 @@ function sortNotesAndStrings(notes: ReadonlyArray<Note>, strings?: StringNumber 
 }
 
 export class ObjStaffNoteGroup extends MusicObject {
-    public noteHeadRects: DivRect[] = [];
-    public dotRects: DivRect[] = [];
+    public noteHeadRects: AnchoredRect[] = [];
+    public dotRects: AnchoredRect[] = [];
     public accidentals: ObjAccidental[] = [];
-    public stemTip?: DivRect;
-    public stemBase?: DivRect;
-    public flagRects: DivRect[] = [];
+    public stemTip?: AnchoredRect;
+    public stemBase?: AnchoredRect;
+    public flagRects: AnchoredRect[] = [];
 
     private prevTopNoteY = 0;
     private prevBottomNoteY = 0;
@@ -75,7 +75,7 @@ export class ObjStaffNoteGroup extends MusicObject {
     }
 
     updateRect() {
-        this.rect = this.noteHeadRects[0].copy();
+        this.rect = this.noteHeadRects[0].clone();
         this.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
         if (this.stemTip) this.rect.expandInPlace(this.stemTip);
         if (this.stemBase) this.rect.expandInPlace(this.stemBase);
@@ -84,7 +84,7 @@ export class ObjStaffNoteGroup extends MusicObject {
         this.accidentals.forEach(a => this.rect.expandInPlace(a.getRect()));
     }
 
-    getRect(): DivRect {
+    getRect(): AnchoredRect {
         let bottomNoteRect = this.noteHeadRects[0];
         let topNoteRect = this.noteHeadRects[this.noteHeadRects.length - 1];
 
@@ -132,7 +132,7 @@ export class ObjTabNoteGroup extends MusicObject {
     }
 
     updateRect() {
-        this.rect = this.fretNumbers[0].getRect().copy();
+        this.rect = this.fretNumbers[0].getRect().clone();
         this.fretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
     }
 
@@ -618,7 +618,7 @@ export class ObjNoteGroup extends MusicObject {
                 if (isTopNote && stemDir === Stem.Down) stemBaseStaff = noteStaff;
 
                 // Add note head
-                let noteHeadRect = obj.noteHeadRects[noteIndex] = DivRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
+                let noteHeadRect = obj.noteHeadRects[noteIndex] = AnchoredRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
                 noteStaff.addObject(noteHeadRect);
 
                 // Add accidental
@@ -636,7 +636,7 @@ export class ObjNoteGroup extends MusicObject {
                     let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2 + i * dotWidth * 1.5;
                     let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
 
-                    let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                    let r = AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                     obj.dotRects.push(r);
                     noteStaff.addObject(r);
                 }
@@ -646,14 +646,14 @@ export class ObjNoteGroup extends MusicObject {
                     if (stemDir === Stem.Up && isBottomNote) {
                         let dotX = noteX;
                         let dotY = noteY + unitSize * (isNoteOnLine ? 3 : 2);
-                        let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                        let r = AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                         obj.dotRects.push(r);
                         stemBaseStaff.addObject(r);
                     }
                     else if (stemDir === Stem.Down && isTopNote) {
                         let dotX = noteX;
                         let dotY = noteY - unitSize * (isNoteOnLine ? 3 : 2);
-                        let r = DivRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                        let r = AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth);
                         obj.dotRects.push(r);
                         stemBaseStaff.addObject(r);
                     }
@@ -669,8 +669,8 @@ export class ObjNoteGroup extends MusicObject {
             let stemBaseY = stemDir === Stem.Up ? bottomNoteY : topNoteY;
 
             if (hasStem) {
-                obj.stemTip = new DivRect(stemX, stemX, stemTipY, stemTipY);
-                obj.stemBase = new DivRect(stemX, stemX, stemBaseY, stemBaseY);
+                obj.stemTip = new AnchoredRect(stemX, stemX, stemTipY, stemTipY);
+                obj.stemBase = new AnchoredRect(stemX, stemX, stemBaseY, stemBaseY);
                 stemTipStaff.addObject(obj.stemTip);
                 stemBaseStaff.addObject(obj.stemBase);
             }
@@ -684,8 +684,8 @@ export class ObjNoteGroup extends MusicObject {
                     let flagAddY = i * unitSize * DocumentSettings.FlagSeparation;
 
                     let r = obj.flagRects[i] = stemDir === Stem.Up
-                        ? new DivRect(stemX, stemX + flagWidth, stemTipY + flagAddY, stemTipY + flagHeight + flagAddY)
-                        : new DivRect(stemX, stemX + flagWidth, stemTipY - flagHeight - flagAddY, stemTipY - flagAddY);
+                        ? new AnchoredRect(stemX, stemX + flagWidth, stemTipY + flagAddY, stemTipY + flagHeight + flagAddY)
+                        : new AnchoredRect(stemX, stemX + flagWidth, stemTipY - flagHeight - flagAddY, stemTipY - flagAddY);
 
                     stemTipStaff.addObject(r);
                 }
@@ -733,13 +733,13 @@ export class ObjNoteGroup extends MusicObject {
 
     updateRect() {
         if (this.staffObjects.length > 0) {
-            this.rect = this.staffObjects[0].noteHeadRects[0].copy();
+            this.rect = this.staffObjects[0].noteHeadRects[0].clone();
         }
         else if (this.tabObjects.length > 0 && this.tabObjects[0].fretNumbers.length > 0) {
-            this.rect = this.tabObjects[0].fretNumbers[0].getRect().copy();
+            this.rect = this.tabObjects[0].fretNumbers[0].getRect().clone();
         }
         else {
-            this.rect = new DivRect();
+            this.rect = new AnchoredRect();
             return;
         }
 

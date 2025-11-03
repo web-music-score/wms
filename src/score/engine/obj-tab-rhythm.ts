@@ -1,10 +1,10 @@
-import { DivRect, getVoiceIds, MTabRhythm, VoiceId } from "../pub";
+import { getVoiceIds, MTabRhythm, VoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
 import { ObjTab } from "./obj-staff-and-tab";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjText } from "./obj-text";
@@ -20,7 +20,7 @@ export class ObjTabRhythm extends MusicObject {
 
         this.voiceId = getVoiceIds().filter(voiceId => tab.containsVoiceId(voiceId));
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
 
         this.mi = new MTabRhythm(this);
     }
@@ -40,7 +40,7 @@ export class ObjTabRhythm extends MusicObject {
 
         this.voiceId.sort((a, b) => Utils.Math.cmp(numColsInVoiceId[a], numColsInVoiceId[b]));
 
-        this.rect = new DivRect();
+        this.rect = new AnchoredRect();
     }
 
     private hasTuplets(): boolean {
@@ -50,12 +50,12 @@ export class ObjTabRhythm extends MusicObject {
     layoutFitToMeasure(ctx: RenderContext) {
         let { unitSize, fontSize } = ctx;
         let { measure } = this;
-        let { left, right } = measure.getColumnsContentRect();
+        let cr = measure.getColumnsContentRect();
         let stemHeight = unitSize * 5;
 
-        this.rect.left = left;
-        this.rect.anchorX = (left + right) / 2;
-        this.rect.right = right;
+        this.rect.left = cr.left;
+        this.rect.anchorX = cr.centerX;
+        this.rect.right = cr.right;
         this.rect.top = this.hasTuplets() ? -fontSize : 0;
         this.rect.anchorY = 0; // Center line is at stem top, under the tuplet number.
         this.rect.bottom = stemHeight;
@@ -111,7 +111,7 @@ export class ObjTabRhythm extends MusicObject {
 
                     if (symbols.length === 1) {
                         for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
-                            ctx.drawFlag(new DivRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), "up");
+                            ctx.drawFlag(new AnchoredRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), "up");
                         }
                     }
 

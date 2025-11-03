@@ -6,10 +6,11 @@ import * as Audio from "@tspro/web-music-score/audio";
 import * as Theory from "@tspro/web-music-score/theory";
 import * as Score from "@tspro/web-music-score/score";
 import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import { Rect } from "@tspro/ts-utils-lib";
 
 interface PlayNotesProps {
     app: GuitarApp;
-    windowRect: Score.DivRect;
+    windowRect: Rect;
 }
 
 interface PlayNotesState {

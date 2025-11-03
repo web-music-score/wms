@@ -1,10 +1,10 @@
-import { Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, Tuplet, TupletRatio, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
-import { DivRect, Stem, MBeamGroup, MusicInterface, MStaffBeamGroup, TupletOptions } from "../pub";
+import { Stem, MBeamGroup, MusicInterface, MStaffBeamGroup, TupletOptions } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
@@ -43,8 +43,8 @@ class BeamPoint {
         this.beamGroup.requestRectUpdate();
     }
 
-    getRect(): DivRect {
-        return new DivRect(this.x, this.x, this.x, this.y - this.topBeamsHeight, this.y, this.y + this.bottomBeamsHeight);
+    getRect(): AnchoredRect {
+        return new AnchoredRect(this.x, this.x, this.x, this.y - this.topBeamsHeight, this.y, this.y + this.bottomBeamsHeight);
     }
 }
 
@@ -81,10 +81,10 @@ export class ObjStaffBeamGroup extends MusicObject {
 
     updateRect() {
         if (this.points.length > 0) {
-            this.rect = this.points[0].getRect().copy();
+            this.rect = this.points[0].getRect().clone();
         }
         else if (this.tupletNumber) {
-            this.rect = this.tupletNumber.getRect().copy();
+            this.rect = this.tupletNumber.getRect().clone();
         }
         this.points.forEach(pt => this.rect.expandInPlace(pt.getRect()));
         if (this.tupletNumber) {
@@ -476,12 +476,12 @@ export class ObjBeamGroup extends MusicObject {
 
     updateRect() {
         if (this.staffObjects.length === 0) {
-            this.rect = new DivRect();
+            this.rect = new AnchoredRect();
         }
         else {
             this.staffObjects.forEach(obj => obj.updateRect());
 
-            this.rect = this.staffObjects[0].getRect().copy();
+            this.rect = this.staffObjects[0].getRect().clone();
 
             for (let i = 1; i < this.staffObjects.length; i++) {
                 this.rect.expandInPlace(this.staffObjects[i].getRect());
