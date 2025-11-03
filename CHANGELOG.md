@@ -1,16 +1,16 @@
 # Changelog
 
-## [5.4.0] - 2025-11-
+## [5.4.0] - 2025-11-03
 ### Added
 - isVoiceId(), isStringNumber() and isVerseNumber().
 - Note.isNote().
-- Draw rest that is only symbol in voiceId in the middle of measure.
 
 ### Fixed
 - Improved note displacement when notes are close to each other.
+- If rest is the only symbol in voiceId then draw it in the middle of measure.
 
-### Changed
-- Many updates with new ts-utils-lib versions.
+### Deprecated
+- `Score.DivRect` - Using `AnchoredRect` and `Rect` from `@tspro/ts-utils-lib`.
 
 ## [5.3.0] - 2025-10-16
 ## Added
