@@ -1374,6 +1374,9 @@ export class ObjMeasure extends MusicObject {
         const accState = new AccidentalState(this);
         this.columns.forEach(col => col.layout(ctx, accState));
 
+        // Some layout objects need to reserve space so they do not overlap with neighbors.
+        this.columns.forEach(col => col.layoutReserveSpace(ctx));
+
         // Layout measure end object
         this.barLineRight.layout(ctx);
 

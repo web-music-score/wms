@@ -4,6 +4,7 @@
 ### FIxed
 - Lyrics hyphen / extender line y-coord was wrong after previous update.
 - Position of vertical curly arepggio line.
+- Reserve space for specified layout objects.
 
 ## [5.4.0] - 2025-11-03
 ### Added

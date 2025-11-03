@@ -28,18 +28,18 @@ export enum LayoutGroupId {
     LyricsVerse3
 }
 
-const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { widen?: boolean, rowAlign?: boolean, padding?: number }>([
+const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { reserveSpace?: boolean, rowAlign?: boolean, padding?: number }>([
     [LayoutGroupId.TabRhythm, { rowAlign: true }],
-    [LayoutGroupId.Fermata, { widen: true }],
-    [LayoutGroupId.NoteLabel, { widen: true }],
+    [LayoutGroupId.Fermata, { reserveSpace: true }],
+    [LayoutGroupId.NoteLabel, { reserveSpace: true }],
     [LayoutGroupId.Navigation, { rowAlign: true }],
     [LayoutGroupId.Ending, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.TempoAnnotation, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.DynamicsAnnotation, { rowAlign: true, padding: 2 }],
-    [LayoutGroupId.ChordLabel, { widen: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse1, { widen: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse2, { widen: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse3, { widen: true, rowAlign: true }],
+    [LayoutGroupId.ChordLabel, { reserveSpace: true, rowAlign: true }],
+    [LayoutGroupId.LyricsVerse1, { reserveSpace: true, rowAlign: true }],
+    [LayoutGroupId.LyricsVerse2, { reserveSpace: true, rowAlign: true }],
+    [LayoutGroupId.LyricsVerse3, { reserveSpace: true, rowAlign: true }],
 ]);
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
@@ -157,12 +157,12 @@ export class LayoutGroup {
     private readonly layoutObject = asMulti(new IndexArray<LayoutObjectWrapper[]>());
 
     readonly rowAlign: boolean
-    readonly widensColumn: boolean;
+    readonly reserveSpace: boolean;
     readonly padding: number;
 
     constructor(readonly layoutGroupId: number) {
         this.rowAlign = LayoutGroupIdAttrs.get(layoutGroupId)?.rowAlign === true;
-        this.widensColumn = LayoutGroupIdAttrs.get(layoutGroupId)?.widen === true;
+        this.reserveSpace = LayoutGroupIdAttrs.get(layoutGroupId)?.reserveSpace === true;
         this.padding = LayoutGroupIdAttrs.get(layoutGroupId)?.padding ?? 0;
     }
 

@@ -330,10 +330,6 @@ export class ObjRhythmColumn extends MusicObject {
             return;
         }
 
-        this.requestRectUpdate();
-
-        this.rect = new AnchoredRect();
-
         let { row } = this;
 
         let leftw = 0;
@@ -378,17 +374,8 @@ export class ObjRhythmColumn extends MusicObject {
         leftw *= DocumentSettings.ColumnWidthScale;
         rightw *= DocumentSettings.ColumnWidthScale;
 
-        // Widen column by anchored layout objects.
-        this.getAnchoredLayoutObjects().forEach(obj => {
-            if (obj.layoutGroup.widensColumn) {
-                leftw = Math.max(leftw, obj.musicObj.getRect().leftw);
-                rightw = Math.max(rightw, obj.musicObj.getRect().rightw);
-            }
-        });
-
-        this.rect.left = -leftw;
-        this.rect.anchorX = 0;
-        this.rect.right = rightw;
+        this.rect = new AnchoredRect(-leftw, 0, rightw, 0, 0, 0);
+        this.requestRectUpdate();
 
         // Update accidental states
         this.voiceSymbol.forEach(symbol => symbol.updateAccidentalState(accState));
@@ -424,6 +411,48 @@ export class ObjRhythmColumn extends MusicObject {
             }
             else {
                 this.staffMaxDiatonicId.delete(staff);
+            }
+        });
+    }
+
+    layoutReserveSpace(ctx: RenderContext) {
+        // Some layout objects need to reserve space so they do not overlap with neighbors.
+        const columns = this.measure.getColumns();
+
+        const extraSpace = ctx.unitSize;
+
+        this.getAnchoredLayoutObjects().forEach(obj => {
+            if (obj.layoutGroup.reserveSpace) {
+                const i = columns.indexOf(this);
+                if (i < 0) return;
+
+                const leftOverflow = obj.getRect().leftw - this.getRect().leftw;
+                if (leftOverflow > 0) {
+                    const prevCol = columns[i - 1] as ObjRhythmColumn | undefined;
+                    if (prevCol) {
+                        prevCol.getAnchoredLayoutObjects().forEach(prevObj => {
+                            if (prevObj.layoutGroupId === obj.layoutGroupId) {
+                                const rightOverflow = prevObj.getRect().rightw - prevCol.getRect().rightw;
+                                this.rect.left -= Math.max(rightOverflow + leftOverflow, 0) + extraSpace;
+                                this.requestRectUpdate();
+                            }
+                        });
+                    }
+                }
+
+                const rightOverflow = obj.getRect().rightw - this.getRect().rightw;
+                if (rightOverflow > 0) {
+                    const nextCol = columns[i + 1] as ObjRhythmColumn | undefined;
+                    if (nextCol) {
+                        nextCol.getAnchoredLayoutObjects().forEach(nextObj => {
+                            if (nextObj.layoutGroupId === obj.layoutGroupId) {
+                                const leftOverflow = nextObj.getRect().leftw - nextCol.getRect().leftw;
+                                this.rect.right += Math.max(rightOverflow + leftOverflow, 0) + extraSpace;
+                                this.requestRectUpdate();
+                            }
+                        });
+                    }
+                }
             }
         });
     }
