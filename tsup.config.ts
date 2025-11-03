@@ -2,7 +2,7 @@ import { defineConfig } from 'tsup'
 import pkg from './package.json' assert { type: 'json' }
 import { tsupPluginInlineAssets } from "@tspro/tsup-plugin-inline-assets";
 
-const bannerText = `/* WebMusicScore v${pkg.version} | (c) 2023 PahkaSoft | MIT License | Includes: Tone.js (MIT License) */`;
+const bannerText = `/* WebMusicScore v${pkg.version} | (c) 2023-2025 PahkaSoft | MIT License | Includes: Tone.js (MIT License) */`;
 
 export default defineConfig([
     // ESM bundle
