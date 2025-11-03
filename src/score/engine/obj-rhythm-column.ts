@@ -206,12 +206,6 @@ export class ObjRhythmColumn extends MusicObject {
         this.lyricsObject.set(lyricsObj.verse, lyricsObj.line, lyricsObj.vpos, lyricsObj);
     }
 
-    getMinWidth() {
-        let noteSizes = this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize);
-        let maxNoteSize = Math.min(8, Math.max(1, ...noteSizes));
-        return Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * 0.75;
-    }
-
     updateNoteDisplacements() {
         type NoteHeadDisplacement = {
             noteGroup: ObjNoteGroup,
@@ -356,15 +350,16 @@ export class ObjRhythmColumn extends MusicObject {
         });
 
         if (this.arpeggioDir !== undefined) {
-            let arpeggioWidth = 0;
-            this.arpeggios = row.getNotationLines().map(line => {
-                let arpeggio = new ObjArpeggio(this, line, this.getArpeggioDir());
-                arpeggio.layout(ctx);
-                arpeggio.offset(-leftw - arpeggio.getRect().right, line.getRect().anchorY - arpeggio.getRect().anchorY);
-                arpeggioWidth = Math.max(arpeggioWidth, arpeggio.getRect().width);
-                line.addObject(arpeggio);
-                this.measure.addStaticObject(line, arpeggio);
-                return arpeggio;
+            this.arpeggios = row.getNotationLines().map(line => new ObjArpeggio(this, line, this.getArpeggioDir()));
+            this.arpeggios.forEach(a => a.layout(ctx));
+            const arpeggioWidth = this.arpeggios
+                .map(a => a.getRect().width)
+                .reduce((accState, cur) => Math.max(accState, cur))
+                + ctx.unitSize; // Add space
+            this.arpeggios.forEach(a => {
+                a.offset(-leftw - arpeggioWidth + a.getRect().leftw, a.line.getRect().anchorY - a.getRect().anchorY);
+                a.line.addObject(a);
+                this.measure.addStaticObject(a.line, a);
             });
             leftw += arpeggioWidth;
         }
@@ -372,7 +367,11 @@ export class ObjRhythmColumn extends MusicObject {
             this.arpeggios = [];
         }
 
-        const MinColumnWidth = this.getMinWidth() * ctx.unitSize;
+        // Calculate min column width
+        const noteSizes = this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize);
+        const maxNoteSize = Math.min(8, Math.max(1, ...noteSizes));
+        const MinColumnWidth = Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * ctx.unitSize * 0.75;
+
         leftw = Math.max(leftw, MinColumnWidth / 2);
         rightw = Math.max(rightw, MinColumnWidth / 2);
 
