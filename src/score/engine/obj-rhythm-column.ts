@@ -207,16 +207,9 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getMinWidth() {
-        let maxNoteSize = Math.max(...this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize));
-
-        let w = DocumentSettings.NoteHeadWidth;
-
-        switch (maxNoteSize) {
-            case 1: return w * 5; // whole note
-            case 2: return w * 3; // half note
-            case 4: return w * 2; // quarter note
-            default: return w;
-        }
+        let noteSizes = this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize);
+        let maxNoteSize = Math.min(8, Math.max(1, ...noteSizes));
+        return Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * 0.75;
     }
 
     updateNoteDisplacements() {
@@ -348,13 +341,9 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect = new AnchoredRect();
 
         let { row } = this;
-        let { unitSize } = ctx;
 
-        // Set initially column's min width
-        let halfMinWidth = this.getMinWidth() * unitSize / 2;
-
-        let leftw = halfMinWidth;
-        let rightw = halfMinWidth;
+        let leftw = 0;
+        let rightw = 0;
 
         // Layout voice symbols
         this.voiceSymbol.forEach(symbol => {
@@ -383,22 +372,27 @@ export class ObjRhythmColumn extends MusicObject {
             this.arpeggios = [];
         }
 
-        // Widen column by anchored score objects
-        let widenColumnObjs = this.getAnchoredLayoutObjects().filter(layoutObj => layoutObj.layoutGroup.widensColumn);
+        const MinColumnWidth = this.getMinWidth() * ctx.unitSize;
+        leftw = Math.max(leftw, MinColumnWidth / 2);
+        rightw = Math.max(rightw, MinColumnWidth / 2);
 
-        if (widenColumnObjs.length > 0) {
-            widenColumnObjs.forEach(layoutObj => {
-                leftw = Math.max(leftw, layoutObj.musicObj.getRect().leftw);
-                rightw = Math.max(rightw, layoutObj.musicObj.getRect().rightw);
-            });
-        }
+        leftw *= DocumentSettings.ColumnWidthScale;
+        rightw *= DocumentSettings.ColumnWidthScale;
 
-        // Update accidental states
-        this.voiceSymbol.forEach(symbol => symbol.updateAccidentalState(accState));
+        // Widen column by anchored layout objects.
+        this.getAnchoredLayoutObjects().forEach(obj => {
+            if (obj.layoutGroup.widensColumn) {
+                leftw = Math.max(leftw, obj.musicObj.getRect().leftw);
+                rightw = Math.max(rightw, obj.musicObj.getRect().rightw);
+            }
+        });
 
         this.rect.left = -leftw;
         this.rect.anchorX = 0;
         this.rect.right = rightw;
+
+        // Update accidental states
+        this.voiceSymbol.forEach(symbol => symbol.updateAccidentalState(accState));
 
         // Find min/max diatonicId for each staff.
         this.row.getStaves().forEach(staff => {
@@ -441,7 +435,7 @@ export class ObjRhythmColumn extends MusicObject {
 
     updateRect() {
         this.shapeRects = [
-            ...this.voiceSymbol.filter(s => !!s).mapToArray(s => s.getRect().clone()),
+            ...this.voiceSymbol.filter(s => s !== undefined).mapToArray(s => s.getRect().clone()),
             ...this.arpeggios.map(a => a.getRect().clone())
         ];
 

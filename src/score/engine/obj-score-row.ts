@@ -325,16 +325,16 @@ export class ObjScoreRow extends MusicObject {
         let minColumnsAreaWidth = 0;
 
         this.measures.forEach(m => {
-            targetColumnsAreaWidth -= (m.getSolidAreaWidth() + m.getPostMeasureBreakWidth());
-            minColumnsAreaWidth += m.getMinColumnsAreaWidth();
+            targetColumnsAreaWidth -= (m.getTotalSolidWidth() + m.getPostMeasureBreakWidth());
+            minColumnsAreaWidth += m.getMinColumnsWidth();
         });
 
         let columnsAreaScale = targetColumnsAreaWidth / minColumnsAreaWidth;
 
-        let x = this.doc.getInstrumentGroupSize(ctx).braceRight;
+        let x = this.doc.getInstrumentGroupRegions(ctx).braceRight;
 
         this.measures.forEach(m => {
-            let newMeasureWidth = m.getSolidAreaWidth() + m.getMinColumnsAreaWidth() * columnsAreaScale;
+            let newMeasureWidth = m.getTotalSolidWidth() + m.getMinColumnsWidth() * columnsAreaScale;
             m.layoutWidth(ctx, newMeasureWidth);
             let r = m.getRect();
             m.offset(x - r.left, -r.anchorY);
@@ -458,7 +458,7 @@ export class ObjScoreRow extends MusicObject {
         this.notationLines.forEach(m => m.draw(ctx));
 
         // Draw instrument names
-        let grpSize = this.doc.getInstrumentGroupSize(ctx);
+        let grpSize = this.doc.getInstrumentGroupRegions(ctx);
         this.instrumentNames.forEach((obj, i) => {
             let grp = this.instrumentLineGroups[i];
 

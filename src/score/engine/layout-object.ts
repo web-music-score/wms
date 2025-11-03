@@ -30,16 +30,16 @@ export enum LayoutGroupId {
 
 const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { widen?: boolean, rowAlign?: boolean, padding?: number }>([
     [LayoutGroupId.TabRhythm, { rowAlign: true }],
-    [LayoutGroupId.Fermata, {}],
+    [LayoutGroupId.Fermata, { widen: true }],
     [LayoutGroupId.NoteLabel, { widen: true }],
     [LayoutGroupId.Navigation, { rowAlign: true }],
     [LayoutGroupId.Ending, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.TempoAnnotation, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.DynamicsAnnotation, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.ChordLabel, { widen: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse1, { rowAlign: true }],
-    [LayoutGroupId.LyricsVerse2, { rowAlign: true }],
-    [LayoutGroupId.LyricsVerse3, { rowAlign: true }],
+    [LayoutGroupId.LyricsVerse1, { rowAlign: true, widen: true }],
+    [LayoutGroupId.LyricsVerse2, { rowAlign: true, widen: true }],
+    [LayoutGroupId.LyricsVerse3, { rowAlign: true, widen: true }],
 ]);
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {

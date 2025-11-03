@@ -8,6 +8,9 @@ export const DocumentSettings = {
     DocumentScale: 1,
     DocumentMinWidth: 75,
 
+    MinColumnsWidth: 10,
+    ColumnWidthScale: 1.7,
+
     PostMeasureBreakWidth: 10,
 
     NoteDotSpace: 0.5,
