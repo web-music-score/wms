@@ -1,7 +1,6 @@
 import * as React from "react";
 import { Note, SymbolSet, getScale, Scale, ScaleType } from "@tspro/web-music-score/theory";
-import { DivRect } from "@tspro/web-music-score/score";
-import { Device, Utils } from "@tspro/ts-utils-lib";
+import { Device, Rect, Utils } from "@tspro/ts-utils-lib";
 
 const SelectedColor = "#0A0";
 
@@ -91,7 +90,7 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
 
         style = Object.assign({}, style, { width, height })
 
-        let circleRect = new DivRect(0, width, 0, height).scaleCopy(0.65);
+        let circleRect = new Rect(0, 0, width, height).scaleCopy(0.65);
 
         let lineWidth = Math.max(1, circleRect.width / 100);
         let fontSize = circleRect.width / 15;
@@ -115,8 +114,8 @@ export class CircleOfFifths extends React.Component<CircleOfFifthsProps, {}> {
 
             let dx = Math.sin(rad);
             let dy = -Math.cos(rad);
-            let x = circleRect.anchorX + dx * circleRect.width / 2;
-            let y = circleRect.anchorY + dy * circleRect.height / 2;
+            let x = circleRect.centerX + dx * circleRect.width / 2;
+            let y = circleRect.centerY + dy * circleRect.height / 2;
 
             // Add marker
             components.push(<div key={"m" + i} style={{

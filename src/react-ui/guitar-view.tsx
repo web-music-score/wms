@@ -1,6 +1,5 @@
 import * as React from "react";
-import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { DivRect } from "@tspro/web-music-score/score";
+import { Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Handedness } from "@tspro/web-music-score/theory";
 import { GuitarContext, FretPosition } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
@@ -52,7 +51,7 @@ export class FretPositionData {
      * @param cellRect - Rect of fret position cell (space around string and between fret and next fret).
      * @param noteRect - Rect to display note name in circle.
      */
-    constructor(readonly fretPosition: Readonly<FretPosition>, readonly cellRect: DivRect, readonly noteRect: DivRect) { }
+    constructor(readonly fretPosition: Readonly<FretPosition>, readonly cellRect: Rect, readonly noteRect: Rect) { }
 }
 
 /** Update fret position function type. */
@@ -151,18 +150,18 @@ export class GuitarView extends React.Component<GuitarViewProps, GuitarViewState
 
                 let cellHeight = (left.bottomStringY - left.topStringY) / 5;
 
-                let cellRect = DivRect.create(
+                let cellRect = new Rect(
                     left.x,
                     left.bottomStringY - cellHeight * (stringId + 0.5),
                     right.x - left.x,
                     cellHeight);
 
                 if (guitarCtx.handedness === Handedness.LeftHanded) {
-                    cellRect = new DivRect(width - cellRect.right, width - cellRect.left, cellRect.top, cellRect.bottom);
+                    cellRect = new Rect(width - cellRect.right, cellRect.top, cellRect.width, cellRect.height);
                 }
 
-                let noteRect = DivRect.create(
-                    cellRect.left + (guitarCtx.handedness === Handedness.LeftHanded ? cellRect.width - noteWidth : 0),
+                let noteRect = new Rect(
+                    cellRect.left + (guitarCtx.handedness === Handedness.LeftHanded ? (cellRect.width - noteWidth) : 0),
                     cellRect.top,
                     noteWidth,
                     cellRect.height).scaleCopy(0.75, 0.95);
