@@ -37,9 +37,9 @@ const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { widen?: boolean, rowAlign
     [LayoutGroupId.TempoAnnotation, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.DynamicsAnnotation, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.ChordLabel, { widen: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse1, { rowAlign: true, widen: true }],
-    [LayoutGroupId.LyricsVerse2, { rowAlign: true, widen: true }],
-    [LayoutGroupId.LyricsVerse3, { rowAlign: true, widen: true }],
+    [LayoutGroupId.LyricsVerse1, { widen: true, rowAlign: true }],
+    [LayoutGroupId.LyricsVerse2, { widen: true, rowAlign: true }],
+    [LayoutGroupId.LyricsVerse3, { widen: true, rowAlign: true }],
 ]);
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
