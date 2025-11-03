@@ -30,8 +30,7 @@ export class ObjLyrics extends MusicObject {
         this.hyphen = Guard.isEnumValue(lyricsOptions?.hyphen, LyricsHyphen) ? lyricsOptions?.hyphen : undefined;
 
         this.text = new ObjText(this, { text: lyricsText, color: this.color, scale: 0.8 }, halign, 0);
-
-        this.rect = new AnchoredRect();
+        this.rect = this.text.getRect().clone();
 
         this.mi = new MLyrics(this);
     }
@@ -53,7 +52,7 @@ export class ObjLyrics extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.rect.contains(x, y) ? [this] : [];
+        return this.getRect().contains(x, y) ? [this] : [];
     }
 
     layout(ctx: RenderContext) {
@@ -81,8 +80,8 @@ export class ObjLyrics extends MusicObject {
             let w = this.hyphen === LyricsHyphen.Hyphen ? Math.min(hyphenw, maxw) : maxw;
 
             if (w > 0) {
-                let cx = r ? (r.left + l.right) / 2 : (l.right + w / 0.85)
-                let cy = l.centerY / 2;
+                let cx = r ? (l.right + r.left) / 2 : (l.right + w / 0.85)
+                let cy = l.centerY;
 
                 ctx.moveTo(cx - w / 2, cy);
                 ctx.lineTo(cx + w / 2, cy);
