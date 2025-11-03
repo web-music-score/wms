@@ -1385,11 +1385,12 @@ export class ObjMeasure extends MusicObject {
             this.barLineLeft.getRect().width +
             padding;
 
-        this.rightSolidAreaWidth = padding + this.barLineRight.getRect().width;
+        this.minColumnsAreaWidth = Math.max(
+            ObjMeasure.MinFlexContentWidth * unitSize,
+            this.columns.map(col => col.getRect().width).reduce((acc, cur) => (acc + cur))
+        );
 
-        this.minColumnsAreaWidth = 0;
-        this.columns.forEach(col => this.minColumnsAreaWidth += col.getRect().width);
-        this.minColumnsAreaWidth = Math.max(this.minColumnsAreaWidth, ObjMeasure.MinFlexContentWidth * unitSize);
+        this.rightSolidAreaWidth = padding + this.barLineRight.getRect().width;
     }
 
     layoutWidth(ctx: RenderContext, width: number) {
