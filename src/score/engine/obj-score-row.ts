@@ -469,7 +469,7 @@ export class ObjScoreRow extends MusicObject {
                     grp[0].getTopLineY(),
                     grp[grp.length - 1].getBottomLineY()
                 );
-                ctx.color("brack").lineWidth(1).drawBrace(r, "left");
+                ctx.color("brack").lineWidth(1).drawBracket(r, "{");
             }
 
             if (obj) {

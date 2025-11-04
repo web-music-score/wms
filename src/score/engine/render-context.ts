@@ -660,7 +660,7 @@ export class RenderContext {
         return this;
     }
 
-    getTextWidth(text: string, font: string) {
+    getTextWidth(text: string, font: string): number {
         if (this.ctx) {
             let savedFont = this.ctx.font;
             this.ctx.font = font;
@@ -673,62 +673,92 @@ export class RenderContext {
         }
     }
 
-    arc(x: number, y: number, radius: number, startRadians: number, endRadians: number) {
-        this.ctx?.arc(x, y, radius, startRadians, endRadians);
+    arc(x: number, y: number, radius: number, startRadians: number, endRadians: number): RenderContext {
+        if (this.ctx) this.ctx.arc(x, y, radius, startRadians, endRadians);
+        return this;
     }
 
-    fillCircle(x: number, y: number, radius: number) {
-        if (this.ctx) {
-            this.ctx.beginPath();
-            this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
-            this.ctx.fill();
-        }
+    fillCircle(x: number, y: number, radius: number): RenderContext {
+        if (!this.ctx) return this;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
+        this.ctx.fill();
+        return this;
     }
 
-    strokeLine(startX: number, startY: number, endX: number, endY: number) {
-        if (this.ctx) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(startX, startY);
-            this.ctx.lineTo(endX, endY);
-            this.ctx.stroke();
-        }
+    strokeLine(startX: number, startY: number, endX: number, endY: number): RenderContext {
+        if (!this.ctx) return this;
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.stroke();
+        return this;
     }
 
-    strokePartialLine(startX: number, startY: number, endX: number, endY: number, startT: number, endT: number) {
+    strokePartialLine(startX: number, startY: number, endX: number, endY: number, startT: number, endT: number): RenderContext {
+        if (!this.ctx) return this;
         let x1 = startX + (endX - startX) * startT;
         let y1 = startY + (endY - startY) * startT;
-
         let x2 = startX + (endX - startX) * endT;
         let y2 = startY + (endY - startY) * endT;
-
-        if (this.ctx) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(x1, y1);
-            this.ctx.lineTo(x2, y2);
-            this.ctx.stroke();
-        }
+        this.ctx.beginPath();
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+        return this;
     }
 
-    drawBrace(rect: AnchoredRect, side: "left" | "right") {
-        if (this.ctx) {
-            let { left, right, width, top, bottom, anchorY } = rect;
+    /** @deprecated - Use {@link drawBracket} instead. */
+    drawBrace(rect: AnchoredRect, side: "left" | "right"): RenderContext {
+        return this.drawBracket(rect, side === "left" ? "{" : "}");
+    }
 
-            if (side === "right") {
-                [left, right, width] = [right, left, -width];
-            }
-
-            this.ctx.beginPath();
-            this.ctx.moveTo(right, top);
-            this.ctx.bezierCurveTo(
-                left + width * 0.1, top,
-                left + width * 0.8, anchorY,
-                left, anchorY);
-            this.ctx.moveTo(right, bottom);
-            this.ctx.bezierCurveTo(
-                left + width * 0.1, bottom,
-                left + width * 0.8, anchorY,
-                left, anchorY);
-            this.ctx.stroke();
+    drawBracket(rect: AnchoredRect, bracket: "(" | ")" | "[" | "]" | "{" | "}" | "<" | ">"): RenderContext {
+        if (!this.ctx) return this;
+        let { left, right, width, top, bottom, height, anchorY } = rect;
+        if ([")", "]", "}", ">"].includes(bracket)) {
+            [left, right, width] = [right, left, -width];
         }
+        switch (bracket) {
+            case "(": case ")":
+                this.ctx.beginPath();
+                this.ctx.moveTo(right, top);
+                this.ctx.bezierCurveTo(
+                    left - width * 0.2, top + height * 0.3,
+                    left - width * 0.2, top + height * 0.7,
+                    right, bottom);
+                this.ctx.stroke();
+                break;
+            case "{": case "}":
+                this.ctx.beginPath();
+                this.ctx.moveTo(right, top);
+                this.ctx.bezierCurveTo(
+                    left + width * 0.1, top,
+                    left + width * 0.8, anchorY,
+                    left, anchorY);
+                this.ctx.moveTo(right, bottom);
+                this.ctx.bezierCurveTo(
+                    left + width * 0.1, bottom,
+                    left + width * 0.8, anchorY,
+                    left, anchorY);
+                this.ctx.stroke();
+                break;
+            case "[": case "]":
+                this.ctx.beginPath();
+                this.ctx.moveTo(right, top);
+                this.ctx.lineTo(left, top);
+                this.ctx.lineTo(left, bottom);
+                this.ctx.lineTo(right, bottom);
+                this.ctx.stroke();
+                break;
+            case "<": case ">":
+                this.ctx.beginPath();
+                this.ctx.moveTo(right, top);
+                this.ctx.lineTo(left, anchorY);
+                this.ctx.lineTo(right, bottom);
+                this.ctx.stroke();
+                break;
+        }
+        return this;
     }
 }
