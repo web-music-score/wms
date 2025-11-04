@@ -1,6 +1,6 @@
 # Changelog
 
-## [5.4.1] - 2025-11-??
+## [5.4.1] - 2025-11-04
 ### FIxed
 - Lyrics hyphen / extender line y-coord was wrong after previous update.
 - Position of vertical curly arepggio line.

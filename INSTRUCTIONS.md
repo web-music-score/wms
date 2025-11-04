@@ -4,10 +4,10 @@
  `git log --pretty="- %s"`
 
 ## Update Version Numbers
-- Change version in package.json: `"5.4.0"`
+- Change version in package.json: `"MAJ.MIN.PATCH"`
 - (For major update change version also for all apps)
-- Create git commit: e.g. `git commit -a -m "v5.4.0"`
-- Create git tag: e.g. `git tag v5.4.0`
+- Create git commit: e.g. `git commit -a -m "vMAJ.MIN.PATCH"`
+- Create git tag: e.g. `git tag vMAJ.MIN.PATCH`
 
 ## Build
 `npm run build`
