@@ -104,7 +104,16 @@ export function createNoteOptionsDemo() {
         .addMeasure()
         .addChord(0, ["C3", "E3", "F#3", "A3", "B3", "C4"], "4n", { stem: "up" })
         .addChord(0, ["C3", "E3", "F#3", "A3", "B3", "C4"], "4n", { stem: "down" })
+        .endRow()
 
+        .addMeasure()
+        .setKeySignature("C Major")
+        .addNote(0, "Gbb3", "4n")
+        .addNote(0, "Gb3", "4n")
+        .addNote(0, "G3", "4n")
+        .addNote(0, "G3", "4n")
+        .addNote(0, "G#3", "4n")
+        .addNote(0, "Gx3", "4n")
 
         .getDocument();
 }
