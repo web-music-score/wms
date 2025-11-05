@@ -130,15 +130,6 @@ export class LayoutObjectWrapper {
         return y;
     }
 
-    getTextContent(): string | undefined {
-        if (this.musicObj instanceof ObjText || this.musicObj instanceof ObjSpecialText) {
-            return this.musicObj.getText();
-        }
-        else {
-            return undefined;
-        }
-    }
-
     layout(ctx: RenderContext) {
         this.line.addObject(this);
     }

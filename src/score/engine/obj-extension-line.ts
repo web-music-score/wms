@@ -7,14 +7,27 @@ import { Extension } from "./extension";
 import { MExtensionLine } from "../pub";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { ObjText } from "./obj-text";
+import { ObjSpecialText } from "./obj-special-text";
 
-export type ExtensionLineLeftObj = ObjBarLineLeft | MusicObject;
-export type ExtensionLineRightObj = ObjRhythmColumn | ObjBarLineRight;
+export type ExtensionStartObject = ObjText | ObjSpecialText;
+export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
+export type ExtensionLineRightObject = ObjRhythmColumn | ObjBarLineRight;
+export type ExtensionStopObject = ObjMeasure | ObjText | ObjSpecialText;
+export type ExtensionObjectAll = ExtensionStartObject | ExtensionLineLeftObject | ExtensionLineRightObject | ExtensionStopObject;
+
+function isExtensionStartObject(obj: unknown) {
+    return obj instanceof ObjText || obj instanceof ObjSpecialText;
+}
+
+function isExtensionStopObject(obj: unknown) {
+    return obj instanceof ObjText || obj instanceof ObjSpecialText;
+}
 
 export class ObjExtensionLine extends MusicObject {
     readonly mi: MExtensionLine;
 
-    constructor(readonly measure: ObjMeasure, readonly line: ObjNotationLine, readonly extension: Extension, readonly leftObj: ExtensionLineLeftObj, readonly rightObj: ExtensionLineRightObj) {
+    constructor(readonly measure: ObjMeasure, readonly line: ObjNotationLine, readonly extension: Extension, readonly cols: ExtensionObjectAll[]) {
         super(measure);
 
         extension.addTail(this);
@@ -30,37 +43,49 @@ export class ObjExtensionLine extends MusicObject {
         return this.mi;
     }
 
-    private getLineLeft(): number {
-        if (this.leftObj instanceof ObjBarLineLeft) {
-            return this.leftObj.getRect().anchorX;
+    private getLineLeft(ctx: RenderContext): number {
+        let obj = this.cols[0];
+
+        if (isExtensionStartObject(obj))
+            return obj.getRect().right;
+
+        if (obj instanceof ObjBarLineLeft)
+            return obj.getRect().anchorX;
+
+        if (obj instanceof ObjRhythmColumn) {
+            const mcols = obj.measure.getColumns();
+            if (obj === mcols[0])
+                return obj.measure.getRect().left;
         }
-        else {
-            return this.leftObj.getRect().right;
-        }
+
+        return obj.getRect().right;
     }
 
-    private getLineRight(): number {
-        if (this.rightObj instanceof ObjRhythmColumn) {
-            let col = this.rightObj;
-            let nextCol = col.getNextColumn();
+    private getLineRight(ctx: RenderContext): number {
+        let obj = this.cols[this.cols.length - 1];
 
-            if (nextCol && nextCol.measure === col.measure) {
-                return (col.getRect().right + nextCol.getRect().left) / 2;
-            }
-            else {
-                return (col.getRect().right + col.measure.getBarLineRight().getRect().left) / 2;
-            }
+        if (isExtensionStopObject(obj))
+            return obj.getRect().left - ctx.unitSize * 2;
+
+        if (obj instanceof ObjRhythmColumn) {
+            const mcols = obj.measure.getColumns();
+            if (obj === mcols[mcols.length - 1])
+                return obj.measure.getRect().right;
+
+            let next = obj.getNextColumn();
+            if (next)
+                return (obj.getRect().right + next.getRect().left) / 2;
         }
-        else { // ObjBarLineRight
-            return this.rightObj.getRect().anchorX;
-        }
+
+        return obj.getRect().anchorX;
     }
 
     layoutFitToMeasure(ctx: RenderContext) {
         let { unitSize } = ctx;
 
-        let lineLeft = this.getLineLeft();
-        let lineRight = this.getLineRight();
+        let lineLeft = this.getLineLeft(ctx);
+        let lineRight = this.getLineRight(ctx);
+
         let lineRectH = unitSize;
 
         this.rect = new AnchoredRect(lineLeft, lineRight, -lineRectH / 2, lineRectH / 2);
@@ -93,7 +118,9 @@ export class ObjExtensionLine extends MusicObject {
 
         // Draw tip end of last line
         let tails = this.extension.getTails();
-        if (tails.length > 0 && this === tails[tails.length - 1]) {
+        let last = tails[tails.length - 1];
+
+        if (this === last && !isExtensionStopObject(this.cols[this.cols.length - 1])) {
             let tipH = rect.anchorY > this.line.getRect().anchorY ? -ctx.unitSize : ctx.unitSize;
             ctx.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
         }

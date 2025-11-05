@@ -1,9 +1,12 @@
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Navigation } from "../pub";
-import { isDynamicsText, isTempoText } from "./element-data";
 import { MusicObject, MusicObjectLink } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjText } from "./obj-text";
+import { ObjSpecialText } from "./obj-special-text";
+import { ObjMeasure } from "./obj-measure";
+import { LayoutObjectWrapper } from "./layout-object";
+import { ExtensionStopObject } from "./obj-extension-line";
 
 export type ExtensionLineStyle = "solid" | "dashed";
 export type ExtensionLinePos = "bottom" | "middle";
@@ -15,24 +18,28 @@ function getTextAnchorY(linePos: ExtensionLinePos) {
     }
 }
 
-export type ExtensionRangeInfo = {
-    startColumn: ObjRhythmColumn,
-    endColumn: ObjRhythmColumn,
-    columnRange: ObjRhythmColumn[],
-    extensionBreakText?: string
+export function getTextContent(obj: MusicObject): string {
+    if (obj instanceof ObjText || obj instanceof ObjSpecialText)
+        return obj.getText();
+    if (obj instanceof ObjMeasure)
+        return "[measure]";
+    return "";
 }
 
-enum ExtensionContext { Undefined, Tempo, Volume }
-
-function getContext(elementText: string): ExtensionContext {
-    if (isDynamicsText(elementText)) {
-        return ExtensionContext.Volume;
+export class ExtensionRange {
+    public readonly columnRange: ObjRhythmColumn[];
+    public stopObject?: ExtensionStopObject;
+    constructor(public readonly startColumn: ObjRhythmColumn) {
+        this.columnRange = [startColumn];
     }
-    else if (isTempoText(elementText)) {
-        return ExtensionContext.Tempo;
+    get endColumn(): ObjRhythmColumn {
+        return this.columnRange[this.columnRange.length - 1];
     }
-    else {
-        return ExtensionContext.Undefined;
+    addColumn(col: ObjRhythmColumn) {
+        if (this.endColumn !== col) this.columnRange.push(col);
+    }
+    setStopObject(obj: ExtensionStopObject) {
+        this.stopObject = obj;
     }
 }
 
@@ -45,10 +52,10 @@ export class Extension extends MusicObjectLink {
 
     private readonly startColumn: ObjRhythmColumn;
 
-    private readonly context: ExtensionContext;
+    private readonly layoutObj?: LayoutObjectWrapper;
 
-    constructor(head: MusicObject, startColumn: ObjRhythmColumn, length: number, visible: boolean, lineStyle: ExtensionLineStyle, linePos: ExtensionLinePos) {
-        super(head);
+    constructor(readonly headObj: LayoutObjectWrapper, startColumn: ObjRhythmColumn, length: number, visible: boolean, lineStyle: ExtensionLineStyle, linePos: ExtensionLinePos) {
+        super(headObj.musicObj);
 
         this.length = length;
         this.visible = visible;
@@ -58,15 +65,11 @@ export class Extension extends MusicObjectLink {
 
         this.startColumn = startColumn;
 
-        this.context = head instanceof ObjText
-            ? getContext(head.getText())
-            : ExtensionContext.Undefined;
-
-        if (head instanceof ObjText) {
-            head.updateAnchorY(getTextAnchorY(linePos));
+        if (headObj.musicObj instanceof ObjText) {
+            headObj.musicObj.updateAnchorY(getTextAnchorY(linePos));
         }
         else {
-            throw new MusicError( MusicErrorType.Score, "Update anchor's y-coordinate is only implemented for text objects.");
+            throw new MusicError(MusicErrorType.Score, "Update anchor's y-coordinate is only implemented for text objects.");
         }
     }
 
@@ -82,82 +85,45 @@ export class Extension extends MusicObjectLink {
         return this.linePos;
     }
 
-    private getSpanBreakText(col: ObjRhythmColumn, context: ExtensionContext): string | undefined {
-        if (col === col.measure.getColumn(0)) {
-            let prevMeasure = col.measure.getPrevMeasure();
-            if (prevMeasure) {
-                if (prevMeasure.hasEndSection() || prevMeasure.hasEndSong()) {
-                    return "section-break";
-                }
-                let elemArr = [Navigation.EndRepeat, Navigation.Ending];
-                for (let i = 0; i < elemArr.length; i++) {
-                    if (prevMeasure.hasNavigation(elemArr[i])) {
-                        return "section-break";
-                    }
-                }
-            }
-        }
+    private static StopNavigations = [Navigation.EndRepeat, Navigation.Ending];
 
-        if (context === ExtensionContext.Tempo) {
-            let objArr = col.getAnchoredLayoutObjects();
-
-            for (let i = 0; i < objArr.length; i++) {
-                let text = objArr[i].getTextContent();
-
-                if (text && isTempoText(text)) {
-                    return text;
-                }
-            }
-        }
-        else if (context === ExtensionContext.Volume) {
-            let objArr = col.getAnchoredLayoutObjects();
-
-            for (let i = 0; i < objArr.length; i++) {
-                let text = objArr[i].getTextContent();
-
-                if (text && isDynamicsText(text)) {
-                    return text;
-                }
-            }
-        }
-
-        return undefined;
+    private whatStopped(col: ObjRhythmColumn): ExtensionStopObject | undefined {
+        const m = col.measure;
+        const cols = m.getColumns();
+        return (
+            col === cols[cols.length - 1] &&
+            m.hasEndSection() || m.hasEndSong() || Extension.StopNavigations.some(nav => m.hasNavigation(nav))
+        )
+            ? m
+            : col.getAnchoredLayoutObjects()
+                .filter(obj => obj !== this.headObj && obj.layoutGroupId === this.headObj.layoutGroupId)
+                .map(obj => obj.musicObj)
+                .filter(obj => obj instanceof ObjText || obj instanceof ObjSpecialText)[0];
     }
 
-    getExtensionRangeInfo(): ExtensionRangeInfo {
-        let { startColumn, length: extensionLength, context } = this;
+    getRange(): ExtensionRange {
+        let { startColumn, length } = this;
 
-        let columnRange: ObjRhythmColumn[] = [startColumn];
-
-        if (extensionLength <= 0) {
-            return { startColumn, endColumn: startColumn, columnRange, extensionBreakText: undefined }
-        }
-
-        let ticksLeft = extensionLength;
-        let endColumn = startColumn;
+        let curColumn: ObjRhythmColumn | undefined = startColumn;
+        let range = new ExtensionRange(curColumn);
+        let ticksLeft = length;
 
         while (true) {
-            let nextColumn = endColumn.getNextColumn();
+            if (ticksLeft <= 0) return range;
 
-            if (!nextColumn) {
-                return { startColumn, endColumn, columnRange, extensionBreakText: undefined }
+            const stopObject = this.whatStopped(curColumn);
+            if (stopObject !== undefined) {
+                range.setStopObject(stopObject);
+                return range;
             }
 
-            let extensionBreakText = this.getSpanBreakText(nextColumn, context);
+            ticksLeft -= curColumn.getTicksToNextColumn();
 
-            if (extensionBreakText !== undefined) {
-                return { startColumn, endColumn, columnRange, extensionBreakText }
-            }
+            curColumn = curColumn.getNextColumn();
+            if (!curColumn) return range;
 
-            ticksLeft -= endColumn.getTicksToNextColumn();
-
-            if (ticksLeft <= 0) {
-                return { startColumn, endColumn, columnRange, extensionBreakText: undefined }
-            }
-            else {
-                endColumn = nextColumn;
-                columnRange.push(endColumn);
-            }
+            if (ticksLeft > 0)
+                range.addColumn(curColumn);
         }
     }
 }

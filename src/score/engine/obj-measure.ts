@@ -21,7 +21,7 @@ import { ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
 import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
-import { ObjExtensionLine } from "./obj-extension-line";
+import { ExtensionObjectAll, ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
@@ -118,7 +118,7 @@ export class ObjMeasure extends MusicObject {
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
     private lastAddedRhythmSymbol?: RhythmSymbol;
-    private addExtensionToMusicObjects: MusicObject[] = [];
+    private addExtensionToLayoutObjs: LayoutObjectWrapper[] = [];
 
     private layoutObjects: LayoutObjectWrapper[] = [];
 
@@ -519,10 +519,12 @@ export class ObjMeasure extends MusicObject {
         return this.postMeasureBreakWidth;
     }
 
-    private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjNotationLine, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
-        this.layoutObjects.push(new LayoutObjectWrapper(musicObj, line, layoutGroupId, verticalPos));
+    private addLayoutObject(musicObj: LayoutableMusicObject, line: ObjNotationLine, layoutGroupId: LayoutGroupId, verticalPos: VerticalPos): LayoutObjectWrapper {
+        const layoutObj = new LayoutObjectWrapper(musicObj, line, layoutGroupId, verticalPos);
+        this.layoutObjects.push(layoutObj);
         this.requestLayout();
         this.requestRectUpdate();
+        return layoutObj;
     }
 
     private forEachStaffGroup(staffTabOrGroups: StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, addFn: (line: ObjNotationLine, vpos: VerticalPos) => void) {
@@ -732,8 +734,8 @@ export class ObjMeasure extends MusicObject {
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
-            this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(textObj);
+            const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
+            this.enableExtension(layoutObj);
         });
     }
 
@@ -761,8 +763,8 @@ export class ObjMeasure extends MusicObject {
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
-            this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(textObj);
+            const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
+            this.enableExtension(layoutObj);
         });
     }
 
@@ -793,14 +795,15 @@ export class ObjMeasure extends MusicObject {
     }
 
     addExtension(extensionLength: number | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible: boolean) {
-        this.addExtensionToMusicObjects.forEach(musicObj => {
-            let anchor = musicObj.getParent();
+        this.addExtensionToLayoutObjs.forEach(layoutObj => {
+            const { musicObj } = layoutObj;
+            const anchor = musicObj.getParent();
 
             if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
                 let lineStyle: ExtensionLineStyle = "dashed";
                 let linePos: ExtensionLinePos = "bottom";
 
-                let extension = new Extension(musicObj, anchor, getExtensionTicks(extensionLength), extensionVisible, lineStyle, linePos);
+                let extension = new Extension(layoutObj, anchor, getExtensionTicks(extensionLength), extensionVisible, lineStyle, linePos);
                 musicObj.setLink(extension);
             }
             else {
@@ -808,7 +811,7 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
-        if (this.addExtensionToMusicObjects.length === 0) {
+        if (this.addExtensionToLayoutObjs.length === 0) {
             throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
         }
 
@@ -816,12 +819,12 @@ export class ObjMeasure extends MusicObject {
         this.requestLayout();
     }
 
-    private enableExtension(musicObject: MusicObject) {
-        this.addExtensionToMusicObjects.push(musicObject);
+    private enableExtension(layoutObj: LayoutObjectWrapper) {
+        this.addExtensionToLayoutObjs.push(layoutObj);
     }
 
     private disableExtension() {
-        this.addExtensionToMusicObjects = [];
+        this.addExtensionToLayoutObjs = [];
     }
 
     getEnding(): ObjEnding | undefined {
@@ -1086,31 +1089,44 @@ export class ObjMeasure extends MusicObject {
             if (musicObj.getLink() instanceof Extension) {
                 let extension = musicObj.getLink() as Extension;
 
-                if (extension.getHead() === musicObj) {
-                    // Remove old extnsion lines
-                    extension.getTails().forEach(musicObj2 => measure.removeLayoutObjects(musicObj2));
+                if (extension.getHead() !== musicObj)
+                    return;
 
-                    // Create new extension lines
-                    let { startColumn, endColumn } = extension.getExtensionRangeInfo();
+                // Remove old extnsion lines
+                extension.getTails().forEach(musicObj2 => measure.removeLayoutObjects(musicObj2));
 
-                    if (extension.isVisible() && startColumn !== endColumn) {
-                        for (let m: ObjMeasure | undefined = startColumn.measure; m !== undefined; m = m === endColumn.measure ? undefined : m.getNextMeasure()) {
-                            let leftObj = m === startColumn.measure ? extension.getHead() : m.getBarLineLeft();
-                            let rightObj = m === endColumn.measure ? endColumn : m.getBarLineRight();
+                if (!extension.isVisible())
+                    return;
 
-                            const lines = m.row.getNotationLines();
+                // Create new extension lines
+                const range = extension.getRange();
+                const rcols = range.columnRange.slice();
 
-                            let line2: ObjNotationLine | undefined = lines.find(l => l.name !== "" && l.name === line.name) ?? lines[line.id];
+                for (let isFirst = true; rcols.length > 1; isFirst = false) {
+                    const { measure } = rcols[0];
+                    const i = rcols.findIndex(col => col.measure !== measure);
+                    const mcols = rcols.splice(0, i > 0 ? i : rcols.length);
+                    if (mcols.length < 2) continue;
 
-                            if (line2) {
-                                m.addLayoutObject(new ObjExtensionLine(m, line2, extension, leftObj, rightObj), line2, layoutGroupId, verticalPos);
-                            }
-                        }
-                    }
+                    let lineMatch = measure.row.findMatchingLine(line);
+                    if (!lineMatch) continue;
+
+                    const isLast = rcols.length === 0;
+
+                    const extCols = [
+                        ...(isFirst ? [musicObj] : []),
+                        ...mcols,
+                        ...(isLast && range.stopObject ? [range.stopObject] : [])
+                    ];
+
+                    measure.addLayoutObject(
+                        new ObjExtensionLine(measure, lineMatch, extension, extCols),
+                        lineMatch, layoutGroupId, verticalPos);
                 }
             }
         });
     }
+
 
     addBeamGroup(beam: ObjBeamGroup) {
         this.beamGroups.push(beam);

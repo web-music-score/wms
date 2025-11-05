@@ -1,4 +1,4 @@
-import { AnchoredRect, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-music-score/theory";
 import * as Audio from "@tspro/web-music-score/audio";
 import { ObjDocument } from "./obj-document";
@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAnnotation, TempoAnnotation } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
-import { Extension } from "./extension";
+import { Extension, getTextContent } from "./extension";
 import { getDynamicsVolume } from "./element-data";
 
 export type CursorPositionChangeListener = (cursorRect: Rect | undefined) => void;
@@ -288,7 +288,8 @@ export class Player {
             }
 
             col.getAnchoredLayoutObjects().forEach(layoutObj => {
-                let text = layoutObj.getTextContent() ?? "";
+                const text = getTextContent(layoutObj.musicObj);
+
                 let vol: number | undefined;
 
                 if (text === TempoAnnotation.a_tempo) {
@@ -300,15 +301,17 @@ export class Player {
                 else if (layoutObj.musicObj.getLink() instanceof Extension) {
                     let extension = layoutObj.musicObj.getLink() as Extension;
 
-                    let { columnRange, extensionBreakText } = extension.getExtensionRangeInfo();
-                    let totalTicks = Utils.Math.sum(columnRange.map(c => c.getTicksToNextColumn()));
+                    const range = extension.getRange();
+                    const stopText = range.stopObject ? getTextContent(range.stopObject) : "";
+
+                    let totalTicks = Utils.Math.sum(range.columnRange.map(c => c.getTicksToNextColumn()));
 
                     switch (text) {
                         case TempoAnnotation.accel: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed * AccelerandoSpeedMul;
                             let accuTicks = 0;
-                            columnRange.forEach(c => {
+                            range.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushSpeed(c, startSpeed + (endSpeed - startSpeed) * accuTicks / totalTicks);
                             });
@@ -318,7 +321,7 @@ export class Player {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed / RitardandoSpeedDiv;
                             let accuTicks = 0;
-                            columnRange.forEach(c => {
+                            range.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushSpeed(c, startSpeed + (endSpeed - startSpeed) * accuTicks / totalTicks);
                             });
@@ -327,11 +330,11 @@ export class Player {
                         case DynamicsAnnotation.cresc: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
-                            if (extensionBreakText && (vol = getDynamicsVolume(extensionBreakText)) !== undefined && vol > startVol) {
+                            if (range.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol > startVol) {
                                 endVol = vol;
                             }
                             let accuTicks = 0;
-                            columnRange.forEach(c => {
+                            range.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushVolume(c, startVol + (endVol - startVol) * accuTicks / totalTicks);
                             });
@@ -341,11 +344,11 @@ export class Player {
                         case DynamicsAnnotation.dim: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
-                            if (extensionBreakText && (vol = getDynamicsVolume(extensionBreakText)) !== undefined && vol < startVol) {
+                            if (range.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol < startVol) {
                                 endVol = vol;
                             }
                             let accuTicks = 0;
-                            columnRange.forEach(c => {
+                            range.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushVolume(c, startVol + (endVol - startVol) * accuTicks / totalTicks);
                             });
