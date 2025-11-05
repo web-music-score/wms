@@ -73,21 +73,24 @@ export class ObjHeader extends MusicObject {
 
         if (this.titleText) {
             this.titleText.layout(ctx);
-            this.titleText.offset((left + right) / 2, top);
+            this.titleText.setCenterX((left + right) / 2);
+            this.titleText.setTop(top);
             top += this.titleText.getRect().height;
             this.rect.expandInPlace(this.titleText.getRect());
         }
 
         if (this.composerText) {
             this.composerText.layout(ctx);
-            this.composerText.offset(right, top)
+            this.composerText.setRight(right);
+            this.composerText.setTop(top);
             top += this.composerText.getRect().height;
             this.rect.expandInPlace(this.composerText.getRect());
         }
 
         if (this.arrangerText) {
             this.arrangerText.layout(ctx);
-            this.arrangerText.offset(right, top)
+            this.arrangerText.setRight(right);
+            this.arrangerText.setTop(top);
             top += this.arrangerText.getRect().height;
             this.rect.expandInPlace(this.arrangerText.getRect());
         }

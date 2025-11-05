@@ -626,7 +626,8 @@ export class ObjNoteGroup extends MusicObject {
                     let acc = obj.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
                     if (acc) {
                         acc.layout(ctx);
-                        acc.offset(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw, noteY);
+                        acc.setAnchorX(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw);
+                        acc.setAnchorY(noteY);
                     }
                     noteStaff.addObject(acc);
                 }
@@ -714,10 +715,8 @@ export class ObjNoteGroup extends MusicObject {
                     let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
                     fretNumber.layout(ctx);
 
-                    let x = this.col.getRect().anchorX;
-                    let y = tab.getStringY(stringNumber - 1);
-
-                    fretNumber.offset(x, y);
+                    fretNumber.setAnchorX(this.col.getRect().anchorX);
+                    fretNumber.setAnchorY(tab.getStringY(stringNumber - 1));
 
                     obj.fretNumbers.push(fretNumber);
                 }
@@ -758,8 +757,8 @@ export class ObjNoteGroup extends MusicObject {
     }
 
     offset(dx: number, dy: number) {
-        this.staffObjects.forEach(obj => obj.offset(dx, 0)); // dy is offset in notation line
-        this.tabObjects.forEach(obj => obj.offset(dx, 0));   // dy is offset in notation line
+        this.staffObjects.forEach(obj => obj.offset(dx, 0));
+        this.tabObjects.forEach(obj => obj.offset(dx, 0));
         this.requestRectUpdate();
     }
 

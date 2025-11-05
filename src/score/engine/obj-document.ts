@@ -362,7 +362,8 @@ export class ObjDocument extends MusicObject {
 
         // Stack rows on top of each other
         this.rows.forEach(row => {
-            row.offset(-this.rect.left, this.rect.bottom + unitSize * 2 - row.getRect().top);
+            row.setLeft(0);
+            row.setTop(this.rect.bottom + unitSize * 2);
             this.rect.expandInPlace(row.getRect());
         });
 

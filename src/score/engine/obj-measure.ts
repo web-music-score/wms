@@ -1350,7 +1350,7 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
-        // Layout tab string notes
+        // Layout tab tuning notes
         this.tabStringNotes.length = 0;
         if (this === this.row.getFirstMeasure()) {
             this.row.getTabs().forEach(tab => {
@@ -1359,7 +1359,8 @@ export class ObjMeasure extends MusicObject {
                     let obj = new ObjText(this, { text: note, scale: 0.8 }, 1, 0.5);
 
                     obj.layout(ctx);
-                    obj.offset(this.regions.tabTuning_0 * 0.8, tab.getStringY(stringId));
+                    obj.setRight(this.regions.tabTuning_0 * 0.8);
+                    obj.setCenterY(tab.getStringY(stringId));
 
                     this.tabStringNotes.push(obj);
                     tab.addObject(obj);
@@ -1413,22 +1414,23 @@ export class ObjMeasure extends MusicObject {
         this.rect.anchorX = this.rect.left + width / 2;
         this.rect.right = this.rect.left + width;
 
-        let rect: AnchoredRect;
-
         this.signatures.forEach(signature => {
-            rect = signature.getRect();
-            signature.offset(this.rect.left + this.regions.tabTuning_0 - rect.left, -rect.anchorY);
+            signature.setLeft(this.rect.left + this.regions.tabTuning_0);
+            signature.setAnchorY(this.rect.anchorY);
         });
 
         let signaturesWidth = Math.max(0, ...this.signatures.map(signature => signature.getRect().width));
 
-        rect = this.barLineLeft.getRect();
-        this.barLineLeft.offset(this.rect.left + this.regions.tabTuning_0 + signaturesWidth - rect.left, -rect.anchorY);
+        this.barLineLeft.setLeft(this.rect.left + this.regions.tabTuning_0 + signaturesWidth);
+        this.barLineLeft.setAnchorY(this.rect.anchorY);
 
-        rect = this.barLineRight.getRect();
-        this.barLineRight.offset(this.rect.right - rect.right, -rect.anchorY);
+        this.barLineRight.setRight(this.rect.right);
+        this.barLineRight.setAnchorY(this.rect.anchorY);
 
-        this.endRepeatPlayCountText?.offset(this.barLineRight.getRect().left, this.barLineRight.getRect().top);
+        if (this.endRepeatPlayCountText) {
+            this.endRepeatPlayCountText.setCenterX(this.barLineRight.getRect().left);
+            this.endRepeatPlayCountText.setBottom(this.barLineRight.getRect().top);
+        }
 
         let columnsLeft = this.rect.left + this.regions.leftSolid;
         let columnsRight = this.rect.right - this.regions.rightSolid;
@@ -1439,9 +1441,10 @@ export class ObjMeasure extends MusicObject {
         let curColumnLeft = columnsLeft;
 
         this.columns.forEach(col => {
-            rect = col.getRect();
+            let rect = col.getRect();
             let columnAnchorX = curColumnLeft + rect.leftw * columnScale;
-            col.offset(columnAnchorX - rect.anchorX, -rect.anchorY);
+            col.setAnchorX(columnAnchorX);
+            col.setAnchorY(this.rect.anchorY);
             curColumnLeft += rect.width * columnScale;
         });
 
@@ -1461,7 +1464,7 @@ export class ObjMeasure extends MusicObject {
 
             // Now relocate onlyRest middle of measure
             const r = this.getColumnsContentRect();
-            onlyRest.offset(r.centerX - onlyRest.getRect().anchorX, 0);
+            onlyRest.setAnchorX(r.centerX);
         });
     }
 
@@ -1552,9 +1555,8 @@ export class ObjMeasure extends MusicObject {
 
         this.barLineRight.offset(dx, dy);
 
-        if (this.endRepeatPlayCountText) {
+        if (this.endRepeatPlayCountText)
             this.endRepeatPlayCountText.offset(dx, dy);
-        }
 
         this.connectives.forEach(connective => connective.offset(dx, 0));
 

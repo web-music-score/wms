@@ -332,7 +332,7 @@ export class ObjScoreRow extends MusicObject {
 
         this.notationLines.forEach(line => line.layoutWidth(ctx));
 
-        this.rowGroups.forEach(grp => grp.offset(this.regions.instrRight - grp.getRect().right, 0));
+        this.rowGroups.forEach(grp => grp.setRight(this.regions.instrRight));
 
         let targetColumnsAreaWidth = this.regions.staffWidth;
         let minColumnsAreaWidth = 0;
@@ -350,7 +350,8 @@ export class ObjScoreRow extends MusicObject {
             let newMeasureWidth = m.getTotalSolidWidth() + m.getMinColumnsWidth() * columnsAreaScale;
             m.layoutWidth(ctx, newMeasureWidth);
             let r = m.getRect();
-            m.offset(x - r.left, -r.anchorY);
+            m.setLeft(x);
+            m.setAnchorY(0);
             x += r.width;
             x += m.getPostMeasureBreakWidth();
         });

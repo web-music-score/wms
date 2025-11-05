@@ -79,7 +79,8 @@ export class ObjEnding extends MusicObject {
 
         this.rect = new AnchoredRect(measureContent.left + unitSize, measureContent.right - unitSize, -endingHeight, 0);
 
-        this.endingText.offset(this.rect.left + unitSize / 2, this.rect.bottom);
+        this.endingText.setLeft(this.rect.left + unitSize / 2);
+        this.endingText.setBottom(this.rect.bottom);
 
         this.shapeRects = [
             new AnchoredRect(this.rect.left, this.rect.left + 1, this.rect.top, this.rect.bottom),
