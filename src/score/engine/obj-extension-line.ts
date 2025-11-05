@@ -13,7 +13,7 @@ import { ObjSpecialText } from "./obj-special-text";
 export type ExtensionStartObject = ObjText | ObjSpecialText;
 export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
 export type ExtensionLineRightObject = ObjRhythmColumn | ObjBarLineRight;
-export type ExtensionStopObject = ObjMeasure | ObjText | ObjSpecialText;
+export type ExtensionStopObject = ObjBarLineRight | ObjText | ObjSpecialText;
 export type ExtensionObjectAll = ExtensionStartObject | ExtensionLineLeftObject | ExtensionLineRightObject | ExtensionStopObject;
 
 function isExtensionStartObject(obj: unknown) {
@@ -21,7 +21,7 @@ function isExtensionStartObject(obj: unknown) {
 }
 
 function isExtensionStopObject(obj: unknown) {
-    return obj instanceof ObjText || obj instanceof ObjSpecialText;
+    return obj instanceof ObjBarLineRight || obj instanceof ObjText || obj instanceof ObjSpecialText;
 }
 
 export class ObjExtensionLine extends MusicObject {
@@ -47,7 +47,7 @@ export class ObjExtensionLine extends MusicObject {
         let obj = this.cols[0];
 
         if (isExtensionStartObject(obj))
-            return obj.getRect().right;
+            return obj.getRect().right + ctx.unitSize;
 
         if (obj instanceof ObjBarLineLeft)
             return obj.getRect().anchorX;
@@ -65,7 +65,7 @@ export class ObjExtensionLine extends MusicObject {
         let obj = this.cols[this.cols.length - 1];
 
         if (isExtensionStopObject(obj))
-            return obj.getRect().left - ctx.unitSize * 2;
+            return obj.getRect().left - ctx.unitSize;
 
         if (obj instanceof ObjRhythmColumn) {
             const mcols = obj.measure.getColumns();
@@ -73,7 +73,7 @@ export class ObjExtensionLine extends MusicObject {
                 return obj.measure.getRect().right;
 
             let next = obj.getNextColumn();
-            if (next)
+            if (next && next.measure === obj.measure)
                 return (obj.getRect().right + next.getRect().left) / 2;
         }
 
@@ -81,14 +81,14 @@ export class ObjExtensionLine extends MusicObject {
     }
 
     layoutFitToMeasure(ctx: RenderContext) {
-        let { unitSize } = ctx;
+        let recth = ctx.unitSize;
 
         let lineLeft = this.getLineLeft(ctx);
         let lineRight = this.getLineRight(ctx);
 
-        let lineRectH = unitSize;
+        [lineLeft, lineRight] = [Math.min(lineLeft, lineRight), Math.max(lineLeft, lineRight)];
 
-        this.rect = new AnchoredRect(lineLeft, lineRight, -lineRectH / 2, lineRectH / 2);
+        this.rect = new AnchoredRect(lineLeft, lineRight, -recth / 2, recth / 2);
     }
 
     pick(x: number, y: number): MusicObject[] {

@@ -1108,7 +1108,7 @@ export class ObjMeasure extends MusicObject {
                     const mcols = rcols.splice(0, i > 0 ? i : rcols.length);
                     if (mcols.length < 2) continue;
 
-                    let lineMatch = measure.row.findMatchingLine(line);
+                    const lineMatch = measure.row.findMatchingLine(line);
                     if (!lineMatch) continue;
 
                     const isLast = rcols.length === 0;

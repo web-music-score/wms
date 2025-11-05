@@ -52,12 +52,10 @@ export class Extension extends MusicObjectLink {
 
     private readonly startColumn: ObjRhythmColumn;
 
-    private readonly layoutObj?: LayoutObjectWrapper;
-
     constructor(readonly headObj: LayoutObjectWrapper, startColumn: ObjRhythmColumn, length: number, visible: boolean, lineStyle: ExtensionLineStyle, linePos: ExtensionLinePos) {
         super(headObj.musicObj);
 
-        this.length = length;
+        this.length = length + 1;
         this.visible = visible;
 
         this.lineStyle = lineStyle;
@@ -90,15 +88,16 @@ export class Extension extends MusicObjectLink {
     private whatStopped(col: ObjRhythmColumn): ExtensionStopObject | undefined {
         const m = col.measure;
         const cols = m.getColumns();
-        return (
+
+        const stoppingCol = col.getAnchoredLayoutObjects()
+            .filter(obj => obj !== this.headObj && obj.layoutGroupId === this.headObj.layoutGroupId)
+            .map(obj => obj.musicObj)
+            .filter(obj => obj instanceof ObjText || obj instanceof ObjSpecialText)[0];
+
+        return stoppingCol ? stoppingCol : (
             col === cols[cols.length - 1] &&
             m.hasEndSection() || m.hasEndSong() || Extension.StopNavigations.some(nav => m.hasNavigation(nav))
-        )
-            ? m
-            : col.getAnchoredLayoutObjects()
-                .filter(obj => obj !== this.headObj && obj.layoutGroupId === this.headObj.layoutGroupId)
-                .map(obj => obj.musicObj)
-                .filter(obj => obj instanceof ObjText || obj instanceof ObjSpecialText)[0];
+        ) ? m.getBarLineRight() : undefined;
     }
 
     getRange(): ExtensionRange {
