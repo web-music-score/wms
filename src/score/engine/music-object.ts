@@ -67,6 +67,9 @@ export abstract class MusicObject {
 
     abstract offset(dx: number, dy: number): void;
 
+    offsetX(dx: number) { this.offset(dx, 0); }
+    offsetY(dy: number) { this.offset(0, dy); }
+
     setLeft(x: number) { this.offset(x - this.getRect().left, 0); }
     setRight(x: number) { this.offset(x - this.getRect().right, 0); }
     setTop(y: number) { this.offset(0, y - this.getRect().top); }

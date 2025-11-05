@@ -506,8 +506,7 @@ export class ObjBeamGroup extends MusicObject {
             }
 
             if (obj.tupletNumber) {
-                let y = (left.y + right.y) / 2 + obj.tupletNumberOffsetY;
-                obj.tupletNumber.offset(0, -obj.tupletNumber.getRect().anchorY + y);
+                obj.tupletNumber.setAnchorY((left.y + right.y) / 2 + obj.tupletNumberOffsetY);
             }
         });
     }

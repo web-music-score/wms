@@ -171,8 +171,7 @@ export class ObjTabRhythm extends MusicObject {
                         this.tupletPartsTextObjMap.set(text, textObj = new ObjText(this, { text, scale: 0.75 }, 0.5, 0.5));
                         textObj.layout(ctx);
                     }
-                    textObj.offset(-textObj.getRect().anchorX, -textObj.getRect().anchorY);
-                    textObj.offset(cx, stemTop - fontSize / 2);
+                    textObj.setCenter(cx, stemTop - fontSize / 2);
                     textObj.draw(ctx);
                 }
 

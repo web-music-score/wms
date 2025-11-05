@@ -147,6 +147,10 @@ export class LayoutObjectWrapper {
         this.musicObj.offset(dx, dy);
     }
 
+    setAnchorY(y: number) {
+        this.musicObj.setAnchorY(y);
+    }
+
     getRect(): AnchoredRect {
         return this.musicObj.getRect();
     }

@@ -63,7 +63,7 @@ export abstract class ObjNotationLine extends MusicObject {
         }
 
         // Set y-position
-        layoutObj.offset(0, y - layoutObj.getRect().anchorY);
+        layoutObj.setAnchorY(y - layoutObj.getRect().anchorY);
 
         // Position resolved
         layoutObj.setPositionResolved();
@@ -101,7 +101,7 @@ export abstract class ObjNotationLine extends MusicObject {
                 musicObj.layoutFitToMeasure(ctx);
             }
             else {
-                musicObj.offset(anchor.getRect().anchorX - musicObj.getRect().anchorX, 0);
+                musicObj.setAnchorX(anchor.getRect().anchorX);
             }
         });
 

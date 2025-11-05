@@ -401,11 +401,11 @@ export class ObjScoreRow extends MusicObject {
                 prev.staffConfig.grandId !== undefined && prev.staffConfig.grandId === cur.staffConfig.grandId
             ) {
                 let dy = prev.getBottomLineY() - cur.getTopLineY() + unitSize * 6;
-                cur.offset(0, dy);
+                cur.offsetY(dy);
             }
             else {
                 let dy = prev.calcBottom() - cur.calcTop() + unitSize * 3;
-                cur.offset(0, dy);
+                cur.offsetY(dy);
             }
         }
 

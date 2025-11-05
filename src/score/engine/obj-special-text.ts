@@ -59,8 +59,8 @@ export class ObjSpecialText extends MusicObject {
                 let codaText = this.components[1];
                 codaSym.layout(ctx);
                 codaText.layout(ctx);
-                codaSym.offset(0, codaText.getRect().centerY);
-                codaText.offset(codaSym.getRect().right, 0);
+                codaSym.setAnchorY(codaText.getRect().centerY);
+                codaText.setLeft(codaSym.getRect().right);
                 this.rect = new AnchoredRect(
                     codaSym.getRect().left, codaSym.getRect().anchorX, codaText.getRect().right,
                     codaText.getRect().top, codaText.getRect().anchorY, codaText.getRect().bottom
@@ -72,8 +72,8 @@ export class ObjSpecialText extends MusicObject {
                 let codaSym = this.components[1];
                 toCodaText.layout(ctx);
                 codaSym.layout(ctx);
-                codaSym.offset(0, toCodaText.getRect().centerY);
-                toCodaText.offset(codaSym.getRect().left, 0);
+                codaSym.setAnchorY(toCodaText.getRect().centerY);
+                toCodaText.setRight(codaSym.getRect().left);
                 this.rect = new AnchoredRect(
                     toCodaText.getRect().left, codaSym.getRect().anchorX, codaSym.getRect().right,
                     toCodaText.getRect().top, toCodaText.getRect().anchorY, toCodaText.getRect().bottom
