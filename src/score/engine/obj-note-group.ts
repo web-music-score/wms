@@ -626,8 +626,9 @@ export class ObjNoteGroup extends MusicObject {
                     let acc = obj.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
                     if (acc) {
                         acc.layout(ctx);
-                        acc.setAnchorX(-noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw);
-                        acc.setAnchorY(noteY);
+                        acc.setAnchor(
+                            -noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw,
+                            noteY);
                     }
                     noteStaff.addObject(acc);
                 }
@@ -715,8 +716,7 @@ export class ObjNoteGroup extends MusicObject {
                     let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
                     fretNumber.layout(ctx);
 
-                    fretNumber.setAnchorX(this.col.getRect().anchorX);
-                    fretNumber.setAnchorY(tab.getStringY(stringNumber - 1));
+                    fretNumber.setAnchor(this.col.getRect().anchorX, tab.getStringY(stringNumber - 1));
 
                     obj.fretNumbers.push(fretNumber);
                 }

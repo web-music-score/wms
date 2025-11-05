@@ -267,8 +267,7 @@ export class ObjRest extends MusicObject {
                 obj.dotRects.push(AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth));
             }
 
-            obj.setAnchorX(0);
-            obj.setAnchorY(staff.getDiatonicIdY(diatonicId));
+            obj.setAnchor(0, staff.getDiatonicIdY(diatonicId));
 
             this.staffObjects.push(obj);
             this.measure.addStaticObject(staff, obj);

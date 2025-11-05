@@ -356,8 +356,7 @@ export class ObjRhythmColumn extends MusicObject {
                 .reduce((accState, cur) => Math.max(accState, cur))
                 + ctx.unitSize; // Add space
             this.arpeggios.forEach(a => {
-                a.setAnchorX(-leftw - arpeggioWidth / 2);
-                a.setAnchorY(a.line.getRect().anchorY);
+                a.setAnchor(-leftw - arpeggioWidth / 2, a.line.getRect().anchorY);
                 a.line.addObject(a);
                 this.measure.addStaticObject(a.line, a);
             });

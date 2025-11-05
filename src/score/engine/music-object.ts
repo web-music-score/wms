@@ -71,8 +71,12 @@ export abstract class MusicObject {
     setRight(x: number) { this.offset(x - this.getRect().right, 0); }
     setTop(y: number) { this.offset(0, y - this.getRect().top); }
     setBottom(y: number) { this.offset(0, y - this.getRect().bottom); }
+
+    setAnchor(x: number, y: number) { this.offset(x - this.getRect().anchorX, y - this.getRect().anchorY); }
     setAnchorX(x: number) { this.offset(x - this.getRect().anchorX, 0); }
     setAnchorY(y: number) { this.offset(0, y - this.getRect().anchorY); }
+
+    setCenter(x: number, y: number) { this.offset(x - this.getRect().centerX, y - this.getRect().centerY); }
     setCenterX(x: number) { this.offset(x - this.getRect().centerX, 0); }
     setCenterY(y: number) { this.offset(0, y - this.getRect().centerY); }
 

@@ -1443,8 +1443,7 @@ export class ObjMeasure extends MusicObject {
         this.columns.forEach(col => {
             let rect = col.getRect();
             let columnAnchorX = curColumnLeft + rect.leftw * columnScale;
-            col.setAnchorX(columnAnchorX);
-            col.setAnchorY(this.rect.anchorY);
+            col.setAnchor(columnAnchorX, this.rect.anchorY);
             curColumnLeft += rect.width * columnScale;
         });
 
@@ -1463,8 +1462,7 @@ export class ObjMeasure extends MusicObject {
             if (isOnlySymbolInCol) return;
 
             // Now relocate onlyRest middle of measure
-            const r = this.getColumnsContentRect();
-            onlyRest.setAnchorX(r.centerX);
+            onlyRest.setAnchorX(this.getColumnsContentRect().centerX);
         });
     }
 
