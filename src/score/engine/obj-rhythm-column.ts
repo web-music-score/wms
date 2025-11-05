@@ -332,6 +332,9 @@ export class ObjRhythmColumn extends MusicObject {
 
         let { row } = this;
 
+        this.rect = new AnchoredRect();
+        this.requestRectUpdate();
+
         let leftw = 0;
         let rightw = 0;
 
@@ -375,7 +378,9 @@ export class ObjRhythmColumn extends MusicObject {
         leftw *= DocumentSettings.ColumnWidthScale;
         rightw *= DocumentSettings.ColumnWidthScale;
 
-        this.rect = new AnchoredRect(-leftw, 0, rightw, 0, 0, 0);
+        this.rect.left = -leftw;
+        this.rect.anchorX = 0;
+        this.rect.right = rightw;
         this.requestRectUpdate();
 
         // Update accidental states
