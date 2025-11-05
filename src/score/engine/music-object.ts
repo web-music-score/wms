@@ -53,13 +53,28 @@ export abstract class MusicObject {
 
     updateRect() { }
 
+    forceRectUpdate() {
+        this.needRectUpdate = true;
+        this.updateRect();
+        this.needRectUpdate = false;
+    }
+
     getRect(): AnchoredRect {
-        if (this.needRectUpdate) {
-            this.updateRect();
-            this.needRectUpdate = false;
-        }
+        if (this.needRectUpdate)
+            this.forceRectUpdate();
         return this.rect;
     }
+
+    abstract offset(dx: number, dy: number): void;
+
+    setLeft(x: number) { this.offset(x - this.getRect().left, 0); }
+    setRight(x: number) { this.offset(x - this.getRect().right, 0); }
+    setTop(y: number) { this.offset(0, y - this.getRect().top); }
+    setBottom(y: number) { this.offset(0, y - this.getRect().bottom); }
+    setAnchorX(x: number) { this.offset(x - this.getRect().anchorX, 0); }
+    setAnchorY(y: number) { this.offset(0, y - this.getRect().anchorY); }
+    setCenterX(x: number) { this.offset(x - this.getRect().centerX, 0); }
+    setCenterY(y: number) { this.offset(0, y - this.getRect().centerY); }
 
     /**
      * Most objects are simple rects in shape.

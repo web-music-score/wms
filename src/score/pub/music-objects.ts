@@ -10,7 +10,7 @@ import { ObjFermata } from "../engine/obj-fermata";
 import { ObjHeader } from "../engine/obj-header";
 import { ObjImage } from "../engine/obj-image";
 import { ObjMeasure } from "../engine/obj-measure";
-import { ObjBarLineRight, ObjBarLineLeft, ObjStaffTabBarLine } from "../engine/obj-bar-line";
+import { ObjBarLineRight, ObjBarLineLeft, ObjStaffBarLine } from "../engine/obj-bar-line";
 import { ObjTabNoteGroup, ObjNoteGroup, ObjStaffNoteGroup } from "../engine/obj-note-group";
 import { ObjRest, ObjStaffRest } from "../engine/obj-rest";
 import { ObjRhythmColumn } from "../engine/obj-rhythm-column";
@@ -27,6 +27,7 @@ import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-ta
 import { MPlayer } from "./music-interface";
 import { ObjLyrics } from "score/engine/obj-lyrics";
 import { ObjTabRhythm } from "score/engine/obj-tab-rhythm";
+import { ObjScoreRowGroup } from "score/engine/obj-score-row-group";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -420,17 +421,17 @@ export class MBarLineLeft extends MusicInterface {
 }
 
 /** Bar line object for certain staff or tab. */
-export class MStaffTabBarLine extends MusicInterface {
+export class MStaffBarLine extends MusicInterface {
     /** Object name. */
-    static readonly Name = "StaffTabBarLine";
+    static readonly Name = "StaffBarLine";
 
     /** @internal */
-    constructor(private readonly obj: ObjStaffTabBarLine) {
-        super(MStaffTabBarLine.Name);
+    constructor(private readonly obj: ObjStaffBarLine) {
+        super(MStaffBarLine.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjStaffTabBarLine {
+    getMusicObject(): ObjStaffBarLine {
         return this.obj;
     }
 
@@ -444,7 +445,7 @@ export class MStaffTabBarLine extends MusicInterface {
             return barLine.getMusicInterface()
         }
         else {
-            throw new MusicError(MusicErrorType.Score, `Bar line not let nor right.`);
+            throw new MusicError(MusicErrorType.Score, `Bar line not left nor right.`);
         }
     }
 
@@ -773,6 +774,30 @@ export class MScoreRow extends MusicInterface {
      */
     getNotationLines(): ReadonlyArray<MStaff | MTab> {
         return this.obj.getNotationLines().map(line => getNotationLine(line));
+    }
+}
+
+/** Score row group object. */
+export class MScoreRowGroup extends MusicInterface {
+    /** Object name. */
+    static readonly Name = "ScoreRowGroup";
+
+    /** @internal */
+    constructor(private readonly obj: ObjScoreRowGroup) {
+        super(MScoreRowGroup.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjScoreRowGroup {
+        return this.obj;
+    }
+
+    /**
+     * Get instrument name.
+     * @returns - instrument name.
+     */
+    getInstrument(): string {
+        return this.obj.instrument;
     }
 }
 

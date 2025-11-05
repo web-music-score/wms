@@ -1,6 +1,6 @@
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
-import { ObjScoreRow } from "./obj-score-row";
+import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
 import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
@@ -11,20 +11,12 @@ import { AnchoredRect, Guard, Rect, UniMap } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
-export class InstrumentGroupRegions {
-    nameLeft: number = 0;
-    nameRight: number = 0;
-    braceLeft: number = 0;
-    braceRight: number = 0;
-    get left() { return this.nameLeft; }
-    get right() { return this.braceRight; }
-    get width() { return this.right - this.left; }
-}
-
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
 
     private ctx?: RenderContext;
+
+    readonly regions = new ScoreRowRegions();
 
     private readonly rows: ObjScoreRow[] = [];
     private readonly measures: ObjMeasure[] = [];
@@ -40,8 +32,6 @@ export class ObjDocument extends MusicObject {
     private allConnectiveProps: ConnectiveProps[] = [];
 
     private staffGroups = new UniMap<string, StaffGroup>();
-
-    private instrumentGroupRegions = new InstrumentGroupRegions();
 
     private readonly mi: MDocument;
 
@@ -302,20 +292,6 @@ export class ObjDocument extends MusicObject {
         }
     }
 
-    getInstrumentGroupRegions(ctx: RenderContext): InstrumentGroupRegions {
-        let nameWidth = Math.max(0, ...this.rows.map(row => row.getInstrumentNameWidth(ctx)));
-        let hasName = nameWidth > 0;
-        let padding = hasName ? ctx.unitSize : 0;
-        let braceWidth = hasName ? ctx.unitSize * 5 : 0;
-
-        this.instrumentGroupRegions.nameLeft = 0;
-        this.instrumentGroupRegions.nameRight = nameWidth;
-        this.instrumentGroupRegions.braceLeft = nameWidth + padding;
-        this.instrumentGroupRegions.braceRight = nameWidth + padding + braceWidth + padding;
-
-        return this.instrumentGroupRegions;
-    }
-
     requestLayout() {
         this.needLayout = true;
     }
@@ -360,18 +336,14 @@ export class ObjDocument extends MusicObject {
         // Reset layout groups
         this.rows.forEach(row => row.resetLayoutGroups(ctx));
 
+        this.regions.resetWidths();
+        this.regions.addRowstaffWidth(DocumentSettings.MinStaffWidth * unitSize);
+
         // Layout rows
         this.rows.forEach(row => row.layout(ctx));
-
-        // Get row left and right
-        let rowLeft = this.getInstrumentGroupRegions(ctx).right;
-        let rowRight = rowLeft + Math.max(
-            DocumentSettings.DocumentMinWidth * unitSize,
-            ...this.rows.map(row => row.getMinWidth())
-        );
-
-        // Stretch row to desired width
-        this.rows.forEach(row => row.layoutWidth(ctx, rowLeft, rowRight));
+     
+        // Stretch row accordsing to region data
+        this.rows.forEach(row => row.layoutStretch(ctx));
 
         // Layout layout groups
         this.rows.forEach(row => row.layoutLayoutGroups(ctx));
@@ -379,16 +351,12 @@ export class ObjDocument extends MusicObject {
         // Position notation lines
         this.rows.forEach(row => row.layoutSetNotationLines(ctx));
 
-        // Add padding to rows
-        this.rows.forEach(row => row.layoutPadding(ctx));
-
         // Set document rect and set row positions
         this.rect = new AnchoredRect();
 
         if (this.header) {
-            // Layout header with desired width
-            this.header.layoutWidth(ctx, rowLeft, rowRight);
-
+            // Layout header with
+            this.header.layout(ctx);
             this.rect.expandInPlace(this.header.getRect());
         }
 
@@ -403,6 +371,8 @@ export class ObjDocument extends MusicObject {
 
         this.needLayout = false;
     }
+
+    offset(dx: number, dy: number) { }
 
     drawContent() {
         const { ctx } = this;

@@ -104,7 +104,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     getShapeRects(): AnchoredRect[] {
-        this.getRect(); // executes this.updateRect() if required, which sets this.shapeRects.
+        this.forceRectUpdate(); // Updates shapeRects.
         return this.shapeRects;
     }
 

@@ -12,7 +12,7 @@ export class ObjHeader extends MusicObject {
 
     readonly mi: MHeader;
 
-    constructor(doc: ObjDocument, readonly title?: string, readonly composer?: string, readonly arranger?: string) {
+    constructor(readonly doc: ObjDocument, readonly title?: string, readonly composer?: string, readonly arranger?: string) {
         super(doc);
 
         this.mi = new MHeader(this);
@@ -63,8 +63,11 @@ export class ObjHeader extends MusicObject {
         return [this];
     }
 
-    layoutWidth(ctx: RenderContext, left: number, right: number) {
+    layout(ctx: RenderContext) {
         let top = 0;
+
+        const left = this.doc.regions.staffLeft;
+        const right = this.doc.regions.staffRight;
 
         this.rect = new AnchoredRect(left, right, 0, 0);
 
