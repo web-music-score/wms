@@ -1,4 +1,6 @@
 # Changelog
+## [5.4.2] - 2025-11-??
+- Weird rendering bug on tabs.
 
 ## [5.4.1] - 2025-11-04
 ### FIxed
