@@ -551,5 +551,8 @@ Thanks for helping improve the project!
 
 This project is licensed under the [MIT License](https://mit-license.org/).
 
-It also bundles the [Tone.js](https://github.com/Tonejs/Tone.js) library,
+It also bundles following libs:
+- [Tone.js](https://github.com/Tonejs/Tone.js) library,
 which is licensed under the [MIT License](https://opensource.org/license/mit).
+- [Color Name to Code](https://github.com/simbo/color-name-to-code) library,
+which is licensed under the [MIT &copy; Simon Lepel](http://simbo.mit-license.org/).
