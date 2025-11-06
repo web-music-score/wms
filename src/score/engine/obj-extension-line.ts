@@ -9,6 +9,7 @@ import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
+import { DocumentSettings } from "./settings";
 
 export type ExtensionStartObject = ObjText | ObjSpecialText;
 export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
@@ -106,10 +107,12 @@ export class ObjExtensionLine extends MusicObject {
     draw(ctx: RenderContext) {
         let { rect } = this;
 
-        if (this.extension.getLineStyle() === "dashed") {
-            ctx.setLineDash([7, 3]);
-        }
+        const head = this.extension.headObj.musicObj;
+        const color = (head instanceof ObjText || head instanceof ObjSpecialText) ? head.getColor() : DocumentSettings.ColorExtensionDefault;
 
+        if (this.extension.getLineStyle() === "dashed")
+            ctx.setLineDash([7, 3]);
+        
         ctx.color("black").lineWidth(1);
 
         ctx.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);

@@ -316,7 +316,7 @@ export class ObjBeamGroup extends MusicObject {
         return this.symbols[this.symbols.length - 1];
     }
 
-    get color(): string {
+    private get color(): string {
         return this.symbols[0].color;
     }
 

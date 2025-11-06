@@ -623,6 +623,8 @@ export class ObjMeasure extends MusicObject {
             defaultVerticalPos: VerticalPos
         } | undefined = undefined;
 
+        const color = DocumentSettings.ColorNavigation;
+
         switch (navigation) {
             case Navigation.Ending:
                 if (this.navigationSet.has(navigation)) {
@@ -643,7 +645,7 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjText(anchor, text, 1, 1),
+                    createObj: (): LayoutableMusicObject => new ObjText(anchor, { text, color }, 1, 1),
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -655,7 +657,7 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjText(anchor, text, 1, 1),
+                    createObj: (): LayoutableMusicObject => new ObjText(anchor, { text, color }, 1, 1),
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -666,7 +668,7 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineLeft;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjSpecialText(anchor, text),
+                    createObj: (): LayoutableMusicObject => new ObjSpecialText(anchor, text, color),
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -676,7 +678,7 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjSpecialText(anchor, text),
+                    createObj: (): LayoutableMusicObject => new ObjSpecialText(anchor, text, color),
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -694,9 +696,11 @@ export class ObjMeasure extends MusicObject {
                 }
 
                 if (this.endRepeatPlayCount !== 2) {
-                    let textProps: TextProps = {
-                        text: "" + this.endRepeatPlayCount + "x",
-                        scale: 0.8
+                    const text = `${this.endRepeatPlayCount}x`;
+                    const textProps: TextProps = {
+                        text,
+                        scale: 0.8,
+                        color: DocumentSettings.ColorStaffFrame
                     }
                     this.endRepeatPlayCountText = new ObjText(this, textProps, 0.5, 1);
                 }
@@ -727,7 +731,7 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
         }
 
-        let textProps: TextProps = { text }
+        let textProps: TextProps = { text, color: DocumentSettings.ColorAnnotation }
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;
@@ -770,7 +774,7 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
         }
 
-        let textProps: TextProps = { text }
+        let textProps: TextProps = { text, color: DocumentSettings.ColorLabel }
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;

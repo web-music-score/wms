@@ -5,10 +5,13 @@ import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MEnding, Navigation } from "../pub";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { DocumentSettings } from "./settings";
 
 export class ObjEnding extends MusicObject {
     private endingText: ObjText;
     private shapeRects: AnchoredRect[] = [];
+
+    private color = DocumentSettings.ColorNavigation;
 
     readonly mi: MEnding;
 
@@ -27,9 +30,10 @@ export class ObjEnding extends MusicObject {
         // Sort ascending
         this.passages.sort((a, b) => a - b);
 
-        let text = this.passages.map(p => p + ".").join("");
+        const text = this.passages.map(p => p + ".").join("");
+        const { color } = this;
 
-        this.endingText = new ObjText(this, text, 0, 1);
+        this.endingText = new ObjText(this, { text, color }, 0, 1);
     }
 
     getMusicInterface(): MEnding {
@@ -101,7 +105,7 @@ export class ObjEnding extends MusicObject {
 
         ctx.drawDebugRect(this.rect);
 
-        ctx.color("black").lineWidth(1);
+        ctx.color(this.color).lineWidth(1);
 
         ctx.beginPath();
         ctx.moveTo(rect.left, rect.bottom);

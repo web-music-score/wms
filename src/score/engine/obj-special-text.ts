@@ -13,24 +13,24 @@ export class ObjSpecialText extends MusicObject {
 
     readonly mi: MSpecialText;
 
-    constructor(parent: MusicObject, readonly text: string) {
+    constructor(parent: MusicObject, readonly text: string, readonly color = "black") {
         super(parent);
 
         switch (this.text) {
             case ObjSpecialText.Coda:
                 this.components = [
-                    new ObjText(this, { text: "𝄌", scale: 1.7 }, 0.5, 0.3,),
-                    new ObjText(this, " Coda", 0, 1)
+                    new ObjText(this, { text: "𝄌", scale: 1.7, color }, 0.5, 0.3,),
+                    new ObjText(this, { text: " Coda", color }, 0, 1)
                 ];
                 break;
             case ObjSpecialText.toCoda:
                 this.components = [
-                    new ObjText(this, "toCoda ", 1, 1),
-                    new ObjText(this, { text: "𝄌", scale: 1.7 }, 0.5, 0.3)
+                    new ObjText(this, { text: "toCoda ", color }, 1, 1),
+                    new ObjText(this, { text: "𝄌", scale: 1.7, color }, 0.5, 0.3)
                 ];
                 break;
             case ObjSpecialText.Segno:
-                this.components = [new ObjText(this, { text: "𝄋", scale: 1.1 }, 0.5, 1)];
+                this.components = [new ObjText(this, { text: "𝄋", scale: 1.1, color }, 0.5, 1)];
                 break;
             default:
                 this.components = [];
@@ -46,6 +46,10 @@ export class ObjSpecialText extends MusicObject {
 
     getText() {
         return this.text;
+    }
+
+    getColor() {
+        return this.color;
     }
 
     pick(x: number, y: number): MusicObject[] {

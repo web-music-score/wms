@@ -50,6 +50,12 @@ export const DocumentSettings = {
     ColorRowGroupBrace: "black",
     ColorRowGroupInstrument: "black",
 
+    ColorFermata: "black",
+    ColorAnnotation: "black",
+    ColorNavigation: "black",
+    ColorLabel: "black",
+    ColorExtensionDefault: "black",
+
     ColorStaffFrame: "black",
     ColorStaffNote: "black",
     ColorStaffRest: "black",
