@@ -46,6 +46,9 @@ export const DocumentSettings = {
     ColorHeaderTitle: "black",
     ColorHeaderComposer: "black",
     ColorHeaderArranger: "black",
+    
+    ColorRowGroupBrace: "black",
+    ColorRowGroupInstrument: "black",
 
     ColorStaffFrame: "black",
     ColorStaffNote: "black",
