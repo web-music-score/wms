@@ -1,4 +1,8 @@
 # Changelog
+## [5.4.3] - 2025-11-??
+### Fixes
+- Connect extension line to stopping element at right side.
+
 ## [5.4.2] - 2025-11-05
 ## Fixed
 - Weird tab rendering bug where sad face appear on canvas.
