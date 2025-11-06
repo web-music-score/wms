@@ -40,10 +40,6 @@ function colorNameToRGBA(name: string, alpha = 1): [number, number, number, numb
     return [r, g, b, a];
 }
 
-const HilightStaffPosRectColor = "#55cc55";
-const HilightObjectRectColor = "#55cc55";
-const PlayPosIndicatorColor = "#44aa44";
-
 type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
 
 function staffPosEquals(a: StaffPos | undefined, b: StaffPos | undefined): boolean {
@@ -413,7 +409,7 @@ export class RenderContext {
             return;
         }
 
-        this.fillColor(HilightStaffPosRectColor);
+        this.fillColor(DocumentSettings.ColorHilightStaffPos);
         this.fillRect(staff.row.getRect().left, staff.getDiatonicIdY(diatonicId) - unitSize, staff.row.getRect().width, 2 * unitSize);
 
         if (mousePos !== undefined) {
@@ -430,7 +426,7 @@ export class RenderContext {
 
         let rect = hilightedObj.getRect();
 
-        this.lineColor(HilightObjectRectColor);
+        this.lineColor(DocumentSettings.ColorHilightObject);
         this.strokeRect(rect.left, rect.top, rect.width, rect.height);
     }
 
@@ -438,7 +434,7 @@ export class RenderContext {
         let { cursorRect: r } = this;
 
         if (r) {
-            this.color(PlayPosIndicatorColor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+            this.color(DocumentSettings.ColorPlayCursor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
         }
     }
 
@@ -452,7 +448,7 @@ export class RenderContext {
 
     clearCanvas() {
         if (this.ctx) {
-            // this.ctx.canvas.style.background = "white";
+            this.ctx.canvas.style.background = DocumentSettings.ColorBackGround;
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         }
     }

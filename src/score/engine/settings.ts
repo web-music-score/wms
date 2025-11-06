@@ -41,12 +41,16 @@ export const DocumentSettings = {
     TabHeight: 20,
 
     // --- Colors ---
-    ColorBackGround: "#00000000",
+    ColorBackGround: "white",
+
+    ColorHilightStaffPos: "#55cc55",
+    ColorHilightObject: "#55cc55",
+    ColorPlayCursor: "#44aa44",
 
     ColorHeaderTitle: "black",
     ColorHeaderComposer: "black",
     ColorHeaderArranger: "black",
-    
+
     ColorRowGroupBrace: "black",
     ColorRowGroupInstrument: "black",
 
