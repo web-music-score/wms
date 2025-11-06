@@ -192,8 +192,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
-
-        this.color = options?.color ?? "black";
+        this.color = options?.color ?? DocumentSettings.ColorStaffNote;
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
@@ -705,15 +704,15 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
+            const bgcolor = DocumentSettings.ColorBackGround;
+            const color = DocumentSettings.ColorTabNote;
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers
                 let stringNumber = this.runningStringNumbers[noteIndex];
                 if (Guard.isIntegerBetween(stringNumber, 1, 6)) {
                     let fretId = note.chromaticId - tab.getTuningStrings()[stringNumber - 1].chromaticId;
-                    let color = fretId < 0 ? "red" : "black";
-
-                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: "white" }, 0.5, 0.5);
+                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor }, 0.5, 0.5);
                     fretNumber.layout(ctx);
 
                     fretNumber.setAnchor(this.col.getRect().anchorX, tab.getStringY(stringNumber - 1));

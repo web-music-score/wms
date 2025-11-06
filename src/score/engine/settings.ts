@@ -38,5 +38,33 @@ export const DocumentSettings = {
     StubTieLength: 5,
 
     StaffHeight: 8,
-    TabHeight: 20
+    TabHeight: 20,
+
+    // --- Colors ---
+    ColorBackGround: "#00000000",
+
+    ColorHeaderTitle: "black",
+    ColorHeaderComposer: "black",
+    ColorHeaderArranger: "black",
+
+    ColorStaffFrame: "black",
+    ColorStaffNote: "black",
+    ColorStaffRest: "black",
+    ColorStaffConnective: "black",
+    ColorStaffSignatureClef: "black",
+    ColorStaffSignatureKey: "black",
+    ColorStaffSignatureTime: "black",
+    ColorStaffSignatureTempo: "black",
+    ColorStaffSignatureMeasure: "black",
+
+    ColorTabFrame: "black",
+    ColorTabNote: "black",
+    ColorTabRest: "black",
+    ColorTabConnective: "black",
+    ColorTabTuning: "black",
+    ColorTabSignatureClef: "black",
+    ColorTabSignatureKey: "black",
+    ColorTabSignatureTime: "black",
+    ColorTabSignatureTempo: "black",
+    ColorTabSignatureMeasure: "black",
 }

@@ -8,6 +8,7 @@ import { AnchoredRect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjText } from "./obj-text";
+import { DocumentSettings } from "./settings";
 
 export class ObjTabRhythm extends MusicObject {
 
@@ -28,6 +29,8 @@ export class ObjTabRhythm extends MusicObject {
     getMusicInterface(): MTabRhythm {
         return this.mi;
     }
+
+    get doc() { return this.measure.doc; }
 
     pick(x: number, y: number): MusicObject[] {
         return this.rect.contains(x, y) ? [this] : [];
@@ -71,7 +74,7 @@ export class ObjTabRhythm extends MusicObject {
     draw(ctx: RenderContext) {
         ctx.drawDebugRect(this.rect);
 
-        ctx.color("black").lineWidth(1)
+        ctx.lineWidth(1)
 
         let { unitSize, fontSize } = ctx;
 
@@ -102,12 +105,13 @@ export class ObjTabRhythm extends MusicObject {
                 let nextSym = symbols[j + 1];
                 let colX = sym.col.getRect().anchorX;
                 if (sym instanceof ObjNoteGroup) {
+                    ctx.lineWidth(1);
+                    ctx.color(DocumentSettings.ColorTabNote);
+
                     if (sym.rhythmProps.noteSize >= 2) {
                         ctx.lineWidth(sym.rhythmProps.noteSize === 4 ? 2 : 1);
                         ctx.strokeLine(colX, stemBottom, colX, stemTop)
                     }
-
-                    ctx.lineWidth(1);
 
                     if (symbols.length === 1) {
                         for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
@@ -120,6 +124,9 @@ export class ObjTabRhythm extends MusicObject {
                     }
                 }
                 else if (sym instanceof ObjRest) {
+                    ctx.lineWidth(1);
+                    ctx.color(DocumentSettings.ColorTabRest);
+
                     let cx = colX;
                     let cy = (stemTop + stemBottom) / 2;
                     let scale = 0.65;
@@ -143,6 +150,7 @@ export class ObjTabRhythm extends MusicObject {
                     let rightBeamCount = right.hasTuplet() ? 1 : right instanceof ObjNoteGroup ? right.getLeftBeamCount() : 1;
                     let maxBeamCount = Math.max(leftBeamCount, rightBeamCount);
 
+                    ctx.color(DocumentSettings.ColorTabNote);
                     ctx.lineWidth(2);
 
                     for (let i = 0; i < maxBeamCount; i++) {
@@ -163,6 +171,8 @@ export class ObjTabRhythm extends MusicObject {
                 }
 
                 if (beamGroup && beamGroup.isTuplet()) {
+                    ctx.color(DocumentSettings.ColorTabNote);
+
                     // Add tuplet number
                     let cx = (symbols[0].col.getRect().anchorX + symbols[symbols.length - 1].col.getRect().anchorX) / 2;
                     let text = beamGroup.getTupletRatioText();

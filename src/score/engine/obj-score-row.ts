@@ -467,7 +467,7 @@ export class ObjScoreRow extends MusicObject {
         // Draw notation lines
         this.notationLines.forEach(m => m.draw(ctx));
 
-        // Draw instrument names
+        // Draw row groups
         this.rowGroups.forEach(grp => grp.draw(ctx));
 
         ctx.restore();

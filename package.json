@@ -107,6 +107,7 @@
     ],
     "dependencies": {
         "@tspro/ts-utils-lib": "^2.1.0",
+        "color-name-to-code": "^1.0.1",
         "tone": "^15.1.22"
     },
     "peerDependencies": {

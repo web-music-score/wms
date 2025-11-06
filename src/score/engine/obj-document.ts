@@ -7,7 +7,7 @@ import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, Staff
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
-import { AnchoredRect, Guard, Rect, UniMap } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 
@@ -341,7 +341,7 @@ export class ObjDocument extends MusicObject {
 
         // Layout rows
         this.rows.forEach(row => row.layout(ctx));
-     
+
         // Stretch row accordsing to region data
         this.rows.forEach(row => row.layoutStretch(ctx));
 
@@ -377,16 +377,12 @@ export class ObjDocument extends MusicObject {
 
     drawContent() {
         const { ctx } = this;
-
-        if (!ctx) {
-            return;
-        }
+        if (!ctx) return;
 
         this.rows.forEach(row => row.draw(ctx));
 
-        if (this.header) {
+        if (this.header)
             this.header.draw(ctx);
-        }
     }
 
     pickStaffPosAt(x: number, y: number): { scoreRow: ObjScoreRow, diatonicId: number } | undefined {

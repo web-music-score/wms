@@ -60,6 +60,8 @@ abstract class ObjBarLine extends MusicObject {
 
     abstract solveBarLineType(): BarLineType;
 
+    get doc() { return this.measure.doc; } 
+
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {
             return [];
@@ -182,7 +184,9 @@ abstract class ObjBarLine extends MusicObject {
             return;
 
         ctx.drawDebugRect(this.getRect());
-        ctx.color("black");
+
+        // TODO: staff or tab?
+        ctx.color(DocumentSettings.ColorStaffFrame);
 
         for (const [grp, objects] of this.notationLineObjectsByGrp) {
             objects.forEach((obj, i) => {

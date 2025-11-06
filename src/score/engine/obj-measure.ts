@@ -2,7 +2,7 @@ import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRe
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, getVerseNumbers, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -1393,7 +1393,8 @@ export class ObjMeasure extends MusicObject {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
-                    let obj = new ObjText(this, { text: note, scale: 0.8 }, 1, 0.5);
+                    let color = DocumentSettings.ColorTabTuning;
+                    let obj = new ObjText(this, { text: note, scale: 0.8, color }, 1, 0.5);
 
                     obj.layout(ctx);
                     obj.setRight(this.regions.tabTuning_0 * 0.8);
@@ -1606,24 +1607,22 @@ export class ObjMeasure extends MusicObject {
 
     draw(ctx: RenderContext) {
         ctx.drawDebugRect(this.getRect());
+        ctx.lineWidth(1);
 
         // Draw staff lines
         let left = this.getStaffLineLeft();
         let right = this.getStaffLineRight();
-
-        ctx.color("black").lineWidth(1);
-
-        const drawLine = (y: number) => ctx.strokeLine(left, y, right, y);
+        const drawLine = (y: number, color: string) => ctx.color(color).strokeLine(left, y, right, y);
 
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p));
+                    drawLine(line.getDiatonicIdY(p), DocumentSettings.ColorStaffFrame);
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId));
+                    drawLine(line.getStringY(stringId), DocumentSettings.ColorTabFrame);
                 }
             }
         });

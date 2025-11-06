@@ -202,7 +202,7 @@ export type StaffTabOrGroup = number | string;
 export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
 
 /** Measure options. */
-export type MeasureOptions ={
+export type MeasureOptions = {
     /** show measure number? */
     showNumber?: boolean
 }

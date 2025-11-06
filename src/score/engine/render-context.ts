@@ -1,31 +1,48 @@
-import { Utils, Vec, Device, UniMap, AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
 import { MDocument, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import F_clef_png from "./assets/F-clef.png";
-import G_clef_png from "./assets/G-clef.png";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "theory/rhythm";
 
+import { colorNameToCode } from "color-name-to-code";
+
+import G_clef_png from "./assets/G-clef.png";
+import F_clef_png from "./assets/F-clef.png";
+
 export enum ImageAsset { G_Clef, F_Clef }
+
+const ImageData = new UniMap<ImageAsset, string>([
+    [ImageAsset.G_Clef, G_clef_png],
+    [ImageAsset.F_Clef, F_clef_png],
+]);
+
+const getImageData = (asset: ImageAsset): string => ImageData.getOrDefault(asset, "");
+
+type HTMLImageData = {
+    src: string;
+    color: string;
+    loaded: boolean;
+    colorized: boolean;
+    img?: HTMLImageElement;
+}
+
+const ImageCache = new BiMap<ImageAsset, string, HTMLImageData>();
+
+function colorNameToRGBA(name: string, alpha = 1): [number, number, number, number] {
+    const hex = colorNameToCode(name).replace("#", ""); // "FF0000"
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const a = Math.round(alpha * 255);
+    return [r, g, b, a];
+}
 
 const HilightStaffPosRectColor = "#55cc55";
 const HilightObjectRectColor = "#55cc55";
 const PlayPosIndicatorColor = "#44aa44";
-
-type ImageAssetData = {
-    src: string,
-    finished?: true,
-    img?: HTMLImageElement
-}
-
-const ImageAssets = new UniMap<ImageAsset, ImageAssetData>([
-    [ImageAsset.G_Clef, { src: G_clef_png }],
-    [ImageAsset.F_Clef, { src: F_clef_png }]
-]);
 
 type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
 
@@ -78,22 +95,6 @@ export class RenderContext {
         this.unitSize = this.fontSize * 0.3;
         this._lineWidth = this.unitSize * 0.2;
 
-        // Load image assets
-        ImageAssets.forEach(asset => {
-            if (asset.finished !== true) {
-                const img = new Image();
-                img.src = asset.src;
-                img.onload = () => {
-                    asset.img = img;
-                    this.finishImageAsset(asset);
-                }
-                img.onerror = () => {
-                    this.finishImageAsset(asset);
-                    throw new MusicError(MusicErrorType.Score, "Failed to load image: " + asset.src);
-                }
-            }
-        });
-
         this.onClickFn = this.onClick.bind(this);
         this.onMouseMoveFn = this.onMouseMove.bind(this);
         this.onMouseLeaveFn = this.onMouseLeave.bind(this);
@@ -108,18 +109,80 @@ export class RenderContext {
         return this.mdoc?.getMusicObject();
     }
 
-    private finishImageAsset(asset: ImageAssetData) {
-        asset.finished = true;
-
-        let allFinished = ImageAssets.every(asset => asset.finished === true);
-
-        if (allFinished) {
-            this.onLoad();
-        }
+    getImageAsset(asset: ImageAsset, color?: string): HTMLImageElement | undefined {
+        color ??= "";
+        return ImageCache.getOrCreate(asset, color, () => {
+            const a: HTMLImageData = { src: getImageData(asset), color, loaded: false, colorized: false };
+            const img = new Image();
+            img.src = a.src;
+            img.onload = () => {
+                a.img = img;
+                this.onImageLoaded(a);
+            }
+            img.onerror = () => {
+                console.error("Failed to load image: " + a.src);
+            }
+            return a;
+        })?.img;
     }
 
-    getImageAsset(imageAsset: ImageAsset): HTMLImageElement | undefined {
-        return ImageAssets.get(imageAsset)?.img;
+    private forceDraw() {
+        this.doc?.requestFullLayout();
+        this.draw();
+    }
+
+    private onImageLoaded(data: HTMLImageData) {
+        if (data.loaded || !data.img) return;
+
+        if (data.colorized || data.color === "") {
+            this.forceDraw();
+            data.loaded = true;
+            return;
+        }
+
+        // rgb values
+        const [nr, ng, nb, na] = colorNameToRGBA(data.color);
+
+        // threshold to decide what counts as "black"
+        const threshold = 40; // 0..255; tweak as needed
+
+        const canvas = document.createElement("canvas");
+        canvas.width = data.img.width;
+        canvas.height = data.img.height;
+
+        const ctx = canvas.getContext("2d");
+        if (ctx == null) {
+            console.error("Failed to colorize image: ctx = null.");
+            return;
+        }
+
+        ctx.drawImage(data.img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const d = imageData.data;
+
+        for (let i = 0; i < d.length; i += 4) {
+            const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+            if (a === 0) continue;
+
+            // If pixel is dark enough, replace with red while preserving alpha
+            if (r < threshold && g < threshold && b < threshold) {
+                d[i + 0] = nr;
+                d[i + 1] = ng;
+                d[i + 2] = nb;
+                //d[i + 3] = na;
+            }
+        }
+
+        ctx.putImageData(imageData, 0, 0);
+
+        data.img.src = canvas.toDataURL("image/png");
+        data.img.onload = () => {
+            data.colorized = true;
+            this.onImageLoaded(data);
+        }
+        data.img.onerror = () => {
+            console.error("Failed to colorize image.");
+        }
     }
 
     setDocument(mdoc?: MDocument) {
@@ -282,13 +345,6 @@ export class RenderContext {
         this.usingTouch = true;
     }
 
-    onLoad() {
-        if (this.doc) {
-            this.doc.requestFullLayout();
-            this.draw();
-        }
-    }
-
     hilightObject(obj?: MusicObject) {
         this.hilightedObj = obj;
     }
@@ -395,7 +451,10 @@ export class RenderContext {
     }
 
     clearCanvas() {
-        this.ctx?.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        if (this.ctx) {
+            // this.ctx.canvas.style.background = "white";
+            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        }
     }
 
     drawDebugRect(r: AnchoredRect | Rect) {

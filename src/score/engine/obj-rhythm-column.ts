@@ -485,6 +485,8 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     draw(ctx: RenderContext) {
+        ctx.color(DocumentSettings.ColorStaffFrame);
+
         // Draw ledger lines
         this.row.getStaves().forEach(staff => {
             let minDiatonicId = this.staffMinDiatonicId.get(staff);

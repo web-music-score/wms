@@ -7,7 +7,7 @@ import { ObjMeasure } from "./obj-measure";
 import { MConnective, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { ObjNotationLine } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 
 export class ObjConnective extends MusicObject {
     private lx = 0;
@@ -59,6 +59,8 @@ export class ObjConnective extends MusicObject {
     getMusicInterface(): MConnective {
         return this.mi;
     }
+
+    get doc() { return this.measure.doc; }
 
     isInsideMeasure() {
         return this.rightNoteGroup === undefined || this.leftNoteGroup.measure === this.rightNoteGroup.measure;
@@ -187,7 +189,11 @@ export class ObjConnective extends MusicObject {
         let t = _lineWidth * 1.5;
         let s = _lineWidth * 0.25;
 
-        ctx.color("black").lineWidth(1);
+        ctx.lineWidth(1);
+        ctx.color(this.line instanceof ObjTab
+            ? DocumentSettings.ColorTabConnective
+            : DocumentSettings.ColorStaffConnective
+        );
 
         if (this.arcHeight === 0) {
             ctx.beginPath();
