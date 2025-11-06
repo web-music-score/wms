@@ -72,22 +72,6 @@ export class ObjText extends MusicObject {
         return this.text;
     }
 
-    updateAnchorX(anchorX: number) {
-        this.anchorX = anchorX;
-        let { width } = this.rect;
-        // this.rect.anchorX does not move
-        this.rect.left = this.rect.anchorX - width * anchorX;
-        this.rect.right = this.rect.anchorX + width * (1 - anchorX);
-    }
-
-    updateAnchorY(anchorY: number) {
-        this.anchorY = anchorY;
-        let { height } = this.rect;
-        // this.rect.anchorY does not move
-        this.rect.top = this.rect.anchorY - height * anchorY;
-        this.rect.bottom = this.rect.anchorY + height * (1 - anchorY);
-    }
-
     pick(x: number, y: number): MusicObject[] {
         return this.rect.contains(x, y) ? [this] : [];
     }

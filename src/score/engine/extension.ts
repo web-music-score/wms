@@ -55,20 +55,13 @@ export class Extension extends MusicObjectLink {
     constructor(readonly headObj: LayoutObjectWrapper, startColumn: ObjRhythmColumn, length: number, visible: boolean, lineStyle: ExtensionLineStyle, linePos: ExtensionLinePos) {
         super(headObj.musicObj);
 
-        this.length = length + 1;
+        this.length = length + 1; // + 1 just to connect with followinf elem.
         this.visible = visible;
 
         this.lineStyle = lineStyle;
         this.linePos = linePos;
 
         this.startColumn = startColumn;
-
-        if (headObj.musicObj instanceof ObjText) {
-            headObj.musicObj.updateAnchorY(getTextAnchorY(linePos));
-        }
-        else {
-            throw new MusicError(MusicErrorType.Score, "Update anchor's y-coordinate is only implemented for text objects.");
-        }
     }
 
     isVisible() {

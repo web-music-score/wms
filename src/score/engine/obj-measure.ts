@@ -21,12 +21,19 @@ import { ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
 import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
-import { ExtensionObjectAll, ObjExtensionLine } from "./obj-extension-line";
+import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
+
+export function getExtensionAnchorY(linePos: ExtensionLinePos) {
+    switch (linePos) {
+        case "bottom": return 0.8;
+        case "middle": return 0.5;
+    }
+}
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -724,16 +731,30 @@ export class ObjMeasure extends MusicObject {
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;
+        let linePos: ExtensionLinePos;
 
         switch (annotation) {
-            case Annotation.Dynamics: layoutGroupId = LayoutGroupId.DynamicsAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
-            case Annotation.Tempo: layoutGroupId = LayoutGroupId.TempoAnnotation; defaultVerticalPos = VerticalPos.Above; textProps.italic = true; break;
+            case Annotation.Dynamics:
+                layoutGroupId = LayoutGroupId.DynamicsAnnotation;
+                defaultVerticalPos = VerticalPos.Above;
+                textProps.italic = true;
+                linePos = "bottom";
+                break;
+            case Annotation.Tempo:
+                layoutGroupId = LayoutGroupId.TempoAnnotation;
+                defaultVerticalPos = VerticalPos.Above;
+                textProps.italic = true;
+                linePos = "bottom";
+                break;
         }
+
+        const anchorX = 0.5;
+        const anchorY = getExtensionAnchorY(linePos);
 
         this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            let textObj = new ObjText(anchor, textProps, 0.5, 1);
+            let textObj = new ObjText(anchor, textProps, anchorX, anchorY);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
             this.enableExtension(layoutObj);
         });
