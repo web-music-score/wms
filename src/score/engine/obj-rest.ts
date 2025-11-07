@@ -5,7 +5,7 @@ import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
-import { DocumentSettings } from "./settings";
+import { DocumentSettings, DocumentColor } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
@@ -83,7 +83,6 @@ export class ObjRest extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLength | NoteLengthStr, readonly options?: RestOptions, tupletRatio?: TupletRatio) {
         super(col);
 
-
         this.setDiatonicId = getDiatonicIdFromStaffPos(this.options?.staffPos) ?? ObjRest.UndefinedDiatonicId;
 
         let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(this.voiceId));
@@ -96,7 +95,7 @@ export class ObjRest extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
 
-        this.color = options?.color ?? DocumentSettings.ColorStaffRest;
+        this.color = options?.color ?? DocumentColor.StaffRest;
 
         this.hide = options?.hide ?? false;
         this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || NoteLengthProps.get(noteLength).isTriplet);

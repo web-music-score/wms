@@ -2,7 +2,7 @@ import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap } from "@tspro/ts
 import { ObjDocument } from "./obj-document";
 import { MDocument, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
-import { DebugSettings, DocumentSettings } from "./settings";
+import { DebugSettings, DocumentSettings, DocumentColor } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "theory/rhythm";
@@ -409,7 +409,7 @@ export class RenderContext {
             return;
         }
 
-        this.fillColor(DocumentSettings.ColorHilightStaffPos);
+        this.fillColor(DocumentColor.HilightStaffPos);
         this.fillRect(staff.row.getRect().left, staff.getDiatonicIdY(diatonicId) - unitSize, staff.row.getRect().width, 2 * unitSize);
 
         if (mousePos !== undefined) {
@@ -426,7 +426,7 @@ export class RenderContext {
 
         let rect = hilightedObj.getRect();
 
-        this.lineColor(DocumentSettings.ColorHilightObject);
+        this.lineColor(DocumentColor.HilightObject);
         this.strokeRect(rect.left, rect.top, rect.width, rect.height);
     }
 
@@ -434,7 +434,7 @@ export class RenderContext {
         let { cursorRect: r } = this;
 
         if (r) {
-            this.color(DocumentSettings.ColorPlayCursor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+            this.color(DocumentColor.PlayCursor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
         }
     }
 
@@ -448,7 +448,7 @@ export class RenderContext {
 
     clearCanvas() {
         if (this.ctx) {
-            this.ctx.canvas.style.background = DocumentSettings.ColorBackground;
+            this.ctx.canvas.style.background = DocumentColor.Background;
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         }
     }

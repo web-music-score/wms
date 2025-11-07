@@ -5,13 +5,13 @@ import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MEnding, Navigation } from "../pub";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { DocumentSettings } from "./settings";
+import { DocumentColor } from "./settings";
 
 export class ObjEnding extends MusicObject {
     private endingText: ObjText;
     private shapeRects: AnchoredRect[] = [];
 
-    private color = DocumentSettings.ColorNavigation;
+    private color = DocumentColor.Navigation;
 
     readonly mi: MEnding;
 

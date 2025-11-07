@@ -5,7 +5,7 @@ import { MusicObject } from "./music-object";
 import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
 import { MConnective, TieType, Connective } from "../pub";
-import { DocumentSettings } from "./settings";
+import { DocumentSettings, DocumentColor } from "./settings";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 
@@ -191,8 +191,8 @@ export class ObjConnective extends MusicObject {
 
         ctx.lineWidth(1);
         ctx.color(this.line instanceof ObjTab
-            ? DocumentSettings.ColorTabConnective
-            : DocumentSettings.ColorStaffConnective
+            ? DocumentColor.TabConnective
+            : DocumentColor.StaffConnective
         );
 
         if (this.arcHeight === 0) {

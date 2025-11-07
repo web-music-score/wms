@@ -8,7 +8,7 @@ import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
-import { DocumentSettings } from "./settings";
+import { DocumentSettings, DocumentColor } from "./settings";
 import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
@@ -192,7 +192,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
-        this.color = options?.color ?? DocumentSettings.ColorStaffNote;
+        this.color = options?.color ?? DocumentColor.StaffNote;
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
@@ -704,8 +704,8 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const bgcolor = DocumentSettings.ColorBackground;
-            const color = DocumentSettings.ColorTabNote;
+            const bgcolor = DocumentColor.Background;
+            const color = DocumentColor.TabNote;
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers

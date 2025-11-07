@@ -5,7 +5,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
-import { DocumentSettings } from "./settings";
+import { DocumentColor } from "./settings";
 
 export class ObjFermata extends MusicObject {
     private color = "black";
@@ -65,7 +65,7 @@ export class ObjFermata extends MusicObject {
 
         ctx.drawDebugRect(this.rect);
 
-        ctx.color(DocumentSettings.ColorFermata).lineWidth(1);
+        ctx.color(DocumentColor.Fermata).lineWidth(1);
 
         ctx.beginPath();
         ctx.moveTo(left, bottom);

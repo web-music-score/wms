@@ -3,7 +3,7 @@ import { RenderContext } from "./render-context";
 import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, MusicInterface, MStaffBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
-import { DocumentSettings } from "./settings";
+import { DocumentSettings, DocumentColor } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect, UniMap } from "@tspro/ts-utils-lib";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
@@ -60,7 +60,7 @@ abstract class ObjBarLine extends MusicObject {
 
     abstract solveBarLineType(): BarLineType;
 
-    get doc() { return this.measure.doc; } 
+    get doc() { return this.measure.doc; }
 
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {
@@ -186,7 +186,7 @@ abstract class ObjBarLine extends MusicObject {
         ctx.drawDebugRect(this.getRect());
 
         // TODO: staff or tab?
-        ctx.color(DocumentSettings.ColorStaffFrame);
+        ctx.color(DocumentColor.StaffFrame);
 
         for (const [grp, objects] of this.notationLineObjectsByGrp) {
             objects.forEach((obj, i) => {
