@@ -17,11 +17,6 @@ function eq(a: string, b: string) {
     return a.toLocaleLowerCase() === b.toLocaleLowerCase();
 }
 
-// TODO: add to ts-utils-lib.
-function toWords(str: string): string[] {
-    return str.split(/(?=[A-Z])/);
-}
-
 export function setColor(color: string, ...colorAttrs: ColorAttr[]) {
     const setBacground = colorAttrs.length === 1 && eq(colorAttrs[0], "background");
     const setAllColors = colorAttrs.length === 0;
