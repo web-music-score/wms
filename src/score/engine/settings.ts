@@ -59,7 +59,6 @@ export const DocumentColor = {
     Annotation: "black",
     Navigation: "black",
     Label: "black",
-    ExtensionDefault: "black",
 
     StaffFrame: "black",
     StaffNote: "black",

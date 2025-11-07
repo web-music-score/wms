@@ -108,12 +108,12 @@ export class ObjExtensionLine extends MusicObject {
         let { rect } = this;
 
         const head = this.extension.headObj.musicObj;
-        const color = (head instanceof ObjText || head instanceof ObjSpecialText) ? head.getColor() : DocumentColor.ExtensionDefault;
+        const color = String(head.userData["extension-color"]);
 
         if (this.extension.getLineStyle() === "dashed")
             ctx.setLineDash([7, 3]);
 
-        ctx.color("black").lineWidth(1);
+        ctx.color(color).lineWidth(1);
 
         ctx.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);
 

@@ -48,10 +48,6 @@ export class ObjSpecialText extends MusicObject {
         return this.text;
     }
 
-    getColor() {
-        return this.color;
-    }
-
     pick(x: number, y: number): MusicObject[] {
         return this.rect.contains(x, y) ? [this] : [];
     }

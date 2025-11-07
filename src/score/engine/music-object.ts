@@ -36,6 +36,8 @@ export abstract class MusicObject {
 
     private link?: MusicObjectLink = undefined;
 
+    public readonly userData: Record<string, unknown> = {};
+
     constructor(protected readonly parent: MusicObject | undefined) { }
 
     abstract getMusicInterface(): MusicInterface;

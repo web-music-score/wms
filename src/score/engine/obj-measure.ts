@@ -125,7 +125,7 @@ export class ObjMeasure extends MusicObject {
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
     private lastAddedRhythmSymbol?: RhythmSymbol;
-    private addExtensionToLayoutObjs: LayoutObjectWrapper[] = [];
+    private addExtensionTo: { layoutObj: LayoutObjectWrapper, color: string }[] = [];
 
     private layoutObjects: LayoutObjectWrapper[] = [];
 
@@ -760,7 +760,7 @@ export class ObjMeasure extends MusicObject {
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, anchorX, anchorY);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj);
+            this.enableExtension(layoutObj, DocumentColor.Annotation);
         });
     }
 
@@ -789,7 +789,7 @@ export class ObjMeasure extends MusicObject {
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj);
+            this.enableExtension(layoutObj, DocumentColor.Label);
         });
     }
 
@@ -820,8 +820,12 @@ export class ObjMeasure extends MusicObject {
     }
 
     addExtension(extensionLength: number | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible: boolean) {
-        this.addExtensionToLayoutObjs.forEach(layoutObj => {
+        this.addExtensionTo.forEach(data => {
+            const { layoutObj, color } = data;
             const { musicObj } = layoutObj;
+
+            musicObj.userData["extension-color"] = color;
+
             const anchor = musicObj.getParent();
 
             if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
@@ -836,7 +840,7 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
-        if (this.addExtensionToLayoutObjs.length === 0) {
+        if (this.addExtensionTo.length === 0) {
             throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
         }
 
@@ -844,12 +848,12 @@ export class ObjMeasure extends MusicObject {
         this.requestLayout();
     }
 
-    private enableExtension(layoutObj: LayoutObjectWrapper) {
-        this.addExtensionToLayoutObjs.push(layoutObj);
+    private enableExtension(layoutObj: LayoutObjectWrapper, color: string) {
+        this.addExtensionTo.push({ layoutObj, color });
     }
 
     private disableExtension() {
-        this.addExtensionToLayoutObjs = [];
+        this.addExtensionTo = [];
     }
 
     getEnding(): ObjEnding | undefined {
