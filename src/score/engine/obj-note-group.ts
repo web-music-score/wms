@@ -704,7 +704,7 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const bgcolor = DocumentSettings.ColorBackGround;
+            const bgcolor = DocumentSettings.ColorBackground;
             const color = DocumentSettings.ColorTabNote;
 
             this.notes.forEach((note, noteIndex) => {

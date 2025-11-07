@@ -448,7 +448,7 @@ export class RenderContext {
 
     clearCanvas() {
         if (this.ctx) {
-            this.ctx.canvas.style.background = DocumentSettings.ColorBackGround;
+            this.ctx.canvas.style.background = DocumentSettings.ColorBackground;
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         }
     }

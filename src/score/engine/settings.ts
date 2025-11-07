@@ -41,7 +41,7 @@ export const DocumentSettings = {
     TabHeight: 20,
 
     // --- Colors ---
-    ColorBackGround: "white",
+    ColorBackground: "white",
 
     ColorHilightStaffPos: "#55cc55",
     ColorHilightObject: "#55cc55",
