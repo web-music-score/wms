@@ -52,8 +52,8 @@ export const DocumentColor = {
     HeaderComposer: "black",
     HeaderArranger: "black",
 
-    RowGroupBrace: "black",
-    RowGroupInstrument: "black",
+    InstrumentGroup: "black",
+    InstrumentName: "black",
 
     Fermata: "black",
     Annotation: "black",

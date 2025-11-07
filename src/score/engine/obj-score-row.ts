@@ -13,6 +13,7 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { ObjText } from "./obj-text";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
 import { ObjFermata } from "./obj-fermata";
+import { DocumentColor } from "./settings";
 
 export class ScoreRowRegions {
     public instrWidth = 0;
@@ -458,7 +459,9 @@ export class ObjScoreRow extends MusicObject {
             let top = Math.min(...this.notationLines.map(line => line.getTopLineY()));
             let bottom = Math.max(...this.notationLines.map(line => line.getBottomLineY()));
 
-            ctx.color("black").lineWidth(1).strokeLine(left, top, left, bottom);
+            ctx.color(this.notationLines[0] instanceof ObjTab ? DocumentColor.TabFrame : DocumentColor.StaffFrame)
+                .lineWidth(1)
+                .strokeLine(left, top, left, bottom);
         }
 
         // Draw measures

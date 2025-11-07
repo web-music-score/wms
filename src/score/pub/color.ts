@@ -5,11 +5,11 @@ import { DocumentColor } from "score/engine/settings";
 export type ColorAttr =
     "background" |
     "header" | "title" | "composer" | "arranger" |
-    "rowgroup" | "brace" | "instrument" |
+    "instrument" | "group" | "name" |
     "element" | "fermata" | "annotation" | "navigation" | "label" |
     "exrtension" |
     "staff" | "tab" |
-    "note" | "rest" | "connective" |
+    "frame" | "note" | "rest" | "connective" |
     "signature" | "clef" | "key" | "time" | "tempo" | "measure" |
     "tuning";
 
@@ -45,5 +45,3 @@ export function setColor(color: string, ...colorAttrs: ColorAttr[]) {
     if (noMatch)
         throw new MusicError(MusicErrorType.InvalidArg, `Color attrs ${Utils.Str.stringify(colorAttrs)} did not match any color.`);
 }
-
-setColor("purple", "annotation");

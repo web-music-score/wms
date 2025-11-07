@@ -1,7 +1,7 @@
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
-import { ObjNotationLine } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjScoreRow } from "./obj-score-row";
 import { MScoreRowGroup } from "score/pub";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
@@ -19,7 +19,7 @@ export class ObjScoreRowGroup extends MusicObject {
     constructor(readonly lines: readonly ObjNotationLine[]) {
         super(lines[0].row);
 
-        const color = DocumentColor.RowGroupInstrument;
+        const color = DocumentColor.InstrumentName;
 
         this.instrument = lines[0].getConfig().instrument ?? "";
         this.instrText = new ObjText(this, { text: this.instrument, color, scale: 1 }, 1, 0.5);
@@ -85,7 +85,9 @@ export class ObjScoreRowGroup extends MusicObject {
         this.instrText.draw(ctx);
 
         if (this.hasBrace) {
-            ctx.color(DocumentColor.RowGroupBrace).lineWidth(1).drawBracket(this.braceRect, "{");
+            ctx.color(this.lines[0] instanceof ObjTab ? DocumentColor.TabFrame : DocumentColor.StaffFrame)
+                .lineWidth(1)
+                .drawBracket(this.braceRect, "{");
         }
     }
 }

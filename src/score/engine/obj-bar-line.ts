@@ -188,7 +188,7 @@ abstract class ObjBarLine extends MusicObject {
         // TODO: staff or tab?
         ctx.color(DocumentColor.StaffFrame);
 
-        for (const [grp, objects] of this.notationLineObjectsByGrp) {
+        for (const objects of this.notationLineObjectsByGrp.values()) {
             objects.forEach((obj, i) => {
                 obj.dots.forEach(d => ctx.fillCircle(d.x, d.y, d.r));
                 if (i === 0) {
