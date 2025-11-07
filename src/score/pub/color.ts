@@ -5,7 +5,7 @@ import { DocumentColor } from "score/engine/settings";
 export type ColorAttr =
     "background" |
     "header" | "title" | "composer" | "arranger" |
-    "instrument" | "group" | "name" |
+    "instrument" |
     "element" | "fermata" | "annotation" | "navigation" | "label" |
     "exrtension" |
     "staff" | "tab" |
@@ -17,7 +17,8 @@ function eq(a: string, b: string) {
     return a.toLocaleLowerCase() === b.toLocaleLowerCase();
 }
 
-function words(str: string): string[] {
+// TODO: add to ts-utils-lib.
+function toWords(str: string): string[] {
     return str.split(/(?=[A-Z])/);
 }
 
@@ -31,7 +32,7 @@ export function setColor(color: string, ...colorAttrs: ColorAttr[]) {
     let noMatch = true;
 
     for (const key in DocumentColor) {
-        const keyAttrs = words(key);
+        const keyAttrs = key.split("_");
 
         const isColorMatch = colorAttrs.length > 0 && colorAttrs.every(a => keyAttrs.some(b => eq(a, b)));
         const isBgColorMatch = keyAttrs.length === 1 && eq(keyAttrs[0], "background");

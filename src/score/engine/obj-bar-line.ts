@@ -186,7 +186,7 @@ abstract class ObjBarLine extends MusicObject {
         ctx.drawDebugRect(this.getRect());
 
         // TODO: staff or tab?
-        ctx.color(DocumentColor.StaffFrame);
+        ctx.color(DocumentColor.Staff_Frame);
 
         for (const objects of this.notationLineObjectsByGrp.values()) {
             objects.forEach((obj, i) => {

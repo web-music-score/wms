@@ -65,7 +65,7 @@ export class ObjFermata extends MusicObject {
 
         ctx.drawDebugRect(this.rect);
 
-        ctx.color(DocumentColor.Fermata).lineWidth(1);
+        ctx.color(DocumentColor.Element_Fermata).lineWidth(1);
 
         ctx.beginPath();
         ctx.moveTo(left, bottom);

@@ -191,8 +191,8 @@ export class ObjConnective extends MusicObject {
 
         ctx.lineWidth(1);
         ctx.color(this.line instanceof ObjTab
-            ? DocumentColor.TabConnective
-            : DocumentColor.StaffConnective
+            ? DocumentColor.Tab_Connective
+            : DocumentColor.Staff_Connective
         );
 
         if (this.arcHeight === 0) {

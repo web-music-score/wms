@@ -485,7 +485,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     draw(ctx: RenderContext) {
-        ctx.color(DocumentColor.StaffFrame);
+        ctx.color(DocumentColor.Staff_Frame);
 
         // Draw ledger lines
         this.row.getStaves().forEach(staff => {

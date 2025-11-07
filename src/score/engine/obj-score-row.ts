@@ -459,7 +459,7 @@ export class ObjScoreRow extends MusicObject {
             let top = Math.min(...this.notationLines.map(line => line.getTopLineY()));
             let bottom = Math.max(...this.notationLines.map(line => line.getBottomLineY()));
 
-            ctx.color(this.notationLines[0] instanceof ObjTab ? DocumentColor.TabFrame : DocumentColor.StaffFrame)
+            ctx.color(this.notationLines[0] instanceof ObjTab ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame)
                 .lineWidth(1)
                 .strokeLine(left, top, left, bottom);
         }

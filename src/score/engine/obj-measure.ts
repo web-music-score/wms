@@ -623,7 +623,7 @@ export class ObjMeasure extends MusicObject {
             defaultVerticalPos: VerticalPos
         } | undefined = undefined;
 
-        const color = DocumentColor.Navigation;
+        const color = DocumentColor.Element_Navigation;
 
         switch (navigation) {
             case Navigation.Ending:
@@ -700,7 +700,7 @@ export class ObjMeasure extends MusicObject {
                     const textProps: TextProps = {
                         text,
                         scale: 0.8,
-                        color: DocumentColor.StaffFrame
+                        color: DocumentColor.Staff_Frame
                     }
                     this.endRepeatPlayCountText = new ObjText(this, textProps, 0.5, 1);
                 }
@@ -731,7 +731,7 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
         }
 
-        let textProps: TextProps = { text, color: DocumentColor.Annotation }
+        let textProps: TextProps = { text, color: DocumentColor.Element_Annotation }
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;
@@ -760,7 +760,7 @@ export class ObjMeasure extends MusicObject {
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, anchorX, anchorY);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj, DocumentColor.Annotation);
+            this.enableExtension(layoutObj, DocumentColor.Element_Annotation);
         });
     }
 
@@ -774,7 +774,7 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
         }
 
-        let textProps: TextProps = { text, color: DocumentColor.Label }
+        let textProps: TextProps = { text, color: DocumentColor.Element_Label }
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;
@@ -789,7 +789,7 @@ export class ObjMeasure extends MusicObject {
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj, DocumentColor.Label);
+            this.enableExtension(layoutObj, DocumentColor.Element_Label);
         });
     }
 
@@ -1401,7 +1401,7 @@ export class ObjMeasure extends MusicObject {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
-                    let color = DocumentColor.TabTuning;
+                    let color = DocumentColor.Tab_Tuning;
                     let obj = new ObjText(this, { text: note, scale: 0.8, color }, 1, 0.5);
 
                     obj.layout(ctx);
@@ -1625,12 +1625,12 @@ export class ObjMeasure extends MusicObject {
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p), DocumentColor.StaffFrame);
+                    drawLine(line.getDiatonicIdY(p), DocumentColor.Staff_Frame);
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId), DocumentColor.TabFrame);
+                    drawLine(line.getStringY(stringId), DocumentColor.Tab_Frame);
                 }
             }
         });

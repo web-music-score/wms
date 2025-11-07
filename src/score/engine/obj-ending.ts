@@ -11,7 +11,7 @@ export class ObjEnding extends MusicObject {
     private endingText: ObjText;
     private shapeRects: AnchoredRect[] = [];
 
-    private color = DocumentColor.Navigation;
+    private color = DocumentColor.Element_Navigation;
 
     readonly mi: MEnding;
 

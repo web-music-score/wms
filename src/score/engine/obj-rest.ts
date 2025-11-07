@@ -95,7 +95,7 @@ export class ObjRest extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
 
-        this.color = options?.color ?? DocumentColor.StaffRest;
+        this.color = options?.color ?? DocumentColor.Staff_Rest;
 
         this.hide = options?.hide ?? false;
         this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || NoteLengthProps.get(noteLength).isTriplet);

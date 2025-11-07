@@ -19,7 +19,7 @@ export class ObjScoreRowGroup extends MusicObject {
     constructor(readonly lines: readonly ObjNotationLine[]) {
         super(lines[0].row);
 
-        const color = DocumentColor.InstrumentName;
+        const color = DocumentColor.Instrument;
 
         this.instrument = lines[0].getConfig().instrument ?? "";
         this.instrText = new ObjText(this, { text: this.instrument, color, scale: 1 }, 1, 0.5);
@@ -85,7 +85,7 @@ export class ObjScoreRowGroup extends MusicObject {
         this.instrText.draw(ctx);
 
         if (this.hasBrace) {
-            ctx.color(this.lines[0] instanceof ObjTab ? DocumentColor.TabFrame : DocumentColor.StaffFrame)
+            ctx.color(this.lines[0] instanceof ObjTab ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame)
                 .lineWidth(1)
                 .drawBracket(this.braceRect, "{");
         }

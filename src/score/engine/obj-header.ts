@@ -18,9 +18,9 @@ export class ObjHeader extends MusicObject {
 
         this.mi = new MHeader(this);
 
-        const titleColor = DocumentColor.HeaderTitle;
-        const compColor = DocumentColor.HeaderComposer;
-        const arrColor = DocumentColor.HeaderArranger;
+        const titleColor = DocumentColor.Header_Title;
+        const compColor = DocumentColor.Header_Composer;
+        const arrColor = DocumentColor.Header_Arranger;
 
         this.titleText = this.title
             ? new ObjText(this, { text: this.title, color: titleColor, scale: 2 }, 0.5, 0)
