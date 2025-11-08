@@ -1,5 +1,8 @@
 # Changelog
-## [5.4.3] - 2025-11-??
+## [5.5.0] - 2025-11-??
+### Added
+- Coloring document.
+
 ### Fixes
 - Connect extension line to stopping element at right side.
 
