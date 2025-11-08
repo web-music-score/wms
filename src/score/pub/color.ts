@@ -41,5 +41,3 @@ export function setColor(color: string, ...colorAttrs: ColorAttr[]) {
     if (noMatch)
         throw new MusicError(MusicErrorType.InvalidArg, `Color attrs ${Utils.Str.stringify(colorAttrs)} did not match any color.`);
 }
-
-setColor("purple", "rowgroup");
