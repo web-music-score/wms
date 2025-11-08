@@ -4,7 +4,7 @@ import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
 import { Clef, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
-import { DocumentSettings } from "./settings";
+import { DocumentColor, DocumentSettings } from "./settings";
 import { AnchoredRect, Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
@@ -123,6 +123,20 @@ export abstract class ObjNotationLine extends MusicObject {
                 }
             });
         }
+    }
+
+    drawVerticalLine(ctx: RenderContext, left: number, width: number, toNextLine = false) {
+        ctx.color(this.getConfig().type === "tab" ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame);
+
+        const i = this.row.getNotationLines().indexOf(this);
+        const nextLine = (toNextLine && i >= 0) ? this.row.getNotationLines()[i + 1] : undefined;
+
+        const top = this.getTopLineY();
+        const bottom = nextLine
+            ? nextLine.getTopLineY()
+            : this.getBottomLineY();
+
+        ctx.fillRect(left, top, width, bottom - top);
     }
 
     abstract getConfig(): StaffConfig | TabConfig;

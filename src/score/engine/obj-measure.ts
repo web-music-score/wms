@@ -375,6 +375,14 @@ export class ObjMeasure extends MusicObject {
         return this.nextMeasure === undefined;
     }
 
+    isFirstMeasureInRow() {
+        return this === this.row.getFirstMeasure();
+    }
+
+    isLastMeasureInRow() {
+        return this === this.row.getLastMeasure();
+    }
+
     getNextMeasure() {
         return this.nextMeasure;
     }
@@ -1347,7 +1355,7 @@ export class ObjMeasure extends MusicObject {
             ? DocumentSettings.PostMeasureBreakWidth * unitSize
             : 0;
 
-        let isFirstMeasureInRow = this === this.row.getFirstMeasure();
+        let isFirstMeasureInRow = this.isFirstMeasureInRow();
         let isAfterMeasureBreak = this.getPrevMeasure()?.hasPostMeasureBreak() === true;
 
         this.regions.tabTuning_0 = isFirstMeasureInRow && this.row.hasTab ? unitSize * 4 : 0;
@@ -1397,7 +1405,7 @@ export class ObjMeasure extends MusicObject {
 
         // Layout tab tuning notes
         this.tabStringNotes.length = 0;
-        if (this === this.row.getFirstMeasure()) {
+        if (this.isFirstMeasureInRow()) {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
@@ -1572,7 +1580,7 @@ export class ObjMeasure extends MusicObject {
             ...this.layoutObjects.filter(o => o.isPositionResolved()).map(o => o.musicObj.getRect().bottom)
         );
 
-        if (this === this.row.getLastMeasure()) {
+        if (this.isLastMeasureInRow()) {
             // Expand width of last measure in case there is fermata.
             this.rect.right = Math.max(
                 this.rect.right,
@@ -1635,13 +1643,13 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
-        // For tabs draw left vertical line
-        if (this === this.row.getFirstMeasure()) {
+        // For tabs draw left vertical line (if more than one lines it is drawn by row)
+        if (this.isFirstMeasureInRow() && this.row.getNotationLines().length === 1) {
             this.row.getTabs().forEach(tab => {
                 const grp = this.row.getRowGroups().find(grp => grp.hasNotationLine(tab));
-                
+
                 // Vertical line drawn by row group
-                if(grp && grp.hasBrace) return;
+                if (grp && grp.hasBrace) return;
 
                 const left = this.getStaffLineLeft();
                 const top = tab.getTopLineY();

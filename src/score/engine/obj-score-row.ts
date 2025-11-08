@@ -10,10 +10,8 @@ import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
-import { ObjText } from "./obj-text";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
 import { ObjFermata } from "./obj-fermata";
-import { DocumentColor } from "./settings";
 
 export class ScoreRowRegions {
     public instrWidth = 0;
@@ -441,6 +439,10 @@ export class ObjScoreRow extends MusicObject {
         this.rowGroups.forEach(grp => grp.offset(dx, dy));
     }
 
+    getStaffLineLeft(): number | undefined {
+        return this.getFirstMeasure()?.getStaffLineLeft();
+    }
+
     draw(ctx: RenderContext) {
         ctx.drawDebugRect(this.getRect());
 
@@ -457,6 +459,12 @@ export class ObjScoreRow extends MusicObject {
 
         // Draw notation lines
         this.notationLines.forEach(m => m.draw(ctx));
+
+        // Draw left vline
+        const staffLeft = this.getStaffLineLeft();
+        if (staffLeft !== undefined && this.notationLines.length > 1) {
+            this.notationLines.forEach(line => line.drawVerticalLine(ctx, staffLeft, ctx._lineWidth, true));
+        }
 
         // Draw row groups
         this.rowGroups.forEach(grp => grp.draw(ctx));

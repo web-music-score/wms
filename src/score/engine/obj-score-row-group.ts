@@ -90,10 +90,7 @@ export class ObjScoreRowGroup extends MusicObject {
 
         if (this.hasBrace) {
             const r = this.braceRect;
-            ctx.color(DocumentColor.RowGroup_Frame)
-                .lineWidth(1)
-                .strokeLine(r.right, r.top, r.right, r.bottom)
-                .drawBracket(r, "{");
+            ctx.color(DocumentColor.RowGroup_Frame).lineWidth(1).drawBracket(r, "{");
         }
     }
 }

@@ -16,7 +16,7 @@ export class ObjStaffBarLine extends MusicObject {
 
     readonly mi: MStaffBarLine;
 
-    constructor(readonly barLine: ObjBarLine, readonly line: ObjNotationLine) {
+    constructor(readonly barLine: ObjBarLine, readonly line: ObjNotationLine, readonly rowGroup: ObjScoreRowGroup) {
         super(line);
 
         line.addObject(this);
@@ -61,6 +61,7 @@ abstract class ObjBarLine extends MusicObject {
     abstract solveBarLineType(): BarLineType;
 
     get doc() { return this.measure.doc; }
+    get row() { return this.measure.row; }
 
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {
@@ -97,7 +98,7 @@ abstract class ObjBarLine extends MusicObject {
 
         row.getRowGroups().forEach(grp => {
             grp.lines.forEach(line => {
-                let obj = new ObjStaffBarLine(this, line);
+                let obj = new ObjStaffBarLine(this, line, grp);
 
                 this.notationLineObjects.push(obj);
                 this.notationLineObjectsByGrp.getOrCreate(grp, []).push(obj);
@@ -185,19 +186,10 @@ abstract class ObjBarLine extends MusicObject {
 
         ctx.drawDebugRect(this.getRect());
 
-        // TODO: staff or tab?
-        ctx.color(DocumentColor.Staff_Frame);
-
-        for (const objects of this.notationLineObjectsByGrp.values()) {
-            objects.forEach((obj, i) => {
-                obj.dots.forEach(d => ctx.fillCircle(d.x, d.y, d.r));
-                if (i === 0) {
-                    let { top, height } = obj.barLine.getRect();
-                    obj.vlines.forEach(l => ctx.fillRect(l.left, top, l.width, height));
-                }
-            });
-
-        }
+        this.notationLineObjects.forEach(o => {
+            o.vlines.forEach(l => o.line.drawVerticalLine(ctx, l.left, l.width, o.rowGroup.lines.length > 1));
+            o.dots.forEach(d => ctx.fillCircle(d.x, d.y, d.r));
+        });
     }
 }
 

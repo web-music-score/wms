@@ -6,6 +6,7 @@
 ### Fixes
 - Connect extension line to stopping element at right side.
 - Moved bundled deps to devDeps.
+- Vertical staff/bar lines with instruments/groups.
 
 ## [5.4.2] - 2025-11-05
 ## Fixed
