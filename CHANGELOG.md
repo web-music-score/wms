@@ -5,6 +5,7 @@
 
 ### Fixes
 - Connect extension line to stopping element at right side.
+- Moved bundled deps to devDeps.
 
 ## [5.4.2] - 2025-11-05
 ## Fixed
