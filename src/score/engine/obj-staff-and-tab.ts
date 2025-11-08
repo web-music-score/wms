@@ -10,6 +10,7 @@ import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
+import { ObjScoreRowGroup } from "./obj-score-row-group";
 
 type NotationLineObject = {
     getRect: () => AnchoredRect,
@@ -27,6 +28,10 @@ export abstract class ObjNotationLine extends MusicObject {
 
     constructor(readonly row: ObjScoreRow) {
         super(row);
+    }
+
+    getRowGroup(): ObjScoreRowGroup {
+        return this.row.getRowGroupByLineId(this.id);
     }
 
     addObject(o: NotationLineObject) {
@@ -125,14 +130,18 @@ export abstract class ObjNotationLine extends MusicObject {
         }
     }
 
-    drawVerticalLine(ctx: RenderContext, left: number, width: number, toNextLine = false) {
+    drawVerticalLine(ctx: RenderContext, left: number, width: number, isSystemBarLine = false) {
         ctx.color(this.getConfig().type === "tab" ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame);
 
         const i = this.row.getNotationLines().indexOf(this);
-        const nextLine = (toNextLine && i >= 0) ? this.row.getNotationLines()[i + 1] : undefined;
+        const nextLine = i >= 0 ? this.row.getNotationLines()[i + 1] : undefined;
+        const isGroupLine = this.getRowGroup().lines.length > 1;
+        const isGrandTreble = this instanceof ObjStaff && this.isGrandTreble();
+
+        // SystemBarLine is the left mose vertical bar line.
 
         const top = this.getTopLineY();
-        const bottom = nextLine
+        const bottom = nextLine && (isSystemBarLine || isGroupLine || isGrandTreble)
             ? nextLine.getTopLineY()
             : this.getBottomLineY();
 
@@ -172,7 +181,7 @@ export class ObjStaff extends ObjNotationLine {
 
     readonly mi: MStaff;
 
-    constructor(readonly row: ObjScoreRow, readonly staffConfig: StaffConfig, readonly id: number) {
+    constructor(row: ObjScoreRow, readonly staffConfig: StaffConfig, readonly id: number) {
         super(row);
 
         const getDiatonicId = (noteName: string, isOctaveDown: boolean) => Note.getNote(noteName).diatonicId - (isOctaveDown ? 7 : 0);
@@ -229,9 +238,16 @@ export class ObjStaff extends ObjNotationLine {
     }
 
     joinGrandStaff(staff: ObjStaff) {
-        if (staff !== this) {
+        if (staff !== this)
             this.joinedGrandStaff = staff;
-        }
+    }
+
+    isGrandTreble(): boolean {
+        return this.joinedGrandStaff !== undefined && this.staffConfig.clef === Clef.G;
+    }
+
+    isGrandBass(): boolean {
+        return this.joinedGrandStaff !== undefined && this.staffConfig.clef === Clef.F;
     }
 
     getLineSpacing(): number {
@@ -363,7 +379,7 @@ export class ObjTab extends ObjNotationLine {
 
     readonly mi: MTab;
 
-    constructor(readonly row: ObjScoreRow, readonly tabConfig: TabConfig, readonly id: number) {
+    constructor(row: ObjScoreRow, readonly tabConfig: TabConfig, readonly id: number) {
         super(row);
 
         if (Guard.isArray(tabConfig.tuning)) {

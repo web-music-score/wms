@@ -187,7 +187,7 @@ abstract class ObjBarLine extends MusicObject {
         ctx.drawDebugRect(this.getRect());
 
         this.notationLineObjects.forEach(o => {
-            o.vlines.forEach(l => o.line.drawVerticalLine(ctx, l.left, l.width, o.rowGroup.lines.length > 1));
+            o.vlines.forEach(l => o.line.drawVerticalLine(ctx, l.left, l.width));
             o.dots.forEach(d => ctx.fillCircle(d.x, d.y, d.r));
         });
     }

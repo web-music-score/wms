@@ -1646,10 +1646,10 @@ export class ObjMeasure extends MusicObject {
         // For tabs draw left vertical line (if more than one lines it is drawn by row)
         if (this.isFirstMeasureInRow() && this.row.getNotationLines().length === 1) {
             this.row.getTabs().forEach(tab => {
-                const grp = this.row.getRowGroups().find(grp => grp.hasNotationLine(tab));
+                const grp = tab.getRowGroup();
 
                 // Vertical line drawn by row group
-                if (grp && grp.hasBrace) return;
+                if (grp.hasBrace) return;
 
                 const left = this.getStaffLineLeft();
                 const top = tab.getTopLineY();

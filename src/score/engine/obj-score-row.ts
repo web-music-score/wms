@@ -42,6 +42,8 @@ export class ObjScoreRow extends MusicObject {
     private readonly tabs: ReadonlyArray<ObjTab>;
     private readonly measures: ObjMeasure[] = [];
 
+    private rowGroupByLine: ObjScoreRowGroup[];
+
     private needLayout = true;
 
     readonly mi: MScoreRow;
@@ -73,6 +75,9 @@ export class ObjScoreRow extends MusicObject {
         this.rowGroups = lineGroups
             .filter(lines => lines.length > 0)
             .map(lines => new ObjScoreRowGroup(lines));
+
+        this.rowGroupByLine = this.notationLines.map(line =>
+            this.rowGroups.find(grp => grp.lines.includes(line))!);
 
         // nextRow of prevRow is this
         if (this.prevRow) {
@@ -110,6 +115,10 @@ export class ObjScoreRow extends MusicObject {
 
     getRowGroups(): ReadonlyArray<ObjScoreRowGroup> {
         return this.rowGroups;
+    }
+
+    getRowGroupByLineId(id: number): ObjScoreRowGroup {
+        return this.rowGroupByLine[id];
     }
 
     findMatchingLine(line: ObjNotationLine): ObjNotationLine | undefined {
