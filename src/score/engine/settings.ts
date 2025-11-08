@@ -52,7 +52,8 @@ export const DocumentColor = {
     Header_Composer: "black",
     Header_Arranger: "black",
 
-    Instrument: "black",
+    RowGroup_Instrument: "black",
+    RowGroup_Frame: "black",
 
     Element_Fermata: "black",
     Element_Annotation: "black",

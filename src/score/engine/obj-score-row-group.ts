@@ -19,7 +19,7 @@ export class ObjScoreRowGroup extends MusicObject {
     constructor(readonly lines: readonly ObjNotationLine[]) {
         super(lines[0].row);
 
-        const color = DocumentColor.Instrument;
+        const color = DocumentColor.RowGroup_Instrument;
 
         this.instrument = lines[0].getConfig().instrument ?? "";
         this.instrText = new ObjText(this, { text: this.instrument, color, scale: 1 }, 1, 0.5);
@@ -41,6 +41,10 @@ export class ObjScoreRowGroup extends MusicObject {
 
     get hasInstrument(): boolean {
         return this.instrument.length > 0;
+    }
+
+    hasNotationLine(line: ObjNotationLine) {
+        return this.lines.includes(line);
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -85,9 +89,11 @@ export class ObjScoreRowGroup extends MusicObject {
         this.instrText.draw(ctx);
 
         if (this.hasBrace) {
-            ctx.color(this.lines[0] instanceof ObjTab ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame)
+            const r = this.braceRect;
+            ctx.color(DocumentColor.RowGroup_Frame)
                 .lineWidth(1)
-                .drawBracket(this.braceRect, "{");
+                .strokeLine(r.right, r.top, r.right, r.bottom)
+                .drawBracket(r, "{");
         }
     }
 }

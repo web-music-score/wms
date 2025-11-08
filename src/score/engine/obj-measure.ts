@@ -1635,6 +1635,24 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
+        // For tabs draw left vertical line
+        if (this === this.row.getFirstMeasure()) {
+            this.row.getTabs().forEach(tab => {
+                const grp = this.row.getRowGroups().find(grp => grp.hasNotationLine(tab));
+                
+                // Vertical line drawn by row group
+                if(grp && grp.hasBrace) return;
+
+                const left = this.getStaffLineLeft();
+                const top = tab.getTopLineY();
+                const bottom = tab.getBottomLineY();
+
+                ctx.color(DocumentColor.Tab_Frame)
+                    .lineWidth(1)
+                    .strokeLine(left, top, left, bottom);
+            });
+        }
+
         this.signatures.forEach(signature => signature.draw(ctx));
 
         this.tabStringNotes.forEach(obj => obj.draw(ctx));

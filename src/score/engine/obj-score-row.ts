@@ -452,18 +452,6 @@ export class ObjScoreRow extends MusicObject {
         ctx.rect(left - p, top, width + 2 * p, height);
         ctx.clip();
 
-        // For multiple notation lines draw vertical start line (which is not drawn by measures)
-        if (this.getFirstMeasure() && (this.notationLines.length > 1 || this.notationLines[0] instanceof ObjTab)) {
-            let left = this.getFirstMeasure()!.getStaffLineLeft();
-
-            let top = Math.min(...this.notationLines.map(line => line.getTopLineY()));
-            let bottom = Math.max(...this.notationLines.map(line => line.getBottomLineY()));
-
-            ctx.color(this.notationLines[0] instanceof ObjTab ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame)
-                .lineWidth(1)
-                .strokeLine(left, top, left, bottom);
-        }
-
         // Draw measures
         this.measures.forEach(m => m.draw(ctx));
 
