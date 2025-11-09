@@ -8,7 +8,9 @@ import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { DocumentColor } from "./settings";
 
 function parseInstr(instr: string) {
-    const instrName = instr.startsWith("!{") ? instr.substring(2) : instr.startsWith("!") ? instr.substring(1) : instr;
+    const instrName = (
+        instr.startsWith("!{") ? instr.substring(2) : instr.startsWith("!") ? instr.substring(1) : instr
+    ).trim();
     const hideInstr = instr.startsWith("!");
     const hideBrace = instr.startsWith("!{");
     return { instrName, hideInstr, hideBrace }
