@@ -2,6 +2,7 @@
 ## [5.5.0] - 2025-11-??
 ### Added
 - Coloring document.
+- Instrument name postfixes: "!" (hide name) and "!{" (hide name and grouping left brace).
 
 ### Fixes
 - Connect extension line to stopping element at right side.

@@ -7,9 +7,17 @@ import { MScoreRowGroup } from "score/pub";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { DocumentColor } from "./settings";
 
+function parseInstr(instr: string) {
+    const instrName = instr.startsWith("!{") ? instr.substring(2) : instr.startsWith("!") ? instr.substring(1) : instr;
+    const hideInstr = instr.startsWith("!");
+    const hideBrace = instr.startsWith("!{");
+    return { instrName, hideInstr, hideBrace }
+}
+
 export class ObjScoreRowGroup extends MusicObject {
     private space = 0;
     readonly instrument: string;
+    readonly hasBrace: boolean;
 
     private readonly instrText: ObjText;
     private braceRect = new AnchoredRect();
@@ -21,8 +29,13 @@ export class ObjScoreRowGroup extends MusicObject {
 
         const color = DocumentColor.RowGroup_Instrument;
 
-        this.instrument = lines[0].getConfig().instrument ?? "";
-        this.instrText = new ObjText(this, { text: this.instrument, color, scale: 1 }, 1, 0.5);
+        const instr = parseInstr(lines[0].getConfig().instrument ?? "");
+
+        this.instrument = instr.instrName;
+        this.hasBrace = instr.hideBrace ? false : (this.hasInstrument && lines.length >= 2);
+
+        const text = instr.hideInstr ? "" : this.instrument;
+        this.instrText = new ObjText(this, { text, color, scale: 1 }, 1, 0.5);
 
         this.mi = new MScoreRowGroup(this);
     }
@@ -33,10 +46,6 @@ export class ObjScoreRowGroup extends MusicObject {
 
     get row(): ObjScoreRow {
         return this.lines[0].row;
-    }
-
-    get hasBrace(): boolean {
-        return this.hasInstrument && this.lines.length > 1;
     }
 
     get hasInstrument(): boolean {
