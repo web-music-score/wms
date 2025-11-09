@@ -171,7 +171,7 @@ or corresponding string values (e.g. `"treble"`).
 
 Instrument name hint!
  * `"!Piano"` hides name.
- * `"!{Piano"` hides name and creates a group without system left brace.
+ * `"!{Piano"` hides both name and left brace of the group.
 
 ### Set Automatic Measures Per Row
 ```ts

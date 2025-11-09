@@ -39,7 +39,7 @@ export type BaseConfig = {
      * Consecutive staves/tabs with the same name are grouped together.<br />
      * Hint!<br />
      * `"!Piano"` hides name.<br />
-     * `"!{Piano"` hides name and creates a group without system left brace.
+     * `"!{Piano"` hides both name and left brace of the group.
      * */
     instrument?: string;
 }
