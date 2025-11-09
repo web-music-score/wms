@@ -150,7 +150,7 @@ or corresponding string values (e.g. `"treble"`).
     minNote: "C2",       // (optional) min allowed note.
     maxNote: "C6",       // (optional) max allowed note.
     voiceId: [0, 1],     // (optional) only present voices 0 and 1 in this staff.
-    instrument: "Piano"  // (optional) staves/tabs with same instrument are grouped together with left brace.
+    instrument: "Piano"  // (optional) consecutive staves/tabs with same name are grouped together.
 })
 .setScoreConfiguration([
     { type: "staff", clef: "G", grandId: "grand1" },
@@ -168,6 +168,10 @@ or corresponding string values (e.g. `"treble"`).
     voiceId: 4
 }) // Tab with guitar tuning, present only voiceId 4 in this tab.
 ```
+
+Instrument name hint!
+ * `"!Piano"` hides name.
+ * `"!{Piano"` hides name and creates a group without system left brace.
 
 ### Set Automatic Measures Per Row
 ```ts

@@ -34,7 +34,13 @@ export type BaseConfig = {
     voiceId?: VoiceId | VoiceId[];
     /** @deprecated - Use `voiceId` instead. */
     voiceIds?: VoiceId | VoiceId[];
-    /** Staves/tabs with same instrument name a re grouped together with left brace. */
+    /**
+     * Instrument name for this staf/tab.<br />
+     * Consecutive staves/tabs with the same name are grouped together.<br />
+     * Hint!<br />
+     * `"!Piano"` hides name.<br />
+     * `"!{Piano"` hides name and creates a group without system left brace.
+     * */
     instrument?: string;
 }
 
