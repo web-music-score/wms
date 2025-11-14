@@ -613,7 +613,8 @@ export class ObjMeasure extends MusicObject {
         }
 
         this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
-            this.addLayoutObject(new ObjFermata(anchor, vpos), line, LayoutGroupId.Fermata, vpos);
+            const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Fermata : DocumentColor.Tab_Element_Fermata;
+            this.addLayoutObject(new ObjFermata(anchor, vpos, color), line, LayoutGroupId.Fermata, vpos);
         });
 
         this.disableExtension();
@@ -626,12 +627,10 @@ export class ObjMeasure extends MusicObject {
 
     addNavigation(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation, ...args: unknown[]) {
         let addLayoutObjectProps: {
-            createObj: () => LayoutableMusicObject,
+            createObj: (line: ObjNotationLine) => LayoutableMusicObject,
             layoutGroupId: LayoutGroupId,
             defaultVerticalPos: VerticalPos
         } | undefined = undefined;
-
-        const color = DocumentColor.Element_Navigation;
 
         switch (navigation) {
             case Navigation.Ending:
@@ -641,7 +640,10 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this;
                 let passages = args as number[];
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjEnding(anchor, passages),
+                    createObj: (line) => {
+                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        return new ObjEnding(anchor, color, passages);
+                    },
                     layoutGroupId: LayoutGroupId.Ending,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -653,7 +655,10 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjText(anchor, { text, color }, 1, 1),
+                    createObj: (line) => {
+                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        return new ObjText(anchor, { text, color }, 1, 1);
+                    },
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -665,7 +670,10 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjText(anchor, { text, color }, 1, 1),
+                    createObj: (line) => {
+                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        return new ObjText(anchor, { text, color }, 1, 1);
+                    },
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -676,7 +684,10 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineLeft;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjSpecialText(anchor, text, color),
+                    createObj: (line) => {
+                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        return new ObjSpecialText(anchor, text, color);
+                    },
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -686,7 +697,10 @@ export class ObjMeasure extends MusicObject {
                 let anchor = this.barLineRight;
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
-                    createObj: (): LayoutableMusicObject => new ObjSpecialText(anchor, text, color),
+                    createObj: (line) => {
+                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        return new ObjSpecialText(anchor, text, color);
+                    },
                     layoutGroupId: LayoutGroupId.Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
@@ -717,7 +731,7 @@ export class ObjMeasure extends MusicObject {
 
         if (addLayoutObjectProps) {
             this.forEachStaffGroup(staffTabOrGroups, addLayoutObjectProps.defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-                this.addLayoutObject(addLayoutObjectProps.createObj(), line, addLayoutObjectProps.layoutGroupId, vpos);
+                this.addLayoutObject(addLayoutObjectProps.createObj(line), line, addLayoutObjectProps.layoutGroupId, vpos);
             });
         }
 
@@ -739,7 +753,7 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
         }
 
-        let textProps: TextProps = { text, color: DocumentColor.Element_Annotation }
+        let textProps: TextProps = { text }
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;
@@ -766,9 +780,11 @@ export class ObjMeasure extends MusicObject {
         this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+            const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Annotation : DocumentColor.Tab_Element_Annotation;
+            textProps.color = color;
             let textObj = new ObjText(anchor, textProps, anchorX, anchorY);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj, DocumentColor.Element_Annotation);
+            this.enableExtension(layoutObj, color);
         });
     }
 
@@ -782,7 +798,7 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
         }
 
-        let textProps: TextProps = { text, color: DocumentColor.Element_Label }
+        let textProps: TextProps = { text }
 
         let layoutGroupId: LayoutGroupId;
         let defaultVerticalPos: VerticalPos;
@@ -795,9 +811,11 @@ export class ObjMeasure extends MusicObject {
         this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+            const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Label : DocumentColor.Tab_Element_Label;
+            textProps.color = color;
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj, DocumentColor.Element_Label);
+            this.enableExtension(layoutObj, color);
         });
     }
 

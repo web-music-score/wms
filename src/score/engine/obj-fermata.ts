@@ -8,11 +8,9 @@ import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { DocumentColor } from "./settings";
 
 export class ObjFermata extends MusicObject {
-    private color = "black";
-
     readonly mi: MFermata;
 
-    constructor(parent: ObjRhythmColumn | ObjBarLineRight, readonly pos: VerticalPos) {
+    constructor(parent: ObjRhythmColumn | ObjBarLineRight, readonly pos: VerticalPos, readonly color: string) {
         super(parent);
 
         this.mi = new MFermata(this);
@@ -65,7 +63,7 @@ export class ObjFermata extends MusicObject {
 
         ctx.drawDebugRect(this.rect);
 
-        ctx.color(DocumentColor.Element_Fermata).lineWidth(1);
+        ctx.color(this.color).lineWidth(1);
 
         ctx.beginPath();
         ctx.moveTo(left, bottom);

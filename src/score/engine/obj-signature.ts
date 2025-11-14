@@ -56,7 +56,7 @@ export class ObjStaffSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            let color = DocumentColor.Staff_Signature_Measure;
+            let color = DocumentColor.Staff_Signature_MeasureNum;
             let text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
@@ -381,7 +381,7 @@ export class ObjTabSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            let color = DocumentColor.Tab_Signature_Measure;
+            let color = DocumentColor.Tab_Signature_MeasureNum;
             let text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }

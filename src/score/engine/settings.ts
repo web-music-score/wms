@@ -55,11 +55,6 @@ export const DocumentColor = {
     RowGroup_Instrument: "black",
     RowGroup_Frame: "black",
 
-    Element_Fermata: "black",
-    Element_Annotation: "black",
-    Element_Navigation: "black",
-    Element_Label: "black",
-
     Staff_Frame: "black",
     Staff_Note: "black",
     Staff_Rest: "black",
@@ -68,7 +63,11 @@ export const DocumentColor = {
     Staff_Signature_Key: "black",
     Staff_Signature_Time: "black",
     Staff_Signature_Tempo: "black",
-    Staff_Signature_Measure: "black",
+    Staff_Signature_MeasureNum: "black",
+    Staff_Element_Fermata: "black",
+    Staff_Element_Annotation: "black",
+    Staff_Element_Navigation: "black",
+    Staff_Element_Label: "black",
 
     Tab_Frame: "black",
     Tab_Note: "black",
@@ -79,5 +78,9 @@ export const DocumentColor = {
     //Tab_Signature_Key: "black",
     Tab_Signature_Time: "black",
     Tab_Signature_Tempo: "black",
-    Tab_Signature_Measure: "black",
+    Tab_Signature_MeasureNum: "black",
+    Tab_Element_Fermata: "black",
+    Tab_Element_Annotation: "black",
+    Tab_Element_Navigation: "black",
+    Tab_Element_Label: "black",
 }

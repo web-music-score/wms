@@ -11,11 +11,9 @@ export class ObjEnding extends MusicObject {
     private endingText: ObjText;
     private shapeRects: AnchoredRect[] = [];
 
-    private color = DocumentColor.Element_Navigation;
-
     readonly mi: MEnding;
 
-    constructor(readonly measure: ObjMeasure, readonly passages: number[]) {
+    constructor(readonly measure: ObjMeasure, readonly color: string, readonly passages: number[]) {
         super(measure);
 
         this.mi = new MEnding(this);
@@ -31,7 +29,6 @@ export class ObjEnding extends MusicObject {
         this.passages.sort((a, b) => a - b);
 
         const text = this.passages.map(p => p + ".").join("");
-        const { color } = this;
 
         this.endingText = new ObjText(this, { text, color }, 0, 1);
     }
