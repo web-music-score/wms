@@ -2,12 +2,12 @@
 ## [5.5.0] - 2025-11-??
 ### Added
 - Coloring document.
-- Instrument name postfixes: "!" (hide name) and "!{" (hide name and grouping left brace).
+- Instrument name starts with "!" (hide name) and "!{" (hide name and left brace).
 
 ### Fixes
-- Connect extension line to stopping element at right side.
+- Extension line update: connect to right side element.
+- Vertical staff/bar line update on row groups.
 - Moved bundled deps to devDeps.
-- Vertical staff/bar lines with instruments/groups.
 
 ## [5.4.2] - 2025-11-05
 ## Fixed
