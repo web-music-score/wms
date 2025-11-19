@@ -11,6 +11,10 @@ export {
     createGreensleeves,
 }
 
+/**
+ * Create all music pieces.
+ * @returns - Array of music documents containing all available pieces.
+ */
 export function createAll(): readonly MDocument[] {
     return [
         createAndanteByDiabelli(),
