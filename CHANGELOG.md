@@ -1,5 +1,5 @@
 # Changelog
-## [5.5.0] - 2025-11-??
+## [5.5.0] - 2025-11-19
 ### Added
 - Coloring document.
 - Instrument name starts with "!" (hide name) and "!{" (hide name and left brace).
