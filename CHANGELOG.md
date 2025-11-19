@@ -3,6 +3,7 @@
 ### Added
 - Coloring document.
 - Instrument name starts with "!" (hide name) and "!{" (hide name and left brace).
+- Pieces.createAll() to get array of all demo pieces.
 
 ### Fixes
 - Extension line update: connect to right side element.

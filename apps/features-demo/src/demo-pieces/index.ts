@@ -1,4 +1,4 @@
-import * as Pieces from "@tspro/web-music-score/pieces";
+import { createAll } from "@tspro/web-music-score/pieces";
 import { createNavigationRepeatEndingDemo } from "demo-pieces/navigation-repeats-endings";
 import { createNavigationDCAlFineDemo } from "demo-pieces/navigation-DC_al_Fine";
 import { createNavigationDCAlCodaDemo } from "demo-pieces/navigation-DC_al_Coda";
@@ -33,16 +33,11 @@ export class DemoPieces {
     private readonly docs: (Score.MDocument | string)[] = [];
 
     private constructor() {
-        let pieces: Score.MDocument[] = [];
-        let demos: Score.MDocument[] = [];
-
-        // Add sample pieces
-        pieces.push(Pieces.createGreensleeves());
-        pieces.push(Pieces.createAndanteByDiabelli());
-        pieces.push(Pieces.createFrereJacques());
-        pieces.push(Pieces.createCanonInD());
+        // Add demo pieces
+        let pieces: Score.MDocument[] = [...createAll()];
 
         // Add features demos
+        let demos: Score.MDocument[] = [];
         demos.push(createNavigationRepeatEndingDemo());
         demos.push(createNavigationDCAlFineDemo());
         demos.push(createNavigationDCAlCodaDemo());
