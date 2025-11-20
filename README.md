@@ -22,7 +22,7 @@ updates and patches.
 
 If someone has piano or keyboard and can record samples for me I'd be happy to add a new instrument.
 About ten mp3 samples between C2 to C6 would be fine (named "E2.mp3", etc).
-My email can be found on [GitHub](https://github.com/pahkasoft) (visible for signed in users).
+My email can be found on [GitHub](https://github.com/web-music-score) (visible for signed in users).
 
 ## Installation
 
@@ -545,7 +545,7 @@ While designed for compatibility in mind, the library has not been explicitly te
 
 Found a bug or unexpected behavior? Suggest a feature or impovement?
 
-[Please open a new issue.](https://github.com/pahkasoft/web-music-score/issues/new/choose)
+[Please open a new issue.](https://github.com/web-music-score/wms/issues/new/choose)
 
 Thanks for helping improve the project!
 

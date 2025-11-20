@@ -1,15 +1,15 @@
 {
     "name": "@tspro/web-music-score",
     "version": "5.5.0",
-    "author": "PahkaSoft",
+    "author": "Stefan Brockmann",
     "license": "MIT",
     "private": false,
     "repository": {
         "type": "git",
-        "url": "https://github.com/pahkasoft/web-music-score.git"
+        "url": "https://github.com/web-music-score/wms.git"
     },
     "bugs": {
-        "url": "https://github.com/pahkasoft/web-music-score/issues/new/choose"
+        "url": "https://github.com/web-music-score/wms/issues/new/choose"
     },
     "description": "TS/JS component for rendering and playing music scores in the browser.",
     "exports": {

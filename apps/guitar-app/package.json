@@ -1,7 +1,7 @@
 {
     "name": "guitar-app",
     "version": "5.5.0",
-    "author": "PahkaSoft",
+    "author": "Stefan Brockmann",
     "license": "MIT",
     "private": true,
     "devDependencies": {
