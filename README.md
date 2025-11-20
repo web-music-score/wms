@@ -13,12 +13,10 @@ This is a work in progress project. Lately there has been improvements that requ
 version update. As the project matures there might be less major updates, and more minor
 updates and patches.
 
-## Version 5 Update
-
-Version 5.0.0 updated audio interface, instrument bundles are no longer dependant of the main lib and can be loaded in browser environment as independent modules.
-
-- How to add and use instrument, see sections [Instruments](#instruments)
-- How to add and use instrument browser version, see sections [Browser Modules](#browser-modules)
+## Near Future Plan
+- Dedicated GitHub account `github.com/web-music-score` (created).
+- Unscoped npm package `web-music-score` (reserved).
+- Dedicated website `web-music-score.org` (reserved).
 
 ## Help Wanted
 
