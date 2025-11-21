@@ -472,16 +472,14 @@ export class ObjMeasure extends MusicObject {
         return this.tempo;
     }
 
-    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr, dotted?: boolean | number) {
+    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr) {
         this.getPrevMeasure()?.endSection();
 
         if (beatLength === undefined) {
             this.alterTempo = { beatsPerMinute }
         }
         else {
-            let dotCount = typeof dotted === "number" && dotted > 0
-                ? dotted
-                : dotted === true ? 1 : NoteLengthProps.get(beatLength).dotCount;
+            let dotCount = NoteLengthProps.get(beatLength).dotCount;
 
             let options = {
                 beatLength: validateNoteLength(beatLength),
@@ -1347,7 +1345,7 @@ export class ObjMeasure extends MusicObject {
                 }
             }
 
-            rests.reverse().forEach(rest => this.addRest(voiceId, rest.noteLength, { dotted: rest.dotCount }));
+            rests.reverse().forEach(rest => this.addRest(voiceId, NoteLengthProps.create(rest.noteLength, rest.dotCount).noteLength));
         }
     }
 

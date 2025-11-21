@@ -26,6 +26,10 @@ function assertArgMsg(condition: boolean, msg: string) {
     if (!condition) throw new MusicError(MusicErrorType.Score, msg);
 }
 
+function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
+    assertArgMsg(!Guard.isTypedObject(obj, [prop]), msg);
+}
+
 function assertBaseConfig(baseConfig: BaseConfig) {
     assertArg(
         Guard.isObject(baseConfig),
@@ -33,14 +37,7 @@ function assertBaseConfig(baseConfig: BaseConfig) {
         Guard.isUndefined(baseConfig.voiceId) || isVoiceId(baseConfig.voiceId) || Guard.isArray(baseConfig.voiceId) && baseConfig.voiceId.every(voiceId => isVoiceId(voiceId))
     );
 
-    // Handle deprecated voiceIds.
-    if (!Guard.isUndefined(baseConfig.voiceIds)) {
-        assertArg(isVoiceId(baseConfig.voiceIds) || Guard.isArray(baseConfig.voiceIds) && baseConfig.voiceIds.every(voiceId => isVoiceId(voiceId)));
-        console.warn(`Staff/tab config property 'voiceIds' is deprecated, use 'voiceId' instead.`);
-        let arr = Utils.Arr.toArray(baseConfig.voiceId ?? []);
-        Utils.Arr.toArray(baseConfig.voiceIds).forEach(voiceId => arr.push(voiceId));
-        baseConfig.voiceId = arr;
-    }
+    assertObjHasNoProp(baseConfig, "voiceIds", "Baseconfig.voiceIds was removed. Use BaseConfig.voiceId instead.");
 
     if (Guard.isArray(baseConfig.voiceId)) {
         baseConfig.voiceId = Utils.Arr.removeDuplicates(baseConfig.voiceId);
@@ -59,12 +56,10 @@ function assertStaffConfig(staffConfig: StaffConfig) {
         Guard.isBooleanOrUndefined(staffConfig.isOctaveDown),
         Guard.isUndefined(staffConfig.minNote) || Note.isNote(staffConfig.minNote),
         Guard.isUndefined(staffConfig.maxNote) || Note.isNote(staffConfig.maxNote),
-        Guard.isStringOrUndefined(staffConfig.grandId),
-        Guard.isBooleanOrUndefined(staffConfig.isGrand)
+        Guard.isStringOrUndefined(staffConfig.grandId)
     );
 
-    if (!Guard.isUndefined(staffConfig.isGrand))
-        console.warn(`Staff config property 'isGrand' is deprecated, use 'grandId' instead.`);
+    assertObjHasNoProp(staffConfig, "isGrand", "StaffConfig.isGrand was removed. Use StaffConfig.grandId instead.");
 }
 
 
@@ -85,13 +80,11 @@ function assertTabConfig(tabConfig: TabConfig) {
 function assertNoteOptions(noteOptions: NoteOptions) {
     assertArg(
         Guard.isObject(noteOptions),
-        Guard.isBooleanOrUndefined(noteOptions.dotted) || Guard.isIntegerGte(noteOptions.dotted, 0),
         Guard.isEnumValueOrUndefined(noteOptions.stem, Stem),
         Guard.isStringOrUndefined(noteOptions.color),
         Guard.isBooleanOrUndefined(noteOptions.arpeggio) || Guard.isEnumValue(noteOptions.arpeggio, Arpeggio),
         Guard.isBooleanOrUndefined(noteOptions.staccato),
         Guard.isBooleanOrUndefined(noteOptions.diamond),
-        Guard.isBooleanOrUndefined(noteOptions.triplet),
         (
             Guard.isUndefined(noteOptions.string) ||
             isStringNumber(noteOptions.string) ||
@@ -99,19 +92,23 @@ function assertNoteOptions(noteOptions: NoteOptions) {
             Guard.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => isStringNumber(string))
         )
     );
-    assertArgMsg(Guard.isUndefined((noteOptions as any).tieSpan), `NoteOptions.tieSpan was removed. Use addConnective("tie", tieSpan)`);
-    assertArgMsg(Guard.isUndefined((noteOptions as any).slurSpan), `NoteOptions.slurSpan was removed. Use addConnective("slur", slurSpan)`);
+
+    assertObjHasNoProp(noteOptions, "dotted", "NoteOptions.dotted was removed.");
+    assertObjHasNoProp(noteOptions, "triplet", "NoteOptions.triplet was removed.");
+    assertObjHasNoProp(noteOptions, "tieSpan", `NoteOptions.tieSpan was removed. Use addConnective("tie", tieSpan)`);
+    assertObjHasNoProp(noteOptions, "slurSpan", `NoteOptions.slurSpan was removed. Use addConnective("slur", slurSpan)`);
 }
 
 function assertRestOptions(restOptions: RestOptions) {
     assertArg(
         Guard.isObject(restOptions),
-        Guard.isBooleanOrUndefined(restOptions.dotted) || Guard.isIntegerGte(restOptions.dotted, 0),
         Guard.isStringOrUndefined(restOptions.staffPos) || Guard.isInteger(restOptions.staffPos) || restOptions.staffPos instanceof Note,
         Guard.isStringOrUndefined(restOptions.color),
-        Guard.isBooleanOrUndefined(restOptions.hide),
-        Guard.isBooleanOrUndefined(restOptions.triplet)
+        Guard.isBooleanOrUndefined(restOptions.hide)
     );
+
+    assertObjHasNoProp(restOptions, "dotted", "RestOptions.dotted was removed.");
+    assertObjHasNoProp(restOptions, "triplet", "RestOptions.triplet was removed.");
 }
 
 function assertLyricsOptions(lyricsOptions: LyricsOptions) {
@@ -410,25 +407,15 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr): DocumentBuilder;
-    /**
-     * @deprecated - Use dotted beatLength instead (e.g. "4..").
-     * @param beatsPerMinute - Tempo beats per minute.
-     * @param beatLength - Length of one beat.
-     * @param dotted - Dot count of length of one beat.
-     * @returns - This document builder instance.
-     */
-    setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr, dotted: boolean | number): DocumentBuilder;
-    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr, dotted?: boolean | number): DocumentBuilder {
-        setAssertFunction("setTempo", beatsPerMinute, beatLength, dotted);
+    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr): DocumentBuilder {
+        setAssertFunction("setTempo", beatsPerMinute, beatLength);
 
         assertArg(
             Guard.isIntegerGte(beatsPerMinute, 1),
-            (
-                Guard.isUndefined(beatLength) && Guard.isUndefined(dotted) ||
-                isNoteLength(beatLength) && (Guard.isBooleanOrUndefined(dotted) || Guard.isIntegerGte(dotted, 0))
-            ));
+            Guard.isUndefined(beatLength) || isNoteLength(beatLength)
+        );
 
-        this.getMeasure().setTempo(beatsPerMinute, beatLength, dotted);
+        this.getMeasure().setTempo(beatsPerMinute, beatLength);
 
         return this;
     }
@@ -553,7 +540,6 @@ export class DocumentBuilder {
                 );
 
                 noteOptions ??= {}
-                delete noteOptions.triplet;
                 assertNoteOptions(noteOptions);
 
                 if (Guard.isArray(note)) {
@@ -580,7 +566,6 @@ export class DocumentBuilder {
                 );
 
                 noteOptions ??= {}
-                delete noteOptions.triplet;
                 assertNoteOptions(noteOptions);
 
                 let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptions, tupletRatio);
@@ -594,7 +579,6 @@ export class DocumentBuilder {
                 assertArg(isNoteLength(restLength));
 
                 restOptions ??= {}
-                delete restOptions.triplet;
                 assertRestOptions(restOptions);
 
                 let s = this.getMeasure().addRest(voiceId, restLength, restOptions, tupletRatio);

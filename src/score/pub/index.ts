@@ -1,5 +1,4 @@
 export * from "./color";
-export * from "./div-rect";
 export * from "./document-builder";
 export * from "./event";
 export * from "./music-interface";

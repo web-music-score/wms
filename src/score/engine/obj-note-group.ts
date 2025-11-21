@@ -196,13 +196,9 @@ export class ObjNoteGroup extends MusicObject {
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
-        this.oldStyleTriplet = tupletRatio === undefined && (options?.triplet === true || NoteLengthProps.get(noteLength).isTriplet);
+        this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
 
-        let dotCount = typeof options?.dotted === "number"
-            ? (options.dotted > 0 ? options.dotted : undefined)
-            : (options?.dotted === true ? 1 : undefined);
-
-        this.rhythmProps = RhythmProps.get(noteLength, dotCount, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
+        this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
         this.mi = new MNoteGroup(this);
     }

@@ -24,9 +24,6 @@ export enum TimeSignatures {
     _12_8 = "12/8"
 }
 
-/** @deprecated - Use TimeSignatures enum values or just it's string values. */
-export type TimeSignatureString = `${TimeSignatures}`;
-
 /** Beam grouping enum. */
 export enum BeamGrouping {
     /** 2-3 beam grouping for 5/8 time signature. */

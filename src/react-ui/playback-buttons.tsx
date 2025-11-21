@@ -1,20 +1,8 @@
 import * as React from "react";
 import { MDocument, MPlaybackButtons } from "web-music-score/score";
 
-/**
- * Playback buttons layout
- * @deprecated - Use `PlaybackButtonsProps` properties `singlePlayStop`, `playStop` or `playPauseStop` instead. 
- */
-export enum PlaybackButtonsLayout {
-    PlayStopSingle,
-    PlayStop,
-    PlayPauseStop
-}
-
 export interface PlaybackButtonsProps {
     doc: MDocument;
-    /** @deprecated - Use `singlePlayStop`, `playStop` or `playPauseStop` properties instead. */
-    buttonLayout?: PlaybackButtonsLayout;
     singlePlayStop?: boolean;
     playStop?: boolean;
     playPauseStop?: boolean;
@@ -74,42 +62,35 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
     }
 
     render() {
-        let { buttonLayout, singlePlayStop, playStop, playPauseStop, playLabel, pauseLabel, stopLabel } = this.props;
+        let { singlePlayStop, playStop, playPauseStop, playLabel, pauseLabel, stopLabel } = this.props;
         let { controller } = this.state;
 
         playLabel ??= "Play";
         pauseLabel ??= "Pause";
         stopLabel ??= "Stop";
 
-        if(singlePlayStop) buttonLayout = PlaybackButtonsLayout.PlayStopSingle;
-        if(playStop) buttonLayout = PlaybackButtonsLayout.PlayStop;
-        if(playPauseStop) buttonLayout = PlaybackButtonsLayout.PlayPauseStop;
-
-        // Default is play pause stop
-        buttonLayout ??= PlaybackButtonsLayout.PlayPauseStop;
-
-        switch (buttonLayout) {
-            case PlaybackButtonsLayout.PlayStopSingle:
-                return (
-                    <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
-                );
-            case PlaybackButtonsLayout.PlayStop:
-                return (
-                    <div className="btn-group">
-                        <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
-                        <button className="btn btn-primary" ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
-                    </div>
-                );
-            case PlaybackButtonsLayout.PlayPauseStop:
-                return (
-                    <div className="btn-group">
-                        <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
-                        <button className="btn btn-primary" ref={btn => { if (btn) controller.setPauseButton(btn, pauseLabel); }} />
-                        <button className="btn btn-primary" ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
-                    </div>
-                );
-            default:
-                return <div>Invalid button layout: {buttonLayout}</div>;
+        if (singlePlayStop) {
+            return (
+                <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
+            );
+        }
+        else if (playStop) {
+            return (
+                <div className="btn-group">
+                    <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
+                    <button className="btn btn-primary" ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
+                </div>
+            );
+        }
+        else { // if(playPauseStop) {
+            // Default is playPauseStop
+            return (
+                <div className="btn-group">
+                    <button className="btn btn-primary" ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
+                    <button className="btn btn-primary" ref={btn => { if (btn) controller.setPauseButton(btn, pauseLabel); }} />
+                    <button className="btn btn-primary" ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
+                </div>
+            );
         }
     }
 }

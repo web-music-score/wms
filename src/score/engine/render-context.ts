@@ -763,11 +763,6 @@ export class RenderContext {
         return this;
     }
 
-    /** @deprecated - Use {@link drawBracket} instead. */
-    drawBrace(rect: AnchoredRect, side: "left" | "right"): RenderContext {
-        return this.drawBracket(rect, side === "left" ? "{" : "}");
-    }
-
     drawBracket(rect: AnchoredRect, bracket: "(" | ")" | "[" | "]" | "{" | "}" | "<" | ">"): RenderContext {
         if (!this.ctx) return this;
         let { left, right, width, top, bottom, height, anchorY } = rect;

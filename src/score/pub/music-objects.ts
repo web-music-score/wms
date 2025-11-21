@@ -717,18 +717,6 @@ export class MRhythmColumn extends MusicInterface {
     }
 
     /**
-     * Get symbol (note group or rest) of this column for given voice id.
-     * @deprecated - Use getRhythmSymbol(voiceId) instead.
-     * @param voiceId - Voice id.
-     * @returns - Note group, rest or undefined.
-     */
-    getVoiceSymbol(voiceId: VoiceId): MNoteGroup | MRest | undefined {
-        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
-
-        return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
-    }
-
-    /**
      * Get the measure this rhythm column is in.
      * @returns - Measure.
      */

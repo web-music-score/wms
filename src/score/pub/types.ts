@@ -32,8 +32,6 @@ export type BaseConfig = {
     name?: string;
     /** Voice id that is presented in this staff/tab. Single value or array.*/
     voiceId?: VoiceId | VoiceId[];
-    /** @deprecated - Use `voiceId` instead. */
-    voiceIds?: VoiceId | VoiceId[];
     /**
      * Instrument name for this staf/tab.<br />
      * Consecutive staves/tabs with the same name are grouped together.<br />
@@ -61,8 +59,6 @@ export type StaffConfig = BaseConfig & {
      * consequtive staves, first having G-clef and second having F-clef.
      */
     grandId?: string;
-    /** @deprecated - Use `grandId` property instead. */
-    isGrand?: boolean;
 }
 
 /** Tab config to add guitar tab in score configuration. */
@@ -227,10 +223,6 @@ export type NoteOptions = {
     diamond?: boolean,
     /** Set string number (array of numbers for chord) to use in guitar tab. */
     string?: StringNumber | StringNumber[],
-    /** @deprecated - Use triplet NoteLength values instead, e.g. NoteLength.QuarterTriplet or "4t", etc. */
-    triplet?: boolean,
-    /** @deprecated - Use dotted NoteLength values instead, e.g. NoteLength.Quarter2Dots or "4..", etc. */
-    dotted?: boolean | number
 }
 
 /** Options for rests. */
@@ -241,10 +233,6 @@ export type RestOptions = {
     color?: string,
     /** Hide this rest, still affects playing. */
     hide?: boolean,
-    /** @deprecated - Use triplet NoteLength values instead, e.g. NoteLength.QuarterTriplet or "4t", etc. */
-    triplet?: boolean,
-    /** @deprecated - Use dotted NoteLength values instead, e.g. NoteLength.Quarter2Dots or "4..", etc. */
-    dotted?: boolean | number
 }
 
 /** Tuplet options. */

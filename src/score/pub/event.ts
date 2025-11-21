@@ -1,5 +1,5 @@
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { MRenderer, MRenderContext } from "./music-interface";
+import { MRenderContext } from "./music-interface";
 import { MScoreRow, MusicInterface } from "./music-objects";
 
 /** Score event type. */
@@ -26,13 +26,6 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     constructor(type: ScoreEventType, readonly renderContext: MRenderContext, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
-
-    /**
-     * @deprecated - Provided for legacy support, use renderContext instead.
-     */
-    get renderer(): MRenderer {
-        return this.renderContext;
-    }
 }
 
 /** Score object event for clicking/entering/leaving score object. */
@@ -49,13 +42,6 @@ export class ScoreObjectEvent extends ScoreEvent {
         if (arguments.length === 0) {
             throw new MusicError(MusicErrorType.Score, "Empty array in score object event!");
         }
-    }
-
-    /**
-     * @deprecated - Provided for legacy support, use renderContext instead.
-     */
-    get renderer(): MRenderer {
-        return this.renderContext;
     }
 
     /** Top object getter. */

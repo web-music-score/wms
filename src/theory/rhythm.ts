@@ -18,8 +18,6 @@ export enum NoteLength {
     WholeDot = "1.",
     /** Double dotted whole note. */
     Whole2Dots = "1..",
-    /** @deprecated - Use Whole2Dots instead. Accidentally had misspelled enum name! */
-    Whole12Dots = "1..",
     /** Triple dotted whole note. */
     Whole3Dots = "1...",
     /** Quadruple-dotted whole note. */

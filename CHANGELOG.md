@@ -3,7 +3,7 @@
 ### **Breaking Changes**
 - Switching to unscoped package name `web-music-score`.
 - Removed all guitar and other stuff (GuitarApp, GuitarContext, circleOfFifths, etc.)
-- Removed deprecated global name Audio_ClassicalGuitar. Use Audio_CG instead.
+- Removed deprecated/obsolote stuff.
 
 ## [5.5.0] - 2025-11-19
 ### Added

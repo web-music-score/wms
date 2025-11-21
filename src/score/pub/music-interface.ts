@@ -171,12 +171,6 @@ export class MRenderContext {
     }
 }
 
-/**
- * Renderer class.
- * @deprecated - Use MRenderContext instead.
- * */
-export class MRenderer extends MRenderContext { }
-
 /** Playback buttons helper class. */
 export class MPlaybackButtons {
     private playButton?: HTMLButtonElement;

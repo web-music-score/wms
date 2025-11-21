@@ -82,40 +82,6 @@ export class ObjDocument extends MusicObject {
             this.curScoreConfig = [config];
         }
 
-        // Convert deprecated isGRand into grandId.
-        for (let cfgId = 0, grandId = "grand"; cfgId < this.curScoreConfig.length;) {
-            let treble = this.curScoreConfig[cfgId];
-            let bass = this.curScoreConfig[cfgId + 1];
-
-            // Create unique grandId.
-            while (this.curScoreConfig.filter(cfg => cfg.type === "staff").findIndex(cfg => cfg.grandId === grandId) >= 0) {
-                grandId += "A";
-            }
-
-            if (treble && treble.type === "staff" && treble.isGrand) {
-                if (treble.grandId !== undefined) {
-                    throw new MusicError(MusicErrorType.Score, `Grand staff error: mixing isGrand and grandId!`);
-                }
-                else if (bass && bass.type === "staff" && bass.isGrand) {
-                    if (bass.grandId !== undefined) {
-                        throw new MusicError(MusicErrorType.Score, `Grand staff error: mixing isGrand and grandId!`);
-                    }
-                    else {
-                        treble.grandId = grandId;
-                        bass.grandId = grandId;
-                        treble.isGrand = bass.isGrand = false;
-                        cfgId += 2;
-                    }
-                }
-                else {
-                    throw new MusicError(MusicErrorType.Score, `Grand staff error: invalid use of isGrand!`);
-                }
-            }
-            else {
-                cfgId++;
-            }
-        }
-
         // Setup grand staff.
         for (let cfgId: number = 0, usedGrandIdes: string[] = []; cfgId < this.curScoreConfig.length;) {
             let treble = this.curScoreConfig[cfgId];
