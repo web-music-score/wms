@@ -20,7 +20,7 @@ export default defineConfig([
         outDir: 'dist',
         target: 'es2015',
         format: ['esm'],
-        dts: true,
+        dts: false,
         sourcemap: true,
         clean: true,
         external: ['react', 'web-music-score'],
@@ -70,6 +70,7 @@ export default defineConfig([
         target: 'es2015',
         format: ['iife'],
         globalName: 'WebMusicScore',
+        dts: false,
         sourcemap: true,
         minify: true,
         clean: false, // Don't wipe dist from the previous build
@@ -91,6 +92,7 @@ export default defineConfig([
         target: 'es2015',
         format: ['iife'],
         globalName: 'Audio_CG',
+        dts: false,
         sourcemap: true,
         minify: true,
         clean: false, // Don't wipe dist from the previous build

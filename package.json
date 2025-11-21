@@ -19,7 +19,7 @@
                 "default": "./dist/core/index.js"
             },
             "import": {
-                "types": "./dist/core/index.d.mts",
+                "types": "./dist/core/index.d.ts",
                 "default": "./dist/core/index.mjs"
             }
         },
@@ -29,7 +29,7 @@
                 "default": "./dist/audio/index.js"
             },
             "import": {
-                "types": "./dist/audio/index.d.mts",
+                "types": "./dist/audio/index.d.ts",
                 "default": "./dist/audio/index.mjs"
             }
         },
@@ -39,7 +39,7 @@
                 "default": "./dist/audio-synth/index.js"
             },
             "import": {
-                "types": "./dist/audio-synth/index.d.mts",
+                "types": "./dist/audio-synth/index.d.ts",
                 "default": "./dist/audio-synth/index.mjs"
             }
         },
@@ -49,7 +49,7 @@
                 "default": "./dist/audio-cg/index.js"
             },
             "import": {
-                "types": "./dist/audio-cg/index.d.mts",
+                "types": "./dist/audio-cg/index.d.ts",
                 "default": "./dist/audio-cg/index.mjs"
             }
         },
@@ -59,7 +59,7 @@
                 "default": "./dist/theory/index.js"
             },
             "import": {
-                "types": "./dist/theory/index.d.mts",
+                "types": "./dist/theory/index.d.ts",
                 "default": "./dist/theory/index.mjs"
             }
         },
@@ -69,7 +69,7 @@
                 "default": "./dist/score/index.js"
             },
             "import": {
-                "types": "./dist/score/index.d.mts",
+                "types": "./dist/score/index.d.ts",
                 "default": "./dist/score/index.mjs"
             }
         },
@@ -79,7 +79,7 @@
                 "default": "./dist/react-ui/index.js"
             },
             "import": {
-                "types": "./dist/react-ui/index.d.mts",
+                "types": "./dist/react-ui/index.d.ts",
                 "default": "./dist/react-ui/index.mjs"
             }
         },
@@ -89,7 +89,7 @@
                 "default": "./dist/pieces/index.js"
             },
             "import": {
-                "types": "./dist/pieces/index.d.mts",
+                "types": "./dist/pieces/index.d.ts",
                 "default": "./dist/pieces/index.mjs"
             }
         }
@@ -102,7 +102,6 @@
         "dist/**/*.js",
         "dist/**/*.mjs",
         "dist/**/*.d.ts",
-        "dist/**/*.d.mts",
         "package.json"
     ],
     "peerDependencies": {
