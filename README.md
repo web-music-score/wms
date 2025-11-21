@@ -9,33 +9,28 @@ npm i web-music-score
 ```
 
 ## Quick Example
-Here is a simplified TypeScript React snippet.
-
 ```ts
-import * as React from "react";
-import { DocumentBuilder } from "web-music-score/score";
-import { MusicScoreView } from "web-music-score/react-ui";
+import * as Score from "web-music-score/score";
 
-class Demo extends React.Component<{}, {}> {
-    state = {};
-    constructor(props: {}) {
-        super(props);
-    }
-    render() {
-        const doc = new DocumentBuilder()
-            .setScoreConfiguration("guitarTreble")
-            .addMeasure()
-            .setKeySignature("C Major")
-            .setTimeSignature("3/4")
-            .addNote(0, "C4", "4n")
-            .addNote(0, "E4", "4n")
-            .addNote(0, "G4", "4n")
-            .endSong()
-            .getDocument();
+const doc = new Score.DocumentBuilder()
+    .setScoreConfiguration("guitarTreble")
+    .addMeasure()
+    .setKeySignature("C Major")
+    .setTimeSignature("3/4")
+    .addNote(0, "C4", "4n")
+    .addNote(0, "E4", "4n")
+    .addNote(0, "G4", "4n")
+    .endSong()
+    .getDocument();
 
-        return <MusicScoreView doc={doc} />;
-    }
-}
+new Score.MRenderContext().
+    setCanvas("scoreCanvasId").
+    setDocument(doc).
+    draw();
+
+new Score.MPlaybackButtons().
+    setPlayStopButton("playButtonId").
+    setDocument(doc);
 ```
 
 ## Report a Bug
