@@ -17,6 +17,8 @@ updates and patches.
 - Dedicated GitHub account `github.com/web-music-score` (created).
 - Unscoped npm package `web-music-score` (reserved).
 - Dedicated website `web-music-score.org` (reserved).
+- Next version will be major update v6.0.0. It will be unscoped pkg, remove deprecated and
+  obsolote stuff, new homepage, etc.
 
 ## Help Wanted
 
