@@ -99,15 +99,6 @@ export default defineConfig([
         banner: {
             js: bannerText
         },
-        footer: {
-            js: `
-// Backward compatibility alias
-var Audio_ClassicalGuitar = Audio_CG;
-if (typeof window !== "undefined") {
-    window.Audio_ClassicalGuitar = window.Audio_CG = Audio_CG;
-}
-`
-        },
         define: {
             __LIB_INFO__: JSON.stringify(`Audio_CG v${pkg.version} (iife)`)
         },
