@@ -11,7 +11,7 @@
         "./src/pieces/index.ts"
     ],
     "out": "docs/",
-    "readme": "README.md",
+    "readme": "none",
     "disableSources": true,
     "excludeInternal": true,
     "excludePrivate": true,
