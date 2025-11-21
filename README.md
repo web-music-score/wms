@@ -9,38 +9,32 @@ npm i web-music-score
 ```
 
 ## Quick Example
-Here is a quick TypeScript code snippet how to build a score document.
+Here is a simplified TypeScript React snippet.
+
 ```ts
-import { DocumentBuilder, MDocument } from "web-music-score/score";
+import * as React from "react";
+import { DocumentBuilder } from "web-music-score/score";
+import { MusicScoreView } from "web-music-score/react-ui";
 
-export function createGreensleeves(): MDocument {
-    return new DocumentBuilder()
-        .setScoreConfiguration("guitarTreble")
-        .setHeader("Greensleeves")
+class Demo extends React.Component<{}, {}> {
+    state = {};
+    constructor(props: {}) {
+        super(props);
+    }
+    render() {
+        const doc = new DocumentBuilder()
+            .setScoreConfiguration("guitarTreble")
+            .addMeasure()
+            .setKeySignature("C Major")
+            .setTimeSignature("3/4")
+            .addNote(0, "C4", "4n")
+            .addNote(0, "E4", "4n")
+            .addNote(0, "G4", "4n")
+            .endSong()
+            .getDocument();
 
-        .addMeasure()
-        .setKeySignature("C Major")
-        .setTimeSignature("6/8")
-        .setTempo(140)
-        .addNote(0, "A3", "8n")
-
-        .addMeasure()
-        .addNavigation("startRepeat")
-        .addNote(0, "C4", "4n", { stem: "up" })
-        .addNote(0, "D4", "8n")
-        .addNote(0, "E4", "8.")
-        .addNote(0, "F4", "16n")
-        .addNote(0, "E4", "8n")
-        .addNote(1, "A2", "8n", { stem: "down" })
-        .addNote(1, "E3", "4n")
-        .addNote(1, "A2", "8n")
-        .addNote(1, "E3", "4n")
-
-        // ... and so on ...
-
-        .endSong()
-
-        .getDocument();
+        return <MusicScoreView doc={doc} />;
+    }
 }
 ```
 
