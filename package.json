@@ -4,6 +4,7 @@
     "author": "Stefan Brockmann",
     "license": "MIT",
     "private": false,
+    "homepage": "https://web-music-score.org",
     "repository": {
         "type": "git",
         "url": "https://github.com/web-music-score/wms.git"
@@ -11,7 +12,7 @@
     "bugs": {
         "url": "https://github.com/web-music-score/wms/issues/new/choose"
     },
-    "description": "TS/JS component for rendering and playing music scores in the browser.",
+    "description": "Web Music Score is a TypeScript/JavaScript music notation web component and player.",
     "exports": {
         "./core": {
             "require": {
