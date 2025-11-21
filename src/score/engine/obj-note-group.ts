@@ -1,5 +1,5 @@
 import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
-import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "@tspro/web-music-score/theory";
+import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId } from "../pub";
@@ -10,7 +10,7 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings, DocumentColor } from "./settings";
 import { ObjText } from "./obj-text";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
 

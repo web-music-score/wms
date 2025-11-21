@@ -1,4 +1,4 @@
-import * as Score from "@tspro/web-music-score/score";
+import * as Score from "web-music-score/score";
 
 export function createNavigationDCAlFineDemo() {
     return new Score.DocumentBuilder()

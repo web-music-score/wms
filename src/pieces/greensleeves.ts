@@ -1,4 +1,4 @@
-import { MDocument, Navigation, DocumentBuilder } from "@tspro/web-music-score/score";
+import { MDocument, Navigation, DocumentBuilder } from "web-music-score/score";
 
 /**
  * Create Greensleeves music piece.<br />

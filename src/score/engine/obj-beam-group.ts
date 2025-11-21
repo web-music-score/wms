@@ -1,5 +1,5 @@
 import { AnchoredRect, Utils } from "@tspro/ts-utils-lib";
-import { NoteLength, Tuplet, TupletRatio, NoteLengthProps } from "@tspro/web-music-score/theory";
+import { NoteLength, Tuplet, TupletRatio, NoteLengthProps } from "web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
@@ -7,7 +7,7 @@ import { ObjText } from "./obj-text";
 import { Stem, MBeamGroup, MusicInterface, MStaffBeamGroup, TupletOptions } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjStaff } from "./obj-staff-and-tab";
 
 export enum BeamGroupType {

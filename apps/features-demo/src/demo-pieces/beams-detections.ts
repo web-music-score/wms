@@ -1,4 +1,4 @@
-import * as Score from "@tspro/web-music-score/score";
+import * as Score from "web-music-score/score";
 
 export function createBeamsDetectionDemo() {
     return new Score.DocumentBuilder()

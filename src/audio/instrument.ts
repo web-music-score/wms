@@ -4,7 +4,7 @@
  * <p>To create your own instrument just create a class that implement this simple interface.</p>
  * 
  * ```ts
- *   import * as Audio from "@tspro/web-music-score/audio";
+ *   import * as Audio from "web-music-score/audio";
  * 
  *   class MyCoolInstrument implements Audio.Instrument {
  *       constructor() { }

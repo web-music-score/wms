@@ -23,7 +23,7 @@ export default defineConfig([
         dts: true,
         sourcemap: true,
         clean: true,
-        external: ['react', '@tspro/web-music-score'],
+        external: ['react', 'web-music-score'],
         banner: {
             js: bannerText
         },
@@ -51,7 +51,7 @@ export default defineConfig([
         dts: true,
         sourcemap: true,
         clean: false, // Don't wipe dist from the previous build
-        external: ['react', '@tspro/web-music-score'],
+        external: ['react', 'web-music-score'],
         banner: {
             js: bannerText
         },

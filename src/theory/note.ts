@@ -1,6 +1,6 @@
 import { Guard, UniMap } from "@tspro/ts-utils-lib";
 import { PitchNotation, SymbolSet } from "./types";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 function mod(n: number, m: number): number {
     return ((n % m) + m) % m;

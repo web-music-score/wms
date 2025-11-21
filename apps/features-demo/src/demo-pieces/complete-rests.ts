@@ -1,5 +1,5 @@
-import * as Theory from "@tspro/web-music-score/theory";
-import * as Score from "@tspro/web-music-score/score";
+import * as Theory from "web-music-score/theory";
+import * as Score from "web-music-score/score";
 
 export function createCompleteRestsDemo() {
     return new Score.DocumentBuilder()

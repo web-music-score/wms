@@ -1,8 +1,8 @@
 import * as React from "react";
-import * as Audio from "@tspro/web-music-score/audio";
-import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
-import * as Score from "@tspro/web-music-score/score";
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import * as Audio from "web-music-score/audio";
+import { ClassicalGuitar } from "web-music-score/audio-cg";
+import * as Score from "web-music-score/score";
+import * as ScoreUI from "web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
 
  Audio.addInstrument(ClassicalGuitar);

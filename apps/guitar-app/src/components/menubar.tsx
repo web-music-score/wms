@@ -1,8 +1,8 @@
 import * as React from "react";
 import { Button, Dropdown, Navbar, Row } from "react-bootstrap";
 import { GuitarApp, Page } from "guitar-app";
-import * as Audio from "@tspro/web-music-score/audio";
-import * as Theory from "@tspro/web-music-score/theory";
+import * as Audio from "web-music-score/audio";
+import * as Theory from "web-music-score/theory";
 
 // Icons I got from https://materialdesignicons.com/
 const HomeIcon = <svg style={{ width: "24px", height: "24px" }}>

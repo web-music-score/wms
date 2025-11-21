@@ -1,5 +1,5 @@
-import { Accidental, Note } from "@tspro/web-music-score/theory";
-import { RhythmProps } from "@tspro/web-music-score/theory";
+import { Accidental, Note } from "web-music-score/theory";
+import { RhythmProps } from "web-music-score/theory";
 import { MusicObject } from "../engine/music-object";
 import { ObjAccidental } from "../engine/obj-accidental";
 import { ObjConnective } from "../engine/obj-connective";
@@ -22,7 +22,7 @@ import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
 import { MPlayer } from "./music-interface";
 import { ObjLyrics } from "score/engine/obj-lyrics";

@@ -1,4 +1,4 @@
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { MRenderer, MRenderContext } from "./music-interface";
 import { MScoreRow, MusicInterface } from "./music-objects";
 

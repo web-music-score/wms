@@ -1,4 +1,4 @@
-import { Note, getTempoString, KeySignature } from "@tspro/web-music-score/theory";
+import { Note, getTempoString, KeySignature } from "web-music-score/theory";
 import { Clef, MStaffSignature, MTabSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
@@ -7,7 +7,7 @@ import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { DocumentColor } from "./settings";
 

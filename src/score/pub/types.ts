@@ -1,5 +1,5 @@
 import { Guard } from "@tspro/ts-utils-lib";
-import { Note } from "@tspro/web-music-score/theory";
+import { Note } from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "core/error";
 
 /** Staff preset values for score configuration. */

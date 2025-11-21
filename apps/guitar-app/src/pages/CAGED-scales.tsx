@@ -3,9 +3,9 @@ import { Alert, Col, Container, Form, Row } from "react-bootstrap";
 import { TuningScaleInfo, Menubar } from "components";
 import { GuitarApp, Page } from "guitar-app";
 import { Rect, Utils } from "@tspro/ts-utils-lib";
-import * as Audio from "@tspro/web-music-score/audio";
-import * as Theory from "@tspro/web-music-score/theory";
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import * as Audio from "web-music-score/audio";
+import * as Theory from "web-music-score/theory";
+import * as ScoreUI from "web-music-score/react-ui";
 
 const LowestNote = "E2";
 

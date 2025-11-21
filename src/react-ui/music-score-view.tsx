@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MDocument, MRenderContext, ScoreEventListener } from "@tspro/web-music-score/score";
+import { MDocument, MRenderContext, ScoreEventListener } from "web-music-score/score";
 
 export interface MusicScoreViewProps {
     doc: MDocument;
@@ -10,8 +10,8 @@ export interface MusicScoreViewProps {
  * Music score view react component.
  * ```ts
  *   // Using with React TSX/JSX
- *   import * as Score from "@tspro/web-music-score/score";
- *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
+ *   import * as Score from "web-music-score/score";
+ *   import * as ScoreUI from "web-music-score/react-ui";
  *  
  *   // Render function of react component.
  *   render() {

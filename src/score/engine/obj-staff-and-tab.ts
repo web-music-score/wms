@@ -1,6 +1,6 @@
-import { getTuningStrings, Note, validateTuningName } from "@tspro/web-music-score/theory";
+import { getTuningStrings, Note, validateTuningName } from "web-music-score/theory";
 import { ImageAsset, RenderContext } from "./render-context";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { Clef, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";

@@ -2,10 +2,10 @@ import * as React from "react";
 import { Col, Container, Row } from "react-bootstrap";
 import { GuitarApp, Page } from "guitar-app";
 import { SelectAccidental, Menubar, TuningScaleInfo } from "components";
-import * as Audio from "@tspro/web-music-score/audio";
-import * as Theory from "@tspro/web-music-score/theory";
-import * as Score from "@tspro/web-music-score/score";
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import * as Audio from "web-music-score/audio";
+import * as Theory from "web-music-score/theory";
+import * as Score from "web-music-score/score";
+import * as ScoreUI from "web-music-score/react-ui";
 
 const tdStyle: React.CSSProperties = {
     paddingLeft: "1em",

@@ -8,7 +8,7 @@ import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { RenderContext } from "./render-context";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";

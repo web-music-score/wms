@@ -1,6 +1,6 @@
 import { Guard } from "@tspro/ts-utils-lib";
 import { NoteLength, NoteLengthProps } from "./rhythm";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Time signature enum.  */
 export enum TimeSignatures {

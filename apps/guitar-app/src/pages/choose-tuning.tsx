@@ -2,9 +2,9 @@ import * as React from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import { Menubar, SelectTuningForm } from "components";
 import { GuitarApp, Page } from "guitar-app";
-import * as Theory from "@tspro/web-music-score/theory";
-import * as Score from "@tspro/web-music-score/score";
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import * as Theory from "web-music-score/theory";
+import * as Score from "web-music-score/score";
+import * as ScoreUI from "web-music-score/react-ui";
 
 interface ChooseTuningProps {
     app: GuitarApp;

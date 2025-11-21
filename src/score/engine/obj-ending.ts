@@ -4,7 +4,7 @@ import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MEnding, Navigation } from "../pub";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { DocumentColor } from "./settings";
 
 export class ObjEnding extends MusicObject {

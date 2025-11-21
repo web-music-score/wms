@@ -1,4 +1,4 @@
-import { Accidental, Note } from "@tspro/web-music-score/theory";
+import { Accidental, Note } from "web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
 
 export class AccidentalState {

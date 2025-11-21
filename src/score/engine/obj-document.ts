@@ -9,7 +9,7 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
 import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;

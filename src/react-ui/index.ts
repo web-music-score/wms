@@ -4,6 +4,6 @@ export * from "./guitar-view";
 export * from "./music-score-view";
 export * from "./playback-buttons";
 
-import { init as initCore } from "@tspro/web-music-score/core";
+import { init as initCore } from "web-music-score/core";
 
 initCore();

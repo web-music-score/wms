@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MDocument, MPlaybackButtons } from "@tspro/web-music-score/score";
+import { MDocument, MPlaybackButtons } from "web-music-score/score";
 
 /**
  * Playback buttons layout
@@ -31,8 +31,8 @@ export interface PlaybackButtonsState {
  * Usage:
  * ```ts
  *   // Using with React TSX/JSX
- *   import * as Score from "@tspro/web-music-score/score";
- *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
+ *   import * as Score from "web-music-score/score";
+ *   import * as ScoreUI from "web-music-score/react-ui";
  * 
  *   // Create document.
  *   const doc = new Score.DocumentBuilder()

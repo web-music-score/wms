@@ -1,8 +1,8 @@
-import { Accidental } from "@tspro/web-music-score/theory";
+import { Accidental } from "web-music-score/theory";
 import { MAccidental } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjAccidental extends MusicObject {

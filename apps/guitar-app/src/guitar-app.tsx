@@ -2,11 +2,11 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { CAGEDScales, ChooseScale, ChooseScaleCircle, ChooseTuning, DiatonicChords, FrontPage, GuitarScales, Intervals, PlayNotes, WhatChord } from "./pages";
 import { Cookies, Rect, Utils } from "@tspro/ts-utils-lib";
-import * as Audio from "@tspro/web-music-score/audio";
-import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
-import * as Theory from "@tspro/web-music-score/theory";
-import * as Score from "@tspro/web-music-score/score";
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import * as Audio from "web-music-score/audio";
+import { ClassicalGuitar } from "web-music-score/audio-cg";
+import * as Theory from "web-music-score/theory";
+import * as Score from "web-music-score/score";
+import * as ScoreUI from "web-music-score/react-ui";
 
 const AppCookies = {
     PitchNotation: "pitchNotation",

@@ -1,4 +1,4 @@
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { Navigation } from "../pub";
 import { MusicObject, MusicObjectLink } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";

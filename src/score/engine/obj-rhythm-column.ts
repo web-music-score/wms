@@ -1,4 +1,4 @@
-import { Note } from "@tspro/web-music-score/theory";
+import { Note } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
@@ -9,7 +9,7 @@ import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
 import { DocumentSettings, DocumentColor } from "./settings";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";

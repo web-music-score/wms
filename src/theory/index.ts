@@ -9,6 +9,6 @@ export * from "./tempo";
 export * from "./rhythm";
 export * from "./types";
 
-import { init as initCore } from "@tspro/web-music-score/core";
+import { init as initCore } from "web-music-score/core";
 
 initCore();

@@ -1,7 +1,7 @@
 import { Guard } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 function getAccidental(chromaticId: number, diatonicId: number): Accidental {
     let a = Note.getChromaticClass(chromaticId) - new Note(diatonicId, 0).chromaticClass;

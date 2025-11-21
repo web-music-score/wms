@@ -1,6 +1,6 @@
 import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Interval direction type. */
 export type IntervalDirection = "Unison" | "Ascending" | "Descending";

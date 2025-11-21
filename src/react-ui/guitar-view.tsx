@@ -1,10 +1,10 @@
 import * as React from "react";
 import { Guard, Rect, Utils } from "@tspro/ts-utils-lib";
-import { Handedness } from "@tspro/web-music-score/theory";
+import { Handedness } from "web-music-score/theory";
 import { GuitarContext, FretPosition } from "./guitar-context";
 import GuitarData from "./assets/guitar.json";
 import GuitarImg from "./assets/guitar.png";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 /**
  * Calculated fret positions for 24 frets here (scale length = 1):
@@ -77,8 +77,8 @@ export interface GuitarViewState {
  * Guitar (neck) view react component.
  * ```ts
  *   // Using with React TSX/JSX
- *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
- *   import * as Theory from "@tspro/web-music-score/theory";
+ *   import * as ScoreUI from "web-music-score/react-ui";
+ *   import * as Theory from "web-music-score/theory";
  *  
  *   // Render function of react component.
  *   render() {

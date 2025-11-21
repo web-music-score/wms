@@ -3,7 +3,7 @@ import { Note } from "./note";
 import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
 import { Interval } from "./interval";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 function getNaturalDiatonicId(chromaticId: number): number {
     // ChromaticId could map to several diatonicId/accidental combinations.

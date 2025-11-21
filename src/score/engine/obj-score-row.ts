@@ -1,11 +1,11 @@
-import { Note } from "@tspro/web-music-score/theory";
+import { Note } from "web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
 import { getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { RenderContext } from "./render-context";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";

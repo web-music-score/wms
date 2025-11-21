@@ -1,7 +1,7 @@
 import { Guard, LRUCache } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Guitar handedness enum. */
 export enum Handedness {

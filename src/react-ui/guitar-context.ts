@@ -1,7 +1,7 @@
-import { GuitarNoteLabel, Handedness, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
-import { getTuningStrings, Note, Scale } from "@tspro/web-music-score/theory";
+import { GuitarNoteLabel, Handedness, PitchNotation, SymbolSet } from "web-music-score/theory";
+import { getTuningStrings, Note, Scale } from "web-music-score/theory";
 import GuitarData from "./assets/guitar.json";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { Guard } from "@tspro/ts-utils-lib";
 
 const DefaultColors = {

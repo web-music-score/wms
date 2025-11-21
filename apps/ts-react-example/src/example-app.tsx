@@ -1,9 +1,9 @@
 import * as React from "react";
-import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
-import * as Audio from "@tspro/web-music-score/audio";
-import * as Score from "@tspro/web-music-score/score";
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
-import { createFrereJacques } from "@tspro/web-music-score/pieces";
+import { ClassicalGuitar } from "web-music-score/audio-cg";
+import * as Audio from "web-music-score/audio";
+import * as Score from "web-music-score/score";
+import * as ScoreUI from "web-music-score/react-ui";
+import { createFrereJacques } from "web-music-score/pieces";
 
 type ExampleAppState = { doc: Score.MDocument }
 

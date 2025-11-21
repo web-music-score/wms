@@ -1,4 +1,4 @@
-import { createAll } from "@tspro/web-music-score/pieces";
+import { createAll } from "web-music-score/pieces";
 import { createNavigationRepeatEndingDemo } from "demo-pieces/navigation-repeats-endings";
 import { createNavigationDCAlFineDemo } from "demo-pieces/navigation-DC_al_Fine";
 import { createNavigationDCAlCodaDemo } from "demo-pieces/navigation-DC_al_Coda";
@@ -18,7 +18,7 @@ import { createStaffConfigGuitarDemo } from "./staff-guitar";
 import { createStaffConfigTabDemo } from "./staff-tab";
 import { createStaffGroupsDemo } from "./staff-groups";
 import { createLyricsDemo } from "./lyrics";
-import * as Score from "@tspro/web-music-score/score";
+import * as Score from "web-music-score/score";
 
 export class DemoPieces {
     private static instance?: DemoPieces;

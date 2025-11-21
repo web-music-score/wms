@@ -1,6 +1,6 @@
-import { Note, PitchNotation, SymbolSet } from "@tspro/web-music-score/theory";
-import { init as initCore, MusicError, MusicErrorType } from "@tspro/web-music-score/core";
-import { Synthesizer } from "@tspro/web-music-score/audio-synth";
+import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
+import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
+import { Synthesizer } from "web-music-score/audio-synth";
 import { Instrument, linearToDecibels } from "./instrument";
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 

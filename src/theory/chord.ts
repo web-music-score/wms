@@ -2,7 +2,7 @@ import { IndexArray, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 const isEqualNote = (n1: Note, n2: Note) => n1.chromaticClass === n2.chromaticClass;
 

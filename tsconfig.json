@@ -26,28 +26,28 @@
         "removeComments": false,
         "skipLibCheck": true,
         "paths": {
-            "@tspro/web-music-score/core": [
+            "web-music-score/core": [
                 "core"
             ],
-            "@tspro/web-music-score/audio": [
+            "web-music-score/audio": [
                 "audio"
             ],
-            "@tspro/web-music-score/audio-synth": [
+            "web-music-score/audio-synth": [
                 "audio-instruments/audio-synth"
             ],
-            "@tspro/web-music-score/audio-cg": [
+            "web-music-score/audio-cg": [
                 "audio-instruments/audio-cg"
             ],
-            "@tspro/web-music-score/theory": [
+            "web-music-score/theory": [
                 "theory"
             ],
-            "@tspro/web-music-score/score": [
+            "web-music-score/score": [
                 "score"
             ],
-            "@tspro/web-music-score/react-ui": [
+            "web-music-score/react-ui": [
                 "react-ui"
             ],
-            "@tspro/web-music-score/pieces": [
+            "web-music-score/pieces": [
                 "pieces"
             ]
         }

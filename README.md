@@ -27,33 +27,33 @@ My email can be found on [GitHub](https://github.com/web-music-score) (visible f
 ## Installation
 
 ```sh
-npm i @tspro/web-music-score
+npm i web-music-score
 ```
 
 ## Import
 
 ```js
 // Import core module, it does not contain much.
-import * as Core from "@tspro/web-music-score/core";
+import * as Core from "web-music-score/core";
 
 // Import audio module, it can play notes.
-import * as Audio from "@tspro/web-music-score/audio";
+import * as Audio from "web-music-score/audio";
 
 // Import theory module, it contains all music theory stuff.
-import * as Theory from "@tspro/web-music-score/theory";
+import * as Theory from "web-music-score/theory";
 
 // Import score module, it contains music score stuff.
-import * as Score from "@tspro/web-music-score/score";
+import * as Score from "web-music-score/score";
 
 // Import react-ui module, it contains all react components.
 // React is peer dependency "^18.0.0 || ^19.0.0".
-import * as ScoreUI from "@tspro/web-music-score/react-ui";
+import * as ScoreUI from "web-music-score/react-ui";
 
 // Import pieces module, it contains demo songs.
-import * as Pieces from "@tspro/web-music-score/pieces";
+import * as Pieces from "web-music-score/pieces";
 
 // You can also use require
-const Score = require("@tspro/web-music-score/score");
+const Score = require("web-music-score/score");
 ```
 
 ## Browser Modules
@@ -69,14 +69,14 @@ React module `react-ui` is not included available for browser usage.
     It is recommended to use exact version number and direct link to the bundle so
     that if something breaks between versions then your web site does not stop working.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@5.5.0/dist/iife/index.global.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tspro/web-music-score@5.5.0/dist/iife/index.global.js"></script>
+<script src="https://unpkg.com/web-music-score@5.5.0/dist/iife/index.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web-music-score@5.5.0/dist/iife/index.global.js"></script>
 
 <!--
     Classical guitar now also available for browser module.
 -->
-<script src="https://unpkg.com/@tspro/web-music-score@5.5.0/dist/iife/audio-cg.global.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tspro/web-music-score@5.5.0/dist/iife/audio-cg.global.js"></script>
+<script src="https://unpkg.com/web-music-score@5.5.0/dist/iife/audio-cg.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/web-music-score@5.5.0/dist/iife/audio-cg.global.js"></script>
 
 <script>
     // The lib is available via global name WebMusicScore.
@@ -433,7 +433,7 @@ Other instruments need to be registered manually.
 
 ```js
 // Import classical guitar instrument.
-import { ClassicalGuitar } from "@tspro/web-music-score/audio-cg";
+import { ClassicalGuitar } from "web-music-score/audio-cg";
 
 // Add and use classical guitar instrument.
 Audio.addInstrument(ClassicalGuitar);

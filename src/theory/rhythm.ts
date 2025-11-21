@@ -1,5 +1,5 @@
 import { Guard, IndexArray, UniMap, Utils } from "@tspro/ts-utils-lib";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 const MaxTupletRatioValue = 12;
 

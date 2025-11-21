@@ -6,7 +6,7 @@ import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
 import { MConnective, TieType, Connective } from "../pub";
 import { DocumentSettings, DocumentColor } from "./settings";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 
 export class ObjConnective extends MusicObject {

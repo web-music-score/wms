@@ -1,8 +1,8 @@
-import { Note } from "@tspro/web-music-score/theory";
+import { Note } from "web-music-score/theory";
 import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, NoteAnchor, Stem, TieType } from "../pub/types";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
 import { ObjNotationLine, ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { Guard } from "@tspro/ts-utils-lib";

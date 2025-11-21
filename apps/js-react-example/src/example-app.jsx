@@ -1,10 +1,10 @@
 import * as React from "react";
 
 // Try require
-const { ClassicalGuitar } = require("@tspro/web-music-score/audio-cg");
-const Audio = require("@tspro/web-music-score/audio");
-const ScoreUI = require("@tspro/web-music-score/react-ui");
-const { createFrereJacques } = require("@tspro/web-music-score/pieces");
+const { ClassicalGuitar } = require("web-music-score/audio-cg");
+const Audio = require("web-music-score/audio");
+const ScoreUI = require("web-music-score/react-ui");
+const { createFrereJacques } = require("web-music-score/pieces");
 
 export class ExampleApp extends React.Component {
     constructor(props) {

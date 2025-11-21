@@ -1,4 +1,4 @@
-import { MDocument } from "@tspro/web-music-score/score";
+import { MDocument } from "web-music-score/score";
 import { createAndanteByDiabelli } from "./andante-diabelli";
 import { createCanonInD } from "./canon-pachelbel";
 import { createFrereJacques } from "./frere-jacques";

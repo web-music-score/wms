@@ -1,6 +1,6 @@
 import { Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
-import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "@tspro/web-music-score/theory";
-import * as Audio from "@tspro/web-music-score/audio";
+import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "web-music-score/theory";
+import * as Audio from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
 import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAnnotation, TempoAnnotation } from "../pub";

@@ -1,6 +1,6 @@
 import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRect } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "@tspro/web-music-score/theory";
-import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "@tspro/web-music-score/theory";
+import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
+import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
 import { RenderContext } from "./render-context";
@@ -22,7 +22,7 @@ import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos 
 import { getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";

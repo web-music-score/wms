@@ -1,4 +1,4 @@
-import { DocumentBuilder, MDocument } from "@tspro/web-music-score/score";
+import { DocumentBuilder, MDocument } from "web-music-score/score";
 
 /**
  * Create Canon in D by Pachelbel music piece.<br />

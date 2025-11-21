@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Symbol set enum. */
 export enum SymbolSet {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Note, SymbolSet, getScale, Scale, ScaleType } from "@tspro/web-music-score/theory";
+import { Note, SymbolSet, getScale, Scale, ScaleType } from "web-music-score/theory";
 import { Device, Rect, Utils } from "@tspro/ts-utils-lib";
 
 const SelectedColor = "#0A0";
@@ -44,8 +44,8 @@ export interface CircleOfFifthsProps {
  * Circle of fifths react component.
  * ```ts
  *   // Using with React TSX/JSX
- *   import * as ScoreUI from "@tspro/web-music-score/react-ui";
- *   import * as Theory from "@tspro/web-music-score/theory";
+ *   import * as ScoreUI from "web-music-score/react-ui";
+ *   import * as Theory from "web-music-score/theory";
  *  
  *   // Render function of react component.
  *   render() {

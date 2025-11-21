@@ -1,4 +1,4 @@
-import * as Audio from "@tspro/web-music-score/audio";
+import * as Audio from "web-music-score/audio";
 import { Guard, UniMap, ValueSet, Utils, Rect } from "@tspro/ts-utils-lib";
 import { Player } from "../engine/player";
 import { RenderContext } from "../engine/render-context";
@@ -6,7 +6,7 @@ import { PlayStateChangeListener } from "./types";
 import { ScoreEventListener } from "./event";
 import { PlayState } from "./types";
 import { MDocument, MScoreRow, MusicInterface } from "./music-objects";
-import { MusicError, MusicErrorType } from "@tspro/web-music-score/core";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {

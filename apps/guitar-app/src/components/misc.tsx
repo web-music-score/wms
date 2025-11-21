@@ -1,7 +1,7 @@
 import { GuitarApp } from "guitar-app";
 import * as React from "react";
 import { Col, Form, Row } from "react-bootstrap";
-import * as Theory from "@tspro/web-music-score/theory";
+import * as Theory from "web-music-score/theory";
 
 interface SelectAccidentalProps {
     accidental: Theory.Accidental | undefined;

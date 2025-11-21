@@ -1,4 +1,4 @@
-import { MDocument, DocumentBuilder } from "@tspro/web-music-score/score";
+import { MDocument, DocumentBuilder } from "web-music-score/score";
 
 /**
  * Create Andante by A. Diabelli music piece.

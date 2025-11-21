@@ -1,4 +1,8 @@
 # Changelog
+## [6.0.0] - 2025-??-??
+### Breaking changes
+- Switching to unscoped package name `web-music-score`.
+
 ## [5.5.0] - 2025-11-19
 ### Added
 - Coloring document.
