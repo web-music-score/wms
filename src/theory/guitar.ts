@@ -3,31 +3,6 @@ import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
-/** Guitar handedness enum. */
-export enum Handedness {
-    /** Right handed guitar. */
-    RightHanded,
-    /** Left handed guitar. */
-    LeftHanded
-}
-
-/** Default guitar handedness (Handedness.RightHanded). */
-export const DefaultHandedness = Handedness.RightHanded;
-
-/**
- * Validate if given argument is guitar handedness.
- * @param h - Guitar handedness to validate.
- * @returns - Guitar handedness if valid, else throws.
- */
-export function validateHandedness(h: unknown): Handedness {
-    if (Guard.isEnumValue(h, Handedness)) {
-        return h;
-    }
-    else {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid handedness: ${h}`);
-    }
-}
-
 /*
  * | string | stringId | freq    | fretboard (RH) | on tab        |
  * |--------|----------|---------|----------------|---------------|
