@@ -1,5 +1,5 @@
 # Changelog
-## [6.0.0] - 2025-??-??
+## [6.0.0-pre.0] - 2025-11-22
 ### **Breaking Changes**
 - Switching to unscoped package name `web-music-score`.
 - Removed all guitar and other stuff (GuitarApp, GuitarContext, circleOfFifths, etc.)
