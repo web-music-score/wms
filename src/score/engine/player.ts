@@ -9,6 +9,17 @@ import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension, getTextContent } from "./extension";
 import { getDynamicsVolume } from "./element-data";
 
+function _setTimeout(cb: () => any, ms: number): number | undefined {
+    return typeof window === "undefined"
+        ? undefined
+        : window.setTimeout(cb, ms);
+}
+
+function _clearTimeout(t: number | undefined) {
+    if(typeof window !== "undefined")
+        window.clearTimeout(t);
+}
+
 export type CursorPositionChangeListener = (cursorRect: Rect | undefined) => void;
 
 const AccelerandoSpeedMul = 2;
@@ -444,7 +455,7 @@ export class Player {
 
                     if (arpeggioDelayTicks > 0) {
                         let arpeggioDelay = getDuration(arpeggioDelayTicks, tempo);
-                        window.setTimeout(() => Audio.playNote(note.note, noteSeconds, volume), arpeggioDelay * 1000);
+                        _setTimeout(() => Audio.playNote(note.note, noteSeconds, volume), arpeggioDelay * 1000);
                     }
                     else {
                         Audio.playNote(note.note, noteSeconds, volume);
@@ -455,7 +466,7 @@ export class Player {
             timeoutSeconds = getDuration(col.getTicksToNextColumn() + fermataHoldTicks, tempo);
         }
 
-        this.playTimer = window.setTimeout(() => this.playStep(), timeoutSeconds * 1000);
+        this.playTimer = _setTimeout(() => this.playStep(), timeoutSeconds * 1000);
 
         // Next pos
         this.playPos = this.getNextPlayPosition(this.playPos);
@@ -496,7 +507,7 @@ export class Player {
     pause() {
         // To pause, only stop timer
         if (this.playTimer) {
-            window.clearTimeout(this.playTimer);
+            _clearTimeout(this.playTimer);
             this.playTimer = undefined;
         }
 
@@ -511,7 +522,7 @@ export class Player {
 
         // ...and stop timer
         if (this.playTimer) {
-            window.clearTimeout(this.playTimer);
+            _clearTimeout(this.playTimer);
             this.playTimer = undefined;
         }
 

@@ -86,7 +86,7 @@ export class RenderContext {
     private onTouchEndFn: (e: TouchEvent) => void;
 
     constructor(private readonly mi: MRenderContext) {
-        this.devicePixelRatio = window.devicePixelRatio;
+        this.devicePixelRatio = typeof window !== "undefined" ? window.devicePixelRatio : 1;
         this.fontSize = Device.FontSize * DocumentSettings.DocumentScale * this.devicePixelRatio;
         this.unitSize = this.fontSize * 0.3;
         this._lineWidth = this.unitSize * 0.2;
@@ -141,6 +141,11 @@ export class RenderContext {
 
         // threshold to decide what counts as "black"
         const threshold = 40; // 0..255; tweak as needed
+
+        if(typeof document === "undefined") {
+            console.error("Failed to colorize image: document is undefined.");
+            return;
+        }
 
         const canvas = document.createElement("canvas");
         canvas.width = data.img.width;
