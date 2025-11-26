@@ -1,58 +1,6 @@
 import * as React from "react";
 import { MDocument, MPlaybackButtons } from "web-music-score/score";
 
-// TODO: Add to ts-utils-lib?
-function injectCss(styleId: string, styleCss: string) {
-    if (styleId === "" || styleCss === "") return; // Nothing to inject
-    if (typeof document === "undefined") return;   // SSR safe
-    if (document.getElementById(styleId)) return;  // Already injected
-    const style = document.createElement("style");
-    style.id = styleId;
-    style.textContent = styleCss;
-    document.head.appendChild(style);
-}
-
-const btnGroupUnknownCss = `
-.wms-btn-group {
-    display: inline-flex;
-    align-items: stretch;
-}
-.wms-btn-group>button,
-.wms-btn-group>.button {
-    border-radius: 0;
-    margin: 0;
-}
-.wms-btn-group>button:first-child,
-.wms-btn-group>.button:first-child {
-    border-top-left-radius: 4px;
-    border-bottom-left-radius: 4px;
-}
-.wms-btn-group>button:last-child,
-.wms-btn-group>.button:last-child {
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-}
-`;
-
-const btnGroupInfimaCss = `
-.wms-btn-group {
-    display: inline-flex;
-    align-items: stretch;
-}
-.wms-btn-group>.button {
-    border-radius: 0;
-    margin: 0;
-}
-.wms-btn-group>.button:first-child {
-    border-top-left-radius: var(--ifm-button-border-radius);
-    border-bottom-left-radius: var(--ifm-button-border-radius);
-}
-.wms-btn-group>.button:last-child {
-    border-top-right-radius: var(--ifm-button-border-radius);
-    border-bottom-right-radius: var(--ifm-button-border-radius);
-}
-`;
-
 function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
     // SSR safe
     if (typeof window === "undefined") return "unknown";
@@ -78,16 +26,6 @@ function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
 
     return "unknown";
 }
-
-let styleSystem: "bootstrap" | "infima" | "unknown" | undefined;
-
-function getStyleSystem(): "bootstrap" | "infima" | "unknown" {
-    if (!styleSystem)
-        styleSystem = detectStyleSystem();
-
-    return styleSystem;
-}
-
 
 export interface PlaybackButtonsProps {
     doc: MDocument;
@@ -135,11 +73,28 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
 
     state: PlaybackButtonsState;
 
+    private buttonClass: string;
+    private buttonGroupClass: string;
+
     constructor(props: PlaybackButtonsProps) {
         super(props);
 
         this.state = {
             controller: new MPlaybackButtons().setDocument(props.doc)
+        }
+
+        switch (detectStyleSystem()) {
+            case "bootstrap":
+                this.buttonClass = "btn btn-primary";
+                this.buttonGroupClass = "btn-group";
+                break;
+            case "infima":
+                this.buttonClass = "button button--primary";
+                this.buttonGroupClass = "ifm-button-group";
+                break;
+            default:
+                this.buttonClass = "wms-button";
+                this.buttonGroupClass = "wms-button-group";
         }
     }
 
@@ -152,45 +107,32 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
     render() {
         let { singlePlayStop, playStop, playLabel, pauseLabel, stopLabel } = this.props;
         let { controller } = this.state;
+        const { buttonClass, buttonGroupClass } = this;
 
         playLabel ??= "Play";
         pauseLabel ??= "Pause";
         stopLabel ??= "Stop";
 
-        const ss = getStyleSystem();
-
-        switch (ss) {
-            case "infima":
-                injectCss("wms-btn-group-style", btnGroupInfimaCss);
-                break;
-            case "unknown":
-                injectCss("wms-btn-group-style", btnGroupUnknownCss);
-                break;
-        }
-
-        const btnPrimaryClass = ss === "bootstrap" ? "btn btn-primary" : ss === "infima" ? "button button--primary" : "button";
-        const btnGroupClass = ss === "bootstrap" ? "btn-group" : "wms-btn-group";
-
         if (singlePlayStop) {
             return (
-                <button className={btnPrimaryClass} ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
+                <button className={buttonClass} ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
             );
         }
         else if (playStop) {
             return (
-                <div className={btnGroupClass}>
-                    <button className={btnPrimaryClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
-                    <button className={btnPrimaryClass} ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
+                <div className={buttonGroupClass}>
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
                 </div>
             );
         }
         else { // if(playPauseStop) {
             // Default is playPauseStop
             return (
-                <div className={btnGroupClass}>
-                    <button className={btnPrimaryClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
-                    <button className={btnPrimaryClass} ref={btn => { if (btn) controller.setPauseButton(btn, pauseLabel); }} />
-                    <button className={btnPrimaryClass} ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
+                <div className={buttonGroupClass}>
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setPauseButton(btn, pauseLabel); }} />
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
                 </div>
             );
         }

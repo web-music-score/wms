@@ -13,5 +13,7 @@ new Score.MRenderContext().
     draw();
 
 new Score.MPlaybackButtons().
-    setPlayStopButton("playButton").
+    setPlayButton("playButton").
+    setPauseButton("pauseButton").
+    setStopButton("stopButton").
     setDocument(doc);

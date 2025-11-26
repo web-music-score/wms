@@ -1,3 +1,5 @@
+import "./custom-css";
+
 export * from "./error";
 
 declare const __LIB_INFO__: string;
