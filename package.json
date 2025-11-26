@@ -95,7 +95,8 @@
             }
         }
     },
-    "unpkg": "./dist/iife/index.global.js",
+    "unpkg": "./dist/iife/index.js",
+    "jsdelivr": "./dist/iife/index.js",
     "files": [
         "CHANGELOG.md",
         "LICENSE",

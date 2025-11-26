@@ -80,7 +80,10 @@ export default defineConfig([
         define: {
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (iife)`)
         },
-        esbuildPlugins: [tsupPluginInlineAssets()]
+        esbuildPlugins: [tsupPluginInlineAssets()],
+        outExtension({ format }) {
+            return format === 'iife' ? { js: '.js' } : {};
+        }
     },
 
     // audio-cg IIFE bundle
@@ -102,6 +105,9 @@ export default defineConfig([
         define: {
             __LIB_INFO__: JSON.stringify(`Audio_CG v${pkg.version} (iife)`)
         },
-        esbuildPlugins: [tsupPluginInlineAssets()]
+        esbuildPlugins: [tsupPluginInlineAssets()],
+        outExtension({ format }) {
+            return format === 'iife' ? { js: '.js' } : {};
+        }
     }
 ]);
