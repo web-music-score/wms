@@ -269,6 +269,7 @@ export class DocumentBuilder {
      * @returns - Music document.
      */
     getDocument(): MDocument {
+        this.getMeasure(); // Ensures document has at least one measure.
         return this.doc.getMusicInterface();
     }
 

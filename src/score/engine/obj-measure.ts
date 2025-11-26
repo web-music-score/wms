@@ -1466,7 +1466,7 @@ export class ObjMeasure extends MusicObject {
 
         this.regions.columnsMin_4 = Math.max(
             DocumentSettings.MinColumnsWidth * unitSize,
-            this.columns.map(col => col.getRect().width).reduce((acc, cur) => (acc + cur))
+            this.columns.map(col => col.getRect().width).reduce((acc, cur) => (acc + cur), 0)
         );
 
         this.regions.padding_5 = padding;
