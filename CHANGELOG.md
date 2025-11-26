@@ -1,8 +1,19 @@
 # Changelog
+## [6.0.0-pre.3] - 2025-11-26
+### Fixed
+- Empty score did not render at all.
+
+## Added
+- Style system detection for "bootstrap", "infima" or "unknown".
+- Button group style for infima "ifm-button-group".
+- Custom styles "wms-button" and "wms-button-group".
+
 ## [6.0.0-pre.2] - 2025-11-26
+### Changed
 - Removed `.global` from IIFE bundle filename.
 
 ## [6.0.0-pre.1] - 2025-11-25
+### Fixed
 - SSR safety (for Docusaurus) by checking typeof `window` and `document` for `"undefined"`.
 
 ## [6.0.0-pre.0] - 2025-11-22
