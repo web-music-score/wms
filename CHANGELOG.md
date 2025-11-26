@@ -1,5 +1,8 @@
 # Changelog
-## [6.0.0-pre.1] - 2025-11-22
+## [6.0.0-pre.2] - 2025-11-26
+- Removed `.global` from IIFE bundle filename.
+
+## [6.0.0-pre.1] - 2025-11-25
 - SSR safety (for Docusaurus) by checking typeof `window` and `document` for `"undefined"`.
 
 ## [6.0.0-pre.0] - 2025-11-22

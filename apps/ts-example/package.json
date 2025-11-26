@@ -1,13 +1,13 @@
 {
     "name": "ts-example",
-    "version": "6.0.0-pre.1",
+    "version": "6.0.0-pre.2",
     "private": true,
     "devDependencies": {
         "@babel/cli": "^7.27.2",
         "@babel/core": "^7.27.7",
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-react": "^7.27.1",
-        "web-music-score": "^6.0.0-pre.1",
+        "web-music-score": "^6.0.0-pre.2",
         "@webpack-cli/serve": "^3.0.1",
         "babel-loader": "^10.0.0",
         "core-js": "^3.43.0",
