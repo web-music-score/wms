@@ -3,6 +3,9 @@
 ### Added
 - Add package.json to "exports" field in package.json, so that website can get the version it is built with.
 
+## Changed
+- Updated ts-utils-lib@2.3.0 with Utils.Dom.injectCss().
+
 ## [6.0.0-pre.3] - 2025-11-26
 ### Fixed
 - Empty score did not render at all.

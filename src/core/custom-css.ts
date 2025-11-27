@@ -1,15 +1,6 @@
-// TODO: Add to ts-utils-lib maybe?
-function injectCss(styleId: string, styleCss: string) {
-    if (styleId === "" || styleCss === "") return; // Nothing to inject
-    if (typeof document === "undefined") return;   // SSR safe
-    if (document.getElementById(styleId)) return;  // Already injected
-    const style = document.createElement("style");
-    style.id = styleId;
-    style.textContent = styleCss;
-    document.head.appendChild(style);
-}
+import { Utils } from "@tspro/ts-utils-lib";
 
-injectCss("wms-custom-css", `
+Utils.Dom.injectCss("wms-custom-css", `
 /* Add custom wms-button and wms-button-group styles */
 
 .wms-button {
