@@ -93,7 +93,8 @@
                 "types": "./dist/pieces/index.d.ts",
                 "default": "./dist/pieces/index.mjs"
             }
-        }
+        },
+        "./package.json": "./package.json"
     },
     "unpkg": "./dist/iife/index.js",
     "jsdelivr": "./dist/iife/index.js",
