@@ -1,9 +1,13 @@
 # Changelog
+## [6.0.0-pre.4] - 2025-11-??
+### Added
+- Add package.json to "exports" field in package.json, so that website can get the version it is built with.
+
 ## [6.0.0-pre.3] - 2025-11-26
 ### Fixed
 - Empty score did not render at all.
 
-## Added
+### Added
 - Style system detection for "bootstrap", "infima" or "unknown".
 - Button group style for infima "ifm-button-group".
 - Custom styles "wms-button" and "wms-button-group".
