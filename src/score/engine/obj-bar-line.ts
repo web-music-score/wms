@@ -3,7 +3,7 @@ import { RenderContext } from "./render-context";
 import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, MusicInterface, MStaffBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
-import { DocumentSettings, DocumentColor } from "./settings";
+import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect, UniMap } from "@tspro/ts-utils-lib";
 import { ObjScoreRowGroup } from "./obj-score-row-group";

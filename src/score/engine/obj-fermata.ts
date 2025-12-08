@@ -5,7 +5,6 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
-import { DocumentColor } from "./settings";
 
 export class ObjFermata extends MusicObject {
     readonly mi: MFermata;

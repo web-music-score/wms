@@ -1,10 +1,10 @@
 import { getTuningStrings, Note, validateTuningName } from "web-music-score/theory";
 import { ImageAsset, RenderContext } from "./render-context";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { Clef, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
+import { Clef, colorKey, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
-import { DocumentColor, DocumentSettings } from "./settings";
+import { DocumentSettings } from "./settings";
 import { AnchoredRect, Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
@@ -131,7 +131,7 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     drawVerticalLine(ctx: RenderContext, left: number, width: number, isSystemBarLine = false) {
-        ctx.color(this.getConfig().type === "tab" ? DocumentColor.Tab_Frame : DocumentColor.Staff_Frame);
+        ctx.color(this.getConfig().type === "tab" ? colorKey("tab.frame") : colorKey("staff.frame"));
 
         const i = this.row.getNotationLines().indexOf(this);
         const nextLine = i >= 0 ? this.row.getNotationLines()[i + 1] : undefined;

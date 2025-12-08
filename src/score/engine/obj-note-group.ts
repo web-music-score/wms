@@ -2,13 +2,13 @@ import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
-import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId } from "../pub";
+import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
-import { DocumentSettings, DocumentColor } from "./settings";
+import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
@@ -192,7 +192,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
-        this.color = options?.color ?? DocumentColor.Staff_Note;
+        this.color = options?.color ?? colorKey("staff.note");
         this.staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
@@ -700,8 +700,8 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const bgcolor = DocumentColor.Background;
-            const color = DocumentColor.Tab_Note;
+            const bgcolor = colorKey("background");
+            const color = colorKey("tab.note");
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers

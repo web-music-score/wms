@@ -1,10 +1,9 @@
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjText } from "./obj-text";
-import { MHeader } from "../pub";
+import { colorKey, MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
-import { DocumentColor } from "./settings";
 
 export class ObjHeader extends MusicObject {
     private titleText?: ObjText;
@@ -18,20 +17,16 @@ export class ObjHeader extends MusicObject {
 
         this.mi = new MHeader(this);
 
-        const titleColor = DocumentColor.Header_Title;
-        const compColor = DocumentColor.Header_Composer;
-        const arrColor = DocumentColor.Header_Arranger;
-
         this.titleText = this.title
-            ? new ObjText(this, { text: this.title, color: titleColor, scale: 2 }, 0.5, 0)
+            ? new ObjText(this, { text: this.title, color: colorKey("header.title"), scale: 2 }, 0.5, 0)
             : undefined;
 
         this.composerText = this.composer
-            ? new ObjText(this, { text: this.composer, color: compColor }, 1, 0)
+            ? new ObjText(this, { text: this.composer, color: colorKey("header.composer") }, 1, 0)
             : undefined;
 
         this.arrangerText = this.arranger
-            ? new ObjText(this, { text: "Arr.: " + this.arranger, color: arrColor }, 1, 0)
+            ? new ObjText(this, { text: "Arr.: " + this.arranger, color: colorKey("header.arranger") }, 1, 0)
             : undefined;
     }
 

@@ -4,8 +4,8 @@ import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
-import { MConnective, TieType, Connective } from "../pub";
-import { DocumentSettings, DocumentColor } from "./settings";
+import { MConnective, TieType, Connective, colorKey } from "../pub";
+import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 
@@ -189,11 +189,8 @@ export class ObjConnective extends MusicObject {
         let t = _lineWidth * 1.5;
         let s = _lineWidth * 0.25;
 
+        ctx.color(this.line instanceof ObjTab ? colorKey("tab.connective") : colorKey("staff.connective"));
         ctx.lineWidth(1);
-        ctx.color(this.line instanceof ObjTab
-            ? DocumentColor.Tab_Connective
-            : DocumentColor.Staff_Connective
-        );
 
         if (this.arcHeight === 0) {
             ctx.beginPath();

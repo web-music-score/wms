@@ -7,6 +7,7 @@ import { ScoreEventListener } from "./event";
 import { PlayState } from "./types";
 import { MDocument, MScoreRow, MusicInterface } from "./music-objects";
 import { MusicError, MusicErrorType } from "web-music-score/core";
+import { Paint } from "./paint";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -102,6 +103,18 @@ export class MRenderContext {
      */
     constructor() {
         this.ctx = new RenderContext(this);
+    }
+
+    /**
+     * Set Paint for this render context.
+     * @param paint - Paint.
+     * @returns - This render context instance.
+     */
+    setPaint(paint?: Paint) {
+        assertArg(Guard.isUndefined(paint) || paint instanceof Paint, "paint", paint);
+
+        this.ctx.setPaint(paint);
+        return this;
     }
 
     /**

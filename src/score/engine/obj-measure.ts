@@ -2,7 +2,7 @@ import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRe
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -14,7 +14,7 @@ import { ObjScoreRow } from "./obj-score-row";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjBeamGroup } from "./obj-beam-group";
-import { DocumentSettings, DocumentColor } from "./settings";
+import { DocumentSettings } from "./settings";
 import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-fermata";
@@ -611,7 +611,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Fermata : DocumentColor.Tab_Element_Fermata;
+            const color = line instanceof ObjTab ? colorKey("staff.element.fermata") : colorKey("tab.element.fermata");
             this.addLayoutObject(new ObjFermata(anchor, vpos, color), line, LayoutGroupId.Fermata, vpos);
         });
 
@@ -639,7 +639,7 @@ export class ObjMeasure extends MusicObject {
                 let passages = args as number[];
                 addLayoutObjectProps = {
                     createObj: (line) => {
-                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjEnding(anchor, color, passages);
                     },
                     layoutGroupId: LayoutGroupId.Ending,
@@ -654,7 +654,7 @@ export class ObjMeasure extends MusicObject {
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
                     createObj: (line) => {
-                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjText(anchor, { text, color }, 1, 1);
                     },
                     layoutGroupId: LayoutGroupId.Navigation,
@@ -669,7 +669,7 @@ export class ObjMeasure extends MusicObject {
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
                     createObj: (line) => {
-                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjText(anchor, { text, color }, 1, 1);
                     },
                     layoutGroupId: LayoutGroupId.Navigation,
@@ -683,7 +683,7 @@ export class ObjMeasure extends MusicObject {
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
                     createObj: (line) => {
-                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjSpecialText(anchor, text, color);
                     },
                     layoutGroupId: LayoutGroupId.Navigation,
@@ -696,7 +696,7 @@ export class ObjMeasure extends MusicObject {
                 let text = getNavigationString(navigation);
                 addLayoutObjectProps = {
                     createObj: (line) => {
-                        const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Navigation : DocumentColor.Tab_Element_Navigation;
+                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjSpecialText(anchor, text, color);
                     },
                     layoutGroupId: LayoutGroupId.Navigation,
@@ -720,7 +720,7 @@ export class ObjMeasure extends MusicObject {
                     const textProps: TextProps = {
                         text,
                         scale: 0.8,
-                        color: DocumentColor.Staff_Frame
+                        color: colorKey("staff.frame")
                     }
                     this.endRepeatPlayCountText = new ObjText(this, textProps, 0.5, 1);
                 }
@@ -778,7 +778,7 @@ export class ObjMeasure extends MusicObject {
         this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Annotation : DocumentColor.Tab_Element_Annotation;
+            const color = line instanceof ObjTab ? colorKey("tab.element.annotation") : colorKey("staff.element.annotation");
             textProps.color = color;
             let textObj = new ObjText(anchor, textProps, anchorX, anchorY);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
@@ -809,7 +809,7 @@ export class ObjMeasure extends MusicObject {
         this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? DocumentColor.Staff_Element_Label : DocumentColor.Tab_Element_Label;
+            const color = line instanceof ObjTab ? colorKey("staff.element.label") : colorKey("tab.element.label");
             textProps.color = color;
             let textObj = new ObjText(anchor, textProps, 0.5, 1);
             const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
@@ -1425,8 +1425,7 @@ export class ObjMeasure extends MusicObject {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
-                    let color = DocumentColor.Tab_Tuning;
-                    let obj = new ObjText(this, { text: note, scale: 0.8, color }, 1, 0.5);
+                    let obj = new ObjText(this, { text: note, scale: 0.8, color: colorKey("tab.tuning") }, 1, 0.5);
 
                     obj.layout(ctx);
                     obj.setRight(this.regions.tabTuning_0 * 0.8);
@@ -1649,12 +1648,12 @@ export class ObjMeasure extends MusicObject {
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p), DocumentColor.Staff_Frame);
+                    drawLine(line.getDiatonicIdY(p), colorKey("staff.frame"));
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId), DocumentColor.Tab_Frame);
+                    drawLine(line.getStringY(stringId), colorKey("tab.frame"));
                 }
             }
         });
@@ -1671,7 +1670,7 @@ export class ObjMeasure extends MusicObject {
                 const top = tab.getTopLineY();
                 const bottom = tab.getBottomLineY();
 
-                ctx.color(DocumentColor.Tab_Frame)
+                ctx.color(colorKey("tab.frame"))
                     .lineWidth(1)
                     .strokeLine(left, top, left, bottom);
             });

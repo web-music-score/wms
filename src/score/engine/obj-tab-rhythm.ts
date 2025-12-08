@@ -1,4 +1,4 @@
-import { getVoiceIds, MTabRhythm, VoiceId } from "../pub";
+import { colorKey, getVoiceIds, MTabRhythm, VoiceId } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
@@ -8,7 +8,6 @@ import { AnchoredRect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjText } from "./obj-text";
-import { DocumentColor } from "./settings";
 
 export class ObjTabRhythm extends MusicObject {
 
@@ -106,7 +105,7 @@ export class ObjTabRhythm extends MusicObject {
                 let colX = sym.col.getRect().anchorX;
                 if (sym instanceof ObjNoteGroup) {
                     ctx.lineWidth(1);
-                    ctx.color(DocumentColor.Tab_Note);
+                    ctx.color(colorKey("tab.note"));
 
                     if (sym.rhythmProps.noteSize >= 2) {
                         ctx.lineWidth(sym.rhythmProps.noteSize === 4 ? 2 : 1);
@@ -125,7 +124,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
                 else if (sym instanceof ObjRest) {
                     ctx.lineWidth(1);
-                    ctx.color(DocumentColor.Tab_Rest);
+                    ctx.color(colorKey("tab.rest"));
 
                     let cx = colX;
                     let cy = (stemTop + stemBottom) / 2;
@@ -150,7 +149,7 @@ export class ObjTabRhythm extends MusicObject {
                     let rightBeamCount = right.hasTuplet() ? 1 : right instanceof ObjNoteGroup ? right.getLeftBeamCount() : 1;
                     let maxBeamCount = Math.max(leftBeamCount, rightBeamCount);
 
-                    ctx.color(DocumentColor.Tab_Note);
+                    ctx.color(colorKey("tab.note"));
                     ctx.lineWidth(2);
 
                     for (let i = 0; i < maxBeamCount; i++) {
@@ -171,7 +170,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
 
                 if (beamGroup && beamGroup.isTuplet()) {
-                    ctx.color(DocumentColor.Tab_Note);
+                    ctx.color(colorKey("tab.note"));
 
                     // Add tuplet number
                     let cx = (symbols[0].col.getRect().anchorX + symbols[symbols.length - 1].col.getRect().anchorX) / 2;

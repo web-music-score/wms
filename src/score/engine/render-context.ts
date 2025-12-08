@@ -1,13 +1,11 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MDocument, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext } from "../pub";
+import { MDocument, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext, Paint, ColorKey } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
-import { DebugSettings, DocumentSettings, DocumentColor } from "./settings";
+import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "theory/rhythm";
-
-import { colorNameToCode } from "color-name-to-code";
 
 import G_clef_png from "./assets/G-clef.png";
 import F_clef_png from "./assets/F-clef.png";
@@ -30,15 +28,6 @@ type HTMLImageData = {
 }
 
 const ImageCache = new BiMap<ImageAsset, string, HTMLImageData>();
-
-function colorNameToRGBA(name: string, alpha = 1): [number, number, number, number] {
-    const hex = colorNameToCode(name).replace("#", ""); // "FF0000"
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    const a = Math.round(alpha * 255);
-    return [r, g, b, a];
-}
 
 type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
 
@@ -68,6 +57,8 @@ export class RenderContext {
     private ctx?: CanvasRenderingContext2D;
 
     private mdoc?: MDocument;
+
+    private paint: Paint = Paint.default;
 
     private cursorRect?: Rect;
     private mousePos?: Vec; // Mouse coord in document space
@@ -137,12 +128,12 @@ export class RenderContext {
         }
 
         // rgb values
-        const [nr, ng, nb, na] = colorNameToRGBA(data.color);
+        const [nr, ng, nb, na] = Paint.colorNameToRGBA(data.color);
 
         // threshold to decide what counts as "black"
         const threshold = 40; // 0..255; tweak as needed
 
-        if(typeof document === "undefined") {
+        if (typeof document === "undefined") {
             console.error("Failed to colorize image: document is undefined.");
             return;
         }
@@ -204,6 +195,14 @@ export class RenderContext {
         if (mdoc) {
             mdoc.getMusicObject().setRenderContext(this);
         }
+    }
+
+    setPaint(paint?: Paint) {
+        this.paint = paint ?? Paint.default;
+    }
+
+    getPaint() {
+        return this.paint;
     }
 
     setCanvas(canvas: HTMLCanvasElement) {
@@ -414,7 +413,7 @@ export class RenderContext {
             return;
         }
 
-        this.fillColor(DocumentColor.HilightStaffPos);
+        this.fillColor(this.paint.colors["hilight.staffpos"]);
         this.fillRect(staff.row.getRect().left, staff.getDiatonicIdY(diatonicId) - unitSize, staff.row.getRect().width, 2 * unitSize);
 
         if (mousePos !== undefined) {
@@ -431,7 +430,7 @@ export class RenderContext {
 
         let rect = hilightedObj.getRect();
 
-        this.lineColor(DocumentColor.HilightObject);
+        this.lineColor(this.paint.colors["hilight.object"]);
         this.strokeRect(rect.left, rect.top, rect.width, rect.height);
     }
 
@@ -439,7 +438,7 @@ export class RenderContext {
         let { cursorRect: r } = this;
 
         if (r) {
-            this.color(DocumentColor.PlayCursor).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+            this.color(this.paint.colors["play.cursor"]).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
         }
     }
 
@@ -453,7 +452,7 @@ export class RenderContext {
 
     clearCanvas() {
         if (this.ctx) {
-            this.ctx.canvas.style.background = DocumentColor.Background;
+            this.ctx.canvas.style.background = this.getPaint().colors["background"];
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         }
     }
@@ -604,18 +603,19 @@ export class RenderContext {
         this.stroke();
     }
 
-    color(color: string): RenderContext {
-        if (this.ctx) this.ctx.strokeStyle = this.ctx.fillStyle = color;
+    color(color: string | ColorKey): RenderContext {
+        if (this.ctx)
+            this.ctx.strokeStyle = this.ctx.fillStyle = this.paint.getColor(color);
         return this;
     }
 
     lineColor(color: string): RenderContext {
-        if (this.ctx) this.ctx.strokeStyle = color;
+        if (this.ctx) this.ctx.strokeStyle = this.paint.getColor(color);
         return this;
     }
 
     fillColor(color: string): RenderContext {
-        if (this.ctx) this.ctx.fillStyle = color;
+        if (this.ctx) this.ctx.fillStyle = this.paint.getColor(color);
         return this;
 
     }

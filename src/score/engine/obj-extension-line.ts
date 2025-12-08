@@ -9,7 +9,6 @@ import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
-import { DocumentColor } from "./settings";
 
 export type ExtensionStartObject = ObjText | ObjSpecialText;
 export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;

@@ -1,8 +1,9 @@
 import * as React from "react";
-import { MDocument, MRenderContext, ScoreEventListener } from "web-music-score/score";
+import { MDocument, MRenderContext, Paint, ScoreEventListener } from "web-music-score/score";
 
 export interface MusicScoreViewProps {
     doc: MDocument;
+    paint?: Paint;
     onScoreEvent?: ScoreEventListener;
 }
 
@@ -34,6 +35,9 @@ export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
         super(props);
 
         this.ctx = new MRenderContext();
+
+        if(props.paint)
+            this.ctx.setPaint(props.paint);
 
         this.ctx.setDocument(props.doc);
 

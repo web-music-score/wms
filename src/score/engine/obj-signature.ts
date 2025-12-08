@@ -1,5 +1,5 @@
 import { Note, getTempoString, KeySignature } from "web-music-score/theory";
-import { Clef, MStaffSignature, MTabSignature } from "../pub";
+import { Clef, colorKey, MStaffSignature, MTabSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjImage } from "./obj-image";
@@ -9,7 +9,6 @@ import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
-import { DocumentColor } from "./settings";
 
 export class ObjStaffSignature extends MusicObject {
     private clefImage?: ObjImage;
@@ -38,7 +37,8 @@ export class ObjStaffSignature extends MusicObject {
     updateClefImage(ctx: RenderContext, showClef: boolean) {
         if (showClef) {
 
-            let color = DocumentColor.Staff_Signature_Clef;
+            let color = ctx.getPaint().getColor(colorKey("staff.signature.clef"));
+
             if (["black", "#000", "#000000"].includes(color))
                 color = "";
 
@@ -56,7 +56,7 @@ export class ObjStaffSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            let color = DocumentColor.Staff_Signature_MeasureNum;
+            let color = colorKey("staff.signature.measurenum");
             let text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
@@ -68,7 +68,7 @@ export class ObjStaffSignature extends MusicObject {
     updateKeySignature(showKeySignature: boolean) {
         if (showKeySignature) {
             let { measure } = this;
-            let color = DocumentColor.Staff_Signature_Key;
+            let color = colorKey("staff.signature.key");
 
             let prevMeasure = measure.getPrevMeasure();
 
@@ -100,7 +100,7 @@ export class ObjStaffSignature extends MusicObject {
     updateTimeSignature(showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color = DocumentColor.Staff_Signature_Time;
+            let color = colorKey("staff.signature.time");
 
             let beatCount = timeSignature.beatCount.toString();
             this.beatCountText = new ObjText(this, { text: beatCount, color, scale: 1.4 }, 0.5, 0.5);
@@ -115,7 +115,7 @@ export class ObjStaffSignature extends MusicObject {
 
     updateTempo(showTempo: boolean) {
         if (showTempo) {
-            let color = DocumentColor.Staff_Signature_Tempo;
+            let color = colorKey("staff.signature.tempo");
             let text = getTempoString(this.measure.getTempo());
             this.tempoText = new ObjText(this, { text, color }, 0.5, 1);
         }
@@ -381,7 +381,7 @@ export class ObjTabSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            let color = DocumentColor.Tab_Signature_MeasureNum;
+            let color = colorKey("tab.signature.measurenum");
             let text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
@@ -393,7 +393,7 @@ export class ObjTabSignature extends MusicObject {
     updateTimeSignature(showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color = DocumentColor.Tab_Signature_Time;
+            let color = colorKey("tab.signature.time");
 
             let beatCount = timeSignature.beatCount.toString();
             this.beatCountText = new ObjText(this, { text: beatCount, color, scale: 1.4 }, 0.5, 0.5);
@@ -408,7 +408,7 @@ export class ObjTabSignature extends MusicObject {
 
     updateTempo(showTempo: boolean) {
         if (showTempo) {
-            let color = DocumentColor.Tab_Signature_Tempo;
+            let color = colorKey("tab.signature.tempo");
             let text = getTempoString(this.measure.getTempo());
             this.tempoText = new ObjText(this, { text, color }, 0, 1);
         }

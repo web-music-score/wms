@@ -1,6 +1,6 @@
 import { Note } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId } from "../pub";
+import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId, colorKey } from "../pub";
 import { RenderContext } from "./render-context";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
@@ -8,7 +8,7 @@ import { ObjMeasure } from "./obj-measure";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player";
-import { DocumentSettings, DocumentColor } from "./settings";
+import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
@@ -485,7 +485,7 @@ export class ObjRhythmColumn extends MusicObject {
     }
 
     draw(ctx: RenderContext) {
-        ctx.color(DocumentColor.Staff_Frame);
+        ctx.color(colorKey("staff.frame"));
 
         // Draw ledger lines
         this.row.getStaves().forEach(staff => {
