@@ -121,14 +121,20 @@ export class RenderContext {
     private onImageLoaded(data: HTMLImageData) {
         if (data.loaded || !data.img) return;
 
-        if (data.colorized || data.color === "") {
+        const color = this.paint.getColor(data.color);
+
+        if (data.colorized ||
+            color === "" || color === "black" ||
+            color === "#000" || color === "#0000" ||
+            color === "#000000" || color === "#00000000"
+        ) {
             this.forceDraw();
             data.loaded = true;
             return;
         }
 
         // rgb values
-        const [nr, ng, nb, na] = Paint.colorNameToRGBA(data.color);
+        const [nr, ng, nb, na] = Paint.colorNameToRGBA(color);
 
         // threshold to decide what counts as "black"
         const threshold = 40; // 0..255; tweak as needed

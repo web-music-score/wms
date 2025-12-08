@@ -71,7 +71,7 @@ export type ColorKeyPart =
 export class Paint {
     public static readonly default = new Paint();
 
-    private static DefaultColors: Record<ColorKey, string> = {
+    public colors: Record<ColorKey, string> = {
         "hilight.staffpos": "#55cc55",
         "hilight.object": "#55cc55",
         "play.cursor": "#44aa44",
@@ -116,8 +116,6 @@ export class Paint {
         "tab.element.navigation": "black",
         "tab.element.label": "black",
     }
-
-    public colors: Record<ColorKey, string> = { ...Paint.DefaultColors };
 
     /**
      * Set color of any score document element. Use combination of color key parts to set color of specific elements.
@@ -204,14 +202,16 @@ export class Paint {
      * @returns - Color code (e.g. "#FFFFFF").
      */
     getColorCode(colorKeyOrColor: ColorKey | string): string {
-        return colorNameToCode(this.getColor(colorKeyOrColor));
+        return Paint.colorNameToCode(this.getColor(colorKeyOrColor));
     }
 
     /**
-     * Reset colors to default.
+     * Get color RGBA.
+     * @param colorKeyOrColor - ColorKey or color.
+     * @returns - Color RGBA (e.g. [1, 1, 1, 1]).
      */
-    reset() {
-        this.colors = { ...Paint.DefaultColors };
+    getColorRGBA(colorKeyOrColor: ColorKey | string): [number, number, number, number] {
+        return Paint.colorNameToRGBA(this.getColor(colorKeyOrColor));
     }
 
     /**
