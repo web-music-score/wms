@@ -1,5 +1,5 @@
 # Changelog
-## [6.0.0-pre.4] - 2025-12-??
+## [6.0.0-pre.4] - 2025-12-08
 ### Added
 - Add package.json to "exports" field in package.json, so that website can get the version it is built with.
 - class Paint for score coloring.
