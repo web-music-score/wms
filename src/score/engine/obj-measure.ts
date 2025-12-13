@@ -1305,21 +1305,21 @@ export class ObjMeasure extends MusicObject {
         return this.voiceSymbols.getAll(voiceId);
     }
 
-    completeRests(voiceId?: VoiceId | VoiceId[]) {
+    fillWithRests(voiceId?: VoiceId | VoiceId[]) {
         if (voiceId === undefined) {
             if (this.getConsumedTicks() === 0) {
                 // Whole measure is empty, add rest to voice 0.
-                this.completeRests(0);
+                this.fillWithRests(0);
             }
             else {
-                // Measure is not empty, complete rests for voices that are not empty.
-                this.completeRests(getVoiceIds().filter(id => this.getConsumedTicks(id) > 0));
+                // Measure is not empty, fill with rests for voices that are not empty.
+                this.fillWithRests(getVoiceIds().filter(id => this.getConsumedTicks(id) > 0));
             }
             return;
         }
         else if (Guard.isArray(voiceId)) {
-            // Complete rests for given voices.
-            voiceId.forEach(id => this.completeRests(id));
+            // Fill with rests for given voices.
+            voiceId.forEach(id => this.fillWithRests(id));
             return;
         }
         else {

@@ -13,7 +13,7 @@ import { createStaffConfigGrandDemo } from "./staff-grand";
 import { createBeamsTupletsDemo } from "./beams-tuplets";
 import { createAnnotationTempoDemo } from "./annotation-tempo";
 import { createAnnotationDynamicsDemo } from "./annotation-dynamics";
-import { createCompleteRestsDemo } from "./complete-rests";
+import { createFillWithRestsDemo } from "./fill-with-rests";
 import { createStaffConfigGuitarDemo } from "./staff-guitar";
 import { createStaffConfigTabDemo } from "./staff-tab";
 import { createStaffGroupsDemo } from "./staff-groups";
@@ -52,7 +52,7 @@ export class DemoPieces {
         demos.push(createStaffConfigGrandDemo());
         demos.push(createAnnotationTempoDemo());
         demos.push(createAnnotationDynamicsDemo());
-        demos.push(createCompleteRestsDemo());
+        demos.push(createFillWithRestsDemo());
         demos.push(createStaffConfigGuitarDemo());
         demos.push(createStaffConfigTabDemo());
         demos.push(createStaffGroupsDemo());

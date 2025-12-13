@@ -1,9 +1,9 @@
 import * as Theory from "web-music-score/theory";
 import * as Score from "web-music-score/score";
 
-export function createCompleteRestsDemo() {
+export function createFillWithRestsDemo() {
     return new Score.DocumentBuilder()
-        .setHeader("Complete Rests")
+        .setHeader("Fill With Rests")
         .setScoreConfiguration("guitarTreble")
 
         .addMeasure()
@@ -11,42 +11,42 @@ export function createCompleteRestsDemo() {
         .setTimeSignature("4/4")
         .setTempo(80)
         .addNote(0, "G3", "1n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, "B3", "2n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, "G3", "2.")
-        .completeRests()
+        .fillWithRests()
         .endRow()
 
         .addMeasure()
         .addNote(0, "A3", "4n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, "B3", "8n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, "B3", Theory.NoteLength.Sixteenth)
-        .completeRests()
+        .fillWithRests()
         .endRow()
 
         .addMeasure()
         .addNote(0, "C4", "8n", { stem: "up" })
         .addNote(1, "D3", "4n", { stem: "down" })
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, "E4", "2.", { stem: "up" })
         .addNote(1, "F3", "2n", { stem: "down" })
-        .completeRests()
+        .fillWithRests()
 
         .getDocument();
 }

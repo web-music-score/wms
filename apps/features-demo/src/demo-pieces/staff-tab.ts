@@ -36,7 +36,7 @@ export function createStaffConfigTabDemo() {
         .addNote(0, "E3", "16n", { string: 5 })
         .addNote(0, "G2", "32n", { string: 6 })
         .addNote(0, "A2", "64n", { string: 6 })
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, ["G3", "A3", "B3", "C4"], "8n", { string: 3 })
@@ -55,7 +55,7 @@ export function createStaffConfigTabDemo() {
         .addNote(0, "E4", "16n", { string: 2 })
         .addNote(0, "C4", "32n", { string: 3 })
         .addNote(0, ["G3", "D3"], "64n", { string: [4, 5] })
-        .completeRests()
+        .fillWithRests()
         .endRow()
 
         .addMeasure()
@@ -72,13 +72,13 @@ export function createStaffConfigTabDemo() {
         .addNote(0, "G3", "8.", { string: 3 })
         .addNote(0, "G#3", "8..", { string: 3 })
         .addNote(0, "A3", "8...", { string: 3 })
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addRest(0, "8.")
         .addRest(0, "8..")
         .addRest(0, "8...")
-        .completeRests()
+        .fillWithRests()
         .endRow()
 
         .addMeasure()
@@ -91,13 +91,13 @@ export function createStaffConfigTabDemo() {
         .addRest(0, "16n")
         .addRest(0, "32n")
         .addRest(0, "64n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addRest(0, "8.")
         .addRest(0, "8..")
         .addRest(0, "8...")
-        .completeRests()
+        .fillWithRests()
         .endRow()
 
         .addMeasure()
@@ -133,7 +133,7 @@ export function createStaffConfigTabDemo() {
         .addNote(0, "C4", "8t", { string: 2 })
         .addNote(0, "D4", "8t", { string: 2 })
         .addRest(0, "8t")
-        .completeRests()
+        .fillWithRests()
 
         .getDocument();
 }

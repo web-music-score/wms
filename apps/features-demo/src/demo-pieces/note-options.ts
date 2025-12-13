@@ -51,17 +51,17 @@ export function createNoteOptionsDemo() {
         .addMeasure()
         .addNote(0, ["E4", "E4"], "8n")
         .addNote(0, ["E4", "E4", "E4", "E4"], "16n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, ["E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4"], "32n")
-        .completeRests()
+        .fillWithRests()
 
         .endRow()
 
         .addMeasure()
         .addNote(0, ["E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4", "E4"], "64n")
-        .completeRests()
+        .fillWithRests()
 
         .addMeasure()
         .addNote(0, "E4", "8n").addLyrics(1, "8n", "flags")
@@ -71,7 +71,7 @@ export function createNoteOptionsDemo() {
         .addNote(0, "E4", "8.").addLyrics(1, "8n", "dots")
         .addNote(0, "E4", "8..")
         .addNote(0, "E4", "8...")
-        .completeRests()
+        .fillWithRests()
 
         .endRow()
 

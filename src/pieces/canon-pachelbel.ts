@@ -20,22 +20,22 @@ export function createCanonInD(): MDocument {
         .setTimeSignature("4/4")
         .setTempo(50, "2n")
 
-        .completeRests(0)
+        .fillWithRests(0)
         .addNote(1, ["D3", "F#3", "A3", "D4"], "8n")
         .addNote(1, ["A2", "C#3", "E3", "A3"], "8n")
 
         .addMeasure({ showNumber: true })
-        .completeRests(0)
+        .fillWithRests(0)
         .addNote(1, ["B2", "D3", "F#3", "B3"], "8n")
         .addNote(1, ["F#2", "A2", "C#3", "F#3"], "8n")
 
         .addMeasure()
-        .completeRests(0)
+        .fillWithRests(0)
         .addNote(1, ["G2", "B2", "D3", "G3"], "8n")
         .addNote(1, ["D2", "F#2", "A2", "D3"], "8n")
 
         .addMeasure({ showNumber: true })
-        .completeRests(0)
+        .fillWithRests(0)
         .addNote(1, ["G2", "B2", "D3", "G3"], "8n")
         .addNote(1, ["A2", "C#3", "E3", "A3"], "8n")
 
