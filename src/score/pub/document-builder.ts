@@ -1018,12 +1018,12 @@ export class DocumentBuilder {
      * @param voiceId - Voice id to add rests to. Single value, array or all if omitted.
      * @returns - This document builder instance.
      */
-    fillWithRests(voiceId?: VoiceId | VoiceId[]): DocumentBuilder {
-        setAssertFunction("fillWithRests", voiceId);
+    fillWithRests(...voiceId: VoiceId[]): DocumentBuilder {
+        setAssertFunction("fillWithRests", ...voiceId);
 
-        assertArg(Guard.isUndefined(voiceId) || isVoiceId(voiceId) || Guard.isArray(voiceId) && voiceId.every(id => isVoiceId(id)));
+        assertArg(Guard.isArray(voiceId) && (voiceId.length === 0 || voiceId.every(id => isVoiceId(id))));
 
-        this.getMeasure().fillWithRests(voiceId);
+        this.getMeasure().fillWithRests(...voiceId);
         return this;
     }
 
