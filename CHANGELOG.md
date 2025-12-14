@@ -1,5 +1,5 @@
 # Changelog
-## [6.0.0-pre.5] - 2025-12-??
+## [6.0.0-pre.5] - 2025-12-14
 ### Changed
 - Renamed `completeRests()` to `fillWithRests()`.
 
