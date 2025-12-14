@@ -1057,4 +1057,24 @@ export class DocumentBuilder {
         }
         return this;
     }
+
+    /**
+     * Add and repeat builder section.
+     * @param times - Repeat count.
+     * @param repeatCreator - Repeat creator function.
+     * @returns - This document builder instance.
+     */
+    repeat(times: number, repeatCreator: (builder: DocumentBuilder) => void): DocumentBuilder {
+         setAssertFunction("repeat", repeatCreator);
+
+        assertArg(
+            Guard.isIntegerGte(times, 0),
+            Guard.isFunction(repeatCreator)
+        );
+
+        for(let i = 0; i < times; i++)
+            repeatCreator(this);
+
+        return this;
+    }
 }
