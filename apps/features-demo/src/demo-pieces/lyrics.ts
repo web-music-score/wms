@@ -8,53 +8,53 @@ export function createLyricsDemo() {
         .addMeasure()
         .setKeySignature("C", "Major")
         .setTimeSignature("4/4")
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La")
-        .addNote(0, "D4", "4n").addLyrics(1, "4n", "La")
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La")
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La")
+        .addNote(0, "C4", "4n").addLyrics(1, "La", "4n")
+        .addNote(0, "D4", "4n").addLyrics(1, "La", "4n")
+        .addNote(0, "C4", "4n").addLyrics(1, "La", "4n")
+        .addNote(0, "C4", "4n").addLyrics(1, "La", "4n")
 
         .addMeasure()
         .setTimeSignature("3/4")
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "Right", { align: "right" })
-        .addNote(0, "D4", "4n").addLyrics(1, "4n", "Center", { align: "center" })
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "Left", { align: "left" })
+        .addNote(0, "C4", "4n").addLyrics(1, "Right", "4n", { align: "right" })
+        .addNote(0, "D4", "4n").addLyrics(1, "Center", "4n", { align: "center" })
+        .addNote(0, "C4", "4n").addLyrics(1, "Left", "4n", { align: "left" })
 
         .addMeasure()
         .setTimeSignature("4/4")
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Hyp", { align: "center", hyphen: "-" })
-        .addNote(0, "D4", "2n").addLyrics(1, "2n", "hen")
+        .addNote(0, "C4", "2n").addLyrics(1, "Hyp", "2n", { align: "center", hyphen: "-" })
+        .addNote(0, "D4", "2n").addLyrics(1, "hen", "2n")
 
         .addMeasure()
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Ext", { hyphen: "---" })
-        .addNote(0, "D4", "2n").addLyrics(1, "2n", "ender")
+        .addNote(0, "C4", "2n").addLyrics(1, "Ext", "2n", { hyphen: "---" })
+        .addNote(0, "D4", "2n").addLyrics(1, "ender", "2n")
         .endRow()
 
         .addMeasure()
         .setTimeSignature("2/4")
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Hyp", { hyphen: "-" })
+        .addNote(0, "C4", "2n").addLyrics(1, "Hyp", "2n", { hyphen: "-" })
 
         .addMeasure()
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "hen")
+        .addNote(0, "C4", "2n").addLyrics(1, "hen", "2n")
 
         .addMeasure()
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Ext", { hyphen: "---" })
+        .addNote(0, "C4", "2n").addLyrics(1, "Ext", "2n", { hyphen: "---" })
 
         .addMeasure()
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "ender")
+        .addNote(0, "C4", "2n").addLyrics(1, "ender", "2n")
 
         .addMeasure()
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "Hyp", { hyphen: "-" })
+        .addNote(0, "C4", "2n").addLyrics(1, "Hyp", "2n", { hyphen: "-" })
         .endRow()
 
         .addMeasure()
-        .addNote(0, "C4", "2n").addLyrics(1, "2n", "hen")
+        .addNote(0, "C4", "2n").addLyrics(1, "hen", "2n")
 
 
         .addMeasure()
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "1. La").addLyrics(2, "4n", "2. Aa", { hyphen: "---" }).addLyrics(3, "4n", "3. Hal", { hyphen: "-" })
-        .addNote(0, "D4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa", { hyphen: "---" }).addLyrics(3, "4n", "le", { hyphen: "-" })
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa", { hyphen: "---" }).addLyrics(3, "4n", "lu", { hyphen: "-" })
-        .addNote(0, "C4", "4n").addLyrics(1, "4n", "La").addLyrics(2, "4n", "aa").addLyrics(3, "4n", "jah.")
+        .addNote(0, "C4", "4n").addLyrics(1, "1. La", "4n").addLyrics(2, "2. Aa", "4n", { hyphen: "---" }).addLyrics(3, "3. Hal", "4n", { hyphen: "-" })
+        .addNote(0, "D4", "4n").addLyrics(1, "La", "4n").addLyrics(2, "aa", "4n", { hyphen: "---" }).addLyrics(3, "le", "4n", { hyphen: "-" })
+        .addNote(0, "C4", "4n").addLyrics(1, "La", "4n").addLyrics(2, "aa", "4n", { hyphen: "---" }).addLyrics(3, "lu", "4n", { hyphen: "-" })
+        .addNote(0, "C4", "4n").addLyrics(1, "La", "4n").addLyrics(2, "aa", "4n").addLyrics(3, "jah.", "4n")
 
         .getDocument();
 }

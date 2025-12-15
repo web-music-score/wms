@@ -945,7 +945,7 @@ export class ObjMeasure extends MusicObject {
         return rest;
     }
 
-    addLyrics(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string, lyricsOptions: LyricsOptions) {
+    addLyrics(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsText: string, lyricsLength: NoteLength | NoteLengthStr, lyricsOptions: LyricsOptions) {
         this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
             let col = this.getRhythmColumn({ verse, line, vpos });
 

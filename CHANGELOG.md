@@ -1,4 +1,8 @@
 # Changelog
+## [6.0.0-pre.6] - 2025-12-??
+### Changed
+- Changed `addLyrics()` argument order to match `addNote()`.
+
 ## [6.0.0-pre.5] - 2025-12-14
 ### Changed
 - Renamed `completeRests()` to `fillWithRests()`.

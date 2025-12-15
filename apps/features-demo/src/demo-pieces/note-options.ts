@@ -9,23 +9,23 @@ export function createNoteOptionsDemo() {
         .setKeySignature("E Natural Minor")
         .setTimeSignature("4/4")
 
-        .addNote(0, "B4", "4n", { stem: "up" }).addLyrics(1, "4n", "stem", { align: "left" })
+        .addNote(0, "B4", "4n", { stem: "up" }).addLyrics(1, "stem", "4n", { align: "left" })
         .addNote(1, "E4", "4n", { stem: "down" })
         .addNote(0, "B4", "4n")
         .addNote(1, "E4", "4n")
 
         .addMeasure()
-        .addNote(0, "B4", "4n", { color: "red" }).addLyrics(1, "4n", "color")
+        .addNote(0, "B4", "4n", { color: "red" }).addLyrics(1, "color", "4n")
         .addNote(1, "E4", "4n", { color: "green" })
         .addNote(0, "B4", "4n", { color: "blue" })
         .addNote(1, "E4", "4n", { color: "yellow" })
 
         .addMeasure()
-        .addChord(0, ["C4", "E4", "G4", "B4", "C5"], "2n", { arpeggio: "up" }).addLyrics(1, "2n", "arpeggio")
+        .addChord(0, ["C4", "E4", "G4", "B4", "C5"], "2n", { arpeggio: "up" }).addLyrics(1, "arpeggio", "2n")
         .addChord(0, ["C4", "E4", "G4", "B4", "C5"], "2n", { arpeggio: "down" })
 
         .addMeasure()
-        .addNote(0, "E4", "8n", { staccato: true, stem: "up" }).addLyrics(1, "8n", "staccato")
+        .addNote(0, "E4", "8n", { staccato: true, stem: "up" }).addLyrics(1, "staccato", "8n")
         .addNote(0, "F#4", "8n", { staccato: true })
         .addNote(0, "G4", "4n", { staccato: true })
         .addNote(0, "B4", "8n", { staccato: true, stem: "down" })
@@ -33,7 +33,7 @@ export function createNoteOptionsDemo() {
         .addNote(0, "D5", "4n", { staccato: true })
 
         .addMeasure()
-        .addNote(0, "E4", "8n", { diamond: true }).addLyrics(1, "8n", "diamond")
+        .addNote(0, "E4", "8n", { diamond: true }).addLyrics(1, "diamond", "8n")
         .addNote(0, "F#4", "8n", { diamond: true })
         .addNote(0, "G4", "4n", { diamond: true })
         .addNote(0, "B4", "8n", { diamond: true })
@@ -42,7 +42,7 @@ export function createNoteOptionsDemo() {
         .endRow()
 
         .addMeasure()
-        .addNote(0, "E4", "1n", { stem: "up" }).addLyrics(1, "8n", "notes lengths")
+        .addNote(0, "E4", "1n", { stem: "up" }).addLyrics(1, "notes lengths", "8n")
 
         .addMeasure()
         .addNote(0, "E4", "2n")
@@ -64,11 +64,11 @@ export function createNoteOptionsDemo() {
         .fillWithRests()
 
         .addMeasure()
-        .addNote(0, "E4", "8n").addLyrics(1, "8n", "flags")
-        .addNote(0, "E4", "16n").addLyrics(1, "16n")
-        .addNote(0, "E4", "32n").addLyrics(1, "32n")
-        .addNote(0, "E4", "64n").addLyrics(1, "64n")
-        .addNote(0, "E4", "8.").addLyrics(1, "8n", "dots")
+        .addNote(0, "E4", "8n").addLyrics(1, "flags", "8n")
+        .addNote(0, "E4", "16n").addLyrics(1, "", "16n")
+        .addNote(0, "E4", "32n").addLyrics(1, "", "32n")
+        .addNote(0, "E4", "64n").addLyrics(1, "", "64n")
+        .addNote(0, "E4", "8.").addLyrics(1, "dots", "8n")
         .addNote(0, "E4", "8..")
         .addNote(0, "E4", "8...")
         .fillWithRests()

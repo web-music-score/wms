@@ -598,7 +598,7 @@ export class DocumentBuilder {
 
     private currentLyricsAlign: LyricsAlign | `${LyricsAlign}` = LyricsAlign.Center;
 
-    private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
+    private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsText: string | string[], lyricsLength: NoteLength | NoteLengthStr, lyricsOptions?: LyricsOptions): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         assertArg(
@@ -618,10 +618,10 @@ export class DocumentBuilder {
         }
 
         if (Guard.isArray(lyricsText)) {
-            lyricsText.forEach(text => this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, text, lyricsOptions));
+            lyricsText.forEach(text => this.getMeasure().addLyrics(staffTabOrGroups, verse, text, lyricsLength, lyricsOptions));
         }
         else {
-            this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsLength, lyricsText, lyricsOptions);
+            this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsText, lyricsLength, lyricsOptions);
         }
 
         return this;
@@ -630,28 +630,28 @@ export class DocumentBuilder {
     /**
      * Add lyrics to current measure.
      * @param verse - Verse number (e.g. 1).
-     * @param lyricsLength - Lyrics text length (e.g. "2n").
      * @param lyricsText - Lyrics text (empty space if omitted), single value or array.
+     * @param lyricsLength - Lyrics text length (e.g. "2n").
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyrics(verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
+    addLyrics(verse: VerseNumber, lyricsText: string | string[], lyricsLength: NoteLength | NoteLengthStr, lyricsOptions?: LyricsOptions): DocumentBuilder {
         setAssertFunction("addLyrics", verse, lyricsLength, lyricsText, lyricsOptions);
-        return this.addLyricsInternal(undefined, verse, lyricsLength, lyricsText ?? "", lyricsOptions);
+        return this.addLyricsInternal(undefined, verse, lyricsText, lyricsLength, lyricsOptions);
     }
 
     /**
      * Add lyrics to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
      * @param verse - Verse number (e.g. 1).
-     * @param lyricsLength - Lyrics text length (e.g. "2n").
      * @param lyricsText - Lyrics text (empty space if omitted), single value or array.
+     * @param lyricsLength - Lyrics text length (e.g. "2n").
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyricsTo(staffTabOrGroups: StaffTabOrGroups, verse: VerseNumber, lyricsLength: NoteLength | NoteLengthStr, lyricsText?: string | string[], lyricsOptions?: LyricsOptions): DocumentBuilder {
+    addLyricsTo(staffTabOrGroups: StaffTabOrGroups, verse: VerseNumber, lyricsText: string | string[], lyricsLength: NoteLength | NoteLengthStr, lyricsOptions?: LyricsOptions): DocumentBuilder {
         setAssertFunction("addLyricsTo", verse, lyricsLength, lyricsText, lyricsOptions);
-        return this.addLyricsInternal(staffTabOrGroups, verse, lyricsLength, lyricsText ?? "", lyricsOptions);
+        return this.addLyricsInternal(staffTabOrGroups, verse, lyricsText, lyricsLength, lyricsOptions);
     }
 
     private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata | `${Fermata}`): DocumentBuilder {
