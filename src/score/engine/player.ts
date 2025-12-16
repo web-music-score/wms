@@ -7,7 +7,7 @@ import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAn
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension, getTextContent } from "./extension";
-import { getDynamicsVolume } from "./element-data";
+import { getDynamicsVolume, isDynamicsText, isTempoText } from "./element-data";
 
 function _setTimeout(cb: () => any, ms: number): number | undefined {
     return typeof window === "undefined"
@@ -16,7 +16,7 @@ function _setTimeout(cb: () => any, ms: number): number | undefined {
 }
 
 function _clearTimeout(t: number | undefined) {
-    if(typeof window !== "undefined")
+    if (typeof window !== "undefined")
         window.clearTimeout(t);
 }
 
@@ -293,7 +293,7 @@ export class Player {
         const pushSpeed = (col: ObjRhythmColumn, speed: number) => speedMap.getOrCreate(col, []).push(speed);
         const pushVolume = (col: ObjRhythmColumn, volume: number) => volumeMap.getOrCreate(col, []).push(volume);
 
-        this.playerColumnSequence.forEach(col => {
+        this.playerColumnSequence.forEach((col, colId) => {
             if (!(col instanceof ObjRhythmColumn)) {
                 return;
             }
@@ -309,8 +309,10 @@ export class Player {
                 else if ((vol = getDynamicsVolume(text)) !== undefined) {
                     curVolume = vol;
                 }
-                else if (layoutObj.musicObj.getLink() instanceof Extension) {
-                    let extension = layoutObj.musicObj.getLink() as Extension;
+                else if (isTempoText(text) || isDynamicsText(text)) {
+                    let extension = layoutObj.musicObj.getLink() instanceof Extension
+                        ? layoutObj.musicObj.getLink() as Extension
+                        : new Extension(layoutObj, col, Infinity, false, "solid", "bottom"); // Create dummy extension.
 
                     const range = extension.getRange();
                     const stopText = range.stopObject ? getTextContent(range.stopObject) : "";

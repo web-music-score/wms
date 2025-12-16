@@ -9,12 +9,27 @@ import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
+import { ObjScoreRow } from "./obj-score-row";
 
 export type ExtensionStartObject = ObjText | ObjSpecialText;
 export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
 export type ExtensionLineRightObject = ObjRhythmColumn | ObjBarLineRight;
 export type ExtensionStopObject = ObjBarLineRight | ObjText | ObjSpecialText;
 export type ExtensionObjectAll = ExtensionStartObject | ExtensionLineLeftObject | ExtensionLineRightObject | ExtensionStopObject;
+
+function getRow(obj: ExtensionObjectAll | undefined): ObjScoreRow | undefined {
+    let o: MusicObject | undefined = obj;
+
+    while (o) {
+        if ((o as any).row instanceof ObjScoreRow)
+            return (o as any).row;
+        if ((o as any).measure instanceof ObjMeasure)
+            return (o as any).measure.row;
+        o = o.getParent();
+    }
+
+    return undefined;
+}
 
 function isExtensionStartObject(obj: unknown) {
     return obj instanceof ObjText || obj instanceof ObjSpecialText;
@@ -43,8 +58,12 @@ export class ObjExtensionLine extends MusicObject {
         return this.mi;
     }
 
+    private getLeftObj(): ExtensionObjectAll {
+        return this.cols[0];
+    }
+
     private getLineLeft(ctx: RenderContext): number {
-        let obj = this.cols[0];
+        let obj = this.getLeftObj();
 
         if (isExtensionStartObject(obj))
             return obj.getRect().right + ctx.unitSize;
@@ -61,8 +80,25 @@ export class ObjExtensionLine extends MusicObject {
         return obj.getRect().right;
     }
 
+    private getRightObj(): ExtensionObjectAll {
+        const obj = this.cols[this.cols.length - 1];
+
+        if (isExtensionStopObject(obj)) {
+            const objRow = getRow(obj);
+
+            const prevObj = this.cols[this.cols.length - 2];
+            const prevObjRow = getRow(prevObj);
+
+            return objRow && prevObjRow && objRow !== prevObjRow
+                ? prevObj
+                : obj;
+        }
+
+        return obj;
+    }
+
     private getLineRight(ctx: RenderContext): number {
-        let obj = this.cols[this.cols.length - 1];
+        let obj = this.getRightObj();
 
         if (isExtensionStopObject(obj))
             return obj.getRect().left - ctx.unitSize;
@@ -122,7 +158,7 @@ export class ObjExtensionLine extends MusicObject {
         let tails = this.extension.getTails();
         let last = tails[tails.length - 1];
 
-        if (this === last && !isExtensionStopObject(this.cols[this.cols.length - 1])) {
+        if (this === last && !isExtensionStopObject(this.getRightObj())) {
             let tipH = rect.anchorY > this.line.getRect().anchorY ? -ctx.unitSize : ctx.unitSize;
             ctx.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
         }

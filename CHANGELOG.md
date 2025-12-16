@@ -3,6 +3,10 @@
 ### Changed
 - Changed `addLyrics()` argument order to match `addNote()`.
 
+## Fixed
+- Draw extension line correctly if stop object is not next row.
+- Play tempo/dynamics correctly without extension line.
+
 ## [6.0.0-pre.5] - 2025-12-14
 ### Changed
 - Renamed `completeRests()` to `fillWithRests()`.

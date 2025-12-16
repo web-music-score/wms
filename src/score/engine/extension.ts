@@ -55,7 +55,7 @@ export class Extension extends MusicObjectLink {
     constructor(readonly headObj: LayoutObjectWrapper, startColumn: ObjRhythmColumn, length: number, visible: boolean, lineStyle: ExtensionLineStyle, linePos: ExtensionLinePos) {
         super(headObj.musicObj);
 
-        this.length = length + 1; // + 1 just to connect with followinf elem.
+        this.length = length + 1; // + 1 just to connect with following elem.
         this.visible = visible;
 
         this.lineStyle = lineStyle;
@@ -101,7 +101,7 @@ export class Extension extends MusicObjectLink {
         let ticksLeft = length;
 
         while (true) {
-            if (ticksLeft <= 0) return range;
+            if (!curColumn || ticksLeft <= 0) return range;
 
             const stopObject = this.whatStopped(curColumn);
             if (stopObject !== undefined) {
@@ -109,13 +109,11 @@ export class Extension extends MusicObjectLink {
                 return range;
             }
 
+            range.addColumn(curColumn);
+
             ticksLeft -= curColumn.getTicksToNextColumn();
 
             curColumn = curColumn.getNextColumn();
-            if (!curColumn) return range;
-
-            if (ticksLeft > 0)
-                range.addColumn(curColumn);
         }
     }
 }
