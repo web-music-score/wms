@@ -13,6 +13,10 @@ let assertingFunction = "";
 
 function setAssertFunction(fnName: string, ...fnArgs: unknown[]) {
     let argsStr = fnArgs.map(arg => JSON.stringify(arg)).join(", ");
+
+    if (argsStr.endsWith(", "))
+        argsStr = argsStr.substring(0, argsStr.length - 2);
+
     assertingFunction = `DocumentBuilder.${fnName}(${argsStr})`;
 }
 
@@ -1065,14 +1069,14 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     repeat(times: number, repeatCreator: (builder: DocumentBuilder) => void): DocumentBuilder {
-         setAssertFunction("repeat", repeatCreator);
+        setAssertFunction("repeat", repeatCreator);
 
         assertArg(
             Guard.isIntegerGte(times, 0),
             Guard.isFunction(repeatCreator)
         );
 
-        for(let i = 0; i < times; i++)
+        for (let i = 0; i < times; i++)
             repeatCreator(this);
 
         return this;
