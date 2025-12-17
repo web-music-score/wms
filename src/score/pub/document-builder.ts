@@ -12,11 +12,7 @@ import { getAnnotation } from "score/engine/element-data";
 let assertingFunction = "";
 
 function setAssertFunction(fnName: string, ...fnArgs: unknown[]) {
-    let argsStr = fnArgs.map(arg => JSON.stringify(arg)).join(", ");
-
-    if (argsStr.endsWith(", "))
-        argsStr = argsStr.substring(0, argsStr.length - 2);
-
+    let argsStr = fnArgs.map(arg => Utils.Str.stringify(arg)).join(", ");
     assertingFunction = `DocumentBuilder.${fnName}(${argsStr})`;
 }
 
