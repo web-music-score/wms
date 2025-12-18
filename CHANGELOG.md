@@ -1,5 +1,8 @@
 # Changelog
-## [6.0.0-pre.6] - 2025-12-??
+## [6.0.0] - 2025-12-18
+
+**Stable release**
+
 ### Changed
 - Changed `addLyrics()` argument order to match `addNote()`.
 
