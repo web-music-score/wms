@@ -1,4 +1,8 @@
 # Changelog
+## [6.0.1] - 2025-12-??
+### Fixed
+- Set rest position in tuplets if rest does not have its own staffPos.
+
 ## [6.0.0] - 2025-12-18
 
 **Stable release**

@@ -10,22 +10,6 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 
-function getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
-    if (typeof staffPos === "number") {
-        // staffPos is midiNumber/chromaticId
-        return Note.getChromaticNote(staffPos).diatonicId;
-    }
-    else if (typeof staffPos === "string") {
-        return Note.getNote(staffPos).diatonicId;
-    }
-    else if (staffPos instanceof Note) {
-        return staffPos.diatonicId;
-    }
-    else {
-        return undefined;
-    }
-}
-
 export class ObjStaffRest extends MusicObject {
     public restRect = new AnchoredRect();
     public dotRects: AnchoredRect[] = [];
@@ -83,13 +67,8 @@ export class ObjRest extends MusicObject {
     constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLength | NoteLengthStr, readonly options?: RestOptions, tupletRatio?: TupletRatio) {
         super(col);
 
-        this.setDiatonicId = getDiatonicIdFromStaffPos(this.options?.staffPos) ?? ObjRest.UndefinedDiatonicId;
-
-        let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(this.voiceId));
-
-        if (this.setDiatonicId !== ObjRest.UndefinedDiatonicId && staves.length > 0 && staves[0].isSpace(this.setDiatonicId)) {
-            this.setDiatonicId += this.setDiatonicId >= staves[0].middleLineDiatonicId ? 1 : -1;
-        }
+        this.setDiatonicId = this.getDiatonicIdFromStaffPos(this.options?.staffPos) ?? ObjRest.UndefinedDiatonicId;
+        this.setDiatonicId = this.getDiatonicIdOnLine(this.setDiatonicId);
 
         // Init with something, will be updated.
         this.runningDiatonicId = this.setDiatonicId;
@@ -123,6 +102,33 @@ export class ObjRest extends MusicObject {
 
     get noteLength() {
         return this.rhythmProps.noteLength;
+    }
+
+    private getDiatonicIdFromStaffPos(staffPos: Note | string | number | undefined): number | undefined {
+        if (typeof staffPos === "number") {
+            // staffPos is midiNumber/chromaticId
+            return Note.getChromaticNote(staffPos).diatonicId;
+        }
+        else if (typeof staffPos === "string") {
+            return Note.getNote(staffPos).diatonicId;
+        }
+        else if (staffPos instanceof Note) {
+            return staffPos.diatonicId;
+        }
+        else {
+            return undefined;
+        }
+    }
+
+    getDiatonicIdOnLine(diatonicId: number) {
+        let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(this.voiceId));
+
+        if (diatonicId !== ObjRest.UndefinedDiatonicId && staves.length > 0 && staves[0].isSpace(diatonicId)) {
+            return diatonicId += diatonicId >= staves[0].middleLineDiatonicId ? 1 : -1;
+        }
+        else {
+            return diatonicId;
+        }
     }
 
     getDiatonicId(staff?: ObjStaff): number {

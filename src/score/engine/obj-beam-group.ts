@@ -9,6 +9,7 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjStaff } from "./obj-staff-and-tab";
+import { ObjRest } from "./obj-rest";
 
 export enum BeamGroupType {
     RegularBeam,
@@ -489,7 +490,7 @@ export class ObjBeamGroup extends MusicObject {
         }
     }
 
-    updateStemTips() {
+    updateNoteStemTips() {
         this.staffObjects.forEach(obj => {
             let left = obj.points[0];
             let right = obj.points[obj.points.length - 1];

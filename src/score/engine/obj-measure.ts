@@ -1421,6 +1421,46 @@ export class ObjMeasure extends MusicObject {
             }
         });
 
+        // Update tuplet rest staffPos
+        getVoiceIds().forEach(voiceId => {
+            const staff = this.row.getStaves()[0];
+
+            if (!staff || !staff.containsVoiceId(voiceId))
+                return;
+
+            this.beamGroups.forEach(b => {
+                const symbols = b.getSymbols();
+
+                symbols.forEach((sym, restId) => {
+                    if (!(sym instanceof ObjRest && sym.setDiatonicId === ObjRest.UndefinedDiatonicId))
+                        return;
+
+                    let leftNoteId = restId;
+                    let rightNoteId = restId;
+
+                    while (symbols[leftNoteId] instanceof ObjRest) leftNoteId--;
+                    while (symbols[rightNoteId] instanceof ObjRest) rightNoteId++;
+
+                    let newRestDiatonicId: number | undefined;
+
+                    if (leftNoteId < 0 && rightNoteId <= symbols.length - 1) {
+                        newRestDiatonicId = symbols[rightNoteId].getDiatonicId(staff);
+                    }
+                    else if (leftNoteId >= 0 && rightNoteId > symbols.length - 1) {
+                        newRestDiatonicId = symbols[leftNoteId].getDiatonicId(staff);
+                    }
+                    else if (leftNoteId >= 0 && rightNoteId <= symbols.length - 1) {
+                        newRestDiatonicId = Math.round(
+                            (symbols[leftNoteId].getDiatonicId(staff) + symbols[rightNoteId].getDiatonicId(staff)) / 2
+                        );
+                    }
+
+                    if (newRestDiatonicId !== undefined)
+                        sym.updateRunningArguments(newRestDiatonicId, b.stemDir, []);
+                });
+            });
+        });
+
         // Layout tab tuning notes
         this.tabStringNotes.length = 0;
         if (this.isFirstMeasureInRow()) {
@@ -1566,7 +1606,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     alignStemsToBeams() {
-        this.beamGroups.forEach(b => b.updateStemTips());
+        this.beamGroups.forEach(b => b.updateNoteStemTips());
     }
 
     layoutDone() {
