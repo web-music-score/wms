@@ -27,8 +27,6 @@ type HTMLImageData = {
     img?: HTMLImageElement;
 }
 
-const ImageCache = new BiMap<ImageAsset, string, HTMLImageData>();
-
 type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
 
 function staffPosEquals(a: StaffPos | undefined, b: StaffPos | undefined): boolean {
@@ -76,6 +74,8 @@ export class RenderContext {
     private onMouseLeaveFn: (e: MouseEvent) => void;
     private onTouchEndFn: (e: TouchEvent) => void;
 
+    private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
+
     constructor(private readonly mi: MRenderContext) {
         this.devicePixelRatio = typeof window !== "undefined" ? window.devicePixelRatio : 1;
         this.fontSize = Device.FontSize * DocumentSettings.DocumentScale * this.devicePixelRatio;
@@ -98,7 +98,7 @@ export class RenderContext {
 
     getImageAsset(asset: ImageAsset, color?: string): HTMLImageElement | undefined {
         color ??= "";
-        return ImageCache.getOrCreate(asset, color, () => {
+        return this.imageCache.getOrCreate(asset, color, () => {
             const a: HTMLImageData = { src: getImageData(asset), color, loaded: false, colorized: false };
             const img = new Image();
             img.src = a.src;
