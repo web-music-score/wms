@@ -1,5 +1,6 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import * as Score from "web-music-score/score";
+import { ObjDocument } from "../engine/obj-document";
+import { MDocument, MPlaybackButtons } from "score/pub";
 
 function addClass(el: HTMLElement, className: string) {
     className.trim().split(" ").filter(cls => cls.length > 0).forEach(cls => Utils.Dom.addClass(el, cls));
@@ -8,9 +9,11 @@ function addClass(el: HTMLElement, className: string) {
 const defaultButtonClass = "wms-button";
 const defaultButtonGroupClass = "wms-button-group";
 
+const emptyDoc = new ObjDocument().getMusicInterface();
+
 class WmsPlaybackButtons extends HTMLElement {
     private div?: HTMLDivElement;
-    private pb: Score.MPlaybackButtons;
+    private pb: MPlaybackButtons;
 
     private playLabel?: string;
     private pauseLabel?: string;
@@ -27,56 +30,19 @@ class WmsPlaybackButtons extends HTMLElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
-    private doc?: Score.MDocument;
+    private _doc: MDocument = emptyDoc;
 
     constructor() {
         super();
 
-        this.pb = new Score.MPlaybackButtons();
+        this.pb = new MPlaybackButtons();
 
-        this.doc = new Score.DocumentBuilder()
-            .setScoreConfiguration("treble")
-            .setTimeSignature("3/4")
-            .addNote(0, ["C4", "E4", "G4"], "4n")
-            .addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
-            .getDocument();
-
-        this.pb.setDocument(this.doc);
-    }
-
-    connectedCallback() {
-        if (typeof document !== "undefined" && !this.div) {
-            this.div = document.createElement("div");
-            addClass(this.div, this.buttonGroupClass);
-            this.append(this.div);
-        }
-
-        this.playLabel = this.getAttribute("playLabel") || undefined;
-        this.pauseLabel = this.getAttribute("pauseLabel") || undefined;
-        this.stopLabel = this.getAttribute("stopLabel") || undefined;
-
-        this.singlePlayStop = false;
-        this.playStop = false;
-        this.playPauseStop = false;
-
-        if (this.hasAttribute("singlePlayStop"))
-            this.singlePlayStop = true;
-        else if (this.hasAttribute("playStop"))
-            this.playStop = true;
-        else this.playPauseStop = true;
-
-        if (this.hasAttribute("buttonClass"))
-            this.buttonClass = this.getAttribute("buttonClass")!;
-        else if (this.hasAttribute("buttonGroupClass"))
-            this.buttonGroupClass = this.getAttribute("buttonGroupClass")!;
-
-        this.render();
+        this.pb.setDocument(this._doc);
     }
 
     static get observedAttributes() {
         return [
-            "doc",
+            "src",
             "singlePlayStop",
             "playStop",
             "playPauseStop",
@@ -125,6 +91,44 @@ class WmsPlaybackButtons extends HTMLElement {
         }
 
         this.render();
+    }
+
+    connectedCallback() {
+        if (typeof document !== "undefined" && !this.div) {
+            this.div = document.createElement("div");
+            addClass(this.div, this.buttonGroupClass);
+            this.append(this.div);
+        }
+
+        this.playLabel = this.getAttribute("playLabel") || undefined;
+        this.pauseLabel = this.getAttribute("pauseLabel") || undefined;
+        this.stopLabel = this.getAttribute("stopLabel") || undefined;
+
+        this.singlePlayStop = false;
+        this.playStop = false;
+        this.playPauseStop = false;
+
+        if (this.hasAttribute("singlePlayStop"))
+            this.singlePlayStop = true;
+        else if (this.hasAttribute("playStop"))
+            this.playStop = true;
+        else this.playPauseStop = true;
+
+        if (this.hasAttribute("buttonClass"))
+            this.buttonClass = this.getAttribute("buttonClass")!;
+        else if (this.hasAttribute("buttonGroupClass"))
+            this.buttonGroupClass = this.getAttribute("buttonGroupClass")!;
+
+        this.render();
+    }
+
+    set doc(doc: MDocument | undefined) {
+        this._doc = doc || emptyDoc;
+        this.pb.setDocument(this._doc);
+    }
+
+    get doc(): MDocument {
+        return this._doc;
     }
 
     private render() {

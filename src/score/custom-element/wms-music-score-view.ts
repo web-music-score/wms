@@ -1,29 +1,50 @@
-import * as Score from "web-music-score/score";
+import { MRenderContext, MDocument } from "../pub";
+import { ObjDocument } from "../engine/obj-document";
+
+const emptyDoc = new ObjDocument().getMusicInterface();
 
 class WmsMusicScoreView extends HTMLElement {
     private canvas: HTMLCanvasElement;
-    private rc: Score.MRenderContext;
+    private rc: MRenderContext;
+
+    private _doc: MDocument = emptyDoc;
+    private _connected = false;
 
     constructor() {
         super();
 
         this.canvas = document.createElement("canvas");
-
-        this.rc = new Score.MRenderContext().setCanvas(this.canvas);
-    }
-
-    connectedCallback() {
-        this.render();
+        this.rc = new MRenderContext().setCanvas(this.canvas);
     }
 
     static get observedAttributes() {
-        return ["doc"];
+        return ["src"];
     }
 
     attributeChangedCallback(name: string, _old: string | null, value: string | null) {
-        if (name === "doc" && value) {
-            this.load(value);
+        if (name === "src" && value) {
+            this.loadFromUrl(value);
         }
+    }
+
+    connectedCallback() {
+        this._connected = true;
+        this.render();
+    }
+
+    set doc(doc: MDocument | undefined) {
+        this._doc = doc || emptyDoc;
+        if (this._connected)
+            this.update();
+    }
+
+    get doc(): MDocument {
+        return this._doc;
+    }
+
+    private update() {
+        this.rc.setDocument(this.doc);
+        this.render();
     }
 
     private render() {
@@ -33,17 +54,7 @@ class WmsMusicScoreView extends HTMLElement {
         this.rc.draw();
     }
 
-    private async load(src: string) {
-        let doc = new Score.DocumentBuilder()
-            .setScoreConfiguration("treble")
-            .setTimeSignature("3/4")
-            .addNote(0, ["C4", "E4", "G4"], "4n")
-            .addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
-            .getDocument();
-
-        this.rc.setDocument(doc);
-    }
+    private loadFromUrl(url: string) { }
 }
 
 /**

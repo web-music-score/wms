@@ -240,6 +240,38 @@ export class MDocument extends MusicInterface {
         assertArg(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
         return new MPlayer(this, playStateChangeListener).play();
     }
+
+    /**
+     * Bind this document to custom HTML element.
+     * @param idOrEl - HTML element id or element.
+     */
+    bindToElement(...idOrEl: (string | HTMLElement)[]) {
+        assertArg(
+            Guard.isArray(idOrEl) &&
+            (
+                idOrEl.length === 0 ||
+                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
+            ),
+            "idOrEl", idOrEl);
+
+        idOrEl.forEach(idOrEl => this.obj.bindToElement(idOrEl));
+    }
+
+    /**
+     * Unbind this document from custom HTML element.
+     * @param idOrEl - HTML element id or element.
+     */
+    unbindFromElement(...idOrEl: (string | HTMLElement)[]) {
+        assertArg(
+            Guard.isArray(idOrEl) &&
+            (
+                idOrEl.length === 0 ||
+                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
+            ),
+            "idOrEl", idOrEl);
+
+        idOrEl.forEach(idOrEl => this.obj.unbindFromElement(idOrEl));
+    }
 }
 
 /** Ending object. */

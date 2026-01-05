@@ -7,7 +7,7 @@ import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, Staff
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
-import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
@@ -397,5 +397,30 @@ export class ObjDocument extends MusicObject {
         }
 
         return [this];
+    }
+
+    private boundElements = new ValueSet<HTMLElement>();
+
+    bindToElement(idOrEl: string | HTMLElement) {
+        if (typeof document === "undefined") return;
+
+        const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        if (el && (el.tagName === "WMS-MUSIC-SCORE-VIEW" || el.tagName === "WMS-PLAYBACK-BUTTONS")) {
+            (el as any).doc = this.getMusicInterface();
+            this.boundElements.add(el);
+            el.addEventListener("disconnected", () => this.boundElements.delete(el));
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Unknown HTML element!");
+    }
+
+    unbindFromElement(idOrEl: string | HTMLElement) {
+        if (typeof document === "undefined") return;
+
+        const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        if (el && (el.tagName === "WMS-MUSIC-SCORE-VIEW" || el.tagName === "WMS-PLAYBACK-BUTTONS")) {
+            (el as any).doc = undefined;
+            this.boundElements.delete(el);
+        }
     }
 }
