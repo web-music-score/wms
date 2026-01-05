@@ -1,4 +1,8 @@
 # Changelog
+## [5.5.1] - 2026-01-05
+### Deprecated
+- Deprecated `@tspro/web-music-score`, use `web-music-score` instead.
+
 ## [5.5.0] - 2025-11-19
 ### Added
 - Coloring document.

@@ -1,13 +1,13 @@
 {
     "name": "ts-react-example",
-    "version": "5.5.0",
+    "version": "5.5.1",
     "private": true,
     "devDependencies": {
         "@babel/cli": "^7.27.2",
         "@babel/core": "^7.27.7",
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-react": "^7.27.1",
-        "@tspro/web-music-score": "^5.5.0",
+        "@tspro/web-music-score": "^5.5.1",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
         "@webpack-cli/serve": "^3.0.1",
