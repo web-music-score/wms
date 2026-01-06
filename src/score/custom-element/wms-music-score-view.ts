@@ -1,13 +1,13 @@
 import { MRenderContext, MDocument } from "../pub";
 import { ObjDocument } from "../engine/obj-document";
-
-const emptyDoc = new ObjDocument().getMusicInterface();
+import { Utils } from "@tspro/ts-utils-lib";
 
 class WmsMusicScoreView extends HTMLElement {
     private canvas: HTMLCanvasElement;
     private rc: MRenderContext;
 
-    private _doc: MDocument = emptyDoc;
+    private _emptyDoc = new ObjDocument().getMusicInterface();
+    private _doc: MDocument = this._emptyDoc;
     private _connected = false;
 
     constructor() {
@@ -33,7 +33,7 @@ class WmsMusicScoreView extends HTMLElement {
     }
 
     set doc(doc: MDocument | undefined) {
-        this._doc = doc || emptyDoc;
+        this._doc = doc || this._emptyDoc;
         if (this._connected)
             this.update();
     }
@@ -70,4 +70,10 @@ export function registerWmsMusicScoreView() {
             WmsMusicScoreView
         );
     }
+}
+
+export function isWmsMusicScoreView(el: unknown): el is WmsMusicScoreView {
+    return Utils.Obj.isObject(el) &&
+        Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
+        el.tagName === "WMS-MUSIC-SCORE-VIEW";
 }

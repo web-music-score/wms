@@ -9,8 +9,6 @@ function addClass(el: HTMLElement, className: string) {
 const defaultButtonClass = "wms-button";
 const defaultButtonGroupClass = "wms-button-group";
 
-const emptyDoc = new ObjDocument().getMusicInterface();
-
 class WmsPlaybackButtons extends HTMLElement {
     private div?: HTMLDivElement;
     private pb: MPlaybackButtons;
@@ -30,13 +28,13 @@ class WmsPlaybackButtons extends HTMLElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
-    private _doc: MDocument = emptyDoc;
+    private _defaultDoc = new ObjDocument().getMusicInterface();
+    private _doc: MDocument = this._defaultDoc;
 
     constructor() {
         super();
 
         this.pb = new MPlaybackButtons();
-
         this.pb.setDocument(this._doc);
     }
 
@@ -123,7 +121,7 @@ class WmsPlaybackButtons extends HTMLElement {
     }
 
     set doc(doc: MDocument | undefined) {
-        this._doc = doc || emptyDoc;
+        this._doc = doc || this._defaultDoc;
         this.pb.setDocument(this._doc);
     }
 
@@ -203,4 +201,10 @@ export function registerWmsPlaybackButtons() {
             WmsPlaybackButtons
         );
     }
+}
+
+export function isWmsPlaybackButtons(el: unknown): el is WmsPlaybackButtons {
+    return Utils.Obj.isObject(el) &&
+        Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
+        el.tagName === "WMS-PLAYBACK-BUTTONS";
 }

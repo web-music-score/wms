@@ -10,6 +10,8 @@ import { ConnectiveProps } from "./connective-props";
 import { AnchoredRect, Guard, Rect, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "web-music-score/core";
+import { isWmsMusicScoreView } from "../custom-element/wms-music-score-view";
+import { isWmsPlaybackButtons } from "../custom-element/wms-playback-buttons";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -402,11 +404,13 @@ export class ObjDocument extends MusicObject {
     private boundElements = new ValueSet<HTMLElement>();
 
     bindToElement(idOrEl: string | HTMLElement) {
-        if (typeof document === "undefined") return;
+        if (typeof document === "undefined")
+            return;
 
         const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
-        if (el && (el.tagName === "WMS-MUSIC-SCORE-VIEW" || el.tagName === "WMS-PLAYBACK-BUTTONS")) {
-            (el as any).doc = this.getMusicInterface();
+
+        if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+            el.doc = this.getMusicInterface();
             this.boundElements.add(el);
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
         }
@@ -415,11 +419,13 @@ export class ObjDocument extends MusicObject {
     }
 
     unbindFromElement(idOrEl: string | HTMLElement) {
-        if (typeof document === "undefined") return;
+        if (typeof document === "undefined")
+            return;
 
         const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
-        if (el && (el.tagName === "WMS-MUSIC-SCORE-VIEW" || el.tagName === "WMS-PLAYBACK-BUTTONS")) {
-            (el as any).doc = undefined;
+
+        if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+            el.doc = undefined;
             this.boundElements.delete(el);
         }
     }
