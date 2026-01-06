@@ -42,6 +42,7 @@ export class MPlayer {
         this.player = new Player();
 
         this.player.setDocument(doc.getMusicObject());
+
         this.player.setCursorPositionChangeListener((cursorRect?: Rect) => {
             doc.getMusicObject().updateCursorRect(cursorRect);
         });
@@ -96,13 +97,13 @@ export class MPlayer {
 
 /** Render context class. */
 export class MRenderContext {
-    private readonly ctx: RenderContext;
+    private readonly _rc: RenderContext;
 
     /**
      * Create new render context instance.
      */
     constructor() {
-        this.ctx = new RenderContext(this);
+        this._rc = new RenderContext(this);
     }
 
     /**
@@ -113,19 +114,19 @@ export class MRenderContext {
     setPaint(paint?: Paint) {
         assertArg(Guard.isUndefined(paint) || paint instanceof Paint, "paint", paint);
 
-        this.ctx.setPaint(paint);
+        this._rc.setPaint(paint);
         return this;
     }
 
     /**
      * Attach music document to this render context.
-     * @param doc - Music document.
+     * @param mdoc - Music document.
      * @returns - This render context instance.
      */
-    setDocument(doc?: MDocument): MRenderContext {
-        assertArg(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+    setDocument(mdoc?: MDocument): MRenderContext {
+        assertArg(Guard.isUndefined(mdoc) || mdoc instanceof MDocument, "mdoc", mdoc);
 
-        this.ctx.setDocument(doc);
+        this._rc.setDocument(mdoc?.getMusicObject());
         return this;
     }
 
@@ -139,7 +140,7 @@ export class MRenderContext {
         canvas = require_t(Utils.Dom.getCanvas(canvas), typeof canvas === "string"
             ? "Cannot set render canvas because invalid canvas id: " + canvas
             : "Cannot set render canvas because given canvas is undefined.");
-        this.ctx.setCanvas(canvas);
+        this._rc.setCanvas(canvas);
         return this;
     }
 
@@ -149,7 +150,7 @@ export class MRenderContext {
      */
     setScoreEventListener(scoreEventListener: ScoreEventListener) {
         assertArg(Guard.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
-        this.ctx.setScoreEventListener(scoreEventListener);
+        this._rc.setScoreEventListener(scoreEventListener);
     }
 
     /**
@@ -157,7 +158,7 @@ export class MRenderContext {
      * @param obj - Music object or undefined to remove hilighting.
      */
     hilightObject(obj?: MusicInterface) {
-        this.ctx.hilightObject(obj?.getMusicObject());
+        this._rc.hilightObject(obj?.getMusicObject());
     }
 
     /**
@@ -165,7 +166,7 @@ export class MRenderContext {
      * @param staffPos - Staff position (score row and diatonic id) or undefined to remove hilighting.
      */
     hilightStaffPos(staffPos?: { scoreRow: MScoreRow, diatonicId: number }) {
-        this.ctx.hilightStaffPos(staffPos ? {
+        this._rc.hilightStaffPos(staffPos ? {
             scoreRow: staffPos.scoreRow.getMusicObject(),
             diatonicId: staffPos.diatonicId
         } : undefined);
@@ -176,7 +177,7 @@ export class MRenderContext {
      */
     draw() {
         try {
-            this.ctx.draw();
+            this._rc.draw();
         }
         catch (err) {
             console.log("Draw failed in music render context!", err);

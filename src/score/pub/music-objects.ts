@@ -245,7 +245,7 @@ export class MDocument extends MusicInterface {
      * Bind this document to custom HTML element.
      * @param idOrEl - HTML element id or element.
      */
-    bindToElement(...idOrEl: (string | HTMLElement)[]) {
+    bindElement(...idOrEl: (string | HTMLElement)[]) {
         assertArg(
             Guard.isArray(idOrEl) &&
             (
@@ -254,14 +254,14 @@ export class MDocument extends MusicInterface {
             ),
             "idOrEl", idOrEl);
 
-        idOrEl.forEach(idOrEl => this.obj.bindToElement(idOrEl));
+        idOrEl.forEach(idOrEl => this.obj.bindElement(idOrEl));
     }
 
     /**
      * Unbind this document from custom HTML element.
      * @param idOrEl - HTML element id or element.
      */
-    unbindFromElement(...idOrEl: (string | HTMLElement)[]) {
+    unbindElement(...idOrEl: (string | HTMLElement)[]) {
         assertArg(
             Guard.isArray(idOrEl) &&
             (
@@ -270,7 +270,7 @@ export class MDocument extends MusicInterface {
             ),
             "idOrEl", idOrEl);
 
-        idOrEl.forEach(idOrEl => this.obj.unbindFromElement(idOrEl));
+        idOrEl.forEach(idOrEl => this.obj.unbindElement(idOrEl));
     }
 }
 

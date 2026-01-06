@@ -6,8 +6,7 @@ class WmsMusicScoreView extends HTMLElement {
     private canvas: HTMLCanvasElement;
     private rc: MRenderContext;
 
-    private _emptyDoc = new ObjDocument().getMusicInterface();
-    private _doc: MDocument = this._emptyDoc;
+    private _doc?: MDocument;
     private _connected = false;
 
     constructor() {
@@ -29,21 +28,21 @@ class WmsMusicScoreView extends HTMLElement {
 
     connectedCallback() {
         this._connected = true;
-        this.render();
+        this.update();
     }
 
     set doc(doc: MDocument | undefined) {
-        this._doc = doc || this._emptyDoc;
+        this._doc = doc;
         if (this._connected)
             this.update();
     }
 
-    get doc(): MDocument {
+    get doc(): MDocument | undefined {
         return this._doc;
     }
 
     private update() {
-        this.rc.setDocument(this.doc);
+        this.rc.setDocument(this._doc);
         this.render();
     }
 
@@ -61,7 +60,7 @@ class WmsMusicScoreView extends HTMLElement {
  * Safe registration (VERY IMPORTANT)
  */
 export function registerWmsMusicScoreView() {
-    if (typeof document === "undefined")
+    if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
     if (!customElements.get("wms-music-score-view")) {

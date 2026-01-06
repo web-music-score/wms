@@ -54,7 +54,7 @@ export class RenderContext {
     private canvas?: HTMLCanvasElement;
     private ctx?: CanvasRenderingContext2D;
 
-    private mdoc?: MDocument;
+    private _doc?: ObjDocument;
 
     private paint: Paint = Paint.default;
 
@@ -93,7 +93,7 @@ export class RenderContext {
     }
 
     get doc(): ObjDocument | undefined {
-        return this.mdoc?.getMusicObject();
+        return this._doc;
     }
 
     getImageAsset(asset: ImageAsset, color?: string): HTMLImageElement | undefined {
@@ -183,23 +183,23 @@ export class RenderContext {
         }
     }
 
-    setDocument(mdoc?: MDocument) {
-        if (this.mdoc === mdoc) {
+    setDocument(doc?: ObjDocument) {
+        if (this._doc === doc) {
             return;
         }
 
         this.updateCursorRect(undefined);
 
-        let prevMDoc = this.mdoc;
+        let prevDoc = this._doc;
 
-        this.mdoc = mdoc;
+        this._doc = doc;
 
-        if (prevMDoc) {
-            prevMDoc.getMusicObject().setRenderContext(undefined);
+        if (prevDoc) {
+            prevDoc.removeRenderContext(this);
         }
 
-        if (mdoc) {
-            mdoc.getMusicObject().setRenderContext(this);
+        if (doc) {
+            doc.addRenderContext(this);
         }
     }
 
@@ -367,20 +367,20 @@ export class RenderContext {
     updateCanvasSize() {
         let { canvas, doc } = this;
 
-        if (canvas && doc) {
-            let rect = doc.getRect();
+        if (!canvas) return;
 
-            let w = rect.width + 1;
-            let h = rect.height + 1;
+        let rect = doc ? doc.getRect() : new AnchoredRect();
 
-            // Canvas internal size
-            canvas.width = w;
-            canvas.height = h;
+        let w = rect.width + 1;
+        let h = rect.height + 1;
 
-            // Canvas element size
-            canvas.style.width = (w / this.devicePixelRatio) + "px";
-            canvas.style.height = (h / this.devicePixelRatio) + "px";
-        }
+        // Canvas internal size
+        canvas.width = w;
+        canvas.height = h;
+
+        // Canvas element size
+        canvas.style.width = (w / this.devicePixelRatio) + "px";
+        canvas.style.height = (h / this.devicePixelRatio) + "px";
     }
 
     draw() {
@@ -388,7 +388,7 @@ export class RenderContext {
             let { doc } = this;
 
             if (doc) {
-                doc.layout();
+                doc.layout(this);
 
                 this.updateCanvasSize();
                 this.clearCanvas();
@@ -397,7 +397,11 @@ export class RenderContext {
                 this.drawHilightObjectRect();
                 this.drawPlayCursor();
 
-                doc.drawContent();
+                doc.drawContent(this);
+            }
+            else {
+                this.updateCanvasSize();
+                this.clearCanvas();
             }
         }
         catch (err) {

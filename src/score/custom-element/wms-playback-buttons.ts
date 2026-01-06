@@ -28,8 +28,7 @@ class WmsPlaybackButtons extends HTMLElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
-    private _defaultDoc = new ObjDocument().getMusicInterface();
-    private _doc: MDocument = this._defaultDoc;
+    private _doc?: MDocument;
 
     constructor() {
         super();
@@ -121,11 +120,11 @@ class WmsPlaybackButtons extends HTMLElement {
     }
 
     set doc(doc: MDocument | undefined) {
-        this._doc = doc || this._defaultDoc;
+        this._doc = doc;
         this.pb.setDocument(this._doc);
     }
 
-    get doc(): MDocument {
+    get doc(): MDocument | undefined {
         return this._doc;
     }
 
@@ -192,7 +191,7 @@ class WmsPlaybackButtons extends HTMLElement {
  * Safe registration (VERY IMPORTANT)
  */
 export function registerWmsPlaybackButtons() {
-    if (typeof document === "undefined")
+    if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
     if (!customElements.get("wms-playback-buttons")) {

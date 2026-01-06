@@ -16,7 +16,7 @@ import { isWmsPlaybackButtons } from "../custom-element/wms-playback-buttons";
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
 
-    private ctx?: RenderContext;
+    private attachedRcSet = new ValueSet<RenderContext>();
 
     readonly regions = new ScoreRowRegions();
 
@@ -129,24 +129,17 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.push(connectiveProps);
     }
 
-    setRenderContext(ctx?: RenderContext) {
-        if (this.ctx === ctx) {
-            return;
-        }
-
-        let prevCtx = this.ctx;
-
-        this.ctx = ctx;
-
-        if (prevCtx) {
-            prevCtx.setDocument(undefined);
-        }
-
-        if (ctx) {
-            ctx.setDocument(this.mi);
-        }
-
+    addRenderContext(rc?: RenderContext) {
+        if (!rc) return;
+        this.attachedRcSet.add(rc);
+        rc.setDocument(this);
         this.requestFullLayout();
+    }
+
+    removeRenderContext(rc?: RenderContext) {
+        if (!rc) return;
+        rc.setDocument(undefined);
+        this.attachedRcSet.delete(rc);
     }
 
     setHeader(title?: string, composer?: string, arranger?: string) {
@@ -255,9 +248,8 @@ export class ObjDocument extends MusicObject {
     }
 
     updateCursorRect(cursorRect?: Rect) {
-        if (this.ctx) {
-            this.ctx.updateCursorRect(cursorRect);
-        }
+        for (const rc of this.attachedRcSet)
+            rc.updateCursorRect(cursorRect);
     }
 
     requestLayout() {
@@ -275,18 +267,12 @@ export class ObjDocument extends MusicObject {
         this.requestLayout();
     }
 
-    layout() {
+    layout(rc: RenderContext) {
         if (!this.needLayout) {
             return;
         }
 
-        const { ctx } = this;
-
-        if (!ctx) {
-            return;
-        }
-
-        let { unitSize } = ctx;
+        let { unitSize } = rc;
 
         // Recreate beams.
         this.forEachMeasure(m => m.createBeams());
@@ -302,29 +288,29 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.forEach(props => props.createConnectives());
 
         // Reset layout groups
-        this.rows.forEach(row => row.resetLayoutGroups(ctx));
+        this.rows.forEach(row => row.resetLayoutGroups(rc));
 
         this.regions.resetWidths();
         this.regions.addRowstaffWidth(DocumentSettings.MinStaffWidth * unitSize);
 
         // Layout rows
-        this.rows.forEach(row => row.layout(ctx));
+        this.rows.forEach(row => row.layout(rc));
 
         // Stretch row accordsing to region data
-        this.rows.forEach(row => row.layoutStretch(ctx));
+        this.rows.forEach(row => row.layoutStretch(rc));
 
         // Layout layout groups
-        this.rows.forEach(row => row.layoutLayoutGroups(ctx));
+        this.rows.forEach(row => row.layoutLayoutGroups(rc));
 
         // Position notation lines
-        this.rows.forEach(row => row.layoutSetNotationLines(ctx));
+        this.rows.forEach(row => row.layoutSetNotationLines(rc));
 
         // Set document rect and set row positions
         this.rect = new AnchoredRect();
 
         if (this.header) {
             // Layout header with
-            this.header.layout(ctx);
+            this.header.layout(rc);
             this.rect.expandInPlace(this.header.getRect());
         }
 
@@ -343,14 +329,9 @@ export class ObjDocument extends MusicObject {
 
     offset(dx: number, dy: number) { }
 
-    drawContent() {
-        const { ctx } = this;
-        if (!ctx) return;
-
-        this.rows.forEach(row => row.draw(ctx));
-
-        if (this.header)
-            this.header.draw(ctx);
+    drawContent(rc: RenderContext) {
+        this.header?.draw(rc);
+        this.rows.forEach(row => row.draw(rc));
     }
 
     pickStaffPosAt(x: number, y: number): { scoreRow: ObjScoreRow, diatonicId: number } | undefined {
@@ -403,7 +384,7 @@ export class ObjDocument extends MusicObject {
 
     private boundElements = new ValueSet<HTMLElement>();
 
-    bindToElement(idOrEl: string | HTMLElement) {
+    bindElement(idOrEl: string | HTMLElement) {
         if (typeof document === "undefined")
             return;
 
@@ -413,12 +394,13 @@ export class ObjDocument extends MusicObject {
             el.doc = this.getMusicInterface();
             this.boundElements.add(el);
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
+            this.requestFullLayout();
         }
         else
             throw new MusicError(MusicErrorType.Score, "Unknown HTML element!");
     }
 
-    unbindFromElement(idOrEl: string | HTMLElement) {
+    unbindElement(idOrEl: string | HTMLElement) {
         if (typeof document === "undefined")
             return;
 
@@ -427,6 +409,7 @@ export class ObjDocument extends MusicObject {
         if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
             el.doc = undefined;
             this.boundElements.delete(el);
+            this.requestFullLayout();
         }
     }
 }
