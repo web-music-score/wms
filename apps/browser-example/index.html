@@ -4,11 +4,11 @@
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WebMusicScore Browser Example</title>
+    <title>Browser Example</title>
 </head>
 
 <body>
-    <h1>WebMusicScore Browser Example</h1>
+    <h1>Browser Example</h1>
 
     <!--
 	Local
@@ -26,9 +26,21 @@
 
     <script src="../../node_modules/web-music-score/dist/iife/index.js"></script>
     <script src="../../node_modules/web-music-score/dist/iife/audio-cg.js"></script>
-    
+
+    <h2>Using Plain JS</h2>
     <canvas id="scoreCanvas"></canvas><br />
-    <button id="playButton" type="button" class="wms-button"></button>
+    <br />
+    <div class="wms-button-group">
+        <button id="playButton" type="button" class="wms-button"></button>
+        <button id="stopButton" type="button" class="wms-button"></button>
+    </div>
+    <br />
+
+    <h2>Using Custom HTML Elements</h2>
+    <wms-music-score-view id="wms-view"></wms-music-score-view>
+    <br />
+    <wms-playback-buttons id="wms-buttons" playStop></wms-playback-buttons>
+    <br />
 
     <script>
         const { Audio, Score } = window.WebMusicScore;
@@ -36,7 +48,7 @@
 
         Audio.addInstrument(ClassicalGuitar);
 
-        let doc = new Score.DocumentBuilder()
+        let docPlainJs = new Score.DocumentBuilder()
             .setScoreConfiguration("treble")
             .setTimeSignature("3/4")
             .addNote(0, ["C4", "E4", "G4"], "4n")
@@ -46,12 +58,23 @@
 
         new Score.MRenderContext().
             setCanvas("scoreCanvas").
-            setDocument(doc).
+            setDocument(docPlainJs).
             draw();
 
         new Score.MPlaybackButtons().
-            setPlayStopButton("playButton").
-            setDocument(doc);
+            setPlayButton("playButton").
+            setStopButton("stopButton").
+            setDocument(docPlainJs);
+
+        let docHtmlEl = new Score.DocumentBuilder()
+            .setScoreConfiguration("treble")
+            .setTimeSignature("3/4")
+            .addNote(0, ["C4", "E4", "G4"], "4n")
+            .addMeasure()
+            .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
+            .getDocument();
+
+        docHtmlEl.bindElement("wms-view", "wms-buttons");
 
     </script>
 </body>
