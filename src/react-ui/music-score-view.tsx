@@ -4,6 +4,8 @@ import { MDocument, MRenderContext, Paint, ScoreEventListener } from "web-music-
 export interface MusicScoreViewProps {
     doc?: MDocument;
     paint?: Paint;
+    zoom?: number | string;
+    staffSize?: number | string;
     onScoreEvent?: ScoreEventListener;
 }
 
@@ -36,8 +38,14 @@ export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
 
         this.rc = new MRenderContext();
 
-        if(props.paint)
+        if (props.paint !== undefined)
             this.rc.setPaint(props.paint);
+
+        if (props.zoom !== undefined)
+            this.rc.setZoom(+props.zoom);
+
+        if (props.staffSize !== undefined)
+            this.rc.setStaffSize(props.staffSize);
 
         this.rc.setDocument(props.doc);
 
@@ -49,6 +57,14 @@ export class MusicScoreView extends React.Component<MusicScoreViewProps, {}> {
     componentDidUpdate(prevProps: Readonly<MusicScoreViewProps>, prevState: Readonly<{}>): void {
         if (prevProps.doc !== this.props.doc) {
             this.rc.setDocument(this.props.doc);
+            this.rc.draw();
+        }
+        if (this.props.zoom !== undefined && prevProps.zoom !== this.props.zoom) {
+            this.rc.setZoom(+this.props.zoom);
+            this.rc.draw();
+        }
+        if (this.props.staffSize !== undefined && prevProps.staffSize !== this.props.staffSize) {
+            this.rc.setStaffSize(this.props.staffSize);
             this.rc.draw();
         }
     }

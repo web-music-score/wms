@@ -83,11 +83,11 @@ abstract class ObjBarLine extends MusicObject {
 
         this.barLineType = this.solveBarLineType();
 
-        let { unitSize, _lineWidth } = ctx;
+        let { unitSize, lineWidthPx } = ctx;
         let { measure, barLineType } = this;
         let { row } = measure;
 
-        let thinW = _lineWidth;
+        let thinW = lineWidthPx;
         let thicW = 0.7 * unitSize;
         let spaceW = 0.7 * unitSize;
         let dotW = DocumentSettings.DotSize * unitSize;

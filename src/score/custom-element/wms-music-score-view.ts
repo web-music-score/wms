@@ -17,12 +17,20 @@ class WmsMusicScoreView extends HTMLElement {
     }
 
     static get observedAttributes() {
-        return ["src"];
+        return ["src", "zoom", "staff-size"];
     }
 
     attributeChangedCallback(name: string, _old: string | null, value: string | null) {
         if (name === "src" && value) {
             this.loadFromUrl(value);
+        }
+
+        if (name === "zoom" && value) {
+            this.rc.setZoom(+value);
+        }
+
+        if (name === "staff-size" && value) {
+            this.rc.setStaffSize(value);
         }
     }
 

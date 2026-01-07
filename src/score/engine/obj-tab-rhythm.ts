@@ -50,7 +50,7 @@ export class ObjTabRhythm extends MusicObject {
     }
 
     layoutFitToMeasure(ctx: RenderContext) {
-        let { unitSize, fontSize } = ctx;
+        let { unitSize, fontSizePx } = ctx;
         let { measure } = this;
         let cr = measure.getColumnsContentRect();
         let stemHeight = unitSize * 5;
@@ -58,7 +58,7 @@ export class ObjTabRhythm extends MusicObject {
         this.rect.left = cr.left;
         this.rect.anchorX = cr.centerX;
         this.rect.right = cr.right;
-        this.rect.top = this.hasTuplets() ? -fontSize : 0;
+        this.rect.top = this.hasTuplets() ? -fontSizePx : 0;
         this.rect.anchorY = 0; // Center line is at stem top, under the tuplet number.
         this.rect.bottom = stemHeight;
     }
@@ -75,7 +75,7 @@ export class ObjTabRhythm extends MusicObject {
 
         ctx.lineWidth(1)
 
-        let { unitSize, fontSize } = ctx;
+        let { unitSize, fontSizePx } = ctx;
 
         let flagSize = unitSize;
         let dotSpace = unitSize;
@@ -180,7 +180,7 @@ export class ObjTabRhythm extends MusicObject {
                         this.tupletPartsTextObjMap.set(text, textObj = new ObjText(this, { text, scale: 0.75 }, 0.5, 0.5));
                         textObj.layout(ctx);
                     }
-                    textObj.setCenter(cx, stemTop - fontSize / 2);
+                    textObj.setCenter(cx, stemTop - fontSizePx / 2);
                     textObj.draw(ctx);
                 }
 

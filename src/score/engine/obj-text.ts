@@ -79,7 +79,7 @@ export class ObjText extends MusicObject {
     layout(ctx: RenderContext) {
         let { scale, anchorX, anchorY, bold, italic } = this;
 
-        let fontSize = ctx.fontSize * scale;
+        let fontSize = ctx.fontSizePx * scale;
 
         this.font = (italic ? "italic " : "") + (bold ? "bold " : "") + fontSize + "px Times New Roman";
 

@@ -2,7 +2,7 @@ import * as Audio from "web-music-score/audio";
 import { Guard, UniMap, ValueSet, Utils, Rect } from "@tspro/ts-utils-lib";
 import { Player } from "../engine/player";
 import { RenderContext } from "../engine/render-context";
-import { PlayStateChangeListener } from "./types";
+import { PlayStateChangeListener, StaffSize } from "./types";
 import { ScoreEventListener } from "./event";
 import { PlayState } from "./types";
 import { MDocument, MScoreRow, MusicInterface } from "./music-objects";
@@ -141,6 +141,32 @@ export class MRenderContext {
             ? "Cannot set render canvas because invalid canvas id: " + canvas
             : "Cannot set render canvas because given canvas is undefined.");
         this._rc.setCanvas(canvas);
+        return this;
+    }
+
+    /**
+     * Set zoom level.
+     * @param zoom - zoom level, default is 1.0.
+     * @returns - This render context instance.
+     */
+    setZoom(zoom: number = 1.0): MRenderContext {
+        assertArg(Guard.isNumberGt(zoom, 0) && Guard.isFinite(zoom), "zoom", zoom);
+        this._rc.setZoom(zoom);
+        return this;
+    }
+
+    /**
+     * Set staff size, distance between top and bottom staff lines.
+     * @param staffSize - staff size e.g. 24, "24", "24px", "1cm", etc.
+     * @returns - This render context instance.
+     */
+    setStaffSize(staffSize: StaffSize = "default"): MRenderContext {
+        assertArg(
+            Guard.isNonEmptyString(staffSize) ||
+            Guard.isNumberGt(staffSize, 0) && Guard.isFinite(staffSize),
+            "staffSize", staffSize
+        );
+        this._rc.setStaffSize(staffSize);
         return this;
     }
 

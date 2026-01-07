@@ -1,11 +1,12 @@
-import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap } from "@tspro/ts-utils-lib";
+import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { MDocument, ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext, Paint, ColorKey } from "../pub";
+import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext, Paint, ColorKey, StaffSize } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "web-music-score/theory";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 import G_clef_png from "./assets/G-clef.png";
 import F_clef_png from "./assets/F-clef.png";
@@ -41,15 +42,24 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
     else return a.length === b.length && a.every((a2, i) => a2 === b[i]);
 }
 
+function getDevicePixelRatio(): number {
+    return typeof window !== "undefined" ? window.devicePixelRatio : 1;
+}
+
 export class RenderContext {
     static NoDocumentText = "Web Music Score: No Document!";
 
-    readonly devicePixelRatio: number;
+    readonly devicePixelRatio: number = 1;
 
-    readonly fontSize: number;
-    readonly unitSize: number;
+    private readonly defaultStaffSizePx: number = 1;
+    private readonly defaultStaffSpacePx: number = 1;
+    private readonly defaultFontSizePx: number = 1;
 
-    readonly _lineWidth: number;
+    private staffSizePx: number = 1;
+    private zoom: number = 1;
+    public staffSpacePx: number = 1;
+    public fontSizePx: number = 1;
+
 
     private scoreEventListener?: ScoreEventListener;
 
@@ -79,10 +89,11 @@ export class RenderContext {
     private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
 
     constructor(private readonly mi: MRenderContext) {
-        this.devicePixelRatio = typeof window !== "undefined" ? window.devicePixelRatio : 1;
-        this.fontSize = Device.FontSize * DocumentSettings.DocumentScale * this.devicePixelRatio;
-        this.unitSize = this.fontSize * 0.3;
-        this._lineWidth = this.unitSize * 0.2;
+        this.devicePixelRatio = getDevicePixelRatio();
+
+        this.defaultFontSizePx = this.fontSizePx = Device.FontSize * this.devicePixelRatio;
+        this.defaultStaffSpacePx = this.staffSpacePx = this.defaultFontSizePx * 0.3;
+        this.defaultStaffSizePx = this.staffSizePx = this.defaultStaffSpacePx * 4;
 
         this.onClickFn = this.onClick.bind(this);
         this.onMouseMoveFn = this.onMouseMove.bind(this);
@@ -207,6 +218,53 @@ export class RenderContext {
 
     setPaint(paint?: Paint) {
         this.paint = paint ?? Paint.default;
+    }
+
+    setZoom(zoom: number) {
+        if (Guard.isFinite(zoom) && Guard.isIntegerGt(zoom, 0))
+            this.updateSize({ zoom });
+        else
+            throw new MusicError(MusicErrorType.Score, "Invalid zoom: " + zoom);
+    }
+
+    setStaffSize(staffSize: StaffSize) {
+        let staffSizePx: number;
+        switch (staffSize) {
+            case "small":
+                staffSizePx = this.defaultStaffSizePx / 1.5;
+                break;
+            case "medium":
+            case "default":
+                staffSizePx = this.defaultStaffSizePx;
+                break;
+            case "large":
+                staffSizePx = this.defaultStaffSizePx * 1.5;
+                break;
+            default:
+                staffSizePx = Device.toPx(staffSize) * this.devicePixelRatio;
+        }
+
+        if (Guard.isFinite(staffSizePx) && Guard.isIntegerGt(staffSizePx, 0))
+            this.updateSize({ staffSizePx });
+        else
+            throw new MusicError(MusicErrorType.Score, "Invalid staffSize: " + staffSize);
+    }
+
+    private updateSize({ zoom, staffSizePx }: { zoom?: number, staffSizePx?: number }) {
+        this.zoom = zoom ?? this.zoom;
+        this.staffSizePx = staffSizePx ?? this.staffSizePx;
+        this.staffSpacePx = this.staffSizePx / 4 * this.zoom;
+        this.fontSizePx = this.defaultFontSizePx * (this.staffSpacePx / this.defaultStaffSpacePx);
+
+        this.doc?.requestFullLayout();
+    }
+
+    get lineWidthPx(): number {
+        return this.staffSpacePx * 0.2;
+    }
+
+    get unitSize(): number {
+        return this.staffSpacePx;
     }
 
     getPaint() {
@@ -682,7 +740,7 @@ export class RenderContext {
     }
 
     lineWidth(lineWidth?: number): RenderContext {
-        if (this.ctx) this.ctx.lineWidth = this._lineWidth * (lineWidth ?? 1)
+        if (this.ctx) this.ctx.lineWidth = this.lineWidthPx * (lineWidth ?? 1)
         return this;
     }
 

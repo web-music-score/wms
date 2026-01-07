@@ -60,16 +60,16 @@
             .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
             .getDocument();
 
-        new Score.MRenderContext().
-            setCanvas("scoreCanvas").
-            setDocument(docPlainJs).
-            setPaint(paint).
-            draw();
+        new Score.MRenderContext()
+            .setCanvas("scoreCanvas")
+            .setDocument(docPlainJs)
+            .setPaint(paint)
+            .draw();
 
-        new Score.MPlaybackButtons().
-            setPlayButton("playButton").
-            setStopButton("stopButton").
-            setDocument(docPlainJs);
+        new Score.MPlaybackButtons()
+            .setPlayButton("playButton")
+            .setStopButton("stopButton")
+            .setDocument(docPlainJs);
 
         const docHtmlEl = new Score.DocumentBuilder()
             .setScoreConfiguration("treble")

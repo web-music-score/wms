@@ -5,7 +5,6 @@ export const DebugSettings = {
 }
 
 export const DocumentSettings = {
-    DocumentScale: 1,
     MinStaffWidth: 75,
 
     MinColumnsWidth: 10,

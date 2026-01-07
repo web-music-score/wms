@@ -9,7 +9,6 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjStaff } from "./obj-staff-and-tab";
-import { ObjRest } from "./obj-rest";
 
 export enum BeamGroupType {
     RegularBeam,
@@ -427,7 +426,7 @@ export class ObjBeamGroup extends MusicObject {
             else if (type === BeamGroupType.RegularBeam || type === BeamGroupType.TupletBeam) {
                 raiseBeamY *= 0.5;
 
-                let beamThickness = ctx._lineWidth * DocumentSettings.BeamThickness;
+                let beamThickness = ctx.lineWidthPx * DocumentSettings.BeamThickness;
 
                 const beamHeight = (i: number) => {
                     let sym = symbols[i];

@@ -367,3 +367,15 @@ export enum PlayState {
 
 /** Play state change listener type. */
 export type PlayStateChangeListener = (playState: PlayState) => void;
+
+/**
+ * Staff size.
+ * <pre>
+ * number:
+ *      number of pixels.
+ * string:
+ *      "20px", "3cm", "25mm", "1in", etc.
+ *      "small" | "medium" | "larg" | "default"
+ * </pre>
+ */
+export type StaffSize = number | string | "small" | "medium" | "large" | "default";

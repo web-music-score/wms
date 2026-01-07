@@ -182,12 +182,12 @@ export class ObjConnective extends MusicObject {
         else { return; }
 
         let { rect } = this;
-        let { _lineWidth } = ctx;
+        let { lineWidthPx } = ctx;
 
         ctx.drawDebugRect(rect);
 
-        let t = _lineWidth * 1.5;
-        let s = _lineWidth * 0.25;
+        let t = lineWidthPx * 1.5;
+        let s = lineWidthPx * 0.25;
 
         ctx.color(this.line instanceof ObjTab ? colorKey("tab.connective") : colorKey("staff.connective"));
         ctx.lineWidth(1);

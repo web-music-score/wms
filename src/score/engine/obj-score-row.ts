@@ -458,7 +458,7 @@ export class ObjScoreRow extends MusicObject {
 
         // Set clip rect for this row
         const { left, top, width, height } = this.getRect();
-        const p = ctx._lineWidth;
+        const p = ctx.lineWidthPx;
         ctx.save();
         ctx.rect(left - p, top, width + 2 * p, height);
         ctx.clip();
@@ -472,7 +472,7 @@ export class ObjScoreRow extends MusicObject {
         // Draw left vline
         const staffLeft = this.getStaffLineLeft();
         if (staffLeft !== undefined && this.notationLines.length > 1) {
-            this.notationLines.forEach(line => line.drawVerticalLine(ctx, staffLeft, ctx._lineWidth, true));
+            this.notationLines.forEach(line => line.drawVerticalLine(ctx, staffLeft, ctx.lineWidthPx, true));
         }
 
         // Draw row groups
