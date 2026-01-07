@@ -397,7 +397,7 @@ export class ObjDocument extends MusicObject {
             this.requestFullLayout();
         }
         else
-            throw new MusicError(MusicErrorType.Score, "Unknown HTML element!");
+            throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
     }
 
     unbindElement(idOrEl: string | HTMLElement) {
@@ -411,5 +411,7 @@ export class ObjDocument extends MusicObject {
             this.boundElements.delete(el);
             this.requestFullLayout();
         }
+        else
+            throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
     }
 }

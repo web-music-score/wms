@@ -23,11 +23,11 @@ import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { ObjNotationLine, ObjStaff, ObjTab } from "score/engine/obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { MPlayer } from "./music-interface";
-import { ObjLyrics } from "score/engine/obj-lyrics";
-import { ObjTabRhythm } from "score/engine/obj-tab-rhythm";
-import { ObjScoreRowGroup } from "score/engine/obj-score-row-group";
+import { ObjLyrics } from "../engine/obj-lyrics";
+import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
+import { ObjScoreRowGroup } from "../engine/obj-score-row-group";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {

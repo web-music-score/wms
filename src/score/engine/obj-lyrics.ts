@@ -1,7 +1,7 @@
 import { LyricsAlign, LyricsHyphen, LyricsOptions, MLyrics, VerseNumber } from "../pub";
 import { RenderContext } from "./render-context";
 import { MusicObject } from "./music-object";
-import { NoteLength, RhythmProps } from "theory/rhythm";
+import { NoteLength, RhythmProps } from "web-music-score/theory";
 import { ObjText } from "./obj-text";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine } from "./obj-staff-and-tab";

@@ -1,8 +1,8 @@
-import { Arpeggio, MArpeggio } from "../pub";
+import { Arpeggio, colorKey, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
 import { RenderContext } from "./render-context";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { ObjNotationLine } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 
 export class ObjArpeggio extends MusicObject {
@@ -11,8 +11,6 @@ export class ObjArpeggio extends MusicObject {
 
     private cycleHeight: number = 0;
     private numCycles: number = 0;
-
-    private color = "black";
 
     readonly mi: MArpeggio;
 
@@ -56,7 +54,9 @@ export class ObjArpeggio extends MusicObject {
 
         ctx.drawDebugRect(this.rect);
 
-        ctx.color(this.color);
+        const color = colorKey(this.line instanceof ObjTab ? "tab.arpeggio" : "staff.arpeggio");
+
+        ctx.color(color);
         ctx.lineWidth(2);
         ctx.beginPath();
 

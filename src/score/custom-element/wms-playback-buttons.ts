@@ -1,6 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { ObjDocument } from "../engine/obj-document";
-import { MDocument, MPlaybackButtons } from "score/pub";
+import { MDocument, MPlaybackButtons } from "../pub";
 
 function addClass(el: HTMLElement, className: string) {
     className.trim().split(" ").filter(cls => cls.length > 0).forEach(cls => Utils.Dom.addClass(el, cls));

@@ -5,7 +5,7 @@ import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
-import { NoteLength, NoteLengthProps, validateNoteLength } from "theory/rhythm";
+import { NoteLength, NoteLengthProps, validateNoteLength } from "web-music-score/theory";
 
 import G_clef_png from "./assets/G-clef.png";
 import F_clef_png from "./assets/F-clef.png";

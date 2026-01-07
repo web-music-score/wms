@@ -1,6 +1,6 @@
 import { Guard } from "@tspro/ts-utils-lib";
 import { Note } from "web-music-score/theory";
-import { MusicError, MusicErrorType } from "core/error";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Staff preset values for score configuration. */
 export enum StaffPreset {

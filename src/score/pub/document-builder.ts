@@ -4,10 +4,10 @@ import { MDocument } from "./music-objects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { ObjMeasure } from "score/engine/obj-measure";
-import { RhythmSymbol } from "score/engine/obj-rhythm-column";
-import { ObjBeamGroup } from "score/engine/obj-beam-group";
-import { getAnnotation } from "score/engine/element-data";
+import { ObjMeasure } from "../engine/obj-measure";
+import { RhythmSymbol } from "../engine/obj-rhythm-column";
+import { ObjBeamGroup } from "../engine/obj-beam-group";
+import { getAnnotation } from "../engine/element-data";
 
 let assertingFunction = "";
 

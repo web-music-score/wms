@@ -1,5 +1,4 @@
-import { MRenderContext, MDocument } from "../pub";
-import { ObjDocument } from "../engine/obj-document";
+import { MRenderContext, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
 class WmsMusicScoreView extends HTMLElement {
@@ -7,6 +6,7 @@ class WmsMusicScoreView extends HTMLElement {
     private rc: MRenderContext;
 
     private _doc?: MDocument;
+    private _paint?: Paint;
     private _connected = false;
 
     constructor() {
@@ -41,8 +41,19 @@ class WmsMusicScoreView extends HTMLElement {
         return this._doc;
     }
 
+    set paint(paint: Paint | undefined) {
+        this._paint = paint;
+        if (this._connected)
+            this.update();
+    }
+
+    get paint(): Paint | undefined {
+        return this._paint;
+    }
+
     private update() {
         this.rc.setDocument(this._doc);
+        this.rc.setPaint(this._paint);
         this.render();
     }
 

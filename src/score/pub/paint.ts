@@ -1,7 +1,15 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
+import { isWmsMusicScoreView } from "../custom-element/wms-music-score-view";
+import { MusicError, MusicErrorType } from "web-music-score/core";
 
 const norm = (s: string) => s.toLowerCase();
+
+function assertArg(condition: boolean, argName: string, argValue: unknown) {
+    if (!condition) {
+        throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
+    }
+}
 
 /** Color keys. */
 export type ColorKey =
@@ -23,6 +31,7 @@ export type ColorKey =
     "staff.rest" |
     "staff.lyrics" |
     "staff.connective" |
+    "staff.arpeggio" |
     "staff.signature.clef" |
     "staff.signature.key" |
     "staff.signature.time" |
@@ -38,6 +47,7 @@ export type ColorKey =
     "tab.rest" |
     "tab.lyrics" |
     "tab.connective" |
+    "tab.arpeggio" |
     "tab.tuning" |
     "tab.signature.clef" |
     "tab.signature.key" |
@@ -60,7 +70,7 @@ export type ColorKeyPart =
     "header" | "title" | "composer" | "arranger" |
     "rowgroup" | "instrument" | "frame" |
     "staff" | "tab" |
-    "note" | "rest" | "lyrics" | "connective" |
+    "note" | "rest" | "lyrics" | "connective" | "arpeggio" |
     "signature" | "clef" | "key" | "time" | "tempo" | "measurenum" |
     "tuning" |
     "element" | "fermata" | "annotation" | "navigation" | "label";
@@ -90,6 +100,7 @@ export class Paint {
         "staff.rest": "black",
         "staff.lyrics": "black",
         "staff.connective": "black",
+        "staff.arpeggio": "black",
         "staff.signature.clef": "black",
         "staff.signature.key": "black",
         "staff.signature.time": "black",
@@ -105,6 +116,7 @@ export class Paint {
         "tab.rest": "black",
         "tab.lyrics": "black",
         "tab.connective": "black",
+        "tab.arpeggio": "black",
         "tab.tuning": "black",
         "tab.signature.clef": "black", // not needed
         "tab.signature.key": "black",  // not needed
@@ -132,14 +144,14 @@ export class Paint {
      * @param colorKeyOrParts - Color key parts to set color for.
      * @param color - Color (HTML color code e.g. "green", "#AA6644", etc.)
      */
-    public setColor(colorKeyOrParts: ColorKey | ColorKeyPart | ColorKeyPart[] | "all", color: string) {
+    public setColor(colorKeyOrParts: ColorKey | ColorKeyPart | ColorKeyPart[] | "all", color: string): Paint {
         // Set all element colors
         if (colorKeyOrParts === "all") {
             for (const key of Object.keys(this.colors) as ColorKey[]) {
                 if (key !== "background" && key !== "hilight.object" && key !== "hilight.staffpos" && key !== "play.cursor")
                     this.colors[key] = color || "black";
             }
-            return;
+            return this;
         }
 
         const isBackground = typeof colorKeyOrParts === "string" && norm(colorKeyOrParts) === "background" ||
@@ -150,20 +162,20 @@ export class Paint {
         // Set background
         if (isBackground) {
             this.colors.background = finalColor;
-            return;
+            return this;
         }
 
         // Direct key override
         if (typeof colorKeyOrParts === "string" && colorKeyOrParts in this.colors) {
             this.colors[colorKeyOrParts as ColorKey] = finalColor;
-            return;
+            return this;
         }
 
         const colorKeyParts = Guard.isArray(colorKeyOrParts) ? colorKeyOrParts : colorKeyOrParts.split(".");
 
         // Set no colors
         if (colorKeyParts.length === 0)
-            return;
+            return this;
 
         const normalizedParts = colorKeyParts.map(norm);
 
@@ -185,6 +197,8 @@ export class Paint {
                 `Color attrs ${Utils.Str.stringify(colorKeyParts)} did not match any color.`
             );
         }
+
+        return this;
     }
 
     /**
@@ -236,5 +250,63 @@ export class Paint {
         const b = parseInt(hex.slice(4, 6), 16);
         const a = Math.round(alpha * 255);
         return [r, g, b, a];
+    }
+
+    private boundElements = new ValueSet<HTMLElement>();
+
+    /**
+     * Bind this paint to custom HTML element.
+     * @param idOrEl - HTML element id or element.
+     */
+    bindElement(...idOrEl: (string | HTMLElement)[]) {
+        assertArg(
+            Guard.isArray(idOrEl) &&
+            (
+                idOrEl.length === 0 ||
+                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
+            ),
+            "idOrEl", idOrEl);
+
+        if (typeof document === "undefined")
+            return;
+
+        idOrEl.forEach(idOrEl => {
+            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+
+            if (isWmsMusicScoreView(el)) {
+                el.addEventListener("disconnected", () => this.boundElements.delete(el));
+                el.paint = this;
+            }
+            else
+                throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
+        });
+    }
+
+    /**
+     * Unbind this paint from custom HTML element.
+     * @param idOrEl - HTML element id or element.
+     */
+    unbindElement(...idOrEl: (string | HTMLElement)[]) {
+        assertArg(
+            Guard.isArray(idOrEl) &&
+            (
+                idOrEl.length === 0 ||
+                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
+            ),
+            "idOrEl", idOrEl);
+
+        if (typeof document === "undefined")
+            return;
+
+        idOrEl.forEach(idOrEl => {
+            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+
+            if (isWmsMusicScoreView(el)) {
+                el.paint = undefined;
+                this.boundElements.delete(el);
+            }
+            else
+                throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
+        });
     }
 }
