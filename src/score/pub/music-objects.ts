@@ -28,6 +28,8 @@ import { MPlayer } from "./music-interface";
 import { ObjLyrics } from "../engine/obj-lyrics";
 import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
 import { ObjScoreRowGroup } from "../engine/obj-score-row-group";
+import { isWmsMusicScoreView } from "../custom-element/wms-music-score-view";
+import { isWmsPlaybackButtons } from "../custom-element/wms-playback-buttons";
 
 function assertArg(condition: boolean, argName: string, argValue: unknown) {
     if (!condition) {
@@ -254,7 +256,15 @@ export class MDocument extends MusicInterface {
             ),
             "idOrEl", idOrEl);
 
-        idOrEl.forEach(idOrEl => this.obj.bindElement(idOrEl));
+        idOrEl.forEach(idOrEl => {
+            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+
+            if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+                this.obj.bindElement(el);
+            }
+            else
+                throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view> or <wms-playback-buttons>!");
+        });
     }
 
     /**
@@ -270,7 +280,15 @@ export class MDocument extends MusicInterface {
             ),
             "idOrEl", idOrEl);
 
-        idOrEl.forEach(idOrEl => this.obj.unbindElement(idOrEl));
+        idOrEl.forEach(idOrEl => {
+            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+
+            if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+                this.obj.unbindElement(el);
+            }
+            else
+                throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view> or <wms-playback-buttons>!");
+        });
     }
 }
 

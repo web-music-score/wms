@@ -278,7 +278,7 @@ export class Paint {
                 el.paint = this;
             }
             else
-                throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
+                throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view>!");
         });
     }
 
@@ -306,7 +306,7 @@ export class Paint {
                 this.boundElements.delete(el);
             }
             else
-                throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
+                throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
         });
     }
 }

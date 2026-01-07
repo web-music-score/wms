@@ -384,11 +384,9 @@ export class ObjDocument extends MusicObject {
 
     private boundElements = new ValueSet<HTMLElement>();
 
-    bindElement(idOrEl: string | HTMLElement) {
+    bindElement(el: HTMLElement) {
         if (typeof document === "undefined")
             return;
-
-        const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
 
         if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
             el.doc = this.getMusicInterface();
@@ -396,22 +394,16 @@ export class ObjDocument extends MusicObject {
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
             this.requestFullLayout();
         }
-        else
-            throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
     }
 
-    unbindElement(idOrEl: string | HTMLElement) {
+    unbindElement(el: HTMLElement) {
         if (typeof document === "undefined")
             return;
-
-        const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
 
         if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
             el.doc = undefined;
             this.boundElements.delete(el);
             this.requestFullLayout();
         }
-        else
-            throw new MusicError(MusicErrorType.Score, "Not a custom HTML element!");
     }
 }
