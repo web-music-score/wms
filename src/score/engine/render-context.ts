@@ -221,7 +221,7 @@ export class RenderContext {
     }
 
     setZoom(zoom: number) {
-        if (Guard.isFinite(zoom) && Guard.isIntegerGt(zoom, 0))
+        if (Guard.isFinite(zoom) && Guard.isNumberGt(zoom, 0))
             this.updateSize({ zoom });
         else
             throw new MusicError(MusicErrorType.Score, "Invalid zoom: " + zoom);
@@ -244,7 +244,7 @@ export class RenderContext {
                 staffSizePx = Device.toPx(staffSize) * this.devicePixelRatio;
         }
 
-        if (Guard.isFinite(staffSizePx) && Guard.isIntegerGt(staffSizePx, 0))
+        if (Guard.isFinite(staffSizePx) && Guard.isNumberGt(staffSizePx, 0))
             this.updateSize({ staffSizePx });
         else
             throw new MusicError(MusicErrorType.Score, "Invalid staffSize: " + staffSize);
