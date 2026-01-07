@@ -5,11 +5,11 @@ import * as Score from "web-music-score/score";
 import * as ScoreUI from "web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
 
- Audio.addInstrument(ClassicalGuitar);
+Audio.addInstrument(ClassicalGuitar);
 
 type DemoAppState = {
     instrument: string;
-    doc: Score.MDocument;
+    doc?: Score.MDocument;
     hoverText: string;
 }
 
@@ -35,7 +35,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
         const onChangePiece = (title: string) => {
             let newDoc = DemoPieces.getInstance().getDocument(title);
 
-            if (newDoc && newDoc.getTitle() !== doc.getTitle()) {
+            if (DemoPieces.getTitle(newDoc) !== DemoPieces.getTitle(doc)) {
                 Score.MPlayer.stopAll();
                 this.setState({ doc: newDoc });
             }
@@ -64,10 +64,10 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             <br />
             <div className="row">
                 <div className="col-3">
-                    <select className="form-select" name="select" value={doc.getTitle()} onChange={e => onChangePiece(e.target.value)}>
+                    <select className="form-select" name="select" value={DemoPieces.getTitle(doc)} onChange={e => onChangePiece(e.target.value)}>
                         {docList.map((doc, i) => {
-                            return <option disabled={!(doc instanceof Score.MDocument)} key={i}>
-                                {(doc instanceof Score.MDocument) ? doc.getTitle() : doc}
+                            return <option disabled={DemoPieces.getTitle(doc).startsWith("-")} key={i}>
+                                {DemoPieces.getTitle(doc)}
                             </option>;
                         })}
                     </select>

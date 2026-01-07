@@ -42,6 +42,8 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
 }
 
 export class RenderContext {
+    static NoDocumentText = "Web Music Score: No Document!";
+
     readonly devicePixelRatio: number;
 
     readonly fontSize: number;
@@ -400,13 +402,62 @@ export class RenderContext {
                 doc.drawContent(this);
             }
             else {
-                this.updateCanvasSize();
-                this.clearCanvas();
+                this.drawNoDoc();
             }
         }
         catch (err) {
             console.error("Render failed!", err);
         }
+    }
+
+    private drawNoDoc() {
+        const { canvas, ctx } = this;
+
+        if (!canvas || !ctx) return;
+
+        ctx.save();
+
+        const text = RenderContext.NoDocumentText;
+        const fontSize = 16;
+        const fontFamily = "Arial";
+
+        // 1. Set font BEFORE measuring
+        ctx.font = `${fontSize}px ${fontFamily}`;
+
+        // 2. Measure text
+        const metrics = ctx.measureText(text);
+
+        // Width is straightforward
+        const width = Math.ceil(metrics.width);
+
+        // Height needs ascent + descent
+        const height = Math.ceil(
+            metrics.actualBoundingBoxAscent +
+            metrics.actualBoundingBoxDescent
+        );
+
+        // 3. Resize canvas (this clears it!)
+        // Canvas internal size
+        canvas.width = width;
+        canvas.height = height;
+
+        // Canvas element size
+        canvas.style.width = (width / this.devicePixelRatio) + "px";
+        canvas.style.height = (height / this.devicePixelRatio) + "px";
+
+        // 4. Re-set font after resize
+        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.textBaseline = "top";
+
+        // Set background
+        ctx.fillStyle = "#FFF";
+        ctx.fillRect(0, 0, width, height);
+
+        // Draw text
+        ctx.fillStyle = "black";
+        ctx.fillText(text, 0, 0);
+
+        ctx.restore();
     }
 
     drawHilightStaffPosRect() {

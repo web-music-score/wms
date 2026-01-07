@@ -28,7 +28,7 @@ function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
 }
 
 export interface PlaybackButtonsProps {
-    doc: MDocument;
+    doc?: MDocument;
     singlePlayStop?: boolean;
     playStop?: boolean;
     playPauseStop?: boolean;

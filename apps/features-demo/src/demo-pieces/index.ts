@@ -30,7 +30,15 @@ export class DemoPieces {
         return this.instance
     }
 
-    private readonly docs: (Score.MDocument | string)[] = [];
+    static getTitle(doc: Score.MDocument | string | undefined): string {
+        return doc instanceof Score.MDocument
+            ? (doc.getTitle() ?? "No Title")
+            : typeof doc === "string"
+                ? doc
+                : "No Document";
+    }
+
+    private readonly docs: (Score.MDocument | string | undefined)[] = [];
 
     private constructor() {
         // Add demo pieces
@@ -59,10 +67,12 @@ export class DemoPieces {
         demos.push(createLyricsDemo());
 
         // Sort by title
-        pieces.sort((a, b) => (a.getTitle() ?? "").localeCompare(b.getTitle() ?? ""));
-        demos.sort((a, b) => (a.getTitle() ?? "").localeCompare(b.getTitle() ?? ""));
+        pieces.sort((a, b) => DemoPieces.getTitle(a).localeCompare(DemoPieces.getTitle(b)));
+        demos.sort((a, b) => DemoPieces.getTitle(a).localeCompare(DemoPieces.getTitle(b)));
 
         this.docs = [
+            "--- No Document ---",
+            undefined,
             "--- Pieces ---",
             ...pieces,
             "--- Features ---",
@@ -71,21 +81,14 @@ export class DemoPieces {
     }
 
     getDefault(): Score.MDocument {
-        let first = this.docs.find(doc => doc instanceof Score.MDocument);
-
-        if (first instanceof Score.MDocument) {
-            return first;
-        }
-        else {
-            throw "No default document available!";
-        }
+        return this.docs.find(doc => doc instanceof Score.MDocument)!;
     }
 
     getDocument(title: string): Score.MDocument | undefined {
-        return this.docs.find(doc => doc instanceof Score.MDocument && doc.getTitle() === title) as (Score.MDocument | undefined);
+        return this.docs.find(doc => DemoPieces.getTitle(doc) === title) as (Score.MDocument | undefined);
     }
 
-    getList(): ReadonlyArray<Score.MDocument | string> {
+    getList(): ReadonlyArray<Score.MDocument | string | undefined> {
         return this.docs;
     }
 }
