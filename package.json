@@ -1,7 +1,7 @@
 {
     "name": "web-music-score",
     "version": "6.0.1",
-    "author": "Stefan Brockmann",
+    "author": "Stefan B.",
     "license": "MIT",
     "private": false,
     "homepage": "https://web-music-score.org",
@@ -112,7 +112,7 @@
     },
     "devDependencies": {
         "@tspro/tsup-plugin-inline-assets": "^1.0.0",
-        "@tspro/ts-utils-lib": "^3.0.0",
+        "@tspro/ts-utils-lib": "^3.0.1",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
         "color-name-to-code": "^1.0.1",
