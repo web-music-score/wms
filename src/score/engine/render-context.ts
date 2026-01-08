@@ -42,14 +42,8 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
     else return a.length === b.length && a.every((a2, i) => a2 === b[i]);
 }
 
-function getDevicePixelRatio(): number {
-    return typeof window !== "undefined" ? window.devicePixelRatio : 1;
-}
-
 export class RenderContext {
     static NoDocumentText = "Web Music Score: No Document!";
-
-    readonly devicePixelRatio: number = 1;
 
     private readonly defaultStaffSizePx: number = 1;
     private readonly defaultStaffSpacePx: number = 1;
@@ -89,9 +83,7 @@ export class RenderContext {
     private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
 
     constructor(private readonly mi: MRenderContext) {
-        this.devicePixelRatio = getDevicePixelRatio();
-
-        this.defaultFontSizePx = this.fontSizePx = Device.FontSize * this.devicePixelRatio;
+        this.defaultFontSizePx = this.fontSizePx = Device.FontSize * Device.DevicePixelRatio;
         this.defaultStaffSpacePx = this.staffSpacePx = this.defaultFontSizePx * 0.3;
         this.defaultStaffSizePx = this.staffSizePx = this.defaultStaffSpacePx * 4;
 
@@ -241,7 +233,7 @@ export class RenderContext {
                 staffSizePx = this.defaultStaffSizePx * 1.5;
                 break;
             default:
-                staffSizePx = Device.unitToPx(staffSize) * this.devicePixelRatio;
+                staffSizePx = Device.unitToPx(staffSize) * Device.DevicePixelRatio;
         }
 
         if (Guard.isFinite(staffSizePx) && Guard.isNumberGt(staffSizePx, 0))
@@ -439,8 +431,8 @@ export class RenderContext {
         canvas.height = h;
 
         // Canvas element size
-        canvas.style.width = (w / this.devicePixelRatio) + "px";
-        canvas.style.height = (h / this.devicePixelRatio) + "px";
+        canvas.style.width = (w / Device.DevicePixelRatio) + "px";
+        canvas.style.height = (h / Device.DevicePixelRatio) + "px";
     }
 
     draw() {
@@ -500,8 +492,8 @@ export class RenderContext {
         canvas.height = height;
 
         // Canvas element size
-        canvas.style.width = (width / this.devicePixelRatio) + "px";
-        canvas.style.height = (height / this.devicePixelRatio) + "px";
+        canvas.style.width = (width / Device.DevicePixelRatio) + "px";
+        canvas.style.height = (height / Device.DevicePixelRatio) + "px";
 
         // 4. Re-set font after resize
         ctx.font = `${fontSize}px ${fontFamily}`;
@@ -562,11 +554,11 @@ export class RenderContext {
     }
 
     txFromScreenCoord(screenCoord: Vec) {
-        return screenCoord.mul(this.devicePixelRatio);
+        return screenCoord.mul(Device.DevicePixelRatio);
     }
 
     txToScreenCoord(coord: Vec) {
-        return coord.div(this.devicePixelRatio);
+        return coord.div(Device.DevicePixelRatio);
     }
 
     clearCanvas() {
