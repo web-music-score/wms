@@ -241,7 +241,7 @@ export class RenderContext {
                 staffSizePx = this.defaultStaffSizePx * 1.5;
                 break;
             default:
-                staffSizePx = Device.toPx(staffSize) * this.devicePixelRatio;
+                staffSizePx = Device.unitToPx(staffSize) * this.devicePixelRatio;
         }
 
         if (Guard.isFinite(staffSizePx) && Guard.isNumberGt(staffSizePx, 0))

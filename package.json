@@ -112,7 +112,7 @@
     },
     "devDependencies": {
         "@tspro/tsup-plugin-inline-assets": "^1.0.0",
-        "@tspro/ts-utils-lib": "^2.3.0",
+        "@tspro/ts-utils-lib": "^3.0.0",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
         "color-name-to-code": "^1.0.1",
