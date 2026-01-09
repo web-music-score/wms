@@ -52,7 +52,7 @@ function render() {
 ### Render With Plain JavaScript
 
 ```html
-<script src="https://unpkg.com/web-music-score@6.0.1/dist/iife/index.js"></script>
+<script src="https://unpkg.com/web-music-score@6.1.0/dist/iife/index.js"></script>
 
 <canvas id="canvas1"></canvas><br />
 
