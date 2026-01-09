@@ -1,9 +1,9 @@
-import { MRenderContext, MDocument, Paint } from "../pub";
+import { WmsView as PlainView, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
-class WmsMusicScoreView extends HTMLElement {
+class WmsView extends HTMLElement {
     private canvas: HTMLCanvasElement;
-    private rc: MRenderContext;
+    private view: PlainView;
 
     private _doc?: MDocument;
     private _paint?: Paint;
@@ -13,7 +13,7 @@ class WmsMusicScoreView extends HTMLElement {
         super();
 
         this.canvas = document.createElement("canvas");
-        this.rc = new MRenderContext().setCanvas(this.canvas);
+        this.view = new PlainView().setCanvas(this.canvas);
     }
 
     static get observedAttributes() {
@@ -26,11 +26,11 @@ class WmsMusicScoreView extends HTMLElement {
         }
 
         if (name === "zoom" && value) {
-            this.rc.setZoom(+value);
+            this.view.setZoom(+value);
         }
 
         if (name === "staff-size" && value) {
-            this.rc.setStaffSize(value);
+            this.view.setStaffSize(value);
         }
     }
 
@@ -60,8 +60,8 @@ class WmsMusicScoreView extends HTMLElement {
     }
 
     private update() {
-        this.rc.setDocument(this._doc);
-        this.rc.setPaint(this._paint);
+        this.view.setDocument(this._doc);
+        this.view.setPaint(this._paint);
         this.render();
     }
 
@@ -69,7 +69,7 @@ class WmsMusicScoreView extends HTMLElement {
         if (!this.contains(this.canvas))
             this.append(this.canvas);
 
-        this.rc.draw();
+        this.view.draw();
     }
 
     private loadFromUrl(url: string) { }
@@ -78,20 +78,17 @@ class WmsMusicScoreView extends HTMLElement {
 /**
  * Safe registration (VERY IMPORTANT)
  */
-export function registerWmsMusicScoreView() {
+export function registerWmsView() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
-    if (!customElements.get("wms-music-score-view")) {
-        customElements.define(
-            "wms-music-score-view",
-            WmsMusicScoreView
-        );
+    if (!customElements.get("wms-view")) {
+        customElements.define("wms-view", WmsView);
     }
 }
 
-export function isWmsMusicScoreView(el: unknown): el is WmsMusicScoreView {
+export function isWmsView(el: unknown): el is WmsView {
     return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
-        el.tagName === "WMS-MUSIC-SCORE-VIEW";
+        el.tagName === "WMS-VIEW";
 }

@@ -1,5 +1,5 @@
-export * from "./music-score-view";
-export * from "./playback-buttons";
+export * from "./wms-view";
+export * from "./wms-controls";
 
 import { init as initCore } from "web-music-score/core";
 

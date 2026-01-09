@@ -10,8 +10,8 @@ import { ConnectiveProps } from "./connective-props";
 import { AnchoredRect, Guard, Rect, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { isWmsMusicScoreView } from "../custom-element/wms-music-score-view";
-import { isWmsPlaybackButtons } from "../custom-element/wms-playback-buttons";
+import { isWmsView } from "../custom-element/wms-view";
+import { isWmsControls } from "../custom-element/wms-controls";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -388,7 +388,7 @@ export class ObjDocument extends MusicObject {
         if (typeof document === "undefined")
             return;
 
-        if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+        if (isWmsView(el) || isWmsControls(el)) {
             el.doc = this.getMusicInterface();
             this.boundElements.add(el);
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
@@ -400,7 +400,7 @@ export class ObjDocument extends MusicObject {
         if (typeof document === "undefined")
             return;
 
-        if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+        if (isWmsView(el) || isWmsControls(el)) {
             el.doc = undefined;
             this.boundElements.delete(el);
             this.requestFullLayout();

@@ -1,6 +1,6 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, MRenderContext, Paint, ColorKey, StaffSize } from "../pub";
+import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
@@ -10,6 +10,7 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 
 import G_clef_png from "./assets/G-clef.png";
 import F_clef_png from "./assets/F-clef.png";
+import { MRenderContext } from "score/pub/deprecated";
 
 export enum ImageAsset { G_Clef, F_Clef }
 

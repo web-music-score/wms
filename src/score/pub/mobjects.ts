@@ -23,29 +23,23 @@ import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { ObjNotationLine, ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
-import { MPlayer } from "./music-interface";
+import { ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { ObjLyrics } from "../engine/obj-lyrics";
 import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
 import { ObjScoreRowGroup } from "../engine/obj-score-row-group";
-import { isWmsMusicScoreView } from "../custom-element/wms-music-score-view";
-import { isWmsPlaybackButtons } from "../custom-element/wms-playback-buttons";
+import { isWmsView } from "../custom-element/wms-view";
+import { isWmsControls } from "../custom-element/wms-controls";
+import { Player } from "./player";
+import { assertArg } from "shared-src";
 
-function assertArg(condition: boolean, argName: string, argValue: unknown) {
-    if (!condition) {
-        throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
-    }
-}
-
-function getNotationLine(line: ObjNotationLine): MStaff | MTab {
+function getMStaffOrMTab(line: unknown): MStaff | MTab {
     if (line instanceof ObjStaff || line instanceof ObjTab) {
         return line.getMusicInterface()
     }
     else {
-        throw new MusicError(MusicErrorType.Score, `Notation line not staff nor tab.`);
+        throw new MusicError(MusicErrorType.Score, `Object is not staff or tab.`);
     }
 }
-
 /** Abstract music interface object class. */
 export abstract class MusicInterface {
     /**
@@ -134,7 +128,7 @@ export class MArpeggio extends MusicInterface {
      * @returns - Staff or tab object.
      */
     getNotationLine(): MStaff | MTab {
-        return getNotationLine(this.obj.line);
+        return getMStaffOrMTab(this.obj.line);
     }
 }
 
@@ -238,9 +232,9 @@ export class MDocument extends MusicInterface {
      * @param playStateChangeListener - Play state change listener function or undefined.
      * @returns - Player instance.
      */
-    play(playStateChangeListener?: PlayStateChangeListener): MPlayer {
+    play(playStateChangeListener?: PlayStateChangeListener): Player {
         assertArg(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
-        return new MPlayer(this, playStateChangeListener).play();
+        return new Player(this, playStateChangeListener).play();
     }
 
     /**
@@ -259,7 +253,7 @@ export class MDocument extends MusicInterface {
         idOrEl.forEach(idOrEl => {
             const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
 
-            if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+            if (isWmsView(el) || isWmsControls(el)) {
                 this.obj.bindElement(el);
             }
             else
@@ -283,7 +277,7 @@ export class MDocument extends MusicInterface {
         idOrEl.forEach(idOrEl => {
             const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
 
-            if (isWmsMusicScoreView(el) || isWmsPlaybackButtons(el)) {
+            if (isWmsView(el) || isWmsControls(el)) {
                 this.obj.unbindElement(el);
             }
             else
@@ -504,7 +498,7 @@ export class MStaffBarLine extends MusicInterface {
      * @returns - Staff or tab.
      */
     getNotationLine(): MStaff | MTab {
-        return getNotationLine(this.obj.line);
+        return getMStaffOrMTab(this.obj.line);
     }
 }
 
@@ -811,7 +805,7 @@ export class MScoreRow extends MusicInterface {
      * @returns - Array of staves and tabs.
      */
     getNotationLines(): ReadonlyArray<MStaff | MTab> {
-        return this.obj.getNotationLines().map(line => getNotationLine(line));
+        return this.obj.getNotationLines().map(line => getMStaffOrMTab(line));
     }
 }
 

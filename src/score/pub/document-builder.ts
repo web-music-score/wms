@@ -1,6 +1,6 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
-import { MDocument } from "./music-objects";
+import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -18,12 +18,12 @@ function setAssertFunction(fnName: string, ...fnArgs: unknown[]) {
 
 function assertArg(...conditions: boolean[]) {
     conditions.forEach(condition => {
-        if (!condition) throw new MusicError(MusicErrorType.Score, assertingFunction);
+        if (!condition) throw new MusicError(MusicErrorType.InvalidArg, assertingFunction);
     });
 }
 
 function assertArgMsg(condition: boolean, msg: string) {
-    if (!condition) throw new MusicError(MusicErrorType.Score, msg);
+    if (!condition) throw new MusicError(MusicErrorType.InvalidArg, msg);
 }
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {

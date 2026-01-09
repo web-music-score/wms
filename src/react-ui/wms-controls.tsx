@@ -1,5 +1,6 @@
 import * as React from "react";
-import { MDocument, MPlaybackButtons } from "web-music-score/score";
+import { warnDeprecated } from "shared-src";
+import { MDocument, WmsControls as JsControls } from "web-music-score/score";
 
 function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
     // SSR safe
@@ -27,7 +28,7 @@ function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
     return "unknown";
 }
 
-export interface PlaybackButtonsProps {
+export interface WmsControlsProps {
     doc?: MDocument;
     singlePlayStop?: boolean;
     playStop?: boolean;
@@ -37,8 +38,8 @@ export interface PlaybackButtonsProps {
     stopLabel?: string;
 }
 
-export interface PlaybackButtonsState {
-    controller: MPlaybackButtons;
+export interface WmsControlsState {
+    controls: JsControls;
 }
 
 /**
@@ -54,33 +55,33 @@ export interface PlaybackButtonsState {
  *       .getDocument();
  * 
  *   // Create default playback buttons (play, pause and stop buttons).
- *   <ScoreUI.PlaybackButtons doc={doc} />
+ *   <ScoreUI.WmsControls doc={doc} />
  *
  *   // Create playback buttons with single play/stop button.
- *   <ScoreUI.PlaybackButtons doc={doc} singlePlayStop />
+ *   <ScoreUI.WmsControls doc={doc} singlePlayStop />
  * 
  *   // Create playback buttons with play and stop buttons.
- *   <ScoreUI.PlaybackButtons doc={doc} playStop />
+ *   <ScoreUI.WmsControls doc={doc} playStop />
  * 
  *   // Create playback buttons with play, pause and stop buttons.
- *   <ScoreUI.PlaybackButtons doc={doc} playPauseStop />
+ *   <ScoreUI.WmsControls doc={doc} playPauseStop />
  * 
  *   // You can also set custom play, pause and stop button labels.
- *   <ScoreUI.PlaybackButtons doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" />
+ *   <ScoreUI.WmsControls doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" />
  * ```
  */
-export class PlaybackButtons extends React.Component<PlaybackButtonsProps, PlaybackButtonsState> {
+export class WmsControls extends React.Component<WmsControlsProps, WmsControlsState> {
 
-    state: PlaybackButtonsState;
+    state: WmsControlsState;
 
     private buttonClass: string;
     private buttonGroupClass: string;
 
-    constructor(props: PlaybackButtonsProps) {
+    constructor(props: WmsControlsProps) {
         super(props);
 
         this.state = {
-            controller: new MPlaybackButtons().setDocument(props.doc)
+            controls: new JsControls().setDocument(props.doc)
         }
 
         switch (detectStyleSystem()) {
@@ -98,15 +99,15 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
         }
     }
 
-    componentDidUpdate(prevProps: Readonly<PlaybackButtonsProps>): void {
+    componentDidUpdate(prevProps: Readonly<WmsControlsProps>): void {
         if (this.props.doc !== prevProps.doc) {
-            this.state.controller.setDocument(this.props.doc);
+            this.state.controls.setDocument(this.props.doc);
         }
     }
 
     render() {
         let { singlePlayStop, playStop, playLabel, pauseLabel, stopLabel } = this.props;
-        let { controller } = this.state;
+        let { controls: controller } = this.state;
         const { buttonClass, buttonGroupClass } = this;
 
         playLabel ??= "Play";
@@ -136,5 +137,31 @@ export class PlaybackButtons extends React.Component<PlaybackButtonsProps, Playb
                 </div>
             );
         }
+    }
+}
+
+
+/**
+ * Deprecated stuff.
+ * Will be removed on major update 7.0.0.
+ * 
+ * Renamed classes:
+ *  - PlaybackButtons => WmsControls
+ */
+
+/**
+ * @deprecated
+ * @internal
+ */
+export interface PlaybackButtonsProps extends WmsControlsProps { }
+
+/**
+ * @deprecated - PlaybackButtons is deprecated.  Will be romoved in 7.0.0. Use WmsControls instead.
+ * @internal
+ */
+export class PlaybackButtons extends WmsControls {
+    constructor(props: PlaybackButtonsProps) {
+        super(props);
+        warnDeprecated("PlaybackButtons is deprecated.  Will be romoved in 7.0.0. Use WmsControls instead.");
     }
 }

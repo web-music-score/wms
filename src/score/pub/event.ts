@@ -1,6 +1,7 @@
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { MRenderContext } from "./music-interface";
-import { MScoreRow, MusicInterface } from "./music-objects";
+import { MScoreRow, MusicInterface } from "./mobjects";
+import { WmsView } from "./wms-view";
+import { MRenderContext } from "./deprecated";
 
 /** Score event type. */
 export type ScoreEventType = "enter" | "leave" | "click";
@@ -19,12 +20,20 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     /**
      * Create new score staff position event.
      * @param type - Score event type.
-     * @param renderContext - Render context.
+     * @param view - View.
      * @param scoreRow - Score row.
      * @param diatonicId - Diatonic id that was clicked/entered/left.
      */
-    constructor(type: ScoreEventType, readonly renderContext: MRenderContext, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
+    constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
+    }
+
+    /**
+     * @deprecated - Use view instead. Will be removed in major update 7.0.0.
+     * @internal
+     */
+    get renderContext(): MRenderContext {
+        return this.view;
     }
 }
 
@@ -33,15 +42,23 @@ export class ScoreObjectEvent extends ScoreEvent {
     /**
      * Create new score object event.
      * @param type - Score event type.
-     * @param renderContext - Render context.
+     * @param view - View.
      * @param objects - Array of objects, last object in this array is the top object that was clicked/entered/left, previous objects are it's parent objects.
      */
-    constructor(type: ScoreEventType, readonly renderContext: MRenderContext, readonly objects: MusicInterface[]) {
+    constructor(type: ScoreEventType, readonly view: WmsView, readonly objects: MusicInterface[]) {
         super(type);
 
         if (arguments.length === 0) {
             throw new MusicError(MusicErrorType.Score, "Empty array in score object event!");
         }
+    }
+
+    /**
+     * @deprecated - Use view instead. Will be removed in major update 7.0.0.
+     * @internal
+     */
+    get renderContext(): MRenderContext {
+        return this.view;
     }
 
     /** Top object getter. */

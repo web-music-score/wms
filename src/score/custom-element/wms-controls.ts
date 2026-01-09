@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MDocument, MPlaybackButtons } from "../pub";
+import { WmsControls as PlainControls, MDocument } from "../pub";
 
 function addClass(el: HTMLElement, className: string) {
     className.trim().split(" ").filter(cls => cls.length > 0).forEach(cls => Utils.Dom.addClass(el, cls));
@@ -8,9 +8,9 @@ function addClass(el: HTMLElement, className: string) {
 const defaultButtonClass = "wms-button";
 const defaultButtonGroupClass = "wms-button-group";
 
-class WmsPlaybackButtons extends HTMLElement {
+class WmsControls extends HTMLElement {
     private div?: HTMLDivElement;
-    private pb: MPlaybackButtons;
+    private ctrl: PlainControls;
 
     private playLabel?: string;
     private pauseLabel?: string;
@@ -32,8 +32,8 @@ class WmsPlaybackButtons extends HTMLElement {
     constructor() {
         super();
 
-        this.pb = new MPlaybackButtons();
-        this.pb.setDocument(this._doc);
+        this.ctrl = new PlainControls();
+        this.ctrl.setDocument(this._doc);
     }
 
     static get observedAttributes() {
@@ -120,7 +120,7 @@ class WmsPlaybackButtons extends HTMLElement {
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
-        this.pb.setDocument(this._doc);
+        this.ctrl.setDocument(this._doc);
     }
 
     get doc(): MDocument | undefined {
@@ -139,7 +139,7 @@ class WmsPlaybackButtons extends HTMLElement {
                 this.btnPlay = document.createElement("button");
                 this.div.append(this.btnPlay);
             }
-            this.pb.setPlayStopButton(this.btnPlay, this.playLabel);
+            this.ctrl.setPlayStopButton(this.btnPlay, this.playLabel);
         }
         else if (this.playStop) {
             if (!this.btnPlay) {
@@ -150,8 +150,8 @@ class WmsPlaybackButtons extends HTMLElement {
                 this.btnStop = document.createElement("button");
                 this.div.append(this.btnStop);
             }
-            this.pb.setPlayButton(this.btnPlay, this.playLabel);
-            this.pb.setStopButton(this.btnStop, this.stopLabel);
+            this.ctrl.setPlayButton(this.btnPlay, this.playLabel);
+            this.ctrl.setStopButton(this.btnStop, this.stopLabel);
         }
         else if (this.playPauseStop) {
             if (!this.btnPlay) {
@@ -166,9 +166,9 @@ class WmsPlaybackButtons extends HTMLElement {
                 this.btnStop = document.createElement("button");
                 this.div.append(this.btnStop);
             }
-            this.pb.setPlayButton(this.btnPlay, this.playLabel);
-            this.pb.setPauseButton(this.btnPause, this.pauseLabel);
-            this.pb.setStopButton(this.btnStop, this.stopLabel);
+            this.ctrl.setPlayButton(this.btnPlay, this.playLabel);
+            this.ctrl.setPauseButton(this.btnPause, this.pauseLabel);
+            this.ctrl.setStopButton(this.btnStop, this.stopLabel);
         }
 
         if (this.btnPlay) {
@@ -193,16 +193,13 @@ export function registerWmsPlaybackButtons() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
-    if (!customElements.get("wms-playback-buttons")) {
-        customElements.define(
-            "wms-playback-buttons",
-            WmsPlaybackButtons
-        );
+    if (!customElements.get("controls")) {
+        customElements.define("wms-controls", WmsControls);
     }
 }
 
-export function isWmsPlaybackButtons(el: unknown): el is WmsPlaybackButtons {
+export function isWmsControls(el: unknown): el is WmsControls {
     return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
-        el.tagName === "WMS-PLAYBACK-BUTTONS";
+        el.tagName === "WMS-CONTROLS";
 }

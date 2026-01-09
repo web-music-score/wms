@@ -1,15 +1,10 @@
 import { Guard, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
-import { isWmsMusicScoreView } from "../custom-element/wms-music-score-view";
+import { isWmsView } from "../custom-element/wms-view";
 import { MusicError, MusicErrorType } from "web-music-score/core";
+import { assertArg } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
-
-function assertArg(condition: boolean, argName: string, argValue: unknown) {
-    if (!condition) {
-        throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
-    }
-}
 
 /** Color keys. */
 export type ColorKey =
@@ -273,7 +268,7 @@ export class Paint {
         idOrEl.forEach(idOrEl => {
             const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
 
-            if (isWmsMusicScoreView(el)) {
+            if (isWmsView(el)) {
                 el.addEventListener("disconnected", () => this.boundElements.delete(el));
                 el.paint = this;
             }
@@ -301,7 +296,7 @@ export class Paint {
         idOrEl.forEach(idOrEl => {
             const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
 
-            if (isWmsMusicScoreView(el)) {
+            if (isWmsView(el)) {
                 el.paint = undefined;
                 this.boundElements.delete(el);
             }

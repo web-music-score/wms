@@ -1,5 +1,5 @@
-import { registerWmsMusicScoreView } from "./wms-music-score-view";
-import { registerWmsPlaybackButtons } from "./wms-playback-buttons";
+import { registerWmsView } from "./wms-view";
+import { registerWmsPlaybackButtons } from "./wms-controls";
 
-registerWmsMusicScoreView();
+registerWmsView();
 registerWmsPlaybackButtons();
