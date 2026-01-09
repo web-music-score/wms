@@ -1,8 +1,16 @@
 # Changelog
 ## [6.1.0] - 2026-01-??
 ### Added
-- Custom HTML elements <wms-music-score-view> and <wms-playback-buttons>.
+- Custom HTML elements <wms-view> and <wms-controls>.
 - Document can be undefined in RenderContext/MusicScoreView.
+
+### Renamed And Deprecated
+ - Score.MRenderContext (deprecated)    => Score.WmsView
+ - Score.MPlaybackButtons (deprecated)  => Score.WmsControls
+ - Score.MPlayer (deprecated)           => Score.PLayer
+ - Score.MRenderContext (deprecated)    => Score.WmsView
+ - ReactUI.MusicScoreView (deprecated)  => ReactUI.WmsView
+ - ReactUI.PlaybackButtons (deprecated) => ReactUI.WmsControls
 
 ## [6.0.1] - 2025-12-31
 ### Fixed
