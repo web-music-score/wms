@@ -22,9 +22,9 @@ export class ExampleApp extends React.Component {
 
         return (
             <div>
-                <ScoreUI.MusicScoreView doc={doc} />
+                <ScoreUI.WmsView doc={doc} />
                 <br />
-                <ScoreUI.PlaybackButtons doc={doc} />
+                <ScoreUI.WmsControls doc={doc} />
             </div>
         );
     }

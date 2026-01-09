@@ -36,7 +36,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             let newDoc = DemoPieces.getInstance().getDocument(title);
 
             if (DemoPieces.getTitle(newDoc) !== DemoPieces.getTitle(doc)) {
-                Score.MPlayer.stopAll();
+                Score.Player.stopAll();
                 this.setState({ doc: newDoc });
             }
         }
@@ -88,7 +88,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             <br />
             {hoverText}
             <br />
-            <ScoreUI.MusicScoreView doc={doc} onScoreEvent={onScoreEvent} />
+            <ScoreUI.WmsView doc={doc} onScoreEvent={onScoreEvent} />
         </div >
     }
 }

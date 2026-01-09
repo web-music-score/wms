@@ -5,7 +5,7 @@ Web Music Score is a TypeScript/JavaScript music notation web component and play
 
 ## Install
 ```bash
-npm i web-music-score
+npm install web-music-score
 ```
 
 ## Quick Example
@@ -23,12 +23,12 @@ const doc = new Score.DocumentBuilder()
     .endSong()
     .getDocument();
 
-new Score.MRenderContext().
+new Score.WmsView().
     setCanvas("scoreCanvasId").
     setDocument(doc).
     draw();
 
-new Score.MPlaybackButtons().
+new Score.WmsControls().
     setPlayStopButton("playButtonId").
     setDocument(doc);
 ```
