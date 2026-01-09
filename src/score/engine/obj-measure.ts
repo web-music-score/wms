@@ -3,7 +3,7 @@ import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeyS
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey } from "../pub";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
@@ -1358,7 +1358,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         if (!this.needLayout) {
             return;
         }
@@ -1367,7 +1367,7 @@ export class ObjMeasure extends MusicObject {
 
         this.requestRectUpdate();
 
-        let { unitSize } = ctx;
+        let { unitSize } = view;
 
         this.postMeasureBreakWidth = this.hasPostMeasureBreak()
             ? DocumentSettings.PostMeasureBreakWidth * unitSize
@@ -1394,13 +1394,13 @@ export class ObjMeasure extends MusicObject {
 
                 signature.staff.addObject(signature);
 
-                signature.updateClefImage(ctx, showClef);
+                signature.updateClefImage(view, showClef);
                 signature.updateMeasureNumber(showMeasureNumber && lineId === 0);
                 signature.updateKeySignature(showKeySignature);
                 signature.updateTimeSignature(showTimeSignature);
                 signature.updateTempo(showTempo && lineId === 0);
 
-                signature.layout(ctx);
+                signature.layout(view);
 
                 this.signatures.push(signature);
             }
@@ -1415,7 +1415,7 @@ export class ObjMeasure extends MusicObject {
                 signature.updateTimeSignature(showTimeSignature);
                 signature.updateTempo(showTempo && lineId === 0);
 
-                signature.layout(ctx);
+                signature.layout(view);
 
                 this.signatures.push(signature);
             }
@@ -1469,7 +1469,7 @@ export class ObjMeasure extends MusicObject {
                     let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
                     let obj = new ObjText(this, { text: note, scale: 0.8, color: colorKey("tab.tuning") }, 1, 0.5);
 
-                    obj.layout(ctx);
+                    obj.layout(view);
                     obj.setRight(this.regions.tabTuning_0 * 0.8);
                     obj.setCenterY(tab.getStringY(stringId));
 
@@ -1480,24 +1480,24 @@ export class ObjMeasure extends MusicObject {
         }
 
         // Layout measure start object
-        this.barLineLeft.layout(ctx);
+        this.barLineLeft.layout(view);
 
         // Layout columns
         const accState = new AccidentalState(this);
-        this.columns.forEach(col => col.layout(ctx, accState));
+        this.columns.forEach(col => col.layout(view, accState));
 
         // Some layout objects need to reserve space so they do not overlap with neighbors.
-        this.columns.forEach(col => col.layoutReserveSpace(ctx));
+        this.columns.forEach(col => col.layoutReserveSpace(view));
 
         // Layout measure end object
-        this.barLineRight.layout(ctx);
+        this.barLineRight.layout(view);
 
         if (this.endRepeatPlayCountText)
-            this.endRepeatPlayCountText.layout(ctx);
+            this.endRepeatPlayCountText.layout(view);
 
-        this.layoutObjects.forEach(obj => obj.layout(ctx));
+        this.layoutObjects.forEach(obj => obj.layout(view));
 
-        let padding = ctx.unitSize;
+        let padding = view.unitSize;
 
         // Calculated region widths
         // this.regions.tabTuning_0 was already set above
@@ -1514,7 +1514,7 @@ export class ObjMeasure extends MusicObject {
         this.regions.rightBarLine_6 = this.barLineRight.getRect().width;
     }
 
-    layoutWidth(ctx: RenderContext, width: number) {
+    layoutWidth(view: View, width: number) {
         if (!this.needLayout) {
             return;
         }
@@ -1577,28 +1577,28 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    layoutConnectives(ctx: RenderContext) {
+    layoutConnectives(view: View) {
         if (!this.needLayout) {
             return;
         }
 
         // Layout connectives
         this.connectives.forEach(connective => {
-            connective.layout(ctx);
+            connective.layout(view);
 
             this.rect.top = Math.min(this.rect.top, connective.getRect().top);
             this.rect.bottom = Math.max(this.rect.bottom, connective.getRect().bottom);
         });
     }
 
-    layoutBeams(ctx: RenderContext) {
+    layoutBeams(view: View) {
         if (!this.needLayout) {
             return;
         }
 
         // Layout Beams
         this.beamGroups.forEach(beamGroup => {
-            beamGroup.layout(ctx);
+            beamGroup.layout(view);
 
             this.rect.top = Math.min(this.rect.top, beamGroup.getRect().top);
             this.rect.bottom = Math.max(this.rect.bottom, beamGroup.getRect().bottom);
@@ -1678,14 +1678,14 @@ export class ObjMeasure extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(ctx: RenderContext) {
-        ctx.drawDebugRect(this.getRect());
-        ctx.lineWidth(1);
+    draw(view: View) {
+        view.drawDebugRect(this.getRect());
+        view.lineWidth(1);
 
         // Draw staff lines
         let left = this.getStaffLineLeft();
         let right = this.getStaffLineRight();
-        const drawLine = (y: number, color: string) => ctx.color(color).strokeLine(left, y, right, y);
+        const drawLine = (y: number, color: string) => view.color(color).strokeLine(left, y, right, y);
 
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
@@ -1712,30 +1712,30 @@ export class ObjMeasure extends MusicObject {
                 const top = tab.getTopLineY();
                 const bottom = tab.getBottomLineY();
 
-                ctx.color(colorKey("tab.frame"))
+                view.color(colorKey("tab.frame"))
                     .lineWidth(1)
                     .strokeLine(left, top, left, bottom);
             });
         }
 
-        this.signatures.forEach(signature => signature.draw(ctx));
+        this.signatures.forEach(signature => signature.draw(view));
 
-        this.tabStringNotes.forEach(obj => obj.draw(ctx));
+        this.tabStringNotes.forEach(obj => obj.draw(view));
 
-        this.barLineLeft.draw(ctx);
+        this.barLineLeft.draw(view);
 
-        this.columns.forEach(col => col.draw(ctx));
+        this.columns.forEach(col => col.draw(view));
 
-        this.barLineRight.draw(ctx);
+        this.barLineRight.draw(view);
 
         if (this.endRepeatPlayCountText) {
-            this.endRepeatPlayCountText.draw(ctx);
+            this.endRepeatPlayCountText.draw(view);
         }
 
-        this.connectives.forEach(connective => connective.draw(ctx));
+        this.connectives.forEach(connective => connective.draw(view));
 
-        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(ctx));
+        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(view));
 
-        this.beamGroups.forEach(beam => beam.draw(ctx));
+        this.beamGroups.forEach(beam => beam.draw(view));
     }
 }

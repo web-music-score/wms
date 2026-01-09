@@ -1,6 +1,6 @@
 import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
@@ -70,8 +70,8 @@ export class ObjConnective extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layout(view: View) {
+        let { unitSize } = view;
         let { measure, line, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId, connectiveProps } = this;
         let { noteAnchor, arcDir } = connectiveProps;
         let { row } = measure;
@@ -174,7 +174,7 @@ export class ObjConnective extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         if (this.rightNoteGroup === undefined) { /* Draw */ }
         else if (this.leftNoteGroup.measure === this.rightNoteGroup.measure) { /* Draw */ }
         else if (this.leftNoteGroup.row.getNextRow() === this.rightNoteGroup.row) { /* Draw */ }
@@ -182,29 +182,29 @@ export class ObjConnective extends MusicObject {
         else { return; }
 
         let { rect } = this;
-        let { lineWidthPx } = ctx;
+        let { lineWidthPx } = view;
 
-        ctx.drawDebugRect(rect);
+        view.drawDebugRect(rect);
 
         let t = lineWidthPx * 1.5;
         let s = lineWidthPx * 0.25;
 
-        ctx.color(this.line instanceof ObjTab ? colorKey("tab.connective") : colorKey("staff.connective"));
-        ctx.lineWidth(1);
+        view.color(this.line instanceof ObjTab ? colorKey("tab.connective") : colorKey("staff.connective"));
+        view.lineWidth(1);
 
         if (this.arcHeight === 0) {
-            ctx.beginPath();
-            ctx.moveTo(this.lx, this.ly);
-            ctx.lineTo(this.rx, this.ry);
-            ctx.stroke();
+            view.beginPath();
+            view.moveTo(this.lx, this.ly);
+            view.lineTo(this.rx, this.ry);
+            view.stroke();
         }
         else {
-            ctx.beginPath();
-            ctx.moveTo(this.lx, this.ly - s);
-            ctx.bezierCurveTo(this.cp1x, this.cp1y - t, this.cp2x, this.cp2y - t, this.rx, this.ry - s);
-            ctx.lineTo(this.rx, this.ry + s);
-            ctx.bezierCurveTo(this.cp2x, this.cp2y + t, this.cp1x, this.cp1y + t, this.lx, this.ly + s);
-            ctx.fill();
+            view.beginPath();
+            view.moveTo(this.lx, this.ly - s);
+            view.bezierCurveTo(this.cp1x, this.cp1y - t, this.cp2x, this.cp2y - t, this.rx, this.ry - s);
+            view.lineTo(this.rx, this.ry + s);
+            view.bezierCurveTo(this.cp2x, this.cp2y + t, this.cp1x, this.cp1y + t, this.lx, this.ly + s);
+            view.fill();
         }
     }
 }

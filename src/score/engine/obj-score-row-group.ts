@@ -1,4 +1,4 @@
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
@@ -75,10 +75,10 @@ export class ObjScoreRowGroup extends MusicObject {
         this.rect = this.instrText.getRect().clone().expandInPlace(this.braceRect);
     }
 
-    layout(ctx: RenderContext) {
-        this.space = ctx.unitSize;
-        this.instrText.layout(ctx);
-        this.braceRect = new AnchoredRect(-(this.hasBrace ? ctx.unitSize * 5 : 0), 0, 0, 0);
+    layout(view: View) {
+        this.space = view.unitSize;
+        this.instrText.layout(view);
+        this.braceRect = new AnchoredRect(-(this.hasBrace ? view.unitSize * 5 : 0), 0, 0, 0);
         this.forceRectUpdate();
     }
 
@@ -95,12 +95,12 @@ export class ObjScoreRowGroup extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        this.instrText.draw(ctx);
+    draw(view: View) {
+        this.instrText.draw(view);
 
         if (this.hasBrace) {
             const r = this.braceRect;
-            ctx.color(colorKey("rowgroup.frame")).lineWidth(1).drawBracket(r, "{");
+            view.color(colorKey("rowgroup.frame")).lineWidth(1).drawBracket(r, "{");
         }
     }
 }

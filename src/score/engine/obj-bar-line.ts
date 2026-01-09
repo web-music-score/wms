@@ -1,5 +1,5 @@
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjMeasure } from "./obj-measure";
 import { MBarLineRight, MBarLineLeft, Navigation, MusicInterface, MStaffBarLine } from "../pub";
 import { PlayerColumnProps } from "./player";
@@ -78,12 +78,12 @@ abstract class ObjBarLine extends MusicObject {
         return [this];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         this.requestRectUpdate();
 
         this.barLineType = this.solveBarLineType();
 
-        let { unitSize, lineWidthPx } = ctx;
+        let { unitSize, lineWidthPx } = view;
         let { measure, barLineType } = this;
         let { row } = measure;
 
@@ -180,15 +180,15 @@ abstract class ObjBarLine extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         if (this.barLineType === BarLineType.None)
             return;
 
-        ctx.drawDebugRect(this.getRect());
+        view.drawDebugRect(this.getRect());
 
         this.notationLineObjects.forEach(o => {
-            o.vlines.forEach(l => o.line.drawVerticalLine(ctx, l.left, l.width));
-            o.dots.forEach(d => ctx.fillCircle(d.x, d.y, d.r));
+            o.vlines.forEach(l => o.line.drawVerticalLine(view, l.left, l.width));
+            o.dots.forEach(d => view.fillCircle(d.x, d.y, d.r));
         });
     }
 }

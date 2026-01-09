@@ -1,5 +1,5 @@
 import { Assert, Guard, Utils } from "@tspro/ts-utils-lib";
-import { RenderContext } from "../engine/render-context";
+import { View } from "../engine/view";
 import { StaffSize } from "./types";
 import { ScoreEventListener } from "./event";
 import { MDocument, MScoreRow, MusicInterface } from "./mobjects";
@@ -16,13 +16,13 @@ function require_t<T>(t: T | undefined | null, message?: string): T {
 }
 
 export class WmsView {
-    private readonly _rc: RenderContext;
+    private readonly _view: View;
 
     /**
      * Create new render context instance.
      */
     constructor() {
-        this._rc = new RenderContext(this);
+        this._view = new View(this);
     }
 
     /**
@@ -33,7 +33,7 @@ export class WmsView {
     setPaint(paint?: Paint) {
         assertArg(Guard.isUndefined(paint) || paint instanceof Paint, "paint", paint);
 
-        this._rc.setPaint(paint);
+        this._view.setPaint(paint);
         return this;
     }
 
@@ -45,7 +45,7 @@ export class WmsView {
     setDocument(mdoc?: MDocument): WmsView {
         assertArg(Guard.isUndefined(mdoc) || mdoc instanceof MDocument, "mdoc", mdoc);
 
-        this._rc.setDocument(mdoc?.getMusicObject());
+        this._view.setDocument(mdoc?.getMusicObject());
         return this;
     }
 
@@ -59,7 +59,7 @@ export class WmsView {
         canvas = require_t(Utils.Dom.getCanvas(canvas), typeof canvas === "string"
             ? "Cannot set render canvas because invalid canvas id: " + canvas
             : "Cannot set render canvas because given canvas is undefined.");
-        this._rc.setCanvas(canvas);
+        this._view.setCanvas(canvas);
         return this;
     }
 
@@ -70,7 +70,7 @@ export class WmsView {
      */
     setZoom(zoom: number = 1.0): WmsView {
         assertArg(Guard.isNumberGt(zoom, 0) && Guard.isFinite(zoom), "zoom", zoom);
-        this._rc.setZoom(zoom);
+        this._view.setZoom(zoom);
         return this;
     }
 
@@ -85,7 +85,7 @@ export class WmsView {
             Guard.isNumberGt(staffSize, 0) && Guard.isFinite(staffSize),
             "staffSize", staffSize
         );
-        this._rc.setStaffSize(staffSize);
+        this._view.setStaffSize(staffSize);
         return this;
     }
 
@@ -95,7 +95,7 @@ export class WmsView {
      */
     setScoreEventListener(scoreEventListener: ScoreEventListener) {
         assertArg(Guard.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
-        this._rc.setScoreEventListener(scoreEventListener);
+        this._view.setScoreEventListener(scoreEventListener);
     }
 
     /**
@@ -103,7 +103,7 @@ export class WmsView {
      * @param obj - Music object or undefined to remove hilighting.
      */
     hilightObject(obj?: MusicInterface) {
-        this._rc.hilightObject(obj?.getMusicObject());
+        this._view.hilightObject(obj?.getMusicObject());
     }
 
     /**
@@ -111,7 +111,7 @@ export class WmsView {
      * @param staffPos - Staff position (score row and diatonic id) or undefined to remove hilighting.
      */
     hilightStaffPos(staffPos?: { scoreRow: MScoreRow, diatonicId: number }) {
-        this._rc.hilightStaffPos(staffPos ? {
+        this._view.hilightStaffPos(staffPos ? {
             scoreRow: staffPos.scoreRow.getMusicObject(),
             diatonicId: staffPos.diatonicId
         } : undefined);
@@ -122,7 +122,7 @@ export class WmsView {
      */
     draw() {
         try {
-            this._rc.draw();
+            this._view.draw();
         }
         catch (err) {
             console.log("Draw failed in music render context!", err);

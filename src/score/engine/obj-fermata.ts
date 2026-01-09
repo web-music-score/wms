@@ -1,6 +1,6 @@
 import { MFermata } from "../pub";
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
@@ -35,8 +35,8 @@ export class ObjFermata extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layout(view: View) {
+        let { unitSize } = view;
 
         let width = unitSize * 4;
         let height = unitSize * 3;
@@ -48,8 +48,8 @@ export class ObjFermata extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    draw(view: View) {
+        let { unitSize } = view;
         let upsideDown = this.pos === VerticalPos.Below;
 
         let dy = (upsideDown ? unitSize : -unitSize) * 0.7;
@@ -60,19 +60,19 @@ export class ObjFermata extends MusicObject {
         let bottom = (upsideDown ? this.rect.top : this.rect.bottom) + dy;
         let height = bottom - top;
 
-        ctx.drawDebugRect(this.rect);
+        view.drawDebugRect(this.rect);
 
-        ctx.color(this.color).lineWidth(1);
+        view.color(this.color).lineWidth(1);
 
-        ctx.beginPath();
-        ctx.moveTo(left, bottom);
-        ctx.bezierCurveTo(left, top, right, top, right, bottom);
-        ctx.bezierCurveTo(right, top + height / 5, left, top + height / 5, left, bottom);
-        ctx.stroke();
-        ctx.fill();
+        view.beginPath();
+        view.moveTo(left, bottom);
+        view.bezierCurveTo(left, top, right, top, right, bottom);
+        view.bezierCurveTo(right, top + height / 5, left, top + height / 5, left, bottom);
+        view.stroke();
+        view.fill();
 
         let r = height / 6;
 
-        ctx.fillCircle((left + right) / 2, bottom - r, Math.abs(r));
+        view.fillCircle((left + right) / 2, bottom - r, Math.abs(r));
     }
 }

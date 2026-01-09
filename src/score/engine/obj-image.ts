@@ -1,4 +1,4 @@
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { MImage } from "../pub";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
@@ -19,9 +19,9 @@ export class ObjImage extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         let { anchorX, anchorY, image, imageScale } = this;
-        let { unitSize } = ctx;
+        let { unitSize } = view;
 
         try {
             let w = image.naturalWidth * imageScale * unitSize;
@@ -39,9 +39,9 @@ export class ObjImage extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         let r = this.rect;
-        ctx.drawDebugRect(r);
-        ctx.drawImage(this.image, r.anchorX - r.leftw, r.anchorY - r.toph, r.width, r.height);
+        view.drawDebugRect(r);
+        view.drawImage(this.image, r.anchorX - r.leftw, r.anchorY - r.toph, r.width, r.height);
     }
 }

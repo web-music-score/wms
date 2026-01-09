@@ -1,5 +1,5 @@
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjText } from "./obj-text";
 import { colorKey, MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
@@ -63,7 +63,7 @@ export class ObjHeader extends MusicObject {
         return [this];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         let top = 0;
 
         const left = this.doc.regions.staffLeft;
@@ -72,7 +72,7 @@ export class ObjHeader extends MusicObject {
         this.rect = new AnchoredRect(left, right, 0, 0);
 
         if (this.titleText) {
-            this.titleText.layout(ctx);
+            this.titleText.layout(view);
             this.titleText.setCenterX((left + right) / 2);
             this.titleText.setTop(top);
             top += this.titleText.getRect().height;
@@ -80,7 +80,7 @@ export class ObjHeader extends MusicObject {
         }
 
         if (this.composerText) {
-            this.composerText.layout(ctx);
+            this.composerText.layout(view);
             this.composerText.setRight(right);
             this.composerText.setTop(top);
             top += this.composerText.getRect().height;
@@ -88,7 +88,7 @@ export class ObjHeader extends MusicObject {
         }
 
         if (this.arrangerText) {
-            this.arrangerText.layout(ctx);
+            this.arrangerText.layout(view);
             this.arrangerText.setRight(right);
             this.arrangerText.setTop(top);
             top += this.arrangerText.getRect().height;
@@ -112,17 +112,17 @@ export class ObjHeader extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         if (this.titleText) {
-            this.titleText.draw(ctx);
+            this.titleText.draw(view);
         }
 
         if (this.composerText) {
-            this.composerText.draw(ctx);
+            this.composerText.draw(view);
         }
 
         if (this.arrangerText) {
-            this.arrangerText.draw(ctx);
+            this.arrangerText.draw(view);
         }
     }
 }

@@ -1,4 +1,4 @@
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
@@ -62,11 +62,11 @@ export class ObjExtensionLine extends MusicObject {
         return this.cols[0];
     }
 
-    private getLineLeft(ctx: RenderContext): number {
+    private getLineLeft(view: View): number {
         let obj = this.getLeftObj();
 
         if (isExtensionStartObject(obj))
-            return obj.getRect().right + ctx.unitSize;
+            return obj.getRect().right + view.unitSize;
 
         if (obj instanceof ObjBarLineLeft)
             return obj.getRect().anchorX;
@@ -97,11 +97,11 @@ export class ObjExtensionLine extends MusicObject {
         return obj;
     }
 
-    private getLineRight(ctx: RenderContext): number {
+    private getLineRight(view: View): number {
         let obj = this.getRightObj();
 
         if (isExtensionStopObject(obj))
-            return obj.getRect().left - ctx.unitSize;
+            return obj.getRect().left - view.unitSize;
 
         if (obj instanceof ObjRhythmColumn) {
             const mcols = obj.measure.getColumns();
@@ -116,11 +116,11 @@ export class ObjExtensionLine extends MusicObject {
         return obj.getRect().anchorX;
     }
 
-    layoutFitToMeasure(ctx: RenderContext) {
-        let recth = ctx.unitSize;
+    layoutFitToMeasure(view: View) {
+        let recth = view.unitSize;
 
-        let lineLeft = this.getLineLeft(ctx);
-        let lineRight = this.getLineRight(ctx);
+        let lineLeft = this.getLineLeft(view);
+        let lineRight = this.getLineRight(view);
 
         [lineLeft, lineRight] = [Math.min(lineLeft, lineRight), Math.max(lineLeft, lineRight)];
 
@@ -131,7 +131,7 @@ export class ObjExtensionLine extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         this.rect = new AnchoredRect();
     }
 
@@ -139,28 +139,28 @@ export class ObjExtensionLine extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         let { rect } = this;
 
         const head = this.extension.headObj.musicObj;
         const color = String(head.userData["extension-color"]);
 
         if (this.extension.getLineStyle() === "dashed")
-            ctx.setLineDash([7, 3]);
+            view.setLineDash([7, 3]);
 
-        ctx.color(color).lineWidth(1);
+        view.color(color).lineWidth(1);
 
-        ctx.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);
+        view.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);
 
-        ctx.setLineDash([]);
+        view.setLineDash([]);
 
         // Draw tip end of last line
         let tails = this.extension.getTails();
         let last = tails[tails.length - 1];
 
         if (this === last && !isExtensionStopObject(this.getRightObj())) {
-            let tipH = rect.anchorY > this.line.getRect().anchorY ? -ctx.unitSize : ctx.unitSize;
-            ctx.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
+            let tipH = rect.anchorY > this.line.getRect().anchorY ? -view.unitSize : view.unitSize;
+            view.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
         }
     }
 }

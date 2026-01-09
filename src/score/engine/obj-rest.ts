@@ -1,7 +1,7 @@
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { colorKey, MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
@@ -238,7 +238,7 @@ export class ObjRest extends MusicObject {
 
     updateAccidentalState(accState: AccidentalState) { }
 
-    layout(ctx: RenderContext, accState: AccidentalState) {
+    layout(view: View, accState: AccidentalState) {
         this.requestRectUpdate();
         this.staffObjects.length = 0;
 
@@ -246,7 +246,7 @@ export class ObjRest extends MusicObject {
             return;
         }
 
-        let { unitSize } = ctx;
+        let { unitSize } = view;
         let { noteSize, dotCount } = this.rhythmProps;
 
         this.row.getStaves().forEach(staff => {
@@ -258,7 +258,7 @@ export class ObjRest extends MusicObject {
 
             let obj = new ObjStaffRest(staff, this);
 
-            obj.restRect = ctx.getRestRect(noteSize);
+            obj.restRect = view.getRestRect(noteSize);
 
             for (let i = 0; i < dotCount; i++) {
                 let dotWidth = DocumentSettings.DotSize * unitSize;
@@ -295,23 +295,23 @@ export class ObjRest extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         if (this.staffObjects.length === 0) {
             return;
         }
 
-        ctx.drawDebugRect(this.getRect());
+        view.drawDebugRect(this.getRect());
 
         let { noteSize } = this.rhythmProps;
 
-        ctx.color(this.color).lineWidth(1);
+        view.color(this.color).lineWidth(1);
 
         this.staffObjects.forEach(obj => {
             let { dotRects, restRect } = obj;
 
-            ctx.drawRest(noteSize, restRect.anchorX, restRect.anchorY);
+            view.drawRest(noteSize, restRect.anchorX, restRect.anchorY);
 
-            dotRects.forEach(r => ctx.fillCircle(r.anchorX, r.anchorY, r.width / 2));
+            dotRects.forEach(r => view.fillCircle(r.anchorX, r.anchorY, r.width / 2));
         });
     }
 }

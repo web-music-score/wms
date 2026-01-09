@@ -1,5 +1,5 @@
 import { LyricsAlign, LyricsHyphen, LyricsOptions, MLyrics, VerseNumber } from "../pub";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { NoteLength, RhythmProps } from "web-music-score/theory";
 import { ObjText } from "./obj-text";
@@ -55,8 +55,8 @@ export class ObjLyrics extends MusicObject {
         return this.getRect().contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
-        this.text.layout(ctx);
+    layout(view: View) {
+        this.text.layout(view);
         this.rect = this.text.getRect().clone();
     }
 
@@ -65,17 +65,17 @@ export class ObjLyrics extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        this.text.draw(ctx);
+    draw(view: View) {
+        this.text.draw(view);
 
         if (this.hyphen !== undefined) {
-            ctx.color(this.color).lineWidth(1);
+            view.color(this.color).lineWidth(1);
 
             // Draw hyphen/extender line between this and next lyrics.
             let l = this.getRect();
             let r = this.nextLyricsObject?.getRect();
 
-            let hyphenw = ctx.unitSize * 1.5;
+            let hyphenw = view.unitSize * 1.5;
             let maxw = r ? (r.left - l.right) * 0.85 : hyphenw;
             let w = this.hyphen === LyricsHyphen.Hyphen ? Math.min(hyphenw, maxw) : maxw;
 
@@ -83,9 +83,9 @@ export class ObjLyrics extends MusicObject {
                 let cx = r ? (l.right + r.left) / 2 : (l.right + w / 0.85)
                 let cy = l.centerY;
 
-                ctx.moveTo(cx - w / 2, cy);
-                ctx.lineTo(cx + w / 2, cy);
-                ctx.stroke();
+                view.moveTo(cx - w / 2, cy);
+                view.lineTo(cx + w / 2, cy);
+                view.stroke();
             }
         }
     }

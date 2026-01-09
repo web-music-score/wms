@@ -1,4 +1,4 @@
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { MSpecialText } from "../pub";
@@ -52,13 +52,13 @@ export class ObjSpecialText extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         switch (this.text) {
             case ObjSpecialText.Coda: {
                 let codaSym = this.components[0];
                 let codaText = this.components[1];
-                codaSym.layout(ctx);
-                codaText.layout(ctx);
+                codaSym.layout(view);
+                codaText.layout(view);
                 codaSym.setAnchorY(codaText.getRect().centerY);
                 codaText.setLeft(codaSym.getRect().right);
                 this.rect = new AnchoredRect(
@@ -70,8 +70,8 @@ export class ObjSpecialText extends MusicObject {
             case ObjSpecialText.toCoda: {
                 let toCodaText = this.components[0];
                 let codaSym = this.components[1];
-                toCodaText.layout(ctx);
-                codaSym.layout(ctx);
+                toCodaText.layout(view);
+                codaSym.layout(view);
                 codaSym.setAnchorY(toCodaText.getRect().centerY);
                 toCodaText.setRight(codaSym.getRect().left);
                 this.rect = new AnchoredRect(
@@ -82,7 +82,7 @@ export class ObjSpecialText extends MusicObject {
             }
             default: {
                 let text = this.components[0];
-                text.layout(ctx);
+                text.layout(view);
                 this.rect = text.getRect().clone();
                 break;
             }
@@ -95,9 +95,9 @@ export class ObjSpecialText extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        ctx.drawDebugRect(this.rect);
+    draw(view: View) {
+        view.drawDebugRect(this.rect);
 
-        this.components.forEach(c => c.draw(ctx));
+        this.components.forEach(c => c.draw(view));
     }
 }

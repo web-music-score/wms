@@ -1,6 +1,6 @@
 import { AnchoredRect, Guard } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MEnding, Navigation } from "../pub";
@@ -61,16 +61,16 @@ export class ObjEnding extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         this.rect = new AnchoredRect();
         this.shapeRects = [this.rect.clone()];
     }
 
-    layoutFitToMeasure(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layoutFitToMeasure(view: View) {
+        let { unitSize } = view;
         let { measure } = this;
 
-        this.endingText.layout(ctx);
+        this.endingText.layout(view);
         let textRect = this.endingText.getRect();
 
         let measureContent = measure.getColumnsContentRect();
@@ -96,24 +96,24 @@ export class ObjEnding extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         let { rect } = this;
 
-        ctx.drawDebugRect(this.rect);
+        view.drawDebugRect(this.rect);
 
-        ctx.color(this.color).lineWidth(1);
+        view.color(this.color).lineWidth(1);
 
-        ctx.beginPath();
-        ctx.moveTo(rect.left, rect.bottom);
-        ctx.lineTo(rect.left, rect.top);
-        ctx.lineTo(rect.right, rect.top);
+        view.beginPath();
+        view.moveTo(rect.left, rect.bottom);
+        view.lineTo(rect.left, rect.top);
+        view.lineTo(rect.right, rect.top);
 
         if (this.isSingleMeasureEnding()) {
-            ctx.lineTo(rect.right, rect.bottom);
+            view.lineTo(rect.right, rect.bottom);
         }
 
-        ctx.stroke();
+        view.stroke();
 
-        this.endingText.draw(ctx);
+        this.endingText.draw(view);
     }
 }

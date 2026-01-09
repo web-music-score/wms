@@ -1,6 +1,6 @@
 import { Accidental } from "web-music-score/theory";
 import { MAccidental } from "../pub";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
@@ -20,8 +20,8 @@ export class ObjAccidental extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layout(view: View) {
+        let { unitSize } = view;
 
         switch (this.accidental) {
             case -2:
@@ -48,19 +48,19 @@ export class ObjAccidental extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        ctx.drawDebugRect(this.rect);
+    draw(view: View) {
+        view.drawDebugRect(this.rect);
 
-        let { unitSize } = ctx;
+        let { unitSize } = view;
         let { accidental } = this;
 
         let x = this.rect.anchorX;
         let y = this.rect.anchorY;
 
-        ctx.color(this.color);
+        view.color(this.color);
 
         const draw_b = (x: number, y: number) => {
-            ctx.lineWidth(1)
+            view.lineWidth(1)
                 .beginPath()
                 .moveTo(x - unitSize * 0.75, y - unitSize * 4)
                 .lineTo(x - unitSize * 0.75, y + unitSize * 1.1)
@@ -82,7 +82,7 @@ export class ObjAccidental extends MusicObject {
         }
         if (accidental === 0) {
             // neutral
-            ctx.beginPath()
+            view.beginPath()
                 .lineWidth(1)
                 .moveTo(x - unitSize * 0.5, y - unitSize * 2.2)
                 .lineTo(x - unitSize * 0.5, y + unitSize * 1)
@@ -99,7 +99,7 @@ export class ObjAccidental extends MusicObject {
         }
         else if (accidental === 1) {
             // #
-            ctx.lineWidth(1)
+            view.lineWidth(1)
                 .beginPath()
                 .moveTo(x - unitSize * 0.3, y - unitSize * 1.6)
                 .lineTo(x - unitSize * 0.3, y + unitSize * 2)
@@ -116,7 +116,7 @@ export class ObjAccidental extends MusicObject {
         }
         else if (accidental === 2) {
             // x
-            ctx.lineWidth(1)
+            view.lineWidth(1)
                 .beginPath()
                 .moveTo(x - unitSize * 0.75, y - unitSize * 0.75)
                 .lineTo(x + unitSize * 0.75, y + unitSize * 0.75)

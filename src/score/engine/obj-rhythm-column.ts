@@ -1,7 +1,7 @@
 import { Note } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId, colorKey } from "../pub";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
 import { ObjMeasure } from "./obj-measure";
@@ -325,7 +325,7 @@ export class ObjRhythmColumn extends MusicObject {
         }
     }
 
-    layout(ctx: RenderContext, accState: AccidentalState) {
+    layout(view: View, accState: AccidentalState) {
         if (!this.needLayout) {
             return;
         }
@@ -340,7 +340,7 @@ export class ObjRhythmColumn extends MusicObject {
 
         // Layout voice symbols
         this.voiceSymbol.forEach(symbol => {
-            symbol.layout(ctx, accState);
+            symbol.layout(view, accState);
 
             let r = symbol.getRect();
 
@@ -350,11 +350,11 @@ export class ObjRhythmColumn extends MusicObject {
 
         if (this.arpeggioDir !== undefined) {
             this.arpeggios = row.getNotationLines().map(line => new ObjArpeggio(this, line, this.getArpeggioDir()));
-            this.arpeggios.forEach(a => a.layout(ctx));
+            this.arpeggios.forEach(a => a.layout(view));
             const arpeggioWidth = this.arpeggios
                 .map(a => a.getRect().width)
                 .reduce((accState, cur) => Math.max(accState, cur))
-                + ctx.unitSize; // Add space
+                + view.unitSize; // Add space
             this.arpeggios.forEach(a => {
                 a.setAnchor(-leftw - arpeggioWidth / 2, a.line.getRect().anchorY);
                 a.line.addObject(a);
@@ -369,7 +369,7 @@ export class ObjRhythmColumn extends MusicObject {
         // Calculate min column width
         const noteSizes = this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize);
         const maxNoteSize = Math.min(8, Math.max(1, ...noteSizes));
-        const MinColumnWidth = Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * ctx.unitSize * 0.75;
+        const MinColumnWidth = Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * view.unitSize * 0.75;
 
         leftw = Math.max(leftw, MinColumnWidth / 2);
         rightw = Math.max(rightw, MinColumnWidth / 2);
@@ -420,11 +420,11 @@ export class ObjRhythmColumn extends MusicObject {
         });
     }
 
-    layoutReserveSpace(ctx: RenderContext) {
+    layoutReserveSpace(view: View) {
         // Some layout objects need to reserve space so they do not overlap with neighbors.
         const columns = this.measure.getColumns();
 
-        const extraSpace = ctx.unitSize;
+        const extraSpace = view.unitSize;
 
         this.getAnchoredLayoutObjects().forEach(obj => {
             if (obj.layoutGroup.reserveSpace) {
@@ -484,8 +484,8 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        ctx.color(colorKey("staff.frame"));
+    draw(view: View) {
+        view.color(colorKey("staff.frame"));
 
         // Draw ledger lines
         this.row.getStaves().forEach(staff => {
@@ -493,18 +493,18 @@ export class ObjRhythmColumn extends MusicObject {
             let maxDiatonicId = this.staffMaxDiatonicId.get(staff);
 
             if (minDiatonicId !== undefined) {
-                ctx.drawLedgerLines(staff, minDiatonicId, this.getRect().anchorX);
+                view.drawLedgerLines(staff, minDiatonicId, this.getRect().anchorX);
             }
 
             if (maxDiatonicId !== undefined) {
-                ctx.drawLedgerLines(staff, maxDiatonicId, this.getRect().anchorX);
+                view.drawLedgerLines(staff, maxDiatonicId, this.getRect().anchorX);
             }
         });
 
         // Draw symbols
-        this.voiceSymbol.forEach(symbol => symbol.draw(ctx));
+        this.voiceSymbol.forEach(symbol => symbol.draw(view));
 
         // Draw arpeggios
-        this.arpeggios.forEach(arpeggio => arpeggio.draw(ctx));
+        this.arpeggios.forEach(arpeggio => arpeggio.draw(view));
     }
 }

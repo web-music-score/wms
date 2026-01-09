@@ -1,7 +1,7 @@
 import { Note, getTempoString, KeySignature } from "web-music-score/theory";
 import { Clef, colorKey, MStaffSignature, MTabSignature } from "../pub";
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjImage } from "./obj-image";
 import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
@@ -34,15 +34,15 @@ export class ObjStaffSignature extends MusicObject {
         return this.mi;
     }
 
-    updateClefImage(ctx: RenderContext, showClef: boolean) {
+    updateClefImage(view: View, showClef: boolean) {
         if (showClef) {
 
-            let color = ctx.getPaint().getColor(colorKey("staff.signature.clef"));
+            let color = view.getPaint().getColor(colorKey("staff.signature.clef"));
 
             if (["black", "#000", "#000000"].includes(color))
                 color = "";
 
-            let img = ctx.getImageAsset(this.staff.clefImageAsset, color);
+            let img = view.getImageAsset(this.staff.clefImageAsset, color);
             this.clefImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
 
             this.eightBelowClef = this.clefImage && this.staff.isOctaveDown
@@ -218,8 +218,8 @@ export class ObjStaffSignature extends MusicObject {
         return [this];
     }
 
-    layout(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layout(view: View) {
+        let { unitSize } = view;
         let { staff } = this;
 
         let paddingX = unitSize;
@@ -230,14 +230,14 @@ export class ObjStaffSignature extends MusicObject {
 
         if (this.clefImage) {
             x += paddingX;
-            this.clefImage.layout(ctx);
+            this.clefImage.layout(view);
             this.clefImage.setAnchor(x, staff.getDiatonicIdY(staff.clefLineDiatonicId));
             this.rect.expandInPlace(this.clefImage.getRect());
             x = this.rect.right;
 
             if (this.eightBelowClef) {
                 let r = this.clefImage.getRect();
-                this.eightBelowClef.layout(ctx);
+                this.eightBelowClef.layout(view);
                 this.eightBelowClef.setCenterX(r.centerX);
                 this.eightBelowClef.setTop(Math.max(r.anchorY + r.height * 0.3, staff.getBottomLineY()));
                 this.rect.expandInPlace(this.eightBelowClef.getRect());
@@ -245,7 +245,7 @@ export class ObjStaffSignature extends MusicObject {
         }
 
         if (this.measureNumber) {
-            this.measureNumber.layout(ctx);
+            this.measureNumber.layout(view);
             this.measureNumber.setLeft(0);
             this.measureNumber.setBottom(Math.min(staff.getTopLineY(), this.clefImage ? this.clefImage.getRect().top : staff.getTopLineY()));
             this.rect.expandInPlace(this.measureNumber.getRect());
@@ -256,7 +256,7 @@ export class ObjStaffSignature extends MusicObject {
             x += paddingX;
 
             this.ksNeutralizeAccidentals.forEach(objAcc => {
-                objAcc.layout(ctx);
+                objAcc.layout(view);
                 objAcc.setLeft(x);
                 objAcc.setAnchorY(staff.getDiatonicIdY(objAcc.diatonicId));
                 this.rect.expandInPlace(objAcc.getRect());
@@ -268,7 +268,7 @@ export class ObjStaffSignature extends MusicObject {
             x += paddingX;
 
             this.ksNewAccidentals.forEach(objAcc => {
-                objAcc.layout(ctx);
+                objAcc.layout(view);
                 objAcc.setLeft(x);
                 objAcc.setAnchorY(staff.getDiatonicIdY(objAcc.diatonicId));
                 this.rect.expandInPlace(objAcc.getRect());
@@ -278,8 +278,8 @@ export class ObjStaffSignature extends MusicObject {
 
         let right = x;
 
-        this.beatCountText?.layout(ctx);
-        this.beatSizeText?.layout(ctx);
+        this.beatCountText?.layout(view);
+        this.beatSizeText?.layout(view);
 
         let tsWidth = Math.max(this.beatCountText?.getRect().width ?? 0, this.beatSizeText?.getRect().width ?? 0);
 
@@ -304,7 +304,7 @@ export class ObjStaffSignature extends MusicObject {
         x = right;
 
         if (this.tempoText) {
-            this.tempoText.layout(ctx);
+            this.tempoText.layout(view);
             this.tempoText.setCenterX(x);
             this.tempoText.setBottom(staff.getTopLineY());
 
@@ -336,26 +336,26 @@ export class ObjStaffSignature extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         // Draw Clef
-        this.clefImage?.draw(ctx);
+        this.clefImage?.draw(view);
 
         // DRaw 8 below clef
-        this.eightBelowClef?.draw(ctx);
+        this.eightBelowClef?.draw(view);
 
         // Draw measure number
-        this.measureNumber?.draw(ctx);
+        this.measureNumber?.draw(view);
 
         // Draw key signature
-        this.ksNeutralizeAccidentals.forEach(acc => acc.draw(ctx));
-        this.ksNewAccidentals.forEach(acc => acc.draw(ctx));
+        this.ksNeutralizeAccidentals.forEach(acc => acc.draw(view));
+        this.ksNewAccidentals.forEach(acc => acc.draw(view));
 
         // Draw time signature
-        this.beatCountText?.draw(ctx);
-        this.beatSizeText?.draw(ctx);
+        this.beatCountText?.draw(view);
+        this.beatSizeText?.draw(view);
 
         // Draw tempo
-        this.tempoText?.draw(ctx);
+        this.tempoText?.draw(view);
     }
 }
 
@@ -454,8 +454,8 @@ export class ObjTabSignature extends MusicObject {
         return [this];
     }
 
-    layout(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layout(view: View) {
+        let { unitSize } = view;
         let { tab } = this;
 
         let paddingX = unitSize;
@@ -466,15 +466,15 @@ export class ObjTabSignature extends MusicObject {
         this.rect = new AnchoredRect();
 
         if (this.measureNumber) {
-            this.measureNumber.layout(ctx);
+            this.measureNumber.layout(view);
             this.measureNumber.setLeft(0);
             this.measureNumber.setBottom(topLineY);
             this.rect.expandInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
         }
 
-        this.beatCountText?.layout(ctx);
-        this.beatSizeText?.layout(ctx);
+        this.beatCountText?.layout(view);
+        this.beatSizeText?.layout(view);
 
         let tsWidth = Math.max(this.beatCountText?.getRect().width ?? 0, this.beatSizeText?.getRect().width ?? 0);
 
@@ -495,7 +495,7 @@ export class ObjTabSignature extends MusicObject {
         }
 
         if (this.tempoText) {
-            this.tempoText.layout(ctx);
+            this.tempoText.layout(view);
             this.tempoText.setLeft(x + unitSize * 2);
             this.tempoText.setBottom(topLineY);
             this.rect.expandInPlace(this.tempoText.getRect());
@@ -512,15 +512,15 @@ export class ObjTabSignature extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         // Draw measure number
-        this.measureNumber?.draw(ctx);
+        this.measureNumber?.draw(view);
 
         // Draw time signature
-        this.beatCountText?.draw(ctx);
-        this.beatSizeText?.draw(ctx);
+        this.beatCountText?.draw(view);
+        this.beatSizeText?.draw(view);
 
         // Draw tempo
-        this.tempoText?.draw(ctx);
+        this.tempoText?.draw(view);
     }
 }

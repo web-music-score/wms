@@ -3,7 +3,7 @@ import { ObjMeasure } from "./obj-measure";
 import { getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
@@ -181,13 +181,13 @@ export class ObjScoreRow extends MusicObject {
         return undefined;
     }
 
-    resetLayoutGroups(ctx: RenderContext) {
+    resetLayoutGroups(view: View) {
         // Clear resolved position and layout objects
-        this.notationLines.forEach(line => line.resetLayoutGroups(ctx));
+        this.notationLines.forEach(line => line.resetLayoutGroups(view));
     }
 
-    layoutLayoutGroups(ctx: RenderContext) {
-        this.notationLines.forEach(line => line.layoutLayoutGroups(ctx));
+    layoutLayoutGroups(view: View) {
+        this.notationLines.forEach(line => line.layoutLayoutGroups(view));
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -304,7 +304,7 @@ export class ObjScoreRow extends MusicObject {
         }
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         if (!this.needLayout) {
             return;
         }
@@ -313,16 +313,16 @@ export class ObjScoreRow extends MusicObject {
 
         this.notationLines.forEach(line => {
             line.removeObjects();
-            line.layoutHeight(ctx);
+            line.layoutHeight(view);
         });
 
         this.rowGroups.forEach(grp => {
-            grp.layout(ctx);
+            grp.layout(view);
             this.regions.addRowInstrWidth(grp.getRect().width);
         });
 
         // Layout measures
-        this.measures.forEach(m => m.layout(ctx));
+        this.measures.forEach(m => m.layout(view));
 
         let packedWidth = this.measures
             .map(m => (m.getMinWidth() + m.getPostMeasureBreakWidth()))
@@ -331,14 +331,14 @@ export class ObjScoreRow extends MusicObject {
         this.regions.addRowstaffWidth(packedWidth);
     }
 
-    layoutStretch(ctx: RenderContext) {
+    layoutStretch(view: View) {
         if (!this.needLayout) {
             return;
         }
 
         this.rect = new AnchoredRect(this.regions.left, this.regions.right, 0, 0);
 
-        this.notationLines.forEach(line => line.layoutWidth(ctx));
+        this.notationLines.forEach(line => line.layoutWidth(view));
 
         this.rowGroups.forEach(grp => grp.setRight(this.regions.instrRight));
 
@@ -356,7 +356,7 @@ export class ObjScoreRow extends MusicObject {
 
         this.measures.forEach(m => {
             let newMeasureWidth = m.getTotalSolidWidth() + m.getMinColumnsWidth() * columnsAreaScale;
-            m.layoutWidth(ctx, newMeasureWidth);
+            m.layoutWidth(view, newMeasureWidth);
             let r = m.getRect();
             m.setLeft(x);
             m.setAnchorY(0);
@@ -365,8 +365,8 @@ export class ObjScoreRow extends MusicObject {
         });
 
         this.measures.forEach(m => {
-            m.layoutConnectives(ctx);
-            m.layoutBeams(ctx);
+            m.layoutConnectives(view);
+            m.layoutBeams(view);
         });
     }
 
@@ -397,8 +397,8 @@ export class ObjScoreRow extends MusicObject {
         this.measures.forEach(m => m.alignStemsToBeams());
     }
 
-    layoutSetNotationLines(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layoutSetNotationLines(view: View) {
+        let { unitSize } = view;
 
         for (let i = 1; i < this.notationLines.length; i++) {
             let prev = this.notationLines[i - 1];
@@ -452,32 +452,32 @@ export class ObjScoreRow extends MusicObject {
         return this.getFirstMeasure()?.getStaffLineLeft();
     }
 
-    draw(ctx: RenderContext) {
-        ctx.drawDebugRect(this.getRect());
+    draw(view: View) {
+        view.drawDebugRect(this.getRect());
 
 
         // Set clip rect for this row
         const { left, top, width, height } = this.getRect();
-        const p = ctx.lineWidthPx;
-        ctx.save();
-        ctx.rect(left - p, top, width + 2 * p, height);
-        ctx.clip();
+        const p = view.lineWidthPx;
+        view.save();
+        view.rect(left - p, top, width + 2 * p, height);
+        view.clip();
 
         // Draw measures
-        this.measures.forEach(m => m.draw(ctx));
+        this.measures.forEach(m => m.draw(view));
 
         // Draw notation lines
-        this.notationLines.forEach(m => m.draw(ctx));
+        this.notationLines.forEach(m => m.draw(view));
 
         // Draw left vline
         const staffLeft = this.getStaffLineLeft();
         if (staffLeft !== undefined && this.notationLines.length > 1) {
-            this.notationLines.forEach(line => line.drawVerticalLine(ctx, staffLeft, ctx.lineWidthPx, true));
+            this.notationLines.forEach(line => line.drawVerticalLine(view, staffLeft, view.lineWidthPx, true));
         }
 
         // Draw row groups
-        this.rowGroups.forEach(grp => grp.draw(ctx));
+        this.rowGroups.forEach(grp => grp.draw(view));
 
-        ctx.restore();
+        view.restore();
     }
 }

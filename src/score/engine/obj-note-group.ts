@@ -1,7 +1,7 @@
 import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
@@ -484,8 +484,8 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
-    getStemHeight(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    getStemHeight(view: View) {
+        let { unitSize } = view;
         let { flagCount, hasStem } = this.rhythmProps;
 
         if (hasStem) {
@@ -574,10 +574,10 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
-    layout(ctx: RenderContext, accState: AccidentalState) {
+    layout(view: View, accState: AccidentalState) {
         this.requestRectUpdate();
 
-        let { unitSize } = ctx;
+        let { unitSize } = view;
         let { row, stemDir } = this;
         let { dotCount, flagCount, hasStem } = this.rhythmProps;
 
@@ -620,7 +620,7 @@ export class ObjNoteGroup extends MusicObject {
                 if (accState.needAccidental(note)) {
                     let acc = obj.accidentals[noteIndex] = new ObjAccidental(this, note.diatonicId, note.accidental, this.color);
                     if (acc) {
-                        acc.layout(ctx);
+                        acc.layout(view);
                         acc.setAnchor(
                             -noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw,
                             noteY);
@@ -661,7 +661,7 @@ export class ObjNoteGroup extends MusicObject {
             let bottomNoteY = obj.noteHeadRects[0].anchorY;
             let topNoteY = obj.noteHeadRects[obj.noteHeadRects.length - 1].anchorY;
             let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
-            let stemHeight = this.getStemHeight(ctx);
+            let stemHeight = this.getStemHeight(view);
             let stemTipY = stemDir === Stem.Up ? topNoteY - stemHeight : bottomNoteY + stemHeight;
             let stemBaseY = stemDir === Stem.Up ? bottomNoteY : topNoteY;
 
@@ -709,7 +709,7 @@ export class ObjNoteGroup extends MusicObject {
                 if (Guard.isIntegerBetween(stringNumber, 1, 6)) {
                     let fretId = note.chromaticId - tab.getTuningStrings()[stringNumber - 1].chromaticId;
                     let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor }, 0.5, 0.5);
-                    fretNumber.layout(ctx);
+                    fretNumber.layout(view);
 
                     fretNumber.setAnchor(this.col.getRect().anchorX, tab.getStringY(stringNumber - 1));
 
@@ -757,79 +757,79 @@ export class ObjNoteGroup extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(ctx: RenderContext) {
-        ctx.drawDebugRect(this.getRect());
+    draw(view: View) {
+        view.drawDebugRect(this.getRect());
 
         let { stemDir } = this;
         let { isSolidNoteHead } = this.rhythmProps;
 
         this.staffObjects.forEach(obj => {
             // Draw accidentals
-            obj.accidentals.forEach(d => d.draw(ctx));
+            obj.accidentals.forEach(d => d.draw(view));
 
-            ctx.color(this.color);
-            ctx.lineWidth(1);
+            view.color(this.color);
+            view.lineWidth(1);
 
             // Draw note heads
             obj.noteHeadRects.forEach(r => {
                 if (this.diamond) {
                     if (isSolidNoteHead) {
-                        ctx.beginPath();
-                        ctx.moveTo(r.anchorX, r.top);
-                        ctx.lineTo(r.right, r.anchorY);
-                        ctx.lineTo(r.anchorX, r.bottom);
-                        ctx.lineTo(r.left, r.anchorY);
-                        ctx.lineTo(r.anchorX, r.top);
-                        ctx.fill();
+                        view.beginPath();
+                        view.moveTo(r.anchorX, r.top);
+                        view.lineTo(r.right, r.anchorY);
+                        view.lineTo(r.anchorX, r.bottom);
+                        view.lineTo(r.left, r.anchorY);
+                        view.lineTo(r.anchorX, r.top);
+                        view.fill();
                     }
                     else {
-                        ctx.beginPath();
-                        ctx.lineWidth(2.5);
-                        ctx.moveTo(r.anchorX, r.top);
-                        ctx.lineTo(r.right, r.anchorY);
-                        ctx.moveTo(r.left, r.anchorY);
-                        ctx.lineTo(r.anchorX, r.bottom);
-                        ctx.stroke();
+                        view.beginPath();
+                        view.lineWidth(2.5);
+                        view.moveTo(r.anchorX, r.top);
+                        view.lineTo(r.right, r.anchorY);
+                        view.moveTo(r.left, r.anchorY);
+                        view.lineTo(r.anchorX, r.bottom);
+                        view.stroke();
 
-                        ctx.beginPath();
-                        ctx.lineWidth(1);
-                        ctx.moveTo(r.right, r.anchorY);
-                        ctx.lineTo(r.anchorX, r.bottom);
-                        ctx.moveTo(r.anchorX, r.top);
-                        ctx.lineTo(r.left, r.anchorY);
-                        ctx.stroke();
+                        view.beginPath();
+                        view.lineWidth(1);
+                        view.moveTo(r.right, r.anchorY);
+                        view.lineTo(r.anchorX, r.bottom);
+                        view.moveTo(r.anchorX, r.top);
+                        view.lineTo(r.left, r.anchorY);
+                        view.stroke();
                     }
                 }
                 else {
-                    ctx.beginPath();
-                    ctx.ellipse(r.anchorX, r.anchorY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
+                    view.beginPath();
+                    view.ellipse(r.anchorX, r.anchorY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
 
                     if (isSolidNoteHead) {
-                        ctx.fill();
+                        view.fill();
                     }
                     else {
-                        ctx.stroke();
+                        view.stroke();
                     }
                 }
             });
 
             // Draw dots
-            obj.dotRects.forEach(r => ctx.fillCircle(r.anchorX, r.anchorY, r.width / 2));
+            obj.dotRects.forEach(r => view.fillCircle(r.anchorX, r.anchorY, r.width / 2));
 
             // Draw stem
             if (obj.stemTip && obj.stemBase) {
-                ctx.beginPath();
-                ctx.moveTo(obj.stemBase.anchorX, obj.stemBase.anchorY);
-                ctx.lineTo(obj.stemTip.anchorX, obj.stemTip.anchorY);
-                ctx.stroke();
+                view.beginPath();
+                view.moveTo(obj.stemBase.anchorX, obj.stemBase.anchorY);
+                view.lineTo(obj.stemTip.anchorX, obj.stemTip.anchorY);
+                view.stroke();
             }
 
             // Draw flags
-            obj.flagRects.forEach(rect => ctx.drawFlag(rect, stemDir === Stem.Up ? "up" : "down"));
+            obj.flagRects.forEach(rect => view.drawFlag(rect, stemDir === Stem.Up ? "up" : "down"));
         });
 
         // Draw tab fret numbers
-        this.tabObjects.forEach(obj => obj.fretNumbers.forEach(fn => fn.draw(ctx)));
+        this.tabObjects.forEach(obj => obj.fretNumbers.forEach(fn => fn.draw(view)));
     }
 
     getDotVerticalDisplacement(staff: ObjStaff, diatonicId: number, stemDir: Stem) {

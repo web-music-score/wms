@@ -1,5 +1,5 @@
 import { MText } from "../pub";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
 
@@ -76,17 +76,17 @@ export class ObjText extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         let { scale, anchorX, anchorY, bold, italic } = this;
 
-        let fontSize = ctx.fontSizePx * scale;
+        let fontSize = view.fontSizePx * scale;
 
         this.font = (italic ? "italic " : "") + (bold ? "bold " : "") + fontSize + "px Times New Roman";
 
-        this.lineWidths = this.textLines.map(text => ctx.getTextWidth(text, this.font));
+        this.lineWidths = this.textLines.map(text => view.getTextWidth(text, this.font));
         this.lineHeight = fontSize;
 
-        let p = this.padding * ctx.unitSize;
+        let p = this.padding * view.unitSize;
 
         let w = p + Math.max(...this.lineWidths) + p;
         let h = p + this.lineHeight * this.textLines.length + p;
@@ -102,48 +102,48 @@ export class ObjText extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
-        ctx.drawDebugRect(this.rect);
+    draw(view: View) {
+        view.drawDebugRect(this.rect);
 
-        ctx.lineWidth(1).font(this.font);
+        view.lineWidth(1).font(this.font);
 
         let { rect, padding, lineHeight, lineWidths, anchorX, anchorY, italic } = this;
 
         if (this.bgcolor !== undefined) {
-            ctx.save();
-            ctx.fillColor(this.bgcolor ?? "black");
-            ctx.beginPath();
-            ctx.fillRect(rect.left, rect.top, rect.width, rect.height);
-            ctx.fill();
-            ctx.restore();
+            view.save();
+            view.fillColor(this.bgcolor ?? "black");
+            view.beginPath();
+            view.fillRect(rect.left, rect.top, rect.width, rect.height);
+            view.fill();
+            view.restore();
         }
 
         let lineCount = this.textLines.length;
         let textHeight = lineCount * lineHeight;
         let fixY = -lineHeight * (italic ? 0.25 : 0.2);
-        let p = padding * ctx.unitSize;
+        let p = padding * view.unitSize;
 
         let aX = (rect.left + p) * (1 - anchorX) + (rect.right - p) * anchorX;
         let aY = (rect.top + p) * (1 - anchorY) + (rect.bottom - p) * anchorY;
 
-        ctx.color(this.color);
+        view.color(this.color);
 
         this.textLines.forEach((textLine, i) => {
             let x = aX - lineWidths[i] * anchorX;
             let y = aY - textHeight * anchorY + lineHeight * (i + 1) + fixY;
-            ctx.fillText(textLine, x, y);
+            view.fillText(textLine, x, y);
         });
 
         switch (this.boxed) {
             case "square":
             case "rectangle":
-                ctx.strokeRect(rect.left, rect.top, rect.width, rect.height);
+                view.strokeRect(rect.left, rect.top, rect.width, rect.height);
                 break;
             case "circle":
             case "ellipse":
-                ctx.beginPath();
-                ctx.ellipse(rect.centerX, rect.centerY, rect.width / 2, rect.height / 2, 0, 0, 2 * Math.PI);
-                ctx.stroke();
+                view.beginPath();
+                view.ellipse(rect.centerX, rect.centerY, rect.width / 2, rect.height / 2, 0, 0, 2 * Math.PI);
+                view.stroke();
                 break;
         }
     }

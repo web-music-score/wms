@@ -1,7 +1,7 @@
 import { AnchoredRect, Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, Tuplet, TupletRatio, NoteLengthProps } from "web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { Stem, MBeamGroup, MusicInterface, MStaffBeamGroup, TupletOptions } from "../pub";
@@ -320,7 +320,7 @@ export class ObjBeamGroup extends MusicObject {
         return this.symbols[0].color;
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         this.requestRectUpdate();
         this.staffObjects.length = 0;
 
@@ -330,7 +330,7 @@ export class ObjBeamGroup extends MusicObject {
             return;
         }
 
-        let { unitSize } = ctx;
+        let { unitSize } = view;
         let { stemDir, type } = this;
 
         let symbolsBeamCoords = symbols.map(s => s.getBeamCoords());
@@ -426,7 +426,7 @@ export class ObjBeamGroup extends MusicObject {
             else if (type === BeamGroupType.RegularBeam || type === BeamGroupType.TupletBeam) {
                 raiseBeamY *= 0.5;
 
-                let beamThickness = ctx.lineWidthPx * DocumentSettings.BeamThickness;
+                let beamThickness = view.lineWidthPx * DocumentSettings.BeamThickness;
 
                 const beamHeight = (i: number) => {
                     let sym = symbols[i];
@@ -464,7 +464,7 @@ export class ObjBeamGroup extends MusicObject {
 
             if (this.isTuplet()) {
                 obj.tupletNumber = new ObjText(this, this.getTupletRatioText(), 0.5, 0.5);
-                obj.tupletNumber.layout(ctx);
+                obj.tupletNumber.layout(view);
                 obj.tupletNumber.offset((leftX + rightX) / 2, (leftY + rightY) / 2 + obj.tupletNumberOffsetY);
             }
 
@@ -516,12 +516,12 @@ export class ObjBeamGroup extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    draw(view: View) {
+        let { unitSize } = view;
         let { stemDir, color, type } = this;
 
         if (type === BeamGroupType.TupletGroup) {
-            ctx.color(color).lineWidth(1);
+            view.color(color).lineWidth(1);
 
             let tipHeight = (stemDir === Stem.Up ? 1 : -1) * unitSize;
             this.staffObjects.forEach(obj => {
@@ -535,21 +535,21 @@ export class ObjBeamGroup extends MusicObject {
                     let rc = Utils.Math.interpolateCoord(lx, ly, rx, ry, 0.5 + tf / 2);
 
                     // Draw lines from left tot tuplet number and from tuplet number to right.
-                    ctx.strokeLine(lx, ly, lc.x, lc.y);
-                    ctx.strokeLine(rc.x, rc.y, rx, ry);
+                    view.strokeLine(lx, ly, lc.x, lc.y);
+                    view.strokeLine(rc.x, rc.y, rx, ry);
                 }
                 else {
                     // Draw line from left to right.
-                    ctx.strokeLine(lx, ly, rx, ry);
+                    view.strokeLine(lx, ly, rx, ry);
                 }
 
                 // Draw tip
-                ctx.strokeLine(lx, ly, lx, ly + tipHeight);
-                ctx.strokeLine(rx, ry, rx, ry + tipHeight);
+                view.strokeLine(lx, ly, lx, ly + tipHeight);
+                view.strokeLine(rx, ry, rx, ry + tipHeight);
             });
         }
         else if (type === BeamGroupType.RegularBeam || type === BeamGroupType.TupletBeam) {
-            ctx.color(color).lineWidth(DocumentSettings.BeamThickness);
+            view.color(color).lineWidth(DocumentSettings.BeamThickness);
 
             this.staffObjects.forEach(obj => {
                 let noteGroupPoints = obj.points.filter(p => p.symbol instanceof ObjNoteGroup);
@@ -570,13 +570,13 @@ export class ObjBeamGroup extends MusicObject {
 
                     for (let beamId = 0; beamId < Math.max(leftBeamCount, rightBeamCount); beamId++) {
                         if (beamId < leftBeamCount && beamId < rightBeamCount) {
-                            ctx.strokeLine(lx, ly, rx, ry);
+                            view.strokeLine(lx, ly, rx, ry);
                         }
                         else if (leftBeamCount > rightBeamCount) {
-                            ctx.strokePartialLine(lx, ly, rx, ry, 0, 0.25);
+                            view.strokePartialLine(lx, ly, rx, ry, 0, 0.25);
                         }
                         else if (rightBeamCount > leftBeamCount) {
-                            ctx.strokePartialLine(lx, ly, rx, ry, 0.75, 1);
+                            view.strokePartialLine(lx, ly, rx, ry, 0.75, 1);
                         }
 
                         ly += beamSeparation;
@@ -586,7 +586,7 @@ export class ObjBeamGroup extends MusicObject {
             });
         }
 
-        this.staffObjects.forEach(obj => obj.tupletNumber?.draw(ctx));
+        this.staffObjects.forEach(obj => obj.tupletNumber?.draw(view));
     }
 
     private setBeamCounts() {

@@ -1,5 +1,5 @@
 import { getTuningStrings, Note, validateTuningName } from "web-music-score/theory";
-import { ImageAsset, RenderContext } from "./render-context";
+import { ImageAsset, View } from "./view";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { Clef, colorKey, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
@@ -46,18 +46,18 @@ export abstract class ObjNotationLine extends MusicObject {
         return this.layoutGroups.getOrCreate(lauoutGroupId, () => new LayoutGroup(lauoutGroupId));
     }
 
-    resetLayoutGroups(ctx: RenderContext) {
+    resetLayoutGroups(view: View) {
         // Clear resolved position and layout objects
-        this.layoutGroups.forEach(layoutGroup => layoutGroup.layout(ctx));
+        this.layoutGroups.forEach(layoutGroup => layoutGroup.layout(view));
     }
 
-    layoutLayoutGroups(ctx: RenderContext) {
+    layoutLayoutGroups(view: View) {
         // Layout in correct order of LayoutGroupId values.
         for (const groupId of Utils.Enum.getEnumValues(LayoutGroupId)) {
             const layoutGroup = this.getLayoutGroup(groupId);
             if (layoutGroup) {
-                this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Above);
-                this.layoutLayoutGroup(ctx, layoutGroup, VerticalPos.Below);
+                this.layoutLayoutGroup(view, layoutGroup, VerticalPos.Above);
+                this.layoutLayoutGroup(view, layoutGroup, VerticalPos.Below);
             }
         }
     }
@@ -74,7 +74,7 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObj.setPositionResolved();
     }
 
-    private alignObjectsY(ctx: RenderContext, layoutObjects: LayoutObjectWrapper[], verticalPos: VerticalPos) {
+    private alignObjectsY(view: View, layoutObjects: LayoutObjectWrapper[], verticalPos: VerticalPos) {
         const layoutObjArr = layoutObjects.filter(obj => !obj.isPositionResolved() && obj.verticalPos === verticalPos);
 
         if (layoutObjArr.length === 0)
@@ -83,8 +83,8 @@ export abstract class ObjNotationLine extends MusicObject {
         const vdir = verticalPos === VerticalPos.Below ? 1 : -1;
 
         let yArr = layoutObjArr.map(layoutObj => {
-            return layoutObj.resolveClosestToStaffY(ctx) +
-                layoutObj.layoutGroup.getPadding(ctx) * vdir;
+            return layoutObj.resolveClosestToStaffY(view) +
+                layoutObj.layoutGroup.getPadding(view) * vdir;
         });
 
         const rowY = verticalPos === VerticalPos.Below
@@ -94,7 +94,7 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
     }
 
-    layoutLayoutGroup(ctx: RenderContext, layoutGroup: LayoutGroup, verticalPos: VerticalPos) {
+    layoutLayoutGroup(view: View, layoutGroup: LayoutGroup, verticalPos: VerticalPos) {
         // Get this row's objects
         let rowLayoutObjs = layoutGroup.getLayoutObjects(verticalPos).filter(layoutObj => !layoutObj.isPositionResolved());
 
@@ -103,7 +103,7 @@ export abstract class ObjNotationLine extends MusicObject {
             let { musicObj, anchor } = layoutObj;
 
             if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine || musicObj instanceof ObjTabRhythm) {
-                musicObj.layoutFitToMeasure(ctx);
+                musicObj.layoutFitToMeasure(view);
             }
             else {
                 musicObj.setAnchorX(anchor.getRect().anchorX);
@@ -112,7 +112,7 @@ export abstract class ObjNotationLine extends MusicObject {
 
         if (layoutGroup.rowAlign) {
             // Resolve row-aligned objects
-            this.alignObjectsY(ctx, rowLayoutObjs, verticalPos);
+            this.alignObjectsY(view, rowLayoutObjs, verticalPos);
         }
         else {
             // Resolve non-row-aligned objects
@@ -121,17 +121,17 @@ export abstract class ObjNotationLine extends MusicObject {
                 if (link && link.getHead() === layoutObj.musicObj) {
                     let objectParts = [link.getHead(), ...link.getTails()];
                     let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                    this.alignObjectsY(ctx, layoutObjs, verticalPos);
+                    this.alignObjectsY(view, layoutObjs, verticalPos);
                 }
                 else {
-                    this.alignObjectsY(ctx, [layoutObj], verticalPos);
+                    this.alignObjectsY(view, [layoutObj], verticalPos);
                 }
             });
         }
     }
 
-    drawVerticalLine(ctx: RenderContext, left: number, width: number, isSystemBarLine = false) {
-        ctx.color(this.getConfig().type === "tab" ? colorKey("tab.frame") : colorKey("staff.frame"));
+    drawVerticalLine(view: View, left: number, width: number, isSystemBarLine = false) {
+        view.color(this.getConfig().type === "tab" ? colorKey("tab.frame") : colorKey("staff.frame"));
 
         const i = this.row.getNotationLines().indexOf(this);
         const nextLine = i >= 0 ? this.row.getNotationLines()[i + 1] : undefined;
@@ -145,7 +145,7 @@ export abstract class ObjNotationLine extends MusicObject {
             ? nextLine.getTopLineY()
             : this.getBottomLineY();
 
-        ctx.fillRect(left, top, width, bottom - top);
+        view.fillRect(left, top, width, bottom - top);
     }
 
     abstract getConfig(): StaffConfig | TabConfig;
@@ -159,10 +159,10 @@ export abstract class ObjNotationLine extends MusicObject {
     abstract containsVoiceId(voiceId: number): boolean;
     abstract containsDiatonicId(diatonicId: number): boolean;
 
-    abstract layoutWidth(ctx: RenderContext): void;
-    abstract layoutHeight(ctx: RenderContext): void;
+    abstract layoutWidth(view: View): void;
+    abstract layoutHeight(view: View): void;
     abstract offset(dx: number, dy: number): void;
-    abstract draw(ctx: RenderContext): void;
+    abstract draw(view: View): void;
 }
 
 export class ObjStaff extends ObjNotationLine {
@@ -337,8 +337,8 @@ export class ObjStaff extends ObjNotationLine {
         return this.getRect().contains(x, y) ? [this] : [];
     }
 
-    layoutHeight(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layoutHeight(view: View) {
+        let { unitSize } = view;
 
         let h = unitSize * DocumentSettings.StaffHeight;
 
@@ -348,7 +348,7 @@ export class ObjStaff extends ObjNotationLine {
         this.rect = new AnchoredRect(0, 0, this.topLineY, this.bottomLineY);
     }
 
-    layoutWidth(ctx: RenderContext) {
+    layoutWidth(view: View) {
         this.rect.left = this.row.getRect().left;
         this.rect.right = this.row.getRect().right;
     }
@@ -367,7 +367,7 @@ export class ObjStaff extends ObjNotationLine {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) { }
+    draw(view: View) { }
 }
 
 export class ObjTab extends ObjNotationLine {
@@ -471,8 +471,8 @@ export class ObjTab extends ObjNotationLine {
         return this.getRect().contains(x, y) ? [this] : [];
     }
 
-    layoutHeight(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layoutHeight(view: View) {
+        let { unitSize } = view;
 
         let h = unitSize * DocumentSettings.TabHeight;
 
@@ -482,7 +482,7 @@ export class ObjTab extends ObjNotationLine {
         this.rect = new AnchoredRect(0, 0, this.top, this.bottom);
     }
 
-    layoutWidth(ctx: RenderContext) {
+    layoutWidth(view: View) {
         this.rect.left = this.row.getRect().left;
         this.rect.right = this.row.getRect().right;
     }
@@ -501,5 +501,5 @@ export class ObjTab extends ObjNotationLine {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) { }
+    draw(view: View) { }
 }

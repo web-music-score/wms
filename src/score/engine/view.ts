@@ -1,6 +1,6 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize } from "../pub";
+import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
@@ -10,7 +10,6 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 
 import G_clef_png from "./assets/G-clef.png";
 import F_clef_png from "./assets/F-clef.png";
-import { MRenderContext } from "score/pub/deprecated";
 
 export enum ImageAsset { G_Clef, F_Clef }
 
@@ -43,8 +42,8 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
     else return a.length === b.length && a.every((a2, i) => a2 === b[i]);
 }
 
-export class RenderContext {
-    static NoDocumentText = "Web Music Score: No Document!";
+export class View {
+    static NoDocumentText = "WmsView: No Document!";
 
     private readonly defaultStaffSizePx: number = 1;
     private readonly defaultStaffSpacePx: number = 1;
@@ -83,7 +82,7 @@ export class RenderContext {
 
     private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
 
-    constructor(private readonly mi: MRenderContext) {
+    constructor(private readonly mi: WmsView) {
         this.defaultFontSizePx = this.fontSizePx = Device.FontSize * Device.DevicePixelRatio;
         this.defaultStaffSpacePx = this.staffSpacePx = this.defaultFontSizePx * 0.3;
         this.defaultStaffSizePx = this.staffSizePx = this.defaultStaffSpacePx * 4;
@@ -94,7 +93,7 @@ export class RenderContext {
         this.onTouchEndFn = this.onTouchEnd.bind(this);
     }
 
-    getMusicInterface(): MRenderContext {
+    getMusicInterface(): WmsView {
         return this.mi;
     }
 
@@ -201,11 +200,11 @@ export class RenderContext {
         this._doc = doc;
 
         if (prevDoc) {
-            prevDoc.removeRenderContext(this);
+            prevDoc.removeView(this);
         }
 
         if (doc) {
-            doc.addRenderContext(this);
+            doc.addView(this);
         }
     }
 
@@ -468,7 +467,7 @@ export class RenderContext {
 
         ctx.save();
 
-        const text = RenderContext.NoDocumentText;
+        const text = View.NoDocumentText;
         const fontSize = 16;
         const fontFamily = "Arial";
 
@@ -505,7 +504,7 @@ export class RenderContext {
         ctx.fillRect(0, 0, width, height);
 
         // Draw text
-        ctx.fillStyle = "black";
+        ctx.fillStyle = "red";
         ctx.fillText(text, 0, 0);
 
         ctx.restore();
@@ -715,119 +714,119 @@ export class RenderContext {
         this.stroke();
     }
 
-    color(color: string | ColorKey): RenderContext {
+    color(color: string | ColorKey): View {
         if (this.ctx)
             this.ctx.strokeStyle = this.ctx.fillStyle = this.paint.getColor(color);
         return this;
     }
 
-    lineColor(color: string): RenderContext {
+    lineColor(color: string): View {
         if (this.ctx) this.ctx.strokeStyle = this.paint.getColor(color);
         return this;
     }
 
-    fillColor(color: string): RenderContext {
+    fillColor(color: string): View {
         if (this.ctx) this.ctx.fillStyle = this.paint.getColor(color);
         return this;
 
     }
 
-    lineWidth(lineWidth?: number): RenderContext {
+    lineWidth(lineWidth?: number): View {
         if (this.ctx) this.ctx.lineWidth = this.lineWidthPx * (lineWidth ?? 1)
         return this;
     }
 
-    font(font: string): RenderContext {
+    font(font: string): View {
         if (this.ctx) this.ctx.font = font;
         return this;
     }
 
-    beginPath(): RenderContext {
+    beginPath(): View {
         if (this.ctx) this.ctx.beginPath();
         return this;
     }
 
-    stroke(): RenderContext {
+    stroke(): View {
         if (this.ctx) this.ctx.stroke();
         return this;
     }
 
-    fill(): RenderContext {
+    fill(): View {
         if (this.ctx) this.ctx.fill();
         return this;
     }
 
-    moveTo(x: number, y: number): RenderContext {
+    moveTo(x: number, y: number): View {
         if (this.ctx) this.ctx.moveTo(x, y);
         return this;
     }
 
-    lineTo(x: number, y: number): RenderContext {
+    lineTo(x: number, y: number): View {
         if (this.ctx) this.ctx.lineTo(x, y);
         return this;
     }
 
-    bezierCurveTo(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): RenderContext {
+    bezierCurveTo(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number): View {
         if (this.ctx) this.ctx.bezierCurveTo(x1, y1, x2, y2, x3, y3);
         return this;
     }
 
-    quadraticCurveTo(x1: number, y1: number, x2: number, y2: number): RenderContext {
+    quadraticCurveTo(x1: number, y1: number, x2: number, y2: number): View {
         if (this.ctx) this.ctx.quadraticCurveTo(x1, y1, x2, y2);
         return this;
     }
 
-    fillRect(x: number, y: number, w: number, h: number): RenderContext {
+    fillRect(x: number, y: number, w: number, h: number): View {
         if (this.ctx) this.ctx.fillRect(x, y, w, h);
         return this;
     }
 
-    setLineDash(pattern: number[]): RenderContext {
+    setLineDash(pattern: number[]): View {
         if (this.ctx) this.ctx.setLineDash(pattern);
         return this;
     }
 
-    drawImage(img: CanvasImageSource, x: number, y: number, w: number, h: number): RenderContext {
+    drawImage(img: CanvasImageSource, x: number, y: number, w: number, h: number): View {
         if (this.ctx) this.ctx.drawImage(img, x, y, w, h);
         return this;
     }
 
-    ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number): RenderContext {
+    ellipse(x: number, y: number, radiusX: number, radiusY: number, rotation: number, startAngle: number, endAngle: number): View {
         if (this.ctx) this.ctx.ellipse(x, y, radiusX, radiusY, rotation, startAngle, endAngle);
         return this;
     }
 
-    clip(): RenderContext {
+    clip(): View {
         if (this.ctx) this.ctx.clip();
         return this;
     }
 
-    save(): RenderContext {
+    save(): View {
         if (this.ctx) this.ctx.save();
         return this;
     }
 
-    restore(): RenderContext {
+    restore(): View {
         if (this.ctx) this.ctx.restore();
         return this;
     }
 
-    rect(x: number, y: number, w: number, h: number): RenderContext {
+    rect(x: number, y: number, w: number, h: number): View {
         if (this.ctx) this.ctx.rect(x, y, w, h);
         return this;
     }
 
-    scale(x: number, y: number): RenderContext {
+    scale(x: number, y: number): View {
         if (this.ctx) this.ctx.scale(x, y);
         return this;
     }
 
-    strokeRect(x: number, y: number, w: number, h: number): RenderContext {
+    strokeRect(x: number, y: number, w: number, h: number): View {
         if (this.ctx) this.ctx.strokeRect(x, y, w, h);
         return this;
     }
 
-    fillText(text: string, x: number, y: number): RenderContext {
+    fillText(text: string, x: number, y: number): View {
         if (this.ctx) this.ctx.fillText(text, x, y);
         return this;
     }
@@ -845,12 +844,12 @@ export class RenderContext {
         }
     }
 
-    arc(x: number, y: number, radius: number, startRadians: number, endRadians: number): RenderContext {
+    arc(x: number, y: number, radius: number, startRadians: number, endRadians: number): View {
         if (this.ctx) this.ctx.arc(x, y, radius, startRadians, endRadians);
         return this;
     }
 
-    fillCircle(x: number, y: number, radius: number): RenderContext {
+    fillCircle(x: number, y: number, radius: number): View {
         if (!this.ctx) return this;
         this.ctx.beginPath();
         this.ctx.arc(x, y, radius, 0, 2 * Math.PI);
@@ -858,7 +857,7 @@ export class RenderContext {
         return this;
     }
 
-    strokeLine(startX: number, startY: number, endX: number, endY: number): RenderContext {
+    strokeLine(startX: number, startY: number, endX: number, endY: number): View {
         if (!this.ctx) return this;
         this.ctx.beginPath();
         this.ctx.moveTo(startX, startY);
@@ -867,7 +866,7 @@ export class RenderContext {
         return this;
     }
 
-    strokePartialLine(startX: number, startY: number, endX: number, endY: number, startT: number, endT: number): RenderContext {
+    strokePartialLine(startX: number, startY: number, endX: number, endY: number, startT: number, endT: number): View {
         if (!this.ctx) return this;
         let x1 = startX + (endX - startX) * startT;
         let y1 = startY + (endY - startY) * startT;
@@ -880,7 +879,7 @@ export class RenderContext {
         return this;
     }
 
-    drawBracket(rect: AnchoredRect, bracket: "(" | ")" | "[" | "]" | "{" | "}" | "<" | ">"): RenderContext {
+    drawBracket(rect: AnchoredRect, bracket: "(" | ")" | "[" | "]" | "{" | "}" | "<" | ">"): View {
         if (!this.ctx) return this;
         let { left, right, width, top, bottom, height, anchorY } = rect;
         if ([")", "]", "}", ">"].includes(bracket)) {

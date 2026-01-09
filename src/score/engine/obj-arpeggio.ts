@@ -1,6 +1,6 @@
 import { Arpeggio, colorKey, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { AnchoredRect } from "@tspro/ts-utils-lib";
@@ -27,8 +27,8 @@ export class ObjArpeggio extends MusicObject {
         return this.rect.contains(x, y) ? [this] : [];
     }
 
-    layout(ctx: RenderContext) {
-        let { unitSize } = ctx;
+    layout(view: View) {
+        let { unitSize } = view;
 
         this.topArrowHeight = this.arpeggioDir === Arpeggio.Up ? unitSize : 0;
         this.bottomArrowHeight = this.arpeggioDir === Arpeggio.Down ? unitSize : 0;
@@ -49,38 +49,38 @@ export class ObjArpeggio extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(ctx: RenderContext) {
+    draw(view: View) {
         let { rect, topArrowHeight, bottomArrowHeight } = this;
 
-        ctx.drawDebugRect(this.rect);
+        view.drawDebugRect(this.rect);
 
         const color = colorKey(this.line instanceof ObjTab ? "tab.arpeggio" : "staff.arpeggio");
 
-        ctx.color(color);
-        ctx.lineWidth(2);
-        ctx.beginPath();
+        view.color(color);
+        view.lineWidth(2);
+        view.beginPath();
 
         for (let i = 0, y = rect.top + topArrowHeight; i < this.numCycles; i++, y += this.cycleHeight) {
-            ctx.moveTo(rect.anchorX, y);
-            ctx.quadraticCurveTo(rect.left, y + this.cycleHeight / 4, rect.anchorX, y + this.cycleHeight / 2);
-            ctx.quadraticCurveTo(rect.right, y + this.cycleHeight * 3 / 4, rect.anchorX, y + this.cycleHeight);
+            view.moveTo(rect.anchorX, y);
+            view.quadraticCurveTo(rect.left, y + this.cycleHeight / 4, rect.anchorX, y + this.cycleHeight / 2);
+            view.quadraticCurveTo(rect.right, y + this.cycleHeight * 3 / 4, rect.anchorX, y + this.cycleHeight);
         }
-        ctx.stroke();
+        view.stroke();
 
         if (topArrowHeight > 0) {
-            ctx.beginPath();
-            ctx.moveTo(rect.anchorX, rect.top);
-            ctx.lineTo(rect.right, rect.top + topArrowHeight);
-            ctx.lineTo(rect.left, rect.top + topArrowHeight);
-            ctx.fill();
+            view.beginPath();
+            view.moveTo(rect.anchorX, rect.top);
+            view.lineTo(rect.right, rect.top + topArrowHeight);
+            view.lineTo(rect.left, rect.top + topArrowHeight);
+            view.fill();
         }
 
         if (bottomArrowHeight > 0) {
-            ctx.beginPath();
-            ctx.moveTo(rect.anchorX, rect.bottom);
-            ctx.lineTo(rect.left, rect.bottom - bottomArrowHeight);
-            ctx.lineTo(rect.right, rect.bottom - bottomArrowHeight);
-            ctx.fill();
+            view.beginPath();
+            view.moveTo(rect.anchorX, rect.bottom);
+            view.lineTo(rect.left, rect.bottom - bottomArrowHeight);
+            view.lineTo(rect.right, rect.bottom - bottomArrowHeight);
+            view.fill();
         }
     }
 }

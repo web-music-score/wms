@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
@@ -99,12 +99,12 @@ export class LayoutObjectWrapper {
         return this.positionResolved;
     }
 
-    resolveClosestToStaffY(ctx: RenderContext): number {
+    resolveClosestToStaffY(view: View): number {
         let { musicObj, measure, verticalPos, line } = this;
 
         let lineTop = line.getTopLineY();
         let lineBottom = line.getBottomLineY();
-        let linePadding = ctx.unitSize * 2;
+        let linePadding = view.unitSize * 2;
 
         let y = verticalPos === VerticalPos.Below
             ? lineBottom + linePadding + musicObj.getRect().toph
@@ -130,7 +130,7 @@ export class LayoutObjectWrapper {
         return y;
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         this.line.addObject(this);
     }
 
@@ -173,14 +173,14 @@ export class LayoutGroup {
         this.layoutObject.remove(layoutObj.verticalPos, layoutObj);
     }
 
-    layout(ctx: RenderContext) {
+    layout(view: View) {
         for (const w of this.layoutObject.values()) {
             w.resetPositionResolved();
-            w.musicObj.layout(ctx);
+            w.musicObj.layout(view);
         }
     }
 
-    getPadding(ctx: RenderContext) {
-        return this.padding * ctx.unitSize;
+    getPadding(view: View) {
+        return this.padding * view.unitSize;
     }
 }

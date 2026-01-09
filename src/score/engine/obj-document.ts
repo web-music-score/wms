@@ -1,4 +1,4 @@
-import { RenderContext } from "./render-context";
+import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
@@ -16,7 +16,7 @@ import { isWmsControls } from "../custom-element/wms-controls";
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
 
-    private attachedRcSet = new ValueSet<RenderContext>();
+    private attachedRcSet = new ValueSet<View>();
 
     readonly regions = new ScoreRowRegions();
 
@@ -129,17 +129,17 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.push(connectiveProps);
     }
 
-    addRenderContext(rc?: RenderContext) {
-        if (!rc) return;
-        this.attachedRcSet.add(rc);
-        rc.setDocument(this);
+    addView(view?: View) {
+        if (!view) return;
+        this.attachedRcSet.add(view);
+        view.setDocument(this);
         this.requestFullLayout();
     }
 
-    removeRenderContext(rc?: RenderContext) {
-        if (!rc) return;
-        rc.setDocument(undefined);
-        this.attachedRcSet.delete(rc);
+    removeView(view?: View) {
+        if (!view) return;
+        view.setDocument(undefined);
+        this.attachedRcSet.delete(view);
     }
 
     setHeader(title?: string, composer?: string, arranger?: string) {
@@ -267,12 +267,12 @@ export class ObjDocument extends MusicObject {
         this.requestLayout();
     }
 
-    layout(rc: RenderContext) {
+    layout(view: View) {
         if (!this.needLayout) {
             return;
         }
 
-        let { unitSize } = rc;
+        let { unitSize } = view;
 
         // Recreate beams.
         this.forEachMeasure(m => m.createBeams());
@@ -288,29 +288,29 @@ export class ObjDocument extends MusicObject {
         this.allConnectiveProps.forEach(props => props.createConnectives());
 
         // Reset layout groups
-        this.rows.forEach(row => row.resetLayoutGroups(rc));
+        this.rows.forEach(row => row.resetLayoutGroups(view));
 
         this.regions.resetWidths();
         this.regions.addRowstaffWidth(DocumentSettings.MinStaffWidth * unitSize);
 
         // Layout rows
-        this.rows.forEach(row => row.layout(rc));
+        this.rows.forEach(row => row.layout(view));
 
         // Stretch row accordsing to region data
-        this.rows.forEach(row => row.layoutStretch(rc));
+        this.rows.forEach(row => row.layoutStretch(view));
 
         // Layout layout groups
-        this.rows.forEach(row => row.layoutLayoutGroups(rc));
+        this.rows.forEach(row => row.layoutLayoutGroups(view));
 
         // Position notation lines
-        this.rows.forEach(row => row.layoutSetNotationLines(rc));
+        this.rows.forEach(row => row.layoutSetNotationLines(view));
 
         // Set document rect and set row positions
         this.rect = new AnchoredRect();
 
         if (this.header) {
             // Layout header with
-            this.header.layout(rc);
+            this.header.layout(view);
             this.rect.expandInPlace(this.header.getRect());
         }
 
@@ -329,9 +329,9 @@ export class ObjDocument extends MusicObject {
 
     offset(dx: number, dy: number) { }
 
-    drawContent(rc: RenderContext) {
-        this.header?.draw(rc);
-        this.rows.forEach(row => row.draw(rc));
+    drawContent(view: View) {
+        this.header?.draw(view);
+        this.rows.forEach(row => row.draw(view));
     }
 
     pickStaffPosAt(x: number, y: number): { scoreRow: ObjScoreRow, diatonicId: number } | undefined {
