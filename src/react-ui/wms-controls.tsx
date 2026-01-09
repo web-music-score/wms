@@ -1,5 +1,4 @@
 import * as React from "react";
-import { warnDeprecated } from "shared-src";
 import { MDocument, WmsControls as JsControls } from "web-music-score/score";
 
 function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
@@ -137,31 +136,5 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
                 </div>
             );
         }
-    }
-}
-
-
-/**
- * Deprecated stuff.
- * Will be removed on major update 7.0.0.
- * 
- * Renamed classes:
- *  - PlaybackButtons => WmsControls
- */
-
-/**
- * @deprecated
- * @internal
- */
-export interface PlaybackButtonsProps extends WmsControlsProps { }
-
-/**
- * @deprecated - PlaybackButtons is deprecated.  Will be romoved in 7.0.0. Use WmsControls instead.
- * @internal
- */
-export class PlaybackButtons extends WmsControls {
-    constructor(props: PlaybackButtonsProps) {
-        super(props);
-        warnDeprecated("PlaybackButtons is deprecated.  Will be romoved in 7.0.0. Use WmsControls instead.");
     }
 }

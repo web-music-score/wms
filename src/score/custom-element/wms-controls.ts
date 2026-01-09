@@ -189,7 +189,7 @@ class WmsControls extends HTMLElement {
 /**
  * Safe registration (VERY IMPORTANT)
  */
-export function registerWmsPlaybackButtons() {
+export function registerWmsControls() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 

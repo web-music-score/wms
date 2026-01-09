@@ -1,5 +1,5 @@
 import { registerWmsView } from "./wms-view";
-import { registerWmsPlaybackButtons } from "./wms-controls";
+import { registerWmsControls } from "./wms-controls";
 
 registerWmsView();
-registerWmsPlaybackButtons();
+registerWmsControls();

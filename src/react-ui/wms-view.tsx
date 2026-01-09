@@ -1,5 +1,4 @@
 import * as React from "react";
-import { warnDeprecated } from "shared-src";
 import { WmsView as JsView, MDocument, Paint, ScoreEventListener } from "web-music-score/score";
 
 export interface WmsViewProps {
@@ -83,30 +82,5 @@ export class WmsView extends React.Component<WmsViewProps, {}> {
                 Your browser does not support the HTML canvas tag.
             </canvas>
         );
-    }
-}
-
-/**
- * Deprecated stuff.
- * Will be removed on major update 7.0.0.
- * 
- * Renamed classes:
- *  - MusicScoreView => WmsView
- */
-
-/**
- * @deprecated
- * @internal
- */
-export interface MusicScoreViewProps extends WmsViewProps { }
-
-/**
- * @deprecated - MusicScoreView is deprecated.  Will be romoved in 7.0.0. Use WmsView instead.
- * @internal
- */
-export class MusicScoreView extends WmsView {
-    constructor(props: MusicScoreViewProps) {
-        super(props);
-        warnDeprecated("MusicScoreView is deprecated.  Will be romoved in 7.0.0. Use WmsView instead.");
     }
 }
