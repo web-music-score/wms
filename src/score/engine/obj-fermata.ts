@@ -41,7 +41,7 @@ export class ObjFermata extends MusicObject {
         let width = unitSize * 4;
         let height = unitSize * 3;
 
-        this.rect = new AnchoredRect(-width / 2, width / 2, -height, 0);
+        this.rect = AnchoredRect.createCentered(0, 0, width, height);
     }
 
     offset(dx: number, dy: number) {

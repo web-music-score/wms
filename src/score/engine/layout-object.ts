@@ -104,7 +104,7 @@ export class LayoutObjectWrapper {
 
         let lineTop = line.getTopLineY();
         let lineBottom = line.getBottomLineY();
-        let linePadding = view.unitSize * 2;
+        let linePadding = view.unitSize;
 
         let y = verticalPos === VerticalPos.Below
             ? lineBottom + linePadding + musicObj.getRect().toph
