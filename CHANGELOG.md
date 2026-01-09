@@ -12,6 +12,9 @@
  - ReactUI.MusicScoreView (deprecated)  => ReactUI.WmsView
  - ReactUI.PlaybackButtons (deprecated) => ReactUI.WmsControls
 
+### Fixed
+- Fermata position.
+
 ## [6.0.1] - 2025-12-31
 ### Fixed
 - Set rest position in tuplets if rest does not have its own staffPos.
