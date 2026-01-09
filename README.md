@@ -9,28 +9,61 @@ npm install web-music-score
 ```
 
 ## Quick Example
-```ts
-import * as Score from "web-music-score/score";
 
+Here are simple snippets to give an overview about usage of this lib.
+
+### Create Document
+
+```ts
 const doc = new Score.DocumentBuilder()
-    .setScoreConfiguration("guitarTreble")
-    .addMeasure()
+    .setScoreConfiguration("treble")
     .setKeySignature("C Major")
     .setTimeSignature("3/4")
-    .addNote(0, "C4", "4n")
-    .addNote(0, "E4", "4n")
-    .addNote(0, "G4", "4n")
-    .endSong()
+    .addNote(0, ["C4", "E4", "G4"], "4n")
+    .addMeasure()
+    .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
     .getDocument();
+```
 
-new Score.WmsView().
-    setCanvas("scoreCanvasId").
-    setDocument(doc).
-    draw();
+### Render With JSX/TSX And React 
 
-new Score.WmsControls().
-    setPlayStopButton("playButtonId").
-    setDocument(doc);
+```ts
+import * as Score from "web-music-score/score";
+import * as ReactUI from "web-music-score/react-ui";
+
+function render() {
+    return <ReactUI.WmsView doc={doc} />;
+}
+```
+
+### Render With Custom HTML Element
+
+```html
+<script src="https://unpkg.com/web-music-score@6.1.0/dist/iife/index.js"></script>
+
+<wms-view id="view1"></wms-view>
+
+<script>
+    const { Score } = window.WebMusicScore;
+
+    doc.bindElement("view1");
+</script>
+```
+### Render With Plain JavaScript
+
+```html
+<script src="https://unpkg.com/web-music-score@6.0.1/dist/iife/index.js"></script>
+
+<canvas id="canvas1"></canvas><br />
+
+<script>
+    const { Score } = window.WebMusicScore;
+
+    new Score.WmsView()
+        .setCanvas("canvas1")
+        .setDocument(doc)
+        .draw();
+</script>
 ```
 
 ## Report a Bug
