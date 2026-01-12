@@ -1,14 +1,19 @@
 import { Utils } from "@tspro/ts-utils-lib";
 import { WmsControls as PlainControls, MDocument } from "../pub";
 
-function addClass(el: HTMLElement, className: string) {
-    className.trim().split(" ").filter(cls => cls.length > 0).forEach(cls => Utils.Dom.addClass(el, cls));
+function addClass(el: Element, className: string) {
+    Utils.Dom.addClass(el, ...className.split(" ").map(cls => cls.trim()));
 }
 
 const defaultButtonClass = "wms-button";
 const defaultButtonGroupClass = "wms-button-group";
 
-class WmsControls extends HTMLElement {
+// Make SSR Safe for Docusaurus.
+const BaseElement = typeof HTMLElement !== "undefined"
+    ? HTMLElement
+    : class { } as any;
+
+class WmsControls extends BaseElement {
     private div?: HTMLDivElement;
     private ctrl: PlainControls;
 
@@ -90,30 +95,36 @@ class WmsControls extends HTMLElement {
     }
 
     connectedCallback() {
-        if (typeof document !== "undefined" && !this.div) {
-            this.div = document.createElement("div");
-            addClass(this.div, this.buttonGroupClass);
-            this.append(this.div);
+        if (typeof document === "undefined") return;
+
+        try {
+            if (!this.div) {
+                this.div = document.createElement("div");
+                addClass(this.div, this.buttonGroupClass);
+                this.append(this.div);
+            }
+
+            this.playLabel = this.getAttribute("playLabel") || undefined;
+            this.pauseLabel = this.getAttribute("pauseLabel") || undefined;
+            this.stopLabel = this.getAttribute("stopLabel") || undefined;
+
+            this.singlePlayStop = false;
+            this.playStop = false;
+            this.playPauseStop = false;
+
+            if (this.hasAttribute("singlePlayStop"))
+                this.singlePlayStop = true;
+            else if (this.hasAttribute("playStop"))
+                this.playStop = true;
+            else this.playPauseStop = true;
+
+            if (this.hasAttribute("buttonClass"))
+                this.buttonClass = this.getAttribute("buttonClass")!;
+            else if (this.hasAttribute("buttonGroupClass"))
+                this.buttonGroupClass = this.getAttribute("buttonGroupClass")!;
+
         }
-
-        this.playLabel = this.getAttribute("playLabel") || undefined;
-        this.pauseLabel = this.getAttribute("pauseLabel") || undefined;
-        this.stopLabel = this.getAttribute("stopLabel") || undefined;
-
-        this.singlePlayStop = false;
-        this.playStop = false;
-        this.playPauseStop = false;
-
-        if (this.hasAttribute("singlePlayStop"))
-            this.singlePlayStop = true;
-        else if (this.hasAttribute("playStop"))
-            this.playStop = true;
-        else this.playPauseStop = true;
-
-        if (this.hasAttribute("buttonClass"))
-            this.buttonClass = this.getAttribute("buttonClass")!;
-        else if (this.hasAttribute("buttonGroupClass"))
-            this.buttonGroupClass = this.getAttribute("buttonGroupClass")!;
+        catch (e) { }
 
         this.render();
     }
@@ -193,9 +204,11 @@ export function registerWmsControls() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
-    if (!customElements.get("controls")) {
-        customElements.define("wms-controls", WmsControls);
+    try {
+        if (!customElements.get("controls"))
+            customElements.define("wms-controls", WmsControls as any);
     }
+    catch (e) { }
 }
 
 export function isWmsControls(el: unknown): el is WmsControls {

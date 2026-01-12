@@ -1,5 +1,10 @@
-import { registerWmsView } from "./wms-view";
-import { registerWmsControls } from "./wms-controls";
+export function registerAllWmsElements() {
+    if (typeof window === "undefined" || typeof customElements === "undefined")
+        return;
 
-registerWmsView();
-registerWmsControls();
+    try {
+        import("./wms-view").then(v => v.registerWmsView());
+        import("./wms-controls").then(c => c.registerWmsControls());
+    }
+    catch (e) { }
+}

@@ -7,7 +7,7 @@
         "@babel/core": "^7.27.7",
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-react": "^7.27.1",
-        "@tspro/ts-utils-lib": "^3.0.1",
+        "@tspro/ts-utils-lib": "^3.3.0",
         "web-music-score": "^6.2.0",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",

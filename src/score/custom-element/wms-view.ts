@@ -1,7 +1,12 @@
 import { WmsView as PlainView, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
-class WmsView extends HTMLElement {
+// Make SSR Safe for Docusaurus.
+const BaseElement = typeof HTMLElement !== "undefined"
+    ? HTMLElement
+    : class { } as any;
+
+class WmsView extends BaseElement {
     private canvas: HTMLCanvasElement;
     private view: PlainView;
 
@@ -66,8 +71,10 @@ class WmsView extends HTMLElement {
     }
 
     private render() {
-        if (!this.contains(this.canvas))
-            this.append(this.canvas);
+        try {
+            if (!this.contains(this.canvas))
+                this.append(this.canvas);
+        } catch (e) { }
 
         this.view.draw();
     }
@@ -82,9 +89,11 @@ export function registerWmsView() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
-    if (!customElements.get("wms-view")) {
-        customElements.define("wms-view", WmsView);
+    try {
+        if (!customElements.get("wms-view"))
+            customElements.define("wms-view", WmsView as any);
     }
+    catch (e) { }
 }
 
 export function isWmsView(el: unknown): el is WmsView {
