@@ -1,4 +1,8 @@
 # Changelog
+## [6.2.1] - 2026-01-12
+### Fixed
+- Made SSR-safe for use in Docusaurus website.
+
 ## [6.2.0] - 2026-01-12
 ### Added
 - `Core.getLibVersion()`
