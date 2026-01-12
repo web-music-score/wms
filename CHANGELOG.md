@@ -1,5 +1,13 @@
 # Changelog
-## [6.1.0] - 2026-01-??
+## [6.2.0] - 2026-01-12
+### Added
+- `Core.getLibVersion()`
+- `Core.getLibInfo()`
+
+### Changed
+- Do not export `package.json`
+
+## [6.1.0] - 2026-01-10
 ### Added
 - Custom HTML elements <wms-view> and <wms-controls>.
 - Document can be undefined in RenderContext/MusicScoreView.

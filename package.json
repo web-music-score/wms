@@ -1,6 +1,6 @@
 {
     "name": "web-music-score",
-    "version": "6.1.0",
+    "version": "6.2.0",
     "author": "Stefan B.",
     "license": "MIT",
     "private": false,
@@ -93,8 +93,7 @@
                 "types": "./dist/pieces/index.d.ts",
                 "default": "./dist/pieces/index.mjs"
             }
-        },
-        "./package.json": "./package.json"
+        }
     },
     "unpkg": "./dist/iife/index.js",
     "jsdelivr": "./dist/iife/index.js",

@@ -28,6 +28,7 @@ export default defineConfig([
             js: bannerText
         },
         define: {
+            __LIB_VERSION__: JSON.stringify(pkg.version),
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (esm)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()]
@@ -56,6 +57,7 @@ export default defineConfig([
             js: bannerText
         },
         define: {
+            __LIB_VERSION__: JSON.stringify(pkg.version),
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (cjs)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()]
@@ -78,6 +80,7 @@ export default defineConfig([
             js: bannerText
         },
         define: {
+            __LIB_VERSION__: JSON.stringify(pkg.version),
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (iife)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()],
@@ -103,6 +106,7 @@ export default defineConfig([
             js: bannerText
         },
         define: {
+            __LIB_VERSION__: JSON.stringify(pkg.version),
             __LIB_INFO__: JSON.stringify(`Audio_CG v${pkg.version} (iife)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()],
