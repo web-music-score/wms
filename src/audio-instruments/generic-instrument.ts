@@ -1,20 +1,25 @@
 import * as Tone from "tone";
 
-// Use direct path to instrument.ts in audio module.
-// Instrument modules must not depend on the audio module.
+// Use direct paths. Instrument modules must not depend on the audio module.
 import { Instrument, linearToDecibels } from "../audio/instrument";
+import { canUseToneJs } from "../audio/can-use-tone-js";
 
 export class GenericInstrument implements Instrument {
 
     private audioSource: Tone.Sampler | undefined = undefined;
 
     constructor(private readonly name: string, urls: Record<string, string>) {
+        if (!canUseToneJs()) {
+            console.warn("Tone.js not available in this environment.");
+            return;
+        }
+
         try {
             this.audioSource = new Tone.Sampler({ urls }).toDestination();
         }
-        catch (error) {
-            console.error(`Failed to initialize instrument "${name}".`);
-            console.error(error);
+        catch (e) {
+            this.audioSource = undefined;
+            console.error(`Failed to initialize instrument "${this.getName()}".`);
         }
     }
 
