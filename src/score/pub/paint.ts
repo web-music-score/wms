@@ -2,7 +2,7 @@ import { Guard, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
 import { isWmsView } from "../custom-element/wms-view";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { assertArg } from "shared-src";
+import { AssertUtil } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
 
@@ -254,7 +254,7 @@ export class Paint {
      * @param idOrEl - HTML element id or element.
      */
     bindElement(...idOrEl: (string | HTMLElement)[]) {
-        assertArg(
+        AssertUtil.assertVar(
             Guard.isArray(idOrEl) &&
             (
                 idOrEl.length === 0 ||
@@ -282,7 +282,7 @@ export class Paint {
      * @param idOrEl - HTML element id or element.
      */
     unbindElement(...idOrEl: (string | HTMLElement)[]) {
-        assertArg(
+        AssertUtil.assertVar(
             Guard.isArray(idOrEl) &&
             (
                 idOrEl.length === 0 ||

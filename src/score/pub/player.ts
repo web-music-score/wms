@@ -3,7 +3,7 @@ import { Guard, ValueSet, Rect } from "@tspro/ts-utils-lib";
 import { Player as InternalPlayer } from "../engine/player";
 import { PlayStateChangeListener } from "./types";
 import { MDocument } from "./mobjects";
-import { assertArg } from "shared-src";
+import { AssertUtil } from "shared-src";
 
 export class Player {
     private static currentlyPlaying = new ValueSet<Player>();
@@ -16,8 +16,8 @@ export class Player {
      * @param playStateChangeListener - Play state change listener.
      */
     constructor(doc: MDocument, playStateChangeListener?: PlayStateChangeListener) {
-        assertArg(doc instanceof MDocument, "doc", doc);
-        assertArg(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
+        AssertUtil.assertVar(doc instanceof MDocument, "doc", doc);
+        AssertUtil.assertVar(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
 
         this.player = new InternalPlayer();
 

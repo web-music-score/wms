@@ -2,7 +2,7 @@ import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { PlayState } from "./types";
 import { MDocument } from "./mobjects";
 import { Player } from "./player";
-import { assertArg, requireT } from "shared-src";
+import { AssertUtil } from "shared-src";
 
 export class WmsControls {
     private playButton?: HTMLButtonElement;
@@ -41,7 +41,7 @@ export class WmsControls {
      * @returns 
      */
     setDocument(doc?: MDocument): WmsControls {
-        assertArg(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+        AssertUtil.assertVar(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
 
         this.onStop();
 
@@ -92,16 +92,16 @@ export class WmsControls {
     /**
      * Set play button.
      * @param btn - HTML button element or element id.
-     * @param btnLabel - Custom button label (e.g. "Play").
+     * @param playLabel - Custom button label (e.g. "Play").
      * @returns - This playback buttons class instance.
      */
-    setPlayButton(btn: HTMLButtonElement | string, btnLabel?: string): WmsControls {
-        assertArg(Guard.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
+    setPlayButton(btn: HTMLButtonElement | string, playLabel?: string): WmsControls {
+        AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
 
         WmsControls.removeOnClickListeners(this.playButton, this.onPlay);
 
-        this.playButton = requireT(Utils.Dom.getButton(btn), "Play button required!");
-        this.playLabel = btnLabel ?? "Play";
+        this.playButton = AssertUtil.requireVar("playButton", Utils.Dom.getButton(btn));
+        this.playLabel = playLabel ?? "Play";
 
         WmsControls.removeOnClickListeners(this.playButton, "all");
         WmsControls.addOnClickListener(this.playButton, this.onPlay);
@@ -114,16 +114,16 @@ export class WmsControls {
     /**
      * Set stop button.
      * @param btn - HTML button element or element id.
-     * @param btnLabel - Custom button label (e.g. "Stop").
+     * @param stopLabel - Custom button label (e.g. "Stop").
      * @returns - This playback buttons class instance.
      */
-    setStopButton(btn: HTMLButtonElement | string, btnLabel?: string): WmsControls {
-        assertArg(Guard.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
+    setStopButton(btn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
+        AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
         WmsControls.removeOnClickListeners(this.stopButton, this.onStop);
 
-        this.stopButton = requireT(Utils.Dom.getButton(btn), "Stop button required!");
-        this.stopLabel = btnLabel ?? "Stop";
+        this.stopButton = AssertUtil.requireVar("stopButton", Utils.Dom.getButton(btn));
+        this.stopLabel = stopLabel ?? "Stop";
 
         WmsControls.removeOnClickListeners(this.stopButton, "all");
         WmsControls.addOnClickListener(this.stopButton, this.onStop);
@@ -141,12 +141,12 @@ export class WmsControls {
      * @returns - This playback buttons class instance.
      */
     setPlayStopButton(btn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
-        assertArg(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
-        assertArg(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
+        AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
+        AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
         WmsControls.removeOnClickListeners(this.playStopButton, this.onPlayStop);
 
-        this.playStopButton = requireT(Utils.Dom.getButton(btn), "Play/stop button required!");
+        this.playStopButton = AssertUtil.requireVar("playStopButton", Utils.Dom.getButton(btn));
         this.playLabel = playLabel ?? "Play";
         this.stopLabel = stopLabel ?? "Stop";
 
@@ -161,16 +161,16 @@ export class WmsControls {
     /**
      * Set pause button.
      * @param btn - HTML button element or element id.
-     * @param btnLabel - Custom button label (e.g. "Pause").
+     * @param pauseLabel - Custom button label (e.g. "Pause").
      * @returns - This playback buttons class instance.
      */
-    setPauseButton(btn: HTMLButtonElement | string, btnLabel?: string): WmsControls {
-        assertArg(Guard.isStringOrUndefined(btnLabel), "btnLabel", btnLabel);
+    setPauseButton(btn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
+        AssertUtil.assertVar(Guard.isStringOrUndefined(pauseLabel), "pauseLabel", pauseLabel);
 
         WmsControls.removeOnClickListeners(this.pauseButton, this.onPause);
 
-        this.pauseButton = requireT(Utils.Dom.getButton(btn), "Pause button required!");
-        this.pauseLabel = btnLabel ?? "Pause";
+        this.pauseButton = AssertUtil.requireVar("pauseButton", Utils.Dom.getButton(btn));
+        this.pauseLabel = pauseLabel ?? "Pause";
 
         WmsControls.removeOnClickListeners(this.pauseButton, "all");
         WmsControls.addOnClickListener(this.pauseButton, this.onPause);
@@ -201,7 +201,7 @@ export class WmsControls {
     }
 
     private static addOnClickListener(btn: HTMLButtonElement, onClickListener: () => void) {
-        assertArg(Guard.isFunction(onClickListener), "onClick", onClickListener);
+        AssertUtil.assertVar(Guard.isFunction(onClickListener), "onClickListener", onClickListener);
         btn.addEventListener("click", onClickListener);
         this.savedOnClickListeners.getOrCreate(btn, []).push(onClickListener);
     }

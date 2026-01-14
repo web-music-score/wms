@@ -4,16 +4,8 @@ import { StaffSize } from "./types";
 import { ScoreEventListener } from "./event";
 import { MDocument, MScoreRow, MusicInterface } from "./mobjects";
 import { Paint } from "./paint";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { AssertUtil } from "shared-src";
 
-function assertArg(condition: boolean, argName: string, argValue: unknown) {
-    if (!condition)
-        throw new MusicError(MusicErrorType.Score, `Invalid arg: ${argName} = ${argValue}`);
-}
-
-function require_t<T>(t: T | undefined | null, message?: string): T {
-    return Assert.require(t, message);
-}
 
 export class WmsView {
     private readonly _view: View;
@@ -31,7 +23,7 @@ export class WmsView {
      * @returns - This render context instance.
      */
     setPaint(paint?: Paint) {
-        assertArg(Guard.isUndefined(paint) || paint instanceof Paint, "paint", paint);
+        AssertUtil.assertVar(Guard.isUndefined(paint) || paint instanceof Paint, "paint", paint);
 
         this._view.setPaint(paint);
         return this;
@@ -39,13 +31,12 @@ export class WmsView {
 
     /**
      * Attach music document to this render context.
-     * @param mdoc - Music document.
+     * @param doc - Music document.
      * @returns - This render context instance.
      */
-    setDocument(mdoc?: MDocument): WmsView {
-        assertArg(Guard.isUndefined(mdoc) || mdoc instanceof MDocument, "mdoc", mdoc);
-
-        this._view.setDocument(mdoc?.getMusicObject());
+    setDocument(doc?: MDocument): WmsView {
+        AssertUtil.assertVar(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+        this._view.setDocument(doc?.getMusicObject());
         return this;
     }
 
@@ -55,11 +46,7 @@ export class WmsView {
      * @returns - This render context instance.
      */
     setCanvas(canvas: HTMLCanvasElement | string): WmsView {
-
-        canvas = require_t(Utils.Dom.getCanvas(canvas), typeof canvas === "string"
-            ? "Cannot set render canvas because invalid canvas id: " + canvas
-            : "Cannot set render canvas because given canvas is undefined.");
-        this._view.setCanvas(canvas);
+        this._view.setCanvas(AssertUtil.requireVar("canvas", Utils.Dom.getCanvas(canvas)));
         return this;
     }
 
@@ -69,7 +56,7 @@ export class WmsView {
      * @returns - This render context instance.
      */
     setZoom(zoom: number = 1.0): WmsView {
-        assertArg(Guard.isNumberGt(zoom, 0) && Guard.isFinite(zoom), "zoom", zoom);
+        AssertUtil.assertVar(Guard.isNumberGt(zoom, 0) && Guard.isFinite(zoom), "zoom", zoom);
         this._view.setZoom(zoom);
         return this;
     }
@@ -80,7 +67,7 @@ export class WmsView {
      * @returns - This render context instance.
      */
     setStaffSize(staffSize: StaffSize = "default"): WmsView {
-        assertArg(
+        AssertUtil.assertVar(
             Guard.isNonEmptyString(staffSize) ||
             Guard.isNumberGt(staffSize, 0) && Guard.isFinite(staffSize),
             "staffSize", staffSize
@@ -94,7 +81,7 @@ export class WmsView {
      * @param scoreEventListener - Score event listener.
      */
     setScoreEventListener(scoreEventListener: ScoreEventListener) {
-        assertArg(Guard.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
+        AssertUtil.assertVar(Guard.isFunctionOrUndefined(scoreEventListener), "scoreEventListener", scoreEventListener);
         this._view.setScoreEventListener(scoreEventListener);
     }
 

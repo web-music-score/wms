@@ -30,7 +30,7 @@ import { ObjScoreRowGroup } from "../engine/obj-score-row-group";
 import { isWmsView } from "../custom-element/wms-view";
 import { isWmsControls } from "../custom-element/wms-controls";
 import { Player } from "./player";
-import { assertArg } from "shared-src";
+import { AssertUtil } from "shared-src";
 
 function getMStaffOrMTab(line: unknown): MStaff | MTab {
     if (line instanceof ObjStaff || line instanceof ObjTab) {
@@ -233,7 +233,7 @@ export class MDocument extends MusicInterface {
      * @returns - Player instance.
      */
     play(playStateChangeListener?: PlayStateChangeListener): Player {
-        assertArg(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
+        AssertUtil.assertVar(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
         return new Player(this, playStateChangeListener).play();
     }
 
@@ -242,7 +242,7 @@ export class MDocument extends MusicInterface {
      * @param idOrEl - HTML element id or element.
      */
     bindElement(...idOrEl: (string | HTMLElement)[]) {
-        assertArg(
+        AssertUtil.assertVar(
             Guard.isArray(idOrEl) &&
             (
                 idOrEl.length === 0 ||
@@ -266,7 +266,7 @@ export class MDocument extends MusicInterface {
      * @param idOrEl - HTML element id or element.
      */
     unbindElement(...idOrEl: (string | HTMLElement)[]) {
-        assertArg(
+        AssertUtil.assertVar(
             Guard.isArray(idOrEl) &&
             (
                 idOrEl.length === 0 ||
@@ -315,7 +315,7 @@ export class MEnding extends MusicInterface {
      * @returns - Boolean whether this ending has asked passage number.
      */
     hasPassage(passage: number): boolean {
-        assertArg(Guard.isIntegerGte(passage, 1), "passage", passage);
+        AssertUtil.assertVar(Guard.isIntegerGte(passage, 1), "passage", passage);
         return this.obj.hasPassage(passage);
     }
 }
@@ -755,7 +755,7 @@ export class MRhythmColumn extends MusicInterface {
      * @returns - Note group, rest or undefined.
      */
     getRhythmSymbol(voiceId: VoiceId): MNoteGroup | MRest | undefined {
-        assertArg(isVoiceId(voiceId), "voiceId", voiceId);
+        AssertUtil.assertVar(isVoiceId(voiceId), "voiceId", voiceId);
 
         return this.obj.getVoiceSymbol(voiceId)?.getMusicInterface();
     }

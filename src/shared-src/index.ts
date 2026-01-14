@@ -1,4 +1,4 @@
-import { Assert, CallTracker } from "@tspro/ts-utils-lib";
+import { Assert, CallTracker, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
 const tracker = new CallTracker();
@@ -10,11 +10,48 @@ export function warnDeprecated(msg: string) {
     tracker.track(msg);
 }
 
-export function assertArg(condition: boolean, argName: string, argValue: unknown) {
-    if (!condition)
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid arg: ${argName} = ${argValue}`);
-}
+export namespace AssertUtil {
+    let assertFunctStr = "";
 
-export function requireT<T>(t: T | undefined | null, message?: string): T {
-    return Assert.require(t, message);
+    function formatArgs(...args: unknown[]) {
+        return args
+            .map(arg => {
+                let s = Utils.Str.stringify(arg)
+                if (s.startsWith("Object{") && s.endsWith("}")) s = s.substring(6);
+                return s;
+            })
+            .join(", ");
+    }
+
+    export function setClassFunc(className: string, fnName: string, ...fnArgs: unknown[]) {
+        assertFunctStr = `${className}.${fnName}(${formatArgs(...fnArgs)})`;
+    }
+
+    export function setFunc(fnName: string, ...fnArgs: unknown[]) {
+        assertFunctStr = `${fnName}(${formatArgs(...fnArgs)})`;
+    }
+
+    export function clearFunc() {
+        assertFunctStr = "";
+    }
+
+    export function assert(...conditions: boolean[]) {
+        if (conditions.some(c => !c))
+            throw new MusicError(MusicErrorType.InvalidArg, assertFunctStr);
+    }
+
+    export function assertMsg(condition: boolean, msg: string) {
+        if (!condition) throw new MusicError(MusicErrorType.InvalidArg, msg);
+    }
+
+    export function assertVar(condition: boolean, varName: string, varValue: unknown) {
+        if (!condition)
+            throw new MusicError(MusicErrorType.InvalidArg, `Invalid value: ${varName} = ${varValue}`);
+    }
+
+    export function requireVar<VAR_VALUE>(varName: string, varValue: VAR_VALUE | undefined | null): VAR_VALUE {
+        if (varValue == null)
+            throw new MusicError(MusicErrorType.InvalidArg, `Invalid value: ${varName} = ${varValue}`);
+        return varValue;
+    }
 }
