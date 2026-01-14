@@ -2,7 +2,7 @@ import { Guard, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
 import { isWmsView } from "../custom-element/wms-view";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { AssertUtil } from "shared-src";
+import { AssertUtil, warnDeprecated } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
 
@@ -32,7 +32,7 @@ export type ColorKey =
     "staff.signature.time" |
     "staff.signature.tempo" |
     "staff.signature.measurenum" |
-    "staff.element.fermata" |
+    "staff.element.fermata" |       // deprecated, belongs to "annotation"
     "staff.element.annotation" |
     "staff.element.navigation" |
     "staff.element.label" |
@@ -49,7 +49,7 @@ export type ColorKey =
     "tab.signature.time" |
     "tab.signature.tempo" |
     "tab.signature.measurenum" |
-    "tab.element.fermata" |
+    "tab.element.fermata" |         // deprecated, belongs to "annotation"
     "tab.element.annotation" |
     "tab.element.navigation" |
     "tab.element.label";
@@ -178,6 +178,9 @@ export class Paint {
 
         for (const key of Object.keys(this.colors) as ColorKey[]) {
             const parts = key.split(".").map(norm);
+
+            if(parts.includes("fermata")) 
+                warnDeprecated("Color key 'fermata' is deprecated, it belongs to 'annotation'.");
 
             const match = normalizedParts.every(a => parts.includes(a));
 

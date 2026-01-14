@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation } from "../pub";
+import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
 export function getNavigationString(navigation: Navigation): string {
@@ -41,6 +41,9 @@ export function getAnnotation(text: string): Annotation | undefined {
     }
     else if (Guard.isEnumValue(text, TempoAnnotation)) {
         return Annotation.Tempo;
+    }
+    else if (Guard.isEnumValue(text, ArticulationAnnotation)) {
+        return Annotation.Articulation;
     }
     else {
         return undefined;

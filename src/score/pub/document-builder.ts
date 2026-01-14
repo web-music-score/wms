@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, ArticulationAnnotation, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "web-music-score/theory";
@@ -641,14 +641,20 @@ export class DocumentBuilder {
     private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata | `${Fermata}`): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         AssertUtil.assert(Guard.isEnumValue(fermata, Fermata));
-        this.getMeasure().addFermata(staffTabOrGroups, fermata as Fermata);
+        switch (fermata) {
+            case "atNote":
+                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Articulation, ArticulationAnnotation.fermata);
+                break;
+            case "atMeasureEnd":
+                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Articulation, ArticulationAnnotation.measureEndFermata);
+                break;
+        }
         return this;
     }
 
     /**
-     * Add fermata to current measure.
-     * @param fermata - Fermata type (e.g. "atNote" or Fermata.AtrNote).
-     * @returns - This document builder instance.
+     * @deprecated - Use addAnnotation instead.
+     * @internal
      */
     addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
@@ -656,10 +662,8 @@ export class DocumentBuilder {
     }
 
     /**
-     * Add Fermata to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param fermata - Fermata type (e.g. "atNote" or Fermata.AtrNote).
-     * @returns - This document builder instance.
+     * @deprecated - Use addAnnotation instead.
+     * @internal
      */
     addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);
@@ -763,7 +767,7 @@ export class DocumentBuilder {
      * @param text - Annotation text (unrestricted).
      * @returns - This document builder instance.
      */
-    addAnnotation(annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
+    addAnnotation(annotation: Annotation | `${Annotation}`, text: AnnotationText | string): DocumentBuilder;
     addAnnotation(...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
         if (args.length === 1) {

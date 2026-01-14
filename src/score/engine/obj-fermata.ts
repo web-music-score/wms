@@ -49,16 +49,11 @@ export class ObjFermata extends MusicObject {
     }
 
     draw(view: View) {
-        let { unitSize } = view;
         let upsideDown = this.pos === VerticalPos.Below;
 
-        let dy = (upsideDown ? unitSize : -unitSize) * 0.7;
+        let { left, right, top, bottom, height, centerX, centerY } = this.rect;
 
-        let left = this.rect.left;
-        let right = this.rect.right;
-        let top = (upsideDown ? this.rect.bottom : this.rect.top) + dy;
-        let bottom = (upsideDown ? this.rect.top : this.rect.bottom) + dy;
-        let height = bottom - top;
+        if (upsideDown) [top, bottom] = [bottom, top];
 
         view.drawDebugRect(this.rect);
 
@@ -73,6 +68,6 @@ export class ObjFermata extends MusicObject {
 
         let r = height / 6;
 
-        view.fillCircle((left + right) / 2, bottom - r, Math.abs(r));
+        view.fillCircle(centerX, bottom + (upsideDown ? r : -r), r);
     }
 }

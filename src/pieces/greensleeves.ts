@@ -196,7 +196,7 @@ export function createGreensleeves(): MDocument {
         .addMeasure()
         .addNavigation("ending", 2)
         .addNote(0, "A3", "4.", { stem: "up" }).addLabel("chord", "Am")
-        .addNote(0, "A3", "4.").addFermata()
+        .addNote(0, "A3", "4.").addAnnotation("fermata")
         .addNote(1, "A2", "8n", { stem: "down" })
         .addNote(1, "E3", "8n")
         .addNote(1, "C4", "8n")

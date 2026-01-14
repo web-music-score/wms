@@ -23,22 +23,22 @@ export function createStaffGroupsDemo() {
         .setKeySignature("C", "Major")
         .setTimeSignature("4/4")
         .setTempo(80)
-        .addNote(0, "C4", "4n").addFermataTo("grp1", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp2", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp3", "atNote")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp1", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp2", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp3", "fermata")
         .addNote(0, "C4", "4n")
 
         .addMeasure()
-        .addNote(0, "C4", "4n").addFermataTo("grp4", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp5", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp6", "atNote")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp4", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp5", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp6", "fermata")
         .addNote(0, "C4", "4n")
 
         .addMeasure()
-        .addNote(0, "C4", "4n").addFermataTo("grp7", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp8", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp9", "atNote")
-        .addNote(0, "C4", "4n").addFermataTo("grp10", "atNote")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp7", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp8", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp9", "fermata")
+        .addNote(0, "C4", "4n").addAnnotationTo("grp10", "fermata")
 
         .getDocument();
 }

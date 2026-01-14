@@ -16,12 +16,13 @@ import { AnchoredRect, asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
 
 export enum LayoutGroupId {
     TabRhythm,
-    Fermata,
+    Annotation_Fermata,
     NoteLabel,
     Navigation,
     Ending,
-    TempoAnnotation,
-    DynamicsAnnotation,
+    Annotation_Articulation,
+    Annotation_Tempo,
+    Annotation_Dynamics,
     ChordLabel,
     LyricsVerse1,
     LyricsVerse2,
@@ -30,12 +31,13 @@ export enum LayoutGroupId {
 
 const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { reserveSpace?: boolean, rowAlign?: boolean, padding?: number }>([
     [LayoutGroupId.TabRhythm, { rowAlign: true }],
-    [LayoutGroupId.Fermata, { reserveSpace: true }],
+    [LayoutGroupId.Annotation_Fermata, { reserveSpace: true, padding: 1 }],
     [LayoutGroupId.NoteLabel, { reserveSpace: true }],
     [LayoutGroupId.Navigation, { rowAlign: true }],
     [LayoutGroupId.Ending, { rowAlign: true, padding: 2 }],
-    [LayoutGroupId.TempoAnnotation, { rowAlign: true, padding: 2 }],
-    [LayoutGroupId.DynamicsAnnotation, { rowAlign: true, padding: 2 }],
+    [LayoutGroupId.Annotation_Articulation, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Tempo, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Dynamics, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.ChordLabel, { reserveSpace: true, rowAlign: true }],
     [LayoutGroupId.LyricsVerse1, { reserveSpace: true, rowAlign: true }],
     [LayoutGroupId.LyricsVerse2, { reserveSpace: true, rowAlign: true }],
@@ -100,18 +102,20 @@ export class LayoutObjectWrapper {
     }
 
     resolveClosestToStaffY(view: View): number {
-        let { musicObj, measure, verticalPos, line } = this;
+        const { musicObj, measure, verticalPos, line, layoutGroup } = this;
+        const padding = layoutGroup.getPadding(view);
 
-        let lineTop = line.getTopLineY();
-        let lineBottom = line.getBottomLineY();
-        let linePadding = view.unitSize;
+        let lineTop = line.getTopLineY() - view.unitSize;
+        let lineBottom = line.getBottomLineY() + view.unitSize;
 
         let y = verticalPos === VerticalPos.Below
-            ? lineBottom + linePadding + musicObj.getRect().toph
-            : lineTop - linePadding - musicObj.getRect().bottomh;
+            ? lineBottom + musicObj.getRect().toph
+            : lineTop - musicObj.getRect().bottomh;
 
         let staticObjects = measure.getStaticObjects(line);
-        let objShapeRects = musicObj.getShapeRects();
+        let objShapeRects = musicObj.getShapeRects().map(r =>
+            new AnchoredRect(r.left, r.anchorX, r.right, r.top - padding, r.anchorY, r.bottom + padding)
+        );
 
         staticObjects.forEach(staticObj => {
             let staticShapeRects = staticObj.getShapeRects();

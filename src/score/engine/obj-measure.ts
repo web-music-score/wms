@@ -2,7 +2,7 @@ import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRe
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation } from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -603,7 +603,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    addFermata(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata) {
+    private addFermata(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata) {
         let anchor = fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn;
 
         if (!anchor) {
@@ -611,8 +611,8 @@ export class ObjMeasure extends MusicObject {
         }
 
         this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? colorKey("staff.element.fermata") : colorKey("tab.element.fermata");
-            this.addLayoutObject(new ObjFermata(anchor, vpos, color), line, LayoutGroupId.Fermata, vpos);
+            const color = line instanceof ObjTab ? colorKey("staff.element.annotation") : colorKey("tab.element.annotation");
+            this.addLayoutObject(new ObjFermata(anchor, vpos, color), line, LayoutGroupId.Annotation_Fermata, vpos);
         });
 
         this.disableExtension();
@@ -742,6 +742,18 @@ export class ObjMeasure extends MusicObject {
     }
 
     addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string) {
+        // Special case: add fermata
+        if (annotation === Annotation.Articulation) {
+            switch (text) {
+                case ArticulationAnnotation.fermata:
+                    this.addFermata(staffTabOrGroups, Fermata.AtNote);
+                    return;
+                case ArticulationAnnotation.measureEndFermata:
+                    this.addFermata(staffTabOrGroups, Fermata.AtMeasureEnd);
+                    return;
+            }
+        }
+
         let anchor = this.lastAddedRhythmColumn;
 
         if (!anchor) {
@@ -759,13 +771,19 @@ export class ObjMeasure extends MusicObject {
 
         switch (annotation) {
             case Annotation.Dynamics:
-                layoutGroupId = LayoutGroupId.DynamicsAnnotation;
+                layoutGroupId = LayoutGroupId.Annotation_Dynamics;
                 defaultVerticalPos = VerticalPos.Above;
                 textProps.italic = true;
                 linePos = "bottom";
                 break;
             case Annotation.Tempo:
-                layoutGroupId = LayoutGroupId.TempoAnnotation;
+                layoutGroupId = LayoutGroupId.Annotation_Tempo;
+                defaultVerticalPos = VerticalPos.Above;
+                textProps.italic = true;
+                linePos = "bottom";
+                break;
+            case Annotation.Articulation:
+                layoutGroupId = LayoutGroupId.Annotation_Articulation;
                 defaultVerticalPos = VerticalPos.Above;
                 textProps.italic = true;
                 linePos = "bottom";

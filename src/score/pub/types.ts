@@ -267,7 +267,10 @@ export type LyricsOptions = {
     hyphen?: LyricsHyphen | `${LyricsHyphen}`
 }
 
-/** Fermata enum. */
+/**
+ * @deprecated - Use Annotation/Articulation instead.
+ * @internal
+ */
 export enum Fermata {
     /** Anchor fermata to note/rest. */
     AtNote = "atNote",
@@ -317,7 +320,10 @@ export enum Annotation {
     Dynamics = "dynamics",
 
     /** "accel.", "rit.", "a tempo" */
-    Tempo = "tempo"
+    Tempo = "tempo",
+
+    /** "fermata" */
+    Articulation = "articulation"
 }
 
 /** Some known dynamics annotations. */
@@ -343,8 +349,14 @@ export enum TempoAnnotation {
     a_tempo = "a tempo"
 }
 
+/** Known articulations. */
+export enum ArticulationAnnotation {
+    fermata = "fermata",
+    measureEndFermata= "measureEndFermata"
+}
+
 /** Known annotation test type. */
-export type AnnotationText = `${DynamicsAnnotation}` | `${TempoAnnotation}`;
+export type AnnotationText = `${DynamicsAnnotation}` | `${TempoAnnotation}` | `${ArticulationAnnotation}`;
 
 /** Label element enum. */
 export enum Label {

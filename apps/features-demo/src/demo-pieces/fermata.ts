@@ -5,7 +5,9 @@ export function createFermataDemo() {
         .setHeader("Fermata")
         .setScoreConfiguration("bass")
 
-        .addStaffGroup("doubleFermata", 0, "both")
+        .addStaffGroup("both", 0, "both")
+        .addStaffGroup("above", 0, "above")
+        .addStaffGroup("below", 0, "below")
 
         .addMeasure()
         .setKeySignature("C", "Major")
@@ -17,24 +19,24 @@ export function createFermataDemo() {
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
         .addNote(0, "C3", "4n")
-        .addFermata("atMeasureEnd")
+        .addAnnotation("articulation", "measureEndFermata")
 
         .addMeasure()
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
-        .addNote(0, "C3", "4n").addFermata()
+        .addNote(0, "C4", "4n").addAnnotationTo("above", "articulation", "fermata")
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
-        .addNote(0, "C3", "4n").addFermata("atNote")
+        .addNote(0, "C3", "4n").addAnnotationTo("below", "articulation", "fermata")
 
         .addMeasure()
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
-        .addRest(0, "4n").addFermata()
+        .addRest(0, "4n").addAnnotation("fermata")
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
         .addRest(0, "4n")
-        .addFermataTo("doubleFermata", "atMeasureEnd")
+        .addAnnotationTo("both", "measureEndFermata")
 
         .getDocument();
 }
