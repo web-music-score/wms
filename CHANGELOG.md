@@ -1,5 +1,8 @@
 # Changelog
 ## [6.3.0] - 2026-01-??
+### Added
+- Common time signature: DocumentBuilder.setTimeSignature("C");
+
 ### Changed
 - Add fermata with DocumentBuilder.addAnnotation("articulation", "fermata"), deprecated DocumentBuilder.addFermata().
 - Paint color key "fermata" is deprecated. Fermata uses now "annotation" color key.
@@ -7,7 +10,6 @@
 ### Fixed
 - Fermata lauyout issues.
 
-## Deprecated
 
 ## [6.2.1] - 2026-01-12
 ### Fixed
