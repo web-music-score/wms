@@ -8,7 +8,7 @@ export function createFillWithRestsDemo() {
 
         .addMeasure()
         .setKeySignature("C", "Major")
-        .setTimeSignature("4/4")
+        .setTimeSignature("C")
         .setTempo(80)
         .addNote(0, "G3", "1n")
         .fillWithRests()

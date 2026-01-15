@@ -1415,7 +1415,7 @@ export class ObjMeasure extends MusicObject {
                 signature.updateClefImage(view, showClef);
                 signature.updateMeasureNumber(showMeasureNumber && lineId === 0);
                 signature.updateKeySignature(showKeySignature);
-                signature.updateTimeSignature(showTimeSignature);
+                signature.updateTimeSignature(view, showTimeSignature);
                 signature.updateTempo(showTempo && lineId === 0);
 
                 signature.layout(view);
@@ -1430,7 +1430,7 @@ export class ObjMeasure extends MusicObject {
                 signature.tab.addObject(signature);
 
                 signature.updateMeasureNumber(showMeasureNumber && lineId === 0);
-                signature.updateTimeSignature(showTimeSignature);
+                signature.updateTimeSignature(view, showTimeSignature);
                 signature.updateTempo(showTempo && lineId === 0);
 
                 signature.layout(view);

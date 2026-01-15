@@ -340,6 +340,12 @@ export class DocumentBuilder {
     }
 
     /**
+     * Set common time signature "C" for current measure and forward.
+     * @param timeSignature - "C".
+     * @returns - This document builder instance.
+     */
+    setTimeSignature(timeSignature: "C"): DocumentBuilder;
+    /**
      * Set time signature for current measure and forward.
      * @param timeSignature - TimeSignature object instance.
      * @returns - This document builder instance.
@@ -363,7 +369,10 @@ export class DocumentBuilder {
     setTimeSignature(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "setTimeSignature", ...args);
 
-        if (args[0] instanceof TimeSignature) {
+        if (args[0] === "C") {
+            this.getMeasure().setTimeSignature(new TimeSignature("C"));
+        }
+        else if (args[0] instanceof TimeSignature) {
             this.getMeasure().setTimeSignature(args[0]);
         }
         else if (Guard.isEnumValue(args[0], TimeSignatures) && Guard.isEnumValueOrUndefined(args[1], BeamGrouping)) {

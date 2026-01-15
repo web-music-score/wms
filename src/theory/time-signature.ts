@@ -38,6 +38,7 @@ export enum BeamGrouping {
 
 /** Time signature class. */
 export class TimeSignature {
+    readonly isCommon: boolean = false;
     /** Number of beats in measure, upper value (e.g. "3" in "3/4"). */
     readonly beatCount: number;
     /** Beat size of time signature, lower value (e.g. "4" in "3/4"). */
@@ -49,6 +50,11 @@ export class TimeSignature {
     /** Beam groups (e.g. [[2], [2]] or [[2, 2], [2, 2]] (first try as [[4], [4]])). */
     readonly beamGroupSizes: number[][] = [];
 
+    /**
+     * Create new time signature instance.
+     * @param timeSignature - Commmon time signature "C".
+     */
+    constructor(timeSignature: "C");
     /**
      * Create new time signature instance.
      * @param timeSignature - For example "4/4".
@@ -65,7 +71,12 @@ export class TimeSignature {
     constructor(...args: unknown[]) {
         let beamGrouping: BeamGrouping | undefined;
 
-        if (Guard.isEnumValue(args[0], TimeSignatures)) {
+        if (args[0] === "C") {
+            this.beatCount = 4;
+            this.beatSize = 4;
+            this.isCommon = true;
+        }
+        else if (Guard.isEnumValue(args[0], TimeSignatures)) {
             let parts = args[0].split("/");
 
             this.beatCount = +parts[0];

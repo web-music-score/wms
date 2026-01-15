@@ -8,14 +8,16 @@ import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
-import G_clef_png from "./assets/G-clef.png";
-import F_clef_png from "./assets/F-clef.png";
+import GClefData from "./assets/G-clef.png";
+import FClefData from "./assets/F-clef.png";
+import TimeSigCommonData from "./assets/time-sig-common.png";
 
-export enum ImageAsset { G_Clef, F_Clef }
+export enum ImageAsset { GClef, FClef, TimeSigCommon }
 
 const ImageData = new UniMap<ImageAsset, string>([
-    [ImageAsset.G_Clef, G_clef_png],
-    [ImageAsset.F_Clef, F_clef_png],
+    [ImageAsset.GClef, GClefData],
+    [ImageAsset.FClef, FClefData],
+    [ImageAsset.TimeSigCommon, TimeSigCommonData],
 ]);
 
 const getImageData = (asset: ImageAsset): string => ImageData.getOrDefault(asset, "");

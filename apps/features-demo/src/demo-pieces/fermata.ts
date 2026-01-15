@@ -11,7 +11,7 @@ export function createFermataDemo() {
 
         .addMeasure()
         .setKeySignature("C", "Major")
-        .setTimeSignature("4/4")
+        .setTimeSignature("C")
         .setTempo(80)
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
