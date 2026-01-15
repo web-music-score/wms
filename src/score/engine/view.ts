@@ -1,6 +1,6 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView } from "../pub";
+import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView, Player } from "../pub";
 import { ObjScoreRow } from "./obj-score-row";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
@@ -66,7 +66,7 @@ export class View {
 
     private paint: Paint = Paint.default;
 
-    private cursorRect?: Rect;
+    private cursorRects = new UniMap<Player, Rect>();
     private mousePos?: Vec; // Mouse coord in document space
 
     private curStaffPos?: StaffPos;
@@ -194,8 +194,6 @@ export class View {
         if (this._doc === doc) {
             return;
         }
-
-        this.updateCursorRect(undefined);
 
         let prevDoc = this._doc;
 
@@ -413,8 +411,12 @@ export class View {
         this.hilightedStaffPos = staffPos;
     }
 
-    updateCursorRect(cursorRect: Rect | undefined) {
-        this.cursorRect = cursorRect;
+    updateCursorRect(player: Player, cursorRect: Rect | undefined) {
+        if (cursorRect)
+            this.cursorRects.set(player, cursorRect);
+        else
+            this.cursorRects.delete(player);
+
         this.draw();
     }
 
@@ -548,11 +550,8 @@ export class View {
     }
 
     drawPlayCursor() {
-        let { cursorRect: r } = this;
-
-        if (r) {
+        for (const [key, r] of this.cursorRects)
             this.color(this.paint.colors["play.cursor"]).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
-        }
     }
 
     txFromScreenCoord(screenCoord: Vec) {

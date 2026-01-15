@@ -1,4 +1,4 @@
-import { Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { Rect, UniMap, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "web-music-score/theory";
 import * as Audio from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
@@ -114,7 +114,7 @@ export class PlayerColumnProps {
     }
 }
 
-export class Player {
+export class PlayerEngine {
     private playTimer: number | undefined = undefined;
 
     private playPos: number | undefined;
@@ -124,7 +124,7 @@ export class Player {
     private doc?: ObjDocument;
 
     private cursorPositionChangeListener?: CursorPositionChangeListener;
-    private playStateChnageListener?: PlayStateChangeListener
+    private playStateChnageListeners = new ValueSet<PlayStateChangeListener>();
 
     private playerColumnSequence: PlayerColumn[] = [];
 
@@ -132,20 +132,22 @@ export class Player {
 
     setDocument(doc: ObjDocument) {
         this.doc = doc;
-
-        this.doc.resetMeasures();
-
-        this.playerColumnSequence = this.collectPlayerColumnSequence();
-
-        this.updatePlayerProps();
     }
 
     setCursorPositionChangeListener(fn: CursorPositionChangeListener) {
         this.cursorPositionChangeListener = fn;
     }
 
-    setPlayStateChnageListener(fn: PlayStateChangeListener) {
-        this.playStateChnageListener = fn;
+    setPlayStateChangeListener(fn: PlayStateChangeListener) {
+        this.playStateChnageListeners.add(fn);
+    }
+
+    removePlayStateChangeListener(fn: PlayStateChangeListener) {
+        this.playStateChnageListeners.delete(fn);
+    }
+
+    getPlayStateChangeListeners(): PlayStateChangeListener[] {
+        return this.playStateChnageListeners.toArray();
     }
 
     private notifyCursorPositionChanged() {
@@ -162,12 +164,9 @@ export class Player {
                 : PlayState.Stopped;
 
         if (this.playState !== newPlayState) {
-            if (this.playStateChnageListener) {
-                this.playStateChnageListener(newPlayState);
-            }
+            this.playStateChnageListeners.forEach(listener => listener(newPlayState));
             this.playState = newPlayState;
         }
-
     }
 
     private collectPlayerMeasureSequence(): ObjMeasure[] {
@@ -190,7 +189,7 @@ export class Player {
 
             if (curEnding) {
                 let passage = curMeasure.getPassCount();
-                curMeasure = Player.getMeasureByEndingPassage(curMeasure, passage);
+                curMeasure = PlayerEngine.getMeasureByEndingPassage(curMeasure, passage);
             }
 
             if (!curMeasure) {
@@ -404,6 +403,12 @@ export class Player {
         }
     }
 
+    private initializeForPlayback() {
+        this.doc?.resetMeasures();
+        this.playerColumnSequence = this.collectPlayerColumnSequence();
+        this.updatePlayerProps();
+    }
+
     private playStep() {
         this.notifyCursorPositionChanged();
         this.notifyPlayStateChanged();
@@ -477,6 +482,8 @@ export class Player {
     }
 
     play() {
+        this.initializeForPlayback();
+
         if (this.playState === PlayState.Playing) {
             // Restart playing
             this.stop();
@@ -539,6 +546,10 @@ export class Player {
         }
 
         return this.playPos;
+    }
+
+    getPlayState(): PlayState {
+        return this.playState;
     }
 
     getCursorRect(): Rect | undefined {

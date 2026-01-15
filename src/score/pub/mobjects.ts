@@ -177,6 +177,8 @@ export class MDocument extends MusicInterface {
     /** Object name. */
     static readonly Name = "Document";
 
+    private defaultPlayer?: Player;
+
     /** @internal */
     constructor(private readonly obj: ObjDocument) {
         super(MDocument.Name);
@@ -234,7 +236,28 @@ export class MDocument extends MusicInterface {
      */
     play(playStateChangeListener?: PlayStateChangeListener): Player {
         AssertUtil.assertVar(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
-        return new Player(this, playStateChangeListener).play();
+
+        const player = this.getDefaultPlayer();
+
+        //player.stop();
+
+        if (playStateChangeListener)
+            player.setPlayStateChangeListener(playStateChangeListener);
+
+        player.play();
+
+        return player;
+    }
+
+    /**
+     * Get default player.
+     * @returns - Player.
+     */
+    getDefaultPlayer(): Player {
+        if (!this.defaultPlayer)
+            this.defaultPlayer = new Player(this);
+
+        return this.defaultPlayer;
     }
 
     /**

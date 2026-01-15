@@ -21,7 +21,7 @@ export class WmsControls {
 
     private playState: PlayState = PlayState.Stopped;
 
-    private player?: Player = undefined;
+    private player?: Player;
 
     /**
      * Create new playback buttons helper class instance.
@@ -36,28 +36,43 @@ export class WmsControls {
     }
 
     /**
-     * Attach music document whose playcak will be controlled by this playback buttons helper class instance.
-     * @param doc - Music document.
+     * Attach player that will be controlled by these controls.
+     * @param player - Player.
      * @returns 
      */
-    setDocument(doc?: MDocument): WmsControls {
-        AssertUtil.assertVar(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+    setPlayer(player?: Player): WmsControls {
+        AssertUtil.assertVar(Guard.isUndefined(player) || player instanceof Player, "player", player);
+
+        if (this.player === player) return this;
 
         this.onStop();
 
-        if (doc) {
-            this.player = new Player(doc, (playState: PlayState) => {
+        this.player = player;
+
+        if (this.player) {
+            this.player.setPlayStateChangeListener((playState: PlayState) => {
                 this.playState = playState;
                 this.updateButtons();
-            });
+            })
+            this.playState = this.player.getPlayState();
         }
         else {
-            this.player = undefined;
+            this.playState = PlayState.Stopped;
         }
 
         this.updateButtons();
 
         return this;
+    }
+
+    /**
+     * Attach document whose default player will be controlled by these controls.
+     * @param doc - Music document.
+     * @returns 
+     */
+    setDocument(doc?: MDocument): WmsControls {
+        AssertUtil.assertVar(Guard.isUndefined(doc) || doc instanceof MDocument, "doc", doc);
+        return this.setPlayer(doc?.getDefaultPlayer());
     }
 
     /**

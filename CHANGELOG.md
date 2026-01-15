@@ -2,6 +2,8 @@
 ## [6.3.0] - 2026-01-??
 ### Added
 - Common time signature: DocumentBuilder.setTimeSignature("C");
+- Each doc has default player, but in addition separate players can play the document, simultaneously.
+- `<WmsControls player={player} />` and WmsControls.setPlayer(player).
 
 ### Changed
 - Add fermata with DocumentBuilder.addAnnotation("articulation", "fermata"), deprecated DocumentBuilder.addFermata().

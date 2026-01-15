@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { WmsControls as PlainControls, MDocument } from "../pub";
+import { WmsControls as PlainControls, MDocument, Player } from "../pub";
 
 function addClass(el: Element, className: string) {
     Utils.Dom.addClass(el, ...className.split(" ").map(cls => cls.trim()));
@@ -32,13 +32,12 @@ class WmsControls extends BaseElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
-    private _doc?: MDocument;
+    private _player?: Player;
 
     constructor() {
         super();
 
         this.ctrl = new PlainControls();
-        this.ctrl.setDocument(this._doc);
     }
 
     static get observedAttributes() {
@@ -136,6 +135,16 @@ class WmsControls extends BaseElement {
 
     get doc(): MDocument | undefined {
         return this._doc;
+    }
+
+    set player(player: Player | undefined) {
+        this._player = player;
+        if (this._connected)
+            this.update();
+    }
+
+    get player(): Player | undefined {
+        return this._player;
     }
 
     private render() {

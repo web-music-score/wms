@@ -1,14 +1,16 @@
 import * as Audio from "web-music-score/audio";
 import { Guard, ValueSet, Rect } from "@tspro/ts-utils-lib";
-import { Player as InternalPlayer } from "../engine/player";
-import { PlayStateChangeListener } from "./types";
+import { PlayerEngine } from "../engine/player-engine";
+import { PlayState, PlayStateChangeListener } from "./types";
 import { MDocument } from "./mobjects";
 import { AssertUtil } from "shared-src";
+import { isWmsControls } from "score/custom-element/wms-controls";
+import { MusicError, MusicErrorType } from "core/error";
 
 export class Player {
     private static currentlyPlaying = new ValueSet<Player>();
 
-    private readonly player: InternalPlayer;
+    private readonly player: PlayerEngine;
 
     /**
      * Create new music player.
@@ -19,17 +21,49 @@ export class Player {
         AssertUtil.assertVar(doc instanceof MDocument, "doc", doc);
         AssertUtil.assertVar(Guard.isFunctionOrUndefined(playStateChangeListener), "playStateChangeListener", playStateChangeListener);
 
-        this.player = new InternalPlayer();
+        this.player = new PlayerEngine();
 
         this.player.setDocument(doc.getMusicObject());
 
         this.player.setCursorPositionChangeListener((cursorRect?: Rect) => {
-            doc.getMusicObject().updateCursorRect(cursorRect);
+            doc.getMusicObject().updateCursorRect(this, cursorRect);
         });
 
         if (playStateChangeListener) {
-            this.player.setPlayStateChnageListener(playStateChangeListener);
+            this.player.setPlayStateChangeListener(playStateChangeListener);
         }
+    }
+
+    /**
+     * Set play state change listener.
+     * @param playStateChangeListener - Play state change listener.
+     */
+    setPlayStateChangeListener(playStateChangeListener: PlayStateChangeListener) {
+        this.player.setPlayStateChangeListener(playStateChangeListener);
+    }
+
+    /**
+     * Remove play state change listener.
+     * @param playStateChangeListener - Play state change listener.
+     */
+    removePlayStateChangeListener(playStateChangeListener: PlayStateChangeListener) {
+        this.player.removePlayStateChangeListener(playStateChangeListener);
+    }
+
+    /**
+     * Get play state change listeners.
+     * @param playStateChangeListener - Array of play state change listeners.
+     */
+    getPlayStateChangeListeners(): PlayStateChangeListener[] {
+        return this.player.getPlayStateChangeListeners();
+    }
+
+    /**
+     * Get play state.
+     * @returns - Play state.
+     */
+    getPlayState(): PlayState {
+        return this.player.getPlayState();
     }
 
     /**
@@ -72,5 +106,63 @@ export class Player {
         Player.currentlyPlaying.delete(this);
 
         return this;
+    }
+
+    private boundElements = new ValueSet<HTMLElement>();
+
+    /**
+     * Bind this player to custom HTML element.
+     * @param idOrEl - HTML element id or element.
+     */
+    bindElement(...idOrEl: (string | HTMLElement)[]) {
+        AssertUtil.assertVar(
+            Guard.isArray(idOrEl) &&
+            (
+                idOrEl.length === 0 ||
+                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
+            ),
+            "idOrEl", idOrEl);
+
+        if (typeof document === "undefined")
+            return;
+
+        idOrEl.forEach(idOrEl => {
+            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+
+            if (isWmsControls(el)) {
+                el.addEventListener("disconnected", () => this.boundElements.delete(el));
+                el.player = this;
+            }
+            else
+                throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-controls>!");
+        });
+    }
+
+    /**
+     * Unbind this player from custom HTML element.
+     * @param idOrEl - HTML element id or element.
+     */
+    unbindElement(...idOrEl: (string | HTMLElement)[]) {
+        AssertUtil.assertVar(
+            Guard.isArray(idOrEl) &&
+            (
+                idOrEl.length === 0 ||
+                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
+            ),
+            "idOrEl", idOrEl);
+
+        if (typeof document === "undefined")
+            return;
+
+        idOrEl.forEach(idOrEl => {
+            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+
+            if (isWmsControls(el)) {
+                el.player = undefined;
+                this.boundElements.delete(el);
+            }
+            else
+                throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
+        });
     }
 }

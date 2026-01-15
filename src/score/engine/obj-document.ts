@@ -3,7 +3,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId } from "../pub";
+import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId, Player } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
@@ -16,7 +16,7 @@ import { isWmsControls } from "../custom-element/wms-controls";
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
 
-    private attachedRcSet = new ValueSet<View>();
+    private attachedViews = new ValueSet<View>();
 
     readonly regions = new ScoreRowRegions();
 
@@ -131,7 +131,7 @@ export class ObjDocument extends MusicObject {
 
     addView(view?: View) {
         if (!view) return;
-        this.attachedRcSet.add(view);
+        this.attachedViews.add(view);
         view.setDocument(this);
         this.requestFullLayout();
     }
@@ -139,7 +139,7 @@ export class ObjDocument extends MusicObject {
     removeView(view?: View) {
         if (!view) return;
         view.setDocument(undefined);
-        this.attachedRcSet.delete(view);
+        this.attachedViews.delete(view);
     }
 
     setHeader(title?: string, composer?: string, arranger?: string) {
@@ -247,9 +247,9 @@ export class ObjDocument extends MusicObject {
         this.measures.forEach(m => m.resetPassCount());
     }
 
-    updateCursorRect(cursorRect?: Rect) {
-        for (const rc of this.attachedRcSet)
-            rc.updateCursorRect(cursorRect);
+    updateCursorRect(player: Player, cursorRect?: Rect) {
+        for (const view of this.attachedViews)
+            view.updateCursorRect(player, cursorRect);
     }
 
     requestLayout() {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { MDocument, WmsControls as JsControls } from "web-music-score/score";
+import { MDocument, WmsControls as JsControls, Player } from "web-music-score/score";
 
 function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
     // SSR safe
@@ -29,6 +29,7 @@ function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
 
 export interface WmsControlsProps {
     doc?: MDocument;
+    player?: Player;
     singlePlayStop?: boolean;
     playStop?: boolean;
     playPauseStop?: boolean;
@@ -79,9 +80,12 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
     constructor(props: WmsControlsProps) {
         super(props);
 
-        this.state = {
-            controls: new JsControls().setDocument(props.doc)
-        }
+        const controls = new JsControls();
+
+        if (props.player) controls.setPlayer(props.player);
+        else if (props.doc) controls.setDocument(props.doc);
+
+        this.state = { controls }
 
         switch (detectStyleSystem()) {
             case "bootstrap":

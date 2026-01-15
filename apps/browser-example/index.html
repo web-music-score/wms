@@ -27,32 +27,29 @@
     <script src="../../node_modules/web-music-score/dist/iife/index.js"></script>
     <script src="../../node_modules/web-music-score/dist/iife/audio-cg.js"></script>
 
-    <h2>Using Plain JS</h2>
-    <canvas id="scoreCanvas"></canvas><br />
-    <br />
-    <div class="wms-button-group">
-        <button id="playButton" type="button" class="wms-button"></button>
-        <button id="stopButton" type="button" class="wms-button"></button>
-    </div>
-    <br />
-
-    <h2>Using Custom HTML Elements</h2>
-    <wms-view id="wms-view"></wms-view>
-    <br />
-    <wms-controls id="wms-buttons" playStop></wms-controls>
-    <br />
-
     <script>
         const { Audio, Score } = window.WebMusicScore;
         const { ClassicalGuitar } = window.Audio_CG;
 
         Audio.addInstrument(ClassicalGuitar);
+    </script>
 
-        const paint = new Score.Paint()
+    <h2>Using Plain JS</h2>
+    <canvas id="scoreCanvas"></canvas><br />
+    <br />
+    <div class="wms-button-group">
+        <button id="playButton" type="button" class="wms-button"></button>
+        <button id="pauseButton" type="button" class="wms-button"></button>
+        <button id="stopButton" type="button" class="wms-button"></button>
+    </div>
+    <br />
+
+    <script>
+        const paint1 = new Score.Paint()
             .setColor("background", "#ddd")
             .setColor("staff", "red");
 
-        const docPlainJs = new Score.DocumentBuilder()
+        const doc1 = new Score.DocumentBuilder()
             .setScoreConfiguration("treble")
             .setTimeSignature("3/4")
             .addNote(0, ["C4", "E4", "G4"], "4n")
@@ -60,18 +57,35 @@
             .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
             .getDocument();
 
+        const player1 = new Score.Player(doc1);
+
         new Score.WmsView()
             .setCanvas("scoreCanvas")
-            .setDocument(docPlainJs)
-            .setPaint(paint)
+            .setDocument(doc1)
+            .setPaint(paint1)
             .draw();
 
         new Score.WmsControls()
             .setPlayButton("playButton")
+            .setPauseButton("pauseButton")
             .setStopButton("stopButton")
-            .setDocument(docPlainJs);
+            //.setDocument(doc1)
+            .setPlayer(player1);
+    </script>
 
-        const docHtmlEl = new Score.DocumentBuilder()
+
+    <h2>Using Custom HTML Elements</h2>
+    <wms-view id="wms-view"></wms-view>
+    <br />
+    <wms-controls id="wms-buttons" playPauseStop></wms-controls>
+    <br />
+
+    <script>
+        const paint2 = new Score.Paint()
+            .setColor("background", "#ddd")
+            .setColor("staff", "red");
+
+        const doc2 = new Score.DocumentBuilder()
             .setScoreConfiguration("treble")
             .setTimeSignature("3/4")
             .addNote(0, ["C4", "E4", "G4"], "4n")
@@ -79,8 +93,11 @@
             .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
             .getDocument();
 
-        docHtmlEl.bindElement("wms-view", "wms-buttons");
-        paint.bindElement("wms-view");
+        const player2 = new Score.Player(doc1);
+
+        doc2.bindElement("wms-view", "wms-buttons");
+        player2.bindElement("wms-buttons");
+        paint2.bindElement("wms-view");
 
     </script>
 </body>

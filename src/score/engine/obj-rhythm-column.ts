@@ -7,7 +7,7 @@ import { ObjArpeggio } from "./obj-arpeggio";
 import { ObjMeasure } from "./obj-measure";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
-import { PlayerColumnProps } from "./player";
+import { PlayerColumnProps } from "./player-engine";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
