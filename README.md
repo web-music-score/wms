@@ -39,7 +39,7 @@ function render() {
 ### Render With Custom HTML Element
 
 ```html
-<script src="https://unpkg.com/web-music-score@6.2.1/dist/iife/index.js"></script>
+<script src="https://unpkg.com/web-music-score@6.3.0-pre.1/dist/iife/index.js"></script>
 
 <wms-view id="view1"></wms-view>
 
@@ -52,7 +52,7 @@ function render() {
 ### Render With Plain JavaScript
 
 ```html
-<script src="https://unpkg.com/web-music-score@6.2.1/dist/iife/index.js"></script>
+<script src="https://unpkg.com/web-music-score@6.3.0-pre.1/dist/iife/index.js"></script>
 
 <canvas id="canvas1"></canvas><br />
 

@@ -371,16 +371,11 @@ export class PlayerEngine {
             });
 
             let speedArr = speedMap.getOrDefault(col, []);
-            if (speedArr.length > 0) {
-                curSpeed = Utils.Math.sum(speedArr) / speedArr.length;
-            }
+            if (speedArr.length > 0) curSpeed = Utils.Math.avg(...speedArr);
+            col.getPlayerProps().setSpeed(curSpeed);
 
             let volumeArr = volumeMap.getOrDefault(col, []);
-            if (volumeArr.length > 0) {
-                curVolume = Utils.Math.sum(volumeArr) / volumeArr.length;
-            }
-
-            col.getPlayerProps().setSpeed(curSpeed);
+            if (volumeArr.length > 0) curVolume = Utils.Math.avg(...volumeArr);
             col.getPlayerProps().setVolume(curVolume);
         });
 

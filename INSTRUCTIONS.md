@@ -22,4 +22,9 @@
 
 ## Publish
     npm login
+
+    // Latest
     npm publish --access public
+
+    // Next
+    npm publish --access public --tag next

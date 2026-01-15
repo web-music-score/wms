@@ -1,5 +1,5 @@
 # Changelog
-## [6.3.0] - 2026-01-??
+## [6.3.0-pre.1] - 2026-01-??
 ### Added
 - Common time signature: DocumentBuilder.setTimeSignature("C");
 - Each doc has default player, but in addition separate players can play the document, simultaneously.
