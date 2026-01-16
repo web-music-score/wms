@@ -265,7 +265,7 @@ export class MDocument extends MusicInterface {
      * @param elem - HTML element id or element.
      */
     bindElement(elem: string | HTMLElement) {
-        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
@@ -281,7 +281,7 @@ export class MDocument extends MusicInterface {
      * @param elem - HTML element id or element.
      */
     unbindElement(elem: string | HTMLElement) {
-        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 

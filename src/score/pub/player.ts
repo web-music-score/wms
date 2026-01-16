@@ -115,7 +115,7 @@ export class Player {
      * @param elem - HTML element id or element.
      */
     bindElement(elem: string | HTMLElement) {
-        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
 
         if (typeof document === "undefined")
             return;
@@ -135,7 +135,7 @@ export class Player {
      * @param elem - HTML element id or element.
      */
     unbindElement(elem: string | HTMLElement) {
-        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
 
         if (typeof document === "undefined")
             return;
