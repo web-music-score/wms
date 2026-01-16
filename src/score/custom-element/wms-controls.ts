@@ -21,6 +21,7 @@ class WmsControls extends BaseElement {
     private pauseLabel?: string;
     private stopLabel?: string;
 
+    private singlePlay = false;
     private singlePlayStop = false;
     private playStop = false;
     private playPauseStop = true;
@@ -43,6 +44,7 @@ class WmsControls extends BaseElement {
     static get observedAttributes() {
         return [
             "src",
+            "singlePlay",
             "singlePlayStop",
             "playStop",
             "playPauseStop",
@@ -64,6 +66,13 @@ class WmsControls extends BaseElement {
         if (name === "stopLabel" && value)
             this.stopLabel = value;
 
+        if (name === "singlePlay") {
+            this.singlePlay = true;
+            this.singlePlayStop = true;
+            this.playStop = false;
+            this.playPauseStop = false;
+        }
+
         if (name === "singlePlayStop") {
             this.singlePlayStop = true;
             this.playStop = false;
@@ -71,12 +80,14 @@ class WmsControls extends BaseElement {
         }
 
         if (name === "playStop") {
+            this.singlePlay = false;
             this.singlePlayStop = false;
             this.playStop = true;
             this.playPauseStop = false;
         }
 
         if (name === "playPauseStop") {
+            this.singlePlay = false;
             this.singlePlayStop = false;
             this.playStop = false;
             this.playPauseStop = true;
@@ -107,11 +118,14 @@ class WmsControls extends BaseElement {
             this.pauseLabel = this.getAttribute("pauseLabel") || undefined;
             this.stopLabel = this.getAttribute("stopLabel") || undefined;
 
+            this.singlePlay = false;
             this.singlePlayStop = false;
             this.playStop = false;
             this.playPauseStop = false;
 
-            if (this.hasAttribute("singlePlayStop"))
+            if (this.hasAttribute("singlePlay"))
+                this.singlePlay = true;
+            else if (this.hasAttribute("singlePlayStop"))
                 this.singlePlayStop = true;
             else if (this.hasAttribute("playStop"))
                 this.playStop = true;
@@ -154,12 +168,19 @@ class WmsControls extends BaseElement {
         this.div.innerHTML = "";
         this.btnPlay = this.btnPause = this.btnStop = undefined;
 
-        if (this.singlePlayStop) {
+        if (this.singlePlay) {
             if (!this.btnPlay) {
                 this.btnPlay = document.createElement("button");
                 this.div.append(this.btnPlay);
             }
-            this.ctrl.setPlayStopButton(this.btnPlay, this.playLabel);
+            this.ctrl.setPlayButton(this.btnPlay, this.playLabel);
+        }
+        else if (this.singlePlayStop) {
+            if (!this.btnPlay) {
+                this.btnPlay = document.createElement("button");
+                this.div.append(this.btnPlay);
+            }
+            this.ctrl.setPlayStopButton(this.btnPlay, this.playLabel, this.stopLabel);
         }
         else if (this.playStop) {
             if (!this.btnPlay) {

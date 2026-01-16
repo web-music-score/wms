@@ -30,6 +30,7 @@ function detectStyleSystem(): "bootstrap" | "infima" | "unknown" {
 export interface WmsControlsProps {
     doc?: MDocument;
     player?: Player;
+    singlePlay?: boolean;
     singlePlayStop?: boolean;
     playStop?: boolean;
     playPauseStop?: boolean;
@@ -47,7 +48,7 @@ export interface WmsControlsState {
  * ```ts
  *   // Using with React TSX/JSX
  *   import * as Score from "web-music-score/score";
- *   import * as ScoreUI from "web-music-score/react-ui";
+ *   import * as ReactUI from "web-music-score/react-ui";
  * 
  *   // Create document.
  *   const doc = new Score.DocumentBuilder()
@@ -55,19 +56,22 @@ export interface WmsControlsState {
  *       .getDocument();
  * 
  *   // Create default playback buttons (play, pause and stop buttons).
- *   <ScoreUI.WmsControls doc={doc} />
+ *   <ReactUI.WmsControls doc={doc} />
  *
- *   // Create playback buttons with single play/stop button.
- *   <ScoreUI.WmsControls doc={doc} singlePlayStop />
+ *   // Create playback buttons with single play button.
+ *   <ReactUI.WmsControls doc={doc} play />
+
+*   // Create playback buttons with single play/stop button.
+ *   <ReactUI.WmsControls doc={doc} singlePlayStop />
  * 
  *   // Create playback buttons with play and stop buttons.
- *   <ScoreUI.WmsControls doc={doc} playStop />
+ *   <ReactUI.WmsControls doc={doc} playStop />
  * 
  *   // Create playback buttons with play, pause and stop buttons.
- *   <ScoreUI.WmsControls doc={doc} playPauseStop />
+ *   <ReactUI.WmsControls doc={doc} playPauseStop />
  * 
  *   // You can also set custom play, pause and stop button labels.
- *   <ScoreUI.WmsControls doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" />
+ *   <ReactUI.WmsControls doc={doc} playLabel="⏵" pauseLabel="⏸" stopLabel="⏹" />
  * ```
  */
 export class WmsControls extends React.Component<WmsControlsProps, WmsControlsState> {
@@ -109,7 +113,7 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
     }
 
     render() {
-        let { singlePlayStop, playStop, playLabel, pauseLabel, stopLabel } = this.props;
+        let { singlePlay, singlePlayStop, playStop, playLabel, pauseLabel, stopLabel } = this.props;
         let { controls: controller } = this.state;
         const { buttonClass, buttonGroupClass } = this;
 
@@ -117,9 +121,18 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
         pauseLabel ??= "Pause";
         stopLabel ??= "Stop";
 
-        if (singlePlayStop) {
+        if (singlePlay) {
             return (
-                <button className={buttonClass} ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
+                <div className={buttonGroupClass}>
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
+                </div>
+            );
+        }
+        else if (singlePlayStop) {
+            return (
+                <div className={buttonGroupClass}>
+                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
+                </div>
             );
         }
         else if (playStop) {
