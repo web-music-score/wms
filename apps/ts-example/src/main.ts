@@ -12,7 +12,5 @@ new Score.WmsView()
     .draw();
 
 new Score.WmsControls()
-    .setPlayButton("playButton")
-    .setPauseButton("pauseButton")
-    .setStopButton("stopButton")
+    .setPlayPauseStop("playButton", "pauseButton", "stopButton")
     .setDocument(doc);

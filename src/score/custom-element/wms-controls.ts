@@ -173,14 +173,14 @@ class WmsControls extends BaseElement {
                 this.btnPlay = document.createElement("button");
                 this.div.append(this.btnPlay);
             }
-            this.ctrl.setPlayButton(this.btnPlay, this.playLabel);
+            this.ctrl.setSinglePlay(this.btnPlay, this.playLabel);
         }
         else if (this.singlePlayStop) {
             if (!this.btnPlay) {
                 this.btnPlay = document.createElement("button");
                 this.div.append(this.btnPlay);
             }
-            this.ctrl.setPlayStopButton(this.btnPlay, this.playLabel, this.stopLabel);
+            this.ctrl.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
         }
         else if (this.playStop) {
             if (!this.btnPlay) {
@@ -191,8 +191,7 @@ class WmsControls extends BaseElement {
                 this.btnStop = document.createElement("button");
                 this.div.append(this.btnStop);
             }
-            this.ctrl.setPlayButton(this.btnPlay, this.playLabel);
-            this.ctrl.setStopButton(this.btnStop, this.stopLabel);
+            this.ctrl.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
         }
         else if (this.playPauseStop) {
             if (!this.btnPlay) {
@@ -207,9 +206,7 @@ class WmsControls extends BaseElement {
                 this.btnStop = document.createElement("button");
                 this.div.append(this.btnStop);
             }
-            this.ctrl.setPlayButton(this.btnPlay, this.playLabel);
-            this.ctrl.setPauseButton(this.btnPause, this.pauseLabel);
-            this.ctrl.setStopButton(this.btnStop, this.stopLabel);
+            this.ctrl.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
         }
 
         if (this.btnPlay) {

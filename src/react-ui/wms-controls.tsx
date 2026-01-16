@@ -81,6 +81,10 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
     private buttonClass: string;
     private buttonGroupClass: string;
 
+    private btnPlay?: HTMLButtonElement;
+    private btnPause?: HTMLButtonElement;
+    private btnStop?: HTMLButtonElement;
+
     constructor(props: WmsControlsProps) {
         super(props);
 
@@ -117,29 +121,53 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
         let { controls: controller } = this.state;
         const { buttonClass, buttonGroupClass } = this;
 
-        playLabel ??= "Play";
-        pauseLabel ??= "Pause";
-        stopLabel ??= "Stop";
+        playLabel ??= JsControls.DefaultPlayLabel;
+        pauseLabel ??= JsControls.DefaultPauseLabel;
+        stopLabel ??= JsControls.DefaultStopLabel;
+
+        this.btnPlay = this.btnPause = this.btnStop = undefined;
 
         if (singlePlay) {
             return (
                 <div className={buttonGroupClass}>
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnPlay = btn;
+                            controller.setSinglePlay(this.btnPlay, playLabel);
+                        }
+                    }} />
                 </div>
             );
         }
         else if (singlePlayStop) {
             return (
                 <div className={buttonGroupClass}>
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayStopButton(btn, playLabel, stopLabel); }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnPlay = btn;
+                            controller.setSinglePlayStop(btn, playLabel, stopLabel);
+                        }
+                    }} />
                 </div>
             );
         }
         else if (playStop) {
             return (
                 <div className={buttonGroupClass}>
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnPlay = btn;
+                            if (this.btnPlay && this.btnStop)
+                                controller.setPlayStop(this.btnPlay, this.btnStop, playLabel, stopLabel);
+                        }
+                    }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnStop = btn;
+                            if (this.btnPlay && this.btnStop)
+                                controller.setPlayStop(this.btnPlay, this.btnStop, playLabel, stopLabel);
+                        }
+                    }} />
                 </div>
             );
         }
@@ -147,9 +175,27 @@ export class WmsControls extends React.Component<WmsControlsProps, WmsControlsSt
             // Default is playPauseStop
             return (
                 <div className={buttonGroupClass}>
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setPlayButton(btn, playLabel); }} />
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setPauseButton(btn, pauseLabel); }} />
-                    <button className={buttonClass} ref={btn => { if (btn) controller.setStopButton(btn, stopLabel); }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnPlay = btn;
+                            if (this.btnPlay && this.btnPause && this.btnStop)
+                                controller.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, playLabel, pauseLabel, stopLabel);
+                        }
+                    }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnPause = btn;
+                            if (this.btnPlay && this.btnPause && this.btnStop)
+                                controller.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, playLabel, pauseLabel, stopLabel);
+                        }
+                    }} />
+                    <button className={buttonClass} ref={btn => {
+                        if (btn) {
+                            this.btnStop = btn;
+                            if (this.btnPlay && this.btnPause && this.btnStop)
+                                controller.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, playLabel, pauseLabel, stopLabel);
+                        }
+                    }} />
                 </div>
             );
         }

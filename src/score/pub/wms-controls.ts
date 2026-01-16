@@ -5,6 +5,10 @@ import { Player } from "./player";
 import { AssertUtil } from "shared-src";
 
 export class WmsControls {
+    public static readonly DefaultPlayLabel = "Play";
+    public static readonly DefaultPauseLabel = "Pause";
+    public static readonly DefaultStopLabel = "Stop";
+
     private playButton?: HTMLButtonElement;
     private stopButton?: HTMLButtonElement;
     private playStopButton?: HTMLButtonElement;
@@ -15,9 +19,9 @@ export class WmsControls {
     private onPlayStop: () => void;
     private onPause: () => void;
 
-    private playLabel = "Play";
-    private stopLabel = "Stop";
-    private pauseLabel = "Pause";
+    private playLabel = WmsControls.DefaultPlayLabel;
+    private stopLabel = WmsControls.DefaultStopLabel;
+    private pauseLabel = WmsControls.DefaultPauseLabel;
 
     private playState: PlayState = PlayState.Stopped;
 
@@ -106,17 +110,19 @@ export class WmsControls {
 
     /**
      * Set play button.
-     * @param btn - HTML button element or element id.
+     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
+     * @internal
+     * @param playBtn - HTML button element or element id.
      * @param playLabel - Custom button label (e.g. "Play").
      * @returns - This playback buttons class instance.
      */
-    setPlayButton(btn: HTMLButtonElement | string, playLabel?: string): WmsControls {
+    setPlayButton(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
 
         WmsControls.removeOnClickListeners(this.playButton, this.onPlay);
 
-        this.playButton = AssertUtil.requireVar("playButton", Utils.Dom.getButton(btn));
-        this.playLabel = playLabel ?? "Play";
+        this.playButton = AssertUtil.requireVar("playBtn", Utils.Dom.getButton(playBtn));
+        this.playLabel = playLabel ?? WmsControls.DefaultPlayLabel;
 
         WmsControls.removeOnClickListeners(this.playButton, "all");
         WmsControls.addOnClickListener(this.playButton, this.onPlay);
@@ -128,17 +134,19 @@ export class WmsControls {
 
     /**
      * Set stop button.
-     * @param btn - HTML button element or element id.
+     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
+     * @internal
+     * @param stopBtn - HTML button element or element id.
      * @param stopLabel - Custom button label (e.g. "Stop").
      * @returns - This playback buttons class instance.
      */
-    setStopButton(btn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
+    setStopButton(stopBtn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
         WmsControls.removeOnClickListeners(this.stopButton, this.onStop);
 
-        this.stopButton = AssertUtil.requireVar("stopButton", Utils.Dom.getButton(btn));
-        this.stopLabel = stopLabel ?? "Stop";
+        this.stopButton = AssertUtil.requireVar("stopBtn", Utils.Dom.getButton(stopBtn));
+        this.stopLabel = stopLabel ?? WmsControls.DefaultStopLabel;
 
         WmsControls.removeOnClickListeners(this.stopButton, "all");
         WmsControls.addOnClickListener(this.stopButton, this.onStop);
@@ -150,20 +158,22 @@ export class WmsControls {
 
     /**
      * Set play/stop button.
-     * @param btn - HTML button element or element id.
+     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
+     * @internal
+     * @param playStopBtn - HTML button element or element id.
      * @param playLabel - Custom button label for play action (e.g. "Play").
      * @param stopLabel - Custom button label for stop action (e.g. "Stop").
      * @returns - This playback buttons class instance.
      */
-    setPlayStopButton(btn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
+    setPlayStopButton(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
         AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
         WmsControls.removeOnClickListeners(this.playStopButton, this.onPlayStop);
 
-        this.playStopButton = AssertUtil.requireVar("playStopButton", Utils.Dom.getButton(btn));
-        this.playLabel = playLabel ?? "Play";
-        this.stopLabel = stopLabel ?? "Stop";
+        this.playStopButton = AssertUtil.requireVar("playStopBtn", Utils.Dom.getButton(playStopBtn));
+        this.playLabel = playLabel ?? WmsControls.DefaultPlayLabel;
+        this.stopLabel = stopLabel ?? WmsControls.DefaultStopLabel;
 
         WmsControls.removeOnClickListeners(this.playStopButton, "all");
         WmsControls.addOnClickListener(this.playStopButton, this.onPlayStop);
@@ -175,17 +185,19 @@ export class WmsControls {
 
     /**
      * Set pause button.
-     * @param btn - HTML button element or element id.
+     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
+     * @internal
+     * @param pauseBtn - HTML button element or element id.
      * @param pauseLabel - Custom button label (e.g. "Pause").
      * @returns - This playback buttons class instance.
      */
-    setPauseButton(btn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
+    setPauseButton(pauseBtn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(pauseLabel), "pauseLabel", pauseLabel);
 
         WmsControls.removeOnClickListeners(this.pauseButton, this.onPause);
 
-        this.pauseButton = AssertUtil.requireVar("pauseButton", Utils.Dom.getButton(btn));
-        this.pauseLabel = pauseLabel ?? "Pause";
+        this.pauseButton = AssertUtil.requireVar("pauseBtn", Utils.Dom.getButton(pauseBtn));
+        this.pauseLabel = pauseLabel ?? WmsControls.DefaultPauseLabel;
 
         WmsControls.removeOnClickListeners(this.pauseButton, "all");
         WmsControls.addOnClickListener(this.pauseButton, this.onPause);
@@ -219,5 +231,59 @@ export class WmsControls {
         AssertUtil.assertVar(Guard.isFunction(onClickListener), "onClickListener", onClickListener);
         btn.addEventListener("click", onClickListener);
         this.savedOnClickListeners.getOrCreate(btn, []).push(onClickListener);
+    }
+
+    /**
+     * Setup with single play button.
+     * @param playBtn - Play button can be HTMLButtonElement or button element id.
+     * @param playLabel - Play button label (optional: "Play" if omitted).
+     * @returns 
+     */
+    setSinglePlay(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
+        this.setPlayButton(playBtn, playLabel);
+        return this;
+    }
+
+    /**
+     * Setup with single play/stop toggle button.
+     * @param playStopBtn - Play/Stop button can be HTMLButtonElement or button element id.
+     * @param playLabel - Play button label (optional: "Play" if omitted).
+     * @param stopLabel - Stop button label (optional: "Stop" if omitted).
+     * @returns 
+     */
+    setSinglePlayStop(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string) {
+        this.setPlayStopButton(playStopBtn, playLabel);
+        return this;
+    }
+
+    /**
+     * Setup with play and stop buttons.
+     * @param playBtn - Play button can be HTMLButtonElement or button element id.
+     * @param stopBtn - Stop button can be HTMLButtonElement or button element id.
+     * @param playLabel - Play button label (optional: "Play" if omitted).
+     * @param stopLabel - Stop button label (optional: "Stop" if omitted).
+     * @returns 
+     */
+    setPlayStop(playBtn: HTMLButtonElement | string, stopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string) {
+        this.setPlayButton(playBtn, playLabel);
+        this.setStopButton(stopBtn, stopLabel);
+        return this;
+    }
+
+    /**
+     * Setup with play, pause and stop buttons.
+     * @param playBtn - Play button can be HTMLButtonElement or button element id.
+     * @param pauseBtn - Pause button can be HTMLButtonElement or button element id.
+     * @param stopBtn - Stop button can be HTMLButtonElement or button element id.
+     * @param playLabel - Play button label (optional: "Play" if omitted).
+     * @param pauseLabel - Pause button label (optional: "Pause" if omitted).
+     * @param stopLabel - Stop button label (optional: "Stop" if omitted).
+     * @returns 
+     */
+    setPlayPauseStop(playBtn: HTMLButtonElement | string, pauseBtn: HTMLButtonElement | string, stopBtn: HTMLButtonElement | string, playLabel?: string, pauseLabel?: string, stopLabel?: string) {
+        this.setPlayButton(playBtn, playLabel);
+        this.setPauseButton(pauseBtn, pauseLabel);
+        this.setStopButton(stopBtn, stopLabel);
+        return this;
     }
 }
