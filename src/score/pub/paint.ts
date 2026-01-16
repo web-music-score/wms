@@ -179,7 +179,7 @@ export class Paint {
         for (const key of Object.keys(this.colors) as ColorKey[]) {
             const parts = key.split(".").map(norm);
 
-            if(parts.includes("fermata")) 
+            if (parts.includes("fermata"))
                 warnDeprecated("Color key 'fermata' is deprecated, it belongs to 'annotation'.");
 
             const match = normalizedParts.every(a => parts.includes(a));
@@ -254,57 +254,41 @@ export class Paint {
 
     /**
      * Bind this paint to custom HTML element.
-     * @param idOrEl - HTML element id or element.
+     * @param elem - HTML element id or element.
      */
-    bindElement(...idOrEl: (string | HTMLElement)[]) {
-        AssertUtil.assertVar(
-            Guard.isArray(idOrEl) &&
-            (
-                idOrEl.length === 0 ||
-                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
-            ),
-            "idOrEl", idOrEl);
+    bindElement(elem: string | HTMLElement) {
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
 
         if (typeof document === "undefined")
             return;
 
-        idOrEl.forEach(idOrEl => {
-            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-            if (isWmsView(el)) {
-                el.addEventListener("disconnected", () => this.boundElements.delete(el));
-                el.paint = this;
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view>!");
-        });
+        if (isWmsView(el)) {
+            el.addEventListener("disconnected", () => this.boundElements.delete(el));
+            el.paint = this;
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view>!");
     }
 
     /**
      * Unbind this paint from custom HTML element.
-     * @param idOrEl - HTML element id or element.
+     * @param elem - HTML element id or element.
      */
-    unbindElement(...idOrEl: (string | HTMLElement)[]) {
-        AssertUtil.assertVar(
-            Guard.isArray(idOrEl) &&
-            (
-                idOrEl.length === 0 ||
-                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
-            ),
-            "idOrEl", idOrEl);
+    unbindElement(elem: string | HTMLElement) {
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
 
         if (typeof document === "undefined")
             return;
 
-        idOrEl.forEach(idOrEl => {
-            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-            if (isWmsView(el)) {
-                el.paint = undefined;
-                this.boundElements.delete(el);
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
-        });
+        if (isWmsView(el)) {
+            el.paint = undefined;
+            this.boundElements.delete(el);
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
     }
 }

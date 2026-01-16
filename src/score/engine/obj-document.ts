@@ -384,25 +384,25 @@ export class ObjDocument extends MusicObject {
 
     private boundElements = new ValueSet<HTMLElement>();
 
-    bindElement(el: HTMLElement) {
+    bindElement(elem: HTMLElement) {
         if (typeof document === "undefined")
             return;
 
-        if (isWmsView(el) || isWmsControls(el)) {
-            el.doc = this.getMusicInterface();
-            this.boundElements.add(el);
-            el.addEventListener("disconnected", () => this.boundElements.delete(el));
+        if (isWmsView(elem) || isWmsControls(elem)) {
+            elem.doc = this.getMusicInterface();
+            this.boundElements.add(elem);
+            elem.addEventListener("disconnected", () => this.boundElements.delete(elem));
             this.requestFullLayout();
         }
     }
 
-    unbindElement(el: HTMLElement) {
+    unbindElement(elem: HTMLElement) {
         if (typeof document === "undefined")
             return;
 
-        if (isWmsView(el) || isWmsControls(el)) {
-            el.doc = undefined;
-            this.boundElements.delete(el);
+        if (isWmsView(elem) || isWmsControls(elem)) {
+            elem.doc = undefined;
+            this.boundElements.delete(elem);
             this.requestFullLayout();
         }
     }

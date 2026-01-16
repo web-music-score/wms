@@ -112,57 +112,41 @@ export class Player {
 
     /**
      * Bind this player to custom HTML element.
-     * @param idOrEl - HTML element id or element.
+     * @param elem - HTML element id or element.
      */
-    bindElement(...idOrEl: (string | HTMLElement)[]) {
-        AssertUtil.assertVar(
-            Guard.isArray(idOrEl) &&
-            (
-                idOrEl.length === 0 ||
-                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
-            ),
-            "idOrEl", idOrEl);
+    bindElement(elem: string | HTMLElement) {
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
 
         if (typeof document === "undefined")
             return;
 
-        idOrEl.forEach(idOrEl => {
-            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-            if (isWmsControls(el)) {
-                el.addEventListener("disconnected", () => this.boundElements.delete(el));
-                el.player = this;
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-controls>!");
-        });
+        if (isWmsControls(el)) {
+            el.addEventListener("disconnected", () => this.boundElements.delete(el));
+            el.player = this;
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-controls>!");
     }
 
     /**
      * Unbind this player from custom HTML element.
-     * @param idOrEl - HTML element id or element.
+     * @param elem - HTML element id or element.
      */
-    unbindElement(...idOrEl: (string | HTMLElement)[]) {
-        AssertUtil.assertVar(
-            Guard.isArray(idOrEl) &&
-            (
-                idOrEl.length === 0 ||
-                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
-            ),
-            "idOrEl", idOrEl);
+    unbindElement(elem: string | HTMLElement) {
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
 
         if (typeof document === "undefined")
             return;
 
-        idOrEl.forEach(idOrEl => {
-            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-            if (isWmsControls(el)) {
-                el.player = undefined;
-                this.boundElements.delete(el);
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
-        });
+        if (isWmsControls(el)) {
+            el.player = undefined;
+            this.boundElements.delete(el);
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
     }
 }

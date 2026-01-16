@@ -262,50 +262,34 @@ export class MDocument extends MusicInterface {
 
     /**
      * Bind this document to custom HTML element.
-     * @param idOrEl - HTML element id or element.
+     * @param elem - HTML element id or element.
      */
-    bindElement(...idOrEl: (string | HTMLElement)[]) {
-        AssertUtil.assertVar(
-            Guard.isArray(idOrEl) &&
-            (
-                idOrEl.length === 0 ||
-                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
-            ),
-            "idOrEl", idOrEl);
+    bindElement(elem: string | HTMLElement) {
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
 
-        idOrEl.forEach(idOrEl => {
-            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-            if (isWmsView(el) || isWmsControls(el)) {
-                this.obj.bindElement(el);
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view> or <wms-playback-buttons>!");
-        });
+        if (isWmsView(el) || isWmsControls(el)) {
+            this.obj.bindElement(el);
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view> or <wms-playback-buttons>!");
     }
 
     /**
      * Unbind this document from custom HTML element.
-     * @param idOrEl - HTML element id or element.
+     * @param elem - HTML element id or element.
      */
-    unbindElement(...idOrEl: (string | HTMLElement)[]) {
-        AssertUtil.assertVar(
-            Guard.isArray(idOrEl) &&
-            (
-                idOrEl.length === 0 ||
-                idOrEl.every(idOrEl => Guard.isNonEmptyString(idOrEl) || Guard.isObject(idOrEl))
-            ),
-            "idOrEl", idOrEl);
+    unbindElement(elem: string | HTMLElement) {
+        AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "idOrEl", elem);
 
-        idOrEl.forEach(idOrEl => {
-            const el = typeof idOrEl === "string" ? document.getElementById(idOrEl) : idOrEl;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-            if (isWmsView(el) || isWmsControls(el)) {
-                this.obj.unbindElement(el);
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view> or <wms-playback-buttons>!");
-        });
+        if (isWmsView(el) || isWmsControls(el)) {
+            this.obj.unbindElement(el);
+        }
+        else
+            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view> or <wms-playback-buttons>!");
     }
 }
 
