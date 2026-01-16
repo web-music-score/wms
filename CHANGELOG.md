@@ -1,5 +1,13 @@
 # Changelog
-## [6.3.0-pre.1] - 2026-01-??
+## [6.3.0-pre.2] - 2026-01-16
+### Added
+- Added WmsControls layout: singlePlay
+- Added WmsControls functions: setSinglePlay(), setSinglePlayStop(), setPlayStop() and setPlayPauseStop().
+
+### Deprecated
+- Score.WmsControls function: setPlayButton(), setPlayStopButton(), setPauseButton() and setStopButton().
+
+## [6.3.0-pre.1] - 2026-01-15
 ### Added
 - Common time signature: DocumentBuilder.setTimeSignature("C");
 - Each doc has default player, but in addition separate players can play the document, simultaneously.
