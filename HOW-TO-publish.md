@@ -1,6 +1,8 @@
 # HOW-TO Publish
 
 ## Pre-Release
+    // Update CHANGELOG.md
+
     // Set Version
     Set package.json "version" to "X.Y.Z-pre.N"`
 
@@ -20,6 +22,8 @@
     npm publish --access public --tag next
 
 ## Latest
+    // Update CHANGELOG.md
+
     // Set Version
     Set package.json "version" to "X.Y.Z"`
 

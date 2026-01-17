@@ -1,4 +1,10 @@
 # Changelog
+## [6.3.0] - 2026-01-17
+**Stable Release**
+## Changed
+- Include version in typedocs.
+- Fixzed tpedoc and stuff.
+
 ## [6.3.0-pre.2] - 2026-01-16
 ### Added
 - Added WmsControls layout: singlePlay
