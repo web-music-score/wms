@@ -8,7 +8,7 @@ import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { getAnnotation } from "../engine/element-data";
-import { AssertUtil } from "shared-src";
+import { AssertUtil, warnDeprecated } from "shared-src";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
@@ -666,6 +666,7 @@ export class DocumentBuilder {
      */
     addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
+        warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
         return this.addFermataInternal(undefined, fermata);
     }
 
@@ -674,6 +675,7 @@ export class DocumentBuilder {
      */
     addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);
+        warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
         return this.addFermataInternal(staffTabOrGroups, fermata);
     }
 

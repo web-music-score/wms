@@ -2,7 +2,7 @@ import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { PlayState } from "./types";
 import { MDocument } from "./mobjects";
 import { Player } from "./player";
-import { AssertUtil } from "shared-src";
+import { AssertUtil, warnDeprecated } from "shared-src";
 
 export class WmsControls {
     public static readonly DefaultPlayLabel = "Play";
@@ -118,6 +118,8 @@ export class WmsControls {
     setPlayButton(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
 
+        warnDeprecated("setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+
         WmsControls.removeOnClickListeners(this.playButton, this.onPlay);
 
         this.playButton = AssertUtil.requireVar("playBtn", Utils.Dom.getButton(playBtn));
@@ -140,6 +142,8 @@ export class WmsControls {
      */
     setStopButton(stopBtn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
+
+        warnDeprecated("setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
 
         WmsControls.removeOnClickListeners(this.stopButton, this.onStop);
 
@@ -166,6 +170,8 @@ export class WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
         AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
+        warnDeprecated("setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+
         WmsControls.removeOnClickListeners(this.playStopButton, this.onPlayStop);
 
         this.playStopButton = AssertUtil.requireVar("playStopBtn", Utils.Dom.getButton(playStopBtn));
@@ -189,6 +195,8 @@ export class WmsControls {
      */
     setPauseButton(pauseBtn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(pauseLabel), "pauseLabel", pauseLabel);
+
+        warnDeprecated("setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
 
         WmsControls.removeOnClickListeners(this.pauseButton, this.onPause);
 

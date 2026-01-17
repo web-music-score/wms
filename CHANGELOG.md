@@ -1,5 +1,7 @@
 # Changelog
 ## [6.4.0-pre.1] - 2026-01-??
+### Fixed
+- Missing and existing deprecation warning messages.
 
 ## [6.3.0] - 2026-01-17
 **Stable Release**

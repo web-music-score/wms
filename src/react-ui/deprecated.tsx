@@ -5,7 +5,7 @@ import { WmsView, WmsViewProps } from "./wms-view";
 
 /**
  * Deprecated stuff.
- * Will be removed on major update 7.0.0.
+ * Will be removed in future release.
  * 
  * Renamed classes:
  *  - MusicScoreView => WmsView
@@ -18,12 +18,12 @@ import { WmsView, WmsViewProps } from "./wms-view";
 export interface MusicScoreViewProps extends WmsViewProps { }
 
 /**
- * @deprecated - MusicScoreView is deprecated. Will be romoved in future release. Use WmsView instead.
+ * @deprecated - MusicScoreView is deprecated. Will be removed in future release. Use WmsView instead.
  */
 export class MusicScoreView extends WmsView {
     constructor(props: MusicScoreViewProps) {
         super(props);
-        warnDeprecated("MusicScoreView is deprecated.  Will be romoved in 7.0.0. Use WmsView instead.");
+        warnDeprecated("MusicScoreView is deprecated. Will be removed in future release. Use WmsView instead.");
     }
 }
 
@@ -33,11 +33,11 @@ export class MusicScoreView extends WmsView {
 export interface PlaybackButtonsProps extends WmsControlsProps { }
 
 /**
- * @deprecated - PlaybackButtons is deprecated. Will be romoved in future release. Use WmsControls instead.
+ * @deprecated - PlaybackButtons is deprecated. Will be removed in future release. Use WmsControls instead.
  */
 export class PlaybackButtons extends WmsControls {
     constructor(props: PlaybackButtonsProps) {
         super(props);
-        warnDeprecated("PlaybackButtons is deprecated.  Will be romoved in 7.0.0. Use WmsControls instead.");
+        warnDeprecated("PlaybackButtons is deprecated. Will be removed in future release. Use WmsControls instead.");
     }
 }

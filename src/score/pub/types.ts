@@ -268,7 +268,7 @@ export type LyricsOptions = {
 }
 
 /**
- * @deprecated - Fermata is deprecated. Will be removed in future release. Use Annotation and Articulaion instead.
+ * @deprecated - Fermata is deprecated. Will be removed in future release. Use Annotation and ArticulaionAnnotation instead.
  */
 export enum Fermata {
     /** Anchor fermata to note/rest. */

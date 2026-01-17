@@ -2,6 +2,7 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 import { MScoreRow, MusicInterface } from "./mobjects";
 import { WmsView } from "./wms-view";
 import { MRenderContext } from "./deprecated";
+import { warnDeprecated } from "shared-src";
 
 /** Score event type. */
 export type ScoreEventType = "enter" | "leave" | "click";
@@ -32,6 +33,7 @@ export class ScoreStaffPosEvent extends ScoreEvent {
      * @deprecated - renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
+        warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
         return this.view;
     }
 }
@@ -56,6 +58,7 @@ export class ScoreObjectEvent extends ScoreEvent {
      * @deprecated - renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
+        warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
         return this.view;
     }
 
