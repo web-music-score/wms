@@ -29,8 +29,7 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     }
 
     /**
-     * @deprecated - Use view instead. Will be removed in major update 7.0.0.
-     * @internal
+     * @deprecated - renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
         return this.view;
@@ -54,8 +53,7 @@ export class ScoreObjectEvent extends ScoreEvent {
     }
 
     /**
-     * @deprecated - Use view instead. Will be removed in major update 7.0.0.
-     * @internal
+     * @deprecated - renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
         return this.view;

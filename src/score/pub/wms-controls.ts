@@ -110,8 +110,7 @@ export class WmsControls {
 
     /**
      * Set play button.
-     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
-     * @internal
+     * @deprecated - setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
      * @param playBtn - HTML button element or element id.
      * @param playLabel - Custom button label (e.g. "Play").
      * @returns - This playback buttons class instance.
@@ -134,8 +133,7 @@ export class WmsControls {
 
     /**
      * Set stop button.
-     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
-     * @internal
+     * @deprecated - setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
      * @param stopBtn - HTML button element or element id.
      * @param stopLabel - Custom button label (e.g. "Stop").
      * @returns - This playback buttons class instance.
@@ -158,8 +156,7 @@ export class WmsControls {
 
     /**
      * Set play/stop button.
-     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
-     * @internal
+     * @deprecated - setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
      * @param playStopBtn - HTML button element or element id.
      * @param playLabel - Custom button label for play action (e.g. "Play").
      * @param stopLabel - Custom button label for stop action (e.g. "Stop").
@@ -185,8 +182,7 @@ export class WmsControls {
 
     /**
      * Set pause button.
-     * @deprecated - Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead. Will be removed in future major release.
-     * @internal
+     * @deprecated - setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
      * @param pauseBtn - HTML button element or element id.
      * @param pauseLabel - Custom button label (e.g. "Pause").
      * @returns - This playback buttons class instance.

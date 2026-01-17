@@ -662,8 +662,7 @@ export class DocumentBuilder {
     }
 
     /**
-     * @deprecated - Use addAnnotation instead.
-     * @internal
+     * @deprecated - addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      */
     addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
@@ -671,8 +670,7 @@ export class DocumentBuilder {
     }
 
     /**
-     * @deprecated - Use addAnnotation instead.
-     * @internal
+     * @deprecated - addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.
      */
     addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);
