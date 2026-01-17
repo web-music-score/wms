@@ -16,6 +16,7 @@
     "excludeInternal": true,
     "excludePrivate": true,
     "excludeProtected": true,
+    "includeVersion": true,
     "externalSymbolLinkMappings": {
         "@types/react": {
             "*": "#"
