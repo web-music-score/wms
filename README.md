@@ -39,28 +39,28 @@ function render() {
 ### Render With Custom HTML Element
 
 ```html
-<script src="https://unpkg.com/web-music-score@6.3.0-pre.2/dist/iife/index.js"></script>
+<script src="https://unpkg.com/web-music-score@6.3.0/dist/iife/index.js"></script>
 
-<wms-view id="view1"></wms-view>
+<wms-view id="viewId"></wms-view>
 
 <script>
     const { Score } = window.WebMusicScore;
 
-    doc.bindElement("view1");
+    doc.bindElement("viewId");
 </script>
 ```
 ### Render With Plain JavaScript
 
 ```html
-<script src="https://unpkg.com/web-music-score@6.3.0-pre.2/dist/iife/index.js"></script>
+<script src="https://unpkg.com/web-music-score@6.3.0/dist/iife/index.js"></script>
 
-<canvas id="canvas1"></canvas><br />
+<canvas id="canvasId"></canvas><br />
 
 <script>
     const { Score } = window.WebMusicScore;
 
     new Score.WmsView()
-        .setCanvas("canvas1")
+        .setCanvas("canvasId")
         .setDocument(doc)
         .draw();
 </script>
