@@ -52,7 +52,6 @@ export class Player {
 
     /**
      * Get play state change listeners.
-     * @param playStateChangeListener - Array of play state change listeners.
      */
     getPlayStateChangeListeners(): PlayStateChangeListener[] {
         return this.player.getPlayStateChangeListeners();
