@@ -168,6 +168,9 @@ export class Paint {
 
         const colorKeyParts = Guard.isArray(colorKeyOrParts) ? colorKeyOrParts : colorKeyOrParts.split(".");
 
+        if (colorKeyParts.includes("fermata"))
+            warnDeprecated(`Color key "fermata" is deprecated. Will be removed in future release. Use "annotation" instead.`);
+
         // Set no colors
         if (colorKeyParts.length === 0)
             return this;
@@ -178,9 +181,6 @@ export class Paint {
 
         for (const key of Object.keys(this.colors) as ColorKey[]) {
             const parts = key.split(".").map(norm);
-
-            if (parts.includes("fermata"))
-                warnDeprecated(`Color key "fermata" is deprecated. Will be removed in future release. Use "annotation" instead.`);
 
             const match = normalizedParts.every(a => parts.includes(a));
 

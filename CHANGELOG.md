@@ -3,6 +3,7 @@
 ### Fixed
 - Missing and existing deprecation warning messages.
 - Fixes on Custom HTML Elements.
+- Wrongly showed deprecated warning messages.
 
 ## [6.3.0] - 2026-01-17
 **Stable Release**
