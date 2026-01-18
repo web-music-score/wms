@@ -1,4 +1,9 @@
 # Changelog
+## [6.3.1] - 2026-01-18
+### Fixed
+- Fixed/improved deprecationg warning messages.
+- Fixed/improved custom HTML element update.
+
 ## [6.3.0] - 2026-01-17
 **Stable Release**
 ## Changed
