@@ -33,7 +33,10 @@ class WmsControls extends BaseElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
+    private _doc?: MDocument;
     private _player?: Player;
+
+    private _connected = false;
 
     constructor() {
         super();
@@ -139,12 +142,14 @@ class WmsControls extends BaseElement {
         }
         catch (e) { }
 
-        this.render();
+        this._connected = true;
+        this.update();
     }
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
-        this.ctrl.setDocument(this._doc);
+        this._player = doc?.getDefaultPlayer();
+        this.update();
     }
 
     get doc(): MDocument | undefined {
@@ -152,18 +157,22 @@ class WmsControls extends BaseElement {
     }
 
     set player(player: Player | undefined) {
+        this._doc = undefined;
         this._player = player;
-        if (this._connected)
-            this.update();
+        this.update();
     }
 
     get player(): Player | undefined {
         return this._player;
     }
 
+    private update() {
+        this.ctrl.setPlayer(this._player);
+        if (this._connected) this.render();
+    }
+
     private render() {
-        if (typeof document === "undefined" || !this.div)
-            return;
+        if (typeof document === "undefined" || !this.div) return;
 
         this.div.innerHTML = "";
         this.btnPlay = this.btnPause = this.btnStop = undefined;

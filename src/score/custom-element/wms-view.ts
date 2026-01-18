@@ -46,8 +46,7 @@ class WmsView extends BaseElement {
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
-        if (this._connected)
-            this.update();
+        this.update();
     }
 
     get doc(): MDocument | undefined {
@@ -56,8 +55,7 @@ class WmsView extends BaseElement {
 
     set paint(paint: Paint | undefined) {
         this._paint = paint;
-        if (this._connected)
-            this.update();
+        this.update();
     }
 
     get paint(): Paint | undefined {
@@ -67,10 +65,12 @@ class WmsView extends BaseElement {
     private update() {
         this.view.setDocument(this._doc);
         this.view.setPaint(this._paint);
-        this.render();
+        if(this._connected) this.render();
     }
 
     private render() {
+        if (typeof document === "undefined") return;
+
         try {
             if (!this.contains(this.canvas))
                 this.append(this.canvas);
