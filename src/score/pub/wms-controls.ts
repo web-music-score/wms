@@ -2,7 +2,7 @@ import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { PlayState } from "./types";
 import { MDocument } from "./mobjects";
 import { Player } from "./player";
-import { AssertUtil } from "shared-src";
+import { AssertUtil, warnDeprecated } from "shared-src";
 
 export class WmsControls {
     public static readonly DefaultPlayLabel = "Play";
@@ -108,14 +108,7 @@ export class WmsControls {
         }
     }
 
-    /**
-     * Set play button.
-     * @deprecated - setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
-     * @param playBtn - HTML button element or element id.
-     * @param playLabel - Custom button label (e.g. "Play").
-     * @returns - This playback buttons class instance.
-     */
-    setPlayButton(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
+    private _setPlayButton(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
 
         WmsControls.removeOnClickListeners(this.playButton, this.onPlay);
@@ -132,13 +125,18 @@ export class WmsControls {
     }
 
     /**
-     * Set stop button.
-     * @deprecated - setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
-     * @param stopBtn - HTML button element or element id.
-     * @param stopLabel - Custom button label (e.g. "Stop").
+     * Set play button.
+     * @deprecated - setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
+     * @param playBtn - HTML button element or element id.
+     * @param playLabel - Custom button label (e.g. "Play").
      * @returns - This playback buttons class instance.
      */
-    setStopButton(stopBtn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
+    setPlayButton(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
+        warnDeprecated("setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        return this._setPlayButton(playBtn, playLabel);
+    }
+
+    private _setStopButton(stopBtn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
         WmsControls.removeOnClickListeners(this.stopButton, this.onStop);
@@ -155,14 +153,18 @@ export class WmsControls {
     }
 
     /**
-     * Set play/stop button.
-     * @deprecated - setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
-     * @param playStopBtn - HTML button element or element id.
-     * @param playLabel - Custom button label for play action (e.g. "Play").
-     * @param stopLabel - Custom button label for stop action (e.g. "Stop").
+     * Set stop button.
+     * @deprecated - setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
+     * @param stopBtn - HTML button element or element id.
+     * @param stopLabel - Custom button label (e.g. "Stop").
      * @returns - This playback buttons class instance.
      */
-    setPlayStopButton(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
+    setStopButton(stopBtn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
+        warnDeprecated("setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        return this._setStopButton(stopBtn, stopLabel);
+    }
+
+    private _setPlayStopButton(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(playLabel), "playLabel", playLabel);
         AssertUtil.assertVar(Guard.isStringOrUndefined(stopLabel), "stopLabel", stopLabel);
 
@@ -181,13 +183,19 @@ export class WmsControls {
     }
 
     /**
-     * Set pause button.
-     * @deprecated - setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
-     * @param pauseBtn - HTML button element or element id.
-     * @param pauseLabel - Custom button label (e.g. "Pause").
+     * Set play/stop button.
+     * @deprecated - setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
+     * @param playStopBtn - HTML button element or element id.
+     * @param playLabel - Custom button label for play action (e.g. "Play").
+     * @param stopLabel - Custom button label for stop action (e.g. "Stop").
      * @returns - This playback buttons class instance.
      */
-    setPauseButton(pauseBtn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
+    setPlayStopButton(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
+        warnDeprecated("setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        return this._setPlayStopButton(playStopBtn, playLabel, stopLabel);
+    }
+
+    private _setPauseButton(pauseBtn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
         AssertUtil.assertVar(Guard.isStringOrUndefined(pauseLabel), "pauseLabel", pauseLabel);
 
         WmsControls.removeOnClickListeners(this.pauseButton, this.onPause);
@@ -201,6 +209,18 @@ export class WmsControls {
         this.updateButtons();
 
         return this;
+    }
+
+    /**
+     * Set pause button.
+     * @deprecated - setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.
+     * @param pauseBtn - HTML button element or element id.
+     * @param pauseLabel - Custom button label (e.g. "Pause").
+     * @returns - This playback buttons class instance.
+     */
+    setPauseButton(pauseBtn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
+        warnDeprecated("setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        return this._setPauseButton(pauseBtn, pauseLabel);
     }
 
     private static savedOnClickListeners = new UniMap<HTMLButtonElement, (() => void)[]>();
@@ -236,7 +256,7 @@ export class WmsControls {
      * @returns 
      */
     setSinglePlay(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
-        this.setPlayButton(playBtn, playLabel);
+        this._setPlayButton(playBtn, playLabel);
         return this;
     }
 
@@ -248,7 +268,7 @@ export class WmsControls {
      * @returns 
      */
     setSinglePlayStop(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string) {
-        this.setPlayStopButton(playStopBtn, playLabel);
+        this._setPlayStopButton(playStopBtn, playLabel);
         return this;
     }
 
@@ -261,8 +281,8 @@ export class WmsControls {
      * @returns 
      */
     setPlayStop(playBtn: HTMLButtonElement | string, stopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string) {
-        this.setPlayButton(playBtn, playLabel);
-        this.setStopButton(stopBtn, stopLabel);
+        this._setPlayButton(playBtn, playLabel);
+        this._setStopButton(stopBtn, stopLabel);
         return this;
     }
 
@@ -277,9 +297,9 @@ export class WmsControls {
      * @returns 
      */
     setPlayPauseStop(playBtn: HTMLButtonElement | string, pauseBtn: HTMLButtonElement | string, stopBtn: HTMLButtonElement | string, playLabel?: string, pauseLabel?: string, stopLabel?: string) {
-        this.setPlayButton(playBtn, playLabel);
-        this.setPauseButton(pauseBtn, pauseLabel);
-        this.setStopButton(stopBtn, stopLabel);
+        this._setPlayButton(playBtn, playLabel);
+        this._setPauseButton(pauseBtn, pauseLabel);
+        this._setStopButton(stopBtn, stopLabel);
         return this;
     }
 }

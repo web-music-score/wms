@@ -172,15 +172,15 @@ export class Paint {
         if (colorKeyParts.length === 0)
             return this;
 
+        if (colorKeyParts.includes("fermata"))
+            warnDeprecated("Color key 'fermata' is deprecated, it belongs to 'annotation'.");
+
         const normalizedParts = colorKeyParts.map(norm);
 
         let matched = false;
 
         for (const key of Object.keys(this.colors) as ColorKey[]) {
             const parts = key.split(".").map(norm);
-
-            if (parts.includes("fermata"))
-                warnDeprecated("Color key 'fermata' is deprecated, it belongs to 'annotation'.");
 
             const match = normalizedParts.every(a => parts.includes(a));
 
