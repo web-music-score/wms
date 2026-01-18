@@ -2,11 +2,11 @@ import { WmsView as PlainView, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
 // Make SSR Safe for Docusaurus.
-const BaseElement = typeof HTMLElement !== "undefined"
+const BaseHTMLElement = typeof HTMLElement !== "undefined"
     ? HTMLElement
     : class { } as any;
 
-class WmsView extends BaseElement {
+export class WmsViewHTMLElement extends BaseHTMLElement {
     private canvas: HTMLCanvasElement;
     private view: PlainView;
 
@@ -46,8 +46,7 @@ class WmsView extends BaseElement {
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
-        if (this._connected)
-            this.update();
+        this.update();
     }
 
     get doc(): MDocument | undefined {
@@ -56,8 +55,7 @@ class WmsView extends BaseElement {
 
     set paint(paint: Paint | undefined) {
         this._paint = paint;
-        if (this._connected)
-            this.update();
+        this.update();
     }
 
     get paint(): Paint | undefined {
@@ -67,7 +65,7 @@ class WmsView extends BaseElement {
     private update() {
         this.view.setDocument(this._doc);
         this.view.setPaint(this._paint);
-        this.render();
+        if (this._connected) this.render();
     }
 
     private render() {
@@ -83,20 +81,24 @@ class WmsView extends BaseElement {
 }
 
 /**
+ * @internal
  * Safe registration (VERY IMPORTANT)
  */
-export function registerWmsView() {
+export function registerWmsViewHTMLElement() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
     try {
         if (!customElements.get("wms-view"))
-            customElements.define("wms-view", WmsView as any);
+            customElements.define("wms-view", WmsViewHTMLElement as any);
     }
     catch (e) { }
 }
 
-export function isWmsView(el: unknown): el is WmsView {
+/**
+ * @internal
+ */
+export function isWmsViewHTMLElement(el: unknown): el is WmsViewHTMLElement {
     return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
         el.tagName === "WMS-VIEW";

@@ -4,7 +4,7 @@ import { PlayerEngine } from "../engine/player-engine";
 import { PlayState, PlayStateChangeListener } from "./types";
 import { MDocument } from "./mobjects";
 import { AssertUtil } from "shared-src";
-import { isWmsControls } from "score/custom-element/wms-controls";
+import { isWmsControlsHTMLElement } from "score/custom-element/wms-controls";
 import { MusicError, MusicErrorType } from "core/error";
 
 export class Player {
@@ -121,7 +121,7 @@ export class Player {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsControls(el)) {
+        if (isWmsControlsHTMLElement(el)) {
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
             el.player = this;
         }
@@ -141,11 +141,11 @@ export class Player {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsControls(el)) {
+        if (isWmsControlsHTMLElement(el)) {
             el.player = undefined;
             this.boundElements.delete(el);
         }
         else
-            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
+            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-view>!");
     }
 }

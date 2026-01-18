@@ -43,21 +43,34 @@
         <button id="stopButton" type="button" class="wms-button"></button>
     </div>
     <br />
+    <br />
 
     <script>
-        const paint1 = new Score.Paint()
-            .setColor("background", "#ddd")
-            .setColor("staff", "red");
+        function createDoc() {
+            return new Score.DocumentBuilder()
+                .setScoreConfiguration("treble")
+                .setTimeSignature("3/4")
+                .addNote(0, ["C4", "E4", "G4"], "4n")
+                .addMeasure()
+                .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
+                .getDocument();
+        }
 
-        const doc1 = new Score.DocumentBuilder()
-            .setScoreConfiguration("treble")
-            .setTimeSignature("3/4")
-            .addNote(0, ["C4", "E4", "G4"], "4n")
-            .addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
-            .getDocument();
+        function createPaint() {
+            return new Score.Paint()
+                .setColor("background", "#ddd")
+                .setColor("staff", "red");
+        }
 
-        const player1 = new Score.Player(doc1);
+        function createPlayerFor(doc) {
+            return new Score.Player(doc);
+        }
+    </script>
+
+    <script>
+        const paint1 = createPaint();
+        const doc1 = createDoc();
+        const player1 = createPlayerFor(doc1);
 
         new Score.WmsView()
             .setCanvas("scoreCanvas")
@@ -72,32 +85,46 @@
     </script>
 
 
-    <h2>Using Custom HTML Elements</h2>
+    <h2>Using Custom HTML Elements (HTML)</h2>
     <wms-view id="wms-view"></wms-view>
     <br />
     <wms-controls id="wms-buttons" playPauseStop></wms-controls>
     <br />
+    <br />
 
     <script>
-        const paint2 = new Score.Paint()
-            .setColor("background", "#ddd")
-            .setColor("staff", "red");
-
-        const doc2 = new Score.DocumentBuilder()
-            .setScoreConfiguration("treble")
-            .setTimeSignature("3/4")
-            .addNote(0, ["C4", "E4", "G4"], "4n")
-            .addMeasure()
-            .addChord(0, ["C4", "E4", "G4"], "2.", { arpeggio: true })
-            .getDocument();
-
-        const player2 = new Score.Player(doc1);
+        const paint2 = createPaint();
+        const doc2 = createDoc();
+        const player2 = createPlayerFor(doc2);
 
         doc2.bindElement("wms-view");
-        doc2.bindElement("wms-buttons");
+        //doc2.bindElement("wms-buttons");
         player2.bindElement("wms-buttons");
         paint2.bindElement("wms-view");
+    </script>
 
+    <h2>Using Custom HTML Elements (Programmatic)</h2>
+    <div id="viewContainerId"></div>
+    <br />
+    <div id="controlsContainerId"></div>
+    <br />
+    <br />
+
+    <script>
+        const paint3 = createPaint();
+        const doc3 = createDoc();
+        const player3 = createPlayerFor(doc3);
+
+        const viewEl = document.createElement("wms-view");
+        document.getElementById("viewContainerId").append(viewEl);
+
+        const controlsEl = document.createElement("wms-controls");
+        document.getElementById("controlsContainerId").append(controlsEl);
+
+        doc3.bindElement(viewEl);
+        doc3.bindElement(controlsEl);
+        //player3.bindElement(controlsEl);
+        paint3.bindElement(viewEl);
     </script>
 </body>
 

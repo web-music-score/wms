@@ -9,11 +9,11 @@ const defaultButtonClass = "wms-button";
 const defaultButtonGroupClass = "wms-button-group";
 
 // Make SSR Safe for Docusaurus.
-const BaseElement = typeof HTMLElement !== "undefined"
+const BaseHTMLElement = typeof HTMLElement !== "undefined"
     ? HTMLElement
     : class { } as any;
 
-class WmsControls extends BaseElement {
+export class WmsControlsHTMLElement extends BaseHTMLElement {
     private div?: HTMLDivElement;
     private ctrl: PlainControls;
 
@@ -33,6 +33,7 @@ class WmsControls extends BaseElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
+    private _doc?: MDocument;
     private _player?: Player;
 
     constructor() {
@@ -43,7 +44,6 @@ class WmsControls extends BaseElement {
 
     static get observedAttributes() {
         return [
-            "src",
             "singlePlay",
             "singlePlayStop",
             "playStop",
@@ -144,7 +144,8 @@ class WmsControls extends BaseElement {
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
-        this.ctrl.setDocument(this._doc);
+        this._player = doc?.getDefaultPlayer();
+        this.update();
     }
 
     get doc(): MDocument | undefined {
@@ -152,13 +153,18 @@ class WmsControls extends BaseElement {
     }
 
     set player(player: Player | undefined) {
+        this._doc = undefined;
         this._player = player;
-        if (this._connected)
-            this.update();
+        this.update();
     }
 
     get player(): Player | undefined {
         return this._player;
+    }
+
+    private update() {
+        this.ctrl.setPlayer(this._player);
+        if (this._connected) this.render();
     }
 
     private render() {
@@ -225,20 +231,24 @@ class WmsControls extends BaseElement {
 }
 
 /**
+ * @internal
  * Safe registration (VERY IMPORTANT)
  */
-export function registerWmsControls() {
+export function registerWmsControlsHTMLElement() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
     try {
         if (!customElements.get("controls"))
-            customElements.define("wms-controls", WmsControls as any);
+            customElements.define("wms-controls", WmsControlsHTMLElement as any);
     }
     catch (e) { }
 }
 
-export function isWmsControls(el: unknown): el is WmsControls {
+/**
+ * @internal
+ */
+export function isWmsControlsHTMLElement(el: unknown): el is WmsControlsHTMLElement {
     return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
         el.tagName === "WMS-CONTROLS";

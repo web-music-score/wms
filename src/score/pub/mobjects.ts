@@ -27,8 +27,8 @@ import { ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { ObjLyrics } from "../engine/obj-lyrics";
 import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
 import { ObjScoreRowGroup } from "../engine/obj-score-row-group";
-import { isWmsView } from "../custom-element/wms-view";
-import { isWmsControls } from "../custom-element/wms-controls";
+import { isWmsViewHTMLElement } from "../custom-element/wms-view";
+import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 import { Player } from "./player";
 import { AssertUtil } from "shared-src";
 
@@ -269,11 +269,11 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el) || isWmsControls(el)) {
+        if (isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) {
             this.obj.bindElement(el);
         }
         else
-            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view> or <wms-playback-buttons>!");
+            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-view> or <wms-controls>!");
     }
 
     /**
@@ -285,11 +285,11 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el) || isWmsControls(el)) {
+        if (isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) {
             this.obj.unbindElement(el);
         }
         else
-            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view> or <wms-playback-buttons>!");
+            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-view> or <wms-controls>!");
     }
 }
 

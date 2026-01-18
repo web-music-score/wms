@@ -1,6 +1,6 @@
 import { Guard, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
-import { isWmsView } from "../custom-element/wms-view";
+import { isWmsViewHTMLElement } from "../custom-element/wms-view";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AssertUtil, warnDeprecated } from "shared-src";
 
@@ -264,12 +264,12 @@ export class Paint {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el)) {
+        if (isWmsViewHTMLElement(el)) {
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
             el.paint = this;
         }
         else
-            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view>!");
+            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-view>!");
     }
 
     /**
@@ -284,11 +284,11 @@ export class Paint {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el)) {
+        if (isWmsViewHTMLElement(el)) {
             el.paint = undefined;
             this.boundElements.delete(el);
         }
         else
-            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view>!");
+            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-view>!");
     }
 }
