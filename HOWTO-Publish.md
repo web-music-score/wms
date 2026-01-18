@@ -3,7 +3,7 @@
 ## Pre-Release
     // Update CHANGELOG.md
 
-    // Set Version
+    // Update Versions
     Set package.json "version" to "X.Y.Z-pre.N"`
 
     // Commit
@@ -21,10 +21,10 @@
     // Publish
     npm publish --access public --tag next
 
-## Latest
+## Latest/Patches
     // Update CHANGELOG.md
 
-    // Set Version
+    // Update Versions
     Set package.json "version" to "X.Y.Z"`
 
     // Commit
