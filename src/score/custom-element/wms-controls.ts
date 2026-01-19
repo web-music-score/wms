@@ -57,49 +57,48 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
     }
 
     attributeChangedCallback(name: string, _old: string | null, value: string | null) {
-        if (name === "playLabel" && value)
-            this.playLabel = value;
+        if (name === "playLabel")
+            this.playLabel = value ?? undefined;
 
-        if (name === "pauseLabel" && value)
-            this.pauseLabel = value;
+        if (name === "pauseLabel")
+            this.pauseLabel = value ?? undefined;
 
-        if (name === "stopLabel" && value)
-            this.stopLabel = value;
+        if (name === "stopLabel")
+            this.stopLabel = value ?? undefined;
 
-        if (name === "singlePlay") {
+        if (name === "singlePlay" && value) {
             this.singlePlay = true;
+            this.singlePlayStop = false;
+            this.playStop = false;
+            this.playPauseStop = false;
+        }
+
+        if (name === "singlePlayStop" && value) {
+            this.singlePlay = false;
             this.singlePlayStop = true;
             this.playStop = false;
             this.playPauseStop = false;
         }
 
-        if (name === "singlePlayStop") {
-            this.singlePlayStop = true;
-            this.playStop = false;
-            this.playPauseStop = false;
-        }
-
-        if (name === "playStop") {
+        if (name === "playStop" && value) {
             this.singlePlay = false;
             this.singlePlayStop = false;
             this.playStop = true;
             this.playPauseStop = false;
         }
 
-        if (name === "playPauseStop") {
+        if (name === "playPauseStop" && value) {
             this.singlePlay = false;
             this.singlePlayStop = false;
             this.playStop = false;
             this.playPauseStop = true;
         }
 
-        if (name === "buttonClass") {
-            this.buttonClass = value || defaultButtonClass;
-        }
+        if (name === "buttonClass")
+            this.buttonClass = value ?? defaultButtonClass;
 
-        if (name === "buttonGroupClass") {
-            this.buttonGroupClass = value || defaultButtonGroupClass;
-        }
+        if (name === "buttonGroupClass")
+            this.buttonGroupClass = value ?? defaultButtonGroupClass;
 
         this.render();
     }
@@ -114,28 +113,48 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
                 this.append(this.div);
             }
 
-            this.playLabel = this.getAttribute("playLabel") || undefined;
-            this.pauseLabel = this.getAttribute("pauseLabel") || undefined;
-            this.stopLabel = this.getAttribute("stopLabel") || undefined;
+            if (this.hasAttribute("playLabel"))
+                this.playLabel = this.getAttribute("playLabel")!;
 
-            this.singlePlay = false;
-            this.singlePlayStop = false;
-            this.playStop = false;
-            this.playPauseStop = false;
+            if (this.hasAttribute("pauseLabel"))
+                this.pauseLabel = this.getAttribute("pauseLabel")!;
 
-            if (this.hasAttribute("singlePlay"))
+            if (this.hasAttribute("stopLabel"))
+                this.stopLabel = this.getAttribute("stopLabel")!;
+
+            if (this.hasAttribute("singlePlay")) {
                 this.singlePlay = true;
-            else if (this.hasAttribute("singlePlayStop"))
+                this.singlePlayStop = false;
+                this.playStop = false;
+                this.playPauseStop = false;
+            }
+
+            if (this.hasAttribute("singlePlayStop")) {
+                this.singlePlay = false;
                 this.singlePlayStop = true;
-            else if (this.hasAttribute("playStop"))
+                this.playStop = false;
+                this.playPauseStop = false;
+            }
+
+            if (this.hasAttribute("playStop")) {
+                this.singlePlay = false;
+                this.singlePlayStop = false;
                 this.playStop = true;
-            else this.playPauseStop = true;
+                this.playPauseStop = false;
+            }
+
+            if (this.hasAttribute("playPauseStop")) {
+                this.singlePlay = false;
+                this.singlePlayStop = false;
+                this.playStop = false;
+                this.playPauseStop = true;
+            }
 
             if (this.hasAttribute("buttonClass"))
                 this.buttonClass = this.getAttribute("buttonClass")!;
-            else if (this.hasAttribute("buttonGroupClass"))
-                this.buttonGroupClass = this.getAttribute("buttonGroupClass")!;
 
+            if (this.hasAttribute("buttonGroupClass"))
+                this.buttonGroupClass = this.getAttribute("buttonGroupClass")!;
         }
         catch (e) { }
 
