@@ -24,7 +24,7 @@ export class WmsView {
      * @param elem - <wms-view> HTML element or element id.
      * @returns - WmsView instance or undefined.
      */
-    static getFromElement(elem: HTMLElement | null | undefined): WmsView | undefined {
+    static getByElementId(elem: HTMLElement | null | undefined): WmsView | undefined {
         if (typeof document === "undefined")
             return undefined;
 

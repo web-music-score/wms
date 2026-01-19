@@ -46,7 +46,7 @@ export class WmsControls {
      * @param elem - <wms-controls> HTML element or element id.
      * @returns - WmsControls instance or undefined.
      */
-    static getFromElement(elem: HTMLElement | null | undefined): WmsControls | undefined {
+    static getByElementId(elem: HTMLElement | null | undefined): WmsControls | undefined {
         if (typeof document === "undefined")
             return undefined;
 
