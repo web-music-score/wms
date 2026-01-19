@@ -274,7 +274,7 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) {
+        if ((isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) && el.doc !== this) {
             el.doc = this;
             this.getMusicObject().requestFullLayout();
             return true;
@@ -297,7 +297,7 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) {
+        if ((isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) && el.doc === this) {
             el.doc = undefined;
             this.getMusicObject().requestFullLayout();
             return true;
