@@ -1,4 +1,8 @@
 # Changelog
+## [6.3.4] - 2026-01-19
+### Fixed
+- WmsControls bug.
+
 ## [6.3.3] - 2026-01-19
 ### Changed
 - bindElement() returns false on failure, does not throw.
