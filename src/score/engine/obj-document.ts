@@ -10,8 +10,6 @@ import { ConnectiveProps } from "./connective-props";
 import { AnchoredRect, Guard, Rect, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { isWmsViewHTMLElement } from "../custom-element/wms-view";
-import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;

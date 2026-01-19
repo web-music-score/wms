@@ -5,7 +5,6 @@ import { PlayState, PlayStateChangeListener } from "./types";
 import { MDocument } from "./mobjects";
 import { AssertUtil } from "shared-src";
 import { isWmsControlsHTMLElement } from "score/custom-element/wms-controls";
-import { MusicError, MusicErrorType } from "core/error";
 
 export class Player {
     private static currentlyPlaying = new ValueSet<Player>();
