@@ -21,14 +21,14 @@ export class WmsView {
     /**
      * Get WmsView from custom HTML element <wms-view>.
      * 
-     * @param element - <wms-view> HTML element or element id.
+     * @param elem - <wms-view> HTML element or element id.
      * @returns - WmsView instance or undefined.
      */
-    static getFromElement(element: HTMLElement | null | undefined): WmsView | undefined {
+    static getFromElement(elem: HTMLElement | null | undefined): WmsView | undefined {
         if (typeof document === "undefined")
             return undefined;
 
-        const el = typeof element === "string" ? document.getElementById(element) : element;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
         if(!el) return undefined;
 

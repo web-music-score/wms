@@ -43,14 +43,14 @@ export class WmsControls {
     /**
      * Get WmsControls from custom HTML element <wms-controls>.
      * 
-     * @param element - <wms-controls> HTML element or element id.
+     * @param elem - <wms-controls> HTML element or element id.
      * @returns - WmsControls instance or undefined.
      */
-    static getFromElement(element: HTMLElement | null | undefined): WmsControls | undefined {
+    static getFromElement(elem: HTMLElement | null | undefined): WmsControls | undefined {
         if (typeof document === "undefined")
             return undefined;
 
-        const el = typeof element === "string" ? document.getElementById(element) : element;
+        const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
         if (!el) return undefined;
 
