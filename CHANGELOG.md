@@ -1,4 +1,8 @@
 # Changelog
+## [6.3.3] - 2026-01-19
+### Changed
+- bindElement() returns false on failure, does not throw.
+
 ## [6.3.2] - 2026-01-19
 ### Fixed
 - Fixed and improved custom HTML element <wms-controls> behavior.
