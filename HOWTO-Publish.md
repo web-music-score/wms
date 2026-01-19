@@ -42,5 +42,5 @@
     // Publish
     npm publish --access public
 
-    // Add "next" Tag
+    // Add "next" Tag (latest only, not for patches)
     npm dist-tag add web-music-score@X.Y.Z next
