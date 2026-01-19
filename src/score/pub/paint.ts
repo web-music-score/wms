@@ -1,7 +1,6 @@
-import { Guard, Utils, ValueSet } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
 import { isWmsView } from "../custom-element/wms-view";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AssertUtil, warnDeprecated } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
