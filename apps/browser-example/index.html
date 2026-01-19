@@ -119,6 +119,12 @@
         document.getElementById("viewContainerId").append(viewEl);
 
         const controlsEl = document.createElement("wms-controls");
+
+        // controlsEl.setAttribute("singlePlay", "true");
+        // controlsEl.setAttribute("singlePlayStop", "true");
+        // controlsEl.setAttribute("playStop", "true");
+        // controlsEl.setAttribute("playPauseStop", "true");
+
         document.getElementById("controlsContainerId").append(controlsEl);
 
         doc3.bindElement(viewEl);
