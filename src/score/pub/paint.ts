@@ -250,8 +250,6 @@ export class Paint {
         return [r, g, b, a];
     }
 
-    private boundElements = new ValueSet<HTMLElement>();
-
     /**
      * Bind this paint to custom HTML element.
      * 
@@ -267,7 +265,6 @@ export class Paint {
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
         if (isWmsViewHTMLElement(el)) {
-            el.addEventListener("disconnected", () => this.boundElements.delete(el));
             el.paint = this;
             return true;
         }
@@ -291,7 +288,6 @@ export class Paint {
 
         if (isWmsViewHTMLElement(el)) {
             el.paint = undefined;
-            this.boundElements.delete(el);
             return true;
         }
 

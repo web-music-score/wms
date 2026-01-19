@@ -20,11 +20,6 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
     private pauseLabel?: string;
     private stopLabel?: string;
 
-    private singlePlay = false;
-    private singlePlayStop = false;
-    private playStop = false;
-    private playPauseStop = true;
-
     private btnPlay?: HTMLButtonElement;
     private btnPause?: HTMLButtonElement;
     private btnStop?: HTMLButtonElement;
@@ -32,9 +27,11 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
+    private layout: "singlePlay" | "singlePlayStop" | "playStop" | "playPauseStop" = "playPauseStop";
     private _controls: WmsControls;
     private _doc?: MDocument;
     private _player?: Player;
+    private _connected = false;
 
     constructor() {
         super();
@@ -66,33 +63,17 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
         if (name === "stopLabel")
             this.stopLabel = value ?? undefined;
 
-        if (name === "singlePlay" && value) {
-            this.singlePlay = true;
-            this.singlePlayStop = false;
-            this.playStop = false;
-            this.playPauseStop = false;
-        }
+        if (name === "singlePlay" && value)
+            this.layout = "singlePlay";
 
-        if (name === "singlePlayStop" && value) {
-            this.singlePlay = false;
-            this.singlePlayStop = true;
-            this.playStop = false;
-            this.playPauseStop = false;
-        }
+        if (name === "singlePlayStop" && value)
+            this.layout = "singlePlayStop";
 
-        if (name === "playStop" && value) {
-            this.singlePlay = false;
-            this.singlePlayStop = false;
-            this.playStop = true;
-            this.playPauseStop = false;
-        }
+        if (name === "playStop" && value)
+            this.layout = "playStop";
 
-        if (name === "playPauseStop" && value) {
-            this.singlePlay = false;
-            this.singlePlayStop = false;
-            this.playStop = false;
-            this.playPauseStop = true;
-        }
+        if (name === "playPauseStop" && value)
+            this.layout = "playPauseStop";
 
         if (name === "buttonClass")
             this.buttonClass = value ?? defaultButtonClass;
@@ -100,7 +81,7 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
         if (name === "buttonGroupClass")
             this.buttonGroupClass = value ?? defaultButtonGroupClass;
 
-        this.render();
+        this.update();
     }
 
     connectedCallback() {
@@ -122,33 +103,19 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
             if (this.hasAttribute("stopLabel"))
                 this.stopLabel = this.getAttribute("stopLabel")!;
 
-            if (this.hasAttribute("singlePlay")) {
-                this.singlePlay = true;
-                this.singlePlayStop = false;
-                this.playStop = false;
-                this.playPauseStop = false;
-            }
+            this.layout = "playPauseStop";
 
-            if (this.hasAttribute("singlePlayStop")) {
-                this.singlePlay = false;
-                this.singlePlayStop = true;
-                this.playStop = false;
-                this.playPauseStop = false;
-            }
+            if (this.hasAttribute("singlePlay"))
+                this.layout = "singlePlay";
 
-            if (this.hasAttribute("playStop")) {
-                this.singlePlay = false;
-                this.singlePlayStop = false;
-                this.playStop = true;
-                this.playPauseStop = false;
-            }
+            if (this.hasAttribute("singlePlayStop"))
+                this.layout = "singlePlayStop";
 
-            if (this.hasAttribute("playPauseStop")) {
-                this.singlePlay = false;
-                this.singlePlayStop = false;
-                this.playStop = false;
-                this.playPauseStop = true;
-            }
+            if (this.hasAttribute("playStop"))
+                this.layout = "playStop";
+
+            if (this.hasAttribute("playPauseStop"))
+                this.layout = "playPauseStop";
 
             if (this.hasAttribute("buttonClass"))
                 this.buttonClass = this.getAttribute("buttonClass")!;
@@ -158,8 +125,15 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
         }
         catch (e) { }
 
-        this.render();
+        this._connected = true;
+        this.update();
     }
+
+    disconnectedCallback() {
+        this._connected = false;
+    }
+
+    adoptedCallback() { }
 
     get wmsControls(): WmsControls {
         return this._controls;
@@ -197,55 +171,60 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
         this.div.innerHTML = "";
         this.btnPlay = this.btnPause = this.btnStop = undefined;
 
-        if (this.singlePlay) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            this._controls.setSinglePlay(this.btnPlay, this.playLabel);
-        }
-        else if (this.singlePlayStop) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            this._controls.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
-        }
-        else if (this.playStop) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            if (!this.btnStop) {
-                this.btnStop = document.createElement("button");
-                this.div.append(this.btnStop);
-            }
-            this._controls.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
-        }
-        else if (this.playPauseStop) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            if (!this.btnPause) {
-                this.btnPause = document.createElement("button");
-                this.div.append(this.btnPause);
-            }
-            if (!this.btnStop) {
-                this.btnStop = document.createElement("button");
-                this.div.append(this.btnStop);
-            }
-            this._controls.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
+        switch (this.layout) {
+            case "singlePlay":
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                this._controls.setSinglePlay(this.btnPlay, this.playLabel);
+                break;
+            case "singlePlayStop":
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                this._controls.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
+                break;
+            case "playStop":
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                if (!this.btnStop) {
+                    this.btnStop = document.createElement("button");
+                    this.div.append(this.btnStop);
+                }
+                this._controls.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
+                break;
+            case "playPauseStop":
+            default:
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                if (!this.btnPause) {
+                    this.btnPause = document.createElement("button");
+                    this.div.append(this.btnPause);
+                }
+                if (!this.btnStop) {
+                    this.btnStop = document.createElement("button");
+                    this.div.append(this.btnStop);
+                }
+                this._controls.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
+                break;
         }
 
         if (this.btnPlay) {
             this.btnPlay.type = "button";
             addClass(this.btnPlay, this.buttonClass)
         }
+
         if (this.btnPause) {
             this.btnPause.type = "button";
             addClass(this.btnPause, this.buttonClass)
         }
+
         if (this.btnStop) {
             this.btnStop.type = "button";
             addClass(this.btnStop, this.buttonClass)

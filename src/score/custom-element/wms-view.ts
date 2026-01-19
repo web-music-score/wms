@@ -46,6 +46,12 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
         this.update();
     }
 
+    disconnectedCallback() {
+        this._connected = false;
+    }
+
+    adoptedCallback() { }
+
     get wmsView(): WmsView {
         return this._view;
     }
