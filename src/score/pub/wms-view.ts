@@ -5,6 +5,7 @@ import { ScoreEventListener } from "./event";
 import { MDocument, MScoreRow, MusicInterface } from "./mobjects";
 import { Paint } from "./paint";
 import { AssertUtil } from "shared-src";
+import { isWmsViewHTMLElement } from "../custom-element/wms-view";
 
 
 export class WmsView {
@@ -15,6 +16,25 @@ export class WmsView {
      */
     constructor() {
         this._view = new View(this);
+    }
+
+    /**
+     * Get WmsView from custom HTML element <wms-view>.
+     * 
+     * @param element - <wms-view> HTML element or element id.
+     * @returns - WmsView instance or undefined.
+     */
+    static getFromElement(element: HTMLElement | null | undefined): WmsView | undefined {
+        if (typeof document === "undefined")
+            return undefined;
+
+        const el = typeof element === "string" ? document.getElementById(element) : element;
+
+        if(!el) return undefined;
+
+        if(!isWmsViewHTMLElement(el)) return undefined;
+
+        return el.wmsView;
     }
 
     /**

@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { WmsControls as PlainControls, MDocument, Player } from "../pub";
+import { WmsControls, MDocument, Player } from "../pub";
 
 function addClass(el: Element, className: string) {
     Utils.Dom.addClass(el, ...className.split(" ").map(cls => cls.trim()));
@@ -15,7 +15,6 @@ const BaseHTMLElement = typeof HTMLElement !== "undefined"
 
 export class WmsControlsHTMLElement extends BaseHTMLElement {
     private div?: HTMLDivElement;
-    private ctrl: PlainControls;
 
     private playLabel?: string;
     private pauseLabel?: string;
@@ -33,13 +32,14 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
+    private _controls: WmsControls;
     private _doc?: MDocument;
     private _player?: Player;
 
     constructor() {
         super();
 
-        this.ctrl = new PlainControls();
+        this._controls = new WmsControls();
     }
 
     static get observedAttributes() {
@@ -161,6 +161,10 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
         this.render();
     }
 
+    get wmsControls(): WmsControls {
+        return this._controls;
+    }
+
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
         this._player = doc?.getDefaultPlayer();
@@ -182,7 +186,7 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
     }
 
     private update() {
-        this.ctrl.setPlayer(this._player);
+        this._controls.setPlayer(this._player);
         if (this._connected) this.render();
     }
 
@@ -198,14 +202,14 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
                 this.btnPlay = document.createElement("button");
                 this.div.append(this.btnPlay);
             }
-            this.ctrl.setSinglePlay(this.btnPlay, this.playLabel);
+            this._controls.setSinglePlay(this.btnPlay, this.playLabel);
         }
         else if (this.singlePlayStop) {
             if (!this.btnPlay) {
                 this.btnPlay = document.createElement("button");
                 this.div.append(this.btnPlay);
             }
-            this.ctrl.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
+            this._controls.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
         }
         else if (this.playStop) {
             if (!this.btnPlay) {
@@ -216,7 +220,7 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
                 this.btnStop = document.createElement("button");
                 this.div.append(this.btnStop);
             }
-            this.ctrl.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
+            this._controls.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
         }
         else if (this.playPauseStop) {
             if (!this.btnPlay) {
@@ -231,7 +235,7 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
                 this.btnStop = document.createElement("button");
                 this.div.append(this.btnStop);
             }
-            this.ctrl.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
+            this._controls.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
         }
 
         if (this.btnPlay) {
@@ -272,6 +276,6 @@ export function isWmsControlsHTMLElement(el: unknown): el is WmsControlsHTMLElem
         return false;
 
     return Utils.Obj.isObject(el) &&
-        Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
+        Utils.Obj.hasProperties(el, ["tagName"]) &&
         el.tagName === "WMS-CONTROLS";
 }

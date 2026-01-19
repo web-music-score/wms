@@ -3,6 +3,7 @@ import { PlayState } from "./types";
 import { MDocument } from "./mobjects";
 import { Player } from "./player";
 import { AssertUtil, warnDeprecated } from "shared-src";
+import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 
 export class WmsControls {
     public static readonly DefaultPlayLabel = "Play";
@@ -37,6 +38,25 @@ export class WmsControls {
         this.onPause = () => this.player?.pause();
 
         this.updateButtons();
+    }
+
+    /**
+     * Get WmsControls from custom HTML element <wms-controls>.
+     * 
+     * @param element - <wms-controls> HTML element or element id.
+     * @returns - WmsControls instance or undefined.
+     */
+    static getFromElement(element: HTMLElement | null | undefined): WmsControls | undefined {
+        if (typeof document === "undefined")
+            return undefined;
+
+        const el = typeof element === "string" ? document.getElementById(element) : element;
+
+        if (!el) return undefined;
+
+        if (!isWmsControlsHTMLElement(el)) return undefined;
+
+        return el.wmsControls;
     }
 
     /**

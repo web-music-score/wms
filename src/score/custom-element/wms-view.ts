@@ -1,4 +1,4 @@
-import { WmsView as PlainView, MDocument, Paint } from "../pub";
+import { WmsView, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
 // Make SSR Safe for Docusaurus.
@@ -7,9 +7,8 @@ const BaseHTMLElement = typeof HTMLElement !== "undefined"
     : class { } as any;
 
 export class WmsViewHTMLElement extends BaseHTMLElement {
-    private canvas: HTMLCanvasElement;
-    private view: PlainView;
-
+    private _canvas: HTMLCanvasElement;
+    private _view: WmsView;
     private _doc?: MDocument;
     private _paint?: Paint;
     private _connected = false;
@@ -17,8 +16,11 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
     constructor() {
         super();
 
-        this.canvas = document.createElement("canvas");
-        this.view = new PlainView().setCanvas(this.canvas);
+        this._view = new WmsView();
+
+        this._canvas = document.createElement("canvas");
+
+        this._view.setCanvas(this._canvas);
     }
 
     static get observedAttributes() {
@@ -31,17 +33,21 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
         }
 
         if (name === "zoom" && value) {
-            this.view.setZoom(+value);
+            this._view.setZoom(+value);
         }
 
         if (name === "staff-size" && value) {
-            this.view.setStaffSize(value);
+            this._view.setStaffSize(value);
         }
     }
 
     connectedCallback() {
         this._connected = true;
         this.update();
+    }
+
+    get wmsView(): WmsView {
+        return this._view;
     }
 
     set doc(doc: MDocument | undefined) {
@@ -63,18 +69,18 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
     }
 
     private update() {
-        this.view.setDocument(this._doc);
-        this.view.setPaint(this._paint);
+        this._view.setDocument(this._doc);
+        this._view.setPaint(this._paint);
         if (this._connected) this.render();
     }
 
     private render() {
         try {
-            if (!this.contains(this.canvas))
-                this.append(this.canvas);
+            if (!this.contains(this._canvas))
+                this.append(this._canvas);
         } catch (e) { }
 
-        this.view.draw();
+        this._view.draw();
     }
 
     private loadFromUrl(url: string) { }
@@ -103,6 +109,6 @@ export function isWmsViewHTMLElement(el: unknown): el is WmsViewHTMLElement {
         return false;
 
     return Utils.Obj.isObject(el) &&
-        Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
+        Utils.Obj.hasProperties(el, ["tagName"]) &&
         el.tagName === "WMS-VIEW";
 }
