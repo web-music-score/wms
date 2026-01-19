@@ -1,5 +1,8 @@
 # Changelog
 ## [6.4.0-pre.1] - 2026-01-??
+### Added
+- WmsView.getFromElement() and WmsControls.getFromElement().
+
 ### Fixed
 - Missing and existing deprecation warning messages.
 - Fixes on Custom HTML Elements.
