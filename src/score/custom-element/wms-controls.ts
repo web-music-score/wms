@@ -27,7 +27,7 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
-    private layout: "singlePlay" | "singlePlayStop" | "playStop" | "playPauseStop" = "playPauseStop";
+    private _layout: "singlePlay" | "singlePlayStop" | "playStop" | "playPauseStop" = "playPauseStop";
     private _controls: WmsControls;
     private _doc?: MDocument;
     private _player?: Player;
@@ -64,16 +64,16 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
             this.stopLabel = value ?? undefined;
 
         if (name === "singlePlay" && value)
-            this.layout = "singlePlay";
+            this._layout = "singlePlay";
 
         if (name === "singlePlayStop" && value)
-            this.layout = "singlePlayStop";
+            this._layout = "singlePlayStop";
 
         if (name === "playStop" && value)
-            this.layout = "playStop";
+            this._layout = "playStop";
 
         if (name === "playPauseStop" && value)
-            this.layout = "playPauseStop";
+            this._layout = "playPauseStop";
 
         if (name === "buttonClass")
             this.buttonClass = value ?? defaultButtonClass;
@@ -103,19 +103,19 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
             if (this.hasAttribute("stopLabel"))
                 this.stopLabel = this.getAttribute("stopLabel")!;
 
-            this.layout = "playPauseStop";
+            this._layout = "playPauseStop";
 
             if (this.hasAttribute("singlePlay"))
-                this.layout = "singlePlay";
+                this._layout = "singlePlay";
 
             if (this.hasAttribute("singlePlayStop"))
-                this.layout = "singlePlayStop";
+                this._layout = "singlePlayStop";
 
             if (this.hasAttribute("playStop"))
-                this.layout = "playStop";
+                this._layout = "playStop";
 
             if (this.hasAttribute("playPauseStop"))
-                this.layout = "playPauseStop";
+                this._layout = "playPauseStop";
 
             if (this.hasAttribute("buttonClass"))
                 this.buttonClass = this.getAttribute("buttonClass")!;
@@ -171,7 +171,7 @@ export class WmsControlsHTMLElement extends BaseHTMLElement {
         this.div.innerHTML = "";
         this.btnPlay = this.btnPause = this.btnStop = undefined;
 
-        switch (this.layout) {
+        switch (this._layout) {
             case "singlePlay":
                 if (!this.btnPlay) {
                     this.btnPlay = document.createElement("button");
