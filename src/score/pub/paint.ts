@@ -254,41 +254,47 @@ export class Paint {
 
     /**
      * Bind this paint to custom HTML element.
+     * 
      * @param elem - HTML element id or element.
+     * @returns - Boolean whether bind was succesfull.
      */
-    bindElement(elem: string | HTMLElement) {
+    bindElement(elem: string | HTMLElement): boolean {
         AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
 
         if (typeof document === "undefined")
-            return;
+            return false;
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
         if (isWmsViewHTMLElement(el)) {
             el.addEventListener("disconnected", () => this.boundElements.delete(el));
             el.paint = this;
+            return true;
         }
-        else
-            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-view>!");
+
+        return false;
     }
 
     /**
      * Unbind this paint from custom HTML element.
+     * 
      * @param elem - HTML element id or element.
+     * @returns - Boolean whether unbind was succesfull.
      */
-    unbindElement(elem: string | HTMLElement) {
+    unbindElement(elem: string | HTMLElement): boolean {
         AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
 
         if (typeof document === "undefined")
-            return;
+            return false;
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
         if (isWmsViewHTMLElement(el)) {
             el.paint = undefined;
             this.boundElements.delete(el);
+            return true;
         }
-        else
-            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-view>!");
+
+        return false;
     }
 }

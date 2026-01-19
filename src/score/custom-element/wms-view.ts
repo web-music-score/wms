@@ -99,6 +99,9 @@ export function registerWmsViewHTMLElement() {
  * @internal
  */
 export function isWmsViewHTMLElement(el: unknown): el is WmsViewHTMLElement {
+    if (typeof document === "undefined" || typeof customElements === "undefined")
+        return false;
+
     return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
         el.tagName === "WMS-VIEW";
