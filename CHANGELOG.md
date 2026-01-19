@@ -1,4 +1,8 @@
 # Changelog
+## [6.3.2] - 2026-01-19
+### Fixed
+- Fixed and improved custom HTML element <wms-controls> behavior.
+
 ## [6.3.1] - 2026-01-18
 ### Fixed
 - Fixed/improved deprecationg warning messages.
