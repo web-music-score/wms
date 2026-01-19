@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { WmsControls as PlainControls, MDocument, Player } from "../pub";
+import { WmsControls as InternalWmsControls, MDocument, Player } from "../pub";
 
 function addClass(el: Element, className: string) {
     Utils.Dom.addClass(el, ...className.split(" ").map(cls => cls.trim()));
@@ -9,39 +9,35 @@ const defaultButtonClass = "wms-button";
 const defaultButtonGroupClass = "wms-button-group";
 
 // Make SSR Safe for Docusaurus.
-const BaseElement = typeof HTMLElement !== "undefined"
+const BaseHTMLElement = typeof HTMLElement !== "undefined"
     ? HTMLElement
     : class { } as any;
 
-class WmsControls extends BaseElement {
+class WmsControls extends BaseHTMLElement {
     private div?: HTMLDivElement;
-    private ctrl: PlainControls;
-
-    private playLabel?: string;
-    private pauseLabel?: string;
-    private stopLabel?: string;
-
-    private singlePlay = false;
-    private singlePlayStop = false;
-    private playStop = false;
-    private playPauseStop = true;
 
     private btnPlay?: HTMLButtonElement;
     private btnPause?: HTMLButtonElement;
     private btnStop?: HTMLButtonElement;
 
+    private playLabel?: string;
+    private pauseLabel?: string;
+    private stopLabel?: string;
+
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
+    private _controls: InternalWmsControls;
     private _doc?: MDocument;
     private _player?: Player;
 
+    private _layout: "singlePlay" | "singlePlayStop" | "playStop" | "playPauseStop" = "playPauseStop";
     private _connected = false;
 
     constructor() {
         super();
 
-        this.ctrl = new PlainControls();
+        this._controls = new InternalWmsControls();
     }
 
     static get observedAttributes() {
@@ -69,33 +65,17 @@ class WmsControls extends BaseElement {
         if (name === "stopLabel")
             this.stopLabel = value ?? undefined;
 
-        if (name === "singlePlay" && value) {
-            this.singlePlay = true;
-            this.singlePlayStop = false;
-            this.playStop = false;
-            this.playPauseStop = false;
-        }
+        if (name === "singlePlay" && value)
+            this._layout = "singlePlay";
 
-        if (name === "singlePlayStop" && value) {
-            this.singlePlay = false;
-            this.singlePlayStop = true;
-            this.playStop = false;
-            this.playPauseStop = false;
-        }
+        if (name === "singlePlayStop" && value)
+            this._layout = "singlePlayStop";
 
-        if (name === "playStop" && value) {
-            this.singlePlay = false;
-            this.singlePlayStop = false;
-            this.playStop = true;
-            this.playPauseStop = false;
-        }
+        if (name === "playStop" && value)
+            this._layout = "playStop";
 
-        if (name === "playPauseStop" && value) {
-            this.singlePlay = false;
-            this.singlePlayStop = false;
-            this.playStop = false;
-            this.playPauseStop = true;
-        }
+        if (name === "playPauseStop" && value)
+            this._layout = "playPauseStop";
 
         if (name === "buttonClass")
             this.buttonClass = value ?? defaultButtonClass;
@@ -103,7 +83,7 @@ class WmsControls extends BaseElement {
         if (name === "buttonGroupClass")
             this.buttonGroupClass = value ?? defaultButtonGroupClass;
 
-        this.render();
+        this.update();
     }
 
     connectedCallback() {
@@ -125,33 +105,19 @@ class WmsControls extends BaseElement {
             if (this.hasAttribute("stopLabel"))
                 this.stopLabel = this.getAttribute("stopLabel")!;
 
-            if (this.hasAttribute("singlePlay")) {
-                this.singlePlay = true;
-                this.singlePlayStop = false;
-                this.playStop = false;
-                this.playPauseStop = false;
-            }
+            this._layout = "playPauseStop";
 
-            if (this.hasAttribute("singlePlayStop")) {
-                this.singlePlay = false;
-                this.singlePlayStop = true;
-                this.playStop = false;
-                this.playPauseStop = false;
-            }
+            if (this.hasAttribute("singlePlay"))
+                this._layout = "singlePlay";
 
-            if (this.hasAttribute("playStop")) {
-                this.singlePlay = false;
-                this.singlePlayStop = false;
-                this.playStop = true;
-                this.playPauseStop = false;
-            }
+            if (this.hasAttribute("singlePlayStop"))
+                this._layout = "singlePlayStop";
 
-            if (this.hasAttribute("playPauseStop")) {
-                this.singlePlay = false;
-                this.singlePlayStop = false;
-                this.playStop = false;
-                this.playPauseStop = true;
-            }
+            if (this.hasAttribute("playStop"))
+                this._layout = "playStop";
+
+            if (this.hasAttribute("playPauseStop"))
+                this._layout = "playPauseStop";
 
             if (this.hasAttribute("buttonClass"))
                 this.buttonClass = this.getAttribute("buttonClass")!;
@@ -164,6 +130,12 @@ class WmsControls extends BaseElement {
         this._connected = true;
         this.update();
     }
+
+    disconnectedCallback() {
+        this._connected = false;
+    }
+
+    adoptedCallback() { }
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
@@ -186,7 +158,7 @@ class WmsControls extends BaseElement {
     }
 
     private update() {
-        this.ctrl.setPlayer(this._player);
+        this._controls.setPlayer(this._player);
         if (this._connected) this.render();
     }
 
@@ -196,55 +168,60 @@ class WmsControls extends BaseElement {
         this.div.innerHTML = "";
         this.btnPlay = this.btnPause = this.btnStop = undefined;
 
-        if (this.singlePlay) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            this.ctrl.setSinglePlay(this.btnPlay, this.playLabel);
-        }
-        else if (this.singlePlayStop) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            this.ctrl.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
-        }
-        else if (this.playStop) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            if (!this.btnStop) {
-                this.btnStop = document.createElement("button");
-                this.div.append(this.btnStop);
-            }
-            this.ctrl.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
-        }
-        else if (this.playPauseStop) {
-            if (!this.btnPlay) {
-                this.btnPlay = document.createElement("button");
-                this.div.append(this.btnPlay);
-            }
-            if (!this.btnPause) {
-                this.btnPause = document.createElement("button");
-                this.div.append(this.btnPause);
-            }
-            if (!this.btnStop) {
-                this.btnStop = document.createElement("button");
-                this.div.append(this.btnStop);
-            }
-            this.ctrl.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
+        switch (this._layout) {
+            case "singlePlay":
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                this._controls.setSinglePlay(this.btnPlay, this.playLabel);
+                break;
+            case "singlePlayStop":
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                this._controls.setSinglePlayStop(this.btnPlay, this.playLabel, this.stopLabel);
+                break;
+            case "playStop":
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                if (!this.btnStop) {
+                    this.btnStop = document.createElement("button");
+                    this.div.append(this.btnStop);
+                }
+                this._controls.setPlayStop(this.btnPlay, this.btnStop, this.playLabel, this.stopLabel);
+                break;
+            case "playPauseStop":
+            default:
+                if (!this.btnPlay) {
+                    this.btnPlay = document.createElement("button");
+                    this.div.append(this.btnPlay);
+                }
+                if (!this.btnPause) {
+                    this.btnPause = document.createElement("button");
+                    this.div.append(this.btnPause);
+                }
+                if (!this.btnStop) {
+                    this.btnStop = document.createElement("button");
+                    this.div.append(this.btnStop);
+                }
+                this._controls.setPlayPauseStop(this.btnPlay, this.btnPause, this.btnStop, this.playLabel, this.pauseLabel, this.stopLabel);
+                break;
         }
 
         if (this.btnPlay) {
             this.btnPlay.type = "button";
             addClass(this.btnPlay, this.buttonClass)
         }
+
         if (this.btnPause) {
             this.btnPause.type = "button";
             addClass(this.btnPause, this.buttonClass)
         }
+
         if (this.btnStop) {
             this.btnStop.type = "button";
             addClass(this.btnStop, this.buttonClass)
@@ -267,10 +244,10 @@ export function registerWmsControls() {
 }
 
 export function isWmsControls(el: unknown): el is WmsControls {
-   if (typeof document === "undefined" || typeof customElements === "undefined")
+    if (typeof document === "undefined" || typeof customElements === "undefined")
         return false;
 
-   return Utils.Obj.isObject(el) &&
+    return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
         el.tagName === "WMS-CONTROLS";
 }

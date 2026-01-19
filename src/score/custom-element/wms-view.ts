@@ -1,15 +1,14 @@
-import { WmsView as PlainView, MDocument, Paint } from "../pub";
+import { WmsView as InternalWmsView, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
 // Make SSR Safe for Docusaurus.
-const BaseElement = typeof HTMLElement !== "undefined"
+const BaseHTMLElement = typeof HTMLElement !== "undefined"
     ? HTMLElement
     : class { } as any;
 
-class WmsView extends BaseElement {
-    private canvas: HTMLCanvasElement;
-    private view: PlainView;
-
+class WmsView extends BaseHTMLElement {
+    private _canvas: HTMLCanvasElement;
+    private _view: InternalWmsView;
     private _doc?: MDocument;
     private _paint?: Paint;
     private _connected = false;
@@ -17,8 +16,10 @@ class WmsView extends BaseElement {
     constructor() {
         super();
 
-        this.canvas = document.createElement("canvas");
-        this.view = new PlainView().setCanvas(this.canvas);
+        this._view = new InternalWmsView();
+
+        this._canvas = document.createElement("canvas");
+        this._view.setCanvas(this._canvas);
     }
 
     static get observedAttributes() {
@@ -31,11 +32,11 @@ class WmsView extends BaseElement {
         }
 
         if (name === "zoom" && value) {
-            this.view.setZoom(+value);
+            this._view.setZoom(+value);
         }
 
         if (name === "staff-size" && value) {
-            this.view.setStaffSize(value);
+            this._view.setStaffSize(value);
         }
     }
 
@@ -43,6 +44,12 @@ class WmsView extends BaseElement {
         this._connected = true;
         this.update();
     }
+
+    disconnectedCallback() {
+        this._connected = false;
+    }
+
+    adoptedCallback() { }
 
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
@@ -63,20 +70,20 @@ class WmsView extends BaseElement {
     }
 
     private update() {
-        this.view.setDocument(this._doc);
-        this.view.setPaint(this._paint);
-        if(this._connected) this.render();
+        this._view.setDocument(this._doc);
+        this._view.setPaint(this._paint);
+        if (this._connected) this.render();
     }
 
     private render() {
         if (typeof document === "undefined") return;
 
         try {
-            if (!this.contains(this.canvas))
-                this.append(this.canvas);
+            if (!this.contains(this._canvas))
+                this.append(this._canvas);
         } catch (e) { }
 
-        this.view.draw();
+        this._view.draw();
     }
 
     private loadFromUrl(url: string) { }
@@ -97,10 +104,10 @@ export function registerWmsView() {
 }
 
 export function isWmsView(el: unknown): el is WmsView {
-   if (typeof document === "undefined" || typeof customElements === "undefined")
+    if (typeof document === "undefined" || typeof customElements === "undefined")
         return false;
 
-   return Utils.Obj.isObject(el) &&
+    return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
         el.tagName === "WMS-VIEW";
 }

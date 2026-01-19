@@ -107,8 +107,6 @@ export class Player {
         return this;
     }
 
-    private boundElements = new ValueSet<HTMLElement>();
-
     /**
      * Bind this player to custom HTML element.
      * 
@@ -126,7 +124,6 @@ export class Player {
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
         if (isWmsControls(el)) {
-            el.addEventListener("disconnected", () => this.boundElements.delete(el));
             el.player = this;
             return true;
         }
@@ -152,7 +149,6 @@ export class Player {
 
         if (isWmsControls(el)) {
             el.player = undefined;
-            this.boundElements.delete(el);
             return true;
         }
 

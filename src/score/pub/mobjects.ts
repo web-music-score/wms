@@ -276,7 +276,13 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        return el ? this.obj.bindElement(el) : false;
+        if ((isWmsView(el) || isWmsControls(el)) && el.doc !== this) {
+            el.doc = this;
+            this.getMusicObject().requestFullLayout();
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -295,7 +301,13 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        return el ? this.obj.unbindElement(el) : false;
+        if ((isWmsView(el) || isWmsControls(el)) && el.doc === this) {
+            el.doc = undefined;
+            this.getMusicObject().requestFullLayout();
+            return true;
+        }
+
+        return false;
     }
 }
 
