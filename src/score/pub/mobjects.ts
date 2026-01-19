@@ -262,34 +262,40 @@ export class MDocument extends MusicInterface {
 
     /**
      * Bind this document to custom HTML element.
+     * 
+     * Note (since 6.3.3): bindElement() no longer throws if bind fails, it returns false instead.
+     * 
      * @param elem - HTML element id or element.
+     * @returns - Boolean wheter bind was succesfull.
      */
-    bindElement(elem: string | HTMLElement) {
+    bindElement(elem: string | HTMLElement): boolean {
         AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
+
+        if (typeof document === "undefined")
+            return false;
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el) || isWmsControls(el)) {
-            this.obj.bindElement(el);
-        }
-        else
-            throw new MusicError(MusicErrorType.Score, "Bind element must be <wms-music-score-view> or <wms-playback-buttons>!");
+        return el ? this.obj.bindElement(el) : false;
     }
 
     /**
      * Unbind this document from custom HTML element.
+     * 
+     * Note (since 6.3.3): unbindElement() no longer throws if bind fails, it returns false instead.
+     * 
      * @param elem - HTML element id or element.
+     * @returns - Boolean wheter unbind was succesfull.
      */
-    unbindElement(elem: string | HTMLElement) {
+    unbindElement(elem: string | HTMLElement): boolean {
         AssertUtil.assertVar(Guard.isNonEmptyString(elem) || Guard.isObject(elem), "elem", elem);
+
+        if (typeof document === "undefined")
+            return false;
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el) || isWmsControls(el)) {
-            this.obj.unbindElement(el);
-        }
-        else
-            throw new MusicError(MusicErrorType.Score, "Unbind element must be <wms-music-score-view> or <wms-playback-buttons>!");
+        return el ? this.obj.unbindElement(el) : false;
     }
 }
 

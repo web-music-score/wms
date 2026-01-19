@@ -97,7 +97,10 @@ export function registerWmsView() {
 }
 
 export function isWmsView(el: unknown): el is WmsView {
-    return Utils.Obj.isObject(el) &&
+   if (typeof document === "undefined" || typeof customElements === "undefined")
+        return false;
+
+   return Utils.Obj.isObject(el) &&
         Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
         el.tagName === "WMS-VIEW";
 }
