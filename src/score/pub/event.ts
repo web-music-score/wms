@@ -14,9 +14,9 @@ export abstract class ScoreEvent {
 }
 
 /**
- * Score staff event for click/enter/leave on staves.
+ * Score staff note event for click/enter/leave on staves.
  */
-export class ScoreStaffEvent extends ScoreEvent {
+export class ScoreStaffNoteEvent extends ScoreEvent {
     private _note: Note;
 
     constructor(type: ScoreEventType, readonly view: WmsView, readonly staff: MStaff, readonly diatonicId: number, readonly accidental: number) {
