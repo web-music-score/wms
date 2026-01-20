@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { WmsControls as InternalWmsControls, MDocument, Player } from "../pub";
+import { WmsControls, MDocument, Player } from "../pub";
 
 function addClass(el: Element, className: string) {
     Utils.Dom.addClass(el, ...className.split(" ").map(cls => cls.trim()));
@@ -13,36 +13,34 @@ const BaseHTMLElement = typeof HTMLElement !== "undefined"
     ? HTMLElement
     : class { } as any;
 
-class WmsControls extends BaseHTMLElement {
+export class WmsControlsHTMLElement extends BaseHTMLElement {
     private div?: HTMLDivElement;
-
-    private btnPlay?: HTMLButtonElement;
-    private btnPause?: HTMLButtonElement;
-    private btnStop?: HTMLButtonElement;
 
     private playLabel?: string;
     private pauseLabel?: string;
     private stopLabel?: string;
 
+    private btnPlay?: HTMLButtonElement;
+    private btnPause?: HTMLButtonElement;
+    private btnStop?: HTMLButtonElement;
+
     private buttonClass = defaultButtonClass;
     private buttonGroupClass = defaultButtonGroupClass;
 
-    private _controls: InternalWmsControls;
+    private _layout: "singlePlay" | "singlePlayStop" | "playStop" | "playPauseStop" = "playPauseStop";
+    private _controls: WmsControls;
     private _doc?: MDocument;
     private _player?: Player;
-
-    private _layout: "singlePlay" | "singlePlayStop" | "playStop" | "playPauseStop" = "playPauseStop";
     private _connected = false;
 
     constructor() {
         super();
 
-        this._controls = new InternalWmsControls();
+        this._controls = new WmsControls();
     }
 
     static get observedAttributes() {
         return [
-            "src",
             "singlePlay",
             "singlePlayStop",
             "playStop",
@@ -137,6 +135,10 @@ class WmsControls extends BaseHTMLElement {
 
     adoptedCallback() { }
 
+    get wmsControls(): WmsControls {
+        return this._controls;
+    }
+
     set doc(doc: MDocument | undefined) {
         this._doc = doc;
         this._player = doc?.getDefaultPlayer();
@@ -163,7 +165,8 @@ class WmsControls extends BaseHTMLElement {
     }
 
     private render() {
-        if (typeof document === "undefined" || !this.div) return;
+        if (typeof document === "undefined" || !this.div)
+            return;
 
         this.div.innerHTML = "";
         this.btnPlay = this.btnPause = this.btnStop = undefined;
@@ -230,24 +233,28 @@ class WmsControls extends BaseHTMLElement {
 }
 
 /**
+ * @internal
  * Safe registration (VERY IMPORTANT)
  */
-export function registerWmsControls() {
+export function registerWmsControlsHTMLElement() {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return;
 
     try {
         if (!customElements.get("controls"))
-            customElements.define("wms-controls", WmsControls as any);
+            customElements.define("wms-controls", WmsControlsHTMLElement as any);
     }
     catch (e) { }
 }
 
-export function isWmsControls(el: unknown): el is WmsControls {
+/**
+ * @internal
+ */
+export function isWmsControlsHTMLElement(el: unknown): el is WmsControlsHTMLElement {
     if (typeof document === "undefined" || typeof customElements === "undefined")
         return false;
 
     return Utils.Obj.isObject(el) &&
-        Utils.Obj.hasProperties(el, ["tagName", "doc"]) &&
+        Utils.Obj.hasProperties(el, ["tagName"]) &&
         el.tagName === "WMS-CONTROLS";
 }

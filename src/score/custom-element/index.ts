@@ -3,8 +3,8 @@ export function registerAllWmsElements() {
         return;
 
     try {
-        import("./wms-view").then(v => v.registerWmsView());
-        import("./wms-controls").then(c => c.registerWmsControls());
+        import("./wms-view").then(v => v.registerWmsViewHTMLElement());
+        import("./wms-controls").then(c => c.registerWmsControlsHTMLElement());
     }
     catch (e) { }
 }

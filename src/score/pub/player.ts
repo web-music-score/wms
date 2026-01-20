@@ -4,7 +4,7 @@ import { PlayerEngine } from "../engine/player-engine";
 import { PlayState, PlayStateChangeListener } from "./types";
 import { MDocument } from "./mobjects";
 import { AssertUtil } from "shared-src";
-import { isWmsControls } from "score/custom-element/wms-controls";
+import { isWmsControlsHTMLElement } from "score/custom-element/wms-controls";
 
 export class Player {
     private static currentlyPlaying = new ValueSet<Player>();
@@ -122,7 +122,7 @@ export class Player {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsControls(el)) {
+        if (isWmsControlsHTMLElement(el)) {
             el.player = this;
             return true;
         }
@@ -146,7 +146,7 @@ export class Player {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsControls(el)) {
+        if (isWmsControlsHTMLElement(el)) {
             el.player = undefined;
             return true;
         }

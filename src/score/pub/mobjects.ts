@@ -27,8 +27,8 @@ import { ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { ObjLyrics } from "../engine/obj-lyrics";
 import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
 import { ObjScoreRowGroup } from "../engine/obj-score-row-group";
-import { isWmsView } from "../custom-element/wms-view";
-import { isWmsControls } from "../custom-element/wms-controls";
+import { isWmsViewHTMLElement } from "../custom-element/wms-view";
+import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 import { Player } from "./player";
 import { AssertUtil } from "shared-src";
 
@@ -276,7 +276,7 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if ((isWmsView(el) || isWmsControls(el)) && el.doc !== this) {
+        if ((isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) && el.doc !== this) {
             el.doc = this;
             this.getMusicObject().requestFullLayout();
             return true;
@@ -301,7 +301,7 @@ export class MDocument extends MusicInterface {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if ((isWmsView(el) || isWmsControls(el)) && el.doc === this) {
+        if ((isWmsViewHTMLElement(el) || isWmsControlsHTMLElement(el)) && el.doc === this) {
             el.doc = undefined;
             this.getMusicObject().requestFullLayout();
             return true;

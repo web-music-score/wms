@@ -1,6 +1,6 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
-import { isWmsView } from "../custom-element/wms-view";
+import { isWmsViewHTMLElement } from "../custom-element/wms-view";
 import { AssertUtil, warnDeprecated } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
@@ -265,7 +265,7 @@ export class Paint {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el)) {
+        if (isWmsViewHTMLElement(el)) {
             el.paint = this;
             return true;
         }
@@ -289,7 +289,7 @@ export class Paint {
 
         const el = typeof elem === "string" ? document.getElementById(elem) : elem;
 
-        if (isWmsView(el)) {
+        if (isWmsViewHTMLElement(el)) {
             el.paint = undefined;
             return true;
         }
