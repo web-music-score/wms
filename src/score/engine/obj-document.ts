@@ -354,6 +354,7 @@ export class ObjDocument extends MusicObject {
                     return {
                         staff,
                         diatonicId,
+                        measure: m,
                         accidental: m.getKeySignature().getAccidental(diatonicId)
                     };
                 }

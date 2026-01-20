@@ -2,7 +2,7 @@ import { Assert, Guard, Utils } from "@tspro/ts-utils-lib";
 import { View } from "../engine/view";
 import { StaffSize } from "./types";
 import { ScoreEventListener } from "./event";
-import { MDocument, MScoreRow, MStaff, MusicInterface } from "./mobjects";
+import { MDocument, MMeasure, MScoreRow, MStaff, MusicInterface } from "./mobjects";
 import { Paint } from "./paint";
 import { AssertUtil } from "shared-src";
 import { isWmsViewHTMLElement } from "../custom-element/wms-view";
@@ -117,14 +117,14 @@ export class WmsView {
      * Draw given staff position hilighted.
      * @param staffPos - Staff position information. Accepts ScoreStaffEvent and ScoreStaffPosEvent.
      */
-    hilightStaffPos(staffPos?: { scoreRow?: MScoreRow, staff?: MStaff, diatonicId: number }) {
+    hilightStaffPos(staffPos?: { scoreRow?: MScoreRow, staff?: MStaff, measure?: MMeasure, diatonicId: number }) {
         let done = false;
 
-        if (staffPos?.staff instanceof MStaff) {
+        if (staffPos?.staff instanceof MStaff && staffPos.measure) {
             this._view.hilightStaffPos({
                 staff: staffPos.staff.getMusicObject(),
-                diatonicId: staffPos.diatonicId,
-                accidental: 0
+                measure: staffPos.measure.getMusicObject(),
+                diatonicId: staffPos.diatonicId
             });
             done = true;
         }
@@ -134,8 +134,8 @@ export class WmsView {
             if (staff) {
                 this._view.hilightStaffPos({
                     staff: staff.getMusicObject(),
-                    diatonicId: staffPos.diatonicId,
-                    accidental: 0
+                    measure: undefined,
+                    diatonicId: staffPos.diatonicId
                 });
                 done = true;
             }

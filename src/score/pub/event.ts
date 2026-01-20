@@ -1,5 +1,5 @@
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { MScoreRow, MStaff, MTab, MusicInterface } from "./mobjects";
+import { MMeasure, MScoreRow, MStaff, MTab, MusicInterface } from "./mobjects";
 import { WmsView } from "./wms-view";
 import { MRenderContext } from "./deprecated";
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
@@ -16,10 +16,13 @@ export abstract class ScoreEvent {
 /**
  * Score staff note event for click/enter/leave on staves.
  */
-export class ScoreStaffNoteEvent extends ScoreEvent {
+export class ScoreStaffEvent extends ScoreEvent {
     private _note: Note;
 
-    constructor(type: ScoreEventType, readonly view: WmsView, readonly staff: MStaff, readonly diatonicId: number, readonly accidental: number) {
+    /**
+     * @internal
+     */
+    constructor(type: ScoreEventType, readonly view: WmsView, readonly staff: MStaff, readonly measure: MMeasure, readonly diatonicId: number, readonly accidental: number) {
         super(type);
 
         this._note = new Note(diatonicId, accidental);
@@ -53,6 +56,9 @@ export class ScoreStaffNoteEvent extends ScoreEvent {
  * Note! Not yet implemented, reserved for future.
  */
 export class ScoreTabEvent extends ScoreEvent {
+    /**
+     * @internal
+     */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly tab: MTab) {
         super(type);
     }
@@ -64,6 +70,9 @@ export class ScoreTabEvent extends ScoreEvent {
  * @deprecated - ScoreStaffPosEvent is deprecated (since v6.4.0). Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
  */
 export class ScoreStaffPosEvent extends ScoreEvent {
+    /**
+     * @internal
+     */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
@@ -77,13 +86,12 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     }
 }
 
-/** Score object event for clicking/entering/leaving score object. */
+/**
+ * Score object event for clicking/entering/leaving score object.
+ */
 export class ScoreObjectEvent extends ScoreEvent {
     /**
-     * Create new score object event.
-     * @param type - Score event type.
-     * @param view - View.
-     * @param objects - Array of objects, last object in this array is the top object that was clicked/entered/left, previous objects are it's parent objects.
+     * @internal
      */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly objects: MusicInterface[]) {
         super(type);

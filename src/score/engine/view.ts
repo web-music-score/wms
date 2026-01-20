@@ -1,11 +1,12 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffNoteEvent, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView, Player } from "../pub";
+import { ScoreEventListener, ScoreStaffEvent, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView, Player } from "../pub";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "web-music-score/core";
+import { ObjMeasure } from "./obj-measure";
 
 import GClefData from "./assets/G-clef.png";
 import FClefData from "./assets/F-clef.png";
@@ -29,7 +30,7 @@ type HTMLImageData = {
     img?: HTMLImageElement;
 }
 
-export type StaffPos = { staff: ObjStaff, diatonicId: number, accidental: number }
+export type StaffPos = { staff: ObjStaff, measure?: ObjMeasure, diatonicId: number, accidental?: number }
 
 function staffPosEquals(a: StaffPos | undefined, b: StaffPos | undefined): boolean {
     if (!a && !b) return true;
@@ -300,24 +301,30 @@ export class View {
         let changed = !staffPosEquals(staffPos, this.curStaffPos);
 
         if (changed && this.curStaffPos && this.scoreEventListener) {
-            let { staff, diatonicId, accidental } = this.curStaffPos;
+            let { staff, measure, diatonicId, accidental } = this.curStaffPos;
 
             this.scoreEventListener(new ScoreStaffPosEvent("leave", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
-            this.scoreEventListener(new ScoreStaffNoteEvent("leave", this.getMusicInterface(), staff.getMusicInterface(), diatonicId, accidental));
+
+            if (measure && accidental !== undefined)
+                this.scoreEventListener(new ScoreStaffEvent("leave", this.getMusicInterface(), staff.getMusicInterface(), measure.getMusicInterface(), diatonicId, accidental));
         }
 
         if (changed && staffPos && this.scoreEventListener) {
-            let { staff, diatonicId, accidental } = staffPos;
+            let { staff, measure, diatonicId, accidental } = staffPos;
 
             this.scoreEventListener(new ScoreStaffPosEvent("enter", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
-            this.scoreEventListener(new ScoreStaffNoteEvent("enter", this.getMusicInterface(), staff.getMusicInterface(), diatonicId, accidental));
+
+            if (measure && accidental !== undefined)
+                this.scoreEventListener(new ScoreStaffEvent("enter", this.getMusicInterface(), staff.getMusicInterface(), measure.getMusicInterface(), diatonicId, accidental));
         }
 
         if (click && staffPos && this.scoreEventListener) {
-            let { staff, diatonicId, accidental } = staffPos;
+            let { staff, measure, diatonicId, accidental } = staffPos;
 
             this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
-            this.scoreEventListener(new ScoreStaffNoteEvent("click", this.getMusicInterface(), staff.getMusicInterface(), diatonicId, accidental));
+
+            if (measure && accidental !== undefined)
+                this.scoreEventListener(new ScoreStaffEvent("click", this.getMusicInterface(), staff.getMusicInterface(), measure.getMusicInterface(), diatonicId, accidental));
         }
 
         this.curStaffPos = staffPos;
@@ -526,10 +533,18 @@ export class View {
             return;
         }
 
-        let { staff, diatonicId } = hilightedStaffPos;
+        let { staff, measure, diatonicId } = hilightedStaffPos;
 
         this.fillColor(this.paint.colors["hilight.staffpos"]);
-        this.fillRect(staff.row.getRect().left, staff.getDiatonicIdY(diatonicId) - unitSize, staff.row.getRect().width, 2 * unitSize);
+
+        const y = staff.getDiatonicIdY(diatonicId);
+
+        const measures = staff.row.getMeasures();
+
+        const left = measure ? measure.getRect().left : measures[0].getRect().left;
+        const right = measure ? measure.getRect().right : measures[measures.length - 1].getRect().right;
+
+        this.fillRect(left, y - unitSize, right - left, 2 * unitSize);
 
         if (mousePos !== undefined) {
             this.drawLedgerLines(staff, diatonicId, mousePos.x);
