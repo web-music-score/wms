@@ -3,6 +3,8 @@ import { Utils } from "@tspro/ts-utils-lib";
 Utils.Dom.injectCss("wms-custom-css", `
 /* Add custom wms-button and wms-button-group styles */
 
+.wms-canvas { }
+
 .wms-button {
   display: inline-flex;
   align-items: center;
