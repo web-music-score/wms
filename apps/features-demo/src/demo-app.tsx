@@ -10,7 +10,8 @@ Audio.addInstrument(ClassicalGuitar);
 type DemoAppState = {
     instrument: string;
     doc?: Score.MDocument;
-    hoverText: string;
+    hoverObjectText: string;
+    hoverStaffText: string;
 }
 
 export class DemoApp extends React.Component<{}, DemoAppState> {
@@ -23,12 +24,13 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
         this.state = {
             instrument: Audio.getCurrentInstrument(),
             doc: DemoPieces.getInstance().getDefault(),
-            hoverText: ""
+            hoverObjectText: "",
+            hoverStaffText: ""
         }
     }
 
     render() {
-        let { instrument, doc, hoverText } = this.state;
+        let { instrument, doc, hoverObjectText, hoverStaffText } = this.state;
 
         let docList = DemoPieces.getInstance().getList();
 
@@ -50,11 +52,21 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
             if (event instanceof Score.ScoreObjectEvent) {
                 if (event.type === "leave") {
                     event.view.hilightObject(undefined);
-                    this.setState({ hoverText: "" });
+                    this.setState({ hoverObjectText: "" });
                 }
                 else {
                     event.view.hilightObject(event.topObject);
-                    this.setState({ hoverText: event.topObject.name + " Object" });
+                    this.setState({ hoverObjectText: `Hover Object: ${event.topObject.name}` });
+                }
+            }
+            else if (event instanceof Score.ScoreStaffEvent) {
+                if (event.type === "leave") {
+                    event.view.hilightStaffPos(undefined);
+                    this.setState({ hoverStaffText: "" });
+                }
+                else {
+                    event.view.hilightStaffPos(event);
+                    this.setState({ hoverStaffText: `Hover Note: ${event.noteName}` });
                 }
             }
         }
@@ -85,9 +97,10 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
                     </select>
                 </div>
             </div>
-            <br />
-            {hoverText}
-            <br />
+            <div>
+                <code>{hoverObjectText}</code><br />
+                <code>{hoverStaffText.split("\n").map(s => <>{s}</>)}</code><br />
+            </div>
             <ScoreUI.WmsView doc={doc} onScoreEvent={onScoreEvent} />
         </div >
     }
