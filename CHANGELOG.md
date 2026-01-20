@@ -1,7 +1,7 @@
 # Changelog
-## [6.3.4] - 2026-01-19
+## [6.3.4] - 2026-01-20
 ### Fixed
-- WmsControls bug.
+- Fixed/improved custom html elements wms-view and wms-controls with AI.
 
 ## [6.3.3] - 2026-01-19
 ### Changed
