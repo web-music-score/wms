@@ -53,7 +53,7 @@ export class ScoreStaffEvent extends ScoreEvent {
  * Note! Not yet implemented, reserved for future.
  */
 export class ScoreTabEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly view: WmsView, readonly tab: MTab, readonly stringNumber: number) {
+    constructor(type: ScoreEventType, readonly view: WmsView, readonly tab: MTab) {
         super(type);
     }
 }
