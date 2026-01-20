@@ -2,9 +2,10 @@
 ## [6.4.0-pre.1] - 2026-01-??
 ### Added
 - WmsView.getByElementId() and WmsControls.getByElementId().
+- class ScoreStaffNoteEvent.
 
-### Updated
-- Score.ScoreStaffPosEvent.
+### Deprecated
+- class ScoreStaffPosEvent, use ScoreStaffNoteEvent instead.
 
 ### Fixed
 - Missing and existing deprecation warning messages.

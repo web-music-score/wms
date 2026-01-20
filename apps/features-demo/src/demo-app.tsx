@@ -59,7 +59,7 @@ export class DemoApp extends React.Component<{}, DemoAppState> {
                     this.setState({ hoverObjectText: `Hover Object: ${event.topObject.name}` });
                 }
             }
-            else if (event instanceof Score.ScoreStaffPosEvent) {
+            else if (event instanceof Score.ScoreStaffNoteEvent) {
                 if (event.type === "leave") {
                     event.view.hilightStaffPos(undefined);
                     this.setState({ hoverStaffText: "" });
