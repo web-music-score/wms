@@ -14,58 +14,15 @@ export abstract class ScoreEvent {
 }
 
 /**
- * Score staff note event for click/enter/leave on staves.
- */
-export class ScoreStaffNoteEvent extends ScoreEvent {
-    private _note: Note;
-
-    constructor(type: ScoreEventType, readonly view: WmsView, readonly staff: MStaff, readonly diatonicId: number, readonly accidental: number) {
-        super(type);
-
-        this._note = new Note(diatonicId, accidental);
-    }
-
-    get noteName(): string {
-        return this._note.format(PitchNotation.Scientific, SymbolSet.Ascii);
-    }
-
-    get diatonicClass(): number {
-        return this._note.diatonicClass;
-    }
-
-    get chromaticId(): number {
-        return this._note.chromaticId;
-    }
-
-    get chromaticClass(): number {
-        return this._note.chromaticClass;
-    }
-
-    get midiNumber(): number {
-        return this._note.midiNumber;
-    }
-
-}
-
-/**
- * Score tab event for click/enter/leave on tabs.
- *
- * Note! Not yet implemented, reserved for future.
- */
-export class ScoreTabEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly view: WmsView, readonly tab: MTab) {
-        super(type);
-    }
-}
-
-/**
  * Score staff position event for click/enter/leave staff positions.
- * 
- * @deprecated - ScoreStaffPosEvent is deprecated (since v6.4.0). Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
  */
 export class ScoreStaffPosEvent extends ScoreEvent {
-    constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
+    private _note?: Note;
+
+    constructor(type: ScoreEventType, readonly view: WmsView, private readonly staffOrRow: MStaff | MScoreRow, readonly diatonicId: number, accidental?: number) {
         super(type);
+
+        this._note = accidental !== undefined ? new Note(diatonicId, accidental) : undefined;
     }
 
     /**
@@ -74,6 +31,69 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     get renderContext(): MRenderContext {
         warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
         return this.view;
+    }
+
+    /**
+     * Staff (since v6.4.0).
+     */
+    get staff(): MStaff {
+        if(this.staffOrRow instanceof MScoreRow)
+            throw new MusicError(MusicErrorType.Unknown, "ScoreStaffPosEvent.staff is not supported!");
+        return this.staffOrRow;
+    }
+
+    /**
+     * Row.
+     *
+     * @deprecated - scoreRow is deprecated. Will be removed in future release. Use staff instead.
+     */
+    get scoreRow(): MScoreRow {
+        return this.staffOrRow instanceof MScoreRow ? this.staffOrRow : this.staffOrRow.getRow();
+    }
+
+    /**
+     * Note name (since v6.4.0).
+     */
+    get noteName(): string {
+        if(!this._note)
+            throw new MusicError(MusicErrorType.Unknown, "ScoreStaffPosEvent.noteName is not supported!");
+        return this._note.format(PitchNotation.Scientific, SymbolSet.Ascii);
+    }
+
+    /**
+     * Diatonic class (since v6.4.0).
+     */
+    get diatonicClass(): number {
+        if(!this._note)
+            throw new MusicError(MusicErrorType.Unknown, "ScoreStaffPosEvent.diatonicClass is not supported!");
+        return this._note.diatonicClass;
+    }
+
+    /**
+     * Chromatic id (since v6.4.0).
+     */
+    get chromaticId(): number {
+        if(!this._note)
+            throw new MusicError(MusicErrorType.Unknown, "ScoreStaffPosEvent.chromaticId is not supported!");
+        return this._note.chromaticId;
+    }
+
+    /**
+     * Chromatic class (since v6.4.0).
+     */
+    get chromaticClass(): number {
+        if(!this._note)
+            throw new MusicError(MusicErrorType.Unknown, "ScoreStaffPosEvent.chromaticClass is not supported!");
+        return this._note.chromaticClass;
+    }
+
+    /**
+     * Midi number (since v6.4.0).
+     */
+    get midiNumber(): number {
+        if(!this._note)
+            throw new MusicError(MusicErrorType.Unknown, "ScoreStaffPosEvent.midiNumber is not supported!");
+        return this._note.midiNumber;
     }
 }
 
