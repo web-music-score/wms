@@ -1,7 +1,7 @@
 import { getTuningStrings, Note, validateTuningName } from "web-music-score/theory";
 import { ImageAsset, View } from "./view";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { Clef, colorKey, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
+import { Clef, colorKey, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
@@ -331,6 +331,24 @@ export class ObjStaff extends ObjNotationLine {
         }
 
         return bottom;
+    }
+
+    calcUsedDiatonicIdRange(): { minDiatonicId: number, maxDiatonicId: number } {
+        let minDiatonicId = this.minDiatonicId ?? this.bottomLineDiatonicId;
+        let maxDiatonicId = this.maxDiatonicId ?? this.topLineDiatonicId;
+
+        const voiceIds = getVoiceIds().filter(voiceId => this.containsVoiceId(voiceId));
+
+        voiceIds.forEach(voiceId => {
+            this.row.getMeasures().forEach(m => {
+                m.getVoiceSymbols(voiceId).forEach(s => {
+                    minDiatonicId = Math.min(minDiatonicId, s.getDiatonicId());
+                    maxDiatonicId = Math.max(maxDiatonicId, s.getDiatonicId());
+                });
+            });
+        });
+
+        return { minDiatonicId, maxDiatonicId }
     }
 
     pick(x: number, y: number): MusicObject[] {

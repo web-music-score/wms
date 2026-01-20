@@ -1,7 +1,6 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView, Player } from "../pub";
-import { ObjScoreRow } from "./obj-score-row";
+import { ScoreEventListener, ScoreStaffEvent, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView, Player } from "../pub";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
@@ -30,12 +29,12 @@ type HTMLImageData = {
     img?: HTMLImageElement;
 }
 
-type StaffPos = { scoreRow: ObjScoreRow, diatonicId: number }
+export type StaffPos = { staff: ObjStaff, diatonicId: number, accidental: number }
 
 function staffPosEquals(a: StaffPos | undefined, b: StaffPos | undefined): boolean {
     if (!a && !b) return true;
     else if (!a || !b) return false;
-    else return a.scoreRow === b.scoreRow && a.diatonicId === b.diatonicId;
+    else return a.staff === b.staff && a.diatonicId === b.diatonicId;
 }
 
 function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefined): boolean {
@@ -301,18 +300,24 @@ export class View {
         let changed = !staffPosEquals(staffPos, this.curStaffPos);
 
         if (changed && this.curStaffPos && this.scoreEventListener) {
-            let { scoreRow, diatonicId } = this.curStaffPos;
-            this.scoreEventListener(new ScoreStaffPosEvent("leave", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
+            let { staff, diatonicId, accidental } = this.curStaffPos;
+
+            this.scoreEventListener(new ScoreStaffPosEvent("leave", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
+            this.scoreEventListener(new ScoreStaffEvent("leave", this.getMusicInterface(), staff.getMusicInterface(), diatonicId, accidental));
         }
 
         if (changed && staffPos && this.scoreEventListener) {
-            let { scoreRow, diatonicId } = staffPos;
-            this.scoreEventListener(new ScoreStaffPosEvent("enter", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
+            let { staff, diatonicId, accidental } = staffPos;
+
+            this.scoreEventListener(new ScoreStaffPosEvent("enter", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
+            this.scoreEventListener(new ScoreStaffEvent("enter", this.getMusicInterface(), staff.getMusicInterface(), diatonicId, accidental));
         }
 
         if (click && staffPos && this.scoreEventListener) {
-            let { scoreRow, diatonicId } = staffPos;
-            this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), scoreRow.getMusicInterface(), diatonicId));
+            let { staff, diatonicId, accidental } = staffPos;
+
+            this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
+            this.scoreEventListener(new ScoreStaffEvent("click", this.getMusicInterface(), staff.getMusicInterface(), diatonicId, accidental));
         }
 
         this.curStaffPos = staffPos;
@@ -407,7 +412,7 @@ export class View {
         this.hilightedObj = obj;
     }
 
-    hilightStaffPos(staffPos?: { scoreRow: ObjScoreRow, diatonicId: number }) {
+    hilightStaffPos(staffPos?: StaffPos) {
         this.hilightedStaffPos = staffPos;
     }
 
@@ -521,12 +526,7 @@ export class View {
             return;
         }
 
-        let { scoreRow, diatonicId } = hilightedStaffPos;
-        let staff = scoreRow.getStaff(diatonicId);
-
-        if (!staff) {
-            return;
-        }
+        let { staff, diatonicId } = hilightedStaffPos;
 
         this.fillColor(this.paint.colors["hilight.staffpos"]);
         this.fillRect(staff.row.getRect().left, staff.getDiatonicIdY(diatonicId) - unitSize, staff.row.getRect().width, 2 * unitSize);

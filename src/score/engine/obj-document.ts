@@ -1,4 +1,4 @@
-import { View } from "./view";
+import { StaffPos, View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
@@ -332,26 +332,31 @@ export class ObjDocument extends MusicObject {
         this.rows.forEach(row => row.draw(view));
     }
 
-    pickStaffPosAt(x: number, y: number): { scoreRow: ObjScoreRow, diatonicId: number } | undefined {
+    pickStaffPosAt(x: number, y: number): StaffPos | undefined {
         if (!this.rect.contains(x, y)) {
             return undefined;
         }
 
-        for (let ri = 0; ri < this.rows.length; ri++) {
-            let row = this.rows[ri];
+        for (let r = 0; r < this.rows.length; r++) {
+            const row = this.rows[r];
 
-            if (!row.hasStaff) {
-                continue;
-            }
+            for (let s = 0; s < row.getStaves().length; s++) {
+                const staff = row.getStaves()[s];
 
-            if (!row.getRect().contains(x, y)) {
-                continue;
-            }
+                const m = row.getMeasures().find(m => m.getRect().contains(x, y));
 
-            let diatonicId = row.getDiatonicIdAt(y);
+                if (!m) continue;
 
-            if (diatonicId !== undefined) {
-                return { scoreRow: row, diatonicId };
+                let diatonicId = staff.getDiatonicIdAt(y);
+                let { minDiatonicId, maxDiatonicId } = staff.calcUsedDiatonicIdRange();
+
+                if (diatonicId !== undefined && diatonicId >= minDiatonicId && diatonicId <= maxDiatonicId) {
+                    return {
+                        staff,
+                        diatonicId,
+                        accidental: m.getKeySignature().getAccidental(diatonicId)
+                    };
+                }
             }
         }
 

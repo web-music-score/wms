@@ -2,7 +2,7 @@ import { Assert, Guard, Utils } from "@tspro/ts-utils-lib";
 import { View } from "../engine/view";
 import { StaffSize } from "./types";
 import { ScoreEventListener } from "./event";
-import { MDocument, MScoreRow, MusicInterface } from "./mobjects";
+import { MDocument, MScoreRow, MStaff, MusicInterface } from "./mobjects";
 import { Paint } from "./paint";
 import { AssertUtil } from "shared-src";
 import { isWmsViewHTMLElement } from "../custom-element/wms-view";
@@ -115,13 +115,33 @@ export class WmsView {
 
     /**
      * Draw given staff position hilighted.
-     * @param staffPos - Staff position (score row and diatonic id) or undefined to remove hilighting.
+     * @param staffPos - Staff position information. Accepts ScoreStaffEvent and ScoreStaffPosEvent.
      */
-    hilightStaffPos(staffPos?: { scoreRow: MScoreRow, diatonicId: number }) {
-        this._view.hilightStaffPos(staffPos ? {
-            scoreRow: staffPos.scoreRow.getMusicObject(),
-            diatonicId: staffPos.diatonicId
-        } : undefined);
+    hilightStaffPos(staffPos?: { scoreRow?: MScoreRow, staff?: MStaff, diatonicId: number }) {
+        let done = false;
+
+        if (staffPos?.staff instanceof MStaff) {
+            this._view.hilightStaffPos({
+                staff: staffPos.staff.getMusicObject(),
+                diatonicId: staffPos.diatonicId,
+                accidental: 0
+            });
+            done = true;
+        }
+
+        if (staffPos?.scoreRow instanceof MScoreRow) {
+            const staff = staffPos.scoreRow.getNotationLines().find(l => l instanceof MStaff);
+            if (staff) {
+                this._view.hilightStaffPos({
+                    staff: staff.getMusicObject(),
+                    diatonicId: staffPos.diatonicId,
+                    accidental: 0
+                });
+                done = true;
+            }
+        }
+
+        if (!done) this._view.hilightStaffPos(undefined);
     }
 
     /**

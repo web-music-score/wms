@@ -1,7 +1,8 @@
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { MScoreRow, MusicInterface } from "./mobjects";
+import { MScoreRow, MStaff, MTab, MusicInterface } from "./mobjects";
 import { WmsView } from "./wms-view";
 import { MRenderContext } from "./deprecated";
+import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
 import { warnDeprecated } from "shared-src";
 
 /** Score event type. */
@@ -9,22 +10,60 @@ export type ScoreEventType = "enter" | "leave" | "click";
 
 /** Abstract score event class. */
 export abstract class ScoreEvent {
-    /**
-     * Create new score event instance.
-     * @param type - Score event type.
-     */
     constructor(readonly type: ScoreEventType) { }
 }
 
-/** Score staff position event for clicking/entering/leaving staff position (diatonic id) in staff notation line. */
+/**
+ * Score staff event for click/enter/leave on staves.
+ */
+export class ScoreStaffEvent extends ScoreEvent {
+    private _note: Note;
+
+    constructor(type: ScoreEventType, readonly view: WmsView, readonly staff: MStaff, readonly diatonicId: number, readonly accidental: number) {
+        super(type);
+
+        this._note = new Note(diatonicId, accidental);
+    }
+
+    get noteName(): string {
+        return this._note.format(PitchNotation.Scientific, SymbolSet.Ascii);
+    }
+
+    get diatonicClass(): number {
+        return this._note.diatonicClass;
+    }
+
+    get chromaticId(): number {
+        return this._note.chromaticId;
+    }
+
+    get chromaticClass(): number {
+        return this._note.chromaticClass;
+    }
+
+    get midiNumber(): number {
+        return this._note.midiNumber;
+    }
+
+}
+
+/**
+ * Score tab event for click/enter/leave on tabs.
+ *
+ * Note! Not yet implemented, reserved for future.
+ */
+export class ScoreTabEvent extends ScoreEvent {
+    constructor(type: ScoreEventType, readonly view: WmsView, readonly tab: MTab, readonly stringNumber: number) {
+        super(type);
+    }
+}
+
+/**
+ * Score staff position event for click/enter/leave staff positions.
+ * 
+ * @deprecated - ScoreStaffPosEvent is deprecated (since v6.4.0). Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
+ */
 export class ScoreStaffPosEvent extends ScoreEvent {
-    /**
-     * Create new score staff position event.
-     * @param type - Score event type.
-     * @param view - View.
-     * @param scoreRow - Score row.
-     * @param diatonicId - Diatonic id that was clicked/entered/left.
-     */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
