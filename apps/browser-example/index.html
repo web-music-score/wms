@@ -35,7 +35,7 @@
     </script>
 
     <h2>Using Plain JS</h2>
-    <canvas id="scoreCanvas"></canvas><br />
+    <canvas id="scoreCanvas" class="wms-canvas"></canvas><br />
     <br />
     <div class="wms-button-group">
         <button id="playButton" type="button" class="wms-button"></button>
@@ -79,6 +79,9 @@
             .draw();
 
         new Score.WmsControls()
+            //.setSinglePlay("playButton")
+            //.setSinglePlayStop("playButton", "stopButton")
+            //.setPlayStop("playButton", "stopButton")
             .setPlayPauseStop("playButton", "pauseButton", "stopButton")
             //.setDocument(doc1)
             .setPlayer(player1);
@@ -88,7 +91,7 @@
     <h2>Using Custom HTML Elements (HTML)</h2>
     <wms-view id="wms-view"></wms-view>
     <br />
-    <wms-controls id="wms-buttons" playPauseStop></wms-controls>
+    <wms-controls id="wms-buttons" play-pause-stop></wms-controls>
     <br />
     <br />
 
@@ -120,10 +123,10 @@
 
         const controlsEl = document.createElement("wms-controls");
 
-        // controlsEl.setAttribute("singlePlay", "true");
-        // controlsEl.setAttribute("singlePlayStop", "true");
-        // controlsEl.setAttribute("playStop", "true");
-        // controlsEl.setAttribute("playPauseStop", "true");
+        // controlsEl.setAttribute("single-play", "true");
+        // controlsEl.setAttribute("single-play-stop", "true");
+        // controlsEl.setAttribute("play-stop", "true");
+        // controlsEl.setAttribute("play-pause-stop", "true");
 
         document.getElementById("controlsContainerId").append(controlsEl);
 

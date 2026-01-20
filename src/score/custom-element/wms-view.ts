@@ -1,13 +1,15 @@
 import { WmsView, MDocument, Paint } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
-// Make SSR Safe for Docusaurus.
+const defaultCanvasClass = "wms-canvas";
+
+// Make SSR-safe (Docusaurus / Node)
 const BaseHTMLElement = typeof HTMLElement !== "undefined"
     ? HTMLElement
-    : class { } as any;
+    : (class { } as any);
 
 export class WmsViewHTMLElement extends BaseHTMLElement {
-    private _canvas: HTMLCanvasElement;
+    private _canvas?: HTMLCanvasElement;
     private _view: WmsView;
     private _doc?: MDocument;
     private _paint?: Paint;
@@ -18,7 +20,11 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
 
         this._view = new WmsView();
 
+        // Never touch DOM in SSR
+        if (typeof document === "undefined") return;
+
         this._canvas = document.createElement("canvas");
+        Utils.Dom.addClass(this._canvas, defaultCanvasClass);
 
         this._view.setCanvas(this._canvas);
     }
@@ -33,24 +39,34 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
         }
 
         if (name === "zoom" && value) {
-            this._view.setZoom(+value);
+            this._view?.setZoom(+value);
         }
 
         if (name === "staff-size" && value) {
-            this._view.setStaffSize(value);
+            this._view?.setStaffSize(value);
         }
     }
 
+    // Called when inserted into DOM
     connectedCallback() {
+        if (this._connected) return;
         this._connected = true;
+
+        if (this._canvas) {
+            this.append(this._canvas);
+        }
+
         this.update();
     }
 
+    // Called when removed from DOM
     disconnectedCallback() {
         this._connected = false;
     }
 
-    adoptedCallback() { }
+    adoptedCallback() {
+        // No-op (rarely needed)
+    }
 
     get wmsView(): WmsView {
         return this._view;
@@ -75,18 +91,13 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
     }
 
     private update() {
-        this._view.setDocument(this._doc);
-        this._view.setPaint(this._paint);
-        if (this._connected) this.render();
-    }
+        if (!this._connected) return;
+        if (!this._view) return;
 
-    private render() {
-        try {
-            if (!this.contains(this._canvas))
-                this.append(this._canvas);
-        } catch (e) { }
+        if (this._doc) this._view.setDocument(this._doc);
+        if (this._paint) this._view.setPaint(this._paint);
 
-        this._view.draw();
+        this._view?.draw();
     }
 
     private loadFromUrl(url: string) { }
