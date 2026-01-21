@@ -4,12 +4,22 @@ import { WmsView } from "./wms-view";
 import { MRenderContext } from "./deprecated";
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
 import { warnDeprecated } from "shared-src";
+import { Utils } from "@tspro/ts-utils-lib";
 
 /** Score event type. */
 export type ScoreEventType = "enter" | "leave" | "click";
 
 /** Abstract score event class. */
 export abstract class ScoreEvent {
+    readonly kind: string = "ScoreEvent";
+
+    static is(event: unknown): event is ScoreEvent {
+        return (
+            event instanceof ScoreEvent ||
+            Utils.Obj.isObject(event) && Utils.Obj.hasProperties(event, ["kind", "type"]) && event.kind === "ScoreEvent"
+        );
+    }
+
     constructor(readonly type: ScoreEventType) { }
 }
 
@@ -17,6 +27,15 @@ export abstract class ScoreEvent {
  * Score staff note event for click/enter/leave on staves.
  */
 export class ScoreStaffEvent extends ScoreEvent {
+    readonly kind: string = "ScoreStaffEvent";
+
+    static is(event: unknown): event is ScoreStaffEvent {
+        return (
+            event instanceof ScoreStaffEvent ||
+            Utils.Obj.isObject(event) && Utils.Obj.hasProperties(event, ["kind", "type", "view", "staff", "measure", "diatonicId", "accidental"]) && event.kind === "ScoreStaffEvent"
+        );
+    }
+
     private _note: Note;
 
     /**
@@ -56,6 +75,15 @@ export class ScoreStaffEvent extends ScoreEvent {
  * Note! Not yet implemented, reserved for future.
  */
 export class ScoreTabEvent extends ScoreEvent {
+    readonly kind: string = "ScoreTabEvent";
+
+    static is(event: unknown): event is ScoreTabEvent {
+        return (
+            event instanceof ScoreTabEvent ||
+            Utils.Obj.isObject(event) && Utils.Obj.hasProperties(event, ["kind", "type", "view", "tab"]) && event.kind === "ScoreTabEvent"
+        );
+    }
+
     /**
      * @internal
      */
@@ -90,6 +118,15 @@ export class ScoreStaffPosEvent extends ScoreEvent {
  * Score object event for clicking/entering/leaving score object.
  */
 export class ScoreObjectEvent extends ScoreEvent {
+    readonly kind: string = "ScoreObjectEvent";
+
+    static is(event: unknown): event is ScoreObjectEvent {
+        return (
+            event instanceof ScoreObjectEvent ||
+            Utils.Obj.isObject(event) && Utils.Obj.hasProperties(event, ["kind", "type", "view", "objects"]) && event.kind === "ScoreObjectEvent"
+        );
+    }
+
     /**
      * @internal
      */
@@ -124,5 +161,7 @@ export class ScoreObjectEvent extends ScoreEvent {
     }
 }
 
-/** Score event listener type. */
+/**
+ * Score event listener type.
+ */
 export type ScoreEventListener = (event: ScoreEvent) => void;
