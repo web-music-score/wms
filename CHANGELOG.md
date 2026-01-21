@@ -2,15 +2,16 @@
 ## [6.4.0-pre.1] - 2026-01-??
 ### Added
 - WmsView.getByElementId() and WmsControls.getByElementId().
-- class ScoreStaffNoteEvent.
+- ScoreStaffEvent, and ScoreTabEvent (tab event is future plan).
+- ScoreEvent.is(), ScoreStaffEvent.is(), ScoreTabEvent.is() and ScoreObjectEvent.is() to use
+  instead of instanceof operator.
 
 ### Deprecated
-- class ScoreStaffPosEvent, use ScoreStaffNoteEvent instead.
+- ScoreStaffPosEvent, use ScoreStaffEvent instead.
 
 ### Fixed
-- Missing and existing deprecation warning messages.
-- Fixes on Custom HTML Elements.
-- Wrongly showed deprecated warning messages.
+- Deprecation warning messages.
+- Improved/fixes custom HTML elements a lot with AI.
 
 ## [6.3.0] - 2026-01-17
 **Stable Release**
