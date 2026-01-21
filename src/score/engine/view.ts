@@ -35,7 +35,7 @@ export type StaffPos = { staff: ObjStaff, measure?: ObjMeasure, diatonicId: numb
 function staffPosEquals(a: StaffPos | undefined, b: StaffPos | undefined): boolean {
     if (!a && !b) return true;
     else if (!a || !b) return false;
-    else return a.staff === b.staff && a.diatonicId === b.diatonicId;
+    else return a.staff === b.staff && a.measure === b.measure && a.diatonicId === b.diatonicId;
 }
 
 function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefined): boolean {
