@@ -9,7 +9,9 @@ import { Utils } from "@tspro/ts-utils-lib";
 /** Score event type. */
 export type ScoreEventType = "enter" | "leave" | "click";
 
-/** Abstract score event class. */
+/**
+ * Abstract base class for score events.
+ */
 export abstract class ScoreEvent {
     readonly kind: string = "ScoreEvent";
 
@@ -20,6 +22,10 @@ export abstract class ScoreEvent {
         );
     }
 
+    /**
+     * 
+     * @param type - Event type: "enter", "leave" or "click". 
+     */
     constructor(readonly type: ScoreEventType) { }
 }
 
@@ -29,6 +35,9 @@ export abstract class ScoreEvent {
 export class ScoreStaffEvent extends ScoreEvent {
     readonly kind: string = "ScoreStaffEvent";
 
+    /**
+     * Replacement for <code>event instanceof ScoreStaffEvent</code>.
+     */
     static is(event: unknown): event is ScoreStaffEvent {
         return (
             event instanceof ScoreStaffEvent ||
@@ -39,7 +48,13 @@ export class ScoreStaffEvent extends ScoreEvent {
     private _note: Note;
 
     /**
-     * @internal
+     * 
+     * @param type - Event type: "enter", "leave" or "click".
+     * @param view - Score.WmsView object.
+     * @param staff 
+     * @param measure 
+     * @param diatonicId 
+     * @param accidental 
      */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly staff: MStaff, readonly measure: MMeasure, readonly diatonicId: number, readonly accidental: number) {
         super(type);
@@ -77,6 +92,9 @@ export class ScoreStaffEvent extends ScoreEvent {
 export class ScoreTabEvent extends ScoreEvent {
     readonly kind: string = "ScoreTabEvent";
 
+    /**
+     * Replacement for <code>event instanceof ScoreTabEvent</code>.
+     */ 
     static is(event: unknown): event is ScoreTabEvent {
         return (
             event instanceof ScoreTabEvent ||
@@ -85,7 +103,10 @@ export class ScoreTabEvent extends ScoreEvent {
     }
 
     /**
-     * @internal
+     * 
+     * @param type - Event type: "enter", "leave" or "click".
+     * @param view - Score.WmsView object.
+     * @param tab 
      */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly tab: MTab) {
         super(type);
@@ -93,13 +114,19 @@ export class ScoreTabEvent extends ScoreEvent {
 }
 
 /**
- * Score staff position event for click/enter/leave staff positions.
+ * Score staff pos event.
  * 
- * @deprecated - ScoreStaffPosEvent is deprecated (since v6.4.0). Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
+ * This event class was deprecated because it does not support multiple staves or tabs per score row.
+ * 
+ * @deprecated - ScoreStaffPosEvent is deprecated. Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
  */
 export class ScoreStaffPosEvent extends ScoreEvent {
     /**
-     * @internal
+     * 
+     * @param type - Event type: "enter", "leave" or "click".
+     * @param view - Score.WmsView object.
+     * @param scoreRow
+     * @param diatonicId
      */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
@@ -120,6 +147,9 @@ export class ScoreStaffPosEvent extends ScoreEvent {
 export class ScoreObjectEvent extends ScoreEvent {
     readonly kind: string = "ScoreObjectEvent";
 
+    /**
+     * Replacement for <code>event instanceof ScoreObjectEvent</code>.
+     */ 
     static is(event: unknown): event is ScoreObjectEvent {
         return (
             event instanceof ScoreObjectEvent ||
@@ -128,14 +158,16 @@ export class ScoreObjectEvent extends ScoreEvent {
     }
 
     /**
-     * @internal
+     * 
+     * @param type - Event type: "enter", "leave" or "click".
+     * @param view - Score.WmsView object.
+     * @param objects - Objects from root (first) to top (last).
      */
     constructor(type: ScoreEventType, readonly view: WmsView, readonly objects: MusicInterface[]) {
         super(type);
 
-        if (arguments.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Empty array in score object event!");
-        }
+        if (arguments.length === 0)
+            throw new MusicError(MusicErrorType.Score, "Empty objects array in ScoreObjectEvent!");
     }
 
     /**
@@ -146,7 +178,7 @@ export class ScoreObjectEvent extends ScoreEvent {
         return this.view;
     }
 
-    /** Top object getter. */
+    /** Top object. */
     get topObject(): MusicInterface {
         return this.objects[this.objects.length - 1];
     }
@@ -154,10 +186,21 @@ export class ScoreObjectEvent extends ScoreEvent {
     /**
      * Find object.
      * @param fn - Compare function.
+     * @param topToBottom - Find from top to bottom or from bottom to top (default if omitted).
      * @returns - First object that matched compare function, or undefined if no match.
      */
-    findObject(fn: (obj: MusicInterface) => boolean): MusicInterface | undefined {
-        return this.objects.find(obj => fn(obj)); // TODO: Should be reversed?
+    findObject(fn: (obj: MusicInterface) => boolean, topToBottom = false): MusicInterface | undefined {
+        if (topToBottom) {
+            for (let i = this.objects.length - 1; i >= 0; i--) {
+                if (fn(this.objects[i])) return this.objects[i];
+            }
+        }
+        else {
+            for (let i = 0; i < this.objects.length - 1; i++) {
+                if (fn(this.objects[i])) return this.objects[i];
+            }
+        }
+        return undefined;
     }
 }
 
