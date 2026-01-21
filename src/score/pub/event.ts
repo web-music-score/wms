@@ -196,7 +196,7 @@ export class ScoreObjectEvent extends ScoreEvent {
             }
         }
         else {
-            for (let i = 0; i < this.objects.length - 1; i++) {
+            for (let i = 0; i < this.objects.length; i++) {
                 if (fn(this.objects[i])) return this.objects[i];
             }
         }
