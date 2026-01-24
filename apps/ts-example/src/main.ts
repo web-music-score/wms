@@ -1,6 +1,3 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
-
 import * as Score from "web-music-score/score";
 import { createFrereJacques } from "web-music-score/pieces";
 
