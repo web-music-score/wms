@@ -12,6 +12,7 @@
 ### Fixed
 - Deprecation warning messages.
 - Improved/fixes custom HTML elements a lot with AI.
+- Notehead partially clipped. Expanded clip rect.
 
 ## [6.3.0] - 2026-01-17
 **Stable Release**
