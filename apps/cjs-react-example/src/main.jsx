@@ -4,9 +4,7 @@ const ExampleApp = require("./example-app");
 
 const rootElem = document.getElementById("root");
 
-if (!rootElem) {
-    throw "Root element not found!";
-}
+if (!rootElem) throw "Root element not found!";
 
 const root = ReactDOM.createRoot(rootElem);
 
