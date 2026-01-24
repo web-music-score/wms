@@ -1,16 +1,14 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import * as React from "react";
 import *as ReactDOM from "react-dom/client";
-
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import DemoApp from "./demo-app";
 
-const root = ReactDOM.createRoot(
-    document.getElementById('root') as HTMLElement
-);
+const rootElem = document.getElementById('root');
+
+if (!rootElem) throw "Root element not found!";
+
+const root = ReactDOM.createRoot(rootElem);
 
 root.render(
     <React.StrictMode>
