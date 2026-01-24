@@ -1,6 +1,6 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom/client";
-import ExampleApp from "./example-app";
+const React = require("react");
+const ReactDOM = require("react-dom/client");
+const ExampleApp = require("./example-app");
 
 const rootElem = document.getElementById("root");
 

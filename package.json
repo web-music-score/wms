@@ -129,9 +129,10 @@
         "build": "tsup",
         "watch": "tsup --watch",
         "build:all": "npm run build && npm run build:prod --workspaces --if-present",
-        "build:features-demo": "npm run build:prod --workspace features-demo",
         "start:features-demo": "npm run start --workspace features-demo",
-        "start:guitar-app": "npm run start --workspace guitar-app",
+        "start:cjs-react-example": "npm run start --workspace js-react-example",
+        "start:ts-example": "npm run start --workspace ts-example",
+        "start:ts-react-example": "npm run start --workspace ts-react-example",
         "docs": "typedoc"
     }
 }
