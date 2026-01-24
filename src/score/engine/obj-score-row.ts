@@ -458,9 +458,9 @@ export class ObjScoreRow extends MusicObject {
 
         // Set clip rect for this row
         const { left, top, width, height } = this.getRect();
-        const p = view.lineWidthPx;
+        const p = view.unitSize;
         view.save();
-        view.rect(left - p, top, width + 2 * p, height);
+        view.rect(left - p, top - p, width + 2 * p, height + 2 * p);
         view.clip();
 
         // Draw measures

@@ -1,4 +1,8 @@
 # Changelog
+## [Unreleased]
+### Fixed
+- Notehead partially clipped. Expanded clip rect.
+
 ## [6.3.4] - 2026-01-20
 ### Fixed
 - Fixed/improved custom html elements wms-view and wms-controls with AI.
@@ -17,10 +21,9 @@
 - Fixed/improved custom HTML element update.
 
 ## [6.3.0] - 2026-01-17
-**Stable Release**
 ## Changed
 - Include version in typedocs.
-- Fixzed tpedoc and stuff.
+- Fixed typedoc and stuff.
 
 ## [6.3.0-pre.2] - 2026-01-16
 ### Added
