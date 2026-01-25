@@ -1,6 +1,9 @@
 # Changelog
 ## [Unreleased]
 ### Fixed
+
+## [6.3.5]
+### Fixed
 - Notehead partially clipped. Expanded clip rect.
 
 ## [6.3.4] - 2026-01-20
