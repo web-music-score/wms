@@ -1,13 +1,13 @@
 {
     "name": "ts-react-example",
-    "version": "6.3.5",
+    "version": "6.3.6",
     "private": true,
     "devDependencies": {
         "@babel/cli": "^7.27.2",
         "@babel/core": "^7.27.7",
         "@babel/preset-env": "^7.27.2",
         "@babel/preset-react": "^7.27.1",
-        "web-music-score": "^6.3.5",
+        "web-music-score": "^6.3.6",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
         "@webpack-cli/serve": "^3.0.1",
