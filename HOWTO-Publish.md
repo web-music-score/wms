@@ -7,7 +7,7 @@
     Set package.json "version" to "X.Y.Z-pre.N"`
 
     // Install
-    npm run install
+    npm install
 
     // Build
     npm run build
@@ -31,7 +31,7 @@
     Set package.json "version" to "X.Y.Z"`
 
     // Install
-    npm run install
+    npm install
 
     // Build
     npm run build
