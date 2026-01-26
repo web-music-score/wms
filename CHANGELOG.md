@@ -1,5 +1,5 @@
 # Changelog
-## [6.4.0-pre.2] - Unreleased
+## [6.4.0-pre.2] - 2026-01-26
 ### Changed
 - Updated React test apps.
 
