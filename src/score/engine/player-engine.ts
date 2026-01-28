@@ -329,7 +329,8 @@ export class PlayerEngine {
                             });
                             break;
                         }
-                        case TempoAnnotation.rit: {
+                        case TempoAnnotation.rit:
+                        case TempoAnnotation.rall: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed / RitardandoSpeedDiv;
                             let accuTicks = 0;

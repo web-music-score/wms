@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation } from "../pub";
+import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, AnnotationText } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
 export function getNavigationString(navigation: Navigation): string {
@@ -14,6 +14,15 @@ export function getNavigationString(navigation: Navigation): string {
         case Navigation.toCoda: return ObjSpecialText.toCoda;
         default:
             return navigation[0].toUpperCase() + navigation.substring(1);
+    }
+}
+
+export function getAnnotationTextReplacement(text: AnnotationText): string {
+    switch (text) {
+        case "tenuto": return "—";
+        case "accent": return ">";
+        case "marcato": return "^";
+        default: return text;
     }
 }
 
@@ -36,7 +45,10 @@ export function isTempoText(text: string): text is `${TempoAnnotation}` {
 }
 
 export function getAnnotation(text: string): Annotation | undefined {
-    if (Guard.isEnumValue(text, DynamicsAnnotation)) {
+    if (Guard.isEnumValue(text, Navigation)) {
+        return Annotation.Navigation;
+    }
+    else if (Guard.isEnumValue(text, DynamicsAnnotation)) {
         return Annotation.Dynamics;
     }
     else if (Guard.isEnumValue(text, TempoAnnotation)) {
@@ -44,6 +56,18 @@ export function getAnnotation(text: string): Annotation | undefined {
     }
     else if (Guard.isEnumValue(text, ArticulationAnnotation)) {
         return Annotation.Articulation;
+    }
+    else if (Guard.isEnumValue(text, ExpressionAnnotation)) {
+        return Annotation.Expression;
+    }
+    else if (Guard.isEnumValue(text, TechniqueAnnotation)) {
+        return Annotation.Technique;
+    }
+    else if (Guard.isEnumValue(text, OrnamentAnnotation)) {
+        return Annotation.Ornament;
+    }
+    else if (Guard.isEnumValue(text, MiscAnnotation)) {
+        return Annotation.Misc;
     }
     else {
         return undefined;

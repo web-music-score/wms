@@ -2,7 +2,7 @@ import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRe
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation } from "../pub";
+import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation, AnnotationText } from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -19,7 +19,7 @@ import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getNavigationString } from "./element-data";
+import { getAnnotation, getAnnotationTextReplacement, getNavigationString } from "./element-data";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -80,6 +80,20 @@ function getVerseLayoutGroupId(verse: VerseNumber): LayoutGroupId {
         default:
             throw new MusicError(MusicErrorType.Unknown, "VerseNumber is not 1, 2 or 3.");
     }
+}
+
+const AnnotationGroupIdMap = new UniMap<Annotation, LayoutGroupId>([
+    [Annotation.Navigation, LayoutGroupId.Navigation],
+    [Annotation.Dynamics, LayoutGroupId.Annotation_Dynamics],
+    [Annotation.Tempo, LayoutGroupId.Annotation_Tempo],
+    [Annotation.Articulation, LayoutGroupId.Annotation_Articulation],
+]);
+
+function getAnnotationLayoutGroupId(a: Annotation, text: string): LayoutGroupId {
+    if (text === ArticulationAnnotation.fermata || text === ArticulationAnnotation.measureEndFermata)
+        return LayoutGroupId.Annotation_Fermata;
+
+    return AnnotationGroupIdMap.getOrDefault(a, LayoutGroupId.Annotation_Misc);
 }
 
 class MeasureRegions {
@@ -603,27 +617,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    private addFermata(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata) {
-        let anchor = fermata === Fermata.AtMeasureEnd ? this.barLineRight : this.lastAddedRhythmColumn;
-
-        if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add Fermata because anchor is undefined.");
-        }
-
-        this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Above, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? colorKey("staff.element.annotation") : colorKey("tab.element.annotation");
-            this.addLayoutObject(new ObjFermata(anchor, vpos, color), line, LayoutGroupId.Annotation_Fermata, vpos);
-        });
-
-        this.disableExtension();
-        this.requestLayout();
-    }
-
-    hasFermata(anchor: ObjRhythmColumn | ObjBarLineRight) {
-        return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
-    }
-
-    addNavigation(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation, ...args: unknown[]) {
+    private addNavigation(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation, ...args: unknown[]) {
         let addLayoutObjectProps: {
             createObj: (line: ObjNotationLine) => LayoutableMusicObject,
             layoutGroupId: LayoutGroupId,
@@ -741,65 +735,71 @@ export class ObjMeasure extends MusicObject {
         return this.navigationSet.has(n);
     }
 
-    addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string) {
-        // Special case: add fermata
-        if (annotation === Annotation.Articulation) {
-            switch (text) {
-                case ArticulationAnnotation.fermata:
-                    this.addFermata(staffTabOrGroups, Fermata.AtNote);
-                    return;
-                case ArticulationAnnotation.measureEndFermata:
-                    this.addFermata(staffTabOrGroups, Fermata.AtMeasureEnd);
-                    return;
-            }
+    hasFermata(anchor: ObjRhythmColumn | ObjBarLineRight) {
+        return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
+    }
+
+    addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string, ...args: unknown[]) {
+        // Handle navigations separately.
+        if (annotation === Annotation.Navigation) {
+            if (getAnnotation(text) !== Annotation.Navigation)
+                throw new MusicError(MusicErrorType.Score, "Annotation text is not Navigation.");
+            this.addNavigation(staffTabOrGroups, text as Navigation, ...args);
+            return;
         }
 
-        let anchor = this.lastAddedRhythmColumn;
+        let anchor: ObjBarLineRight | ObjRhythmColumn | undefined;
+
+        switch (text) {
+            case ArticulationAnnotation.measureEndFermata:
+                anchor = this.barLineRight;
+                break;
+            default:
+                anchor = this.lastAddedRhythmColumn;
+                break;
+        }
 
         if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because anchor is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Annotation anchor is undefined.");
         }
         else if (text.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add annotation because annotation text is empty.");
+            throw new MusicError(MusicErrorType.Score, "Annotation text is empty.");
         }
 
-        let textProps: TextProps = { text }
-
-        let layoutGroupId: LayoutGroupId;
-        let defaultVerticalPos: VerticalPos;
-        let linePos: ExtensionLinePos;
-
-        switch (annotation) {
-            case Annotation.Dynamics:
-                layoutGroupId = LayoutGroupId.Annotation_Dynamics;
-                defaultVerticalPos = VerticalPos.Above;
-                textProps.italic = true;
-                linePos = "bottom";
-                break;
-            case Annotation.Tempo:
-                layoutGroupId = LayoutGroupId.Annotation_Tempo;
-                defaultVerticalPos = VerticalPos.Above;
-                textProps.italic = true;
-                linePos = "bottom";
-                break;
-            case Annotation.Articulation:
-                layoutGroupId = LayoutGroupId.Annotation_Articulation;
-                defaultVerticalPos = VerticalPos.Above;
-                textProps.italic = true;
-                linePos = "bottom";
-                break;
-        }
+        let defaultVerticalPos: VerticalPos = VerticalPos.Above;
+        let extensionLinePos: ExtensionLinePos = "bottom";
+        let italicText: boolean = true;
 
         const anchorX = 0.5;
-        const anchorY = getExtensionAnchorY(linePos);
+        const anchorY = getExtensionAnchorY(extensionLinePos);
+        const layoutGroupId = getAnnotationLayoutGroupId(annotation, text);
+
+        let textProps: TextProps = {
+            text: getAnnotationTextReplacement(text as AnnotationText),
+            italic: italicText
+        }
 
         this.disableExtension();
 
         this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
             const color = line instanceof ObjTab ? colorKey("tab.element.annotation") : colorKey("staff.element.annotation");
-            textProps.color = color;
-            let textObj = new ObjText(anchor, textProps, anchorX, anchorY);
-            const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
+            let layoutObj: LayoutObjectWrapper;
+            switch (text) {
+                case ArticulationAnnotation.fermata:
+                case ArticulationAnnotation.measureEndFermata: {
+                    // Create ObjFermata
+                    const fermataObj = new ObjFermata(anchor, vpos, color);
+                    layoutObj = this.addLayoutObject(fermataObj, line, LayoutGroupId.Annotation_Fermata, vpos);
+                    break;
+                }
+                default: {
+                    // Create ObjText
+                    textProps.color = color;
+                    const textObj = new ObjText(anchor, textProps, anchorX, anchorY);
+                    layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos)
+                    break;
+                }
+            }
             this.enableExtension(layoutObj, color);
         });
     }

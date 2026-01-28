@@ -277,85 +277,242 @@ export enum Fermata {
     AtMeasureEnd = "atMeasureEnd"
 }
 
-/** Navigation element enum. */
+/** Annotation types */
+export enum Annotation {
+    /** Navigation annotation */
+    Navigation = "navigation",
+    /** Dynamics annotation */
+    Dynamics = "dynamics",
+    /** Tempo annotation */
+    Tempo = "tempo",
+    /** Articulation annotation */
+    Articulation = "articulation",
+    /** Expression annotation */
+    Expression = "expression",
+    /** Technique annotation */
+    Technique = "technique",
+    /** Ornament annotation */
+    Ornament = "ornament",
+    /** Miscellaneous annotation */
+    Misc = "misc"
+}
+
+/** Navigation annotations */
 export enum Navigation {
     /** Repeat back to beginning and play to the "Fine" marking. */
     DC_al_Fine = "D.C. al Fine",
-
     /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
     DC_al_Coda = "D.C. al Coda",
-
     /** Repeat back to Segno sign (𝄋) and play to the "Fine" marking. */
     DS_al_Fine = "D.S. al Fine",
-
     /** Repeat back to Segno sign (𝄋) and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
     DS_al_Coda = "D.S. al Coda",
-
     /** "𝄌 Coda" section. */
     Coda = "Coda",
-
     /** From "toCoda 𝄌" jump to the "𝄌 Coda" section. */
     toCoda = "toCoda",
-
     /** Jump here from D.S. al Fine or D.S. al Coda. */
     Segno = "Segno",
-
     /** Stop playing after D.C. al Fine or D.S. al Fine. */
     Fine = "Fine",
-
     /** Start of repeat section. */
     StartRepeat = "startRepeat",
-
     /** End of repeat section. Jump to start of repeat section. */
     EndRepeat = "endRepeat",
-
     /** Jump to ending with correct passage number. */
     Ending = "ending"
 }
 
-/** Annotation element enum. */
-export enum Annotation {
-    /** "ppp", "pp", "p", "mp", "m", "mf", "f", "ff", "fff", "cresc.", "decresc.", "dim." */
-    Dynamics = "dynamics",
-
-    /** "accel.", "rit.", "a tempo" */
-    Tempo = "tempo",
-
-    /** "fermata" */
-    Articulation = "articulation"
-}
-
-/** Some known dynamics annotations. */
+/** Dynamic annotations */
 export enum DynamicsAnnotation {
-    cresc = "cresc.",
-    decresc = "decresc.",
-    dim = "dim.",
+    /** pianississimo (very, very soft) */
     ppp = "ppp",
+    /** pianissimo (very soft) */
     pp = "pp",
+    /** piano (soft) */
     p = "p",
+    /** mezzo-piano (moderately soft) */
     mp = "mp",
+    /** mezzo */
     m = "m",
+    /** mezzo-forte (moderately loud) */
     mf = "mf",
+    /** forte (loud) */
     f = "f",
+    /** fortissimo (very loud) */
     ff = "ff",
-    fff = "fff"
+    /** fortississimo (very, very loud) */
+    fff = "fff",
+    /** crescendo (gradually louder) */
+    cresc = "cresc.",
+    /** diminuendo (gradually softer) */
+    decresc = "decresc.",
+    /** diminuendo (gradually softer) */
+    dim = "dim.",
+    /** forte then immediately piano */
+    fp = "fp",
+    /** sudden strong accent */
+    sf = "sf",
+    /** sudden strong accent */
+    sfz = "sfz",
+    /** sudden strong accent */
+    sforzando = "sforzando",
 }
 
-/** Some known tempo annotations. */
+/** Tempo annotations */
 export enum TempoAnnotation {
+    /** gradually faster */
     accel = "accel.",
+    /** gradually slower */
     rit = "rit.",
-    a_tempo = "a tempo"
+    /** gradually slower */
+    rall = "rall.",
+    /** return to original tempo */
+    a_tempo = "a tempo",
+    /** flexible tempo */
+    rubato = "rubato",
+    // fermata currently in Articulation
+    /** very slow */
+    Largo = "Largo",
+    /** slow */
+    Adagio = "Adagio",
+    /** walking pace */
+    Andante = "Andante",
+    /** moderate */
+    Moderato = "Moderato",
+    /** fast */
+    Allegro = "Allegro",
+    /** lively, fast */
+    Vivace = "Vivace",
+    /** very fast */
+    Presto = "Presto",
+    /** extremely fast */
+    Prestissimo = "Prestissimo",
 }
 
-/** Known articulations. */
+/** Articulation annotations */
 export enum ArticulationAnnotation {
+    /** hold longer than written */
     fermata = "fermata",
-    measureEndFermata= "measureEndFermata"
+    /** hold at measure end */
+    measureEndFermata = "measureEndFermata",
+
+    /** short, detached */
+    staccato = "staccato",
+    /** held for full value */
+    tenuto = "tenuto",
+    /** emphasized */
+    accent = "accent",
+    /** strongly accented */
+    marcato = "marcato",
+    /** smoothly connected */
+    legato = "legato",
+    /** gently separated (tenuto + staccato) */
+    portato = "portato",
+}
+
+/** Expression annotations */
+export enum ExpressionAnnotation {
+    /** sweetly */
+    dolce = "dolce",
+    /** singing style */
+    cantabile = "cantabile",
+    /** expressively */
+    espressivo = "espressivo",
+    /** expressively */
+    espr = "espr.",
+    /** lightly */
+    leggiero = "leggiero",
+    /** heavy */
+    pesante = "pesante",
+    /** with energy */
+    con_brio = "con brio",
+    /** with fire */
+    con_fuoco = "con fuoco",
+    /** playful */
+    giocoso = "giocoso",
+    /** majestic */
+    maestoso = "maestoso",
+    /** mysterious */
+    misterioso = "misterioso",
+    /** calm */
+    tranquillo = "tranquillo",
+}
+
+/** Technique annotations */
+export enum TechniqueAnnotation {
+    // Strings
+    /** plucked */
+    pizz = "pizz.",
+    /** bowed */
+    arco = "arco",
+    /** with the wood of the bow */
+    col_legno = "col legno",
+    /** near the bridge */
+    sul_ponticello = "sul ponticello",
+    /** over the fingerboard */
+    sul_tasto = "sul tasto",
+    /**  */
+    vibrato = "vibrato",
+    /**  */
+    senza_vibrato = "senza vibrato",
+    // Keyboard
+    /** legato pedal */
+    legato_pedal = "legato pedal",
+    /** staccato pedal */
+    staccato_pedal = "staccato pedal",
+    /** soft pedal */
+    una_corda = "una corda",
+    /** release soft pedal */
+    tre_corde = "tre corde",
+}
+
+/** Ornament annotations */
+export enum OrnamentAnnotation {
+    /**  */
+    trill = "trill",
+    /**  */
+    tr = "tr",
+    /**  */
+    mordent = "mordent",
+    /**  */
+    grace_note = "grace note",
+    /**  */
+    turn = "turn",
+    /**  */
+    appoggiatura = "appoggiatura",
+    /**  */
+    acciaccatura = "acciaccatura",
+}
+
+/** Miscellaneous annotations */
+export enum MiscAnnotation {
+    /** play one octave higher */
+    _8va = "8va",
+    /** play one octave lower */
+    _8vb = "8vb",
+    /** silent */
+    tacet = "tacet",
+    /** continue similarly */
+    sim = "sim.",
+    /** divided parts */
+    div = "div.",
+    /** play in unison */
+    unis = "unis.",
+    /** small notes for reference */
+    cue_notes = "cue notes",
 }
 
 /** Known annotation test type. */
-export type AnnotationText = `${DynamicsAnnotation}` | `${TempoAnnotation}` | `${ArticulationAnnotation}`;
+export type AnnotationText =
+    `${Navigation}` |
+    `${DynamicsAnnotation}` |
+    `${TempoAnnotation}` |
+    `${ArticulationAnnotation}` |
+    `${ExpressionAnnotation}` |
+    `${TechniqueAnnotation}` |
+    `${OrnamentAnnotation}` |
+    `${MiscAnnotation}`;
 
 /** Label element enum. */
 export enum Label {

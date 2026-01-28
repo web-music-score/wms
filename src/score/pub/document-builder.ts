@@ -689,7 +689,7 @@ export class DocumentBuilder {
             Guard.isEnumValue(navigation, Navigation) && Guard.isEmptyArray(args)
         );
 
-        this.getMeasure().addNavigation(staffTabOrGroups, navigation as Navigation, ...args);
+        this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Navigation, navigation, ...args);
 
         return this;
     }
