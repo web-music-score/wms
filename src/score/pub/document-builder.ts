@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, ArticulationAnnotation, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, StringNumber, TabConfig, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, TabConfig, TemporalAnnotation, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "web-music-score/theory";
@@ -7,7 +7,7 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
-import { getAnnotation } from "../engine/element-data";
+import { getAnnotation } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated } from "shared-src";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
@@ -652,10 +652,10 @@ export class DocumentBuilder {
         AssertUtil.assert(Guard.isEnumValue(fermata, Fermata));
         switch (fermata) {
             case "atNote":
-                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Articulation, ArticulationAnnotation.fermata);
+                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Temporal, TemporalAnnotation.fermata);
                 break;
             case "atMeasureEnd":
-                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Articulation, ArticulationAnnotation.measureEndFermata);
+                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Temporal, TemporalAnnotation.measureEndFermata);
                 break;
         }
         return this;
@@ -747,7 +747,7 @@ export class DocumentBuilder {
         return this.addNavigationInternal(staffTabOrGroups, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}` | undefined, text: string): DocumentBuilder {
+    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}` | undefined, text: string, ...args: unknown[]): DocumentBuilder {
         annotation ??= getAnnotation(text);
 
         if (annotation === undefined) {
@@ -761,7 +761,7 @@ export class DocumentBuilder {
             Guard.isNonEmptyString(text)
         );
 
-        this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Annotation, text);
+        this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Annotation, text, ...args);
 
         return this;
     }

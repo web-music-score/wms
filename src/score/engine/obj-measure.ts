@@ -2,7 +2,7 @@ import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRe
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Fermata, Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation, AnnotationText } from "../pub";
+import { Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation, TemporalAnnotation } from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -19,7 +19,7 @@ import { ObjText, TextProps } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotation, getAnnotationTextReplacement, getNavigationString } from "./element-data";
+import { getAnnotationTextReplacement, getNavigationString } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -86,13 +86,15 @@ const AnnotationGroupIdMap = new UniMap<Annotation, LayoutGroupId>([
     [Annotation.Navigation, LayoutGroupId.Navigation],
     [Annotation.Dynamics, LayoutGroupId.Annotation_Dynamics],
     [Annotation.Tempo, LayoutGroupId.Annotation_Tempo],
-    [Annotation.Articulation, LayoutGroupId.Annotation_Articulation],
 ]);
 
 function getAnnotationLayoutGroupId(a: Annotation, text: string): LayoutGroupId {
-    if (text === ArticulationAnnotation.fermata || text === ArticulationAnnotation.measureEndFermata)
+    if (
+        text === ArticulationAnnotation.fermata || text === ArticulationAnnotation.measureEndFermata ||
+        text === TemporalAnnotation.fermata || text === TemporalAnnotation.measureEndFermata
+    ) {
         return LayoutGroupId.Annotation_Fermata;
-
+    }
     return AnnotationGroupIdMap.getOrDefault(a, LayoutGroupId.Annotation_Misc);
 }
 
@@ -755,6 +757,7 @@ export class ObjMeasure extends MusicObject {
         let anchor: ObjBarLineRight | ObjRhythmColumn | undefined;
 
         switch (text) {
+            case TemporalAnnotation.measureEndFermata:
             case ArticulationAnnotation.measureEndFermata:
                 anchor = this.barLineRight;
                 break;
@@ -779,7 +782,7 @@ export class ObjMeasure extends MusicObject {
         const layoutGroupId = getAnnotationLayoutGroupId(annotation, text);
 
         let textProps: TextProps = {
-            text: getAnnotationTextReplacement(text as AnnotationText),
+            text: getAnnotationTextReplacement(text),
             italic: italicText
         }
 

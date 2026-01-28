@@ -7,7 +7,7 @@ import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAn
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension, getTextContent } from "./extension";
-import { getDynamicsVolume, isDynamicsText, isTempoText } from "./element-data";
+import { getDynamicsVolume, isDynamicsText, isTempoText } from "./annotation-utils";
 
 function _setTimeout(cb: () => any, ms: number): number | undefined {
     return typeof window === "undefined"

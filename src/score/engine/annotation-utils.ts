@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, AnnotationText } from "../pub";
+import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, AnnotationText, TemporalAnnotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
 export function getNavigationString(navigation: Navigation): string {
@@ -17,13 +17,13 @@ export function getNavigationString(navigation: Navigation): string {
     }
 }
 
-export function getAnnotationTextReplacement(text: AnnotationText): string {
+export function getAnnotationTextReplacement(text: string): string {
     switch (text) {
-        case "tenuto": return "—";
-        case "accent": return ">";
-        case "marcato": return "^";
-        default: return text;
+        case ArticulationAnnotation.tenuto: return "—";     // TODO: Maybe should draw better symbol instead.
+        case ArticulationAnnotation.accent: return ">";     // TODO: Maybe should draw better symbol instead.
+        case ArticulationAnnotation.marcato: return "^";    // TODO: Maybe should draw better symbol instead.
     }
+    return text;
 }
 
 export function isDynamicsText(text: string): text is `${DynamicsAnnotation}` {
@@ -53,6 +53,10 @@ export function getAnnotation(text: string): Annotation | undefined {
     }
     else if (Guard.isEnumValue(text, TempoAnnotation)) {
         return Annotation.Tempo;
+    }
+    else if (Guard.isEnumValue(text, TemporalAnnotation)) {
+        // Have this before ArticulationAnnotation (fermata is deprecated there).
+        return Annotation.Temporal;
     }
     else if (Guard.isEnumValue(text, ArticulationAnnotation)) {
         return Annotation.Articulation;

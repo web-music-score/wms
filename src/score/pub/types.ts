@@ -291,6 +291,8 @@ export enum Annotation {
     Expression = "expression",
     /** Technique annotation */
     Technique = "technique",
+    /** Temporal annotation */
+    Temporal = "temporal",
     /** Ornament annotation */
     Ornament = "ornament",
     /** Miscellaneous annotation */
@@ -392,11 +394,10 @@ export enum TempoAnnotation {
 
 /** Articulation annotations */
 export enum ArticulationAnnotation {
-    /** hold longer than written */
+    /** @deprecated - use TemporalAnnotation.fermata */
     fermata = "fermata",
-    /** hold at measure end */
+    /** @deprecated - use TemporalAnnotation.measureEndFermata */
     measureEndFermata = "measureEndFermata",
-
     /** short, detached */
     staccato = "staccato",
     /** held for full value */
@@ -485,6 +486,14 @@ export enum OrnamentAnnotation {
     acciaccatura = "acciaccatura",
 }
 
+/** Temporal effect annotations */
+export enum TemporalAnnotation {
+    /** hold longer than written */
+    fermata = "fermata",
+    /** hold at measure end */
+    measureEndFermata = "measureEndFermata",
+}
+
 /** Miscellaneous annotations */
 export enum MiscAnnotation {
     /** play one octave higher */
@@ -512,6 +521,7 @@ export type AnnotationText =
     `${ExpressionAnnotation}` |
     `${TechniqueAnnotation}` |
     `${OrnamentAnnotation}` |
+    `${TemporalAnnotation}` |
     `${MiscAnnotation}`;
 
 /** Label element enum. */
