@@ -694,66 +694,31 @@ export class DocumentBuilder {
         return this;
     }
 
-    /**
-     * Add navigation element to current measure.
-     * @param navigation - Navigation element (e.g. "D.S. al Fine" or Navigation.DS_al_Fine).
-     * @returns - This document builder instance.
-     */
+    /** @deprecated - Use `addAnnotation()` instead. */
     addNavigation(navigation: Navigation | `${Navigation}`): DocumentBuilder;
-    /**
-     * Add end repeat navigation element to current measure.
-     * @param navigation - End repeat navigation element ("endRepeat" or Navigation.EndRepeat).
-     * @param playCount - Number of times to play the ended repeat section.
-     * @returns - This document builder instance.
-     */
+    /** @deprecated - Use `addAnnotation()` instead. */
     addNavigation(navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
-    /**
-     * Add ending navigation element to current measure.
-     * @param navigation - Ending navigation element ("ending" or Navigation.Ending).
-     * @param passages - Passage numbers for measure marked by this ending is played.
-     * @returns - This document builder instance.
-     */
+    /** @deprecated - Use `addAnnotation()` instead. */
     addNavigation(navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+
     addNavigation(navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
         return this.addNavigationInternal(undefined, navigation, ...args);
     }
 
-    /**
-     * Add navigation element to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation 
-     * @returns - This document builder instance.
-     */
+    /** @deprecated - Use `addAnnotationTo()` instead. */
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`): DocumentBuilder;
-    /**
-     * Add end repeat navigation element to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation 
-     * @param playCount 
-     * @returns - This document builder instance.
-     */
+    /** @deprecated - Use `addAnnotationTo()` instead. */
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
-    /**
-     * Add ending navigation element to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation 
-     * @param passages 
-     * @returns - This document builder instance.
-     */
+    /** @deprecated - Use `addAnnotationTo()` instead. */
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+
     addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTabOrGroups, navigation, ...args);
         return this.addNavigationInternal(staffTabOrGroups, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}` | undefined, text: string, ...args: unknown[]): DocumentBuilder {
-        annotation ??= getAnnotation(text);
-
-        if (annotation === undefined) {
-            throw new MusicError(MusicErrorType.Score, `Annotation text "${text}" is not known annotation.`);
-        }
-
+    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}`, text: string, ...args: unknown[]): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         AssertUtil.assert(
@@ -766,52 +731,63 @@ export class DocumentBuilder {
         return this;
     }
 
-    /**
-     * Add annotation text to column of last added note/chord/rest in current measure.
-     * @param text - Known annotation text (e.g. "pp").
-     * @returns - This document builder instance.
-     */
+    addAnnotation(text: Navigation.Ending, ...passages: number[]): DocumentBuilder;
+    addAnnotation(text: Navigation.EndRepeat, playCount?: number): DocumentBuilder;
     addAnnotation(text: AnnotationText): DocumentBuilder;
-    /**
-     * Add annotation text to column of last added note/chord/rest in current measure.
-     * @param annotation - Annotation type (e.g. "tempo" or Annotation.Tempo).
-     * @param text - Annotation text (unrestricted).
-     * @returns - This document builder instance.
-     */
+
+    addAnnotation(annotation: Annotation | `${Annotation}`, text: Navigation.Ending, ...passages: number[]): DocumentBuilder;
+    addAnnotation(annotation: Annotation | `${Annotation}`, text: Navigation.EndRepeat, playCount?: number): DocumentBuilder;
     addAnnotation(annotation: Annotation | `${Annotation}`, text: AnnotationText | string): DocumentBuilder;
-    addAnnotation(...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
+
+    addAnnotation(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
-        if (args.length === 1) {
-            return this.addAnnotationInternal(undefined, undefined, args[0]);
+
+        if (Guard.isNonEmptyString(args[0])) {
+            if (Guard.isEnumValue(args[0], Annotation) && Guard.isNonEmptyString(args[1])) {
+                const annotation = args[0];
+                const text = args[1];
+                return this.addAnnotationInternal(undefined, annotation, text, ...args.slice(2));
+            }
+            const annotation = getAnnotation(args[0]);
+            if (!annotation)
+                throw new MusicError(MusicErrorType.Score, `Unknown annotation "${args[0]}".`);
+            const text = args[0];
+            return this.addAnnotationInternal(undefined, annotation, text, ...args.slice(1));
         }
-        else {
-            return this.addAnnotationInternal(undefined, args[0], args[1]);
-        }
+
+        AssertUtil.assert(false);
+
+        return this;
     }
 
-    /**
-     * Add annotation text to column of last added note/chord/rest in current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param text - Known annotation text (e.g. "pp").
-     * @returns - This document builder instance.
-     */
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, text: AnnotationText): DocumentBuilder;
-    /**
-     * Add annotation text to column of last added note/chord/rest in current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param annotation - Annotation type (e.g. "tempo" or Annotation.Tempo).
-     * @param text - Annotation text (unrestricted).
-     * @returns - This document builder instance.
-     */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: string): DocumentBuilder;
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: [string] | [Annotation | `${Annotation}`, string]): DocumentBuilder {
+
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, text: AnnotationText | string): DocumentBuilder;
+
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTabOrGroups, ...args);
-        if (args.length === 1) {
-            return this.addAnnotationInternal(staffTabOrGroups, undefined, args[0]);
+
+        if (Guard.isNonEmptyString(args[0])) {
+            if (Guard.isEnumValue(args[0], Annotation) && Guard.isNonEmptyString(args[1])) {
+                const annotation = args[0];
+                const text = args[1];
+                return this.addAnnotationInternal(staffTabOrGroups, annotation, text, ...args.slice(2));
+            }
+            const annotation = getAnnotation(args[0]);
+            if (!annotation)
+                throw new MusicError(MusicErrorType.Score, `Unknown annotation "${args[0]}".`);
+            const text = args[0];
+            return this.addAnnotationInternal(staffTabOrGroups, annotation, text, ...args.slice(1));
         }
-        else {
-            return this.addAnnotationInternal(staffTabOrGroups, args[0], args[1]);
-        }
+
+        AssertUtil.assert(false);
+
+        return this;
+
     }
 
     private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
