@@ -39,7 +39,7 @@ export class ObjStaffRest extends MusicObject {
         this.rest.requestRectUpdate();
     }
 
-    updateRect(): void {
+    updateRect() {
         this.rect = this.restRect.clone();
         this.dotRects.forEach(r => this.rect.expandInPlace(r));
     }

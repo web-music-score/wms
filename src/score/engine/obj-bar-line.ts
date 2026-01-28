@@ -32,7 +32,7 @@ export class ObjStaffBarLine extends MusicObject {
         return this.getRect().contains(x, y) ? [this] : [];
     }
 
-    updateRect(): void {
+    updateRect() {
         this.rect = new AnchoredRect(0, 0, this.line.getTopLineY(), this.line.getBottomLineY())
         this.vlines.forEach(l =>
             this.rect.expandInPlace(new AnchoredRect(l.left, l.left + l.width, this.rect.top, this.rect.bottom))
