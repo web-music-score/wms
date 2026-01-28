@@ -617,7 +617,10 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    private addNavigation(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: Navigation, ...args: unknown[]) {
+    private addNavigation(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: string, ...args: unknown[]): boolean {
+        if (!Guard.isEnumValue(navigation, Navigation))
+            return false;
+
         let addLayoutObjectProps: {
             createObj: (line: ObjNotationLine) => LayoutableMusicObject,
             layoutGroupId: LayoutGroupId,
@@ -708,7 +711,6 @@ export class ObjMeasure extends MusicObject {
                 else {
                     throw new MusicError(MusicErrorType.Score, "Invalid end repeat play count (should be 2 or greater integer): " + args[0]);
                 }
-
                 if (this.endRepeatPlayCount !== 2) {
                     const text = `${this.endRepeatPlayCount}x`;
                     const textProps: TextProps = {
@@ -727,8 +729,10 @@ export class ObjMeasure extends MusicObject {
             });
         }
 
-        this.navigationSet.add(navigation);
+        this.navigationSet.add(navigation as Navigation);
         this.disableExtension();
+
+        return true;
     }
 
     hasNavigation(n: Navigation) {
@@ -742,10 +746,10 @@ export class ObjMeasure extends MusicObject {
     addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string, ...args: unknown[]) {
         // Handle navigations separately.
         if (annotation === Annotation.Navigation) {
-            if (getAnnotation(text) !== Annotation.Navigation)
-                throw new MusicError(MusicErrorType.Score, "Annotation text is not Navigation.");
-            this.addNavigation(staffTabOrGroups, text as Navigation, ...args);
-            return;
+            if (this.addNavigation(staffTabOrGroups, text, ...args))
+                return;
+            else
+                throw new MusicError(MusicErrorType.Score, `Invalid navigation: '${text}'`);
         }
 
         let anchor: ObjBarLineRight | ObjRhythmColumn | undefined;
@@ -760,10 +764,10 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Annotation anchor is undefined.");
+            throw new MusicError(MusicErrorType.Score, `Annotation anchor is undefined.`);
         }
-        else if (text.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Annotation text is empty.");
+        else if (text === "") {
+            throw new MusicError(MusicErrorType.Score, `Annotation text is empty.`);
         }
 
         let defaultVerticalPos: VerticalPos = VerticalPos.Above;
