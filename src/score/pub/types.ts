@@ -268,13 +268,21 @@ export type LyricsOptions = {
 }
 
 /**
- * @deprecated - Fermata is deprecated. Will be removed in future release. Use Annotation and ArticulaionAnnotation instead.
+ * @deprecated - Fermata is deprecated. Will be removed in future release. Use Annotation with TemporalAnnotation instead.
  */
 export enum Fermata {
-    /** Anchor fermata to note/rest. */
+    /** Anchor fermata to note/rest. @deprecated */
     AtNote = "atNote",
-    /** Anchor fermata to measure end. */
+    /** Anchor fermata to measure end. @deprecated */
     AtMeasureEnd = "atMeasureEnd"
+}
+
+/** @deprecated - Label is deprecated. Will be removed in future release. Use Annotation with LabelAnnotation instead. */
+export enum Label {
+    /** "C", "C#", "Db", "D", etc. @deprecated */
+    Note = "note",
+    /** "C", "Am", "G7", etc. @deprecated */
+    Chord = "chord"
 }
 
 /** Annotation types */
@@ -293,6 +301,8 @@ export enum Annotation {
     Technique = "technique",
     /** Temporal annotation */
     Temporal = "temporal",
+    /** Label annotation */
+    Label = "label",
     /** Ornament annotation */
     Ornament = "ornament",
     /** Miscellaneous annotation */
@@ -494,6 +504,14 @@ export enum TemporalAnnotation {
 }
 
 /** Miscellaneous annotations */
+export enum LabelAnnotation {
+    /** Pitch label */
+    PitchLabel = "pitchLabel",
+    /** Chord label */
+    ChordLabel = "chordLabel",
+}
+
+/** Miscellaneous annotations */
 export enum MiscAnnotation {
     /** play one octave higher */
     _8va = "8va",
@@ -520,17 +538,9 @@ export type AnnotationText =
     `${ExpressionAnnotation}` |
     `${TechniqueAnnotation}` |
     `${OrnamentAnnotation}` |
+    `${LabelAnnotation}` |
     `${TemporalAnnotation}` |
     `${MiscAnnotation}`;
-
-/** Label element enum. */
-export enum Label {
-    /** "C", "C#", "Db", "D", etc. */
-    Note = "note",
-
-    /** "C", "Am", "G7", etc. */
-    Chord = "chord"
-}
 
 /** Play state enum. */
 export enum PlayState {

@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, TabConfig, TemporalAnnotation, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LabelAnnotation, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, TabConfig, TemporalAnnotation, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
 import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "web-music-score/theory";
@@ -181,7 +181,7 @@ export type ExtensionBuilder = {
  *     .setMeasuresPerRow(4)
  *     .addMeasure()
  *     .addNote(1, "C3", "4n")
- *     .addChord(1, ["C3", "E3", "G3"], "4n").addLabel("chord", "C")
+ *     .addChord(1, ["C3", "E3", "G3"], "4n").addAnnotation("chordLabel", "C")
  *     .addRest(1, "4n")
  *     // etc.
  *     .getDEocument();
@@ -662,7 +662,10 @@ export class DocumentBuilder {
     }
 
     /**
+     * Add fermata to current measure.
      * @deprecated - addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
+     * @returns - This document builder instance.
      */
     addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
@@ -672,7 +675,11 @@ export class DocumentBuilder {
     }
 
     /**
-     * @deprecated - addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.
+     * Add fermata to current measure.
+     * @deprecated - addFermataTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
+     * @returns - This document builder instance.
      */
     addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
@@ -763,6 +770,14 @@ export class DocumentBuilder {
      */
     addAnnotation(annotation: Annotation | `${Annotation}`, annotationText: string): DocumentBuilder;
     /**
+     * Add label annotation to current measure.
+     * @param annotation - Annotation type.
+     * @param labelAnnotation - Label annotation type.
+     * @param labelText - Label text.
+     * @returns - This document builder instance.
+     */
+    addAnnotation(labelAnnotation: LabelAnnotation | `${LabelAnnotation}`, labelText: string): DocumentBuilder;
+    /**
      * Add ending navigation to current measure.
      * @param endingText - Text for ending navigation.
      * @param passages - Passages that this ending is played.
@@ -814,6 +829,15 @@ export class DocumentBuilder {
      */
     addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, annotationText: string): DocumentBuilder;
     /**
+     * Add label annotation to current measure.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param annotation - Annotation type.
+     * @param labelAnnotation - Label annotation type.
+     * @param labelText - Label text.
+     * @returns - This document builder instance.
+     */
+    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, labelAnnotation: LabelAnnotation | `${LabelAnnotation}`, labelText: string): DocumentBuilder;
+    /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
      * @param endingText - Text for ending navigation.
@@ -849,7 +873,6 @@ export class DocumentBuilder {
         AssertUtil.assert(false);
 
         return this;
-
     }
 
     private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
@@ -860,15 +883,20 @@ export class DocumentBuilder {
             Guard.isNonEmptyString(text)
         );
 
-        this.getMeasure().addLabel(staffTabOrGroups, label as Label, text);
+        if (label === Label.Chord)
+            return this.addAnnotationInternal(staffTabOrGroups, Annotation.Label, LabelAnnotation.ChordLabel, text);
+
+        if (label === Label.Note)
+            return this.addAnnotationInternal(staffTabOrGroups, Annotation.Label, LabelAnnotation.PitchLabel, text);
 
         return this;
     }
 
     /**
      * Add label text to column of last added note/chord/rest in current measure.
-     * @param label - Label type (e.g. "chord" or Label.Chord).
-     * @param text - label text (e.g. "Am").
+     * @deprecated - addLabel() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @param label - Label type: "chord" or "note".
+     * @param text - label text.
      * @returns - This document builder instance.
      */
     addLabel(label: Label | `${Label}`, text: string): DocumentBuilder {
@@ -878,9 +906,10 @@ export class DocumentBuilder {
 
     /**
      * Add label text to column of last added note/chord/rest in current measure to given staff/tab/group.
+     * @deprecated - addLabelTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param label - Label type (e.g. "chord" or Label.Chord).
-     * @param text - label text (e.g. "Am").
+     * @param label - Label type "chord" or "note".
+     * @param text - label text.
      * @returns - This document builder instance.
      */
     addLabelTo(staffTabOrGroups: StaffTabOrGroups, label: Label | `${Label}`, text: string): DocumentBuilder {
@@ -1090,7 +1119,7 @@ export class DocumentBuilder {
             let note = notes[i];
 
             this.addNote(0, note, ts.beatLength);
-            this.addLabel(Label.Note, note.formatOmitOctave(SymbolSet.Unicode));
+            this.addAnnotation(LabelAnnotation.PitchLabel, note.formatOmitOctave(SymbolSet.Unicode));
         }
         return this;
     }

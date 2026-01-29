@@ -3,7 +3,8 @@
 ### Annotation Update
 - Already had annotations: Tempo, Dynamics and Articulation.
 - Navigation became one type of annotation.
-- New annotations: Expression, Technique, Temporal, Ornament and Misc.
+- Deprecated Label and replaced with LabelAnnotation.
+- New annotations: Expression, Technique, Temporal, Ornament, Label and Misc.
 - Added lots of new built in annotation texts.
 
 ## [6.4.0-pre.2] - 2026-01-26

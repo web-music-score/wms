@@ -2,7 +2,7 @@ import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRe
 import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation, TemporalAnnotation } from "../pub";
+import { Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation, TemporalAnnotation, LabelAnnotation } from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -83,7 +83,7 @@ function getVerseLayoutGroupId(verse: VerseNumber): LayoutGroupId {
 }
 
 const AnnotationGroupIdMap = new UniMap<Annotation, LayoutGroupId>([
-    [Annotation.Navigation, LayoutGroupId.Navigation],
+    [Annotation.Navigation, LayoutGroupId.Annotation_Navigation],
     [Annotation.Dynamics, LayoutGroupId.Annotation_Dynamics],
     [Annotation.Tempo, LayoutGroupId.Annotation_Tempo],
 ]);
@@ -641,7 +641,7 @@ export class ObjMeasure extends MusicObject {
                         const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjEnding(anchor, color, passages);
                     },
-                    layoutGroupId: LayoutGroupId.Ending,
+                    layoutGroupId: LayoutGroupId.Annotation_Ending,
                     defaultVerticalPos: VerticalPos.Above
                 }
                 break;
@@ -656,7 +656,7 @@ export class ObjMeasure extends MusicObject {
                         const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjText(anchor, { text, color }, 1, 1);
                     },
-                    layoutGroupId: LayoutGroupId.Navigation,
+                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
                 this.addNavigation(staffTabOrGroups, Navigation.EndRepeat);
@@ -671,7 +671,7 @@ export class ObjMeasure extends MusicObject {
                         const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjText(anchor, { text, color }, 1, 1);
                     },
-                    layoutGroupId: LayoutGroupId.Navigation,
+                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
                 break;
@@ -685,7 +685,7 @@ export class ObjMeasure extends MusicObject {
                         const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjSpecialText(anchor, text, color);
                     },
-                    layoutGroupId: LayoutGroupId.Navigation,
+                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
                 break;
@@ -698,7 +698,7 @@ export class ObjMeasure extends MusicObject {
                         const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
                         return new ObjSpecialText(anchor, text, color);
                     },
-                    layoutGroupId: LayoutGroupId.Navigation,
+                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
                     defaultVerticalPos: VerticalPos.Above
                 }
                 break;
@@ -750,6 +750,16 @@ export class ObjMeasure extends MusicObject {
         if (annotation === Annotation.Navigation) {
             if (this.addNavigation(staffTabOrGroups, text, ...args))
                 return;
+            else
+                throw new MusicError(MusicErrorType.Score, `Invalid navigation: '${text}'`);
+        }
+
+        // Handle labels separately.
+        if (annotation === Annotation.Label) {
+            if (Guard.isEnumValue(text, LabelAnnotation)) {
+                this.addLabel(staffTabOrGroups, text, String(args[0]));
+                return;
+            }
             else
                 throw new MusicError(MusicErrorType.Score, `Invalid navigation: '${text}'`);
         }
@@ -811,7 +821,7 @@ export class ObjMeasure extends MusicObject {
         });
     }
 
-    addLabel(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label, text: string) {
+    private addLabel(staffTabOrGroups: StaffTabOrGroups | undefined, label: LabelAnnotation, text: string) {
         let anchor = this.lastAddedRhythmColumn;
 
         if (!anchor) {
@@ -827,8 +837,8 @@ export class ObjMeasure extends MusicObject {
         let defaultVerticalPos: VerticalPos;
 
         switch (label) {
-            case Label.Note: layoutGroupId = LayoutGroupId.NoteLabel; defaultVerticalPos = VerticalPos.Below; break;
-            case Label.Chord: layoutGroupId = LayoutGroupId.ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
+            case LabelAnnotation.PitchLabel: layoutGroupId = LayoutGroupId.Annotation_PitchLabel; defaultVerticalPos = VerticalPos.Below; break;
+            case LabelAnnotation.ChordLabel: layoutGroupId = LayoutGroupId.Annotation_ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
         }
 
         this.disableExtension();

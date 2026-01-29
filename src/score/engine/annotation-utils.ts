@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation } from "../pub";
+import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation, LabelAnnotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 
 export function getNavigationString(navigation: Navigation): string {
@@ -69,6 +69,9 @@ export function getAnnotation(text: string): Annotation | undefined {
     }
     else if (Guard.isEnumValue(text, OrnamentAnnotation)) {
         return Annotation.Ornament;
+    }
+    else if (Guard.isEnumValue(text, LabelAnnotation)) {
+        return Annotation.Label;
     }
     else if (Guard.isEnumValue(text, MiscAnnotation)) {
         return Annotation.Misc;
