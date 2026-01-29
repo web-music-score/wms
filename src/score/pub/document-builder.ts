@@ -1,8 +1,8 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LabelAnnotation, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, TabConfig, TemporalAnnotation, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
+import * as Types from "./types";
 import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
-import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio } from "web-music-score/theory";
+import * as Theory from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
@@ -14,11 +14,11 @@ function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: str
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
 }
 
-function assertBaseConfig(baseConfig: BaseConfig) {
+function assertBaseConfig(baseConfig: Types.BaseConfig) {
     AssertUtil.assert(
         Guard.isObject(baseConfig),
         Guard.isStringOrUndefined(baseConfig.name),
-        Guard.isUndefined(baseConfig.voiceId) || isVoiceId(baseConfig.voiceId) || Guard.isArray(baseConfig.voiceId) && baseConfig.voiceId.every(voiceId => isVoiceId(voiceId))
+        Guard.isUndefined(baseConfig.voiceId) || Types.isVoiceId(baseConfig.voiceId) || Guard.isArray(baseConfig.voiceId) && baseConfig.voiceId.every(voiceId => Types.isVoiceId(voiceId))
     );
 
     assertObjHasNoProp(baseConfig, "voiceIds", "Baseconfig.voiceIds was removed. Use BaseConfig.voiceId instead.");
@@ -30,16 +30,16 @@ function assertBaseConfig(baseConfig: BaseConfig) {
     AssertUtil.assert(Guard.isStringOrUndefined(baseConfig.instrument));
 }
 
-function assertStaffConfig(staffConfig: StaffConfig) {
+function assertStaffConfig(staffConfig: Types.StaffConfig) {
     assertBaseConfig(staffConfig);
 
     AssertUtil.assert(
         Guard.isObject(staffConfig),
         Guard.isStrictEqual(staffConfig.type, "staff"),
-        Guard.isEnumValue(staffConfig.clef, Clef),
+        Guard.isEnumValue(staffConfig.clef, Types.Clef),
         Guard.isBooleanOrUndefined(staffConfig.isOctaveDown),
-        Guard.isUndefined(staffConfig.minNote) || Note.isNote(staffConfig.minNote),
-        Guard.isUndefined(staffConfig.maxNote) || Note.isNote(staffConfig.maxNote),
+        Guard.isUndefined(staffConfig.minNote) || Theory.Note.isNote(staffConfig.minNote),
+        Guard.isUndefined(staffConfig.maxNote) || Theory.Note.isNote(staffConfig.maxNote),
         Guard.isStringOrUndefined(staffConfig.grandId)
     );
 
@@ -47,7 +47,7 @@ function assertStaffConfig(staffConfig: StaffConfig) {
 }
 
 
-function assertTabConfig(tabConfig: TabConfig) {
+function assertTabConfig(tabConfig: Types.TabConfig) {
     assertBaseConfig(tabConfig);
 
     AssertUtil.assert(
@@ -55,25 +55,25 @@ function assertTabConfig(tabConfig: TabConfig) {
         Guard.isStrictEqual(tabConfig.type, "tab"),
         (
             Guard.isUndefined(tabConfig.tuning) ||
-            Guard.isString(tabConfig.tuning) && Guard.isIncluded(tabConfig.tuning, TuningNameList) ||
-            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, getStringNumbers().length && tabConfig.tuning.every(s => Note.isNote(s)))
+            Guard.isString(tabConfig.tuning) && Guard.isIncluded(tabConfig.tuning, Theory.TuningNameList) ||
+            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, Types.getStringNumbers().length && tabConfig.tuning.every(s => Theory.Note.isNote(s)))
         )
     );
 }
 
-function assertNoteOptions(noteOptions: NoteOptions) {
+function assertNoteOptions(noteOptions: Types.NoteOptions) {
     AssertUtil.assert(
         Guard.isObject(noteOptions),
-        Guard.isEnumValueOrUndefined(noteOptions.stem, Stem),
+        Guard.isEnumValueOrUndefined(noteOptions.stem, Types.Stem),
         Guard.isStringOrUndefined(noteOptions.color),
-        Guard.isBooleanOrUndefined(noteOptions.arpeggio) || Guard.isEnumValue(noteOptions.arpeggio, Arpeggio),
+        Guard.isBooleanOrUndefined(noteOptions.arpeggio) || Guard.isEnumValue(noteOptions.arpeggio, Types.Arpeggio),
         Guard.isBooleanOrUndefined(noteOptions.staccato),
         Guard.isBooleanOrUndefined(noteOptions.diamond),
         (
             Guard.isUndefined(noteOptions.string) ||
-            isStringNumber(noteOptions.string) ||
+            Types.isStringNumber(noteOptions.string) ||
             Guard.isEmptyArray(noteOptions.string) ||
-            Guard.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => isStringNumber(string))
+            Guard.isNonEmptyArray(noteOptions.string) && noteOptions.string.every(string => Types.isStringNumber(string))
         )
     );
 
@@ -83,10 +83,10 @@ function assertNoteOptions(noteOptions: NoteOptions) {
     assertObjHasNoProp(noteOptions, "slurSpan", `NoteOptions.slurSpan was removed. Use addConnective("slur", slurSpan)`);
 }
 
-function assertRestOptions(restOptions: RestOptions) {
+function assertRestOptions(restOptions: Types.RestOptions) {
     AssertUtil.assert(
         Guard.isObject(restOptions),
-        Guard.isStringOrUndefined(restOptions.staffPos) || Guard.isInteger(restOptions.staffPos) || restOptions.staffPos instanceof Note,
+        Guard.isStringOrUndefined(restOptions.staffPos) || Guard.isInteger(restOptions.staffPos) || restOptions.staffPos instanceof Theory.Note,
         Guard.isStringOrUndefined(restOptions.color),
         Guard.isBooleanOrUndefined(restOptions.hide)
     );
@@ -95,22 +95,22 @@ function assertRestOptions(restOptions: RestOptions) {
     assertObjHasNoProp(restOptions, "triplet", "RestOptions.triplet was removed.");
 }
 
-function assertLyricsOptions(lyricsOptions: LyricsOptions) {
+function assertLyricsOptions(lyricsOptions: Types.LyricsOptions) {
     AssertUtil.assert(
         Guard.isObject(lyricsOptions),
-        Guard.isEnumValueOrUndefined(lyricsOptions.align, LyricsAlign),
-        Guard.isEnumValueOrUndefined(lyricsOptions.hyphen, LyricsHyphen)
+        Guard.isEnumValueOrUndefined(lyricsOptions.align, Types.LyricsAlign),
+        Guard.isEnumValueOrUndefined(lyricsOptions.hyphen, Types.LyricsHyphen)
     );
 }
 
-function assertMeasureOptions(measureOptions: MeasureOptions) {
+function assertMeasureOptions(measureOptions: Types.MeasureOptions) {
     AssertUtil.assert(
         Guard.isObject(measureOptions),
         Guard.isBooleanOrUndefined(measureOptions.showNumber)
     );
 }
 
-function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) {
+function assertStaffTabOrGRoups(staffTabOrGroups: Types.StaffTabOrGroups | undefined) {
     AssertUtil.assert(
         Guard.isStringOrUndefined(staffTabOrGroups) || Guard.isIntegerGte(staffTabOrGroups, 0) ||
         Guard.isNonEmptyArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
@@ -122,27 +122,27 @@ function assertStaffTabOrGRoups(staffTabOrGroups: StaffTabOrGroups | undefined) 
 export type TupletBuilder = {
     /**
      * Add note to a tuplet.
-     * @param note - Instance of Note or string, single value (e.g. "C4") or array (e.g. ["C4", "E4", "G4"]).
-     * @param noteLength - Note length (e.g. "4n").
-     * @param noteOptions - Note options.
+     * @param note - Instance of Theory.Note or string, single value (e.g. "C4") or array (e.g. ["C4", "E4", "G4"]).
+     * @param noteLength - Theory.Note length (e.g. "4n").
+     * @param noteOptions - Theory.Note options.
      * @returns - This tuplet builder object.
      */
-    addNote: (note: Note | string | (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions) => TupletBuilder,
+    addNote: (note: Theory.Note | string | (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions) => TupletBuilder,
     /**
      * Add chord to a tuplet.
-     * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
-     * @param noteLength - Note length (e.g. "4n"). 
-     * @param noteOptions - Note options. 
+     * @param notes - Array of notes, each instance of Theory.Note or string (e.g. "D4"). 
+     * @param noteLength - Theory.Note length (e.g. "4n"). 
+     * @param noteOptions - Theory.Note options. 
      * @returns - This tuplet builder object. 
      */
-    addChord: (notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions) => TupletBuilder,
+    addChord: (notes: (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions) => TupletBuilder,
     /**
      * Add rest to a tuplet.
      * @param restLength - Rest length (e.g. "4n").  
      * @param restOptions - Rest options.
      * @returns - This tuplet builder object. 
      */
-    addRest: (restLength: NoteLength | NoteLengthStr, restOptions?: RestOptions) => TupletBuilder
+    addRest: (restLength: Theory.NoteLength | Theory.NoteLengthStr, restOptions?: Types.RestOptions) => TupletBuilder
 }
 
 /** Etension builder type. */
@@ -153,7 +153,7 @@ export type ExtensionBuilder = {
      * @param noteCount - Number of note lengths (default = 1).
      * @returns - this extension builder object.
      */
-    notes: (noteLength: NoteLength | NoteLengthStr, noteCount?: number) => ExtensionBuilder,
+    notes: (noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteCount?: number) => ExtensionBuilder,
     /**
      * Increase length of extension length by given number of measures.
      * @param measureCount - Number of measures.
@@ -201,15 +201,15 @@ export class DocumentBuilder {
      * Use staff preset values to set score confguration. This call will request new score row.
      * @param staffPreset - Staff preset (e.g. "treble").
      */
-    setScoreConfiguration(staffPreset: StaffPreset | `${StaffPreset}`): DocumentBuilder;
+    setScoreConfiguration(staffPreset: Types.StaffPreset | `${Types.StaffPreset}`): DocumentBuilder;
     /**
      * Use staff preset values to set score confguration. This call will request new score row.
      * @param config - Score configuration (e.g. { type: "staff", clef: "G", isOctavewDown: true }).
      */
-    setScoreConfiguration(config: ScoreConfiguration): DocumentBuilder;
-    setScoreConfiguration(config: StaffPreset | `${StaffPreset}` | ScoreConfiguration): DocumentBuilder {
+    setScoreConfiguration(config: Types.ScoreConfiguration): DocumentBuilder;
+    setScoreConfiguration(config: Types.StaffPreset | `${Types.StaffPreset}` | Types.ScoreConfiguration): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "setScoreConfiguration", config);
-        if (Guard.isEnumValue(config, StaffPreset)) {
+        if (Guard.isEnumValue(config, Types.StaffPreset)) {
             // Ok
             this.doc.setScoreConfiguration(config);
         }
@@ -242,7 +242,7 @@ export class DocumentBuilder {
         return this;
     }
 
-    private static DefaultMeasureOptions: MeasureOptions = {}
+    private static DefaultMeasureOptions: Types.MeasureOptions = {}
 
     private getMeasure(): ObjMeasure {
         return this.doc.getLastMeasure() ?? this.doc.addMeasure(DocumentBuilder.DefaultMeasureOptions);
@@ -292,7 +292,7 @@ export class DocumentBuilder {
      * @param measureOptions - Measure options.
      * @returns - This document builder instance.
      */
-    addMeasure(measureOptions?: MeasureOptions): DocumentBuilder {
+    addMeasure(measureOptions?: Types.MeasureOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addMeasure", measureOptions);
         measureOptions ??= {};
         assertMeasureOptions(measureOptions);
@@ -306,13 +306,13 @@ export class DocumentBuilder {
      * @param scaleType - Scale type (e.g. string "Major" or ScaleType.Major).
      * @returns - This document builder instance.
      */
-    setKeySignature(tonic: string, scaleType: ScaleType | `${ScaleType}`): DocumentBuilder;
+    setKeySignature(tonic: string, scaleType: Theory.ScaleType | `${Theory.ScaleType}`): DocumentBuilder;
     /**
      * Set key signature for current measure and forward.
      * @param keySignature - KeySignature object instance.
      * @returns - This document builder instance.
      */
-    setKeySignature(keySignature: KeySignature): DocumentBuilder;
+    setKeySignature(keySignature: Theory.KeySignature): DocumentBuilder;
     /**
      * Set key signature for current measure and forward.
      * @param keySignature - Key signature string (e.g. "C Major").
@@ -324,14 +324,14 @@ export class DocumentBuilder {
      * @param scale - Scale object instance.
      * @returns - This document builder instance.
      */
-    setKeySignature(scale: Scale): DocumentBuilder;
+    setKeySignature(scale: Theory.Scale): DocumentBuilder;
     setKeySignature(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "setKeySignature", ...args);
 
         AssertUtil.assert((
-            args[0] instanceof Scale ||
-            args[0] instanceof KeySignature ||
-            Guard.isNonEmptyString(args[0]) && Guard.isEnumValueOrUndefined(args[1], ScaleType)
+            args[0] instanceof Theory.Scale ||
+            args[0] instanceof Theory.KeySignature ||
+            Guard.isNonEmptyString(args[0]) && Guard.isEnumValueOrUndefined(args[1], Theory.ScaleType)
         ));
 
         this.getMeasure().setKeySignature(...args);
@@ -350,14 +350,14 @@ export class DocumentBuilder {
      * @param timeSignature - TimeSignature object instance.
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: TimeSignature): DocumentBuilder;
+    setTimeSignature(timeSignature: Theory.TimeSignature): DocumentBuilder;
     /**
      * Set time signature for current measure and forward.
      * @param timeSignature - TimeSignatures enum value or string (e.g. "3/4").
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: TimeSignatures | `${TimeSignatures}`, beamGrouping?: BeamGrouping | `${BeamGrouping}`): DocumentBuilder;
+    setTimeSignature(timeSignature: Theory.TimeSignatures | `${Theory.TimeSignatures}`, beamGrouping?: Theory.BeamGrouping | `${Theory.BeamGrouping}`): DocumentBuilder;
     /**
      * Set time signature for current measure and forward.
      * @param beatCount - Beat count of time signature (e.g. 3 in "3/4").
@@ -365,21 +365,21 @@ export class DocumentBuilder {
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: BeamGrouping | `${BeamGrouping}`): DocumentBuilder;
+    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: Theory.BeamGrouping | `${Theory.BeamGrouping}`): DocumentBuilder;
     setTimeSignature(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "setTimeSignature", ...args);
 
         if (args[0] === "C") {
-            this.getMeasure().setTimeSignature(new TimeSignature("C"));
+            this.getMeasure().setTimeSignature(new Theory.TimeSignature("C"));
         }
-        else if (args[0] instanceof TimeSignature) {
+        else if (args[0] instanceof Theory.TimeSignature) {
             this.getMeasure().setTimeSignature(args[0]);
         }
-        else if (Guard.isEnumValue(args[0], TimeSignatures) && Guard.isEnumValueOrUndefined(args[1], BeamGrouping)) {
-            this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1]));
+        else if (Guard.isEnumValue(args[0], Theory.TimeSignatures) && Guard.isEnumValueOrUndefined(args[1], Theory.BeamGrouping)) {
+            this.getMeasure().setTimeSignature(new Theory.TimeSignature(args[0], args[1]));
         }
-        else if (Guard.isIntegerGte(args[0], 1) && Guard.isIntegerGte(args[1], 1) && Guard.isEnumValueOrUndefined(args[2], BeamGrouping)) {
-            this.getMeasure().setTimeSignature(new TimeSignature(args[0], args[1], args[2]));
+        else if (Guard.isIntegerGte(args[0], 1) && Guard.isIntegerGte(args[1], 1) && Guard.isEnumValueOrUndefined(args[2], Theory.BeamGrouping)) {
+            this.getMeasure().setTimeSignature(new Theory.TimeSignature(args[0], args[1], args[2]));
         }
         else {
             AssertUtil.assert(false);
@@ -400,13 +400,13 @@ export class DocumentBuilder {
      * @param beatLength - Length of one beat.
      * @returns - This document builder instance.
      */
-    setTempo(beatsPerMinute: number, beatLength: NoteLength | NoteLengthStr): DocumentBuilder;
-    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr): DocumentBuilder {
+    setTempo(beatsPerMinute: number, beatLength: Theory.NoteLength | Theory.NoteLengthStr): DocumentBuilder;
+    setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLength | Theory.NoteLengthStr): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "setTempo", beatsPerMinute, beatLength);
 
         AssertUtil.assert(
             Guard.isIntegerGte(beatsPerMinute, 1),
-            Guard.isUndefined(beatLength) || isNoteLength(beatLength)
+            Guard.isUndefined(beatLength) || Theory.isNoteLength(beatLength)
         );
 
         this.getMeasure().setTempo(beatsPerMinute, beatLength);
@@ -417,21 +417,21 @@ export class DocumentBuilder {
     /**
      * Add note to current measure.
      * @param voiceId - Voice id to add note to.
-     * @param note - Instance of Note or string, single value (e.g. "C4") or array (e.g. ["C4", "E4", "G4"]).
-     * @param noteLength - Note length (e.g. "4n").
-     * @param noteOptions - Note options.
+     * @param note - Instance of Theory.Note or string, single value (e.g. "C4") or array (e.g. ["C4", "E4", "G4"]).
+     * @param noteLength - Theory.Note length (e.g. "4n").
+     * @param noteOptions - Theory.Note options.
      * @returns - This document builder instance.
      */
-    addNote(voiceId: VoiceId, note: Note | string | (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions): DocumentBuilder {
+    addNote(voiceId: Types.VoiceId, note: Theory.Note | string | (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNote", voiceId, note, noteLength, noteOptions);
 
         AssertUtil.assert(
-            isVoiceId(voiceId),
+            Types.isVoiceId(voiceId),
             (
-                note instanceof Note || Guard.isNonEmptyString(note) ||
-                Guard.isArray(note) && note.every(note => note instanceof Note || Guard.isNonEmptyString(note))
+                note instanceof Theory.Note || Guard.isNonEmptyString(note) ||
+                Guard.isArray(note) && note.every(note => note instanceof Theory.Note || Guard.isNonEmptyString(note))
             ),
-            isNoteLength(noteLength)
+            Theory.isNoteLength(noteLength)
         );
 
         noteOptions ??= {}
@@ -454,18 +454,18 @@ export class DocumentBuilder {
     /**
      * Add chord to current measure.
      * @param voiceId - Voice id to add chord to.
-     * @param notes - Array of notes, each instance of Note or string (e.g. "D4"). 
-     * @param noteLength - Note length (e.g. "4n"). 
-     * @param noteOptions - Note options. 
+     * @param notes - Array of notes, each instance of Theory.Note or string (e.g. "D4"). 
+     * @param noteLength - Theory.Note length (e.g. "4n"). 
+     * @param noteOptions - Theory.Note options. 
      * @returns - This document builder instance.
      */
-    addChord(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, noteOptions?: NoteOptions): DocumentBuilder {
+    addChord(voiceId: Types.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addChord", voiceId, notes, noteLength, noteOptions);
 
         AssertUtil.assert(
-            isVoiceId(voiceId),
-            Guard.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Guard.isNonEmptyString(note)),
-            isNoteLength(noteLength)
+            Types.isVoiceId(voiceId),
+            Guard.isNonEmptyArray(notes) && notes.every(note => note instanceof Theory.Note || Guard.isNonEmptyString(note)),
+            Theory.isNoteLength(noteLength)
         );
 
         noteOptions ??= {}
@@ -483,12 +483,12 @@ export class DocumentBuilder {
      * @param restOptions - Rest options.
      * @returns - This document builder instance.
      */
-    addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, restOptions?: RestOptions): DocumentBuilder {
+    addRest(voiceId: Types.VoiceId, restLength: Theory.NoteLength | Theory.NoteLengthStr, restOptions?: Types.RestOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addRest", voiceId, restLength, restOptions);
 
         AssertUtil.assert(
-            isVoiceId(voiceId),
-            isNoteLength(restLength)
+            Types.isVoiceId(voiceId),
+            Theory.isNoteLength(restLength)
         );
 
         restOptions ??= {}
@@ -514,13 +514,13 @@ export class DocumentBuilder {
      * @param tupletBuilder - Tuplet builder function to build tuplet.
      * @returns - This document builder instance.
      */
-    addTuplet(voiceId: VoiceId, tupletRatio: TupletRatio & TupletOptions, tupletBuilder: (notes: TupletBuilder) => void): DocumentBuilder {
+    addTuplet(voiceId: Types.VoiceId, tupletRatio: Theory.TupletRatio & Types.TupletOptions, tupletBuilder: (notes: TupletBuilder) => void): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addTuplet", voiceId, tupletRatio);
 
         AssertUtil.assert(
-            isVoiceId(voiceId),
+            Types.isVoiceId(voiceId),
             Guard.isFunction(tupletBuilder),
-            isTupletRatio(tupletRatio) && Guard.isBooleanOrUndefined(tupletRatio.showRatio)
+            Theory.isTupletRatio(tupletRatio) && Guard.isBooleanOrUndefined(tupletRatio.showRatio)
         );
 
         let tupletSymbols: RhythmSymbol[] = [];
@@ -529,8 +529,8 @@ export class DocumentBuilder {
             addNote: (note, noteLength, noteOptions) => {
                 AssertUtil.setClassFunc("DocumentBuilder", "addTuplet => addNote", note, noteLength, noteOptions);
                 AssertUtil.assert(
-                    note instanceof Note || Guard.isNonEmptyString(note) || Guard.isArray(note) && note.every(note => note instanceof Note || Guard.isNonEmptyString(note)),
-                    isNoteLength(noteLength)
+                    note instanceof Theory.Note || Guard.isNonEmptyString(note) || Guard.isArray(note) && note.every(note => note instanceof Theory.Note || Guard.isNonEmptyString(note)),
+                    Theory.isNoteLength(noteLength)
                 );
 
                 noteOptions ??= {}
@@ -555,8 +555,8 @@ export class DocumentBuilder {
                 AssertUtil.setClassFunc("DocumentBuilder", "addTuplet => addChord", notes, noteLength, noteOptions);
 
                 AssertUtil.assert(
-                    Guard.isNonEmptyArray(notes) && notes.every(note => note instanceof Note || Guard.isNonEmptyString(note)),
-                    isNoteLength(noteLength)
+                    Guard.isNonEmptyArray(notes) && notes.every(note => note instanceof Theory.Note || Guard.isNonEmptyString(note)),
+                    Theory.isNoteLength(noteLength)
                 );
 
                 noteOptions ??= {}
@@ -570,7 +570,7 @@ export class DocumentBuilder {
             addRest: (restLength, restOptions) => {
                 AssertUtil.setClassFunc("DocumentBuilder", "addTuplet => addRest", restLength, restOptions);
 
-                AssertUtil.assert(isNoteLength(restLength));
+                AssertUtil.assert(Theory.isNoteLength(restLength));
 
                 restOptions ??= {}
                 assertRestOptions(restOptions);
@@ -589,14 +589,14 @@ export class DocumentBuilder {
         return this;
     }
 
-    private currentLyricsAlign: LyricsAlign | `${LyricsAlign}` = LyricsAlign.Center;
+    private currentLyricsAlign: Types.LyricsAlign | `${Types.LyricsAlign}` = Types.LyricsAlign.Center;
 
-    private addLyricsInternal(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsText: string | string[], lyricsLength: NoteLength | NoteLengthStr, lyricsOptions?: LyricsOptions): DocumentBuilder {
+    private addLyricsInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         AssertUtil.assert(
-            isVerseNumber(verse),
-            Guard.isEnumValue(lyricsLength, NoteLength),
+            Types.isVerseNumber(verse),
+            Guard.isEnumValue(lyricsLength, Theory.NoteLength),
             Guard.isString(lyricsText) || Guard.isArray(lyricsText) && lyricsText.every(text => Guard.isString(text))
         );
 
@@ -628,7 +628,7 @@ export class DocumentBuilder {
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyrics(verse: VerseNumber, lyricsText: string | string[], lyricsLength: NoteLength | NoteLengthStr, lyricsOptions?: LyricsOptions): DocumentBuilder {
+    addLyrics(verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLyrics", verse, lyricsLength, lyricsText, lyricsOptions);
         return this.addLyricsInternal(undefined, verse, lyricsText, lyricsLength, lyricsOptions);
     }
@@ -642,20 +642,20 @@ export class DocumentBuilder {
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyricsTo(staffTabOrGroups: StaffTabOrGroups, verse: VerseNumber, lyricsText: string | string[], lyricsLength: NoteLength | NoteLengthStr, lyricsOptions?: LyricsOptions): DocumentBuilder {
+    addLyricsTo(staffTabOrGroups: Types.StaffTabOrGroups, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLyricsTo", verse, lyricsLength, lyricsText, lyricsOptions);
         return this.addLyricsInternal(staffTabOrGroups, verse, lyricsText, lyricsLength, lyricsOptions);
     }
 
-    private addFermataInternal(staffTabOrGroups: StaffTabOrGroups | undefined, fermata: Fermata | `${Fermata}`): DocumentBuilder {
+    private addFermataInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, fermata: Types.Fermata | `${Types.Fermata}`): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
-        AssertUtil.assert(Guard.isEnumValue(fermata, Fermata));
+        AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
         switch (fermata) {
-            case Fermata.AtNote:
-                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Temporal, TemporalAnnotation.fermata);
+            case Types.Fermata.AtNote:
+                this.getMeasure().addAnnotation(staffTabOrGroups, Types.Annotation.Temporal, Types.TemporalAnnotation.fermata);
                 break;
-            case Fermata.AtMeasureEnd:
-                this.getMeasure().addAnnotation(staffTabOrGroups, Annotation.Temporal, TemporalAnnotation.measureEndFermata);
+            case Types.Fermata.AtMeasureEnd:
+                this.getMeasure().addAnnotation(staffTabOrGroups, Types.Annotation.Temporal, Types.TemporalAnnotation.measureEndFermata);
                 break;
         }
         return this;
@@ -667,7 +667,7 @@ export class DocumentBuilder {
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
+    addFermata(fermata: Types.Fermata | `${Types.Fermata}` = Types.Fermata.AtNote): DocumentBuilder {
         warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
 
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
@@ -681,7 +681,7 @@ export class DocumentBuilder {
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
+    addFermataTo(staffTabOrGroups: Types.StaffTabOrGroups, fermata: Types.Fermata | `${Types.Fermata}` = Types.Fermata.AtNote): DocumentBuilder {
         warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);
@@ -690,112 +690,112 @@ export class DocumentBuilder {
 
     /**
      * Add navigation to current measure.
-     * @param navigation - Navigation annotation to add.
+     * @param navigation - T.Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Navigation | `${Navigation}`): DocumentBuilder;
+    addNavigation(navigation: Types.Navigation | `${Types.Navigation}`): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
-     * @param navigation - Navigation annotation to add.
+     * @param navigation - T.Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigation(navigation: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
-     * @param navigation - Navigation annotation to add.
+     * @param navigation - T.Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigation(navigation: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
 
-    addNavigation(navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
+    addNavigation(navigation: Types.Navigation | `${Types.Navigation}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
-        return this.addAnnotationInternal(undefined, Annotation.Navigation, navigation, ...args);
+        return this.addAnnotationInternal(undefined, Types.Annotation.Navigation, navigation, ...args);
     }
 
     /**
      * Add navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation - Navigation annotation to add.
+     * @param navigation - T.Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation | `${Types.Navigation}`): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation - Navigation annotation to add.
+     * @param navigation - T.Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation - Navigation annotation to add.
+     * @param navigation - T.Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
 
-    addNavigationTo(staffTabOrGroups: StaffTabOrGroups, navigation: Navigation | `${Navigation}`, ...args: unknown[]): DocumentBuilder {
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation | `${Types.Navigation}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTabOrGroups, navigation, ...args);
-        return this.addAnnotationInternal(staffTabOrGroups, Annotation.Navigation, navigation, ...args);
+        return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Navigation, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation | `${Annotation}`, annotationText: string, ...args: unknown[]): DocumentBuilder {
+    private addAnnotationInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, annotation: Types.Annotation | `${Types.Annotation}`, annotationText: string, ...args: unknown[]): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         AssertUtil.assert(
-            Guard.isEnumValue(annotation, Annotation),
+            Guard.isEnumValue(annotation, Types.Annotation),
             Guard.isNonEmptyString(annotationText)
         );
 
-        this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Annotation, annotationText, ...args);
+        this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Types.Annotation, annotationText, ...args);
 
         return this;
     }
 
     /**
      * Add known annotation text to current measure.
-     * @param annotationText - Annotation text (e.g. "pp").
+     * @param annotationText - T.Annotation text (e.g. "pp").
      * @returns - This document builder instance.
      */
-    addAnnotation(annotationText: AnnotationText): DocumentBuilder;
+    addAnnotation(annotationText: Types.AnnotationText): DocumentBuilder;
     /**
      * Add any annotation text to current measure.
-     * @param annotation - Annotation type (e.g. Annotation.Dynamics).
-     * @param annotationText - Annotation text (e.g. "pp").
+     * @param annotation - T.Annotation type (e.g. T.Annotation.Dynamics).
+     * @param annotationText - T.Annotation text (e.g. "pp").
      * @returns - This document builder instance.
      */
-    addAnnotation(annotation: Annotation | `${Annotation}`, annotationText: string): DocumentBuilder;
+    addAnnotation(annotation: Types.Annotation | `${Types.Annotation}`, annotationText: string): DocumentBuilder;
     /**
      * Add label annotation to current measure.
-     * @param labelAnnotation - Label annotation type.
-     * @param labelText - Label text.
+     * @param labelAnnotation - T.Label annotation type.
+     * @param labelText - T.Label text.
      * @returns - This document builder instance.
      */
-    addAnnotation(labelAnnotation: LabelAnnotation | `${LabelAnnotation}`, labelText: string): DocumentBuilder;
+    addAnnotation(labelAnnotation: Types.LabelAnnotation | `${Types.LabelAnnotation}`, labelText: string): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
      * @param endingText - Text for ending navigation.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotation(endingText: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotation(endingText: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
      * @param endRepeatText - Text for end repeat navigation.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotation(endRepeatText: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotation(endRepeatText: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
 
     addAnnotation(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
 
         if (Guard.isNonEmptyString(args[0])) {
-            if (Guard.isEnumValue(args[0], Annotation) && Guard.isNonEmptyString(args[1])) {
+            if (Guard.isEnumValue(args[0], Types.Annotation) && Guard.isNonEmptyString(args[1])) {
                 const annotation = args[0];
                 const text = args[1];
                 return this.addAnnotationInternal(undefined, annotation, text, ...args.slice(2));
@@ -815,26 +815,26 @@ export class DocumentBuilder {
     /**
      * Add known annotation text to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param annotationText - Annotation text (e.g. "pp"). 
+     * @param annotationText - T.Annotation text (e.g. "pp"). 
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotationText: AnnotationText): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, annotationText: Types.AnnotationText): DocumentBuilder;
     /**
      * Add any annotation text to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param annotation - Annotation type (e.g. Annotation.Dynamics).
-     * @param annotationText - Annotation text (e.g. "pp").
+     * @param annotation - T.Annotation type (e.g. T.Annotation.Dynamics).
+     * @param annotationText - T.Annotation text (e.g. "pp").
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, annotation: Annotation | `${Annotation}`, annotationText: string): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, annotation: Types.Annotation | `${Types.Annotation}`, annotationText: string): DocumentBuilder;
     /**
      * Add label annotation to current measure.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param labelAnnotation - Label annotation type.
-     * @param labelText - Label text.
+     * @param labelAnnotation - T.Label annotation type.
+     * @param labelText - T.Label text.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, labelAnnotation: LabelAnnotation | `${LabelAnnotation}`, labelText: string): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, labelAnnotation: Types.LabelAnnotation | `${Types.LabelAnnotation}`, labelText: string): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
@@ -842,7 +842,7 @@ export class DocumentBuilder {
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, endingText: Navigation.Ending | `${Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endingText: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
@@ -850,13 +850,13 @@ export class DocumentBuilder {
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, endRepeatText: Navigation.EndRepeat | `${Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endRepeatText: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
 
-    addAnnotationTo(staffTabOrGroups: StaffTabOrGroups, ...args: unknown[]): DocumentBuilder {
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTabOrGroups, ...args);
 
         if (Guard.isNonEmptyString(args[0])) {
-            if (Guard.isEnumValue(args[0], Annotation) && Guard.isNonEmptyString(args[1])) {
+            if (Guard.isEnumValue(args[0], Types.Annotation) && Guard.isNonEmptyString(args[1])) {
                 const annotation = args[0];
                 const text = args[1];
                 return this.addAnnotationInternal(staffTabOrGroups, annotation, text, ...args.slice(2));
@@ -873,19 +873,19 @@ export class DocumentBuilder {
         return this;
     }
 
-    private addLabelInternal(staffTabOrGroups: StaffTabOrGroups | undefined, label: Label | `${Label}`, text: string): DocumentBuilder {
+    private addLabelInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         AssertUtil.assert(
-            Guard.isEnumValue(label, Label),
+            Guard.isEnumValue(label, Types.Label),
             Guard.isNonEmptyString(text)
         );
 
-        if (label === Label.Chord)
-            return this.addAnnotationInternal(staffTabOrGroups, Annotation.Label, LabelAnnotation.ChordLabel, text);
+        if (label === Types.Label.Chord)
+            return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Label, Types.LabelAnnotation.ChordLabel, text);
 
-        if (label === Label.Note)
-            return this.addAnnotationInternal(staffTabOrGroups, Annotation.Label, LabelAnnotation.PitchLabel, text);
+        if (label === Types.Label.Note)
+            return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Label, Types.LabelAnnotation.PitchLabel, text);
 
         return this;
     }
@@ -893,11 +893,11 @@ export class DocumentBuilder {
     /**
      * Add label text to column of last added note/chord/rest in current measure.
      * @deprecated - addLabel() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param label - Label type: "chord" or "note".
+     * @param label - T.Label type: "chord" or "note".
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabel(label: Label | `${Label}`, text: string): DocumentBuilder {
+    addLabel(label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLabel", label, text);
         return this.addLabelInternal(undefined, label, text);
     }
@@ -906,61 +906,61 @@ export class DocumentBuilder {
      * Add label text to column of last added note/chord/rest in current measure to given staff/tab/group.
      * @deprecated - addLabelTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param label - Label type "chord" or "note".
+     * @param label - T.Label type "chord" or "note".
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabelTo(staffTabOrGroups: StaffTabOrGroups, label: Label | `${Label}`, text: string): DocumentBuilder {
+    addLabelTo(staffTabOrGroups: Types.StaffTabOrGroups, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTabOrGroups, label, text);
         return this.addLabelInternal(staffTabOrGroups, label, text);
     }
 
     /**
      * Add tie starting from last added note/chord.
-     * @param connective - Connective type ("tie" or Connective.Tie).
+     * @param connective - T.Connective type ("tie" or T.Connective.Tie).
      * @param tieSpan - How many notes across this tie spans.
      * @param notAnchor - Anchor point for note and this tie.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Connective.Tie | `${Connective.Tie}`, tieSpan?: number | TieType | `${TieType}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: Types.Connective.Tie | `${Types.Connective.Tie}`, tieSpan?: number | Types.TieType | `${Types.TieType}`, notAnchor?: Types.NoteAnchor | `${Types.NoteAnchor}`): DocumentBuilder;
     /**
      * Add slur starting from last added note/chord.
-     * @param connective - Connective type ("slur" or Connective.Slur).
+     * @param connective - T.Connective type ("slur" or T.Connective.Slur).
      * @param slurSpan - How many notes across this slur spans.
      * @param notAnchor - Anchor point for note and this slur.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Connective.Slur | `${Connective.Slur}`, slurSpan?: number, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: Types.Connective.Slur | `${Types.Connective.Slur}`, slurSpan?: number, notAnchor?: Types.NoteAnchor | `${Types.NoteAnchor}`): DocumentBuilder;
     /**
      * Add slide starting from last added note/chord.
-     * @param connective - Connective type ("slide" or Connective.Slide).
+     * @param connective - T.Connective type ("slide" or T.Connective.Slide).
      * @param notAnchor - Anchor point for note and this slide.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Connective.Slide | `${Connective.Slide}`, notAnchor?: NoteAnchor | `${NoteAnchor}`): DocumentBuilder;
-    addConnective(connective: Connective | `${Connective}`, ...args: unknown[]): DocumentBuilder {
+    addConnective(connective: Types.Connective.Slide | `${Types.Connective.Slide}`, notAnchor?: Types.NoteAnchor | `${Types.NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: Types.Connective | `${Types.Connective}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addConnective", connective, ...args);
 
-        AssertUtil.assert(Guard.isEnumValue(connective, Connective));
+        AssertUtil.assert(Guard.isEnumValue(connective, Types.Connective));
 
-        if (connective === Connective.Tie) {
-            AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]) || Guard.isEnumValue(args[0], TieType));
-            AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], NoteAnchor));
-            let tieSpan = args[0] as number | TieType | undefined;
-            let noteAnchor = args[1] as NoteAnchor | undefined;
-            this.getMeasure().addConnective(connective as Connective.Tie, tieSpan, noteAnchor);
+        if (connective === Types.Connective.Tie) {
+            AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]) || Guard.isEnumValue(args[0], Types.TieType));
+            AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], Types.NoteAnchor));
+            let tieSpan = args[0] as number | Types.TieType | undefined;
+            let noteAnchor = args[1] as Types.NoteAnchor | undefined;
+            this.getMeasure().addConnective(connective as Types.Connective.Tie, tieSpan, noteAnchor);
         }
-        else if (connective === Connective.Slur) {
+        else if (connective === Types.Connective.Slur) {
             AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]));
-            AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], NoteAnchor));
+            AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], Types.NoteAnchor));
             let slurSpan = args[0] as number | undefined;
-            let noteAnchor = args[1] as NoteAnchor | undefined;
-            this.getMeasure().addConnective(connective as Connective.Slur, slurSpan, noteAnchor);
+            let noteAnchor = args[1] as Types.NoteAnchor | undefined;
+            this.getMeasure().addConnective(connective as Types.Connective.Slur, slurSpan, noteAnchor);
         }
-        else if (connective === Connective.Slide) {
-            AssertUtil.assert(Guard.isEnumValueOrUndefined(args[0], NoteAnchor));
-            let noteAnchor = args[0] as NoteAnchor | undefined;
-            this.getMeasure().addConnective(connective as Connective.Slide, noteAnchor);
+        else if (connective === Types.Connective.Slide) {
+            AssertUtil.assert(Guard.isEnumValueOrUndefined(args[0], Types.NoteAnchor));
+            let noteAnchor = args[0] as Types.NoteAnchor | undefined;
+            this.getMeasure().addConnective(connective as Types.Connective.Slide, noteAnchor);
         }
 
         return this;
@@ -989,9 +989,9 @@ export class DocumentBuilder {
         const helper: ExtensionBuilder = {
             notes: (noteLength, noteCount) => {
                 AssertUtil.setClassFunc("DocumentBuilder", "addExtension.notes", noteLength, noteCount);
-                AssertUtil.assert(isNoteLength(noteLength));
+                AssertUtil.assert(Theory.isNoteLength(noteLength));
                 AssertUtil.assert(Guard.isUndefined(noteCount) || Guard.isNumber(noteCount) && noteCount >= 0);
-                ticks += RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
+                ticks += Theory.RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
                 return helper;
             },
             measures: (measureCount) => {
@@ -1030,7 +1030,7 @@ export class DocumentBuilder {
      * @param verticalPosition - Vertical position, are elements added above, below or both.
      * @returns - This document builder instance.
      */
-    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPosition | `${VerticalPosition}` = VerticalPosition.Auto): DocumentBuilder {
+    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: Types.VerticalPosition | `${Types.VerticalPosition}` = Types.VerticalPosition.Auto): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addStaffGroup", groupName, staffsTabsAndGroups, verticalPosition);
 
         AssertUtil.assert(
@@ -1039,10 +1039,10 @@ export class DocumentBuilder {
                 Guard.isNonEmptyString(staffsTabsAndGroups) || Guard.isIntegerGte(staffsTabsAndGroups, 0) ||
                 Guard.isNonEmptyArray(staffsTabsAndGroups) && staffsTabsAndGroups.every(line => Guard.isNonEmptyString(line) || Guard.isIntegerGte(line, 0))
             ),
-            Guard.isEnumValue(verticalPosition, VerticalPosition)
+            Guard.isEnumValue(verticalPosition, Types.VerticalPosition)
         );
 
-        this.doc.addStaffGroup(groupName, staffsTabsAndGroups, verticalPosition as VerticalPosition);
+        this.doc.addStaffGroup(groupName, staffsTabsAndGroups, verticalPosition as Types.VerticalPosition);
 
         return this;
     }
@@ -1082,10 +1082,10 @@ export class DocumentBuilder {
      * @param voiceId - Voice id to add rests to. Single value, array or all if omitted.
      * @returns - This document builder instance.
      */
-    fillWithRests(...voiceId: VoiceId[]): DocumentBuilder {
+    fillWithRests(...voiceId: Types.VoiceId[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "fillWithRests", ...voiceId);
 
-        AssertUtil.assert(Guard.isArray(voiceId) && (voiceId.length === 0 || voiceId.every(id => isVoiceId(id))));
+        AssertUtil.assert(Guard.isArray(voiceId) && (voiceId.length === 0 || voiceId.every(id => Types.isVoiceId(id))));
 
         this.getMeasure().fillWithRests(...voiceId);
         return this;
@@ -1098,7 +1098,7 @@ export class DocumentBuilder {
      * @param numOctaves - Number of octaves to add.
      * @returns - This document builder instance.
      */
-    addScaleArpeggio(scale: Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
+    addScaleArpeggio(scale: Theory.Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addScaleArpeggio", scale, bottomNote, numOctaves);
 
         AssertUtil.assert(
@@ -1117,7 +1117,7 @@ export class DocumentBuilder {
             let note = notes[i];
 
             this.addNote(0, note, ts.beatLength);
-            this.addAnnotation(LabelAnnotation.PitchLabel, note.formatOmitOctave(SymbolSet.Unicode));
+            this.addAnnotation(Types.LabelAnnotation.PitchLabel, note.formatOmitOctave(Theory.SymbolSet.Unicode));
         }
         return this;
     }
