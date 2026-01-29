@@ -2,7 +2,7 @@ import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { Annotation, AnnotationText, Arpeggio, BaseConfig, Clef, Connective, Fermata, getStringNumbers, isStringNumber, isVerseNumber, isVoiceId, Label, LabelAnnotation, LyricsAlign, LyricsHyphen, LyricsOptions, MeasureOptions, Navigation, NoteAnchor, NoteOptions, RestOptions, ScoreConfiguration, StaffConfig, StaffPreset, StaffTabOrGroups, Stem, TabConfig, TemporalAnnotation, TieType, TupletOptions, VerseNumber, VerticalPosition, VoiceId } from "./types";
 import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
-import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio, validateNoteLength, validateTupletRatio } from "web-music-score/theory";
+import { BeamGrouping, isNoteLength, isTupletRatio, KeySignature, Note, NoteLength, NoteLengthStr, RhythmProps, Scale, ScaleType, SymbolSet, TimeSignature, TimeSignatures, TuningNameList, TupletRatio } from "web-music-score/theory";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
