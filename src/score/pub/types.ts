@@ -532,7 +532,7 @@ export enum MiscAnnotation {
     cue_notes = "cue notes",
 }
 
-/** Known annotation test type. */
+/** Known annotation text type. */
 export type AnnotationText =
     `${NavigationAnnotation}` |
     `${DynamicsAnnotation}` |
