@@ -771,7 +771,6 @@ export class DocumentBuilder {
     addAnnotation(annotation: Annotation | `${Annotation}`, annotationText: string): DocumentBuilder;
     /**
      * Add label annotation to current measure.
-     * @param annotation - Annotation type.
      * @param labelAnnotation - Label annotation type.
      * @param labelText - Label text.
      * @returns - This document builder instance.
@@ -831,7 +830,6 @@ export class DocumentBuilder {
     /**
      * Add label annotation to current measure.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param annotation - Annotation type.
      * @param labelAnnotation - Label annotation type.
      * @param labelText - Label text.
      * @returns - This document builder instance.
