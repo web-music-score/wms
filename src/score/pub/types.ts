@@ -373,7 +373,6 @@ export enum TempoAnnotation {
     a_tempo = "a tempo",
     /** flexible tempo */
     rubato = "rubato",
-    // fermata currently in Articulation
     /** very slow */
     Largo = "Largo",
     /** slow */
