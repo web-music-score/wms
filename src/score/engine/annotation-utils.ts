@@ -1,6 +1,8 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation, LabelAnnotation } from "../pub";
+import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation, LabelAnnotation, NavigationAnnotation, ColorKey } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
+import { LayoutGroupId, VerticalPos } from "./layout-object";
+import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 
 export function getNavigationString(navigation: Navigation): string {
     switch (navigation) {
@@ -26,6 +28,55 @@ export function getAnnotationTextReplacement(text: string): string {
     return text;
 }
 
+export function getAnnotationLayoutGroupId(annotation: Annotation, annotationText: string): LayoutGroupId {
+    switch (annotation) {
+        case Annotation.Dynamics:
+            return LayoutGroupId.Annotation_Dynamics;
+        case Annotation.Tempo:
+            return LayoutGroupId.Annotation_Tempo;
+        case Annotation.Navigation:
+            if (annotationText === NavigationAnnotation.Ending)
+                return LayoutGroupId.Annotation_Ending;
+            return LayoutGroupId.Annotation_Navigation;
+        case Annotation.Label:
+            if (annotationText === LabelAnnotation.ChordLabel)
+                return LayoutGroupId.Annotation_ChordLabel;
+            if (annotationText === LabelAnnotation.PitchLabel)
+                return LayoutGroupId.Annotation_PitchLabel;
+            break;
+        case Annotation.Temporal:
+            if (annotationText === TemporalAnnotation.fermata || annotationText === TemporalAnnotation.measureEndFermata)
+                return LayoutGroupId.Annotation_Fermata;
+            break;
+    }
+
+    return LayoutGroupId.Annotation_Misc
+}
+
+export function getAnnotationDefaultVerticalPos(annotation: Annotation, annotationText: string): VerticalPos {
+    if (annotationText === LabelAnnotation.PitchLabel)
+        return VerticalPos.Below;
+
+    return VerticalPos.Above;
+}
+
+function fromStaffColor(line: ObjNotationLine, staffColor: ColorKey): string {
+    return line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) : staffColor;
+}
+
+export function getAnnotationColor(line: ObjNotationLine, annotation: Annotation, annotationText: string): string {
+    if (annotation === Annotation.Navigation)
+        return fromStaffColor(line, "staff.element.navigation");
+
+    if (annotation === Annotation.Label)
+        return fromStaffColor(line, "staff.element.label");
+
+    if (annotationText === TemporalAnnotation.fermata || annotationText === TemporalAnnotation.measureEndFermata)
+        return fromStaffColor(line, "staff.element.fermata");
+
+    return fromStaffColor(line, "staff.element.annotation");
+}
+
 export function isDynamicsText(text: string): text is `${DynamicsAnnotation}` {
     return Guard.isEnumValue(text, DynamicsAnnotation);
 }
@@ -44,7 +95,7 @@ export function isTempoText(text: string): text is `${TempoAnnotation}` {
     return Guard.isEnumValue(text, TempoAnnotation);
 }
 
-export function getAnnotation(text: string): Annotation | undefined {
+function _getAnnotation(text: string): Annotation | undefined {
     if (Guard.isEnumValue(text, Navigation)) {
         return Annotation.Navigation;
     }
@@ -79,4 +130,11 @@ export function getAnnotation(text: string): Annotation | undefined {
     else {
         return undefined;
     }
+}
+
+// Cache annotations.
+const annotationMap = new UniMap<string, Annotation | undefined>();
+
+export function getAnnotation(text: string): Annotation | undefined {
+    return annotationMap.getOrCreate(text, () => _getAnnotation(text));
 }

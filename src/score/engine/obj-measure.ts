@@ -1,8 +1,8 @@
 import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRect } from "@tspro/ts-utils-lib";
-import { getScale, Scale, validateScaleType, Note, NoteLength, RhythmProps, KeySignature, getDefaultKeySignature, PitchNotation, SymbolSet, TupletRatio, NoteLengthStr, validateNoteLength, NoteLengthProps } from "web-music-score/theory";
+import * as Theory from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Navigation, NoteOptions, RestOptions, Stem, Annotation, Label, StringNumber, MMeasure, getVoiceIds, VoiceId, Connective, NoteAnchor, TieType, VerticalPosition, StaffTabOrGroups, StaffTabOrGroup, VerseNumber, LyricsOptions, MeasureOptions, validateVoiceId, colorKey, ArticulationAnnotation, TemporalAnnotation, LabelAnnotation } from "../pub";
+import * as Pub from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
@@ -15,11 +15,11 @@ import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
-import { ObjText, TextProps } from "./obj-text";
+import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationTextReplacement, getNavigationString } from "./annotation-utils";
+import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationTextReplacement, getNavigationString } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -38,12 +38,12 @@ export function getExtensionAnchorY(linePos: ExtensionLinePos) {
 type AlterTempo = {
     beatsPerMinute: number,
     options?: {
-        beatLength: NoteLength,
+        beatLength: Theory.NoteLength,
         dotCount?: number
     }
 }
 
-function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLengthStr | number)[]): number {
+function getExtensionTicks(extensionLength: number | Theory.NoteLengthStr | (Theory.NoteLengthStr | number)[]): number {
     if (typeof extensionLength === "string") {
         extensionLength = [extensionLength];
     }
@@ -54,7 +54,7 @@ function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLength
             let num = extensionLength[i + 1];
             if (typeof str === "string") {
                 i++;
-                let ticks = RhythmProps.get(str).ticks;
+                let ticks = Theory.RhythmProps.get(str).ticks;
                 if (typeof num === "number") {
                     i++;
                     ticks *= num;
@@ -72,7 +72,7 @@ function getExtensionTicks(extensionLength: number | NoteLengthStr | (NoteLength
     }
 }
 
-function getVerseLayoutGroupId(verse: VerseNumber): LayoutGroupId {
+function getVerseLayoutGroupId(verse: Pub.VerseNumber): LayoutGroupId {
     switch (verse) {
         case 1: return LayoutGroupId.LyricsVerse1;
         case 2: return LayoutGroupId.LyricsVerse2;
@@ -80,22 +80,6 @@ function getVerseLayoutGroupId(verse: VerseNumber): LayoutGroupId {
         default:
             throw new MusicError(MusicErrorType.Unknown, "VerseNumber is not 1, 2 or 3.");
     }
-}
-
-const AnnotationGroupIdMap = new UniMap<Annotation, LayoutGroupId>([
-    [Annotation.Navigation, LayoutGroupId.Annotation_Navigation],
-    [Annotation.Dynamics, LayoutGroupId.Annotation_Dynamics],
-    [Annotation.Tempo, LayoutGroupId.Annotation_Tempo],
-]);
-
-function getAnnotationLayoutGroupId(a: Annotation, text: string): LayoutGroupId {
-    if (
-        text === ArticulationAnnotation.fermata || text === ArticulationAnnotation.measureEndFermata ||
-        text === TemporalAnnotation.fermata || text === TemporalAnnotation.measureEndFermata
-    ) {
-        return LayoutGroupId.Annotation_Fermata;
-    }
-    return AnnotationGroupIdMap.getOrDefault(a, LayoutGroupId.Annotation_Misc);
 }
 
 class MeasureRegions {
@@ -115,11 +99,11 @@ export class ObjMeasure extends MusicObject {
     private prevMeasure: ObjMeasure | undefined;
     private nextMeasure: ObjMeasure | undefined;
 
-    private keySignature: KeySignature = getDefaultKeySignature();
+    private keySignature: Theory.KeySignature = Theory.getDefaultKeySignature();
     private timeSignature: TimeSignature = getDefaultTimeSignature();
     private tempo: Tempo = getDefaultTempo();
 
-    private alterKeySignature?: KeySignature;
+    private alterKeySignature?: Theory.KeySignature;
     private alterTimeSignature?: TimeSignature;
     private alterTempo?: AlterTempo;
 
@@ -151,21 +135,21 @@ export class ObjMeasure extends MusicObject {
 
     private needBeamsUpdate = true;
 
-    private navigationSet = new ValueSet<Navigation>();
+    private navigationSet = new ValueSet<Pub.NavigationAnnotation>();
     private isEndSong: boolean = false;
     private isEndSection: boolean = false;
     private endRepeatPlayCount: number = 2; // play twice.
     private endRepeatPlayCountText?: ObjText;
 
     private staticObjectsCache = new UniMap<ObjNotationLine, MusicObject[]>();
-    private lyricsObjectsCache = new TriMap<ObjNotationLine, VerticalPos, VerseNumber, ObjLyrics[]>();
+    private lyricsObjectsCache = new TriMap<ObjNotationLine, VerticalPos, Pub.VerseNumber, ObjLyrics[]>();
 
-    readonly mi: MMeasure;
+    readonly mi: Pub.MMeasure;
 
-    constructor(readonly row: ObjScoreRow, private readonly options: MeasureOptions) {
+    constructor(readonly row: ObjScoreRow, private readonly options: Pub.MeasureOptions) {
         super(row);
 
-        this.mi = new MMeasure(this);
+        this.mi = new Pub.MMeasure(this);
 
         // Set prevMeasure
         this.prevMeasure = row.doc.getLastMeasure();
@@ -191,7 +175,7 @@ export class ObjMeasure extends MusicObject {
 
     }
 
-    getMusicInterface(): MMeasure {
+    getMusicInterface(): Pub.MMeasure {
         return this.mi;
     }
 
@@ -219,19 +203,19 @@ export class ObjMeasure extends MusicObject {
         return this.passCount;
     }
 
-    updateRunningArguments(runningArgs?: { diatonicId: number, stemDir: Stem, stringNumbers: StringNumber[] }[/* voiceId */]) {
+    updateRunningArguments(runningArgs?: { diatonicId: number, stemDir: Pub.Stem, stringNumbers: Pub.StringNumber[] }[/* voiceId */]) {
         runningArgs ??= [];
 
-        let numVoices = Utils.Math.sum(getVoiceIds().map(voiceId => this.getVoiceSymbols(voiceId).length > 0 ? 1 : 0));
+        let numVoices = Utils.Math.sum(Pub.getVoiceIds().map(voiceId => this.getVoiceSymbols(voiceId).length > 0 ? 1 : 0));
 
-        getVoiceIds().forEach(voiceId => {
+        Pub.getVoiceIds().forEach(voiceId => {
             const getDefaultDiatonicId = (): number => {
                 let staves = this.row.getStaves().filter(staff => staff.containsVoiceId(voiceId));
                 let tabs = this.row.getTabs().filter(tab => tab.containsVoiceId(voiceId));
-                return staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Note.getNote("G4").diatonicId;
+                return staves.length > 0 ? staves[0].middleLineDiatonicId : tabs.length > 0 ? tabs[0].getTuningStrings()[3].diatonicId : Theory.Note.getNote("G4").diatonicId;
             }
-            const getDefaultStemDir = (): Stem => Stem.Auto;
-            const getDefaultStringNumbers = (): StringNumber[] => [];
+            const getDefaultStemDir = (): Pub.Stem => Pub.Stem.Auto;
+            const getDefaultStringNumbers = (): Pub.StringNumber[] => [];
 
             let args = runningArgs[voiceId] ??= {
                 diatonicId: getDefaultDiatonicId(),
@@ -255,30 +239,30 @@ export class ObjMeasure extends MusicObject {
                     }
 
                     switch (sym.options?.stem) {
-                        case Stem.Up:
+                        case Pub.Stem.Up:
                         case "up":
-                            args.stemDir = Stem.Up;
+                            args.stemDir = Pub.Stem.Up;
                             break;
-                        case Stem.Down:
+                        case Pub.Stem.Down:
                         case "down":
-                            args.stemDir = Stem.Down;
+                            args.stemDir = Pub.Stem.Down;
                             break;
-                        case Stem.Auto:
+                        case Pub.Stem.Auto:
                         case "auto":
-                            args.stemDir = Stem.Auto;
+                            args.stemDir = Pub.Stem.Auto;
                             break;
                     }
                 }
 
                 let beamSymbols = sym.getBeamGroup()?.getSymbols();
-                let setStemDir: Stem.Up | Stem.Down;
+                let setStemDir: Pub.Stem.Up | Pub.Stem.Down;
 
                 if (beamSymbols === undefined) {
-                    setStemDir = args.stemDir === Stem.Auto ? this.row.solveAutoStemDir([sym]) : args.stemDir;
+                    setStemDir = args.stemDir === Pub.Stem.Auto ? this.row.solveAutoStemDir([sym]) : args.stemDir;
                 }
                 else {
                     if (sym === beamSymbols[0]) {
-                        setStemDir = args.stemDir === Stem.Auto ? this.row.solveAutoStemDir(beamSymbols) : args.stemDir;
+                        setStemDir = args.stemDir === Pub.Stem.Auto ? this.row.solveAutoStemDir(beamSymbols) : args.stemDir;
                     }
                     else {
                         setStemDir = beamSymbols[0].stemDir;
@@ -419,21 +403,21 @@ export class ObjMeasure extends MusicObject {
     setKeySignature(...args: unknown[]): void {
         this.getPrevMeasure()?.endSection();
 
-        if (args[0] instanceof KeySignature) {
+        if (args[0] instanceof Theory.KeySignature) {
             this.alterKeySignature = args[0];
         }
-        else if (args[0] instanceof Scale) {
+        else if (args[0] instanceof Theory.Scale) {
             this.alterKeySignature = args[0];
         }
         else if (Guard.isNonEmptyString(args[0])) {
             if (args.length === 1) {
-                this.alterKeySignature = getScale(args[0]);
+                this.alterKeySignature = Theory.getScale(args[0]);
             }
             else if (args.length === 2) {
                 try {
                     let tonic = "" + args[0];
-                    let scaleType = validateScaleType("" + args[1]);
-                    this.alterKeySignature = getScale(tonic, scaleType);
+                    let scaleType = Theory.validateScaleType("" + args[1]);
+                    this.alterKeySignature = Theory.getScale(tonic, scaleType);
                 }
                 catch (e) {
                     throw new MusicError(MusicErrorType.Score, "Cannot set key signature because invalid args: " + args);
@@ -445,7 +429,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     updateKeySignature() {
-        this.keySignature = this.prevMeasure ? this.prevMeasure.keySignature : getDefaultKeySignature();
+        this.keySignature = this.prevMeasure ? this.prevMeasure.keySignature : Theory.getDefaultKeySignature();
 
         if (this.alterKeySignature) {
             this.keySignature = this.alterKeySignature;
@@ -488,17 +472,17 @@ export class ObjMeasure extends MusicObject {
         return this.tempo;
     }
 
-    setTempo(beatsPerMinute: number, beatLength?: NoteLength | NoteLengthStr) {
+    setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLength | Theory.NoteLengthStr) {
         this.getPrevMeasure()?.endSection();
 
         if (beatLength === undefined) {
             this.alterTempo = { beatsPerMinute }
         }
         else {
-            let dotCount = NoteLengthProps.get(beatLength).dotCount;
+            let dotCount = Theory.NoteLengthProps.get(beatLength).dotCount;
 
             let options = {
-                beatLength: validateNoteLength(beatLength),
+                beatLength: Theory.validateNoteLength(beatLength),
                 dotCount: dotCount > 0 ? dotCount : undefined
             }
 
@@ -514,7 +498,7 @@ export class ObjMeasure extends MusicObject {
         if (this.alterTempo) {
             let beatsPerMinute = this.alterTempo.beatsPerMinute;
 
-            let beatLength: NoteLength;
+            let beatLength: Theory.NoteLength;
             let dotCount: number;
 
             if (this.alterTempo.options) {
@@ -556,10 +540,10 @@ export class ObjMeasure extends MusicObject {
         return layoutObj;
     }
 
-    private forEachStaffGroup(staffTabOrGroups: StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, addFn: (line: ObjNotationLine, vpos: VerticalPos) => void) {
+    private forEachStaffGroup(staffTabOrGroups: Pub.StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, addFn: (line: ObjNotationLine, vpos: VerticalPos) => void) {
         const lines = this.row.getNotationLines();
 
-        const addToStaffTabOrGroup = (staffTabOrGroup: StaffTabOrGroup, vpos: VerticalPos, prevGroups: string[] = []): void => {
+        const addToStaffTabOrGroup = (staffTabOrGroup: Pub.StaffTabOrGroup, vpos: VerticalPos, prevGroups: string[] = []): void => {
             if (typeof staffTabOrGroup === "number") {
                 if (lines[staffTabOrGroup]) {
                     addFn(lines[staffTabOrGroup], vpos);
@@ -579,17 +563,17 @@ export class ObjMeasure extends MusicObject {
                         (Guard.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups])
                             .forEach(staffTabOrGroup => {
                                 switch (grp.verticalPosition) {
-                                    case VerticalPosition.Above:
+                                    case Pub.VerticalPosition.Above:
                                         addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Above, curGroups);
                                         break;
-                                    case VerticalPosition.Below:
+                                    case Pub.VerticalPosition.Below:
                                         addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Below, curGroups);
                                         break;
-                                    case VerticalPosition.Both:
+                                    case Pub.VerticalPosition.Both:
                                         addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Above, curGroups);
                                         addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Below, curGroups);
                                         break;
-                                    case VerticalPosition.Auto:
+                                    case Pub.VerticalPosition.Auto:
                                         addToStaffTabOrGroup(staffTabOrGroup, defaultVerticalPos, curGroups);
                                         break;
                                 }
@@ -619,125 +603,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    private addNavigation(staffTabOrGroups: StaffTabOrGroups | undefined, navigation: string, ...args: unknown[]): boolean {
-        if (!Guard.isEnumValue(navigation, Navigation))
-            return false;
-
-        let addLayoutObjectProps: {
-            createObj: (line: ObjNotationLine) => LayoutableMusicObject,
-            layoutGroupId: LayoutGroupId,
-            defaultVerticalPos: VerticalPos
-        } | undefined = undefined;
-
-        switch (navigation) {
-            case Navigation.Ending:
-                if (this.navigationSet.has(navigation)) {
-                    throw new MusicError(MusicErrorType.Score, "Cannot add ending beasure measure already has one.");
-                }
-                let anchor = this;
-                let passages = args as number[];
-                addLayoutObjectProps = {
-                    createObj: (line) => {
-                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
-                        return new ObjEnding(anchor, color, passages);
-                    },
-                    layoutGroupId: LayoutGroupId.Annotation_Ending,
-                    defaultVerticalPos: VerticalPos.Above
-                }
-                break;
-            case Navigation.DC_al_Coda:
-            case Navigation.DC_al_Fine:
-            case Navigation.DS_al_Coda:
-            case Navigation.DS_al_Fine: {
-                let anchor = this.barLineRight;
-                let text = getNavigationString(navigation);
-                addLayoutObjectProps = {
-                    createObj: (line) => {
-                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
-                        return new ObjText(anchor, { text, color }, 1, 1);
-                    },
-                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
-                    defaultVerticalPos: VerticalPos.Above
-                }
-                this.addNavigation(staffTabOrGroups, Navigation.EndRepeat);
-                this.endSong();
-                break;
-            }
-            case Navigation.Fine: {
-                let anchor = this.barLineRight;
-                let text = getNavigationString(navigation);
-                addLayoutObjectProps = {
-                    createObj: (line) => {
-                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
-                        return new ObjText(anchor, { text, color }, 1, 1);
-                    },
-                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
-                    defaultVerticalPos: VerticalPos.Above
-                }
-                break;
-            }
-            case Navigation.Segno:
-            case Navigation.Coda: {
-                let anchor = this.barLineLeft;
-                let text = getNavigationString(navigation);
-                addLayoutObjectProps = {
-                    createObj: (line) => {
-                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
-                        return new ObjSpecialText(anchor, text, color);
-                    },
-                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
-                    defaultVerticalPos: VerticalPos.Above
-                }
-                break;
-            }
-            case Navigation.toCoda: {
-                let anchor = this.barLineRight;
-                let text = getNavigationString(navigation);
-                addLayoutObjectProps = {
-                    createObj: (line) => {
-                        const color = line instanceof ObjTab ? colorKey("staff.element.navigation") : colorKey("tab.element.navigation");
-                        return new ObjSpecialText(anchor, text, color);
-                    },
-                    layoutGroupId: LayoutGroupId.Annotation_Navigation,
-                    defaultVerticalPos: VerticalPos.Above
-                }
-                break;
-            }
-            case Navigation.EndRepeat:
-                if (args.length === 0) {
-                    this.endRepeatPlayCount = 2;
-                }
-                else if (Guard.isIntegerGte(args[0], 2)) {
-                    this.endRepeatPlayCount = args[0];
-                }
-                else {
-                    throw new MusicError(MusicErrorType.Score, "Invalid end repeat play count (should be 2 or greater integer): " + args[0]);
-                }
-                if (this.endRepeatPlayCount !== 2) {
-                    const text = `${this.endRepeatPlayCount}x`;
-                    const textProps: TextProps = {
-                        text,
-                        scale: 0.8,
-                        color: colorKey("staff.frame")
-                    }
-                    this.endRepeatPlayCountText = new ObjText(this, textProps, 0.5, 1);
-                }
-                break;
-        }
-
-        if (addLayoutObjectProps) {
-            this.forEachStaffGroup(staffTabOrGroups, addLayoutObjectProps.defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-                this.addLayoutObject(addLayoutObjectProps.createObj(line), line, addLayoutObjectProps.layoutGroupId, vpos);
-            });
-        }
-
-        this.navigationSet.add(navigation as Navigation);
-        this.disableExtension();
-
-        return true;
-    }
-
-    hasNavigation(n: Navigation) {
+    hasNavigation(n: Pub.NavigationAnnotation) {
         return this.navigationSet.has(n);
     }
 
@@ -745,140 +611,174 @@ export class ObjMeasure extends MusicObject {
         return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
     }
 
-    addAnnotation(staffTabOrGroups: StaffTabOrGroups | undefined, annotation: Annotation, text: string, ...args: unknown[]) {
-        // Handle navigations separately.
-        if (annotation === Annotation.Navigation) {
-            if (this.addNavigation(staffTabOrGroups, text, ...args))
-                return;
-            else
-                throw new MusicError(MusicErrorType.Score, `Invalid navigation: '${text}'`);
-        }
-
-        // Handle labels separately.
-        if (annotation === Annotation.Label) {
-            if (Guard.isEnumValue(text, LabelAnnotation)) {
-                this.addLabel(staffTabOrGroups, text, String(args[0]));
-                return;
-            }
-            else
-                throw new MusicError(MusicErrorType.Score, `Invalid navigation: '${text}'`);
-        }
-
-        let anchor: ObjBarLineRight | ObjRhythmColumn | undefined;
-
-        switch (text) {
-            case TemporalAnnotation.measureEndFermata:
-            case ArticulationAnnotation.measureEndFermata:
-                anchor = this.barLineRight;
-                break;
-            default:
-                anchor = this.lastAddedRhythmColumn;
-                break;
-        }
-
-        if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, `Annotation anchor is undefined.`);
-        }
-        else if (text === "") {
+    addAnnotation(staffTabOrGroups: Pub.StaffTabOrGroups | undefined, annotation: Pub.Annotation, annotationText: string, ...args: unknown[]) {
+        if (!Guard.isNonEmptyString(annotationText))
             throw new MusicError(MusicErrorType.Score, `Annotation text is empty.`);
-        }
 
-        let defaultVerticalPos: VerticalPos = VerticalPos.Above;
-        let extensionLinePos: ExtensionLinePos = "bottom";
-        let italicText: boolean = true;
+        if (Guard.isEnumValue(annotationText, Pub.LabelAnnotation) && !Guard.isNonEmptyString(args[0]))
+            throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
 
         const anchorX = 0.5;
-        const anchorY = getExtensionAnchorY(extensionLinePos);
-        const layoutGroupId = getAnnotationLayoutGroupId(annotation, text);
+        const anchorY = getExtensionAnchorY("bottom");
 
-        let textProps: TextProps = {
-            text: getAnnotationTextReplacement(text),
-            italic: italicText
-        }
+        let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
-        this.disableExtension();
+        const getColor = (line: ObjNotationLine) => getAnnotationColor(line, annotation, annotationText);
 
-        this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? colorKey("tab.element.annotation") : colorKey("staff.element.annotation");
-            let layoutObj: LayoutObjectWrapper;
-            switch (text) {
-                case ArticulationAnnotation.fermata:
-                case ArticulationAnnotation.measureEndFermata: {
-                    // Create ObjFermata
-                    const fermataObj = new ObjFermata(anchor, vpos, color);
-                    layoutObj = this.addLayoutObject(fermataObj, line, LayoutGroupId.Annotation_Fermata, vpos);
-                    break;
+        const colAnchor = this.lastAddedRhythmColumn;
+
+        switch (annotationText) {
+            case Pub.NavigationAnnotation.Ending:
+                if (this.navigationSet.has(annotationText))
+                    throw new MusicError(MusicErrorType.Score, "Cannot add ending becaure measure already has one.");
+                createLayoutObject = (line) => {
+                    const anchor = this;
+                    const passages = args.map(arg => Number(arg));
+                    const color = getColor(line);
+                    return new ObjEnding(anchor, color, passages);
                 }
-                default: {
-                    // Create ObjText
-                    textProps.color = color;
-                    const textObj = new ObjText(anchor, textProps, anchorX, anchorY);
-                    layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos)
-                    break;
+                break;
+            case Pub.NavigationAnnotation.DC_al_Coda:
+            case Pub.NavigationAnnotation.DC_al_Fine:
+            case Pub.NavigationAnnotation.DS_al_Coda:
+            case Pub.NavigationAnnotation.DS_al_Fine:
+                createLayoutObject = (line) => {
+                    const anchor = this.barLineRight;
+                    const text = getNavigationString(annotationText);
+                    const color = getColor(line);
+                    return new ObjText(anchor, { text, color }, 1, 1);
+                }
+                this.addAnnotation(staffTabOrGroups, Pub.Annotation.Navigation, Pub.NavigationAnnotation.EndRepeat);
+                this.endSong();
+                break;
+            case Pub.NavigationAnnotation.Fine:
+                createLayoutObject = (line) => {
+                    const anchor = this.barLineRight;
+                    const text = getNavigationString(annotationText);
+                    const color = getColor(line);
+                    return new ObjText(anchor, { text, color }, 1, 1);
+                }
+                break;
+            case Pub.NavigationAnnotation.Segno:
+            case Pub.NavigationAnnotation.Coda:
+                createLayoutObject = (line) => {
+                    const anchor = this.barLineLeft;
+                    const text = getNavigationString(annotationText);
+                    const color = getColor(line);
+                    return new ObjSpecialText(anchor, text, color);
+                }
+                break;
+            case Pub.NavigationAnnotation.toCoda:
+                createLayoutObject = (line) => {
+                    const anchor = this.barLineRight;
+                    const text = getNavigationString(annotationText);
+                    const color = getColor(line);
+                    return new ObjSpecialText(anchor, text, color);
+                }
+                break;
+            case Pub.NavigationAnnotation.EndRepeat:
+                if (args.length === 0) {
+                    this.endRepeatPlayCount = 2;
+                }
+                else if (Guard.isIntegerGte(args[0], 2)) {
+                    this.endRepeatPlayCount = args[0];
+                }
+                else {
+                    throw new MusicError(MusicErrorType.Score, "Invalid repeat play count: " + args[0]);
+                }
+                if (this.endRepeatPlayCount !== 2) {
+                    const text = `${this.endRepeatPlayCount}x`;
+                    const color = Pub.colorKey("staff.frame");
+                    this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
+                }
+                break;
+            case Pub.NavigationAnnotation.StartRepeat:
+                break;
+            case Pub.TemporalAnnotation.fermata:
+                if (colAnchor) {
+                    createLayoutObject = (line, vpos) => new ObjFermata(colAnchor, vpos, getColor(line));
+                }
+                break;
+            case Pub.TemporalAnnotation.measureEndFermata:
+                createLayoutObject = (line, vpos) => {
+                    const anchor = this.barLineRight;
+                    return new ObjFermata(anchor, vpos, getColor(line));
+                }
+                break;
+            case Pub.LabelAnnotation.ChordLabel: {
+                if (colAnchor) {
+                    createLayoutObject = (line, vpos) => {
+                        const color = getColor(line);
+                        const text = String(args[0]);
+                        return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
+                    }
+                }
+                break;
+            }
+            case Pub.LabelAnnotation.PitchLabel: {
+                if (colAnchor) {
+                    createLayoutObject = (line, vpos) => {
+                        const color = getColor(line);
+                        const text = String(args[0]);
+                        return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
+                    }
+                }
+                break;
+            }
+            default: {
+                if (colAnchor) {
+                    createLayoutObject = (line, vpos) => {
+                        const color = getColor(line);
+                        const text = getAnnotationTextReplacement(annotationText);
+                        return new ObjText(colAnchor, { text, color, italic: true }, anchorX, anchorY);
+                    }
                 }
             }
-            this.enableExtension(layoutObj, color);
-        });
+        }
+
+        this.disableExtensionLine();
+
+        if (createLayoutObject) {
+            const layoutGroupId = getAnnotationLayoutGroupId(annotation, annotationText);
+            const defaultVerticalPos = getAnnotationDefaultVerticalPos(annotation, annotationText);
+
+            this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+                const layoutObj = this.addLayoutObject(createLayoutObject(line, vpos), line, layoutGroupId, vpos);
+                this.enableExtensionLine(layoutObj, getColor(line));
+            });
+        }
+
+        if (Guard.isEnumValue(annotationText, Pub.NavigationAnnotation))
+            this.navigationSet.add(annotationText);
     }
 
-    private addLabel(staffTabOrGroups: StaffTabOrGroups | undefined, label: LabelAnnotation, text: string) {
-        let anchor = this.lastAddedRhythmColumn;
-
-        if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add label because anchor is undefined.");
-        }
-        else if (text.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
-        }
-
-        let textProps: TextProps = { text }
-
-        let layoutGroupId: LayoutGroupId;
-        let defaultVerticalPos: VerticalPos;
-
-        switch (label) {
-            case LabelAnnotation.PitchLabel: layoutGroupId = LayoutGroupId.Annotation_PitchLabel; defaultVerticalPos = VerticalPos.Below; break;
-            case LabelAnnotation.ChordLabel: layoutGroupId = LayoutGroupId.Annotation_ChordLabel; defaultVerticalPos = VerticalPos.Above; break;
-        }
-
-        this.disableExtension();
-
-        this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
-            const color = line instanceof ObjTab ? colorKey("staff.element.label") : colorKey("tab.element.label");
-            textProps.color = color;
-            let textObj = new ObjText(anchor, textProps, 0.5, 1);
-            const layoutObj = this.addLayoutObject(textObj, line, layoutGroupId, vpos);
-            this.enableExtension(layoutObj, color);
-        });
-    }
-
-    addConnective(connective: Connective.Tie, tieSpan?: number | TieType, notAnchor?: NoteAnchor): void;
-    addConnective(connective: Connective.Slur, slurSpan?: number, notAnchor?: NoteAnchor): void;
-    addConnective(connective: Connective.Slide, notAnchor?: NoteAnchor): void;
-    addConnective(connective: Connective, ...args: unknown[]): void {
+    addConnective(connective: Pub.Connective.Tie, tieSpan?: number | Pub.TieType, notAnchor?: Pub.NoteAnchor): void;
+    addConnective(connective: Pub.Connective.Slur, slurSpan?: number, notAnchor?: Pub.NoteAnchor): void;
+    addConnective(connective: Pub.Connective.Slide, notAnchor?: Pub.NoteAnchor): void;
+    addConnective(connective: Pub.Connective, ...args: unknown[]): void {
         let anchor = this.lastAddedRhythmSymbol;
 
         if (!(anchor instanceof ObjNoteGroup)) {
             throw new MusicError(MusicErrorType.Score, "Connective can be added to note group only.");
         }
 
-        if (connective === Connective.Tie) {
-            let tieSpan = Guard.isInteger(args[0]) || Guard.isEnumValue(args[0], TieType) ? args[0] : 2;
-            let noteAnchor = Guard.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Connective.Tie, tieSpan, noteAnchor, anchor));
+        if (connective === Pub.Connective.Tie) {
+            let tieSpan = Guard.isInteger(args[0]) || Guard.isEnumValue(args[0], Pub.TieType) ? args[0] : 2;
+            let noteAnchor = Guard.isEnumValue(args[1], Pub.NoteAnchor) ? args[1] : Pub.NoteAnchor.Auto;
+            anchor.startConnective(new ConnectiveProps(Pub.Connective.Tie, tieSpan, noteAnchor, anchor));
         }
-        else if (connective === Connective.Slur) {
+        else if (connective === Pub.Connective.Slur) {
             let slurSpan = Guard.isInteger(args[0]) ? args[0] : 2;
-            let noteAnchor = Guard.isEnumValue(args[1], NoteAnchor) ? args[1] : NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Connective.Slur, slurSpan, noteAnchor, anchor));
+            let noteAnchor = Guard.isEnumValue(args[1], Pub.NoteAnchor) ? args[1] : Pub.NoteAnchor.Auto;
+            anchor.startConnective(new ConnectiveProps(Pub.Connective.Slur, slurSpan, noteAnchor, anchor));
         }
-        else if (connective === Connective.Slide) {
-            let noteAnchor = Guard.isEnumValue(args[0], NoteAnchor) ? args[0] : NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Connective.Slide, 2, noteAnchor, anchor));
+        else if (connective === Pub.Connective.Slide) {
+            let noteAnchor = Guard.isEnumValue(args[0], Pub.NoteAnchor) ? args[0] : Pub.NoteAnchor.Auto;
+            anchor.startConnective(new ConnectiveProps(Pub.Connective.Slide, 2, noteAnchor, anchor));
         }
     }
 
-    addExtension(extensionLength: number | NoteLengthStr | (NoteLengthStr | number)[], extensionVisible: boolean) {
+    addExtension(extensionLength: number | Theory.NoteLengthStr | (Theory.NoteLengthStr | number)[], extensionVisible: boolean) {
         this.addExtensionTo.forEach(data => {
             const { layoutObj, color } = data;
             const { musicObj } = layoutObj;
@@ -903,15 +803,15 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
         }
 
-        this.disableExtension();
+        this.disableExtensionLine();
         this.requestLayout();
     }
 
-    private enableExtension(layoutObj: LayoutObjectWrapper, color: string) {
+    private enableExtensionLine(layoutObj: LayoutObjectWrapper, color: string) {
         this.addExtensionTo.push({ layoutObj, color });
     }
 
-    private disableExtension() {
+    private disableExtensionLine() {
         this.addExtensionTo = [];
     }
 
@@ -926,7 +826,7 @@ export class ObjMeasure extends MusicObject {
     endSong() {
         this.isEndSong = true;
         this.requestLayout();
-        this.disableExtension();
+        this.disableExtensionLine();
     }
 
     hasEndSong() {
@@ -936,7 +836,7 @@ export class ObjMeasure extends MusicObject {
     endSection() {
         this.isEndSection = true;
         this.requestLayout();
-        this.disableExtension();
+        this.disableExtensionLine();
     }
 
     hasEndSection() {
@@ -945,7 +845,7 @@ export class ObjMeasure extends MusicObject {
 
     endRow() {
         this.doc.requestNewRow();
-        this.disableExtension();
+        this.disableExtensionLine();
     }
 
     private addRhythmSymbol(symbol: RhythmSymbol) {
@@ -965,26 +865,26 @@ export class ObjMeasure extends MusicObject {
         this.lastAddedRhythmSymbol = symbol;
     }
 
-    addNoteGroup(voiceId: VoiceId, notes: (Note | string)[], noteLength: NoteLength | NoteLengthStr, options?: NoteOptions, tupletRatio?: TupletRatio): ObjNoteGroup {
-        let realNotes = notes.map(note => typeof note === "string" ? Note.getNote(note) : note);
+    addNoteGroup(voiceId: Pub.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, options?: Pub.NoteOptions, tupletRatio?: Theory.TupletRatio): ObjNoteGroup {
+        let realNotes = notes.map(note => typeof note === "string" ? Theory.Note.getNote(note) : note);
         let col = this.getRhythmColumn(voiceId);
         let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio);
         this.addRhythmSymbol(noteGroup);
         return noteGroup;
     }
 
-    addRest(voiceId: VoiceId, restLength: NoteLength | NoteLengthStr, options?: RestOptions, tupletRatio?: TupletRatio): ObjRest {
+    addRest(voiceId: Pub.VoiceId, restLength: Theory.NoteLength | Theory.NoteLengthStr, options?: Pub.RestOptions, tupletRatio?: Theory.TupletRatio): ObjRest {
         let col = this.getRhythmColumn(voiceId);
         let rest = new ObjRest(col, voiceId, restLength, options, tupletRatio);
         this.addRhythmSymbol(rest);
         return rest;
     }
 
-    addLyrics(staffTabOrGroups: StaffTabOrGroups | undefined, verse: VerseNumber, lyricsText: string, lyricsLength: NoteLength | NoteLengthStr, lyricsOptions: LyricsOptions) {
+    addLyrics(staffTabOrGroups: Pub.StaffTabOrGroups | undefined, verse: Pub.VerseNumber, lyricsText: string, lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions: Pub.LyricsOptions) {
         this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
             let col = this.getRhythmColumn({ verse, line, vpos });
 
-            let lyricsObj = new ObjLyrics(col, verse, line, vpos, validateNoteLength(lyricsLength), lyricsText, lyricsOptions);
+            let lyricsObj = new ObjLyrics(col, verse, line, vpos, Theory.validateNoteLength(lyricsLength), lyricsText, lyricsOptions);
 
             col.addLyricsObject(lyricsObj);
 
@@ -1006,7 +906,7 @@ export class ObjMeasure extends MusicObject {
      * @param positionTicks - get ObjRhythmColumn with positionTicks. Insert new if necessary.
      * @returns 
      */
-    private getRhythmColumn(arg: VoiceId | { verse: VerseNumber, line: ObjNotationLine, vpos: VerticalPos }): ObjRhythmColumn {
+    private getRhythmColumn(arg: Pub.VoiceId | { verse: Pub.VerseNumber, line: ObjNotationLine, vpos: VerticalPos }): ObjRhythmColumn {
         // Find next positionTicks for symbol in voiceId or lyrics object in verse.
         let positionTicks = 0;
 
@@ -1041,11 +941,11 @@ export class ObjMeasure extends MusicObject {
         return this.getTimeSignature().measureTicks;
     }
 
-    getConsumedTicks(voiceId?: VoiceId) {
+    getConsumedTicks(voiceId?: Pub.VoiceId) {
         let measureTicks = 0;
 
         this.columns.forEach(col => {
-            getVoiceIds().forEach(curVoiceId => {
+            Pub.getVoiceIds().forEach(curVoiceId => {
                 let symbol = col.getVoiceSymbol(curVoiceId);
                 if (symbol && (voiceId === undefined || voiceId === curVoiceId)) {
                     measureTicks = Math.max(measureTicks, col.positionTicks + symbol.rhythmProps.ticks);
@@ -1225,7 +1125,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     // Create triplets by triplet property of NoteOptions/RestOptions.
-    private createOldStyleTriplets(voiceId: VoiceId) {
+    private createOldStyleTriplets(voiceId: Pub.VoiceId) {
         let symbols = this.getVoiceSymbols(voiceId);
 
         for (let i = 0; i < symbols.length;) {
@@ -1268,7 +1168,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         // Recreate beams
-        getVoiceIds().forEach(voiceId => {
+        Pub.getVoiceIds().forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId).slice();
 
             if (symbols.length < 2) {
@@ -1296,7 +1196,7 @@ export class ObjMeasure extends MusicObject {
                     groupStartTicks = groupStartTicksSave;
 
                     beamGroupSize2.forEach(beamGroupSize3 => {
-                        let beamGroupTicks = beamGroupSize3 * NoteLengthProps.get("8n").ticks;
+                        let beamGroupTicks = beamGroupSize3 * Theory.NoteLengthProps.get("8n").ticks;
                         let groupEndTicks = groupStartTicks + beamGroupTicks;
 
                         let groupSymbols = symbols.filter(symbol => {
@@ -1336,11 +1236,11 @@ export class ObjMeasure extends MusicObject {
         return this.barLineRight;
     }
 
-    getVoiceSymbols(voiceId: VoiceId): ReadonlyArray<RhythmSymbol> {
+    getVoiceSymbols(voiceId: Pub.VoiceId): ReadonlyArray<RhythmSymbol> {
         return this.voiceSymbols.getAll(voiceId);
     }
 
-    fillWithRests(...voiceId: VoiceId[]) {
+    fillWithRests(...voiceId: Pub.VoiceId[]) {
         if (voiceId.length === 0) {
             if (this.getConsumedTicks() === 0) {
                 // Whole measure is empty, add rest to voice 0.
@@ -1348,7 +1248,7 @@ export class ObjMeasure extends MusicObject {
             }
             else {
                 // Measure is not empty, fill with rests for voices that are not empty.
-                this.fillWithRests(...getVoiceIds().filter(id => this.getConsumedTicks(id) > 0));
+                this.fillWithRests(...Pub.getVoiceIds().filter(id => this.getConsumedTicks(id) > 0));
             }
             return;
         }
@@ -1361,19 +1261,19 @@ export class ObjMeasure extends MusicObject {
             const id = voiceId[0];
 
             // Comlete rests for given voice.
-            validateVoiceId(id);
+            Pub.validateVoiceId(id);
 
             let measureTicks = this.getMeasureTicks();
             let consumedTicks = this.getConsumedTicks(id);
             let remainingTicks = measureTicks - consumedTicks;
 
-            let rests: RhythmProps[] = [];
+            let rests: Theory.RhythmProps[] = [];
 
             while (remainingTicks > 0) {
-                for (let noteSize = NoteLengthProps.LongestNoteSize; noteSize <= NoteLengthProps.ShortestNoteSize; noteSize *= 2) {
-                    let restLength = NoteLengthProps.create(noteSize).noteLength;
-                    for (let dotCount = NoteLengthProps.get(restLength).maxDotCount; dotCount >= 0; dotCount--) {
-                        let restProps = RhythmProps.get(restLength, dotCount);
+                for (let noteSize = Theory.NoteLengthProps.LongestNoteSize; noteSize <= Theory.NoteLengthProps.ShortestNoteSize; noteSize *= 2) {
+                    let restLength = Theory.NoteLengthProps.create(noteSize).noteLength;
+                    for (let dotCount = Theory.NoteLengthProps.get(restLength).maxDotCount; dotCount >= 0; dotCount--) {
+                        let restProps = Theory.RhythmProps.get(restLength, dotCount);
                         while (restProps.ticks <= remainingTicks) {
                             rests.push(restProps);
                             remainingTicks -= restProps.ticks;
@@ -1382,7 +1282,7 @@ export class ObjMeasure extends MusicObject {
                 }
             }
 
-            rests.reverse().forEach(rest => this.addRest(id, NoteLengthProps.create(rest.noteLength, rest.dotCount).noteLength));
+            rests.reverse().forEach(rest => this.addRest(id, Theory.NoteLengthProps.create(rest.noteLength, rest.dotCount).noteLength));
         }
     }
 
@@ -1457,7 +1357,7 @@ export class ObjMeasure extends MusicObject {
         });
 
         // Update tuplet rest staffPos
-        getVoiceIds().forEach(voiceId => {
+        Pub.getVoiceIds().forEach(voiceId => {
             const staff = this.row.getStaves()[0];
 
             if (!staff || !staff.containsVoiceId(voiceId))
@@ -1501,8 +1401,8 @@ export class ObjMeasure extends MusicObject {
         if (this.isFirstMeasureInRow()) {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    let note = tab.getTuningStrings()[stringId].format(PitchNotation.Helmholtz, SymbolSet.Unicode);
-                    let obj = new ObjText(this, { text: note, scale: 0.8, color: colorKey("tab.tuning") }, 1, 0.5);
+                    let note = tab.getTuningStrings()[stringId].format(Theory.PitchNotation.Helmholtz, Theory.SymbolSet.Unicode);
+                    let obj = new ObjText(this, { text: note, scale: 0.8, color: Pub.colorKey("tab.tuning") }, 1, 0.5);
 
                     obj.layout(view);
                     obj.setRight(this.regions.tabTuning_0 * 0.8);
@@ -1594,13 +1494,13 @@ export class ObjMeasure extends MusicObject {
         });
 
         // Reposition lonely rest in the middle of measure.
-        getVoiceIds().forEach(voiceId => {
+        Pub.getVoiceIds().forEach(voiceId => {
             const symbols = this.getVoiceSymbols(voiceId);
 
             const onlyRest = symbols.length === 1 && symbols[0] instanceof ObjRest ? symbols[0] : undefined;
             if (!onlyRest) return;
 
-            const isOnlySymbolInCol = getVoiceIds()
+            const isOnlySymbolInCol = Pub.getVoiceIds()
                 .map(voiceId => onlyRest.col.getVoiceSymbol(voiceId))
                 .filter(sym => sym !== undefined && sym !== onlyRest)
                 .length === 0;
@@ -1725,12 +1625,12 @@ export class ObjMeasure extends MusicObject {
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p), colorKey("staff.frame"));
+                    drawLine(line.getDiatonicIdY(p), Pub.colorKey("staff.frame"));
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId), colorKey("tab.frame"));
+                    drawLine(line.getStringY(stringId), Pub.colorKey("tab.frame"));
                 }
             }
         });
@@ -1747,7 +1647,7 @@ export class ObjMeasure extends MusicObject {
                 const top = tab.getTopLineY();
                 const bottom = tab.getBottomLineY();
 
-                view.color(colorKey("tab.frame"))
+                view.color(Pub.colorKey("tab.frame"))
                     .lineWidth(1)
                     .strokeLine(left, top, left, bottom);
             });
