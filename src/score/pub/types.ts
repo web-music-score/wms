@@ -310,7 +310,7 @@ export enum Annotation {
 }
 
 /** Navigation annotations */
-export enum Navigation {
+export enum NavigationAnnotation {
     /** Repeat back to beginning and play to the "Fine" marking. */
     DC_al_Fine = "D.C. al Fine",
     /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
@@ -334,6 +334,9 @@ export enum Navigation {
     /** Jump to ending with correct passage number. */
     Ending = "ending"
 }
+
+/** Export also as Navigation for support. */
+export { NavigationAnnotation as Navigation }
 
 /** Dynamic annotations */
 export enum DynamicsAnnotation {
@@ -531,7 +534,7 @@ export enum MiscAnnotation {
 
 /** Known annotation test type. */
 export type AnnotationText =
-    `${Navigation}` |
+    `${NavigationAnnotation}` |
     `${DynamicsAnnotation}` |
     `${TempoAnnotation}` |
     `${ArticulationAnnotation}` |
