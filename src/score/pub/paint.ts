@@ -31,7 +31,7 @@ export type ColorKey =
     "staff.signature.time" |
     "staff.signature.tempo" |
     "staff.signature.measurenum" |
-    "staff.element.fermata" |       // deprecated, belongs to "annotation"
+    "staff.element.fermata" |
     "staff.element.annotation" |
     "staff.element.navigation" |
     "staff.element.label" |
@@ -48,7 +48,7 @@ export type ColorKey =
     "tab.signature.time" |
     "tab.signature.tempo" |
     "tab.signature.measurenum" |
-    "tab.element.fermata" |         // deprecated, belongs to "annotation"
+    "tab.element.fermata" |
     "tab.element.annotation" |
     "tab.element.navigation" |
     "tab.element.label";
