@@ -406,9 +406,9 @@ export enum TempoAnnotation {
 
 /** Articulation annotations */
 export enum ArticulationAnnotation {
-    /** @deprecated - use TemporalAnnotation.fermata */
+    /** @deprecated - ArticulationAnnotation.fermata is deprecated, use TemporalAnnotation.fermata instead. */
     fermata = "fermata",
-    /** @deprecated - use TemporalAnnotation.measureEndFermata */
+    /** @deprecated - ArticulationAnnotation.measureEndFermata is deprecated, use TemporalAnnotation.measureEndFermata instead. */
     measureEndFermata = "measureEndFermata",
     /** short, detached */
     staccato = "staccato",
