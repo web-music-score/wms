@@ -7,8 +7,9 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
-import { getAnnotation } from "../engine/annotation-utils";
+import { resolveAnnotation } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated } from "shared-src";
+import { isEnumValueLoose, resolveEnumValue, resolveRequiredEnumValue } from "../engine/enum-utils";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
@@ -647,7 +648,7 @@ export class DocumentBuilder {
         return this.addLyricsInternal(staffTabOrGroups, verse, lyricsText, lyricsLength, lyricsOptions);
     }
 
-    private addFermataInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, fermata: Types.Fermata | `${Types.Fermata}`): DocumentBuilder {
+    private addFermataInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, fermata: Types.Fermata): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
         AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
         switch (fermata) {
@@ -671,7 +672,8 @@ export class DocumentBuilder {
         warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
 
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
-        return this.addFermataInternal(undefined, fermata);
+
+        return this.addFermataInternal(undefined, resolveRequiredEnumValue(fermata, Types.Fermata));
     }
 
     /**
@@ -685,7 +687,8 @@ export class DocumentBuilder {
         warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);
-        return this.addFermataInternal(staffTabOrGroups, fermata);
+
+        return this.addFermataInternal(staffTabOrGroups, resolveRequiredEnumValue(fermata, Types.Fermata));
     }
 
     /**
@@ -743,15 +746,21 @@ export class DocumentBuilder {
         return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Navigation, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, annotation: Types.Annotation | `${Types.Annotation}`, annotationText: string, ...args: unknown[]): DocumentBuilder {
+    private addAnnotationInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, annotation: Types.Annotation | undefined, annotationText: string, ...args: unknown[]): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         AssertUtil.assert(
-            Guard.isEnumValue(annotation, Types.Annotation),
+            Guard.isEnumValueOrUndefined(annotation, Types.Annotation),
             Guard.isNonEmptyString(annotationText)
         );
 
-        this.getMeasure().addAnnotation(staffTabOrGroups, annotation as Types.Annotation, annotationText, ...args);
+        if (!annotation) {
+            annotation = resolveAnnotation(annotationText);
+            if (!annotation)
+                throw new MusicError(MusicErrorType.Score, `Failed to resolve annotation from "${args[0]}".`);
+        }
+
+        this.getMeasure().addAnnotation(staffTabOrGroups, annotation, annotationText, ...args);
 
         return this;
     }
@@ -794,22 +803,14 @@ export class DocumentBuilder {
     addAnnotation(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
 
-        if (Guard.isNonEmptyString(args[0])) {
-            if (Guard.isEnumValue(args[0], Types.Annotation) && Guard.isNonEmptyString(args[1])) {
-                const annotation = args[0];
-                const text = args[1];
-                return this.addAnnotationInternal(undefined, annotation, text, ...args.slice(2));
-            }
-            const annotation = getAnnotation(args[0]);
-            if (!annotation)
-                throw new MusicError(MusicErrorType.Score, `Unknown annotation "${args[0]}".`);
-            const text = args[0];
-            return this.addAnnotationInternal(undefined, annotation, text, ...args.slice(1));
+        const annotation = resolveEnumValue(String(args[0]), Types.Annotation);
+        if (annotation) {
+            const annotationText = String(args[1]);
+            return this.addAnnotationInternal(undefined, annotation, annotationText, ...args.slice(2));
         }
 
-        AssertUtil.assert(false);
-
-        return this;
+        const annotationText = String(args[0]);
+        return this.addAnnotationInternal(undefined, undefined, annotationText, ...args.slice(1));
     }
 
     /**
@@ -855,25 +856,17 @@ export class DocumentBuilder {
     addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTabOrGroups, ...args);
 
-        if (Guard.isNonEmptyString(args[0])) {
-            if (Guard.isEnumValue(args[0], Types.Annotation) && Guard.isNonEmptyString(args[1])) {
-                const annotation = args[0];
-                const text = args[1];
-                return this.addAnnotationInternal(staffTabOrGroups, annotation, text, ...args.slice(2));
-            }
-            const annotation = getAnnotation(args[0]);
-            if (!annotation)
-                throw new MusicError(MusicErrorType.Score, `Unknown annotation "${args[0]}".`);
-            const text = args[0];
-            return this.addAnnotationInternal(staffTabOrGroups, annotation, text, ...args.slice(1));
+        const annotation = resolveEnumValue(String(args[0]), Types.Annotation);
+        if (annotation) {
+            const annotationText = String(args[1]);
+            return this.addAnnotationInternal(staffTabOrGroups, annotation, annotationText, ...args.slice(2));
         }
 
-        AssertUtil.assert(false);
-
-        return this;
+        const annotationText = String(args[0]);
+        return this.addAnnotationInternal(staffTabOrGroups, undefined, annotationText, ...args.slice(1));
     }
 
-    private addLabelInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
+    private addLabelInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, label: Types.Label, text: string): DocumentBuilder {
         assertStaffTabOrGRoups(staffTabOrGroups);
 
         AssertUtil.assert(
@@ -899,7 +892,7 @@ export class DocumentBuilder {
      */
     addLabel(label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLabel", label, text);
-        return this.addLabelInternal(undefined, label, text);
+        return this.addLabelInternal(undefined, resolveRequiredEnumValue(label, Types.Label), text);
     }
 
     /**
@@ -912,7 +905,7 @@ export class DocumentBuilder {
      */
     addLabelTo(staffTabOrGroups: Types.StaffTabOrGroups, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTabOrGroups, label, text);
-        return this.addLabelInternal(staffTabOrGroups, label, text);
+        return this.addLabelInternal(staffTabOrGroups, resolveRequiredEnumValue(label, Types.Label), text);
     }
 
     /**
