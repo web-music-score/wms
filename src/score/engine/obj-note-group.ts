@@ -152,7 +152,7 @@ export class ObjNoteGroup extends MusicObject {
     private runningStringNumbers: StringNumber[];
 
     readonly color: string;
-    readonly staccato: boolean;
+    readonly _staccato: boolean;
     readonly diamond: boolean;
     readonly arpeggio: Arpeggio | undefined;
     readonly oldStyleTriplet: boolean;
@@ -193,7 +193,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
         this.color = options?.color ?? colorKey("staff.note");
-        this.staccato = options?.staccato ?? false;
+        this._staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
@@ -217,6 +217,10 @@ export class ObjNoteGroup extends MusicObject {
 
     get row() {
         return this.col.row;
+    }
+
+    get staccato(): boolean {
+        return this._staccato || this.col.staccato;
     }
 
     get minDiatonicId(): number {

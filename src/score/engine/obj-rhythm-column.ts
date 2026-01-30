@@ -37,6 +37,8 @@ export class ObjRhythmColumn extends MusicObject {
     private arpeggioDir: Arpeggio | undefined;
     private arpeggios: ObjArpeggio[] = [];
 
+    private _staccato = false;
+
     private readonly playerProps: PlayerColumnProps;
 
     private needLayout = true;
@@ -151,6 +153,14 @@ export class ObjRhythmColumn extends MusicObject {
         }
 
         return []; // Do not return [this].
+    }
+
+    set staccato(b: true) {
+        this._staccato = b;
+    }
+
+    get staccato(): boolean {
+        return this._staccato;
     }
 
     hasArpeggio() {

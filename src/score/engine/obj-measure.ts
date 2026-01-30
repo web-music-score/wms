@@ -618,6 +618,11 @@ export class ObjMeasure extends MusicObject {
         if (Guard.isEnumValue(annotationText, Pub.LabelAnnotation) && !Guard.isNonEmptyString(args[0]))
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
 
+        if(annotationText === Pub.ArticulationAnnotation.staccato && this.lastAddedRhythmColumn) {
+            this.lastAddedRhythmColumn.staccato = true;
+            return;
+        }
+
         const anchorX = 0.5;
         const anchorY = getExtensionAnchorY("bottom");
 
