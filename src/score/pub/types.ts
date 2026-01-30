@@ -412,13 +412,13 @@ export enum ArticulationAnnotation {
     measureEndFermata = "measureEndFermata",
     /** short, detached */
     staccato = "staccato",
-    /** held for full value */
+    /** (—) – held for full value */
     tenuto = "tenuto",
-    /** emphasized */
+    /** (>) – emphasized */
     accent = "accent",
-    /** strongly accented */
+    /** (^) – strongly accented */
     marcato = "marcato",
-    /** smoothly connected */
+    /** (slur) smoothly connected */
     legato = "legato",
     /** gently separated (tenuto + staccato) */
     portato = "portato",
