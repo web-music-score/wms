@@ -197,11 +197,17 @@ export enum VerticalPosition {
     Both = "both"
 }
 
-/** Staff/tab/group type can be staff/tab index or staff/tab/group name. */
-export type StaffTabOrGroup = number | string;
+/** Identifier (index or name) for staff, tab, or group. */
+export type StaffTarget = number | string;
 
-/** Staff/tab/group snglevalue or array of values. */
-export type StaffTabOrGroups = StaffTabOrGroup | StaffTabOrGroup[];
+/** Single or multiple staff/tab/group identifiers. */
+export type StaffTargets = StaffTarget | StaffTarget[];
+
+/** @deprecated - StaffTabOrGroup is deprecated. Will be removed in future release. Use StaffTarget instead. */
+export type { StaffTarget as StaffTabOrGroup }
+
+/** @deprecated - StaffTabOrGroups is deprecated. Will be removed in future release. Use StaffTargets instead. */
+export type { StaffTargets as StaffTabOrGroups }
 
 /** Measure options. */
 export type MeasureOptions = {

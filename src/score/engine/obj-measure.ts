@@ -540,41 +540,41 @@ export class ObjMeasure extends MusicObject {
         return layoutObj;
     }
 
-    private forEachStaffGroup(staffTabOrGroups: Pub.StaffTabOrGroups | undefined, defaultVerticalPos: VerticalPos, addFn: (line: ObjNotationLine, vpos: VerticalPos) => void) {
+    private forEachStaffTarget(staffTargets: Pub.StaffTargets | undefined, defaultVerticalPos: VerticalPos, addFn: (line: ObjNotationLine, vpos: VerticalPos) => void) {
         const lines = this.row.getNotationLines();
 
-        const addToStaffTabOrGroup = (staffTabOrGroup: Pub.StaffTabOrGroup, vpos: VerticalPos, prevGroups: string[] = []): void => {
-            if (typeof staffTabOrGroup === "number") {
-                if (lines[staffTabOrGroup]) {
-                    addFn(lines[staffTabOrGroup], vpos);
+        const addToStaffTarget = (staffTarget: Pub.StaffTarget, vpos: VerticalPos, prevGroups: string[] = []): void => {
+            if (typeof staffTarget === "number") {
+                if (lines[staffTarget]) {
+                    addFn(lines[staffTarget], vpos);
                 }
             }
-            else if (typeof staffTabOrGroup === "string" && staffTabOrGroup.length > 0) {
-                let stavesAndTabs = lines.filter(l => l.name === staffTabOrGroup);
+            else if (typeof staffTarget === "string" && staffTarget.length > 0) {
+                let stavesAndTabs = lines.filter(l => l.name === staffTarget);
 
                 stavesAndTabs.forEach(line => addFn(line, vpos));
 
                 if (stavesAndTabs.length === 0) {
-                    let grp = this.doc.getStaffGroup(staffTabOrGroup);
+                    let grp = this.doc.getStaffGroup(staffTarget);
 
-                    if (grp && !prevGroups.includes(staffTabOrGroup)) {
-                        let curGroups = [...prevGroups, staffTabOrGroup];
+                    if (grp && !prevGroups.includes(staffTarget)) {
+                        let curGroups = [...prevGroups, staffTarget];
 
                         (Guard.isArray(grp.staffsTabsAndGroups) ? grp.staffsTabsAndGroups : [grp.staffsTabsAndGroups])
-                            .forEach(staffTabOrGroup => {
+                            .forEach(staffTarget => {
                                 switch (grp.verticalPosition) {
                                     case Pub.VerticalPosition.Above:
-                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Above, curGroups);
+                                        addToStaffTarget(staffTarget, VerticalPos.Above, curGroups);
                                         break;
                                     case Pub.VerticalPosition.Below:
-                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Below, curGroups);
+                                        addToStaffTarget(staffTarget, VerticalPos.Below, curGroups);
                                         break;
                                     case Pub.VerticalPosition.Both:
-                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Above, curGroups);
-                                        addToStaffTabOrGroup(staffTabOrGroup, VerticalPos.Below, curGroups);
+                                        addToStaffTarget(staffTarget, VerticalPos.Above, curGroups);
+                                        addToStaffTarget(staffTarget, VerticalPos.Below, curGroups);
                                         break;
                                     case Pub.VerticalPosition.Auto:
-                                        addToStaffTabOrGroup(staffTabOrGroup, defaultVerticalPos, curGroups);
+                                        addToStaffTarget(staffTarget, defaultVerticalPos, curGroups);
                                         break;
                                 }
                             });
@@ -583,23 +583,23 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        if (staffTabOrGroups === undefined) {
+        if (staffTargets === undefined) {
             if (
                 lines.length >= 2 &&
                 lines[0] instanceof ObjStaff && lines[1] instanceof ObjStaff &&
                 lines[0].staffConfig.grandId !== undefined && lines[0].staffConfig.grandId === lines[1].staffConfig.grandId
             ) {
-                addToStaffTabOrGroup(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
+                addToStaffTarget(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
             }
             else {
-                addToStaffTabOrGroup(0, defaultVerticalPos);
+                addToStaffTarget(0, defaultVerticalPos);
             }
         }
-        else if (Guard.isArray(staffTabOrGroups)) {
-            staffTabOrGroups.forEach(staffTabOrGroup => addToStaffTabOrGroup(staffTabOrGroup, defaultVerticalPos));
+        else if (Guard.isArray(staffTargets)) {
+            staffTargets.forEach(staffTarget => addToStaffTarget(staffTarget, defaultVerticalPos));
         }
         else {
-            addToStaffTabOrGroup(staffTabOrGroups, defaultVerticalPos);
+            addToStaffTarget(staffTargets, defaultVerticalPos);
         }
     }
 
@@ -611,7 +611,7 @@ export class ObjMeasure extends MusicObject {
         return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
     }
 
-    addAnnotation(staffTabOrGroups: Pub.StaffTabOrGroups | undefined, annotation: Pub.Annotation, annotationText: string, ...args: unknown[]) {
+    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotation: Pub.Annotation, annotationText: string, ...args: unknown[]) {
         if (!Guard.isNonEmptyString(annotationText))
             throw new MusicError(MusicErrorType.Score, `Annotation text is empty.`);
 
@@ -653,7 +653,7 @@ export class ObjMeasure extends MusicObject {
                     const color = getColor(line);
                     return new ObjText(anchor, { text, color }, 1, 1);
                 }
-                this.addAnnotation(staffTabOrGroups, Pub.Annotation.Navigation, Pub.NavigationAnnotation.EndRepeat);
+                this.addAnnotation(staffTargets, Pub.Annotation.Navigation, Pub.NavigationAnnotation.EndRepeat);
                 this.endSong();
                 break;
             case Pub.NavigationAnnotation.Fine:
@@ -747,7 +747,7 @@ export class ObjMeasure extends MusicObject {
             const layoutGroupId = getAnnotationLayoutGroupId(annotation, annotationText);
             const defaultVerticalPos = getAnnotationDefaultVerticalPos(annotation, annotationText);
 
-            this.forEachStaffGroup(staffTabOrGroups, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
+            this.forEachStaffTarget(staffTargets, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
                 const layoutObj = this.addLayoutObject(createLayoutObject(line, vpos), line, layoutGroupId, vpos);
                 this.enableExtensionLine(layoutObj, getColor(line));
             });
@@ -885,8 +885,8 @@ export class ObjMeasure extends MusicObject {
         return rest;
     }
 
-    addLyrics(staffTabOrGroups: Pub.StaffTabOrGroups | undefined, verse: Pub.VerseNumber, lyricsText: string, lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions: Pub.LyricsOptions) {
-        this.forEachStaffGroup(staffTabOrGroups, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
+    addLyrics(staffTargets: Pub.StaffTargets | undefined, verse: Pub.VerseNumber, lyricsText: string, lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions: Pub.LyricsOptions) {
+        this.forEachStaffTarget(staffTargets, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
             let col = this.getRhythmColumn({ verse, line, vpos });
 
             let lyricsObj = new ObjLyrics(col, verse, line, vpos, Theory.validateNoteLength(lyricsLength), lyricsText, lyricsOptions);

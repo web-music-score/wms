@@ -111,11 +111,10 @@ function assertMeasureOptions(measureOptions: Types.MeasureOptions) {
     );
 }
 
-function assertStaffTabOrGRoups(staffTabOrGroups: Types.StaffTabOrGroups | undefined) {
+function assertStaffTargets(staffTargets: Types.StaffTargets | undefined) {
     AssertUtil.assert(
-        Guard.isStringOrUndefined(staffTabOrGroups) || Guard.isIntegerGte(staffTabOrGroups, 0) ||
-        Guard.isNonEmptyArray(staffTabOrGroups) && staffTabOrGroups.every(staffTabOrGroup =>
-            Guard.isString(staffTabOrGroup) || Guard.isIntegerGte(staffTabOrGroup, 0))
+        Guard.isStringOrUndefined(staffTargets) || Guard.isIntegerGte(staffTargets, 0) ||
+        Guard.isNonEmptyArray(staffTargets) && staffTargets.every(staffTarget => Guard.isString(staffTarget) || Guard.isIntegerGte(staffTarget, 0))
     );
 }
 
@@ -592,8 +591,8 @@ export class DocumentBuilder {
 
     private currentLyricsAlign: Types.LyricsAlign | `${Types.LyricsAlign}` = Types.LyricsAlign.Center;
 
-    private addLyricsInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
-        assertStaffTabOrGRoups(staffTabOrGroups);
+    private addLyricsInternal(staffTargets: Types.StaffTargets | undefined, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
+        assertStaffTargets(staffTargets);
 
         AssertUtil.assert(
             Types.isVerseNumber(verse),
@@ -612,10 +611,10 @@ export class DocumentBuilder {
         }
 
         if (Guard.isArray(lyricsText)) {
-            lyricsText.forEach(text => this.getMeasure().addLyrics(staffTabOrGroups, verse, text, lyricsLength, lyricsOptions));
+            lyricsText.forEach(text => this.getMeasure().addLyrics(staffTargets, verse, text, lyricsLength, lyricsOptions));
         }
         else {
-            this.getMeasure().addLyrics(staffTabOrGroups, verse, lyricsText, lyricsLength, lyricsOptions);
+            this.getMeasure().addLyrics(staffTargets, verse, lyricsText, lyricsLength, lyricsOptions);
         }
 
         return this;
@@ -636,27 +635,27 @@ export class DocumentBuilder {
 
     /**
      * Add lyrics to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param verse - Verse number (e.g. 1).
      * @param lyricsText - Lyrics text (empty space if omitted), single value or array.
      * @param lyricsLength - Lyrics text length (e.g. "2n").
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyricsTo(staffTabOrGroups: Types.StaffTabOrGroups, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
+    addLyricsTo(staffTargets: Types.StaffTargets, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLyricsTo", verse, lyricsLength, lyricsText, lyricsOptions);
-        return this.addLyricsInternal(staffTabOrGroups, verse, lyricsText, lyricsLength, lyricsOptions);
+        return this.addLyricsInternal(staffTargets, verse, lyricsText, lyricsLength, lyricsOptions);
     }
 
-    private addFermataInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, fermata: Types.Fermata): DocumentBuilder {
-        assertStaffTabOrGRoups(staffTabOrGroups);
+    private addFermataInternal(staffTargets: Types.StaffTargets | undefined, fermata: Types.Fermata): DocumentBuilder {
+        assertStaffTargets(staffTargets);
         AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
         switch (fermata) {
             case Types.Fermata.AtNote:
-                this.getMeasure().addAnnotation(staffTabOrGroups, Types.Annotation.Temporal, Types.TemporalAnnotation.fermata);
+                this.getMeasure().addAnnotation(staffTargets, Types.Annotation.Temporal, Types.TemporalAnnotation.fermata);
                 break;
             case Types.Fermata.AtMeasureEnd:
-                this.getMeasure().addAnnotation(staffTabOrGroups, Types.Annotation.Temporal, Types.TemporalAnnotation.measureEndFermata);
+                this.getMeasure().addAnnotation(staffTargets, Types.Annotation.Temporal, Types.TemporalAnnotation.measureEndFermata);
                 break;
         }
         return this;
@@ -679,16 +678,16 @@ export class DocumentBuilder {
     /**
      * Add fermata to current measure.
      * @deprecated - addFermataTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermataTo(staffTabOrGroups: Types.StaffTabOrGroups, fermata: Types.Fermata | `${Types.Fermata}` = Types.Fermata.AtNote): DocumentBuilder {
+    addFermataTo(staffTargets: Types.StaffTargets, fermata: Types.Fermata | `${Types.Fermata}` = Types.Fermata.AtNote): DocumentBuilder {
         warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
-        AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);
+        AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTargets, fermata);
 
-        return this.addFermataInternal(staffTabOrGroups, resolveRequiredEnumValue(fermata, Types.Fermata));
+        return this.addFermataInternal(staffTargets, resolveRequiredEnumValue(fermata, Types.Fermata));
     }
 
     /**
@@ -719,35 +718,35 @@ export class DocumentBuilder {
 
     /**
      * Add navigation to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param navigation - Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param navigation - Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
 
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`, ...args: unknown[]): DocumentBuilder {
-        AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTabOrGroups, navigation, ...args);
-        return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Navigation, navigation, ...args);
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`, ...args: unknown[]): DocumentBuilder {
+        AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTargets, navigation, ...args);
+        return this.addAnnotationInternal(staffTargets, Types.Annotation.Navigation, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, annotation: Types.Annotation | undefined, annotationText: string, ...args: unknown[]): DocumentBuilder {
-        assertStaffTabOrGRoups(staffTabOrGroups);
+    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, annotation: Types.Annotation | undefined, annotationText: string, ...args: unknown[]): DocumentBuilder {
+        assertStaffTargets(staffTargets);
 
         AssertUtil.assert(
             Guard.isEnumValueOrUndefined(annotation, Types.Annotation),
@@ -760,7 +759,7 @@ export class DocumentBuilder {
                 throw new MusicError(MusicErrorType.Score, `Failed to resolve annotation from "${args[0]}".`);
         }
 
-        this.getMeasure().addAnnotation(staffTabOrGroups, annotation, annotationText, ...args);
+        this.getMeasure().addAnnotation(staffTargets, annotation, annotationText, ...args);
 
         return this;
     }
@@ -815,59 +814,59 @@ export class DocumentBuilder {
 
     /**
      * Add known annotation text to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param annotationText - T.Annotation text (e.g. "pp"). 
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, annotationText: Types.AnnotationText): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, annotationText: Types.AnnotationText): DocumentBuilder;
     /**
      * Add any annotation text to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param annotation - T.Annotation type (e.g. T.Annotation.Dynamics).
      * @param annotationText - T.Annotation text (e.g. "pp").
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, annotation: Types.Annotation | `${Types.Annotation}`, annotationText: string): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, annotation: Types.Annotation | `${Types.Annotation}`, annotationText: string): DocumentBuilder;
     /**
      * Add label annotation to current measure.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param labelAnnotation - T.Label annotation type.
      * @param labelText - T.Label text.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, labelAnnotation: Types.LabelAnnotation | `${Types.LabelAnnotation}`, labelText: string): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, labelAnnotation: Types.LabelAnnotation | `${Types.LabelAnnotation}`, labelText: string): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param endingText - Text for ending navigation.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endingText: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, endingText: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param endRepeatText - Text for end repeat navigation.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endRepeatText: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, endRepeatText: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount?: number): DocumentBuilder;
 
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, ...args: unknown[]): DocumentBuilder {
-        AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTabOrGroups, ...args);
+    addAnnotationTo(staffTargets: Types.StaffTargets, ...args: unknown[]): DocumentBuilder {
+        AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTargets, ...args);
 
         const annotation = resolveEnumValue(String(args[0]), Types.Annotation);
         if (annotation) {
             const annotationText = String(args[1]);
-            return this.addAnnotationInternal(staffTabOrGroups, annotation, annotationText, ...args.slice(2));
+            return this.addAnnotationInternal(staffTargets, annotation, annotationText, ...args.slice(2));
         }
 
         const annotationText = String(args[0]);
-        return this.addAnnotationInternal(staffTabOrGroups, undefined, annotationText, ...args.slice(1));
+        return this.addAnnotationInternal(staffTargets, undefined, annotationText, ...args.slice(1));
     }
 
-    private addLabelInternal(staffTabOrGroups: Types.StaffTabOrGroups | undefined, label: Types.Label, text: string): DocumentBuilder {
-        assertStaffTabOrGRoups(staffTabOrGroups);
+    private addLabelInternal(staffTargets: Types.StaffTargets | undefined, label: Types.Label, text: string): DocumentBuilder {
+        assertStaffTargets(staffTargets);
 
         AssertUtil.assert(
             Guard.isEnumValue(label, Types.Label),
@@ -875,10 +874,10 @@ export class DocumentBuilder {
         );
 
         if (label === Types.Label.Chord)
-            return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Label, Types.LabelAnnotation.ChordLabel, text);
+            return this.addAnnotationInternal(staffTargets, Types.Annotation.Label, Types.LabelAnnotation.ChordLabel, text);
 
         if (label === Types.Label.Note)
-            return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Label, Types.LabelAnnotation.PitchLabel, text);
+            return this.addAnnotationInternal(staffTargets, Types.Annotation.Label, Types.LabelAnnotation.PitchLabel, text);
 
         return this;
     }
@@ -898,14 +897,14 @@ export class DocumentBuilder {
     /**
      * Add label text to column of last added note/chord/rest in current measure to given staff/tab/group.
      * @deprecated - addLabelTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param label - T.Label type "chord" or "note".
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabelTo(staffTabOrGroups: Types.StaffTabOrGroups, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
-        AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTabOrGroups, label, text);
-        return this.addLabelInternal(staffTabOrGroups, resolveRequiredEnumValue(label, Types.Label), text);
+    addLabelTo(staffTargets: Types.StaffTargets, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
+        AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTargets, label, text);
+        return this.addLabelInternal(staffTargets, resolveRequiredEnumValue(label, Types.Label), text);
     }
 
     /**
@@ -1019,7 +1018,7 @@ export class DocumentBuilder {
     /**
      * Add staff group.
      * @param groupName - Name of staff group.
-     * @param staffsTabsAndGroups - staff/tab index (0=top), staff/tab name, or staff group name. Single value or array.
+     * @param staffsTabsAndGroups - Single or multiple staff/tab/group identifiers. Single value or array.
      * @param verticalPosition - Vertical position, are elements added above, below or both.
      * @returns - This document builder instance.
      */

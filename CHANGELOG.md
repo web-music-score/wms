@@ -6,6 +6,7 @@
 - Deprecated Label and replaced with LabelAnnotation.
 - New annotations: Expression, Technique, Temporal, Ornament, Label and Misc.
 - Added lots of new built in annotation texts.
+- Renamed all StaffTabOrGroup(s) types to StaffTarget(s).
 
 ## [6.4.0-pre.2] - 2026-01-26
 ### Changed
