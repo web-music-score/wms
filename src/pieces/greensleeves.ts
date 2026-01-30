@@ -1,4 +1,4 @@
-import { MDocument, Navigation, DocumentBuilder } from "web-music-score/score";
+import { MDocument, NavigationAnnotation, DocumentBuilder } from "web-music-score/score";
 
 /**
  * Create Greensleeves music piece.<br />
@@ -19,7 +19,7 @@ export function createGreensleeves(): MDocument {
         .addNote(0, "A3", "8n")
 
         .addMeasure()
-        .addNavigation(Navigation.StartRepeat)
+        .addNavigation(NavigationAnnotation.StartRepeat)
         .addNote(0, "C4", "4n", { stem: "up" }).addLabel("chord", "Am")
         .addNote(0, "D4", "8n")
         .addNote(0, "E4", "8.")

@@ -3,7 +3,7 @@ import { MusicObject } from "./music-object";
 import { View } from "./view";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
-import { MEnding, Navigation } from "../pub";
+import { MEnding, NavigationAnnotation } from "../pub";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
 export class ObjEnding extends MusicObject {
@@ -44,8 +44,8 @@ export class ObjEnding extends MusicObject {
         let { measure } = this;
         let next = measure.getNextMeasure();
 
-        return next?.hasNavigation(Navigation.Ending) === true ||
-            measure.hasNavigation(Navigation.EndRepeat) ||
+        return next?.hasNavigation(NavigationAnnotation.Ending) === true ||
+            measure.hasNavigation(NavigationAnnotation.EndRepeat) ||
             measure.isLastMeasure();
     }
 

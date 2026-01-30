@@ -335,7 +335,7 @@ export enum NavigationAnnotation {
     Ending = "ending"
 }
 
-/** Export also as Navigation for support. */
+/** Export also as Navigation alias for legacy support. */
 export { NavigationAnnotation as Navigation }
 
 /** Dynamic annotations */

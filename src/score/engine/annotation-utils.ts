@@ -1,20 +1,20 @@
 import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
-import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation, LabelAnnotation, NavigationAnnotation, ColorKey } from "../pub";
+import { Annotation, NavigationAnnotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation, LabelAnnotation, ColorKey } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { isEnumValueLoose } from "./enum-utils";
 
-export function getNavigationString(navigation: Navigation): string {
+export function getNavigationString(navigation: NavigationAnnotation): string {
     switch (navigation) {
-        case Navigation.DC_al_Coda: return "D.C. al Coda";
-        case Navigation.DC_al_Fine: return "D.C. al Fine";
-        case Navigation.DS_al_Coda: return "D.S. al Coda";
-        case Navigation.DS_al_Fine: return "D.S. al Fine";
-        case Navigation.Fine: return "Fine";
-        case Navigation.Segno: return ObjSpecialText.Segno;
-        case Navigation.Coda: return ObjSpecialText.Coda;
-        case Navigation.toCoda: return ObjSpecialText.toCoda;
+        case NavigationAnnotation.DC_al_Coda: return "D.C. al Coda";
+        case NavigationAnnotation.DC_al_Fine: return "D.C. al Fine";
+        case NavigationAnnotation.DS_al_Coda: return "D.S. al Coda";
+        case NavigationAnnotation.DS_al_Fine: return "D.S. al Fine";
+        case NavigationAnnotation.Fine: return "Fine";
+        case NavigationAnnotation.Segno: return ObjSpecialText.Segno;
+        case NavigationAnnotation.Coda: return ObjSpecialText.Coda;
+        case NavigationAnnotation.toCoda: return ObjSpecialText.toCoda;
         default:
             return navigation[0].toUpperCase() + navigation.substring(1);
     }
@@ -97,7 +97,7 @@ export function isTempoText(text: string): text is `${TempoAnnotation}` {
 }
 
 function resolveAnnotationFromText(annotationText: string): Annotation | undefined {
-    if (isEnumValueLoose(annotationText, Navigation)) {
+    if (isEnumValueLoose(annotationText, NavigationAnnotation)) {
         return Annotation.Navigation;
     }
     else if (isEnumValueLoose(annotationText, DynamicsAnnotation)) {

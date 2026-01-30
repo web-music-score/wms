@@ -693,26 +693,26 @@ export class DocumentBuilder {
 
     /**
      * Add navigation to current measure.
-     * @param navigation - T.Navigation annotation to add.
+     * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Types.Navigation | `${Types.Navigation}`): DocumentBuilder;
+    addNavigation(navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
-     * @param navigation - T.Navigation annotation to add.
+     * @param navigation - Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigation(navigation: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
-     * @param navigation - T.Navigation annotation to add.
+     * @param navigation - Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigation(navigation: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
 
-    addNavigation(navigation: Types.Navigation | `${Types.Navigation}`, ...args: unknown[]): DocumentBuilder {
+    addNavigation(navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
         return this.addAnnotationInternal(undefined, Types.Annotation.Navigation, navigation, ...args);
     }
@@ -720,28 +720,28 @@ export class DocumentBuilder {
     /**
      * Add navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation - T.Navigation annotation to add.
+     * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation | `${Types.Navigation}`): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation - T.Navigation annotation to add.
+     * @param navigation - Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
-     * @param navigation - T.Navigation annotation to add.
+     * @param navigation - Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
 
-    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.Navigation | `${Types.Navigation}`, ...args: unknown[]): DocumentBuilder {
+    addNavigationTo(staffTabOrGroups: Types.StaffTabOrGroups, navigation: Types.NavigationAnnotation | `${Types.NavigationAnnotation}`, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTabOrGroups, navigation, ...args);
         return this.addAnnotationInternal(staffTabOrGroups, Types.Annotation.Navigation, navigation, ...args);
     }
@@ -791,14 +791,14 @@ export class DocumentBuilder {
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotation(endingText: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotation(endingText: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
      * @param endRepeatText - Text for end repeat navigation.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotation(endRepeatText: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotation(endRepeatText: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount?: number): DocumentBuilder;
 
     addAnnotation(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
@@ -843,7 +843,7 @@ export class DocumentBuilder {
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endingText: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endingText: Types.NavigationAnnotation.Ending | `${Types.NavigationAnnotation.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
@@ -851,7 +851,7 @@ export class DocumentBuilder {
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endRepeatText: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, endRepeatText: Types.NavigationAnnotation.EndRepeat | `${Types.NavigationAnnotation.EndRepeat}`, playCount?: number): DocumentBuilder;
 
     addAnnotationTo(staffTabOrGroups: Types.StaffTabOrGroups, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTabOrGroups, ...args);
