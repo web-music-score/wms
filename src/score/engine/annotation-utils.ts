@@ -3,6 +3,7 @@ import { Navigation, Annotation, DynamicsAnnotation, TempoAnnotation, Articulati
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
+import { isEnumValueLoose } from "./enum-utils";
 
 export function getNavigationString(navigation: Navigation): string {
     switch (navigation) {
@@ -95,36 +96,36 @@ export function isTempoText(text: string): text is `${TempoAnnotation}` {
     return Guard.isEnumValue(text, TempoAnnotation);
 }
 
-function _getAnnotation(text: string): Annotation | undefined {
-    if (Guard.isEnumValue(text, Navigation)) {
+function resolveAnnotationFromText(annotationText: string): Annotation | undefined {
+    if (isEnumValueLoose(annotationText, Navigation)) {
         return Annotation.Navigation;
     }
-    else if (Guard.isEnumValue(text, DynamicsAnnotation)) {
+    else if (isEnumValueLoose(annotationText, DynamicsAnnotation)) {
         return Annotation.Dynamics;
     }
-    else if (Guard.isEnumValue(text, TempoAnnotation)) {
+    else if (isEnumValueLoose(annotationText, TempoAnnotation)) {
         return Annotation.Tempo;
     }
-    else if (Guard.isEnumValue(text, TemporalAnnotation)) {
+    else if (isEnumValueLoose(annotationText, TemporalAnnotation)) {
         // Have this before ArticulationAnnotation (fermata is deprecated there).
         return Annotation.Temporal;
     }
-    else if (Guard.isEnumValue(text, ArticulationAnnotation)) {
+    else if (isEnumValueLoose(annotationText, ArticulationAnnotation)) {
         return Annotation.Articulation;
     }
-    else if (Guard.isEnumValue(text, ExpressionAnnotation)) {
+    else if (isEnumValueLoose(annotationText, ExpressionAnnotation)) {
         return Annotation.Expression;
     }
-    else if (Guard.isEnumValue(text, TechniqueAnnotation)) {
+    else if (isEnumValueLoose(annotationText, TechniqueAnnotation)) {
         return Annotation.Technique;
     }
-    else if (Guard.isEnumValue(text, OrnamentAnnotation)) {
+    else if (isEnumValueLoose(annotationText, OrnamentAnnotation)) {
         return Annotation.Ornament;
     }
-    else if (Guard.isEnumValue(text, LabelAnnotation)) {
+    else if (isEnumValueLoose(annotationText, LabelAnnotation)) {
         return Annotation.Label;
     }
-    else if (Guard.isEnumValue(text, MiscAnnotation)) {
+    else if (isEnumValueLoose(annotationText, MiscAnnotation)) {
         return Annotation.Misc;
     }
     else {
@@ -135,6 +136,6 @@ function _getAnnotation(text: string): Annotation | undefined {
 // Cache annotations.
 const annotationMap = new UniMap<string, Annotation | undefined>();
 
-export function getAnnotation(text: string): Annotation | undefined {
-    return annotationMap.getOrCreate(text, () => _getAnnotation(text));
+export function resolveAnnotation(text: string): Annotation | undefined {
+    return annotationMap.getOrCreate(text, () => resolveAnnotationFromText(text));
 }
