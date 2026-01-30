@@ -19,7 +19,7 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationTextReplacement, getNavigationString } from "./annotation-utils";
+import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -135,7 +135,7 @@ export class ObjMeasure extends MusicObject {
 
     private needBeamsUpdate = true;
 
-    private navigationSet = new ValueSet<Pub.NavigationAnnotation>();
+    private navigationSet = new ValueSet<Pub.Navigation>();
     private isEndSong: boolean = false;
     private isEndSection: boolean = false;
     private endRepeatPlayCount: number = 2; // play twice.
@@ -603,7 +603,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    hasNavigation(n: Pub.NavigationAnnotation) {
+    hasNavigation(n: Pub.Navigation) {
         return this.navigationSet.has(n);
     }
 
@@ -611,15 +611,16 @@ export class ObjMeasure extends MusicObject {
         return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
     }
 
-    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotation: Pub.Annotation, annotationText: string, ...args: unknown[]) {
-        if (!Guard.isNonEmptyString(annotationText))
-            throw new MusicError(MusicErrorType.Score, `Annotation text is empty.`);
+    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, ...args: unknown[]) {
+        if (!Guard.isNonEmptyString(annotationKind))
+            throw new MusicError(MusicErrorType.Score, `Annotation kind is not proper string.`);
 
-        if (Guard.isEnumValue(annotationText, Pub.LabelAnnotation) && !Guard.isNonEmptyString(args[0]))
+        if (annotationGroup === Pub.AnnotationGroup.Label && !Guard.isNonEmptyString(args[0]))
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
 
-        if(annotationText === Pub.ArticulationAnnotation.staccato && this.lastAddedRhythmColumn) {
-            this.lastAddedRhythmColumn.staccato = true;
+        if (annotationKind === Pub.AnnotationKind.staccato) {
+            if (this.lastAddedRhythmColumn)
+                this.lastAddedRhythmColumn.staccato = true;
             return;
         }
 
@@ -628,13 +629,13 @@ export class ObjMeasure extends MusicObject {
 
         let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
-        const getColor = (line: ObjNotationLine) => getAnnotationColor(line, annotation, annotationText);
+        const getColor = (line: ObjNotationLine) => getAnnotationColor(line, annotationGroup, annotationKind);
 
         const colAnchor = this.lastAddedRhythmColumn;
 
-        switch (annotationText) {
-            case Pub.NavigationAnnotation.Ending:
-                if (this.navigationSet.has(annotationText))
+        switch (annotationKind) {
+            case Pub.Navigation.Ending:
+                if (this.navigationSet.has(annotationKind))
                     throw new MusicError(MusicErrorType.Score, "Cannot add ending becaure measure already has one.");
                 createLayoutObject = (line) => {
                     const anchor = this;
@@ -643,45 +644,45 @@ export class ObjMeasure extends MusicObject {
                     return new ObjEnding(anchor, color, passages);
                 }
                 break;
-            case Pub.NavigationAnnotation.DC_al_Coda:
-            case Pub.NavigationAnnotation.DC_al_Fine:
-            case Pub.NavigationAnnotation.DS_al_Coda:
-            case Pub.NavigationAnnotation.DS_al_Fine:
+            case Pub.Navigation.DC_al_Coda:
+            case Pub.Navigation.DC_al_Fine:
+            case Pub.Navigation.DS_al_Coda:
+            case Pub.Navigation.DS_al_Fine:
                 createLayoutObject = (line) => {
                     const anchor = this.barLineRight;
-                    const text = getNavigationString(annotationText);
+                    const text = getNavigationString(annotationKind);
                     const color = getColor(line);
                     return new ObjText(anchor, { text, color }, 1, 1);
                 }
-                this.addAnnotation(staffTargets, Pub.Annotation.Navigation, Pub.NavigationAnnotation.EndRepeat);
+                this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.Navigation.EndRepeat);
                 this.endSong();
                 break;
-            case Pub.NavigationAnnotation.Fine:
+            case Pub.Navigation.Fine:
                 createLayoutObject = (line) => {
                     const anchor = this.barLineRight;
-                    const text = getNavigationString(annotationText);
+                    const text = getNavigationString(annotationKind);
                     const color = getColor(line);
                     return new ObjText(anchor, { text, color }, 1, 1);
                 }
                 break;
-            case Pub.NavigationAnnotation.Segno:
-            case Pub.NavigationAnnotation.Coda:
+            case Pub.Navigation.Segno:
+            case Pub.Navigation.Coda:
                 createLayoutObject = (line) => {
                     const anchor = this.barLineLeft;
-                    const text = getNavigationString(annotationText);
+                    const text = getNavigationString(annotationKind);
                     const color = getColor(line);
                     return new ObjSpecialText(anchor, text, color);
                 }
                 break;
-            case Pub.NavigationAnnotation.toCoda:
+            case Pub.Navigation.toCoda:
                 createLayoutObject = (line) => {
                     const anchor = this.barLineRight;
-                    const text = getNavigationString(annotationText);
+                    const text = getNavigationString(annotationKind);
                     const color = getColor(line);
                     return new ObjSpecialText(anchor, text, color);
                 }
                 break;
-            case Pub.NavigationAnnotation.EndRepeat:
+            case Pub.Navigation.EndRepeat:
                 if (args.length === 0) {
                     this.endRepeatPlayCount = 2;
                 }
@@ -697,20 +698,20 @@ export class ObjMeasure extends MusicObject {
                     this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
                 }
                 break;
-            case Pub.NavigationAnnotation.StartRepeat:
+            case Pub.Navigation.StartRepeat:
                 break;
-            case Pub.TemporalAnnotation.fermata:
+            case Pub.AnnotationKind.fermata:
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => new ObjFermata(colAnchor, vpos, getColor(line));
                 }
                 break;
-            case Pub.TemporalAnnotation.measureEndFermata:
+            case Pub.AnnotationKind.measureEndFermata:
                 createLayoutObject = (line, vpos) => {
                     const anchor = this.barLineRight;
                     return new ObjFermata(anchor, vpos, getColor(line));
                 }
                 break;
-            case Pub.LabelAnnotation.ChordLabel: {
+            case Pub.AnnotationKind.ChordLabel: {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
                         const color = getColor(line);
@@ -720,7 +721,7 @@ export class ObjMeasure extends MusicObject {
                 }
                 break;
             }
-            case Pub.LabelAnnotation.PitchLabel: {
+            case Pub.AnnotationKind.PitchLabel: {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
                         const color = getColor(line);
@@ -734,7 +735,7 @@ export class ObjMeasure extends MusicObject {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
                         const color = getColor(line);
-                        const text = getAnnotationTextReplacement(annotationText);
+                        const text = getAnnotationKindTextReplacement(annotationKind);
                         return new ObjText(colAnchor, { text, color, italic: true }, anchorX, anchorY);
                     }
                 }
@@ -744,8 +745,8 @@ export class ObjMeasure extends MusicObject {
         this.disableExtensionLine();
 
         if (createLayoutObject) {
-            const layoutGroupId = getAnnotationLayoutGroupId(annotation, annotationText);
-            const defaultVerticalPos = getAnnotationDefaultVerticalPos(annotation, annotationText);
+            const layoutGroupId = getAnnotationLayoutGroupId(annotationGroup, annotationKind);
+            const defaultVerticalPos = getAnnotationDefaultVerticalPos(annotationGroup, annotationKind);
 
             this.forEachStaffTarget(staffTargets, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
                 const layoutObj = this.addLayoutObject(createLayoutObject(line, vpos), line, layoutGroupId, vpos);
@@ -753,8 +754,8 @@ export class ObjMeasure extends MusicObject {
             });
         }
 
-        if (Guard.isEnumValue(annotationText, Pub.NavigationAnnotation))
-            this.navigationSet.add(annotationText);
+        if (Guard.isEnumValue(annotationKind, Pub.Navigation))
+            this.navigationSet.add(annotationKind);
     }
 
     addConnective(connective: Pub.Connective.Tie, tieSpan?: number | Pub.TieType, notAnchor?: Pub.NoteAnchor): void;

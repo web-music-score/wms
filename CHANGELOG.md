@@ -1,12 +1,15 @@
 # Changelog
 ## [6.4.0-pre.3] - Unreleased
-### Annotation Update
-- Already had annotations: Tempo, Dynamics and Articulation.
-- Renamed Navigation to NavigationAnnotation, to support export { NavigationAnnotation as Navigation }.
-- Deprecated Label and replaced with LabelAnnotation.
-- New annotations: Expression, Technique, Temporal, Ornament, Label and Misc.
-- Added lots of new built in annotation texts.
-- Renamed all StaffTabOrGroup(s) types to StaffTarget(s).
+### Changed
+- Big annotation update. Mostly internal stuff.
+    * Renamed enum `Annotation` to `AnnotationGroup` and deprecated `Annotation`.
+    * Added enum `AnnotationKind` to contain all annotations, and added lots of them.
+    * Deprecated enums `TempoAnnotation`, `DynamicsAnnotation` and `ArticulationAnnotation`.
+    * `AnnotationGroup` is now: `{` `Tempo`, `Dynamic`, `Articulation`, `Navigation`,
+      `Expression`, `Technique`, `Temporal`, `Ornament`, `Label`, `Misc` `}`.
+    * Deprecated `addLabel()`, use `addAnnotation()`.
+    * Deprecated earlier `addFermata()`, use `addAnnotation()`.
+- Renamed type `StaffTabOrGroup(s)` to `StaffTarget(s)`. Deprecated `StaffTabOrGroup(s)`.
 
 ## [6.4.0-pre.2] - 2026-01-26
 ### Changed

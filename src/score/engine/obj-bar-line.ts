@@ -1,7 +1,7 @@
 import { MusicObject } from "./music-object";
 import { View } from "./view";
 import { ObjMeasure } from "./obj-measure";
-import { MBarLineRight, MBarLineLeft, NavigationAnnotation, MusicInterface, MStaffBarLine } from "../pub";
+import { MBarLineRight, MBarLineLeft, Navigation, MusicInterface, MStaffBarLine } from "../pub";
 import { PlayerColumnProps } from "./player-engine";
 import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
@@ -210,10 +210,10 @@ export class ObjBarLineLeft extends ObjBarLine {
         let m = this.measure;
         let prev = m.getPrevMeasure();
 
-        if (m.hasNavigation(NavigationAnnotation.StartRepeat)) {
+        if (m.hasNavigation(Navigation.StartRepeat)) {
             // If prev measure on same row has end-repeat:
             //     prev measure draws end-start-repeat and this measure does not draw start-repeat
-            if (prev && prev.row === m.row && prev.hasNavigation(NavigationAnnotation.EndRepeat)) {
+            if (prev && prev.row === m.row && prev.hasNavigation(Navigation.EndRepeat)) {
                 return BarLineType.None;
             }
             else {
@@ -251,10 +251,10 @@ export class ObjBarLineRight extends ObjBarLine {
         let m = this.measure;
         let next = m.getNextMeasure();
 
-        if (m.hasNavigation(NavigationAnnotation.EndRepeat)) {
+        if (m.hasNavigation(Navigation.EndRepeat)) {
             // If next measure on same row has start-repeat:
             //     this measure draws end-start-repeat and next measure does not draw start-repeat
-            if (next && next.row === m.row && next.hasNavigation(NavigationAnnotation.StartRepeat)) {
+            if (next && next.row === m.row && next.hasNavigation(Navigation.StartRepeat)) {
                 return BarLineType.EndStartRepeat;
             }
             else {
@@ -269,12 +269,12 @@ export class ObjBarLineRight extends ObjBarLine {
             return BarLineType.Double;
         }
 
-        if (m === m.row.getLastMeasure() && next && next.row === m.row.getNextRow() && next.hasNavigation(NavigationAnnotation.StartRepeat)) {
+        if (m === m.row.getLastMeasure() && next && next.row === m.row.getNextRow() && next.hasNavigation(Navigation.StartRepeat)) {
             // IF this is last measure of row && next row begins with start repeat
             return BarLineType.Double;
         }
 
-        if (next && next.hasNavigation(NavigationAnnotation.StartRepeat)) {
+        if (next && next.hasNavigation(Navigation.StartRepeat)) {
             return BarLineType.None;
         }
 

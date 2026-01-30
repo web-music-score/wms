@@ -1,4 +1,4 @@
-import { NavigationAnnotation } from "../pub";
+import { Navigation } from "../pub";
 import { MusicObject, MusicObjectLink } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjText } from "./obj-text";
@@ -75,7 +75,7 @@ export class Extension extends MusicObjectLink {
         return this.linePos;
     }
 
-    private static StopNavigations = [NavigationAnnotation.EndRepeat, NavigationAnnotation.Ending];
+    private static StopNavigations = [Navigation.EndRepeat, Navigation.Ending];
 
     private whatStopped(col: ObjRhythmColumn): ExtensionStopObject | undefined {
         const m = col.measure;

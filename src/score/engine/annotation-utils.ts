@@ -1,52 +1,52 @@
-import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
-import { Annotation, NavigationAnnotation, DynamicsAnnotation, TempoAnnotation, ArticulationAnnotation, ExpressionAnnotation, TechniqueAnnotation, OrnamentAnnotation, MiscAnnotation, TemporalAnnotation, LabelAnnotation, ColorKey } from "../pub";
+import { UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnnotationGroup, Navigation, ColorKey, AnnotationKind, DynamicsAnnotation } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
-import { isEnumValueLoose } from "./enum-utils";
 
-export function getNavigationString(navigation: NavigationAnnotation): string {
+export function getNavigationString(navigation: Navigation): string {
     switch (navigation) {
-        case NavigationAnnotation.DC_al_Coda: return "D.C. al Coda";
-        case NavigationAnnotation.DC_al_Fine: return "D.C. al Fine";
-        case NavigationAnnotation.DS_al_Coda: return "D.S. al Coda";
-        case NavigationAnnotation.DS_al_Fine: return "D.S. al Fine";
-        case NavigationAnnotation.Fine: return "Fine";
-        case NavigationAnnotation.Segno: return ObjSpecialText.Segno;
-        case NavigationAnnotation.Coda: return ObjSpecialText.Coda;
-        case NavigationAnnotation.toCoda: return ObjSpecialText.toCoda;
+        case Navigation.DC_al_Coda: return "D.C. al Coda";
+        case Navigation.DC_al_Fine: return "D.C. al Fine";
+        case Navigation.DS_al_Coda: return "D.S. al Coda";
+        case Navigation.DS_al_Fine: return "D.S. al Fine";
+        case Navigation.Fine: return "Fine";
+        case Navigation.Segno: return ObjSpecialText.Segno;
+        case Navigation.Coda: return ObjSpecialText.Coda;
+        case Navigation.toCoda: return ObjSpecialText.toCoda;
         default:
             return navigation[0].toUpperCase() + navigation.substring(1);
     }
 }
 
-export function getAnnotationTextReplacement(text: string): string {
+export function getAnnotationKindTextReplacement(text: string): string {
     switch (text) {
-        case ArticulationAnnotation.tenuto: return "—";     // TODO: Maybe should draw better symbol instead.
-        case ArticulationAnnotation.accent: return ">";     // TODO: Maybe should draw better symbol instead.
-        case ArticulationAnnotation.marcato: return "^";    // TODO: Maybe should draw better symbol instead.
+        case AnnotationKind.tenuto: return "—";     // TODO: Maybe should draw better symbol instead.
+        case AnnotationKind.accent: return ">";     // TODO: Maybe should draw better symbol instead.
+        case AnnotationKind.marcato: return "^";    // TODO: Maybe should draw better symbol instead.
     }
     return text;
 }
 
-export function getAnnotationLayoutGroupId(annotation: Annotation, annotationText: string): LayoutGroupId {
-    switch (annotation) {
-        case Annotation.Dynamics:
-            return LayoutGroupId.Annotation_Dynamics;
-        case Annotation.Tempo:
+export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, annotationKind: string): LayoutGroupId {
+    switch (annotationGroup) {
+        case AnnotationGroup.Dynamics:
+        case AnnotationGroup.Dynamic:
+            return LayoutGroupId.Annotation_Dynamic;
+        case AnnotationGroup.Tempo:
             return LayoutGroupId.Annotation_Tempo;
-        case Annotation.Navigation:
-            if (annotationText === NavigationAnnotation.Ending)
+        case AnnotationGroup.Navigation:
+            if (annotationKind === Navigation.Ending)
                 return LayoutGroupId.Annotation_Ending;
             return LayoutGroupId.Annotation_Navigation;
-        case Annotation.Label:
-            if (annotationText === LabelAnnotation.ChordLabel)
+        case AnnotationGroup.Label:
+            if (annotationKind === AnnotationKind.ChordLabel)
                 return LayoutGroupId.Annotation_ChordLabel;
-            if (annotationText === LabelAnnotation.PitchLabel)
+            if (annotationKind === AnnotationKind.PitchLabel)
                 return LayoutGroupId.Annotation_PitchLabel;
             break;
-        case Annotation.Temporal:
-            if (annotationText === TemporalAnnotation.fermata || annotationText === TemporalAnnotation.measureEndFermata)
+        case AnnotationGroup.Temporal:
+            if (annotationKind === AnnotationKind.fermata || annotationKind === AnnotationKind.measureEndFermata)
                 return LayoutGroupId.Annotation_Fermata;
             break;
     }
@@ -54,8 +54,8 @@ export function getAnnotationLayoutGroupId(annotation: Annotation, annotationTex
     return LayoutGroupId.Annotation_Misc
 }
 
-export function getAnnotationDefaultVerticalPos(annotation: Annotation, annotationText: string): VerticalPos {
-    if (annotationText === LabelAnnotation.PitchLabel)
+export function getAnnotationDefaultVerticalPos(annotationGroup: AnnotationGroup, annotationKind: string): VerticalPos {
+    if (annotationKind === AnnotationKind.PitchLabel)
         return VerticalPos.Below;
 
     return VerticalPos.Above;
@@ -65,26 +65,26 @@ function fromStaffColor(line: ObjNotationLine, staffColor: ColorKey): string {
     return line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) : staffColor;
 }
 
-export function getAnnotationColor(line: ObjNotationLine, annotation: Annotation, annotationText: string): string {
-    if (annotation === Annotation.Navigation)
+export function getAnnotationColor(line: ObjNotationLine, annotationGroup: AnnotationGroup, annotationKind: string): string {
+    if (annotationGroup === AnnotationGroup.Navigation)
         return fromStaffColor(line, "staff.element.navigation");
 
-    if (annotation === Annotation.Label)
+    if (annotationGroup === AnnotationGroup.Label)
         return fromStaffColor(line, "staff.element.label");
 
-    if (annotationText === TemporalAnnotation.fermata || annotationText === TemporalAnnotation.measureEndFermata)
+    if (annotationKind === AnnotationKind.fermata || annotationKind === AnnotationKind.measureEndFermata)
         return fromStaffColor(line, "staff.element.fermata");
 
     return fromStaffColor(line, "staff.element.annotation");
 }
 
-export function isDynamicsText(text: string): text is `${DynamicsAnnotation}` {
-    return Guard.isEnumValue(text, DynamicsAnnotation);
+export function isDynamicsText(annotationKind: string): boolean {
+    return resolveAnnotationGroup(annotationKind) === AnnotationGroup.Dynamic;
 }
 
-export function getDynamicsVolume(text: string): number | undefined {
-    if (/^(p+|f+|m|mp|mf)$/.test(text)) {
-        let volume = 0.5 - Utils.Str.charCount(text, "p") * 0.1 + Utils.Str.charCount(text, "f") * 0.1;
+export function getDynamicsVolume(annotationKind: string): number | undefined {
+    if (/^(p+|f+|m|mp|mf)$/.test(annotationKind)) {
+        let volume = 0.5 - Utils.Str.charCount(annotationKind, "p") * 0.1 + Utils.Str.charCount(annotationKind, "f") * 0.1;
         return Utils.Math.clamp(volume, 0, 1);
     }
     else {
@@ -92,50 +92,122 @@ export function getDynamicsVolume(text: string): number | undefined {
     }
 }
 
-export function isTempoText(text: string): text is `${TempoAnnotation}` {
-    return Guard.isEnumValue(text, TempoAnnotation);
-}
-
-function resolveAnnotationFromText(annotationText: string): Annotation | undefined {
-    if (isEnumValueLoose(annotationText, NavigationAnnotation)) {
-        return Annotation.Navigation;
-    }
-    else if (isEnumValueLoose(annotationText, DynamicsAnnotation)) {
-        return Annotation.Dynamics;
-    }
-    else if (isEnumValueLoose(annotationText, TempoAnnotation)) {
-        return Annotation.Tempo;
-    }
-    else if (isEnumValueLoose(annotationText, TemporalAnnotation)) {
-        // Have this before ArticulationAnnotation (fermata is deprecated there).
-        return Annotation.Temporal;
-    }
-    else if (isEnumValueLoose(annotationText, ArticulationAnnotation)) {
-        return Annotation.Articulation;
-    }
-    else if (isEnumValueLoose(annotationText, ExpressionAnnotation)) {
-        return Annotation.Expression;
-    }
-    else if (isEnumValueLoose(annotationText, TechniqueAnnotation)) {
-        return Annotation.Technique;
-    }
-    else if (isEnumValueLoose(annotationText, OrnamentAnnotation)) {
-        return Annotation.Ornament;
-    }
-    else if (isEnumValueLoose(annotationText, LabelAnnotation)) {
-        return Annotation.Label;
-    }
-    else if (isEnumValueLoose(annotationText, MiscAnnotation)) {
-        return Annotation.Misc;
-    }
-    else {
-        return undefined;
-    }
+export function isTempoText(annotationKind: string): boolean {
+    return resolveAnnotationGroup(annotationKind) === AnnotationGroup.Tempo;
 }
 
 // Cache annotations.
-const annotationMap = new UniMap<string, Annotation | undefined>();
+const MapAnnotationKindToGroup = new UniMap<string, AnnotationGroup>([
+    // Navigation annotations
+    [AnnotationKind.DC_al_Fine, AnnotationGroup.Navigation],
+    [AnnotationKind.DC_al_Coda, AnnotationGroup.Navigation],
+    [AnnotationKind.DS_al_Fine, AnnotationGroup.Navigation],
+    [AnnotationKind.DS_al_Coda, AnnotationGroup.Navigation],
+    [AnnotationKind.Coda, AnnotationGroup.Navigation],
+    [AnnotationKind.toCoda, AnnotationGroup.Navigation],
+    [AnnotationKind.Segno, AnnotationGroup.Navigation],
+    [AnnotationKind.Fine, AnnotationGroup.Navigation],
+    [AnnotationKind.StartRepeat, AnnotationGroup.Navigation],
+    [AnnotationKind.EndRepeat, AnnotationGroup.Navigation],
+    [AnnotationKind.Ending, AnnotationGroup.Navigation],
 
-export function resolveAnnotation(text: string): Annotation | undefined {
-    return annotationMap.getOrCreate(text, () => resolveAnnotationFromText(text));
+    // Dynamic annotations
+    [AnnotationKind.ppp, AnnotationGroup.Dynamic],
+    [AnnotationKind.pp, AnnotationGroup.Dynamic],
+    [AnnotationKind.p, AnnotationGroup.Dynamic],
+    [AnnotationKind.mp, AnnotationGroup.Dynamic],
+    [AnnotationKind.m, AnnotationGroup.Dynamic],
+    [AnnotationKind.mf, AnnotationGroup.Dynamic],
+    [AnnotationKind.f, AnnotationGroup.Dynamic],
+    [AnnotationKind.ff, AnnotationGroup.Dynamic],
+    [AnnotationKind.fff, AnnotationGroup.Dynamic],
+    [AnnotationKind.cresc, AnnotationGroup.Dynamic],
+    [AnnotationKind.decresc, AnnotationGroup.Dynamic],
+    [AnnotationKind.dim, AnnotationGroup.Dynamic],
+    [AnnotationKind.fp, AnnotationGroup.Dynamic],
+    [AnnotationKind.sf, AnnotationGroup.Dynamic],
+    [AnnotationKind.sfz, AnnotationGroup.Dynamic],
+    [AnnotationKind.sforzando, AnnotationGroup.Dynamic],
+
+    // Tempo annotations
+    [AnnotationKind.accel, AnnotationGroup.Tempo],
+    [AnnotationKind.rit, AnnotationGroup.Tempo],
+    [AnnotationKind.rall, AnnotationGroup.Tempo],
+    [AnnotationKind.a_tempo, AnnotationGroup.Tempo],
+    [AnnotationKind.rubato, AnnotationGroup.Tempo],
+    [AnnotationKind.Largo, AnnotationGroup.Tempo],
+    [AnnotationKind.Adagio, AnnotationGroup.Tempo],
+    [AnnotationKind.Andante, AnnotationGroup.Tempo],
+    [AnnotationKind.Moderato, AnnotationGroup.Tempo],
+    [AnnotationKind.Allegro, AnnotationGroup.Tempo],
+    [AnnotationKind.Vivace, AnnotationGroup.Tempo],
+    [AnnotationKind.Presto, AnnotationGroup.Tempo],
+    [AnnotationKind.Prestissimo, AnnotationGroup.Tempo],
+
+    // Articulation annotations
+    [AnnotationKind.staccato, AnnotationGroup.Articulation],
+    [AnnotationKind.tenuto, AnnotationGroup.Articulation],
+    [AnnotationKind.accent, AnnotationGroup.Articulation],
+    [AnnotationKind.marcato, AnnotationGroup.Articulation],
+    [AnnotationKind.legato, AnnotationGroup.Articulation],
+    [AnnotationKind.portato, AnnotationGroup.Articulation],
+
+    // Expression annotations
+    [AnnotationKind.dolce, AnnotationGroup.Expression],
+    [AnnotationKind.cantabile, AnnotationGroup.Expression],
+    [AnnotationKind.espressivo, AnnotationGroup.Expression],
+    [AnnotationKind.espr, AnnotationGroup.Expression],
+    [AnnotationKind.leggiero, AnnotationGroup.Expression],
+    [AnnotationKind.pesante, AnnotationGroup.Expression],
+    [AnnotationKind.con_brio, AnnotationGroup.Expression],
+    [AnnotationKind.con_fuoco, AnnotationGroup.Expression],
+    [AnnotationKind.giocoso, AnnotationGroup.Expression],
+    [AnnotationKind.maestoso, AnnotationGroup.Expression],
+    [AnnotationKind.misterioso, AnnotationGroup.Expression],
+    [AnnotationKind.tranquillo, AnnotationGroup.Expression],
+
+    // Technique annotations
+    // Strings
+    [AnnotationKind.pizz, AnnotationGroup.Technique],
+    [AnnotationKind.arco, AnnotationGroup.Technique],
+    [AnnotationKind.col_legno, AnnotationGroup.Technique],
+    [AnnotationKind.sul_ponticello, AnnotationGroup.Technique],
+    [AnnotationKind.sul_tasto, AnnotationGroup.Technique],
+    [AnnotationKind.vibrato, AnnotationGroup.Technique],
+    [AnnotationKind.senza_vibrato, AnnotationGroup.Technique],
+    // Keyboard
+    [AnnotationKind.legato_pedal, AnnotationGroup.Technique],
+    [AnnotationKind.staccato_pedal, AnnotationGroup.Technique],
+    [AnnotationKind.una_corda, AnnotationGroup.Technique],
+    [AnnotationKind.tre_corde, AnnotationGroup.Technique],
+
+    // Ornament annotations
+    [AnnotationKind.trill, AnnotationGroup.Ornament],
+    [AnnotationKind.tr, AnnotationGroup.Ornament],
+    [AnnotationKind.mordent, AnnotationGroup.Ornament],
+    [AnnotationKind.grace_note, AnnotationGroup.Ornament],
+    [AnnotationKind.turn, AnnotationGroup.Ornament],
+    [AnnotationKind.appoggiatura, AnnotationGroup.Ornament],
+    [AnnotationKind.acciaccatura, AnnotationGroup.Ornament],
+
+    // Temporal effect annotations
+    [AnnotationKind.fermata, AnnotationGroup.Temporal],
+    [AnnotationKind.measureEndFermata, AnnotationGroup.Temporal],
+
+    // Label annotations
+    [AnnotationKind.PitchLabel, AnnotationGroup.Label],
+    [AnnotationKind.ChordLabel, AnnotationGroup.Label],
+
+    // Misc annotations
+    [AnnotationKind._8va, AnnotationGroup.Misc],
+    [AnnotationKind._8vb, AnnotationGroup.Misc],
+    [AnnotationKind.tacet, AnnotationGroup.Misc],
+    [AnnotationKind.sim, AnnotationGroup.Misc],
+    [AnnotationKind.div, AnnotationGroup.Misc],
+    [AnnotationKind.unis, AnnotationGroup.Misc],
+    [AnnotationKind.cue_notes, AnnotationGroup.Misc],
+]);
+
+export function resolveAnnotationGroup(annotationKind: string): AnnotationGroup | undefined {
+    return MapAnnotationKindToGroup.get(annotationKind);
 }

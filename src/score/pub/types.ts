@@ -291,12 +291,14 @@ export enum Label {
     Chord = "chord"
 }
 
-/** Annotation types */
-export enum Annotation {
+/** Annotation group */
+export enum AnnotationGroup {
     /** Navigation annotation */
     Navigation = "navigation",
-    /** Dynamics annotation */
+    /** @deprecated - Dynamics is deprecated. Will be removed in future release. Use Dynamic instead. */
     Dynamics = "dynamics",
+    /** Dynamic annotation */
+    Dynamic = "dynamic",
     /** Tempo annotation */
     Tempo = "tempo",
     /** Articulation annotation */
@@ -315,8 +317,15 @@ export enum Annotation {
     Misc = "misc"
 }
 
-/** Navigation annotations */
-export enum NavigationAnnotation {
+/** @deprecated - Annotation is deprecated. Will be removed in future release. Use AnnotationGroup instead. */
+export { AnnotationGroup as Annotation }
+
+/** Annotation kind enum */
+export enum AnnotationKind {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Navigation
+    //////////////////////////////////////////////////
+
     /** Repeat back to beginning and play to the "Fine" marking. */
     DC_al_Fine = "D.C. al Fine",
     /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
@@ -338,14 +347,12 @@ export enum NavigationAnnotation {
     /** End of repeat section. Jump to start of repeat section. */
     EndRepeat = "endRepeat",
     /** Jump to ending with correct passage number. */
-    Ending = "ending"
-}
+    Ending = "ending",
 
-/** Export also as Navigation alias for legacy support. */
-export { NavigationAnnotation as Navigation }
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Dynamic
+    //////////////////////////////////////////////////
 
-/** Dynamic annotations */
-export enum DynamicsAnnotation {
     /** pianississimo (very, very soft) */
     ppp = "ppp",
     /** pianissimo (very soft) */
@@ -378,10 +385,11 @@ export enum DynamicsAnnotation {
     sfz = "sfz",
     /** sudden strong accent */
     sforzando = "sforzando",
-}
 
-/** Tempo annotations */
-export enum TempoAnnotation {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Tempo
+    //////////////////////////////////////////////////
+
     /** gradually faster */
     accel = "accel.",
     /** gradually slower */
@@ -408,14 +416,11 @@ export enum TempoAnnotation {
     Presto = "Presto",
     /** extremely fast */
     Prestissimo = "Prestissimo",
-}
 
-/** Articulation annotations */
-export enum ArticulationAnnotation {
-    /** @deprecated - ArticulationAnnotation.fermata is deprecated, use TemporalAnnotation.fermata instead. */
-    fermata = "fermata",
-    /** @deprecated - ArticulationAnnotation.measureEndFermata is deprecated, use TemporalAnnotation.measureEndFermata instead. */
-    measureEndFermata = "measureEndFermata",
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Articulation
+    //////////////////////////////////////////////////
+
     /** short, detached */
     staccato = "staccato",
     /** (—) – held for full value */
@@ -428,10 +433,11 @@ export enum ArticulationAnnotation {
     legato = "legato",
     /** gently separated (tenuto + staccato) */
     portato = "portato",
-}
 
-/** Expression annotations */
-export enum ExpressionAnnotation {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Expression
+    //////////////////////////////////////////////////
+
     /** sweetly */
     dolce = "dolce",
     /** singing style */
@@ -456,11 +462,12 @@ export enum ExpressionAnnotation {
     misterioso = "misterioso",
     /** calm */
     tranquillo = "tranquillo",
-}
 
-/** Technique annotations */
-export enum TechniqueAnnotation {
-    // Strings
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Technique
+    //////////////////////////////////////////////////
+
+    //////////// Strings ////////////
     /** plucked */
     pizz = "pizz.",
     /** bowed */
@@ -475,7 +482,7 @@ export enum TechniqueAnnotation {
     vibrato = "vibrato",
     /**  */
     senza_vibrato = "senza vibrato",
-    // Keyboard
+    //////////// Keyboard ////////////
     /** legato pedal */
     legato_pedal = "legato pedal",
     /** staccato pedal */
@@ -484,10 +491,11 @@ export enum TechniqueAnnotation {
     una_corda = "una corda",
     /** release soft pedal */
     tre_corde = "tre corde",
-}
 
-/** Ornament annotations */
-export enum OrnamentAnnotation {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Ornament
+    //////////////////////////////////////////////////
+
     /**  */
     trill = "trill",
     /**  */
@@ -502,26 +510,29 @@ export enum OrnamentAnnotation {
     appoggiatura = "appoggiatura",
     /**  */
     acciaccatura = "acciaccatura",
-}
 
-/** Temporal effect annotations */
-export enum TemporalAnnotation {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Temporal
+    //////////////////////////////////////////////////
+
     /** hold longer than written */
     fermata = "fermata",
     /** hold at measure end */
     measureEndFermata = "measureEndFermata",
-}
 
-/** Miscellaneous annotations */
-export enum LabelAnnotation {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Label
+    //////////////////////////////////////////////////
+
     /** Pitch label */
     PitchLabel = "pitchLabel",
     /** Chord label */
     ChordLabel = "chordLabel",
-}
 
-/** Miscellaneous annotations */
-export enum MiscAnnotation {
+    //////////////////////////////////////////////////
+    // AnnotationGroup.Misc
+    //////////////////////////////////////////////////
+
     /** play one octave higher */
     _8va = "8va",
     /** play one octave lower */
@@ -538,18 +549,80 @@ export enum MiscAnnotation {
     cue_notes = "cue notes",
 }
 
-/** Known annotation text type. */
-export type AnnotationText =
-    `${NavigationAnnotation}` |
-    `${DynamicsAnnotation}` |
-    `${TempoAnnotation}` |
-    `${ArticulationAnnotation}` |
-    `${ExpressionAnnotation}` |
-    `${TechniqueAnnotation}` |
-    `${OrnamentAnnotation}` |
-    `${LabelAnnotation}` |
-    `${TemporalAnnotation}` |
-    `${MiscAnnotation}`;
+/** Annotation kind text type. @deprecated - Do not use. */
+export type AnnotationText = `${AnnotationKind}`;
+
+/** Navigation annotations */
+export enum Navigation {
+    /** Repeat back to beginning and play to the "Fine" marking. */
+    DC_al_Fine = AnnotationKind.DC_al_Fine,
+    /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
+    DC_al_Coda = AnnotationKind.DC_al_Coda,
+    /** Repeat back to Segno sign (𝄋) and play to the "Fine" marking. */
+    DS_al_Fine = AnnotationKind.DS_al_Fine,
+    /** Repeat back to Segno sign (𝄋) and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
+    DS_al_Coda = AnnotationKind.DS_al_Coda,
+    /** "𝄌 Coda" section. */
+    Coda = AnnotationKind.Coda,
+    /** From "toCoda 𝄌" jump to the "𝄌 Coda" section. */
+    toCoda = AnnotationKind.toCoda,
+    /** Jump here from D.S. al Fine or D.S. al Coda. */
+    Segno = AnnotationKind.Segno,
+    /** Stop playing after D.C. al Fine or D.S. al Fine. */
+    Fine = AnnotationKind.Fine,
+    /** Start of repeat section. */
+    StartRepeat = AnnotationKind.StartRepeat,
+    /** End of repeat section. Jump to start of repeat section. */
+    EndRepeat = AnnotationKind.EndRepeat,
+    /** Jump to ending with correct passage number. */
+    Ending = AnnotationKind.Ending
+}
+
+/** @deprecated - DynamicsAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
+export enum DynamicsAnnotation {
+    /** pianississimo (very, very soft) */
+    ppp = AnnotationKind.ppp,
+    /** pianissimo (very soft) */
+    pp = AnnotationKind.pp,
+    /** piano (soft) */
+    p = AnnotationKind.p,
+    /** mezzo-piano (moderately soft) */
+    mp = AnnotationKind.mp,
+    /** mezzo */
+    m = AnnotationKind.m,
+    /** mezzo-forte (moderately loud) */
+    mf = AnnotationKind.mf,
+    /** forte (loud) */
+    f = AnnotationKind.f,
+    /** fortissimo (very loud) */
+    ff = AnnotationKind.ff,
+    /** fortississimo (very, very loud) */
+    fff = AnnotationKind.fff,
+    /** crescendo (gradually louder) */
+    cresc = AnnotationKind.cresc,
+    /** diminuendo (gradually softer) */
+    decresc = AnnotationKind.decresc,
+    /** diminuendo (gradually softer) */
+    dim = AnnotationKind.dim,
+}
+
+/** @deprecated - TempoAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
+export enum TempoAnnotation {
+    /** gradually faster */
+    accel = AnnotationKind.accel,
+    /** gradually slower */
+    rit = AnnotationKind.rit,
+    /** gradually slower */
+    rall = AnnotationKind.rall,
+    /** return to original tempo */
+    a_tempo = AnnotationKind.a_tempo,
+}
+
+/** @deprecated - ArticulationAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
+export enum ArticulationAnnotation {
+    fermata = AnnotationKind.fermata,
+    measureEndFermata = AnnotationKind.measureEndFermata,
+}
 
 /** Play state enum. */
 export enum PlayState {
