@@ -9,7 +9,7 @@ import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotation } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated } from "shared-src";
-import { isEnumValueLoose, resolveEnumValue, resolveRequiredEnumValue } from "../engine/enum-utils";
+import { resolveEnumValue, resolveRequiredEnumValue } from "../engine/enum-utils";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
