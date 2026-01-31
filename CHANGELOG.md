@@ -5,7 +5,7 @@
     * Renamed enum `Annotation` to `AnnotationGroup` and deprecated `Annotation`.
     * Added enum `AnnotationKind` to contain all annotations, and added lots of them.
     * Deprecated enums `TempoAnnotation`, `DynamicsAnnotation` and `ArticulationAnnotation`.
-    * `AnnotationGroup` is now: `{` `Tempo`, `Dynamic`, `Articulation`, `Navigation`,
+    * `AnnotationGroup` is now: `{` `Tempo`, `Dynamics`, `Articulation`, `Navigation`,
       `Expression`, `Technique`, `Temporal`, `Ornament`, `Label`, `Misc` `}`.
     * Deprecated `addLabel()`, use `addAnnotation()`.
     * Deprecated earlier `addFermata()`, use `addAnnotation()`.

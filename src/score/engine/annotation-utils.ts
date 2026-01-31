@@ -31,7 +31,6 @@ export function getAnnotationKindTextReplacement(text: string): string {
 export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, annotationKind: string): LayoutGroupId {
     switch (annotationGroup) {
         case AnnotationGroup.Dynamics:
-        case AnnotationGroup.Dynamic:
             return LayoutGroupId.Annotation_Dynamic;
         case AnnotationGroup.Tempo:
             return LayoutGroupId.Annotation_Tempo;
@@ -79,7 +78,7 @@ export function getAnnotationColor(line: ObjNotationLine, annotationGroup: Annot
 }
 
 export function isDynamicsText(annotationKind: string): boolean {
-    return resolveAnnotationGroup(annotationKind) === AnnotationGroup.Dynamic;
+    return resolveAnnotationGroup(annotationKind) === AnnotationGroup.Dynamics;
 }
 
 export function getDynamicsVolume(annotationKind: string): number | undefined {
@@ -112,22 +111,22 @@ const MapAnnotationKindToGroup = new UniMap<string, AnnotationGroup>([
     [AnnotationKind.Ending, AnnotationGroup.Navigation],
 
     // Dynamic annotations
-    [AnnotationKind.ppp, AnnotationGroup.Dynamic],
-    [AnnotationKind.pp, AnnotationGroup.Dynamic],
-    [AnnotationKind.p, AnnotationGroup.Dynamic],
-    [AnnotationKind.mp, AnnotationGroup.Dynamic],
-    [AnnotationKind.m, AnnotationGroup.Dynamic],
-    [AnnotationKind.mf, AnnotationGroup.Dynamic],
-    [AnnotationKind.f, AnnotationGroup.Dynamic],
-    [AnnotationKind.ff, AnnotationGroup.Dynamic],
-    [AnnotationKind.fff, AnnotationGroup.Dynamic],
-    [AnnotationKind.cresc, AnnotationGroup.Dynamic],
-    [AnnotationKind.decresc, AnnotationGroup.Dynamic],
-    [AnnotationKind.dim, AnnotationGroup.Dynamic],
-    [AnnotationKind.fp, AnnotationGroup.Dynamic],
-    [AnnotationKind.sf, AnnotationGroup.Dynamic],
-    [AnnotationKind.sfz, AnnotationGroup.Dynamic],
-    [AnnotationKind.sforzando, AnnotationGroup.Dynamic],
+    [AnnotationKind.ppp, AnnotationGroup.Dynamics],
+    [AnnotationKind.pp, AnnotationGroup.Dynamics],
+    [AnnotationKind.p, AnnotationGroup.Dynamics],
+    [AnnotationKind.mp, AnnotationGroup.Dynamics],
+    [AnnotationKind.m, AnnotationGroup.Dynamics],
+    [AnnotationKind.mf, AnnotationGroup.Dynamics],
+    [AnnotationKind.f, AnnotationGroup.Dynamics],
+    [AnnotationKind.ff, AnnotationGroup.Dynamics],
+    [AnnotationKind.fff, AnnotationGroup.Dynamics],
+    [AnnotationKind.cresc, AnnotationGroup.Dynamics],
+    [AnnotationKind.decresc, AnnotationGroup.Dynamics],
+    [AnnotationKind.dim, AnnotationGroup.Dynamics],
+    [AnnotationKind.fp, AnnotationGroup.Dynamics],
+    [AnnotationKind.sf, AnnotationGroup.Dynamics],
+    [AnnotationKind.sfz, AnnotationGroup.Dynamics],
+    [AnnotationKind.sforzando, AnnotationGroup.Dynamics],
 
     // Tempo annotations
     [AnnotationKind.accel, AnnotationGroup.Tempo],

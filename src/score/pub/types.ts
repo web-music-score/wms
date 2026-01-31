@@ -295,10 +295,8 @@ export enum Label {
 export enum AnnotationGroup {
     /** Navigation annotation */
     Navigation = "navigation",
-    /** @deprecated - Dynamics is deprecated. Will be removed in future release. Use Dynamic instead. */
-    Dynamics = "dynamics",
-    /** Dynamic annotation */
-    Dynamic = "dynamic",
+    /** Dynamics annotation */
+    Dynamics = "dynamic",
     /** Tempo annotation */
     Tempo = "tempo",
     /** Articulation annotation */
@@ -350,7 +348,7 @@ export enum AnnotationKind {
     Ending = "ending",
 
     //////////////////////////////////////////////////
-    // AnnotationGroup.Dynamic
+    // AnnotationGroup.Dynamics
     //////////////////////////////////////////////////
 
     /** pianississimo (very, very soft) */
