@@ -3,8 +3,7 @@
 ## Pre-Release
     // Update CHANGELOG.md
 
-    // Set Version
-    Set package.json "version" to "X.Y.Z-pre.N"`
+    // Version: "X.Y.Z-pre.N"`
 
     // Install
     npm install
@@ -24,11 +23,13 @@
     // Publish
     npm publish --access public --tag next
 
+    // Bump version
+
+
 ## Latest
     // Update CHANGELOG.md
 
-    // Set Version
-    Set package.json "version" to "X.Y.Z"`
+    // Version: "X.Y.Z"`
 
     // Install
     npm install
@@ -50,3 +51,5 @@
 
     // Add "next" tag when publishing first stable vX.Y.0 (not for patches)
     npm dist-tag add web-music-score@X.Y.Z next
+
+    // Bump version
