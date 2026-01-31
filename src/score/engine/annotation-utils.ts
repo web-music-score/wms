@@ -24,6 +24,7 @@ export function getAnnotationKindTextReplacement(text: string): string {
         case AnnotationKind.tenuto: return "—";     // TODO: Maybe should draw better symbol instead.
         case AnnotationKind.accent: return ">";     // TODO: Maybe should draw better symbol instead.
         case AnnotationKind.marcato: return "^";    // TODO: Maybe should draw better symbol instead.
+        case AnnotationKind.trill: return "tr";
     }
     return text;
 }
