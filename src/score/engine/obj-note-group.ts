@@ -152,11 +152,12 @@ export class ObjNoteGroup extends MusicObject {
     private runningStringNumbers: StringNumber[];
 
     readonly color: string;
-    readonly _staccato: boolean;
     readonly diamond: boolean;
     readonly arpeggio: Arpeggio | undefined;
     readonly oldStyleTriplet: boolean;
     readonly rhythmProps: RhythmProps;
+
+    private articulation?: "staccato";
 
     private startConnnectives: ConnectiveProps[] = [];
     private runningConnectives: ConnectiveProps[] = [];
@@ -193,10 +194,11 @@ export class ObjNoteGroup extends MusicObject {
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
         this.color = options?.color ?? colorKey("staff.note");
-        this._staccato = options?.staccato ?? false;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
+
+        if(options?.staccato) this.articulation = "staccato";
 
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
@@ -219,8 +221,12 @@ export class ObjNoteGroup extends MusicObject {
         return this.col.row;
     }
 
-    get staccato(): boolean {
-        return this._staccato || this.col.staccato;
+    setStaccato() {
+        this.articulation = "staccato";
+    }
+
+    hasStaccato(): boolean {
+        return this.articulation === "staccato";
     }
 
     get minDiatonicId(): number {
@@ -643,7 +649,7 @@ export class ObjNoteGroup extends MusicObject {
                 }
 
                 // Add staccato dot
-                if (this.staccato) {
+                if (this.articulation === "staccato") {
                     if (stemDir === Stem.Up && isBottomNote) {
                         let dotX = noteX;
                         let dotY = noteY + unitSize * (isNoteOnLine ? 3 : 2);

@@ -619,8 +619,8 @@ export class ObjMeasure extends MusicObject {
             throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
 
         if (annotationKind === Pub.AnnotationKind.staccato) {
-            if (this.lastAddedRhythmColumn)
-                this.lastAddedRhythmColumn.staccato = true;
+            if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup)
+                this.lastAddedRhythmSymbol.setStaccato();
             return;
         }
 

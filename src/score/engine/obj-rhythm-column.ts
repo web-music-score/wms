@@ -155,10 +155,6 @@ export class ObjRhythmColumn extends MusicObject {
         return []; // Do not return [this].
     }
 
-    set staccato(b: true) {
-        this._staccato = b;
-    }
-
     get staccato(): boolean {
         return this._staccato;
     }
@@ -311,7 +307,7 @@ export class ObjRhythmColumn extends MusicObject {
 
                 symbol.notes.forEach(note => {
                     let ticks = symbol.getPlayTicks(note);
-                    let staccato = symbol.staccato;
+                    let staccato = symbol.hasStaccato();
 
                     addNote(note, ticks, staccato, slur);
                 });
