@@ -6,7 +6,7 @@
     // Version: "X.Y.Z-pre.N"`
 
     // Install
-    npm install
+    npm install --workspaces
 
     // Build
     npm run build
@@ -32,7 +32,7 @@
     // Version: "X.Y.Z"`
 
     // Install
-    npm install
+    npm install --workspaces
 
     // Build
     npm run build
