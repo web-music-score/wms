@@ -296,7 +296,7 @@ export enum AnnotationGroup {
     /** Navigation annotation */
     Navigation = "navigation",
     /** Dynamics annotation */
-    Dynamics = "dynamic",
+    Dynamics = "dynamics",
     /** Tempo annotation */
     Tempo = "tempo",
     /** Articulation annotation */
