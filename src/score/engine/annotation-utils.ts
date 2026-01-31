@@ -79,7 +79,7 @@ export function getAnnotationColor(line: ObjNotationLine, annotationGroup: Annot
 }
 
 export function isDynamicsText(annotationKind: string): boolean {
-    return resolveAnnotationGroup(annotationKind) === AnnotationGroup.Dynamics;
+    return resolveAnnotationGroup(annotationKind as AnnotationKind) === AnnotationGroup.Dynamics;
 }
 
 export function getDynamicsVolume(annotationKind: string): number | undefined {
@@ -93,11 +93,11 @@ export function getDynamicsVolume(annotationKind: string): number | undefined {
 }
 
 export function isTempoText(annotationKind: string): boolean {
-    return resolveAnnotationGroup(annotationKind) === AnnotationGroup.Tempo;
+    return resolveAnnotationGroup(annotationKind as AnnotationKind) === AnnotationGroup.Tempo;
 }
 
 // Cache annotations.
-const MapAnnotationKindToGroup = new UniMap<string, AnnotationGroup>([
+const AnnotationKindToGroupMap = new UniMap<AnnotationKind, AnnotationGroup>([
     // Navigation annotations
     [AnnotationKind.DC_al_Fine, AnnotationGroup.Navigation],
     [AnnotationKind.DC_al_Coda, AnnotationGroup.Navigation],
@@ -208,6 +208,18 @@ const MapAnnotationKindToGroup = new UniMap<string, AnnotationGroup>([
     [AnnotationKind.cue_notes, AnnotationGroup.Misc],
 ]);
 
-export function resolveAnnotationGroup(annotationKind: string): AnnotationGroup | undefined {
-    return MapAnnotationKindToGroup.get(annotationKind);
+export function resolveAnnotationGroup(annotationKind: AnnotationKind): AnnotationGroup | undefined {
+    return AnnotationKindToGroupMap.get(annotationKind);
+}
+
+function normaliseAnnotationKind(annotationKind: string): string {
+    let str = String(annotationKind).trim().toLowerCase();
+    return str.endsWith(".") ? str.substring(str.length - 1) : str;
+}
+
+const NormalisedAnnotationKindMap = new UniMap<string, AnnotationKind>();
+AnnotationKindToGroupMap.forEach((_, kind) => NormalisedAnnotationKindMap.set(normaliseAnnotationKind(kind), kind));
+
+export function resolveAnnotationKind(annotationKind: string): AnnotationKind | undefined {
+    return NormalisedAnnotationKindMap.get(normaliseAnnotationKind(annotationKind));
 }

@@ -7,7 +7,7 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
-import { resolveAnnotationGroup } from "../engine/annotation-utils";
+import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated } from "shared-src";
 import { resolveEnumValue, resolveRequiredEnumValue } from "../engine/enum-utils";
 
@@ -754,9 +754,10 @@ export class DocumentBuilder {
         );
 
         if (!annotationGroup) {
-            annotationGroup = resolveAnnotationGroup(annotationKind);
+            const kind = resolveAnnotationKind(annotationKind);
+            annotationGroup = kind ? resolveAnnotationGroup(kind) : undefined;
             if (!annotationGroup)
-                throw new MusicError(MusicErrorType.Score, `Failed to resolve annotation from "${args[0]}".`);
+                throw new MusicError(MusicErrorType.Score, `Failed to resolve annotation group for annotation kind "${args[0]}".`);
         }
 
         this.getMeasure().addAnnotation(staffTargets, annotationGroup, annotationKind, ...args);
