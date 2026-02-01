@@ -327,9 +327,12 @@ export class ObjDocument extends MusicObject {
 
     offset(dx: number, dy: number) { }
 
-    drawContent(view: View) {
-        this.header?.draw(view);
-        this.rows.forEach(row => row.draw(view));
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
+        this.header?.draw(view, clipRect);
+        this.rows.forEach(row => row.draw(view, clipRect));
     }
 
     pickStaffPosAt(x: number, y: number): StaffPos | undefined {

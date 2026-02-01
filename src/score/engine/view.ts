@@ -56,7 +56,6 @@ export class View {
     public staffSpacePx: number = 1;
     public fontSizePx: number = 1;
 
-
     private scoreEventListener?: ScoreEventListener;
 
     private canvas?: HTMLCanvasElement;
@@ -451,25 +450,37 @@ export class View {
         canvas.style.height = (h / Device.DevicePixelRatio) + "px";
     }
 
+    drawStaticContent(clipRect?: Rect) {
+        this.doc?.draw(this, clipRect);
+    }
+
+    drawOverlayContent(clipRect?: Rect) {
+        this.drawHilightStaffPos(clipRect);
+        this.drawHilightObj(clipRect);
+        this.drawCursor(clipRect);
+    }
+
     draw() {
         try {
             let { doc } = this;
 
-            if (doc) {
-                doc.layout(this);
-
-                this.updateCanvasSize();
-                this.clearCanvas();
-
-                this.drawHilightStaffPosRect();
-                this.drawHilightObjectRect();
-                this.drawPlayCursor();
-
-                doc.drawContent(this);
-            }
-            else {
+            if (!doc) {
                 this.drawNoDoc();
+                return;
             }
+
+            const oldSize = doc.getRect();
+
+            doc.layout(this);
+
+            const newSize = doc.getRect();
+
+            if (!oldSize.equals(newSize))
+                this.updateCanvasSize();
+
+            this.drawBackGround();
+            this.drawOverlayContent();
+            this.drawStaticContent();
         }
         catch (err) {
             console.error("Render failed!", err);
@@ -526,7 +537,7 @@ export class View {
         ctx.restore();
     }
 
-    drawHilightStaffPosRect() {
+    drawHilightStaffPos(clipRect?: Rect) {
         let { mousePos, hilightedStaffPos, unitSize } = this;
 
         if (!hilightedStaffPos) {
@@ -535,8 +546,6 @@ export class View {
 
         let { staff, measure, diatonicId } = hilightedStaffPos;
 
-        this.fillColor(this.paint.colors["hilight.staffpos"]);
-
         const y = staff.getDiatonicIdY(diatonicId);
 
         const measures = staff.row.getMeasures();
@@ -544,29 +553,38 @@ export class View {
         const left = measure ? measure.getRect().left : measures[0].getRect().left;
         const right = measure ? measure.getRect().right : measures[measures.length - 1].getRect().right;
 
-        this.fillRect(left, y - unitSize, right - left, 2 * unitSize);
+        const r = new Rect(left, y - unitSize, right - left, 2 * unitSize);
+
+        if (clipRect && !clipRect.intersects(r))
+            return;
+
+        this.fillColor(this.paint.colors["hilight.staffpos"])
+            .fillRect(r.left, r.top, r.width, r.height);
 
         if (mousePos !== undefined) {
             this.drawLedgerLines(staff, diatonicId, mousePos.x);
         }
     }
 
-    drawHilightObjectRect() {
-        let { hilightedObj } = this;
+    drawHilightObj(clipRect?: Rect) {
+        let r = this.hilightedObj?.getRect().toRect();
 
-        if (!hilightedObj) {
+        if (!r || clipRect && !clipRect.intersects(r))
             return;
-        }
-
-        let rect = hilightedObj.getRect();
 
         this.lineColor(this.paint.colors["hilight.object"]);
-        this.strokeRect(rect.left, rect.top, rect.width, rect.height);
+        this.strokeRect(r.left, r.top, r.width, r.height);
     }
 
-    drawPlayCursor() {
-        for (const [key, r] of this.cursorRects)
-            this.color(this.paint.colors["play.cursor"]).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+    drawCursor(clipRect?: Rect) {
+        for (const [_, r] of this.cursorRects) {
+            if (clipRect && !clipRect.intersects(r))
+                return;
+
+            this.color(this.paint.colors["play.cursor"])
+                .lineWidth(2)
+                .strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+        }
     }
 
     txFromScreenCoord(screenCoord: Vec) {
@@ -577,10 +595,11 @@ export class View {
         return coord.div(Device.DevicePixelRatio);
     }
 
-    clearCanvas() {
+    drawBackGround(rect?: Rect) {
         if (this.ctx) {
-            this.ctx.canvas.style.background = this.getPaint().colors["background"];
-            this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+            rect ??= new Rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+            this.ctx.canvas.style.background = this.paint.colors["background"];
+            this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
         }
     }
 

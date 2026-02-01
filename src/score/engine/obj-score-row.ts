@@ -6,7 +6,7 @@ import { ObjDocument } from "./obj-document";
 import { View } from "./view";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
@@ -452,19 +452,14 @@ export class ObjScoreRow extends MusicObject {
         return this.getFirstMeasure()?.getStaffLineLeft();
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.getRect());
 
-
-        // Set clip rect for this row
-        const { left, top, width, height } = this.getRect();
-        const p = view.unitSize;
-        view.save();
-        view.rect(left - p, top - p, width + 2 * p, height + 2 * p);
-        view.clip();
-
         // Draw measures
-        this.measures.forEach(m => m.draw(view));
+        this.measures.forEach(m => m.draw(view, clipRect));
 
         // Draw notation lines
         this.notationLines.forEach(m => m.draw(view));
@@ -477,7 +472,5 @@ export class ObjScoreRow extends MusicObject {
 
         // Draw row groups
         this.rowGroups.forEach(grp => grp.draw(view));
-
-        view.restore();
     }
 }

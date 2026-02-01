@@ -3,7 +3,7 @@ import { View } from "./view";
 import { ObjText } from "./obj-text";
 import { colorKey, MHeader } from "../pub";
 import { ObjDocument } from "./obj-document";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjHeader extends MusicObject {
     private titleText?: ObjText;
@@ -112,7 +112,10 @@ export class ObjHeader extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         if (this.titleText) {
             this.titleText.draw(view);
         }

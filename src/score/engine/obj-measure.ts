@@ -1,4 +1,4 @@
-import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRect } from "@tspro/ts-utils-lib";
+import { Guard, IndexArray, UniMap, TriMap, ValueSet, Utils, asMulti, AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import * as Theory from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
@@ -1619,7 +1619,10 @@ export class ObjMeasure extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.getRect());
         view.lineWidth(1);
 

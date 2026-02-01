@@ -1,4 +1,4 @@
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { MusicInterface } from "../pub";
 import { LayoutObjectWrapper } from "./layout-object";
 
@@ -123,5 +123,19 @@ export abstract class MusicObject {
 
     isLinked(): boolean {
         return this.link !== null;
+    }
+
+    intersects(clipRect?: Rect): boolean {
+        if (!clipRect) return true;
+
+        const r = this.getRect();
+        if (!r) return true;
+
+        return !(
+            r.right < clipRect.left ||
+            r.left > clipRect.right ||
+            r.bottom < clipRect.top ||
+            r.top > clipRect.bottom
+        );
     }
 }
