@@ -247,7 +247,7 @@ export class ObjDocument extends MusicObject {
 
     updateCursorRect(player: Player, cursorRect?: Rect) {
         for (const view of this.attachedViews)
-            view.updateCursorRect(player, cursorRect);
+            view.updateCursorOverlay(player, cursorRect);
     }
 
     requestLayout() {
@@ -321,6 +321,9 @@ export class ObjDocument extends MusicObject {
 
         // Done
         this.rows.forEach(row => row.layoutDone());
+
+        // Mark whole view dirty.
+        view.isAllDirty = true;
 
         this.needLayout = false;
     }

@@ -4,7 +4,7 @@ import { ObjText } from "./obj-text";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjScoreRow } from "./obj-score-row";
 import { colorKey, MScoreRowGroup } from "../pub";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 function parseInstr(instr: string) {
     const instrName = (
@@ -95,7 +95,10 @@ export class ObjScoreRowGroup extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         this.instrText.draw(view);
 
         if (this.hasBrace) {

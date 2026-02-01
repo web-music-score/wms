@@ -471,6 +471,6 @@ export class ObjScoreRow extends MusicObject {
         }
 
         // Draw row groups
-        this.rowGroups.forEach(grp => grp.draw(view));
+        this.rowGroups.forEach(grp => grp.draw(view, clipRect));
     }
 }

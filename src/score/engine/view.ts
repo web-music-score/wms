@@ -44,6 +44,12 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
     else return a.length === b.length && a.every((a2, i) => a2 === b[i]);
 }
 
+type Overlay = {
+    rect: Rect;
+    ref: Player | MusicObject;
+    dispose?: boolean;
+}
+
 export class View {
     static NoDocumentText = "WmsView: No Document!";
 
@@ -65,7 +71,7 @@ export class View {
 
     private paint: Paint = Paint.default;
 
-    private cursorRects = new UniMap<Player, Rect>();
+    private cursorOverlays = new UniMap<Player, Overlay>();
     private mousePos?: Vec; // Mouse coord in document space
 
     private curStaffPos?: StaffPos;
@@ -82,6 +88,9 @@ export class View {
     private onTouchEndFn: (e: TouchEvent) => void;
 
     private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
+
+    public isAllDirty = true;
+    private dirtyOverlays: Overlay[] = [];
 
     constructor(private readonly mi: WmsView) {
         this.defaultFontSizePx = this.fontSizePx = Device.FontSize * Device.DevicePixelRatio;
@@ -415,18 +424,55 @@ export class View {
     }
 
     hilightObject(obj?: MusicObject) {
+        if (this.hilightedObj === obj) return;
+
+        if (this.hilightedObj) {
+            this.dirtyOverlays.forEach(o => {
+                if (o.ref === this.hilightedObj)
+                    o.dispose = true;
+            });
+        }
+
+        if (obj) {
+            this.dirtyOverlays = this.dirtyOverlays.filter(o => o.ref !== obj);
+            this.dirtyOverlays.push({ rect: new Rect(obj.getRect()), ref: obj });
+        }
+
         this.hilightedObj = obj;
     }
 
     hilightStaffPos(staffPos?: StaffPos) {
+        if (this.hilightedStaffPos) {
+            this.dirtyOverlays.forEach(o => {
+                if (o.ref === this.hilightedStaffPos?.measure)
+                    o.dispose = true;
+            });
+        }
+
+        if (staffPos?.measure) {
+            this.dirtyOverlays = this.dirtyOverlays.filter(o => o.ref !== staffPos.measure);
+            this.dirtyOverlays.push({ rect: new Rect(staffPos.measure.getRect()), ref: staffPos.measure });
+        }
+
         this.hilightedStaffPos = staffPos;
     }
 
-    updateCursorRect(player: Player, cursorRect: Rect | undefined) {
-        if (cursorRect)
-            this.cursorRects.set(player, cursorRect);
-        else
-            this.cursorRects.delete(player);
+    updateCursorOverlay(player: Player, cursorRect: Rect | undefined) {
+        this.dirtyOverlays = this.dirtyOverlays.filter(o => o.ref !== player);
+
+        const dispose = this.cursorOverlays.get(player);
+
+        if (dispose)
+            this.dirtyOverlays.push({ rect: dispose.rect, ref: dispose.ref, dispose: true });
+
+        if (cursorRect) {
+            const newOverlay = { rect: cursorRect, ref: player };
+            this.cursorOverlays.set(player, newOverlay)
+            this.dirtyOverlays.push(newOverlay);
+        }
+        else {
+            this.cursorOverlays.delete(player);
+        }
 
         this.draw();
     }
@@ -457,7 +503,7 @@ export class View {
     drawOverlayContent(clipRect?: Rect) {
         this.drawHilightStaffPos(clipRect);
         this.drawHilightObj(clipRect);
-        this.drawCursor(clipRect);
+        this.drawCursorOverlays(clipRect);
     }
 
     draw() {
@@ -478,9 +524,30 @@ export class View {
             if (!oldSize.equals(newSize))
                 this.updateCanvasSize();
 
-            this.drawBackGround();
-            this.drawOverlayContent();
-            this.drawStaticContent();
+            if (this.isAllDirty) {
+                this.drawBackGround();
+                this.drawOverlayContent();
+                this.drawStaticContent();
+                this.isAllDirty = false;
+                return;
+            }
+
+            const pad = this.lineWidthPx * 1.5 + this.unitSize * 0.5;
+
+            this.dirtyOverlays = this.dirtyOverlays.filter(o => {
+                this.save();
+
+                const r = o.rect.inflateCopy(pad, pad);
+                this.clipRect(r.left, r.top, r.width, r.height);
+
+                this.drawBackGround(r);
+                this.drawOverlayContent(r);
+                this.drawStaticContent(r);
+
+                this.restore();
+
+                return !o.dispose;
+            });
         }
         catch (err) {
             console.error("Render failed!", err);
@@ -567,7 +634,7 @@ export class View {
     }
 
     drawHilightObj(clipRect?: Rect) {
-        let r = this.hilightedObj?.getRect().toRect();
+        let r = this.hilightedObj?.getRect();
 
         if (!r || clipRect && !clipRect.intersects(r))
             return;
@@ -576,14 +643,14 @@ export class View {
         this.strokeRect(r.left, r.top, r.width, r.height);
     }
 
-    drawCursor(clipRect?: Rect) {
-        for (const [_, r] of this.cursorRects) {
-            if (clipRect && !clipRect.intersects(r))
-                return;
+    drawCursorOverlays(clipRect?: Rect) {
+        for (const [_, o] of this.cursorOverlays) {
+            if (clipRect && !clipRect.intersects(o.rect))
+                continue;
 
             this.color(this.paint.colors["play.cursor"])
                 .lineWidth(2)
-                .strokeLine(r.centerX, r.top, r.centerX, r.bottom);
+                .strokeLine(o.rect.centerX, o.rect.top, o.rect.centerX, o.rect.bottom);
         }
     }
 
@@ -831,8 +898,11 @@ export class View {
         return this;
     }
 
-    clip(): View {
-        if (this.ctx) this.ctx.clip();
+    clipRect(left: number, top: number, width: number, height: number): View {
+        if (!this.ctx) return this;
+        this.ctx.beginPath();
+        this.ctx.rect(left, top, width, height);
+        this.ctx.clip();
         return this;
     }
 

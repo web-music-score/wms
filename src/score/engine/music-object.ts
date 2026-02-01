@@ -126,16 +126,6 @@ export abstract class MusicObject {
     }
 
     intersects(clipRect?: Rect): boolean {
-        if (!clipRect) return true;
-
-        const r = this.getRect();
-        if (!r) return true;
-
-        return !(
-            r.right < clipRect.left ||
-            r.left > clipRect.right ||
-            r.bottom < clipRect.top ||
-            r.top > clipRect.bottom
-        );
+        return !clipRect || this.getRect().intersects(clipRect);
     }
 }
