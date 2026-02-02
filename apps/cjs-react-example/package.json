@@ -1,5 +1,5 @@
 {
-    "name": "js-react-example",
+    "name": "cjs-react-example",
     "version": "6.3.6",
     "private": true,
     "devDependencies": {
