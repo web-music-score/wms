@@ -1,6 +1,9 @@
-# Changelog
-## [6.3.6] - Unreleased
+# CHANGELOG
+
+## [6.3.6] - 2026-02-02
 ### Fixed
+- Do not set canvas size every frame. It clears canvas. There is separate function to clear canvas.
+- Do canvas and doc update first in draw() after setting canvas or doc.
 
 ## [6.3.5]
 ### Fixed
