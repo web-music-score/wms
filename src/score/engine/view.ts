@@ -215,7 +215,7 @@ export class View {
     }
 
     setDocument(doc?: ObjDocument) {
-        if (this._doc === doc) {
+        if (doc && doc === this._doc) {
             return;
         }
 
@@ -231,14 +231,25 @@ export class View {
             doc.addView(this);
         }
 
+        this.resetViewAndDocument();
+    }
+
+    private resetViewAndDocument() {
+        const { doc } = this;
+
+        if (doc) {
+            doc.requestFullLayout();
+            doc.layout(this);
+        }
+
+        this.updateCanvasSize();
+
         // Reset some values
         this.isAllDirty = true;
         this.dirtyOverlays = [];
         this.cursorOverlays.clear();
         this.hilightedObj = undefined;
         this.hilightedStaffPos = undefined;
-
-        this.updateCanvasSize();
     }
 
     setPaint(paint?: Paint) {
@@ -316,6 +327,8 @@ export class View {
         }
 
         this.ctx = this.canvas?.getContext("2d") ?? undefined;
+
+        this.resetViewAndDocument();
     }
 
     setScoreEventListener(fn: ScoreEventListener) {
@@ -564,15 +577,6 @@ export class View {
                 return;
             }
 
-            const oldSize = doc.getRect();
-
-            doc.layout(this);
-
-            const newSize = doc.getRect();
-
-            if (!oldSize.equals(newSize))
-                this.updateCanvasSize();
-
             if (this.isAllDirty) {
                 this.drawBackground();
                 this.drawOverlayContent();
@@ -607,8 +611,6 @@ export class View {
         const { canvas, ctx } = this;
 
         if (!canvas || !ctx) return;
-
-        this.updateCanvasSize();
 
         ctx.save();
 
