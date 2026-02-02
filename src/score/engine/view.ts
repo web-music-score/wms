@@ -58,6 +58,7 @@ export enum DrawSymbol {
     Staccato,
     Staccatissimo,
     Spiccato,
+    Flag
 }
 
 export class View {
@@ -535,7 +536,7 @@ export class View {
                 this.updateCanvasSize();
 
             if (this.isAllDirty) {
-                this.drawBackGround();
+                this.drawBackground();
                 this.drawOverlayContent();
                 this.drawStaticContent();
                 this.isAllDirty = false;
@@ -550,7 +551,7 @@ export class View {
                 const r = o.rect.inflateCopy(pad, pad);
                 this.clipRect(r.left, r.top, r.width, r.height);
 
-                this.drawBackGround(r);
+                this.drawBackground(r);
                 this.drawOverlayContent(r);
                 this.drawStaticContent(r);
 
@@ -614,7 +615,7 @@ export class View {
         ctx.restore();
     }
 
-    drawHilightStaffPos(clipRect?: Rect) {
+    private drawHilightStaffPos(clipRect?: Rect) {
         let { mousePos, hilightedStaffPos, unitSize } = this;
 
         if (!hilightedStaffPos) {
@@ -643,7 +644,7 @@ export class View {
         }
     }
 
-    drawHilightObj(clipRect?: Rect) {
+    private drawHilightObj(clipRect?: Rect) {
         let r = this.hilightedObj?.getRect();
 
         if (!r || clipRect && !clipRect.intersects(r))
@@ -653,7 +654,7 @@ export class View {
         this.strokeRect(r.left, r.top, r.width, r.height);
     }
 
-    drawCursorOverlays(clipRect?: Rect) {
+    private drawCursorOverlays(clipRect?: Rect) {
         for (const [_, o] of this.cursorOverlays) {
             if (clipRect && !clipRect.intersects(o.rect))
                 continue;
@@ -672,7 +673,7 @@ export class View {
         return coord.div(Device.DevicePixelRatio);
     }
 
-    drawBackGround(rect?: Rect) {
+    drawBackground(rect?: Rect) {
         if (this.ctx) {
             rect ??= new Rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
             this.ctx.canvas.style.background = this.paint.colors["background"];
@@ -808,20 +809,6 @@ export class View {
                 this.fill();
             }
         }
-    }
-
-    drawFlag(rect: Rect | AnchoredRect, flipY: boolean) {
-        let { left, width, top, bottom } = rect;
-
-        if (flipY) [top, bottom] = [bottom, top];
-
-        this.beginPath();
-        this.moveTo(left, top);
-        this.bezierCurveTo(
-            left, top * 0.75 + bottom * 0.25,
-            left + width * 1.5, top * 0.5 + bottom * 0.5,
-            left + width * 0.5, bottom);
-        this.stroke();
     }
 
     color(color: string | ColorKey): View {
@@ -1086,6 +1073,15 @@ export class View {
                 this.fillCircle(centerX, bottom - height / 5, Math.abs(height / 6));
                 break;
             }
+            case DrawSymbol.Flag:
+                this.beginPath();
+                this.moveTo(left, top);
+                this.bezierCurveTo(
+                    left, top * 0.75 + bottom * 0.25,
+                    left + width * 1.5, top * 0.5 + bottom * 0.5,
+                    left + width * 0.5, bottom);
+                this.stroke();
+                break;
         }
 
         return this;

@@ -1,5 +1,5 @@
 import { colorKey, getVoiceIds, MTabRhythm, VoiceId } from "../pub";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
 import { ObjTab } from "./obj-staff-and-tab";
@@ -117,7 +117,12 @@ export class ObjTabRhythm extends MusicObject {
 
                     if (symbols.length === 1) {
                         for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
-                            view.drawFlag(new AnchoredRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), false);
+                            view.drawSymbol(
+                                DrawSymbol.Flag,
+                                new AnchoredRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize),
+                                false,
+                                false
+                            );
                         }
                     }
 

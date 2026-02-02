@@ -838,7 +838,7 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             // Draw flags
-            obj.flagRects.forEach(rect => view.drawFlag(rect, stemDir === Stem.Down));
+            obj.flagRects.forEach(rect => view.drawSymbol(DrawSymbol.Flag, rect, false, stemDir === Stem.Down));
         });
 
         // Draw tab fret numbers
