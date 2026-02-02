@@ -85,6 +85,8 @@ export class View {
 
     private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
 
+    private needViewAndDocReset = true;
+
     constructor(private readonly mi: WmsView) {
         this.defaultFontSizePx = this.fontSizePx = Device.FontSize * Device.DevicePixelRatio;
         this.defaultStaffSpacePx = this.staffSpacePx = this.defaultFontSizePx * 0.3;
@@ -208,18 +210,23 @@ export class View {
             doc.addView(this);
         }
 
-        this.resetViewAndDocument();
+        this.needViewAndDocReset = true;
     }
 
-    private resetViewAndDocument() {
+    private resetViewAndDoc() {
+        const { doc } = this;
+
+        if (doc) {
+            doc.requestFullLayout();
+            doc.layout(this);
+        }
+
+        this.updateCanvasSize();
+
+        // Reset some values
         this.hilightedObj = undefined;
         this.hilightedStaffPos = undefined;
         this.cursorRects.clear();
-
-        this.doc?.requestFullLayout();
-        this.doc?.layout(this);
-
-        this.updateCanvasSize();
     }
 
     setPaint(paint?: Paint) {
@@ -302,7 +309,7 @@ export class View {
             this.ctx = undefined;
         }
 
-        this.resetViewAndDocument();
+        this.needViewAndDocReset = true;
     }
 
     setScoreEventListener(fn: ScoreEventListener) {
@@ -484,6 +491,11 @@ export class View {
     }
 
     draw() {
+        if (this.needViewAndDocReset) {
+            this.resetViewAndDoc();
+            this.needViewAndDocReset = false;
+        }
+
         try {
             let { doc } = this;
 
