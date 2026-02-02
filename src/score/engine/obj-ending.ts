@@ -1,4 +1,4 @@
-import { AnchoredRect, Guard } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect } from "@tspro/ts-utils-lib";
 import { MusicObject } from "./music-object";
 import { View } from "./view";
 import { ObjText } from "./obj-text";
@@ -96,7 +96,10 @@ export class ObjEnding extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         let { rect } = this;
 
         view.drawDebugRect(this.rect);
@@ -114,6 +117,6 @@ export class ObjEnding extends MusicObject {
 
         view.stroke();
 
-        this.endingText.draw(view);
+        this.endingText.draw(view, clipRect);
     }
 }

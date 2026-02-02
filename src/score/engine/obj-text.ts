@@ -1,7 +1,7 @@
 import { MText } from "../pub";
 import { View } from "./view";
 import { MusicObject } from "./music-object";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 const DefaultBoxedPadding = 0.5;
 
@@ -102,7 +102,10 @@ export class ObjText extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.rect);
 
         view.lineWidth(1).font(this.font);

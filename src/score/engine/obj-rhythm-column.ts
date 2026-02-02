@@ -13,7 +13,7 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
-import { IndexArray, UniMap, TriMap, AnchoredRect } from "@tspro/ts-utils-lib";
+import { IndexArray, UniMap, TriMap, AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export type ScorePlayerNote = {
     note: Note,
@@ -490,7 +490,10 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.color(colorKey("staff.frame"));
 
         // Draw ledger lines
@@ -508,9 +511,9 @@ export class ObjRhythmColumn extends MusicObject {
         });
 
         // Draw symbols
-        this.voiceSymbol.forEach(symbol => symbol.draw(view));
+        this.voiceSymbol.forEach(symbol => symbol.draw(view, clipRect));
 
         // Draw arpeggios
-        this.arpeggios.forEach(arpeggio => arpeggio.draw(view));
+        this.arpeggios.forEach(arpeggio => arpeggio.draw(view, clipRect));
     }
 }

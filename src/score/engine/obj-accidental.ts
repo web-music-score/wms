@@ -3,7 +3,7 @@ import { MAccidental } from "../pub";
 import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
@@ -48,7 +48,10 @@ export class ObjAccidental extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.rect);
 
         let { unitSize } = view;

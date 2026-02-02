@@ -5,7 +5,7 @@ import { Clef, colorKey, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, Voic
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
-import { AnchoredRect, Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
@@ -162,7 +162,7 @@ export abstract class ObjNotationLine extends MusicObject {
     abstract layoutWidth(view: View): void;
     abstract layoutHeight(view: View): void;
     abstract offset(dx: number, dy: number): void;
-    abstract draw(view: View): void;
+    abstract draw(view: View, clipRect?: Rect): void;
 }
 
 export class ObjStaff extends ObjNotationLine {
@@ -385,7 +385,10 @@ export class ObjStaff extends ObjNotationLine {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) { }
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+    }
 }
 
 export class ObjTab extends ObjNotationLine {
@@ -519,5 +522,8 @@ export class ObjTab extends ObjNotationLine {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) { }
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+    }
 }

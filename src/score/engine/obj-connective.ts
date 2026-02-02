@@ -1,4 +1,4 @@
-import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { View } from "./view";
 import { MusicObject } from "./music-object";
@@ -174,7 +174,10 @@ export class ObjConnective extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         if (this.rightNoteGroup === undefined) { /* Draw */ }
         else if (this.leftNoteGroup.measure === this.rightNoteGroup.measure) { /* Draw */ }
         else if (this.leftNoteGroup.row.getNextRow() === this.rightNoteGroup.row) { /* Draw */ }

@@ -2,7 +2,7 @@ import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { MSpecialText } from "../pub";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjSpecialText extends MusicObject {
     public static toCoda = "𝄌 toCoda";
@@ -95,9 +95,12 @@ export class ObjSpecialText extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.rect);
 
-        this.components.forEach(c => c.draw(view));
+        this.components.forEach(c => c.draw(view, clipRect));
     }
 }

@@ -4,7 +4,7 @@ import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
 import { ObjTab } from "./obj-staff-and-tab";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { AnchoredRect, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjText } from "./obj-text";
@@ -70,7 +70,10 @@ export class ObjTabRhythm extends MusicObject {
     // Keep non-static
     private readonly tupletPartsTextObjMap = new UniMap<string, ObjText>();
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.rect);
 
         view.lineWidth(1)
@@ -181,7 +184,7 @@ export class ObjTabRhythm extends MusicObject {
                         textObj.layout(view);
                     }
                     textObj.setCenter(cx, stemTop - fontSizePx / 2);
-                    textObj.draw(view);
+                    textObj.draw(view, clipRect);
                 }
 
                 if (symbols.length > 1) {

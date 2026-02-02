@@ -99,7 +99,7 @@ export class ObjScoreRowGroup extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
-        this.instrText.draw(view);
+        this.instrText.draw(view, clipRect);
 
         if (this.hasBrace) {
             const r = this.braceRect;

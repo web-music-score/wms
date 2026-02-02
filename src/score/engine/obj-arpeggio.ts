@@ -3,7 +3,7 @@ import { MusicObject } from "./music-object";
 import { View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjArpeggio extends MusicObject {
     private topArrowHeight: number = 0;
@@ -49,7 +49,10 @@ export class ObjArpeggio extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         let { rect, topArrowHeight, bottomArrowHeight } = this;
 
         view.drawDebugRect(this.rect);

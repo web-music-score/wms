@@ -8,7 +8,7 @@ import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MusicError, MusicErrorType } from "web-music-score/core";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 function imgColor(color: string) {
     return ["black", "#000", "#0000", "#000000", "#00000000"].includes(color) ? "" : color;
@@ -373,27 +373,30 @@ export class ObjStaffSignature extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         // Draw Clef
-        this.clefImage?.draw(view);
+        this.clefImage?.draw(view, clipRect);
 
         // DRaw 8 below clef
-        this.eightBelowClef?.draw(view);
+        this.eightBelowClef?.draw(view, clipRect);
 
         // Draw measure number
-        this.measureNumber?.draw(view);
+        this.measureNumber?.draw(view, clipRect);
 
         // Draw key signature
-        this.ksNeutralizeAccidentals.forEach(acc => acc.draw(view));
-        this.ksNewAccidentals.forEach(acc => acc.draw(view));
+        this.ksNeutralizeAccidentals.forEach(acc => acc.draw(view, clipRect));
+        this.ksNewAccidentals.forEach(acc => acc.draw(view, clipRect));
 
         // Draw time signature
-        this.beatCountText?.draw(view);
-        this.beatSizeText?.draw(view);
-        this.commonTsImage?.draw(view);
+        this.beatCountText?.draw(view, clipRect);
+        this.beatSizeText?.draw(view, clipRect);
+        this.commonTsImage?.draw(view, clipRect);
 
         // Draw tempo
-        this.tempoText?.draw(view);
+        this.tempoText?.draw(view, clipRect);
     }
 }
 
@@ -581,16 +584,19 @@ export class ObjTabSignature extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         // Draw measure number
-        this.measureNumber?.draw(view);
+        this.measureNumber?.draw(view, clipRect);
 
         // Draw time signature
-        this.beatCountText?.draw(view);
-        this.beatSizeText?.draw(view);
-        this.commonTsImage?.draw(view);
+        this.beatCountText?.draw(view, clipRect);
+        this.beatSizeText?.draw(view, clipRect);
+        this.commonTsImage?.draw(view, clipRect);
 
         // Draw tempo
-        this.tempoText?.draw(view);
+        this.tempoText?.draw(view, clipRect);
     }
 }

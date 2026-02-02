@@ -1662,24 +1662,24 @@ export class ObjMeasure extends MusicObject {
             });
         }
 
-        this.signatures.forEach(signature => signature.draw(view));
+        this.signatures.forEach(signature => signature.draw(view, clipRect));
 
-        this.tabStringNotes.forEach(obj => obj.draw(view));
+        this.tabStringNotes.forEach(obj => obj.draw(view, clipRect));
 
-        this.barLineLeft.draw(view);
+        this.barLineLeft.draw(view, clipRect);
 
-        this.columns.forEach(col => col.draw(view));
+        this.columns.forEach(col => col.draw(view, clipRect));
 
-        this.barLineRight.draw(view);
+        this.barLineRight.draw(view, clipRect);
 
         if (this.endRepeatPlayCountText) {
-            this.endRepeatPlayCountText.draw(view);
+            this.endRepeatPlayCountText.draw(view, clipRect);
         }
 
-        this.connectives.forEach(connective => connective.draw(view));
+        this.connectives.forEach(connective => connective.draw(view, clipRect));
 
-        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(view));
+        this.layoutObjects.forEach(layoutObj => layoutObj.musicObj.draw(view, clipRect));
 
-        this.beamGroups.forEach(beam => beam.draw(view));
+        this.beamGroups.forEach(beam => beam.draw(view, clipRect));
     }
 }

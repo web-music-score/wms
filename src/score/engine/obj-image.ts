@@ -1,7 +1,7 @@
 import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { MImage } from "../pub";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjImage extends MusicObject {
     readonly mi: MImage;
@@ -39,7 +39,10 @@ export class ObjImage extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         let r = this.rect;
         view.drawDebugRect(r);
         view.drawImage(this.image, r.anchorX - r.leftw, r.anchorY - r.toph, r.width, r.height);

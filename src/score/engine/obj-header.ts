@@ -117,15 +117,15 @@ export class ObjHeader extends MusicObject {
             return;
 
         if (this.titleText) {
-            this.titleText.draw(view);
+            this.titleText.draw(view, clipRect);
         }
 
         if (this.composerText) {
-            this.composerText.draw(view);
+            this.composerText.draw(view, clipRect);
         }
 
         if (this.arrangerText) {
-            this.arrangerText.draw(view);
+            this.arrangerText.draw(view, clipRect);
         }
     }
 }

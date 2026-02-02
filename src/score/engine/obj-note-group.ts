@@ -1,4 +1,4 @@
-import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { View } from "./view";
@@ -767,7 +767,10 @@ export class ObjNoteGroup extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         view.drawDebugRect(this.getRect());
 
         let { stemDir } = this;
@@ -775,7 +778,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.staffObjects.forEach(obj => {
             // Draw accidentals
-            obj.accidentals.forEach(d => d.draw(view));
+            obj.accidentals.forEach(d => d.draw(view, clipRect));
 
             view.color(this.color);
             view.lineWidth(1);

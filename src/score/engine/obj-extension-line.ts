@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { Extension } from "./extension";
 import { MExtensionLine } from "../pub";
 import { ObjNotationLine } from "./obj-staff-and-tab";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjScoreRow } from "./obj-score-row";
@@ -139,7 +139,10 @@ export class ObjExtensionLine extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         let { rect } = this;
 
         const head = this.extension.headObj.musicObj;

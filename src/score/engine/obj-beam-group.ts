@@ -1,4 +1,4 @@
-import { AnchoredRect, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect, Utils } from "@tspro/ts-utils-lib";
 import { NoteLength, Tuplet, TupletRatio, NoteLengthProps } from "web-music-score/theory";
 import { ObjNoteGroup } from "./obj-note-group";
 import { View } from "./view";
@@ -516,7 +516,10 @@ export class ObjBeamGroup extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         let { unitSize } = view;
         let { stemDir, color, type } = this;
 

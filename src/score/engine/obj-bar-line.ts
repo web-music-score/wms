@@ -5,7 +5,7 @@ import { MBarLineRight, MBarLineLeft, Navigation, MusicInterface, MStaffBarLine 
 import { PlayerColumnProps } from "./player-engine";
 import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
-import { AnchoredRect, UniMap } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect, UniMap } from "@tspro/ts-utils-lib";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
@@ -180,7 +180,10 @@ abstract class ObjBarLine extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         if (this.barLineType === BarLineType.None)
             return;
 

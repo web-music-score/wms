@@ -4,7 +4,7 @@ import { View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjFermata extends MusicObject {
     readonly mi: MFermata;
@@ -48,7 +48,10 @@ export class ObjFermata extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         let upsideDown = this.pos === VerticalPos.Below;
 
         let { left, right, top, bottom, height, centerX, centerY } = this.rect;

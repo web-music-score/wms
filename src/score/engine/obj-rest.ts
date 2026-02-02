@@ -8,7 +8,7 @@ import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
-import { AnchoredRect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export class ObjStaffRest extends MusicObject {
     public restRect = new AnchoredRect();
@@ -295,7 +295,10 @@ export class ObjRest extends MusicObject {
         this.requestRectUpdate();
     }
 
-    draw(view: View) {
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
         if (this.staffObjects.length === 0) {
             return;
         }

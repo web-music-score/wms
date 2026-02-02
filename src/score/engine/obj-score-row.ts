@@ -462,7 +462,7 @@ export class ObjScoreRow extends MusicObject {
         this.measures.forEach(m => m.draw(view, clipRect));
 
         // Draw notation lines
-        this.notationLines.forEach(m => m.draw(view));
+        this.notationLines.forEach(m => m.draw(view, clipRect));
 
         // Draw left vline
         const staffLeft = this.getStaffLineLeft();

@@ -6,7 +6,7 @@ import { ObjText } from "./obj-text";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { VerticalPos } from "./layout-object";
-import { Guard } from "@tspro/ts-utils-lib";
+import { Guard, Rect } from "@tspro/ts-utils-lib";
 import { ObjMeasure } from "./obj-measure";
 
 export class ObjLyrics extends MusicObject {
@@ -65,8 +65,11 @@ export class ObjLyrics extends MusicObject {
         this.rect.offsetInPlace(dx, dy);
     }
 
-    draw(view: View) {
-        this.text.draw(view);
+    draw(view: View, clipRect?: Rect) {
+        if (!this.intersects(clipRect))
+            return;
+
+        this.text.draw(view, clipRect);
 
         if (this.hyphen !== undefined) {
             view.color(this.color).lineWidth(1);
