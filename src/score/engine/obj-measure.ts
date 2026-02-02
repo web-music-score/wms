@@ -702,13 +702,13 @@ export class ObjMeasure extends MusicObject {
                 break;
             case Pub.AnnotationKind.fermata:
                 if (colAnchor) {
-                    createLayoutObject = (line, vpos) => new ObjFermata(colAnchor, vpos, getColor(line));
+                    createLayoutObject = (line, vpos) => new ObjFermata(colAnchor, vpos === VerticalPos.Below, getColor(line));
                 }
                 break;
             case Pub.AnnotationKind.measureEndFermata:
                 createLayoutObject = (line, vpos) => {
                     const anchor = this.barLineRight;
-                    return new ObjFermata(anchor, vpos, getColor(line));
+                    return new ObjFermata(anchor, vpos === VerticalPos.Below, getColor(line));
                 }
                 break;
             case Pub.AnnotationKind.ChordLabel: {

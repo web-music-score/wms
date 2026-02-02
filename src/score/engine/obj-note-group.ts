@@ -1,7 +1,7 @@
 import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
@@ -827,7 +827,7 @@ export class ObjNoteGroup extends MusicObject {
             });
 
             // Draw dots
-            obj.dotRects.forEach(r => view.fillCircle(r.anchorX, r.anchorY, r.width / 2));
+            obj.dotRects.forEach(r => view.drawSymbol(DrawSymbol.Dot, r));
 
             // Draw stem
             if (obj.stemTip && obj.stemBase) {

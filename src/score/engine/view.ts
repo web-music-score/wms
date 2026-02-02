@@ -50,6 +50,16 @@ type Overlay = {
     dispose?: boolean;
 }
 
+export enum DrawSymbol {
+    Dot,
+    Fermata,
+    Accent,
+    Marcate,
+    Staccato,
+    Staccatissimo,
+    Spiccato,
+}
+
 export class View {
     static NoDocumentText = "WmsView: No Document!";
 
@@ -1030,6 +1040,56 @@ export class View {
                 this.ctx.stroke();
                 break;
         }
+        return this;
+    }
+
+    getSymbolRect(drawSymbol: DrawSymbol): AnchoredRect {
+        const { unitSize } = this;
+        const dotWidth = DocumentSettings.DotSize * unitSize;
+
+        switch (drawSymbol) {
+            case DrawSymbol.Dot:
+            case DrawSymbol.Staccato:
+                return AnchoredRect.createCentered(0, 0, dotWidth, dotWidth);
+            case DrawSymbol.Fermata:
+                return AnchoredRect.createCentered(0, 0, unitSize * 3.75, unitSize * 2.5);
+            default:
+                // Dummy
+                return AnchoredRect.createCentered(0, 0, unitSize, unitSize);
+        }
+    }
+
+    drawSymbol(drawSymbol: DrawSymbol, rect: AnchoredRect, flipX = false, flipY = false): View {
+        if (!this.ctx) return this;
+
+        let { left, right, top, bottom, width, height, anchorX, anchorY, centerX, centerY } = rect;
+
+        if (flipX) {
+            [left, right] = [right, left];
+            width = -width;
+        }
+        if (flipY) {
+            [top, bottom] = [bottom, top];
+            height = -height;
+        }
+
+        switch (drawSymbol) {
+            case DrawSymbol.Dot:
+            case DrawSymbol.Staccato:
+                this.fillCircle(anchorX, anchorY, width / 2);
+                break;
+            case DrawSymbol.Fermata: {
+                this.beginPath();
+                this.moveTo(left, bottom);
+                this.bezierCurveTo(left, top - height / 4, right, top - height / 4, right, bottom);
+                this.bezierCurveTo(right, top, left, top, left, bottom);
+                this.stroke();
+                this.fill();
+                this.fillCircle(centerX, bottom - height / 5, Math.abs(height / 6));
+                break;
+            }
+        }
+
         return this;
     }
 }

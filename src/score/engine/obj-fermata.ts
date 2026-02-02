@@ -1,6 +1,6 @@
 import { MFermata } from "../pub";
 import { MusicObject } from "./music-object";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { VerticalPos } from "./layout-object";
@@ -9,7 +9,7 @@ import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 export class ObjFermata extends MusicObject {
     readonly mi: MFermata;
 
-    constructor(parent: ObjRhythmColumn | ObjBarLineRight, readonly pos: VerticalPos, readonly color: string) {
+    constructor(parent: ObjRhythmColumn | ObjBarLineRight, readonly flipY: boolean, readonly color: string) {
         super(parent);
 
         this.mi = new MFermata(this);
@@ -36,12 +36,7 @@ export class ObjFermata extends MusicObject {
     }
 
     layout(view: View) {
-        let { unitSize } = view;
-
-        let width = unitSize * 4;
-        let height = unitSize * 3;
-
-        this.rect = AnchoredRect.createCentered(0, 0, width, height);
+        this.rect = view.getSymbolRect(DrawSymbol.Fermata);
     }
 
     offset(dx: number, dy: number) {
@@ -52,25 +47,6 @@ export class ObjFermata extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
-        let upsideDown = this.pos === VerticalPos.Below;
-
-        let { left, right, top, bottom, height, centerX, centerY } = this.rect;
-
-        if (upsideDown) [top, bottom] = [bottom, top];
-
-        view.drawDebugRect(this.rect);
-
-        view.color(this.color).lineWidth(1);
-
-        view.beginPath();
-        view.moveTo(left, bottom);
-        view.bezierCurveTo(left, top, right, top, right, bottom);
-        view.bezierCurveTo(right, top + height / 5, left, top + height / 5, left, bottom);
-        view.stroke();
-        view.fill();
-
-        let r = height / 6;
-
-        view.fillCircle(centerX, bottom + (upsideDown ? r : -r), r);
+        view.drawSymbol(DrawSymbol.Fermata, this.rect, false, this.flipY);
     }
 }
