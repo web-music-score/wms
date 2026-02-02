@@ -46,6 +46,7 @@ function objectsEquals(a: MusicObject[] | undefined, b: MusicObject[] | undefine
 
 export class View {
     static NoDocumentText = "WmsView: No Document!";
+    static NoDocumentFont = "16px Arial";
 
     private readonly defaultStaffSizePx: number = 1;
     private readonly defaultStaffSpacePx: number = 1;
@@ -191,7 +192,7 @@ export class View {
     }
 
     setDocument(doc?: ObjDocument) {
-        if (this._doc === doc) {
+        if (doc && this._doc === doc) {
             return;
         }
 
@@ -206,6 +207,19 @@ export class View {
         if (doc) {
             doc.addView(this);
         }
+
+        this.resetViewAndDocument();
+    }
+
+    private resetViewAndDocument() {
+        this.hilightedObj = undefined;
+        this.hilightedStaffPos = undefined;
+        this.cursorRects.clear();
+
+        this.doc?.requestFullLayout();
+        this.doc?.layout(this);
+
+        this.updateCanvasSize();
     }
 
     setPaint(paint?: Paint) {
@@ -264,25 +278,31 @@ export class View {
     }
 
     setCanvas(canvas: HTMLCanvasElement) {
-        if (this.canvas !== canvas) {
-            if (this.canvas) {
-                this.canvas.removeEventListener("click", this.onClickFn);
-                this.canvas.removeEventListener("mousemove", this.onMouseMoveFn);
-                this.canvas.removeEventListener("mouseleave", this.onMouseLeaveFn);
-                this.canvas.removeEventListener("touchend", this.onTouchEndFn);
-            }
+        if (this.canvas === canvas)
+            return;
 
-            this.canvas = canvas;
+        if (this.canvas) {
+            this.canvas.removeEventListener("click", this.onClickFn);
+            this.canvas.removeEventListener("mousemove", this.onMouseMoveFn);
+            this.canvas.removeEventListener("mouseleave", this.onMouseLeaveFn);
+            this.canvas.removeEventListener("touchend", this.onTouchEndFn);
+        }
 
+        this.canvas = canvas;
+
+        if (this.canvas) {
             this.canvas.addEventListener("click", this.onClickFn);
             this.canvas.addEventListener("mousemove", this.onMouseMoveFn);
             this.canvas.addEventListener("mouseleave", this.onMouseLeaveFn);
             this.canvas.addEventListener("touchend", this.onTouchEndFn);
-
             this.canvas.style.position = "relative";
+            this.ctx = this.canvas.getContext("2d") ?? undefined;
+        }
+        else {
+            this.ctx = undefined;
         }
 
-        this.ctx = this.canvas?.getContext("2d") ?? undefined;
+        this.resetViewAndDocument();
     }
 
     setScoreEventListener(fn: ScoreEventListener) {
@@ -421,14 +441,38 @@ export class View {
     }
 
     updateCanvasSize() {
-        let { canvas, doc } = this;
+        let { canvas, ctx, doc } = this;
 
-        if (!canvas) return;
+        if (!canvas || !ctx) return;
 
-        let rect = doc ? doc.getRect() : new AnchoredRect();
+        let w = 1;
+        let h = 1;
 
-        let w = rect.width + 1;
-        let h = rect.height + 1;
+        if (doc) {
+            let rect = doc.getRect();
+            w = rect.width + 1;
+            h = rect.height + 1;
+        }
+        else {
+            ctx.save();
+
+            // 1. Set font BEFORE measuring
+            ctx.font = View.NoDocumentFont;
+
+            // 2. Measure text
+            const metrics = ctx.measureText(View.NoDocumentText);
+
+            // Width is straightforward
+            w = Math.ceil(metrics.width);
+
+            // Height needs ascent + descent
+            h = Math.ceil(
+                metrics.actualBoundingBoxAscent +
+                metrics.actualBoundingBoxDescent
+            );
+
+            ctx.restore();
+        }
 
         // Canvas internal size
         canvas.width = w;
@@ -443,21 +487,18 @@ export class View {
         try {
             let { doc } = this;
 
-            if (doc) {
-                doc.layout(this);
-
-                this.updateCanvasSize();
-                this.clearCanvas();
-
-                this.drawHilightStaffPosRect();
-                this.drawHilightObjectRect();
-                this.drawPlayCursor();
-
-                doc.drawContent(this);
-            }
-            else {
+            if (!doc) {
                 this.drawNoDoc();
+                return;
             }
+
+            this.drawBackground();
+
+            this.drawHilightedStaffPos();
+            this.drawHilightedObj();
+            this.drawCursor();
+
+            doc.drawContent(this);
         }
         catch (err) {
             console.error("Render failed!", err);
@@ -471,50 +512,22 @@ export class View {
 
         ctx.save();
 
-        const text = View.NoDocumentText;
-        const fontSize = 16;
-        const fontFamily = "Arial";
-
-        // 1. Set font BEFORE measuring
-        ctx.font = `${fontSize}px ${fontFamily}`;
-
-        // 2. Measure text
-        const metrics = ctx.measureText(text);
-
-        // Width is straightforward
-        const width = Math.ceil(metrics.width);
-
-        // Height needs ascent + descent
-        const height = Math.ceil(
-            metrics.actualBoundingBoxAscent +
-            metrics.actualBoundingBoxDescent
-        );
-
-        // 3. Resize canvas (this clears it!)
-        // Canvas internal size
-        canvas.width = width;
-        canvas.height = height;
-
-        // Canvas element size
-        canvas.style.width = (width / Device.DevicePixelRatio) + "px";
-        canvas.style.height = (height / Device.DevicePixelRatio) + "px";
-
         // 4. Re-set font after resize
-        ctx.font = `${fontSize}px ${fontFamily}`;
+        ctx.font = View.NoDocumentFont;
         ctx.textBaseline = "top";
 
         // Set background
         ctx.fillStyle = "#FFF";
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Draw text
         ctx.fillStyle = "red";
-        ctx.fillText(text, 0, 0);
+        ctx.fillText(View.NoDocumentText, 0, 0);
 
         ctx.restore();
     }
 
-    drawHilightStaffPosRect() {
+    private drawHilightedStaffPos() {
         let { mousePos, hilightedStaffPos, unitSize } = this;
 
         if (!hilightedStaffPos) {
@@ -536,7 +549,7 @@ export class View {
         }
     }
 
-    drawHilightObjectRect() {
+    private drawHilightedObj() {
         let { hilightedObj } = this;
 
         if (!hilightedObj) {
@@ -549,7 +562,7 @@ export class View {
         this.strokeRect(rect.left, rect.top, rect.width, rect.height);
     }
 
-    drawPlayCursor() {
+    private drawCursor() {
         for (const [key, r] of this.cursorRects)
             this.color(this.paint.colors["play.cursor"]).lineWidth(2).strokeLine(r.centerX, r.top, r.centerX, r.bottom);
     }
@@ -562,7 +575,7 @@ export class View {
         return coord.div(Device.DevicePixelRatio);
     }
 
-    clearCanvas() {
+    private drawBackground() {
         if (this.ctx) {
             this.ctx.canvas.style.background = this.getPaint().colors["background"];
             this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
