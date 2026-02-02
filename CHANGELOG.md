@@ -1,7 +1,9 @@
-# Changelog
-## [6.4.0-pre.4] - Unreleased
+# CHANGELOG
+
+## [6.4.0-pre.4] - 2026-02-02
 ### Changed
-- Optimization, draw dirty rects only.
+- Optimization: dirty rects for cursor and overlays.
+- Optimization: other view optimizations, like not setting canvas stuff every frame, etc.
 
 ## [6.4.0-pre.3] - 2026-01-31
 ### Changed
