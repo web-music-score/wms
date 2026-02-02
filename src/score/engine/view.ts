@@ -58,7 +58,11 @@ export enum DrawSymbol {
     Staccato,
     Staccatissimo,
     Spiccato,
-    Flag
+    Flag,
+    NoteHeadStroked,
+    NoteHeadFilled,
+    DiamondNoteHeadStroked,
+    DiamondNoteHeadFilled,
 }
 
 export class View {
@@ -1038,6 +1042,12 @@ export class View {
                 return AnchoredRect.createCentered(0, 0, dotWidth, dotWidth);
             case DrawSymbol.Fermata:
                 return AnchoredRect.createCentered(0, 0, unitSize * 3.75, unitSize * 2.5);
+            case DrawSymbol.NoteHeadFilled:
+            case DrawSymbol.NoteHeadStroked:
+                return AnchoredRect.createCentered(0, 0, DocumentSettings.NoteHeadWidth * unitSize, DocumentSettings.NoteHeadHeight * unitSize);
+            case DrawSymbol.DiamondNoteHeadFilled:
+            case DrawSymbol.DiamondNoteHeadStroked:
+                return AnchoredRect.createCentered(0, 0, DocumentSettings.DiamondNoteHeadSize * unitSize, DocumentSettings.DiamondNoteHeadSize * unitSize);
             default:
                 // Dummy
                 return AnchoredRect.createCentered(0, 0, unitSize, unitSize);
@@ -1048,13 +1058,16 @@ export class View {
         if (!this.ctx) return this;
 
         let { left, right, top, bottom, width, height, anchorX, anchorY, centerX, centerY } = rect;
+        let { leftw, rightw, toph, bottomh } = rect;
 
         if (flipX) {
             [left, right] = [right, left];
+            [leftw, rightw] = [rightw, leftw];
             width = -width;
         }
         if (flipY) {
             [top, bottom] = [bottom, top];
+            [toph, bottomh] = [bottomh, toph];
             height = -height;
         }
 
@@ -1064,6 +1077,7 @@ export class View {
                 this.fillCircle(anchorX, anchorY, width / 2);
                 break;
             case DrawSymbol.Fermata: {
+                this.lineWidth(1);
                 this.beginPath();
                 this.moveTo(left, bottom);
                 this.bezierCurveTo(left, top - height / 4, right, top - height / 4, right, bottom);
@@ -1074,6 +1088,7 @@ export class View {
                 break;
             }
             case DrawSymbol.Flag:
+                this.lineWidth(1);
                 this.beginPath();
                 this.moveTo(left, top);
                 this.bezierCurveTo(
@@ -1081,6 +1096,42 @@ export class View {
                     left + width * 1.5, top * 0.5 + bottom * 0.5,
                     left + width * 0.5, bottom);
                 this.stroke();
+                break;
+            case DrawSymbol.NoteHeadStroked:
+                this.beginPath();
+                this.ellipse(anchorX, anchorY, leftw, toph, -0.3, 0, Math.PI * 2);
+                this.stroke();
+                break;
+            case DrawSymbol.NoteHeadFilled:
+                this.beginPath();
+                this.ellipse(anchorX, anchorY, leftw, toph, -0.3, 0, Math.PI * 2);
+                this.fill();
+                break;
+            case DrawSymbol.DiamondNoteHeadStroked:
+                this.beginPath();
+                this.lineWidth(2.5);
+                this.moveTo(anchorX, top);
+                this.lineTo(right, anchorY);
+                this.moveTo(left, anchorY);
+                this.lineTo(anchorX, bottom);
+                this.stroke();
+
+                this.beginPath();
+                this.lineWidth(1);
+                this.moveTo(right, anchorY);
+                this.lineTo(anchorX, bottom);
+                this.moveTo(anchorX, top);
+                this.lineTo(left, anchorY);
+                this.stroke();
+                break;
+            case DrawSymbol.DiamondNoteHeadFilled:
+                this.beginPath();
+                this.moveTo(anchorX, top);
+                this.lineTo(right, anchorY);
+                this.lineTo(anchorX, bottom);
+                this.lineTo(left, anchorY);
+                this.lineTo(anchorX, top);
+                this.fill();
                 break;
         }
 

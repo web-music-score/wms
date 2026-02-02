@@ -198,7 +198,7 @@ export class ObjNoteGroup extends MusicObject {
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
 
-        if(options?.staccato) this.articulation = "staccato";
+        if (options?.staccato) this.articulation = "staccato";
 
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
@@ -591,10 +591,9 @@ export class ObjNoteGroup extends MusicObject {
         let { row, stemDir } = this;
         let { dotCount, flagCount, hasStem } = this.rhythmProps;
 
-        let dotWidth = DocumentSettings.DotSize * unitSize;
+        let dotRect = view.getSymbolRect(DrawSymbol.Dot);
 
-        let noteHeadWidth = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadWidth) * unitSize;
-        let noteHeadHeight = (this.diamond ? DocumentSettings.DiamondNoteHeadSize : DocumentSettings.NoteHeadHeight) * unitSize;
+        let noteHeadRect = view.getSymbolRect(this.diamond ? DrawSymbol.DiamondNoteHeadFilled : DrawSymbol.NoteHeadFilled);
 
         this.staffObjects.length = 0;
 
@@ -613,7 +612,7 @@ export class ObjNoteGroup extends MusicObject {
                 let isTopNote = noteIndex === this.notes.length - 1;
 
                 let noteStaff = staff.getActualStaff(note.diatonicId) ?? staff;
-                let noteX = this.isNoteDisplaced[noteIndex] ? noteHeadWidth * (stemDir === Stem.Down ? -1 : 1) : 0;
+                let noteX = this.isNoteDisplaced[noteIndex] ? noteHeadRect.width * (stemDir === Stem.Down ? -1 : 1) : 0;
                 let noteY = noteStaff.getDiatonicIdY(note.diatonicId);
                 let isNoteOnLine = noteStaff.isLine(note.diatonicId);
 
@@ -623,8 +622,7 @@ export class ObjNoteGroup extends MusicObject {
                 if (isTopNote && stemDir === Stem.Down) stemBaseStaff = noteStaff;
 
                 // Add note head
-                let noteHeadRect = obj.noteHeadRects[noteIndex] = AnchoredRect.createCentered(noteX, noteY, noteHeadWidth, noteHeadHeight);
-                noteStaff.addObject(noteHeadRect);
+                noteStaff.addObject(obj.noteHeadRects[noteIndex] = noteHeadRect.offsetCopy(noteX, noteY));
 
                 // Add accidental
                 if (accState.needAccidental(note)) {
@@ -633,17 +631,17 @@ export class ObjNoteGroup extends MusicObject {
                         acc.layout(view);
                         acc.setAnchor(
                             -noteHeadRect.leftw - unitSize * DocumentSettings.NoteAccSpace - acc.getRect().rightw,
-                            noteY);
+                            noteY
+                        );
                     }
                     noteStaff.addObject(acc);
                 }
 
                 // Add dots
                 for (let i = 0; i < dotCount; i++) {
-                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotWidth / 2 + i * dotWidth * 1.5;
+                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotRect.width / 2 + i * dotRect.width * 1.5;
                     let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
-
-                    let r = AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                    let r = dotRect.offsetCopy(dotX, dotY);
                     obj.dotRects.push(r);
                     noteStaff.addObject(r);
                 }
@@ -653,14 +651,14 @@ export class ObjNoteGroup extends MusicObject {
                     if (stemDir === Stem.Up && isBottomNote) {
                         let dotX = noteX;
                         let dotY = noteY + unitSize * (isNoteOnLine ? 3 : 2);
-                        let r = AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                        let r = dotRect.offsetCopy(dotX, dotY);
                         obj.dotRects.push(r);
                         stemBaseStaff.addObject(r);
                     }
                     else if (stemDir === Stem.Down && isTopNote) {
                         let dotX = noteX;
                         let dotY = noteY - unitSize * (isNoteOnLine ? 3 : 2);
-                        let r = AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth);
+                        let r = dotRect.offsetCopy(dotX, dotY);
                         obj.dotRects.push(r);
                         stemBaseStaff.addObject(r);
                     }
@@ -670,7 +668,7 @@ export class ObjNoteGroup extends MusicObject {
             // Calculate stem
             let bottomNoteY = obj.noteHeadRects[0].anchorY;
             let topNoteY = obj.noteHeadRects[obj.noteHeadRects.length - 1].anchorY;
-            let stemX = stemDir === Stem.Up ? noteHeadWidth / 2 : -noteHeadWidth / 2;
+            let stemX = stemDir === Stem.Up ? noteHeadRect.width / 2 : -noteHeadRect.width / 2;
             let stemHeight = this.getStemHeight(view);
             let stemTipY = stemDir === Stem.Up ? topNoteY - stemHeight : bottomNoteY + stemHeight;
             let stemBaseY = stemDir === Stem.Up ? bottomNoteY : topNoteY;
@@ -786,43 +784,16 @@ export class ObjNoteGroup extends MusicObject {
             // Draw note heads
             obj.noteHeadRects.forEach(r => {
                 if (this.diamond) {
-                    if (isSolidNoteHead) {
-                        view.beginPath();
-                        view.moveTo(r.anchorX, r.top);
-                        view.lineTo(r.right, r.anchorY);
-                        view.lineTo(r.anchorX, r.bottom);
-                        view.lineTo(r.left, r.anchorY);
-                        view.lineTo(r.anchorX, r.top);
-                        view.fill();
-                    }
-                    else {
-                        view.beginPath();
-                        view.lineWidth(2.5);
-                        view.moveTo(r.anchorX, r.top);
-                        view.lineTo(r.right, r.anchorY);
-                        view.moveTo(r.left, r.anchorY);
-                        view.lineTo(r.anchorX, r.bottom);
-                        view.stroke();
-
-                        view.beginPath();
-                        view.lineWidth(1);
-                        view.moveTo(r.right, r.anchorY);
-                        view.lineTo(r.anchorX, r.bottom);
-                        view.moveTo(r.anchorX, r.top);
-                        view.lineTo(r.left, r.anchorY);
-                        view.stroke();
-                    }
+                    if (isSolidNoteHead)
+                        view.drawSymbol(DrawSymbol.DiamondNoteHeadFilled, r);
+                    else
+                        view.drawSymbol(DrawSymbol.DiamondNoteHeadStroked, r);
                 }
                 else {
-                    view.beginPath();
-                    view.ellipse(r.anchorX, r.anchorY, r.leftw, r.toph, -0.3, 0, Math.PI * 2);
-
-                    if (isSolidNoteHead) {
-                        view.fill();
-                    }
-                    else {
-                        view.stroke();
-                    }
+                    if (isSolidNoteHead)
+                        view.drawSymbol(DrawSymbol.NoteHeadFilled, r);
+                    else
+                        view.drawSymbol(DrawSymbol.NoteHeadStroked, r);
                 }
             });
 
