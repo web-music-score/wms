@@ -85,7 +85,8 @@ export class View {
 
     private imageCache = new BiMap<ImageAsset, string, HTMLImageData>();
 
-    private needViewAndDocReset = true;
+    private needDocUpdate = true;
+    private needCanvasUpdate = true;
 
     constructor(private readonly mi: WmsView) {
         this.defaultFontSizePx = this.fontSizePx = Device.FontSize * Device.DevicePixelRatio;
@@ -210,20 +211,16 @@ export class View {
             doc.addView(this);
         }
 
-        this.needViewAndDocReset = true;
+        this.needDocUpdate = true;
+        this.needCanvasUpdate = true;
     }
 
-    private resetViewAndDoc() {
-        const { doc } = this;
+    private updateDoc() {
+        // Do full doc layout
+        this.doc?.requestFullLayout();
+        this.doc?.layout(this);
 
-        if (doc) {
-            doc.requestFullLayout();
-            doc.layout(this);
-        }
-
-        this.updateCanvasSize();
-
-        // Reset some values
+        // Reset overlays values
         this.hilightedObj = undefined;
         this.hilightedStaffPos = undefined;
         this.cursorRects.clear();
@@ -309,7 +306,7 @@ export class View {
             this.ctx = undefined;
         }
 
-        this.needViewAndDocReset = true;
+        this.needCanvasUpdate = true;
     }
 
     setScoreEventListener(fn: ScoreEventListener) {
@@ -447,7 +444,7 @@ export class View {
         this.draw();
     }
 
-    updateCanvasSize() {
+    updateCanvas() {
         let { canvas, ctx, doc } = this;
 
         if (!canvas || !ctx) return;
@@ -491,9 +488,16 @@ export class View {
     }
 
     draw() {
-        if (this.needViewAndDocReset) {
-            this.resetViewAndDoc();
-            this.needViewAndDocReset = false;
+        // 1. Update doc
+        if (this.needDocUpdate) {
+            this.updateDoc();
+            this.needDocUpdate = false;
+        }
+
+        // 2. Update canvas
+        if (this.needCanvasUpdate) {
+            this.updateCanvas();
+            this.needCanvasUpdate = false;
         }
 
         try {
