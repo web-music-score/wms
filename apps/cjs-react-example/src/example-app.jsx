@@ -1,4 +1,4 @@
-import * as React from "react";
+const React = require("react");
 
 // Try require
 const { ClassicalGuitar } = require("web-music-score/audio-cg");
@@ -6,7 +6,7 @@ const Audio = require("web-music-score/audio");
 const ScoreUI = require("web-music-score/react-ui");
 const { createFrereJacques } = require("web-music-score/pieces");
 
-export class ExampleApp extends React.Component {
+class ExampleApp extends React.Component {
     constructor(props) {
         super(props);
 
@@ -30,4 +30,4 @@ export class ExampleApp extends React.Component {
     }
 }
 
-export default ExampleApp;
+module.exports = ExampleApp;
