@@ -1,5 +1,7 @@
 # Changelog
 ## [6.4.0-pre.4] - Unreleased
+### Changed
+- Optimization, draw dirty rects only.
 
 ## [6.4.0-pre.3] - 2026-01-31
 ### Changed
