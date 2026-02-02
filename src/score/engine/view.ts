@@ -308,25 +308,29 @@ export class View {
     }
 
     setCanvas(canvas: HTMLCanvasElement) {
-        if (this.canvas !== canvas) {
-            if (this.canvas) {
-                this.canvas.removeEventListener("click", this.onClickFn);
-                this.canvas.removeEventListener("mousemove", this.onMouseMoveFn);
-                this.canvas.removeEventListener("mouseleave", this.onMouseLeaveFn);
-                this.canvas.removeEventListener("touchend", this.onTouchEndFn);
-            }
+        if (this.canvas === canvas)
+            return;
 
-            this.canvas = canvas;
+        if (this.canvas) {
+            this.canvas.removeEventListener("click", this.onClickFn);
+            this.canvas.removeEventListener("mousemove", this.onMouseMoveFn);
+            this.canvas.removeEventListener("mouseleave", this.onMouseLeaveFn);
+            this.canvas.removeEventListener("touchend", this.onTouchEndFn);
+        }
 
+        this.canvas = canvas;
+
+        if (canvas) {
             this.canvas.addEventListener("click", this.onClickFn);
             this.canvas.addEventListener("mousemove", this.onMouseMoveFn);
             this.canvas.addEventListener("mouseleave", this.onMouseLeaveFn);
             this.canvas.addEventListener("touchend", this.onTouchEndFn);
-
             this.canvas.style.position = "relative";
+            this.ctx = this.canvas.getContext("2d") ?? undefined;
         }
-
-        this.ctx = this.canvas?.getContext("2d") ?? undefined;
+        else {
+            this.ctx = undefined;
+        }
 
         this.resetViewAndDocument();
     }
