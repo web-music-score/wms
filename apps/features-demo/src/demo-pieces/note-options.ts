@@ -33,10 +33,10 @@ export function createNoteOptionsDemo() {
         .addNote(0, "D5", "4n", { staccato: true })
 
         .addMeasure()
-        .addNote(0, "E4", "8n", { diamond: true }).addLyrics(1, "diamond", "8n")
+        .addNote(0, "E4", "8n", { diamond: true, stem: "up" }).addLyrics(1, "diamond", "8n")
         .addNote(0, "F#4", "8n", { diamond: true })
         .addNote(0, "G4", "4n", { diamond: true })
-        .addNote(0, "B4", "8n", { diamond: true })
+        .addNote(0, "B4", "8n", { diamond: true, stem: "down" })
         .addNote(0, "C5", "8n", { diamond: true })
         .addNote(0, "D5", "4n", { diamond: true })
         .endRow()
