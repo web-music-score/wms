@@ -108,6 +108,8 @@ export class View {
     public isAllDirty = true;
     private dirtyOverlays: Overlay[] = [];
 
+    private needViewAndDocReset = true;
+
     constructor(private readonly mi: WmsView) {
         this.defaultFontSizePx = this.fontSizePx = Device.FontSize * Device.DevicePixelRatio;
         this.defaultStaffSpacePx = this.staffSpacePx = this.defaultFontSizePx * 0.3;
@@ -231,10 +233,10 @@ export class View {
             doc.addView(this);
         }
 
-        this.resetViewAndDocument();
+        this.needViewAndDocReset = true;
     }
 
-    private resetViewAndDocument() {
+    private resetViewAndDoc() {
         const { doc } = this;
 
         if (doc) {
@@ -332,7 +334,7 @@ export class View {
             this.ctx = undefined;
         }
 
-        this.resetViewAndDocument();
+        this.needViewAndDocReset = true;
     }
 
     setScoreEventListener(fn: ScoreEventListener) {
@@ -573,6 +575,11 @@ export class View {
     }
 
     draw() {
+        if (this.needViewAndDocReset) {
+            this.resetViewAndDoc();
+            this.needViewAndDocReset = false;
+        }
+
         try {
             let { doc } = this;
 
