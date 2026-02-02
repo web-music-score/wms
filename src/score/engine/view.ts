@@ -124,8 +124,10 @@ export class View {
         })?.img;
     }
 
-    private forceDraw() {
-        this.doc?.requestFullLayout();
+    private drawAfterImageLoaded() {
+        // Doc size might change after image loaded.
+        this.needDocUpdate = true;
+        this.needCanvasUpdate = true;
         this.draw();
     }
 
@@ -139,7 +141,7 @@ export class View {
             color === "#000" || color === "#0000" ||
             color === "#000000" || color === "#00000000"
         ) {
-            this.forceDraw();
+            this.drawAfterImageLoaded();
             data.loaded = true;
             return;
         }
