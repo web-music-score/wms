@@ -810,12 +810,10 @@ export class View {
         }
     }
 
-    drawFlag(rect: Rect | AnchoredRect, dir: "up" | "down") {
-        let left = rect.left;
-        let right = rect.right;
-        let width = right - left;
-        let top = dir === "up" ? rect.top : rect.bottom;
-        let bottom = dir === "up" ? rect.bottom : rect.top;
+    drawFlag(rect: Rect | AnchoredRect, flipY: boolean) {
+        let { left, width, top, bottom } = rect;
+
+        if (flipY) [top, bottom] = [bottom, top];
 
         this.beginPath();
         this.moveTo(left, top);

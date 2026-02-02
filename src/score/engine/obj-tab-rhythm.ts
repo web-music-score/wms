@@ -117,7 +117,7 @@ export class ObjTabRhythm extends MusicObject {
 
                     if (symbols.length === 1) {
                         for (let i = 0; i < sym.rhythmProps.flagCount; i++) {
-                            view.drawFlag(new AnchoredRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), "up");
+                            view.drawFlag(new AnchoredRect(colX, colX + flagSize, stemTop + i * flagSize, stemTop + (i + 2) * flagSize), false);
                         }
                     }
 
