@@ -47,6 +47,7 @@ export class ObjFermata extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
+        view.color(this.color);
         view.drawSymbol(DrawSymbol.Fermata, this.rect, false, this.flipY);
     }
 }
