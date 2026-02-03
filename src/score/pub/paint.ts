@@ -5,7 +5,15 @@ import { AssertUtil, warnDeprecated } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
 
-/** Color keys. */
+/** Color keys.
+ * ```ts
+ * --- Deprecated since v6.4.0-pre.5 ---
+ * "*.element.fermata"    => use "*.annotation.temporal"
+ * "*.element.annotation" => use "*.annotation.*"
+ * "*.element.navigation" => use "*.annotation.navigation"
+ * "*.element.label"      => use "*.annotation.label"
+ * ```
+*/
 export type ColorKey =
     "hilight.staffpos" |
     "hilight.object" |
