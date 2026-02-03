@@ -61,21 +61,32 @@ export function getAnnotationDefaultVerticalPos(annotationGroup: AnnotationGroup
     return VerticalPos.Above;
 }
 
-function fromStaffColor(line: ObjNotationLine, staffColor: ColorKey): string {
-    return line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) : staffColor;
-}
-
 export function getAnnotationColor(line: ObjNotationLine, annotationGroup: AnnotationGroup, annotationKind: string): string {
-    if (annotationGroup === AnnotationGroup.Navigation)
-        return fromStaffColor(line, "staff.element.navigation");
+    const fromStaffColor = (staffColor: ColorKey): string => line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) : staffColor;
 
-    if (annotationGroup === AnnotationGroup.Label)
-        return fromStaffColor(line, "staff.element.label");
-
-    if (annotationKind === AnnotationKind.fermata || annotationKind === AnnotationKind.measureEndFermata)
-        return fromStaffColor(line, "staff.element.fermata");
-
-    return fromStaffColor(line, "staff.element.annotation");
+    switch (annotationGroup) {
+        case AnnotationGroup.Navigation:
+            return fromStaffColor("staff.annotation.navigation");
+        case AnnotationGroup.Dynamics:
+            return fromStaffColor("staff.annotation.dynamics");
+        case AnnotationGroup.Tempo:
+            return fromStaffColor("staff.annotation.tempo");
+        case AnnotationGroup.Articulation:
+            return fromStaffColor("staff.annotation.articulation");
+        case AnnotationGroup.Expression:
+            return fromStaffColor("staff.annotation.expression");
+        case AnnotationGroup.Technique:
+            return fromStaffColor("staff.annotation.technique");
+        case AnnotationGroup.Temporal:
+            return fromStaffColor("staff.annotation.temporal");
+        case AnnotationGroup.Label:
+            return fromStaffColor("staff.annotation.label");
+        case AnnotationGroup.Ornament:
+            return fromStaffColor("staff.annotation.ornament");
+        case AnnotationGroup.Misc:
+        default:
+            return fromStaffColor("staff.annotation.misc");
+    }
 }
 
 export function isDynamicsText(annotationKind: string): boolean {

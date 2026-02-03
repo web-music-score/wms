@@ -31,10 +31,24 @@ export type ColorKey =
     "staff.signature.time" |
     "staff.signature.tempo" |
     "staff.signature.measurenum" |
+
+    // --- Deprecated since 6.4.0-pre.5 ---
     "staff.element.fermata" |
     "staff.element.annotation" |
     "staff.element.navigation" |
     "staff.element.label" |
+
+    // --- New since 6.4.0-pre.5 ---
+    "staff.annotation.navigation" |
+    "staff.annotation.dynamics" |
+    "staff.annotation.tempo" |
+    "staff.annotation.articulation" |
+    "staff.annotation.expression" |
+    "staff.annotation.technique" |
+    "staff.annotation.temporal" |
+    "staff.annotation.label" |
+    "staff.annotation.ornament" |
+    "staff.annotation.misc" |
 
     "tab.frame" |
     "tab.note" |
@@ -48,10 +62,24 @@ export type ColorKey =
     "tab.signature.time" |
     "tab.signature.tempo" |
     "tab.signature.measurenum" |
+
+    // --- Deprecated since 6.4.0-pre.5 ---
     "tab.element.fermata" |
     "tab.element.annotation" |
     "tab.element.navigation" |
-    "tab.element.label";
+    "tab.element.label" |
+
+    // --- New since 6.4.0-pre.5 ---
+    "tab.annotation.navigation" |
+    "tab.annotation.dynamics" |
+    "tab.annotation.tempo" |
+    "tab.annotation.articulation" |
+    "tab.annotation.expression" |
+    "tab.annotation.technique" |
+    "tab.annotation.temporal" |
+    "tab.annotation.label" |
+    "tab.annotation.ornament" |
+    "tab.annotation.misc";
 
 /** Function to typecheck a valid ColorKey variable. */
 export function colorKey(colorKey: ColorKey): ColorKey {
@@ -67,7 +95,40 @@ export type ColorKeyPart =
     "note" | "rest" | "lyrics" | "connective" | "arpeggio" |
     "signature" | "clef" | "key" | "time" | "tempo" | "measurenum" |
     "tuning" |
-    "element" | "fermata" | "annotation" | "navigation" | "label";
+    "element" | "fermata" | // Deprecated
+    "annotation" |
+    "navigation" | "dynamics" | "tempo" | "articulation" | "expression" | "technique" | "temporal" | "label" | "ornament" | "misc";
+
+function mapDeprecatedColorKeys(colorKey: ColorKey | ColorKeyPart | ColorKeyPart[]): ColorKey | ColorKeyPart | ColorKeyPart[] {
+    if (Guard.isArray(colorKey)) {
+        const hasExactKeys = (keyArr: ColorKeyPart[]) => (
+            keyArr.every(key => colorKey.includes(key)) &&
+            colorKey.every(key => keyArr.includes(key))
+        );
+
+        if (hasExactKeys(["element"]) || hasExactKeys(["element", "annotation"]))
+            return "annotation";
+        else if (hasExactKeys(["element", "fermata"]))
+            return ["annotation", "temporal"];
+        else if (hasExactKeys(["element", "navigation"]))
+            return ["annotation", "navigation"];
+        else if (hasExactKeys(["element", "label"]))
+            return ["annotation", "label"];
+    }
+    else {
+        switch (colorKey) {
+            case "staff.element.fermata": return "staff.annotation.temporal";
+            case "staff.element.annotation": return ["staff", "annotation"];
+            case "staff.element.navigation": return "staff.annotation.navigation";
+            case "staff.element.label": return "staff.annotation.label";
+            case "tab.element.fermata": return "tab.annotation.temporal";
+            case "tab.element.annotation": return ["tab", "annotation"];
+            case "tab.element.navigation": return "tab.annotation.navigation";
+            case "tab.element.label": return "tab.annotation.label";
+        }
+    }
+    return colorKey;
+}
 
 /**
  * Paint class for coloring music scores.
@@ -100,10 +161,22 @@ export class Paint {
         "staff.signature.time": "black",
         "staff.signature.tempo": "black",
         "staff.signature.measurenum": "black",
-        "staff.element.fermata": "black",
-        "staff.element.annotation": "black",
-        "staff.element.navigation": "black",
-        "staff.element.label": "black",
+
+        "staff.element.fermata": "black",       // Deprecated, mapped to "staff.annotation.?"
+        "staff.element.annotation": "black",    // Deprecated, mapped to "staff.annotation.?"
+        "staff.element.navigation": "black",    // Deprecated, mapped to "staff.annotation.?"
+        "staff.element.label": "black",         // Deprecated, mapped to "staff.annotation.?"
+
+        "staff.annotation.navigation": "black",
+        "staff.annotation.dynamics": "black",
+        "staff.annotation.tempo": "black",
+        "staff.annotation.articulation": "black",
+        "staff.annotation.expression": "black",
+        "staff.annotation.technique": "black",
+        "staff.annotation.temporal": "black",
+        "staff.annotation.label": "black",
+        "staff.annotation.ornament": "black",
+        "staff.annotation.misc": "black",
 
         "tab.frame": "black",
         "tab.note": "black",
@@ -117,10 +190,22 @@ export class Paint {
         "tab.signature.time": "black",
         "tab.signature.tempo": "black",
         "tab.signature.measurenum": "black",
-        "tab.element.fermata": "black",
-        "tab.element.annotation": "black",
-        "tab.element.navigation": "black",
-        "tab.element.label": "black",
+
+        "tab.element.fermata": "black",     // Deprecated, mapped to "tab.annotation.?"
+        "tab.element.annotation": "black",  // Deprecated, mapped to "tab.annotation.?"
+        "tab.element.navigation": "black",  // Deprecated, mapped to "tab.annotation.?"
+        "tab.element.label": "black",       // Deprecated, mapped to "tab.annotation.?"
+
+        "tab.annotation.navigation": "black",
+        "tab.annotation.dynamics": "black",
+        "tab.annotation.tempo": "black",
+        "tab.annotation.articulation": "black",
+        "tab.annotation.expression": "black",
+        "tab.annotation.technique": "black",
+        "tab.annotation.temporal": "black",
+        "tab.annotation.label": "black",
+        "tab.annotation.ornament": "black",
+        "tab.annotation.misc": "black",
     }
 
     /**
@@ -147,6 +232,9 @@ export class Paint {
             }
             return this;
         }
+
+        // Map deprecated color keys
+        colorKeyOrParts = mapDeprecatedColorKeys(colorKeyOrParts);
 
         const isBackground = typeof colorKeyOrParts === "string" && norm(colorKeyOrParts) === "background" ||
             Guard.isArray(colorKeyOrParts) && colorKeyOrParts.length === 1 && norm(colorKeyOrParts[0]) === "background";
