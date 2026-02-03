@@ -41,21 +41,21 @@ export class ObjHeader extends MusicObject {
 
         if (this.titleText) {
             let arr = this.titleText.pick(x, y);
-            if (arr) {
+            if (arr.length > 0) {
                 return [this, ...arr];
             }
         }
 
         if (this.composerText) {
             let arr = this.composerText.pick(x, y);
-            if (arr) {
+            if (arr.length > 0) {
                 return [this, ...arr];
             }
         }
 
         if (this.arrangerText) {
             let arr = this.arrangerText.pick(x, y);
-            if (arr) {
+            if (arr.length > 0) {
                 return [this, ...arr];
             }
         }

@@ -1,5 +1,7 @@
 # CHANGELOG
 ## [6.3.7] - Unreleased
+### Fixed
+- Composer and arranger header texts were not picked.
 
 ## [6.3.6] - 2026-02-02
 ### Fixed
