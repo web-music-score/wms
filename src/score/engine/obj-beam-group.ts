@@ -86,9 +86,9 @@ export class ObjStaffBeamGroup extends MusicObject {
         else if (this.tupletNumber) {
             this.rect = this.tupletNumber.getRect().clone();
         }
-        this.points.forEach(pt => this.rect.expandInPlace(pt.getRect()));
+        this.points.forEach(pt => this.rect.unionInPlace(pt.getRect()));
         if (this.tupletNumber) {
-            this.rect.expandInPlace(this.tupletNumber.getRect());
+            this.rect.unionInPlace(this.tupletNumber.getRect());
         }
     }
 }
@@ -484,7 +484,7 @@ export class ObjBeamGroup extends MusicObject {
             this.rect = this.staffObjects[0].getRect().clone();
 
             for (let i = 1; i < this.staffObjects.length; i++) {
-                this.rect.expandInPlace(this.staffObjects[i].getRect());
+                this.rect.unionInPlace(this.staffObjects[i].getRect());
             }
         }
     }

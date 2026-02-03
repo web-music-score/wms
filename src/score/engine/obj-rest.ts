@@ -41,7 +41,7 @@ export class ObjStaffRest extends MusicObject {
 
     updateRect() {
         this.rect = this.restRect.clone();
-        this.dotRects.forEach(r => this.rect.expandInPlace(r));
+        this.dotRects.forEach(r => this.rect.unionInPlace(r));
     }
 }
 
@@ -284,7 +284,7 @@ export class ObjRest extends MusicObject {
             this.rect = this.staffObjects[0].getRect().clone();
             if (this.staffObjects.length > 1) {
                 for (let i = 1; i < this.staffObjects.length; i++) {
-                    this.rect.expandInPlace(this.staffObjects[i].getRect());
+                    this.rect.unionInPlace(this.staffObjects[i].getRect());
                 }
             }
         }

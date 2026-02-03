@@ -309,14 +309,14 @@ export class ObjDocument extends MusicObject {
         if (this.header) {
             // Layout header with
             this.header.layout(view);
-            this.rect.expandInPlace(this.header.getRect());
+            this.rect.unionInPlace(this.header.getRect());
         }
 
         // Stack rows on top of each other
         this.rows.forEach(row => {
             row.setLeft(0);
             row.setTop(this.rect.bottom + unitSize * 2);
-            this.rect.expandInPlace(row.getRect());
+            this.rect.unionInPlace(row.getRect());
         });
 
         // Done

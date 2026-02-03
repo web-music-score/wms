@@ -35,10 +35,10 @@ export class ObjStaffBarLine extends MusicObject {
     updateRect() {
         this.rect = new AnchoredRect(0, 0, this.line.getTopLineY(), this.line.getBottomLineY())
         this.vlines.forEach(l =>
-            this.rect.expandInPlace(new AnchoredRect(l.left, l.left + l.width, this.rect.top, this.rect.bottom))
+            this.rect.unionInPlace(new AnchoredRect(l.left, l.left + l.width, this.rect.top, this.rect.bottom))
         );
         this.dots.forEach(d =>
-            this.rect.expandInPlace(new AnchoredRect(d.x - d.r, d.x + d.r, d.y - d.r, d.y + d.r))
+            this.rect.unionInPlace(new AnchoredRect(d.x - d.r, d.x + d.r, d.y - d.r, d.y + d.r))
         );
     }
 
@@ -167,7 +167,7 @@ abstract class ObjBarLine extends MusicObject {
         if (this.notationLineObjects.length > 0) {
             this.rect = this.notationLineObjects[0].getRect().clone();
             for (let i = 1; i < this.notationLineObjects.length; i++) {
-                this.rect.expandInPlace(this.notationLineObjects[i].getRect());
+                this.rect.unionInPlace(this.notationLineObjects[i].getRect());
             }
         }
         else {
