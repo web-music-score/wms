@@ -76,12 +76,12 @@ export class ObjStaffNoteGroup extends MusicObject {
 
     updateRect() {
         this.rect = this.noteHeadRects[0].clone();
-        this.noteHeadRects.forEach(r => this.rect.expandInPlace(r));
-        if (this.stemTip) this.rect.expandInPlace(this.stemTip);
-        if (this.stemBase) this.rect.expandInPlace(this.stemBase);
-        this.dotRects.forEach(r => this.rect.expandInPlace(r));
-        this.flagRects.forEach(r => this.rect.expandInPlace(r));
-        this.accidentals.forEach(a => this.rect.expandInPlace(a.getRect()));
+        this.noteHeadRects.forEach(r => this.rect.unionInPlace(r));
+        if (this.stemTip) this.rect.unionInPlace(this.stemTip);
+        if (this.stemBase) this.rect.unionInPlace(this.stemBase);
+        this.dotRects.forEach(r => this.rect.unionInPlace(r));
+        this.flagRects.forEach(r => this.rect.unionInPlace(r));
+        this.accidentals.forEach(a => this.rect.unionInPlace(a.getRect()));
     }
 
     getRect(): AnchoredRect {
@@ -133,7 +133,7 @@ export class ObjTabNoteGroup extends MusicObject {
 
     updateRect() {
         this.rect = this.fretNumbers[0].getRect().clone();
-        this.fretNumbers.forEach(fn => this.rect.expandInPlace(fn.getRect()));
+        this.fretNumbers.forEach(fn => this.rect.unionInPlace(fn.getRect()));
     }
 
     offset(dx: number, dy: number) {
@@ -737,8 +737,8 @@ export class ObjNoteGroup extends MusicObject {
             return;
         }
 
-        this.staffObjects.forEach(obj => this.rect.expandInPlace(obj.getRect()));
-        this.tabObjects.forEach(obj => this.rect.expandInPlace(obj.getRect()));
+        this.staffObjects.forEach(obj => this.rect.unionInPlace(obj.getRect()));
+        this.tabObjects.forEach(obj => this.rect.unionInPlace(obj.getRect()));
     }
 
     setStemTipY(staff: ObjStaff, stemTipY: number) {

@@ -72,7 +72,7 @@ export class ObjScoreRowGroup extends MusicObject {
     updateRect() {
         this.instrText.setRight(this.braceRect.left - this.space);
         this.instrText.setCenterY(this.braceRect.anchorY);
-        this.rect = this.instrText.getRect().clone().expandInPlace(this.braceRect);
+        this.rect = this.instrText.getRect().clone().unionInPlace(this.braceRect);
     }
 
     layout(view: View) {

@@ -252,7 +252,7 @@ export class ObjStaffSignature extends MusicObject {
             x += paddingX;
             this.clefImage.layout(view);
             this.clefImage.setAnchor(x, staff.getDiatonicIdY(staff.clefLineDiatonicId));
-            this.rect.expandInPlace(this.clefImage.getRect());
+            this.rect.unionInPlace(this.clefImage.getRect());
             x = this.rect.right;
 
             if (this.eightBelowClef) {
@@ -260,7 +260,7 @@ export class ObjStaffSignature extends MusicObject {
                 this.eightBelowClef.layout(view);
                 this.eightBelowClef.setCenterX(r.centerX);
                 this.eightBelowClef.setTop(Math.max(r.anchorY + r.height * 0.3, staff.getBottomLineY()));
-                this.rect.expandInPlace(this.eightBelowClef.getRect());
+                this.rect.unionInPlace(this.eightBelowClef.getRect());
             }
         }
 
@@ -268,7 +268,7 @@ export class ObjStaffSignature extends MusicObject {
             this.measureNumber.layout(view);
             this.measureNumber.setLeft(0);
             this.measureNumber.setBottom(Math.min(staff.getTopLineY(), this.clefImage ? this.clefImage.getRect().top : staff.getTopLineY()));
-            this.rect.expandInPlace(this.measureNumber.getRect());
+            this.rect.unionInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
         }
 
@@ -279,7 +279,7 @@ export class ObjStaffSignature extends MusicObject {
                 objAcc.layout(view);
                 objAcc.setLeft(x);
                 objAcc.setAnchorY(staff.getDiatonicIdY(objAcc.diatonicId));
-                this.rect.expandInPlace(objAcc.getRect());
+                this.rect.unionInPlace(objAcc.getRect());
                 x = this.rect.right;
             });
         }
@@ -291,7 +291,7 @@ export class ObjStaffSignature extends MusicObject {
                 objAcc.layout(view);
                 objAcc.setLeft(x);
                 objAcc.setAnchorY(staff.getDiatonicIdY(objAcc.diatonicId));
-                this.rect.expandInPlace(objAcc.getRect());
+                this.rect.unionInPlace(objAcc.getRect());
                 x = this.rect.right;
             });
         }
@@ -307,7 +307,7 @@ export class ObjStaffSignature extends MusicObject {
                 x + tsWidth / 2 + paddingX,
                 staff.getDiatonicIdY(staff.middleLineDiatonicId)
             );
-            this.rect.expandInPlace(this.commonTsImage.getRect());
+            this.rect.unionInPlace(this.commonTsImage.getRect());
             right = Math.max(right, this.rect.right);
 
             x = right;
@@ -323,7 +323,7 @@ export class ObjStaffSignature extends MusicObject {
                     x + tsWidth / 2 + paddingX,
                     staff.getDiatonicIdY(staff.middleLineDiatonicId + 2)
                 );
-                this.rect.expandInPlace(this.beatCountText.getRect());
+                this.rect.unionInPlace(this.beatCountText.getRect());
                 right = Math.max(right, this.rect.right);
             }
 
@@ -332,7 +332,7 @@ export class ObjStaffSignature extends MusicObject {
                     x + tsWidth / 2 + paddingX,
                     staff.getDiatonicIdY(staff.bottomLineDiatonicId + 2)
                 );
-                this.rect.expandInPlace(this.beatSizeText.getRect());
+                this.rect.unionInPlace(this.beatSizeText.getRect());
                 right = Math.max(right, this.rect.right);
             }
 
@@ -354,7 +354,7 @@ export class ObjStaffSignature extends MusicObject {
                 }
             });
 
-            this.rect.expandInPlace(this.tempoText.getRect());
+            this.rect.unionInPlace(this.tempoText.getRect());
         }
 
         this.rect.right += paddingX;
@@ -523,7 +523,7 @@ export class ObjTabSignature extends MusicObject {
             this.measureNumber.layout(view);
             this.measureNumber.setLeft(0);
             this.measureNumber.setBottom(topLineY);
-            this.rect.expandInPlace(this.measureNumber.getRect());
+            this.rect.unionInPlace(this.measureNumber.getRect());
             x = Math.max(x, this.rect.right);
         }
 
@@ -536,7 +536,7 @@ export class ObjTabSignature extends MusicObject {
                 x + tsWidth / 2 + paddingX,
                 (tab.getBottomLineY() + tab.getTopLineY()) / 2
             );
-            this.rect.expandInPlace(this.commonTsImage.getRect());
+            this.rect.unionInPlace(this.commonTsImage.getRect());
             x = this.rect.right;
         }
         else {
@@ -550,7 +550,7 @@ export class ObjTabSignature extends MusicObject {
                     0 + tsWidth / 2 + paddingX,
                     tab.getRect().anchorY - this.beatCountText.getRect().bottomh
                 );
-                this.rect.expandInPlace(this.beatCountText.getRect());
+                this.rect.unionInPlace(this.beatCountText.getRect());
             }
 
             if (this.beatSizeText) {
@@ -558,7 +558,7 @@ export class ObjTabSignature extends MusicObject {
                     0 + tsWidth / 2 + paddingX,
                     tab.getRect().anchorY + this.beatSizeText.getRect().toph
                 );
-                this.rect.expandInPlace(this.beatSizeText.getRect());
+                this.rect.unionInPlace(this.beatSizeText.getRect());
             }
         }
 
@@ -566,7 +566,7 @@ export class ObjTabSignature extends MusicObject {
             this.tempoText.layout(view);
             this.tempoText.setLeft(x + unitSize * 2);
             this.tempoText.setBottom(topLineY);
-            this.rect.expandInPlace(this.tempoText.getRect());
+            this.rect.unionInPlace(this.tempoText.getRect());
         }
 
         this.rect.right += paddingX;
