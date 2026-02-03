@@ -2,6 +2,7 @@
 ## [6.3.7] - Unreleased
 ### Fixed
 - Composer and arranger header texts were not picked.
+- TabConfig assert with tuning strings was wrong and threw.
 
 ## [6.3.6] - 2026-02-02
 ### Fixed
