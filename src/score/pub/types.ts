@@ -515,7 +515,7 @@ export enum AnnotationKind {
 
     /** hold longer than written */
     fermata = "fermata",
-    /** hold at measure end */
+    /** @deprecated - Use addAnnotation("fermata", { anchor: "rightBarLine" }) */
     measureEndFermata = "measureEndFermata",
 
     //////////////////////////////////////////////////
@@ -549,6 +549,28 @@ export enum AnnotationKind {
 
 /** Annotation kind text type. @deprecated - Do not use. */
 export type AnnotationText = `${AnnotationKind}`;
+
+/** Annotation anchor */
+export enum AnnotationAnchor {
+    /** Add annotation at certain time position in measure (e.g. time position of last added note) */
+    TimePosition = "timePosition",
+    /** Add annotation at left bar line (start of measure) */
+    LeftBarLine = "leftBarLine",
+    /** Add annotation at right bar line (end of measure) */
+    RightBarLine = "rightBarLine",
+}
+
+/** Annotation options */
+export type AnnotationOptions = {
+    /** Anchor */
+    anchor?: AnnotationAnchor | `${AnnotationAnchor}`;
+    /** Play count for repeats */
+    repeatCount?: number;
+    /** Passage number(s) for endings */
+    endingPassages?: number | number[];
+    /** Text for labels */
+    labelText?: string;
+}
 
 /** Navigation annotations */
 export enum Navigation {

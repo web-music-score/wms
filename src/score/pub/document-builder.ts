@@ -118,6 +118,18 @@ function assertStaffTargets(staffTargets: Types.StaffTargets | undefined) {
     );
 }
 
+function assertAnnotationOptions(annotationOptions: Types.AnnotationOptions) {
+    AssertUtil.assert(
+        Guard.isObject(annotationOptions),
+        Guard.isUndefined(annotationOptions.anchor) || Guard.isEnumValue(annotationOptions.anchor, Types.AnnotationAnchor),
+        Guard.isUndefined(annotationOptions.repeatCount) || Guard.isIntegerGte(annotationOptions.repeatCount, 1),
+        (
+            Guard.isUndefined(annotationOptions.endingPassages) || Guard.isIntegerGte(annotationOptions.endingPassages, 1) ||
+            Guard.isArray(annotationOptions.endingPassages) && annotationOptions.endingPassages.every(p => Guard.isIntegerGte(p, 1))
+        )
+    );
+}
+
 /** Tuplet builder type. */
 export type TupletBuilder = {
     /**
@@ -647,20 +659,6 @@ export class DocumentBuilder {
         return this.addLyricsInternal(staffTargets, verse, lyricsText, lyricsLength, lyricsOptions);
     }
 
-    private addFermataInternal(staffTargets: Types.StaffTargets | undefined, fermata: Types.Fermata): DocumentBuilder {
-        assertStaffTargets(staffTargets);
-        AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
-        switch (fermata) {
-            case Types.Fermata.AtNote:
-                this.getMeasure().addAnnotation(staffTargets, Types.AnnotationGroup.Temporal, Types.AnnotationKind.fermata);
-                break;
-            case Types.Fermata.AtMeasureEnd:
-                this.getMeasure().addAnnotation(staffTargets, Types.AnnotationGroup.Temporal, Types.AnnotationKind.measureEndFermata);
-                break;
-        }
-        return this;
-    }
-
     /**
      * Add fermata to current measure.
      * @deprecated - addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
@@ -671,8 +669,15 @@ export class DocumentBuilder {
         warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
 
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
+        AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
 
-        return this.addFermataInternal(undefined, resolveRequiredEnumValue(fermata, Types.Fermata));
+        if (fermata === Types.Fermata.AtNote)
+            return this.addAnnotation(Types.AnnotationKind.fermata, {});
+
+        if (fermata === Types.Fermata.AtMeasureEnd)
+            return this.addAnnotation(Types.AnnotationKind.fermata, { anchor: "rightBarLine" });
+
+        return this;
     }
 
     /**
@@ -686,8 +691,16 @@ export class DocumentBuilder {
         warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTargets, fermata);
+        assertStaffTargets(staffTargets);
+        AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
 
-        return this.addFermataInternal(staffTargets, resolveRequiredEnumValue(fermata, Types.Fermata));
+        if (fermata === Types.Fermata.AtNote)
+            return this.addAnnotationTo(staffTargets, Types.AnnotationKind.fermata, {});
+
+        if (fermata === Types.Fermata.AtMeasureEnd)
+            return this.addAnnotationTo(staffTargets, Types.AnnotationKind.fermata, { anchor: "rightBarLine" });
+
+        return this;
     }
 
     /**
@@ -745,141 +758,133 @@ export class DocumentBuilder {
         return this.addAnnotationInternal(staffTargets, Types.AnnotationGroup.Navigation, navigation, ...args);
     }
 
-    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, annotationGroup: Types.AnnotationGroup | undefined, annotationKind: string, ...args: unknown[]): DocumentBuilder {
+    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, ...args: unknown[]): DocumentBuilder {
         assertStaffTargets(staffTargets);
 
-        AssertUtil.assert(
-            Guard.isEnumValueOrUndefined(annotationGroup, Types.AnnotationGroup),
-            Guard.isNonEmptyString(annotationKind)
-        );
+        // If there is options, it is last arg.
+        let options = (Guard.isObject(args[args.length - 1]) ? args.pop() : {}) as Types.AnnotationOptions;
+        assertAnnotationOptions(options);
 
-        if (!annotationGroup) {
-            const kind = resolveAnnotationKind(annotationKind);
-            annotationGroup = kind ? resolveAnnotationGroup(kind) : undefined;
-            if (!annotationGroup)
-                throw new MusicError(MusicErrorType.Score, `Failed to resolve annotation group for annotation kind "${args[0]}".`);
+        // If there is group, it is first arg.        
+        let group = resolveEnumValue(String(args[0]), Types.AnnotationGroup);
+        if (group) args.shift();
+
+        // Kind is after that.
+        let kind = String(args.shift());
+
+        // Resolve group if there was none.
+        if (!group) {
+            let resolvedKind = resolveAnnotationKind(kind);
+            if (resolvedKind !== undefined) {
+                group = resolveAnnotationGroup(resolvedKind);
+                kind = resolvedKind;
+            }
         }
 
-        this.getMeasure().addAnnotation(staffTargets, annotationGroup, annotationKind, ...args);
+        AssertUtil.assert(
+            Guard.isEnumValue(group, Types.AnnotationGroup),
+            Guard.isNonEmptyString(kind)
+        );
+
+        // Add optional args for different kinds into options.
+        if (group === Types.AnnotationGroup.Label && Guard.isNonEmptyString(args[0]))
+            options.labelText = String(args.shift());
+
+        if (kind === Types.AnnotationKind.EndRepeat && Guard.isIntegerGte(args[0], 2))
+            options.repeatCount = Number(args.shift());
+
+        if (kind === Types.AnnotationKind.Ending && args.every(a => Guard.isIntegerGte(a, 1)))
+            options.endingPassages = [...args.map(a => Number(a))];
+
+        this.getMeasure().addAnnotation(staffTargets, group!, kind, options);
 
         return this;
     }
 
     /**
-     * Add annotation kind to current measure.
-     * @param annotationKind - Annotation kind (e.g. "pp").
-     * @returns - This document builder instance.
-     */
-    addAnnotation(annotationKind: `${Types.AnnotationKind}`): DocumentBuilder;
-    /**
      * Add any annotation kind to current measure.
-     * @param annotationGroup - Annotation group (e.g. "dynamic").
-     * @param annotationKind - Annotation kind (e.g. "pp").
+     * @param group - Annotation group (e.g. "dynamic").
+     * @param kind - Annotation kind (e.g. "pp").
      * @returns - This document builder instance.
      */
-    addAnnotation(annotationGroup: Types.AnnotationGroup | `${Types.AnnotationGroup}`, annotationKind: string): DocumentBuilder;
+    addAnnotation(group: Types.AnnotationGroup | `${Types.AnnotationGroup}`, kind: string, options?: Types.AnnotationOptions): DocumentBuilder;
     /**
-     * Add label annotation to current measure.
-     * @param labelAnnotation - Label annotation kind.
+     * Add annotation kind to current measure.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @returns - This document builder instance.
+     */
+    addAnnotation(kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, options?: Types.AnnotationOptions): DocumentBuilder;
+    /**
+     * Add annotation with label text to current measure.
+     * @param kind - Annotation kind.
      * @param labelText - Label text.
      * @returns - This document builder instance.
      */
-    addAnnotation(labelAnnotationKind: Types.AnnotationKind.PitchLabel | Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.PitchLabel}` | `${Types.AnnotationKind.ChordLabel}`, labelText: string): DocumentBuilder;
+    addAnnotation(kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, labelText: string, options?: Types.AnnotationOptions): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
-     * @param endingText - Text for ending navigation.
+     * @param kind - Text for ending navigation.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotation(endingText: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotation(kind: Types.AnnotationKind.Ending | `${Types.AnnotationKind.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
-     * @param endRepeatText - Text for end repeat navigation.
-     * @param playCount - Play count for the repeated section.
+     * @param kind - Text for end repeat navigation.
+     * @param repeatCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotation(endRepeatText: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotation(kind: Types.AnnotationKind.EndRepeat | `${Types.AnnotationKind.EndRepeat}`, repeatCount?: number): DocumentBuilder;
 
     addAnnotation(...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
-
-        const annotationGroup = resolveEnumValue(String(args[0]), Types.AnnotationGroup);
-        if (annotationGroup) {
-            const annotationKind = String(args[1]);
-            return this.addAnnotationInternal(undefined, annotationGroup, annotationKind, ...args.slice(2));
-        }
-
-        const annotationKind = String(args[0]);
-        return this.addAnnotationInternal(undefined, undefined, annotationKind, ...args.slice(1));
+        this.addAnnotationInternal(undefined, ...args);
+        return this;
     }
 
-    /**
-     * Add annotation kind to current measure to given staff/tab/group.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param annotationKind - Annotation kind (e.g. "pp"). 
-     * @returns - This document builder instance.
-     */
-    addAnnotationTo(staffTargets: Types.StaffTargets, annotationKind: `${Types.AnnotationKind}`): DocumentBuilder;
     /**
      * Add any annotation kind to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param annotationGroup - Annotation group (e.g. "dynamic").
-     * @param annotationKind - Annotation kind (e.g. "pp").
+     * @param group - Annotation group (e.g. "dynamic").
+     * @param kind - Annotation kind (e.g. "pp").
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, annotationGroup: Types.AnnotationGroup | `${Types.AnnotationGroup}`, annotationKind: string): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, group: Types.AnnotationGroup | `${Types.AnnotationGroup}`, kind: string, options?: Types.AnnotationOptions): DocumentBuilder;
     /**
-     * Add label annotation to current measure.
+     * Add annotation kind to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param labelAnnotationKind - Label annotation kind.
+     * @param kind - Annotation kind (e.g. "pp"). 
+     * @returns - This document builder instance.
+     */
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, options?: Types.AnnotationOptions): DocumentBuilder;
+    /**
+     * Add annotation with label text to current measure.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
+     * @param kind - Annotation kind.
      * @param labelText - Label text.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, labelAnnotationKind: Types.AnnotationKind.PitchLabel | Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.PitchLabel}` | `${Types.AnnotationKind.ChordLabel}`, labelText: string): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, labelText: string, options?: Types.AnnotationOptions): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param endingText - Text for ending navigation.
+     * @param kind - Text for ending navigation.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, endingText: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKind.Ending | `${Types.AnnotationKind.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param endRepeatText - Text for end repeat navigation.
-     * @param playCount - Play count for the repeated section.
+     * @param kind - Text for end repeat navigation.
+     * @param repeatCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, endRepeatText: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount?: number): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKind.EndRepeat | `${Types.AnnotationKind.EndRepeat}`, repeatCount?: number): DocumentBuilder;
 
     addAnnotationTo(staffTargets: Types.StaffTargets, ...args: unknown[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTargets, ...args);
-
-        const annotationGroup = resolveEnumValue(String(args[0]), Types.AnnotationGroup);
-        if (annotationGroup) {
-            const annotationKind = String(args[1]);
-            return this.addAnnotationInternal(staffTargets, annotationGroup, annotationKind, ...args.slice(2));
-        }
-
-        const annotationKind = String(args[0]);
-        return this.addAnnotationInternal(staffTargets, undefined, annotationKind, ...args.slice(1));
-    }
-
-    private addLabelInternal(staffTargets: Types.StaffTargets | undefined, label: Types.Label, text: string): DocumentBuilder {
-        assertStaffTargets(staffTargets);
-
-        AssertUtil.assert(
-            Guard.isEnumValue(label, Types.Label),
-            Guard.isNonEmptyString(text)
-        );
-
-        if (label === Types.Label.Chord)
-            return this.addAnnotationInternal(staffTargets, Types.AnnotationGroup.Label, Types.AnnotationKind.ChordLabel, text);
-
-        if (label === Types.Label.Note)
-            return this.addAnnotationInternal(staffTargets, Types.AnnotationGroup.Label, Types.AnnotationKind.PitchLabel, text);
-
+        this.addAnnotationInternal(staffTargets, ...args);
         return this;
     }
 
@@ -892,7 +897,19 @@ export class DocumentBuilder {
      */
     addLabel(label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLabel", label, text);
-        return this.addLabelInternal(undefined, resolveRequiredEnumValue(label, Types.Label), text);
+
+        AssertUtil.assert(
+            Guard.isEnumValue(label, Types.Label),
+            Guard.isNonEmptyString(text)
+        );
+
+        if (label === Types.Label.Chord)
+            return this.addAnnotation(Types.AnnotationKind.ChordLabel, text);
+
+        if (label === Types.Label.Note)
+            return this.addAnnotation(Types.AnnotationKind.PitchLabel, text);
+
+        return this;
     }
 
     /**
@@ -905,7 +922,21 @@ export class DocumentBuilder {
      */
     addLabelTo(staffTargets: Types.StaffTargets, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTargets, label, text);
-        return this.addLabelInternal(staffTargets, resolveRequiredEnumValue(label, Types.Label), text);
+
+        assertStaffTargets(staffTargets);
+
+        AssertUtil.assert(
+            Guard.isEnumValue(label, Types.Label),
+            Guard.isNonEmptyString(text)
+        );
+
+        if (label === Types.Label.Chord)
+            return this.addAnnotationTo(staffTargets, Types.AnnotationKind.ChordLabel, text);
+
+        if (label === Types.Label.Note)
+            return this.addAnnotationTo(staffTargets, Types.AnnotationKind.PitchLabel, text);
+
+        return this;
     }
 
     /**

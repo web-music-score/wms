@@ -611,12 +611,15 @@ export class ObjMeasure extends MusicObject {
         return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
     }
 
-    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, ...args: unknown[]) {
+    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, annotationOptions: Pub.AnnotationOptions) {
         if (!Guard.isNonEmptyString(annotationKind))
-            throw new MusicError(MusicErrorType.Score, `Annotation kind is not proper string.`);
+            throw new MusicError(MusicErrorType.Score, `Error: invalid annotation kind.`);
 
-        if (annotationGroup === Pub.AnnotationGroup.Label && !Guard.isNonEmptyString(args[0]))
-            throw new MusicError(MusicErrorType.Score, "Cannot add label because label text is empty.");
+        if (annotationGroup === Pub.AnnotationGroup.Label && !Guard.isNonEmptyString(annotationOptions.labelText))
+            throw new MusicError(MusicErrorType.Score, "Error: labelText is empty.");
+
+        if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
+            throw new MusicError(MusicErrorType.Score, "Error: endingPassages is undefined.");
 
         if (annotationKind === Pub.AnnotationKind.staccato) {
             if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup)
@@ -633,15 +636,19 @@ export class ObjMeasure extends MusicObject {
 
         const colAnchor = this.lastAddedRhythmColumn;
 
+        const fermataAnchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
+        ? this.barLineRight
+        : this.lastAddedRhythmColumn;
+
         switch (annotationKind) {
             case Pub.Navigation.Ending:
                 if (this.navigationSet.has(annotationKind))
                     throw new MusicError(MusicErrorType.Score, "Cannot add ending becaure measure already has one.");
                 createLayoutObject = (line) => {
                     const anchor = this;
-                    const passages = args.map(arg => Number(arg));
+                    let passages = annotationOptions.endingPassages!;
                     const color = getColor(line);
-                    return new ObjEnding(anchor, color, passages);
+                    return new ObjEnding(anchor, color, Guard.isArray(passages) ? passages : [passages]);
                 }
                 break;
             case Pub.Navigation.DC_al_Coda:
@@ -654,7 +661,7 @@ export class ObjMeasure extends MusicObject {
                     const color = getColor(line);
                     return new ObjText(anchor, { text, color }, 1, 1);
                 }
-                this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.Navigation.EndRepeat);
+                this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.Navigation.EndRepeat, {});
                 this.endSong();
                 break;
             case Pub.Navigation.Fine:
@@ -683,15 +690,7 @@ export class ObjMeasure extends MusicObject {
                 }
                 break;
             case Pub.Navigation.EndRepeat:
-                if (args.length === 0) {
-                    this.endRepeatPlayCount = 2;
-                }
-                else if (Guard.isIntegerGte(args[0], 2)) {
-                    this.endRepeatPlayCount = args[0];
-                }
-                else {
-                    throw new MusicError(MusicErrorType.Score, "Invalid repeat play count: " + args[0]);
-                }
+                this.endRepeatPlayCount = annotationOptions.repeatCount ?? 2;
                 if (this.endRepeatPlayCount !== 2) {
                     const text = `${this.endRepeatPlayCount}x`;
                     const color = Pub.colorKey("staff.frame");
@@ -701,8 +700,8 @@ export class ObjMeasure extends MusicObject {
             case Pub.Navigation.StartRepeat:
                 break;
             case Pub.AnnotationKind.fermata:
-                if (colAnchor) {
-                    createLayoutObject = (line, vpos) => new ObjFermata(colAnchor, vpos === VerticalPos.Below, getColor(line));
+                if (fermataAnchor) {
+                    createLayoutObject = (line, vpos) => new ObjFermata(fermataAnchor, vpos === VerticalPos.Below, getColor(line));
                 }
                 break;
             case Pub.AnnotationKind.measureEndFermata:
@@ -715,7 +714,7 @@ export class ObjMeasure extends MusicObject {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
                         const color = getColor(line);
-                        const text = String(args[0]);
+                        const text = String(annotationOptions.labelText);
                         return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
                     }
                 }
@@ -725,7 +724,7 @@ export class ObjMeasure extends MusicObject {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
                         const color = getColor(line);
-                        const text = String(args[0]);
+                        const text = String(annotationOptions.labelText);
                         return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
                     }
                 }
