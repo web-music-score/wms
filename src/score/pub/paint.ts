@@ -32,24 +32,6 @@ export type ColorKey =
     "staff.signature.tempo" |
     "staff.signature.measurenum" |
 
-    // --- Deprecated since 6.4.0-pre.5 ---
-    "staff.element.fermata" |
-    "staff.element.annotation" |
-    "staff.element.navigation" |
-    "staff.element.label" |
-
-    // --- New since 6.4.0-pre.5 ---
-    "staff.annotation.navigation" |
-    "staff.annotation.dynamics" |
-    "staff.annotation.tempo" |
-    "staff.annotation.articulation" |
-    "staff.annotation.expression" |
-    "staff.annotation.technique" |
-    "staff.annotation.temporal" |
-    "staff.annotation.label" |
-    "staff.annotation.ornament" |
-    "staff.annotation.misc" |
-
     "tab.frame" |
     "tab.note" |
     "tab.rest" |
@@ -64,10 +46,28 @@ export type ColorKey =
     "tab.signature.measurenum" |
 
     // --- Deprecated since 6.4.0-pre.5 ---
+    "staff.element.fermata" |
+    "staff.element.annotation" |
+    "staff.element.navigation" |
+    "staff.element.label" |
+
+    // --- Deprecated since 6.4.0-pre.5 ---
     "tab.element.fermata" |
     "tab.element.annotation" |
     "tab.element.navigation" |
     "tab.element.label" |
+
+    // --- New since 6.4.0-pre.5 ---
+    "staff.annotation.navigation" |
+    "staff.annotation.dynamics" |
+    "staff.annotation.tempo" |
+    "staff.annotation.articulation" |
+    "staff.annotation.expression" |
+    "staff.annotation.technique" |
+    "staff.annotation.temporal" |
+    "staff.annotation.label" |
+    "staff.annotation.ornament" |
+    "staff.annotation.misc" |
 
     // --- New since 6.4.0-pre.5 ---
     "tab.annotation.navigation" |
@@ -100,34 +100,61 @@ export type ColorKeyPart =
     "navigation" | "dynamics" | "tempo" | "articulation" | "expression" | "technique" | "temporal" | "label" | "ornament" | "misc";
 
 function mapDeprecatedColorKeys(colorKey: ColorKey | ColorKeyPart | ColorKeyPart[]): ColorKey | ColorKeyPart | ColorKeyPart[] {
-    if (Guard.isArray(colorKey)) {
-        const hasExactKeys = (keyArr: ColorKeyPart[]) => (
-            keyArr.every(key => colorKey.includes(key)) &&
-            colorKey.every(key => keyArr.includes(key))
-        );
+    let newColorKey = colorKey;
 
-        if (hasExactKeys(["element"]) || hasExactKeys(["element", "annotation"]))
-            return "annotation";
-        else if (hasExactKeys(["element", "fermata"]))
-            return ["annotation", "temporal"];
-        else if (hasExactKeys(["element", "navigation"]))
-            return ["annotation", "navigation"];
-        else if (hasExactKeys(["element", "label"]))
-            return ["annotation", "label"];
+    const colorKeyArr = Guard.isArray(colorKey) ? colorKey : [colorKey];
+
+    const hasExactKeys = (hasKeys: ColorKeyPart[]) => (
+        hasKeys.every(key => colorKeyArr.includes(key)) &&
+        colorKeyArr.every(key => hasKeys.includes(key as ColorKeyPart))
+    );
+
+    if (hasExactKeys(["element"]) || hasExactKeys(["element", "annotation"])) {
+        newColorKey = "annotation";
+    }
+    else if (hasExactKeys(["element", "fermata"])) {
+        newColorKey = ["annotation", "temporal"];
+    }
+    else if (hasExactKeys(["element", "navigation"])) {
+        newColorKey = ["annotation", "navigation"];
+    }
+    else if (hasExactKeys(["element", "label"])) {
+        newColorKey = ["annotation", "label"];
     }
     else {
         switch (colorKey) {
-            case "staff.element.fermata": return "staff.annotation.temporal";
-            case "staff.element.annotation": return ["staff", "annotation"];
-            case "staff.element.navigation": return "staff.annotation.navigation";
-            case "staff.element.label": return "staff.annotation.label";
-            case "tab.element.fermata": return "tab.annotation.temporal";
-            case "tab.element.annotation": return ["tab", "annotation"];
-            case "tab.element.navigation": return "tab.annotation.navigation";
-            case "tab.element.label": return "tab.annotation.label";
+            case "staff.element.fermata":
+                newColorKey = "staff.annotation.temporal";
+                break;
+            case "staff.element.annotation":
+                newColorKey = ["staff", "annotation"];
+                break;
+            case "staff.element.navigation":
+                newColorKey = "staff.annotation.navigation";
+                break;
+            case "staff.element.label":
+                newColorKey = "staff.annotation.label";
+                break;
+            case "tab.element.fermata":
+                newColorKey = "tab.annotation.temporal";
+                break;
+            case "tab.element.annotation":
+                newColorKey = ["tab", "annotation"];
+                break;
+            case "tab.element.navigation":
+                newColorKey = "tab.annotation.navigation";
+                break;
+            case "tab.element.label":
+                newColorKey = "tab.annotation.label";
+                break;
         }
     }
-    return colorKey;
+
+    if (!Utils.Obj.deepEqual(colorKey, newColorKey)) {
+        warnDeprecated(`Deprecated ColorKey: ${Utils.Str.stringify(colorKey)}`);
+    }
+
+    return newColorKey;
 }
 
 /**
