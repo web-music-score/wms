@@ -46,7 +46,6 @@ function assertStaffConfig(staffConfig: StaffConfig) {
     assertObjHasNoProp(staffConfig, "isGrand", "StaffConfig.isGrand was removed. Use StaffConfig.grandId instead.");
 }
 
-
 function assertTabConfig(tabConfig: TabConfig) {
     assertBaseConfig(tabConfig);
 
@@ -56,7 +55,7 @@ function assertTabConfig(tabConfig: TabConfig) {
         (
             Guard.isUndefined(tabConfig.tuning) ||
             Guard.isString(tabConfig.tuning) && Guard.isIncluded(tabConfig.tuning, TuningNameList) ||
-            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, getStringNumbers().length && tabConfig.tuning.every(s => Note.isNote(s)))
+            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, getStringNumbers().length) && tabConfig.tuning.every(s => Note.isNote(s))
         )
     );
 }
@@ -1016,7 +1015,7 @@ export class DocumentBuilder {
     fillWithRests(...voiceId: VoiceId[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "fillWithRests", ...voiceId);
 
-        AssertUtil.assert(Guard.isArray(voiceId) && (voiceId.length === 0 || voiceId.every(id => isVoiceId(id))));
+        AssertUtil.assert(Guard.isArray(voiceId) && voiceId.every(id => isVoiceId(id)));
 
         this.getMeasure().fillWithRests(...voiceId);
         return this;
