@@ -1,5 +1,8 @@
 # CHANGELOG
 ## [6.4.0-pre.5] - Unreleased
+### Changed
+- Give annotation groups each a Paint ColorKey, deprecate `*.element.*` ColorKeys and map them to the new `*.annotation.*` ColorKeys.
+
 ### Fixed
 - Composer and arranger header texts were not picked.
 
