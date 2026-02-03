@@ -57,7 +57,7 @@ function assertTabConfig(tabConfig: Types.TabConfig) {
         (
             Guard.isUndefined(tabConfig.tuning) ||
             Guard.isString(tabConfig.tuning) && Guard.isIncluded(tabConfig.tuning, Theory.TuningNameList) ||
-            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, Types.getStringNumbers().length && tabConfig.tuning.every(s => Theory.Note.isNote(s)))
+            Guard.isArray(tabConfig.tuning) && Guard.isStrictEqual(tabConfig.tuning.length, Types.getStringNumbers().length) && tabConfig.tuning.every(s => Theory.Note.isNote(s))
         )
     );
 }
@@ -1078,7 +1078,7 @@ export class DocumentBuilder {
     fillWithRests(...voiceId: Types.VoiceId[]): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "fillWithRests", ...voiceId);
 
-        AssertUtil.assert(Guard.isArray(voiceId) && (voiceId.length === 0 || voiceId.every(id => Types.isVoiceId(id))));
+        AssertUtil.assert(Guard.isArray(voiceId) && voiceId.every(id => Types.isVoiceId(id)));
 
         this.getMeasure().fillWithRests(...voiceId);
         return this;
