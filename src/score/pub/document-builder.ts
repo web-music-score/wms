@@ -661,7 +661,9 @@ export class DocumentBuilder {
     }
 
     /**
-     * @deprecated - addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * Add fermata to current measure.
+     * @param fermata - Fermata position.
+     * @returns - This document builder instance.
      */
     addFermata(fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
@@ -669,7 +671,10 @@ export class DocumentBuilder {
     }
 
     /**
-     * @deprecated - addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.
+     * Add fermata to current measure to given staff/tab/group.
+     * @param staffTabOrGroups - staff/tab index (0=top), staff/tab name, or staff group name.
+     * @param fermata - Fermata position.
+     * @returns - This document builder instance.
      */
     addFermataTo(staffTabOrGroups: StaffTabOrGroups, fermata: Fermata | `${Fermata}` = Fermata.AtNote): DocumentBuilder {
         AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTabOrGroups, fermata);

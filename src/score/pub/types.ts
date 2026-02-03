@@ -267,13 +267,11 @@ export type LyricsOptions = {
     hyphen?: LyricsHyphen | `${LyricsHyphen}`
 }
 
-/**
- * @deprecated - Fermata is deprecated. Will be removed in future release. Use Annotation and Articulaion instead.
- */
+/** Fermata */
 export enum Fermata {
-    /** Anchor fermata to note/rest. */
+    /** Anchor fermata at note/rest. */
     AtNote = "atNote",
-    /** Anchor fermata to measure end. */
+    /** Anchor fermata at measure end. */
     AtMeasureEnd = "atMeasureEnd"
 }
 
