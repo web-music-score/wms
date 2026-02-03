@@ -1,5 +1,7 @@
 # CHANGELOG
 ## [6.4.0-pre.5] - Unreleased
+### Fixed
+- Composer and arranger header texts were not picked.
 
 ## [6.4.0-pre.4] - 2026-02-02
 ### Changed
