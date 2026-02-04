@@ -8,6 +8,7 @@ import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension, getTextContent } from "./extension";
 import { getDynamicsVolume, isDynamicsText, isTempoText } from "./element-data";
+import { ObjEnding } from "./obj-ending";
 
 function _setTimeout(cb: () => any, ms: number): number | undefined {
     return typeof window === "undefined"
@@ -181,25 +182,43 @@ export class PlayerEngine {
         let segnoMeasure: ObjMeasure | undefined;
         let alFine = false;
         let alCoda = false;
+        let doNotRepeatRepeats = false;
+        let endingsPassed: { pass: number, ending: ObjEnding }[] = [];
+        let isEndRepeatUnderEnding = false;
 
-        while (curMeasure) {
+        // Just add some limit if there is bug that causes infinite loop.
+        let measuresLeft = this.doc.getMeasures().length * 10;
+
+        while (curMeasure && --measuresLeft >= 0) {
             curMeasure.incPassCount();
 
+            let curPassage = curMeasure.getPassCount();
             let curEnding = curMeasure.getEnding();
 
             if (curEnding) {
-                let passage = curMeasure.getPassCount();
-                curMeasure = PlayerEngine.getMeasureByEndingPassage(curMeasure, passage);
-            }
+                const curPass = endingsPassed.length === 0 ? 1 : endingsPassed[endingsPassed.length - 1].pass + 1;
+                const prevFirstEnding = endingsPassed.slice().reverse().find(e => e.pass === 1)?.ending;
 
-            if (!curMeasure) {
-                continue;
+                if (curEnding.hasPassage(curPass)) {
+                    endingsPassed.push({ pass: curPass, ending: curEnding });
+                }
+                else if (curEnding.hasPassage(1) && prevFirstEnding !== curEnding) {
+                    endingsPassed.push({ pass: 1, ending: curEnding });
+                }
+                else {
+                    // Did jump to another ending?
+                    curEnding = PlayerEngine.resolveNextEnding(curEnding, curPass);
+                    curMeasure = curEnding?.measure;
+                    if (!curMeasure) break;
+                }
+                isEndRepeatUnderEnding = true;
             }
 
             measureSequence.push(curMeasure);
 
             if (curMeasure.hasNavigation(Navigation.StartRepeat)) {
                 startRepeatMeasure = curMeasure;
+                isEndRepeatUnderEnding = false;
             }
 
             if (curMeasure.hasNavigation(Navigation.Segno)) {
@@ -219,31 +238,33 @@ export class PlayerEngine {
             else if (curMeasure.hasNavigation(Navigation.DC_al_Coda)) {
                 alCoda = true;
                 curMeasure = this.doc.getFirstMeasure();
+                doNotRepeatRepeats = true;
             }
             else if (curMeasure.hasNavigation(Navigation.DC_al_Fine)) {
                 alFine = true;
                 curMeasure = this.doc.getFirstMeasure();
+                doNotRepeatRepeats = true;
             }
             else if (curMeasure.hasNavigation(Navigation.DS_al_Coda)) {
                 alCoda = true;
                 curMeasure = segnoMeasure;
+                doNotRepeatRepeats = true;
             }
             else if (curMeasure.hasNavigation(Navigation.DS_al_Fine)) {
                 alFine = true;
                 curMeasure = segnoMeasure;
+                doNotRepeatRepeats = true;
             }
-            else if (curMeasure.hasNavigation(Navigation.EndRepeat)) {
-                let passage = curMeasure.getPassCount();
-                let repeatCount = curMeasure.getEndRepeatPlayCount() - 1;
+            else if (curMeasure.hasNavigation(Navigation.EndRepeat) && (!doNotRepeatRepeats || isEndRepeatUnderEnding)) {
+                const playCount = curMeasure.getEndRepeatPlayCount();
+                const unexpectedEnding = false;
 
-                let cannotPassThrough = curMeasure.getNextMeasure()?.hasNavigation(Navigation.Ending) === true;
-
-                if (passage <= repeatCount || cannotPassThrough) {
+                if (curPassage < playCount || isEndRepeatUnderEnding)
                     curMeasure = startRepeatMeasure;
-                }
-                else {
+                else if (unexpectedEnding)
+                    curMeasure = undefined;
+                else
                     curMeasure = curMeasure.getNextMeasure();
-                }
             }
             else if (curMeasure.hasEndSong()) {
                 curMeasure = undefined;
@@ -381,21 +402,29 @@ export class PlayerEngine {
 
     }
 
-    private static getMeasureByEndingPassage(startMeasure: ObjMeasure, passage: number): ObjMeasure | undefined {
-        for (let m: ObjMeasure | undefined = startMeasure; ; m = m.getNextMeasure()) {
-            let ending = m?.getEnding();
+    private static resolveNextEnding(curEnding: ObjEnding, passage: number): ObjEnding | undefined {
+        let m: ObjMeasure | undefined = curEnding.measure.getNextMeasure()
+        while (m) {
+            const ending = m.getEnding();
 
-            if (ending && ending.hasPassage(passage)) {
-                return m;
-            }
+            if (ending && ending.hasPassage(passage))
+                return ending;
 
-            let next = m?.getNextMeasure();
+            let next = m.getNextMeasure();
 
-            if (!m || m.hasEndSong() || m.hasEndSection() || !next || next.hasNavigation(Navigation.StartRepeat)) {
+            if (
+                !next ||
+                m.hasEndSong() || m.hasEndSection() ||
+                next.hasNavigation(Navigation.StartRepeat) && !next.hasNavigation(Navigation.Ending)
+            ) {
                 // Hit song end, new-section or start-repeat. No passage found.
                 return undefined;
             }
+
+            m = m.getNextMeasure();
         }
+
+        return undefined;
     }
 
     private initializeForPlayback() {
