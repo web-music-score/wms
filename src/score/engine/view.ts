@@ -51,12 +51,13 @@ type Overlay = {
 }
 
 export enum DrawSymbol {
+    Unknown,
     Dot,
     Fermata,
-    Accent,
-    Marcate,
     Staccato,
-    Staccatissimo,
+    Accent,
+    Marcato,
+    Tenuto,
     Spiccato,
     Flag,
     NoteHeadStroked,
@@ -1064,6 +1065,9 @@ export class View {
         const dotWidth = DocumentSettings.DotSize * unitSize;
 
         switch (drawSymbol) {
+            case DrawSymbol.Unknown:
+            default:
+                return AnchoredRect.createCentered(0, 0, unitSize * 2.5, unitSize * 2.5);
             case DrawSymbol.Dot:
             case DrawSymbol.Staccato:
                 return AnchoredRect.createCentered(0, 0, dotWidth, dotWidth);
@@ -1075,9 +1079,14 @@ export class View {
             case DrawSymbol.DiamondNoteHeadFilled:
             case DrawSymbol.DiamondNoteHeadStroked:
                 return AnchoredRect.createCentered(0, 0, DocumentSettings.DiamondNoteHeadSize * unitSize, DocumentSettings.DiamondNoteHeadSize * unitSize);
-            default:
-                // Dummy
-                return AnchoredRect.createCentered(0, 0, unitSize, unitSize);
+            case DrawSymbol.Accent:
+                return AnchoredRect.createCentered(0, 0, unitSize * 2, unitSize * 1.25);
+            case DrawSymbol.Marcato:
+                return AnchoredRect.createCentered(0, 0, unitSize * 1.25, unitSize * 2);
+            case DrawSymbol.Tenuto:
+                return AnchoredRect.createCentered(0, 0, unitSize * 2, unitSize * 0.25);
+            case DrawSymbol.Spiccato:
+                return AnchoredRect.createCentered(0, 0, unitSize * 1.1, dotWidth * 1.3);
         }
     }
 
@@ -1099,6 +1108,17 @@ export class View {
         }
 
         switch (drawSymbol) {
+            case DrawSymbol.Unknown:
+            default:
+                this.lineWidth(1);
+                this.beginPath();
+                this.rect(left, top, width, height);
+                this.moveTo(left, bottom);
+                this.lineTo(right, top);
+                this.moveTo(left, top);
+                this.lineTo(right, bottom);
+                this.stroke();
+                break;
             case DrawSymbol.Dot:
             case DrawSymbol.Staccato:
                 this.fillCircle(anchorX, anchorY, width / 2);
@@ -1158,6 +1178,33 @@ export class View {
                 this.lineTo(anchorX, bottom);
                 this.lineTo(left, anchorY);
                 this.lineTo(anchorX, top);
+                this.fill();
+                break;
+            case DrawSymbol.Accent:
+                this.beginPath();
+                this.moveTo(left, top);
+                this.lineTo(right, centerY);
+                this.lineTo(left, bottom);
+                this.stroke();
+                break;
+            case DrawSymbol.Marcato:
+                this.beginPath();
+                this.moveTo(left, bottom);
+                this.lineTo(centerX, top);
+                this.lineTo(right, bottom);
+                this.stroke();
+                break;
+            case DrawSymbol.Tenuto:
+                this.beginPath();
+                this.moveTo(left, centerY);
+                this.lineTo(right, centerY);
+                this.stroke();
+                break;
+            case DrawSymbol.Spiccato:
+                this.beginPath();
+                this.moveTo(left, top);
+                this.lineTo(centerX, bottom);
+                this.lineTo(right, top);
                 this.fill();
                 break;
         }

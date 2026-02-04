@@ -1,8 +1,8 @@
-import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
-import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey } from "../pub";
+import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -13,6 +13,7 @@ import { ObjText } from "./obj-text";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
+import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 
 function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
     return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -35,6 +36,7 @@ function sortNotesAndStrings(notes: ReadonlyArray<Note>, strings?: StringNumber 
 
 export class ObjStaffNoteGroup extends MusicObject {
     public noteHeadRects: AnchoredRect[] = [];
+    public articulations: { drawSymbol: DrawSymbol, rect: AnchoredRect }[] = [];
     public dotRects: AnchoredRect[] = [];
     public accidentals: ObjAccidental[] = [];
     public stemTip?: AnchoredRect;
@@ -79,6 +81,7 @@ export class ObjStaffNoteGroup extends MusicObject {
         this.noteHeadRects.forEach(r => this.rect.unionInPlace(r));
         if (this.stemTip) this.rect.unionInPlace(this.stemTip);
         if (this.stemBase) this.rect.unionInPlace(this.stemBase);
+        this.articulations.forEach(ar => this.rect.unionInPlace(ar.rect));
         this.dotRects.forEach(r => this.rect.unionInPlace(r));
         this.flagRects.forEach(r => this.rect.unionInPlace(r));
         this.accidentals.forEach(a => this.rect.unionInPlace(a.getRect()));
@@ -99,6 +102,7 @@ export class ObjStaffNoteGroup extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.noteHeadRects.forEach(n => n.offsetInPlace(dx, dy));
+        this.articulations.forEach(ar => ar.rect.offsetInPlace(dx, dy));
         this.dotRects.forEach(n => n.offsetInPlace(dx, dy));
         this.accidentals.forEach(n => n.offset(dx, dy));
         this.stemTip?.offsetInPlace(dx, dy);
@@ -157,7 +161,7 @@ export class ObjNoteGroup extends MusicObject {
     readonly oldStyleTriplet: boolean;
     readonly rhythmProps: RhythmProps;
 
-    private articulation?: "staccato";
+    private articulations: AnnotationKind[] = [];
 
     private startConnnectives: ConnectiveProps[] = [];
     private runningConnectives: ConnectiveProps[] = [];
@@ -198,7 +202,7 @@ export class ObjNoteGroup extends MusicObject {
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
 
-        if (options?.staccato) this.articulation = "staccato";
+        if (options?.staccato) this.articulations = [AnnotationKind.staccato];
 
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
@@ -221,12 +225,28 @@ export class ObjNoteGroup extends MusicObject {
         return this.col.row;
     }
 
-    setStaccato() {
-        this.articulation = "staccato";
+    addArticulation(kind: AnnotationKind): boolean {
+        if (!isNoteArticulation(kind))
+            return false;
+
+        // They are the same
+        if (kind === AnnotationKind.staccatissimo)
+            kind = AnnotationKind.spiccato;
+
+        if (!this.articulations.includes(kind)) {
+            this.articulations.push(kind);
+            this.articulations = sortNoteArticulations(this.articulations);
+        }
+
+        return true;
     }
 
-    hasStaccato(): boolean {
-        return this.articulation === "staccato";
+    hasArticulation(kind: AnnotationKind): boolean {
+        // They are the same
+        if (kind === AnnotationKind.staccatissimo)
+            kind = AnnotationKind.spiccato;
+
+        return this.articulations.includes(kind);
     }
 
     get minDiatonicId(): number {
@@ -646,22 +666,21 @@ export class ObjNoteGroup extends MusicObject {
                     noteStaff.addObject(r);
                 }
 
-                // Add staccato dot
-                if (this.articulation === "staccato") {
-                    if (stemDir === Stem.Up && isBottomNote) {
-                        let dotX = noteX;
-                        let dotY = noteY + unitSize * (isNoteOnLine ? 3 : 2);
-                        let r = dotRect.offsetCopy(dotX, dotY);
-                        obj.dotRects.push(r);
-                        stemBaseStaff.addObject(r);
-                    }
-                    else if (stemDir === Stem.Down && isTopNote) {
-                        let dotX = noteX;
-                        let dotY = noteY - unitSize * (isNoteOnLine ? 3 : 2);
-                        let r = dotRect.offsetCopy(dotX, dotY);
-                        obj.dotRects.push(r);
-                        stemBaseStaff.addObject(r);
-                    }
+                // Add articulations
+                if (stemDir === Stem.Up && isBottomNote || stemDir === Stem.Down && isTopNote) {
+                    let dy = stemDir === Stem.Down ? -1 : 1;
+                    let arX = noteX;
+                    let arY = noteY + (isNoteOnLine ? 3 : 2) * unitSize * dy;
+
+                    this.articulations.forEach((kind, kindId) => {
+                        let drawSymbol = getNoteArticulationDrawSymbol(kind);
+                        let rect = view.getSymbolRect(drawSymbol).offsetCopy(arX, arY);
+
+                        obj.articulations.push({ drawSymbol, rect });
+                        stemBaseStaff.addObject(rect);
+
+                        arY += unitSize * 2 * dy;
+                    });
                 }
             });
 
@@ -796,6 +815,9 @@ export class ObjNoteGroup extends MusicObject {
                         view.drawSymbol(DrawSymbol.NoteHeadStroked, r);
                 }
             });
+
+            // Draw articulations
+            obj.articulations.forEach(ar => view.drawSymbol(ar.drawSymbol, ar.rect));
 
             // Draw dots
             obj.dotRects.forEach(r => view.drawSymbol(DrawSymbol.Dot, r));

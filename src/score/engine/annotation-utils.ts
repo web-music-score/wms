@@ -3,6 +3,7 @@ import { AnnotationGroup, Navigation, ColorKey, AnnotationKind, DynamicsAnnotati
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
+import { DrawSymbol } from "./view";
 
 export function getNavigationString(navigation: Navigation): string {
     switch (navigation) {
@@ -21,9 +22,6 @@ export function getNavigationString(navigation: Navigation): string {
 
 export function getAnnotationKindTextReplacement(text: string): string {
     switch (text) {
-        case AnnotationKind.tenuto: return "—";     // TODO: Maybe should draw better symbol instead.
-        case AnnotationKind.accent: return ">";     // TODO: Maybe should draw better symbol instead.
-        case AnnotationKind.marcato: return "^";    // TODO: Maybe should draw better symbol instead.
         case AnnotationKind.trill: return "tr";
     }
     return text;
@@ -157,6 +155,8 @@ const AnnotationKindToGroupMap = new UniMap<AnnotationKind, AnnotationGroup>([
 
     // Articulation annotations
     [AnnotationKind.staccato, AnnotationGroup.Articulation],
+    [AnnotationKind.staccatissimo, AnnotationGroup.Articulation],
+    [AnnotationKind.spiccato, AnnotationGroup.Articulation],
     [AnnotationKind.tenuto, AnnotationGroup.Articulation],
     [AnnotationKind.accent, AnnotationGroup.Articulation],
     [AnnotationKind.marcato, AnnotationGroup.Articulation],
@@ -233,4 +233,37 @@ AnnotationKindToGroupMap.forEach((_, kind) => NormalisedAnnotationKindMap.set(no
 
 export function resolveAnnotationKind(annotationKind: string): AnnotationKind | undefined {
     return NormalisedAnnotationKindMap.get(normaliseAnnotationKind(annotationKind));
+}
+
+const NoteArticulationOrder = [
+    AnnotationKind.staccato,
+    AnnotationKind.staccatissimo,
+    AnnotationKind.spiccato,
+    AnnotationKind.tenuto,
+    AnnotationKind.accent,
+    AnnotationKind.marcato,
+];
+
+export function isNoteArticulation(kind: AnnotationKind) {
+    return NoteArticulationOrder.includes(kind);
+}
+
+export function sortNoteArticulations(articulations: AnnotationKind[]): AnnotationKind[] {
+    return articulations.slice().sort((a, b) => {
+        let ao = NoteArticulationOrder.indexOf(a); if (ao < 0) ao = Infinity;
+        let bo = NoteArticulationOrder.indexOf(b); if (bo < 0) bo = Infinity;
+        return ao - bo;
+    });
+}
+
+export function getNoteArticulationDrawSymbol(kind: AnnotationKind): DrawSymbol {
+    switch (kind) {
+        case AnnotationKind.staccato: return DrawSymbol.Staccato;
+        case AnnotationKind.staccatissimo: return DrawSymbol.Spiccato;
+        case AnnotationKind.spiccato: return DrawSymbol.Spiccato;
+        case AnnotationKind.accent: return DrawSymbol.Accent;
+        case AnnotationKind.marcato: return DrawSymbol.Marcato;
+        case AnnotationKind.tenuto: return DrawSymbol.Tenuto;
+        default: return DrawSymbol.Unknown;
+    }
 }

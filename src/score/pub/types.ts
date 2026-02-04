@@ -421,11 +421,15 @@ export enum AnnotationKind {
 
     /** short, detached */
     staccato = "staccato",
+    /** even shorter than staccato */
+    staccatissimo = "staccatissimo",
+    /** even shorter than staccato */
+    spiccato = "spiccato",
     /** (—) – held for full value */
     tenuto = "tenuto",
-    /** (>) – emphasized */
+    /** (>) – louder, or with a harder attack */
     accent = "accent",
-    /** (^) – strongly accented */
+    /** (^) – louder or more forcefully */
     marcato = "marcato",
     /** (slur) smoothly connected */
     legato = "legato",

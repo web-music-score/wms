@@ -1,34 +1,21 @@
-import { MFermata } from "../pub";
+import { MDrawSymbol, MFermata } from "../pub";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { ObjBarLineRight } from "./obj-bar-line";
-import { VerticalPos } from "./layout-object";
-import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
+import { Rect } from "@tspro/ts-utils-lib";
 
-export class ObjFermata extends MusicObject {
-    readonly mi: MFermata;
+export class ObjDrawSymbol extends MusicObject {
+    readonly mi: MDrawSymbol;
 
-    constructor(parent: ObjRhythmColumn | ObjBarLineRight, readonly flipY: boolean, readonly color: string) {
+    constructor(parent: ObjRhythmColumn | ObjBarLineLeft | ObjBarLineRight, readonly symbol: DrawSymbol, readonly flipX: boolean, readonly flipY: boolean, readonly color: string) {
         super(parent);
 
-        this.mi = new MFermata(this);
+        this.mi = this instanceof ObjFermata ? new MFermata(this) : new MDrawSymbol(this);
     }
 
-    getMusicInterface(): MFermata {
+    getMusicInterface(): MDrawSymbol {
         return this.mi;
-    }
-
-    static getFermataPositions(anchor: ObjRhythmColumn | ObjBarLineRight): VerticalPos[] {
-        let { measure } = anchor;
-        let { row } = measure;
-
-        if (row.getTopStaff() !== row.getBottomStaff()) {
-            return [VerticalPos.Above, VerticalPos.Below];
-        }
-        else {
-            return [VerticalPos.Above];
-        }
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -36,7 +23,7 @@ export class ObjFermata extends MusicObject {
     }
 
     layout(view: View) {
-        this.rect = view.getSymbolRect(DrawSymbol.Fermata);
+        this.rect = view.getSymbolRect(this.symbol);
     }
 
     offset(dx: number, dy: number) {
@@ -48,6 +35,16 @@ export class ObjFermata extends MusicObject {
             return;
 
         view.color(this.color);
-        view.drawSymbol(DrawSymbol.Fermata, this.rect, false, this.flipY);
+        view.drawSymbol(this.symbol, this.rect, this.flipX, this.flipY);
+    }
+}
+
+export class ObjFermata extends ObjDrawSymbol {
+    constructor(parent: ObjRhythmColumn | ObjBarLineRight, flipY: boolean, color: string) {
+        super(parent, DrawSymbol.Fermata, false, flipY, color);
+    }
+
+    getMusicInterface(): MFermata {
+        return this.mi;
     }
 }

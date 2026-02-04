@@ -3,7 +3,7 @@ import * as Theory from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import * as Pub from "../pub";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
@@ -17,9 +17,9 @@ import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
-import { ObjFermata } from "./obj-fermata";
+import { ObjDrawSymbol, ObjFermata } from "./obj-fermata";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString } from "./annotation-utils";
+import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, resolveAnnotationKind } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -621,10 +621,10 @@ export class ObjMeasure extends MusicObject {
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
             throw new MusicError(MusicErrorType.Score, "Error: endingPassages is undefined.");
 
-        if (annotationKind === Pub.AnnotationKind.staccato) {
-            if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup)
-                this.lastAddedRhythmSymbol.setStaccato();
-            return;
+        if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup) {
+            const kind = resolveAnnotationKind(annotationKind);
+            if (kind && this.lastAddedRhythmSymbol.addArticulation(kind))
+                return;
         }
 
         const anchorX = 0.5;
@@ -636,9 +636,10 @@ export class ObjMeasure extends MusicObject {
 
         const colAnchor = this.lastAddedRhythmColumn;
 
-        const fermataAnchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
-        ? this.barLineRight
-        : this.lastAddedRhythmColumn;
+        const fermataAnchor = (
+            annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine ||
+            annotationKind === Pub.AnnotationKind.measureEndFermata
+        ) ? this.barLineRight : this.lastAddedRhythmColumn;
 
         switch (annotationKind) {
             case Pub.Navigation.Ending:
@@ -700,14 +701,9 @@ export class ObjMeasure extends MusicObject {
             case Pub.Navigation.StartRepeat:
                 break;
             case Pub.AnnotationKind.fermata:
+            case Pub.AnnotationKind.measureEndFermata:
                 if (fermataAnchor) {
                     createLayoutObject = (line, vpos) => new ObjFermata(fermataAnchor, vpos === VerticalPos.Below, getColor(line));
-                }
-                break;
-            case Pub.AnnotationKind.measureEndFermata:
-                createLayoutObject = (line, vpos) => {
-                    const anchor = this.barLineRight;
-                    return new ObjFermata(anchor, vpos === VerticalPos.Below, getColor(line));
                 }
                 break;
             case Pub.AnnotationKind.ChordLabel: {

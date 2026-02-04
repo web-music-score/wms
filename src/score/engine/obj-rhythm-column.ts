@@ -1,6 +1,6 @@
 import { Note } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId, colorKey } from "../pub";
+import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId, colorKey, AnnotationKind } from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
@@ -307,7 +307,7 @@ export class ObjRhythmColumn extends MusicObject {
 
                 symbol.notes.forEach(note => {
                     let ticks = symbol.getPlayTicks(note);
-                    let staccato = symbol.hasStaccato();
+                    let staccato = symbol.hasArticulation(AnnotationKind.staccato);
 
                     addNote(note, ticks, staccato, slur);
                 });
