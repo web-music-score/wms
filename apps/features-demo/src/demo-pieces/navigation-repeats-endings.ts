@@ -10,28 +10,16 @@ export function createNavigationRepeatEndingDemo() {
         .setTimeSignature("3/4")
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
-
-        .addMeasure()
-        .addNote(0, "A3", "4n")
-        .addNote(0, "A3", "2n")
         .addNavigation("endRepeat", 3)
 
         .addMeasure()
         .addNavigation("startRepeat")
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
-
-        .addMeasure()
-        .addNote(0, "A3", "4n")
-        .addNote(0, "A3", "2n")
         .endRow()
 
         .addMeasure()
-        .addNavigation("ending", 1)
-        .addNote(0, "A3", "4n")
-        .addNote(0, "A3", "2n")
-
-        .addMeasure()
+        .addNavigation("ending", 1, 2)
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
 
@@ -42,7 +30,7 @@ export function createNavigationRepeatEndingDemo() {
         .endRow()
 
         .addMeasure()
-        .addNavigation("ending", 2)
+        .addNavigation("ending", 3)
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
 

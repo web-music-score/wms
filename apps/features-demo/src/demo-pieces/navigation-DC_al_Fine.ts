@@ -12,7 +12,9 @@ export function createNavigationDCAlFineDemo() {
         .addNote(0, "G4", "2n")
 
         .addMeasure()
+        .addNavigation("startRepeat")
         .addNote(0, "G4", "2n")
+        .addNavigation("endRepeat")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
