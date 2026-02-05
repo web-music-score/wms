@@ -55,10 +55,11 @@ export enum DrawSymbol {
     Dot,
     Fermata,
     Staccato,
+    Spiccato,
     Accent,
     Marcato,
     Tenuto,
-    Spiccato,
+    Portato,
     Flag,
     NoteHeadStroked,
     NoteHeadFilled,
@@ -1085,6 +1086,8 @@ export class View {
                 return AnchoredRect.createCentered(0, 0, unitSize * 1.25, unitSize * 2);
             case DrawSymbol.Tenuto:
                 return AnchoredRect.createCentered(0, 0, unitSize * 2, unitSize * 0.25);
+            case DrawSymbol.Portato:
+                return AnchoredRect.createCentered(0, 0, unitSize * 2.3 + dotWidth, dotWidth);
             case DrawSymbol.Spiccato:
                 return AnchoredRect.createCentered(0, 0, unitSize * 1.1, dotWidth * 1.3);
         }
@@ -1093,6 +1096,7 @@ export class View {
     drawSymbol(drawSymbol: DrawSymbol, rect: AnchoredRect, flipX = false, flipY = false): View {
         if (!this.ctx) return this;
 
+        let { unitSize } = this;
         let { left, right, top, bottom, width, height, anchorX, anchorY, centerX, centerY } = rect;
         let { leftw, rightw, toph, bottomh } = rect;
 
@@ -1199,6 +1203,13 @@ export class View {
                 this.moveTo(left, centerY);
                 this.lineTo(right, centerY);
                 this.stroke();
+                break;
+            case DrawSymbol.Portato:
+                this.beginPath();
+                this.moveTo(left, centerY);
+                this.lineTo(left + unitSize * 2, centerY);
+                this.stroke();
+                this.fillCircle(right - height / 2, anchorY, height / 2);
                 break;
             case DrawSymbol.Spiccato:
                 this.beginPath();

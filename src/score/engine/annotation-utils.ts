@@ -239,6 +239,7 @@ const NoteArticulationOrder = [
     AnnotationKind.staccato,
     AnnotationKind.staccatissimo,
     AnnotationKind.spiccato,
+    AnnotationKind.portato,
     AnnotationKind.tenuto,
     AnnotationKind.accent,
     AnnotationKind.marcato,
@@ -264,6 +265,7 @@ export function getNoteArticulationDrawSymbol(kind: AnnotationKind): DrawSymbol 
         case AnnotationKind.accent: return DrawSymbol.Accent;
         case AnnotationKind.marcato: return DrawSymbol.Marcato;
         case AnnotationKind.tenuto: return DrawSymbol.Tenuto;
+        case AnnotationKind.portato: return DrawSymbol.Portato;
         default: return DrawSymbol.Unknown;
     }
 }

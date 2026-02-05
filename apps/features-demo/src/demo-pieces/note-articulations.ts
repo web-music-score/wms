@@ -17,7 +17,7 @@ export function createNoteArticulationsDemo() {
         .addMeasure()
         .addNote(0, "C4", "4n").addAnnotation("marcato")
         .addNote(0, "E4", "4n").addAnnotation("tenuto")
-        .addNote(0, "G4", "4n")
+        .addNote(0, "G4", "4n").addAnnotation("portato")
         .addNote(0, "C4", "4n").addAnnotation("staccato").addAnnotation("staccatissimo").addAnnotation("spiccato").addAnnotation("accent").addAnnotation("marcato").addAnnotation("tenuto")
 
         .addMeasure()
@@ -29,7 +29,7 @@ export function createNoteArticulationsDemo() {
         .addMeasure()
         .addNote(0, "C3", "4n").addAnnotation("marcato")
         .addNote(0, "E3", "4n").addAnnotation("tenuto")
-        .addNote(0, "G3", "4n")
+        .addNote(0, "G3", "4n").addAnnotation("portato")
         .addNote(0, "C3", "4n").addAnnotation("staccato").addAnnotation("staccatissimo").addAnnotation("spiccato").addAnnotation("accent").addAnnotation("marcato").addAnnotation("tenuto")
 
         .getDocument();
