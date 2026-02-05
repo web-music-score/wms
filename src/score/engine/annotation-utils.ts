@@ -227,8 +227,11 @@ function normaliseAnnotationKind(annotationKind: string): string {
     return String(annotationKind).trim().toLowerCase().replace(/[.]/g, "").replace(/[-]/g, " ");
 }
 
+// Create normalised annotation kind map.
 const NormalisedAnnotationKindMap = new UniMap<string, AnnotationKind>();
-AnnotationKindToGroupMap.forEach((_, kind) => NormalisedAnnotationKindMap.set(normaliseAnnotationKind(kind), kind));
+// And fill it.
+for (const [kind] of AnnotationKindToGroupMap)
+    NormalisedAnnotationKindMap.set(normaliseAnnotationKind(kind), kind)
 
 export function resolveAnnotationKind(annotationKind: string): AnnotationKind | undefined {
     return NormalisedAnnotationKindMap.get(normaliseAnnotationKind(annotationKind));
