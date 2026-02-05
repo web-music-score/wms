@@ -1,5 +1,5 @@
 import { UniMap, Utils } from "@tspro/ts-utils-lib";
-import { AnnotationGroup, Navigation, ColorKey, AnnotationKind, DynamicsAnnotation } from "../pub";
+import { AnnotationGroup, Navigation, ColorKey, AnnotationKind } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
@@ -224,8 +224,7 @@ export function resolveAnnotationGroup(annotationKind: AnnotationKind): Annotati
 }
 
 function normaliseAnnotationKind(annotationKind: string): string {
-    let str = String(annotationKind).trim().toLowerCase();
-    return str.endsWith(".") ? str.substring(str.length - 1) : str;
+    return String(annotationKind).trim().toLowerCase().replace(/[.]/g, "").replace(/[-]/g, " ");
 }
 
 const NormalisedAnnotationKindMap = new UniMap<string, AnnotationKind>();
