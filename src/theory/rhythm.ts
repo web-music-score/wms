@@ -91,27 +91,13 @@ export enum NoteLength {
 /** String values type of note length enum. */
 export type NoteLengthStr = `${NoteLength}`;
 
-/**
- * Test if given argument is note length.
- * @param noteLength - Note length to validate.
- * @returns - True/false.
- */
 export function isNoteLength(noteLength: unknown): noteLength is NoteLength {
     return Guard.isEnumValue(noteLength, NoteLength);
 }
 
-/**
- * Validate if given argument is note length.
- * @param noteLength - Note length to validate.
- * @returns - Valid note length or throws.
- */
 export function validateNoteLength(noteLength: unknown): NoteLength {
-    if (isNoteLength(noteLength)) {
-        return noteLength;
-    }
-    else {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`);
-    }
+    if (isNoteLength(noteLength)) return noteLength;
+    throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`);
 }
 
 /** Note length props class. */
@@ -230,11 +216,6 @@ export function isTupletRatio(tupletRatio: unknown): tupletRatio is TupletRatio 
     );
 }
 
-/**
- * Validate if given argument is tuplet ratio.
- * @param tupletRatio - Tuplet ratio to validate.
- * @returns - Valid tuplet ratio or throws.
- */
 export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
     if (isTupletRatio(tupletRatio)) {
         return tupletRatio;

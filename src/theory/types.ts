@@ -24,9 +24,7 @@ export const PitchNotationList: ReadonlyArray<PitchNotation> = Utils.Enum.getEnu
 export const DefaultPitchNotation = PitchNotation.Scientific;
 
 /**
- * Validate pitch notation of unknown value.
- * @param pn - Pitch notation value to validate.
- * @returns - Valid pitch notation or throws.
+ * @deprecated - Not required by this library, will be removed in future release.
  */
 export function validatePitchNotation(pn: unknown): PitchNotation {
     if (Guard.isEnumValue(pn, PitchNotation)) {
@@ -42,8 +40,8 @@ export function validatePitchNotation(pn: unknown): PitchNotation {
  * @param pn - Pitch notation.
  * @returns - Name of given pitch notation.
  */
-export function getPitchNotationName(pn: PitchNotation) {
-    return PitchNotation[validatePitchNotation(pn)];
+export function getPitchNotationName(pn: PitchNotation): string {
+    return PitchNotation[pn];
 }
 
 /** Guitar note label enum. */
@@ -63,9 +61,7 @@ export const DefaultGuitarNoteLabel = GuitarNoteLabel.Default;
 export const GuitarNoteLabelList: ReadonlyArray<GuitarNoteLabel> = Utils.Enum.getEnumValues(GuitarNoteLabel);
 
 /**
- * Validate guitar note label of unknown value.
- * @param label - Guitar note label value to validate.
- * @returns - Valid guitar note label or throws.
+ * @deprecated - Not required by this library, will be removed in future release.
  */
 export function validateGuitarNoteLabel(label: unknown): GuitarNoteLabel {
     if (Guard.isEnumValue(label, GuitarNoteLabel)) {

@@ -2,6 +2,7 @@ import { Guard, LRUCache } from "@tspro/ts-utils-lib";
 import TuningData from "./assets/tunings.json";
 import { Note } from "./note";
 import { MusicError, MusicErrorType } from "web-music-score/core";
+import { getClosestString } from "shared-src";
 
 /*
  * | string | stringId | freq    | fretboard (RH) | on tab        |
@@ -17,18 +18,28 @@ export const TuningNameList: ReadonlyArray<string> = TuningData.list.map(data =>
 /** DEfault tuning name (Standard). */
 export const DefaultTuningName: string = TuningNameList[0];
 
-/**
- * Validate if given argument is available tuning name.
- * @param tuningName - Tuning name to validate.
- * @returns - Tuning name if valid, or throws.
- */
 export function validateTuningName(tuningName: string): string {
-    if (TuningNameList.indexOf(tuningName) < 0) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name: ${tuningName}`);
+    if (typeof tuningName !== "string" || TuningNameList.indexOf(tuningName) < 0) {
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name "${tuningName}".`);
     }
     else {
         return tuningName;
     }
+}
+
+/** Currently only hints resolved value in error. */
+export function resolveTuningName(tuningName: unknown): string {
+    const tuningNameStr = String(tuningName);
+
+    if (TuningNameList.includes(tuningNameStr))
+        return tuningNameStr;
+
+    const closest = getClosestString(tuningNameStr, TuningNameList);
+
+    if (closest)
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name "${tuningName}". Did you mean "${closest}"?`);
+
+    throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name "${tuningName}".`);
 }
 
 const TuningStringsCache = new LRUCache<string, ReadonlyArray<Note>>(100);
@@ -45,13 +56,13 @@ export function getTuningStrings(tuningName: string): ReadonlyArray<Note> {
         let tuningData = TuningData.list.find(data => data.name === tuningName);
 
         if (!tuningData) {
-            throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuningName: ${tuningName}`);
+            throw new MusicError(MusicErrorType.InvalidArg, `Invalid tuning name "${tuningName}".`);
         }
 
         tuningStrings = tuningData.strings.slice().reverse().map(noteName => Note.getNote(noteName));
 
         if (!Guard.isIntegerEq(tuningStrings.length, 6)) {
-            throw new MusicError(MusicErrorType.Unknown, `Tuning has ${tuningStrings.length} strings.`);
+            throw new MusicError(MusicErrorType.Unknown, `Invalid tuning string count ${tuningStrings.length}.`);
         }
 
         TuningStringsCache.set(tuningName, tuningStrings);

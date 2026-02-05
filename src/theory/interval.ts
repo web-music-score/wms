@@ -115,23 +115,24 @@ function getIntervalQuality(diatonicInterval: number, chromaticInterval: number)
     }
 }
 
-/**
- * Validate interval quality of unkown value.
- * @param q - Interval quality to validate.
- * @returns - Interval quality if valid, else throws.
- */
-export function validateIntervalQuality(q: unknown): IntervalQuality {
-    if (!(q === "Perfect" || q === "Major" || q === "minor" || q === "Augmented" || q === "diminished" || q === "Doubly Augmented" || q === "doubly diminished")) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quality: ${q}`);
-    }
-    else {
-        return q as IntervalQuality;
-    }
+export function validateIntervalQuality(quality: unknown): IntervalQuality {
+    if (
+        quality === "Perfect" ||
+        quality === "Major" ||
+        quality === "minor" ||
+        quality === "Augmented" ||
+        quality === "diminished" ||
+        quality === "Doubly Augmented" ||
+        quality === "doubly diminished"
+    )
+        return quality;
+    else
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quality "${quality}".`);
 }
 
 function formatQuantity(q: number) {
     if (!Guard.isIntegerGte(q, 1)) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quantity: ${q}`);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quantity "${q}".`);
     }
     else {
         return Utils.Math.toOrdinalNumber(q);

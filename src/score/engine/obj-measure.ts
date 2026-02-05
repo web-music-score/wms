@@ -414,14 +414,9 @@ export class ObjMeasure extends MusicObject {
                 this.alterKeySignature = Theory.getScale(args[0]);
             }
             else if (args.length === 2) {
-                try {
-                    let tonic = "" + args[0];
-                    let scaleType = Theory.validateScaleType("" + args[1]);
-                    this.alterKeySignature = Theory.getScale(tonic, scaleType);
-                }
-                catch (e) {
-                    throw new ScoreError("Cannot set key signature because invalid args: " + args);
-                }
+                let tonic = Theory.resolveTonic(args[0]);
+                let scaleType = Theory.resolveScaleType(args[1]);
+                this.alterKeySignature = Theory.getScale(tonic, scaleType);
             }
         }
 

@@ -81,16 +81,13 @@ export function getVoiceIds(): ReadonlyArray<VoiceId> {
 }
 
 export function isVoiceId(voiceId: unknown): voiceId is VoiceId {
-    return Guard.isIncluded(voiceId, getVoiceIds());
+    return Guard.isIncluded(Number(voiceId), getVoiceIds());
 }
 
 export function validateVoiceId(voiceId: unknown): VoiceId {
-    if (isVoiceId(voiceId)) {
+    if (isVoiceId(voiceId))
         return voiceId;
-    }
-    else {
-        throw new ScoreError(`Voice id ${voiceId} is invalid!`);
-    }
+    throw new ScoreError(`Invalid voice id: ${voiceId}`);
 }
 
 /** Strng number. */
@@ -102,16 +99,12 @@ export function getStringNumbers(): ReadonlyArray<StringNumber> {
 }
 
 export function isStringNumber(stringNum: unknown): stringNum is VerseNumber {
-    return Guard.isIncluded(stringNum, getStringNumbers());
+    return Guard.isIncluded(Number(stringNum), getStringNumbers());
 }
 
 export function validateStringNumber(stringNum: unknown): VerseNumber {
-    if (isStringNumber(stringNum)) {
-        return stringNum;
-    }
-    else {
-        throw new ScoreError(`String number ${stringNum} is invalid!`);
-    }
+    if (isStringNumber(stringNum)) return stringNum;
+    throw new ScoreError(`Invalid string number: ${stringNum}`);
 }
 
 /** Verse number. */
@@ -123,16 +116,12 @@ export function getVerseNumbers(): ReadonlyArray<VerseNumber> {
 }
 
 export function isVerseNumber(verse: unknown): verse is VerseNumber {
-    return Guard.isIncluded(verse, getVerseNumbers());
+    return Guard.isIncluded(Number(verse), getVerseNumbers());
 }
 
-export function validateVerseNumber(verseNum: unknown): VerseNumber {
-    if (isVerseNumber(verseNum)) {
-        return verseNum;
-    }
-    else {
-        throw new ScoreError(`Verse number ${verseNum} is invalid!`);
-    }
+export function validateVerseNumber(verse: unknown): VerseNumber {
+    if (isVerseNumber(verse)) return verse;
+    throw new ScoreError(`Invalid verse number: ${verse}`);
 }
 
 /** Stem direction enum. */

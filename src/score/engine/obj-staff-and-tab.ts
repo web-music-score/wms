@@ -1,4 +1,4 @@
-import { getTuningStrings, Note, validateTuningName } from "web-music-score/theory";
+import { getTuningStrings, Note, resolveTuningName } from "web-music-score/theory";
 import { ImageAsset, View } from "./view";
 import { Clef, colorKey, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
@@ -408,7 +408,7 @@ export class ObjTab extends ObjNotationLine {
             this.tuningStrings = tabConfig.tuning.map(noteName => Note.getNote(noteName)).reverse();
         }
         else if (typeof tabConfig.tuning === "string") {
-            this.tuningName = validateTuningName(tabConfig.tuning);
+            this.tuningName = resolveTuningName(tabConfig.tuning);
             this.tuningStrings = getTuningStrings(this.tuningName);
         }
         else {

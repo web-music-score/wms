@@ -4,6 +4,7 @@ import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
 import { Interval } from "./interval";
 import { MusicError, MusicErrorType } from "web-music-score/core";
+import { getClosestEnumValue, getClosestString } from "shared-src";
 
 function getNaturalDiatonicId(chromaticId: number): number {
     // ChromaticId could map to several diatonicId/accidental combinations.
@@ -90,6 +91,9 @@ export class Scale extends KeySignature {
      * @param scaleType - Scale typo ("e.g. "Major" in "C Major").
      */
     constructor(readonly tonic: string, readonly scaleType: ScaleType) {
+        tonic = resolveTonic(tonic);
+        scaleType = resolveScaleType(scaleType);
+
         super(tonic, getMode(scaleType));
 
         switch (scaleType) {
@@ -375,7 +379,7 @@ export class ScaleFactory {
         });
 
         if (naturalScales.length === 0) {
-            throw new MusicError(MusicErrorType.Scale, `Expected natural scale.`);
+            throw new MusicError(MusicErrorType.Scale, `No natural scale in scale type "${this.type}".`);
         }
 
         const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getNumAccidentals() - b.getNumAccidentals();
@@ -419,7 +423,7 @@ export class ScaleFactory {
      * @returns - Scale.
      */
     getScale(tonic: string): Scale {
-        let scale = this.scaleMap.get(tonic);
+        let scale = this.scaleMap.get(resolveTonic(tonic));
         if (!scale) {
             throw new MusicError(MusicErrorType.Scale, `Invalid scale: ${tonic} ${this.type}`);
         }
@@ -481,7 +485,7 @@ ScaleFactoryList.forEach(factory => {
  * @returns - Scale factory.
  */
 export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFactory {
-    let f = ScaleFactoryMap.get(scaleType);
+    let f = ScaleFactoryMap.get(resolveScaleType(scaleType));
     if (!f) {
         throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
     }
@@ -490,18 +494,41 @@ export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFac
     }
 }
 
-/**
- * Validate scale type.
- * @param scaleType - Scale type of unknown value.
- * @returns - Scale type if given argument was valid scale type, or throws.
- */
 export function validateScaleType(scaleType: unknown): ScaleType {
-    if (Guard.isEnumValue(scaleType, ScaleType)) {
-        return scaleType;
-    }
-    else {
-        throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: "${scaleType}"`);
-    }
+    if (Guard.isEnumValue(scaleType, ScaleType)) return scaleType;
+
+    throw new MusicError(MusicErrorType.Scale, `Invalid scale type "${scaleType}".`);
+}
+
+/** Currently only hints resolved value in error. */
+export function resolveScaleType(scaleType: unknown): ScaleType {
+    if(typeof scaleType !== "string")
+        throw new MusicError(MusicErrorType.Scale, `Scale type is not string.`);
+
+    if (Guard.isEnumValue(scaleType, ScaleType)) return scaleType;
+
+    const closest = getClosestEnumValue(scaleType, ScaleType);
+
+    if (closest)
+        throw new MusicError(MusicErrorType.Scale, `Invalid scale type "${scaleType}". Did you mean "${closest}"?`);
+
+    throw new MusicError(MusicErrorType.Scale, `Invalid scale type "${scaleType}".`);
+}
+
+/** Currently only hints resolved value in error. */
+export function resolveTonic(tonic: unknown): string {
+    if(typeof tonic !== "string")
+        throw new MusicError(MusicErrorType.Scale, `Tonic is not string.`);
+
+    if (FullTonicList.includes(tonic))
+        return tonic;
+
+    const closest = getClosestString(tonic, FullTonicList);
+
+    if (closest)
+        throw new MusicError(MusicErrorType.Scale, `Invalid tonic "${tonic}". Did you mean "${closest}"?`);
+
+    throw new MusicError(MusicErrorType.Scale, `Invalid tonic: "${tonic}"`);
 }
 
 /**
@@ -520,12 +547,12 @@ export function getScale(arg0: string, arg1?: ScaleType | `${ScaleType}`): Scale
     let scaleType: ScaleType;
 
     if (arg1 !== undefined) {
-        tonic = arg0;
-        scaleType = validateScaleType(arg1);
+        tonic = String(arg0);
+        scaleType = String(arg1) as ScaleType;
     }
     else {
-        tonic = arg0.split(" ")[0];
-        scaleType = validateScaleType(arg0.substring(tonic.length + 1));
+        tonic = String(arg0.split(" ")[0]);
+        scaleType = String(arg0.substring(tonic.length + 1)) as ScaleType;
     }
 
     return getScaleFactory(scaleType).getScale(tonic);

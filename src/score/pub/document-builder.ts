@@ -7,8 +7,7 @@ import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
-import { AssertUtil, warnDeprecated } from "shared-src";
-import { resolveEnumValue } from "../engine/enum-utils";
+import { AssertUtil, warnDeprecated, resolveEnumValue } from "shared-src";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
@@ -377,7 +376,7 @@ export class DocumentBuilder {
             AssertUtil.assert((
                 args[0] instanceof Theory.Scale ||
                 args[0] instanceof Theory.KeySignature ||
-                Guard.isNonEmptyString(args[0]) && Guard.isEnumValueOrUndefined(args[1], Theory.ScaleType)
+                Guard.isNonEmptyString(args[0]) && Guard.isNonEmptyStringOrUndefined(args[1])
             ));
 
             this.getMeasure().setKeySignature(...args);
