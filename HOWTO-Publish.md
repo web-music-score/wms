@@ -3,7 +3,7 @@
 ## Pre-Release
     // Update CHANGELOG.md
 
-    // Version: "X.Y.Z-pre.N"`
+    // Version: "X.Y.Z-pre.N"
 
     // Install
     npm install --workspaces

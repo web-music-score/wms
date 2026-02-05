@@ -1,12 +1,17 @@
 # CHANGELOG
-## [6.4.0-pre.5] - Unreleased
+## [6.4.0-pre.5] - 2026-02-05
+### Added
+- Draw note articulations like staccato: staccatissimo, spiccato, tenuto, accent, marcato, portato.
+- Play staccatissimo (even shorter than staccato).
+- Error handler function for DocumentBuilder. User can throw, log, silent, etc. on errors.
+
 ### Changed
 - Give annotation groups each a Paint ColorKey, deprecate `*.element.*` ColorKeys and map them to the new `*.annotation.*` ColorKeys.
 
 ### Fixed
 - Composer and arranger header texts were not picked.
 - TabConfig assert with tuning strings was wrong and threw.
-- There were some problems in repeats and endings player login, improved and fixed.
+- There were some problems in repeats and endings player logic, improved and fixed.
 
 ## [6.4.0-pre.4] - 2026-02-02
 ### Changed
