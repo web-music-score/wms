@@ -9,11 +9,11 @@ import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player-engine";
 import { DocumentSettings } from "./settings";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
 import { IndexArray, UniMap, TriMap, AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { ScoreError } from "./error-utils";
 
 export type ScorePlayerNote = {
     note: Note;
@@ -75,7 +75,7 @@ export class ObjRhythmColumn extends MusicObject {
             return this.measure.getColumn(colId + 1);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot get next column in measure because current column's id in mesure is invalid.");
+            throw new ScoreError("Cannot get next column in measure because current column's id in mesure is invalid.");
         }
     }
 

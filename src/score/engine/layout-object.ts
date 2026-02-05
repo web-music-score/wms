@@ -8,11 +8,11 @@ import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { View } from "./view";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { AnchoredRect, asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
+import { ScoreError } from "./error-utils";
 
 export enum LayoutGroupId {
     TabRhythm,
@@ -53,7 +53,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
         p = p.getParent();
     }
 
-    throw new MusicError(MusicErrorType.Score, "Parent measure is required but not found!");
+    throw new ScoreError("Parent measure is required but not found!");
 }
 
 export enum VerticalPos { Above = 0, Below = 1 }
@@ -79,7 +79,7 @@ export class LayoutObjectWrapper {
         let anchor = this.musicObj.getParent();
 
         if (!anchor) {
-            throw new MusicError(MusicErrorType.Score, "Parent music object is required as an anchor.");
+            throw new ScoreError("Parent music object is required as an anchor.");
         }
 
         this.anchor = anchor;

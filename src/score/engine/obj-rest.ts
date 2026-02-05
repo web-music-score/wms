@@ -6,9 +6,9 @@ import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { ScoreError } from "./error-utils";
 
 export class ObjStaffRest extends MusicObject {
     public restRect = new AnchoredRect();
@@ -232,7 +232,7 @@ export class ObjRest extends MusicObject {
             case 32: return -3;
             case 64: return -3;
             default:
-                throw new MusicError(MusicErrorType.Score, `Get rest dot vertical displacement: Invalid note size: ${noteSize}`);
+                throw new ScoreError(`Get rest dot vertical displacement: Invalid note size: ${noteSize}`);
         }
     }
 

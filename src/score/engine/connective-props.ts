@@ -2,10 +2,10 @@ import { Note } from "web-music-score/theory";
 import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
 import { Connective, NoteAnchor, Stem, TieType } from "../pub/types";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
 import { ObjNotationLine, ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { Guard } from "@tspro/ts-utils-lib";
+import { ScoreError } from "./error-utils";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
@@ -185,7 +185,7 @@ export class ConnectiveProps {
             addConnective(rightNoteGroup.measure, leftNoteGroup, leftNoteId, rightNoteGroup, rightNoteId);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot create connective because it is jumping measures.");
+            throw new ScoreError("Cannot create connective because it is jumping measures.");
         }
     }
 }

@@ -7,8 +7,8 @@ import { ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { ObjAccidental } from "./obj-accidental";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { ScoreError } from "./error-utils";
 
 function imgColor(color: string) {
     return ["black", "#000", "#0000", "#000000", "#00000000"].includes(color) ? "" : color;
@@ -163,7 +163,7 @@ export class ObjStaffSignature extends MusicObject {
             return Note.findNextDiatonicIdAbove(accNote.diatonicId, bottomAccidentalDiatonicId, false);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot get accidental diatonicId because note has no accidental.")
+            throw new ScoreError("Cannot get accidental diatonicId because note has no accidental.")
         }
     }
 

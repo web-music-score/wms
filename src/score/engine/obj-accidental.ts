@@ -2,8 +2,8 @@ import { Accidental } from "web-music-score/theory";
 import { MAccidental } from "../pub";
 import { View } from "./view";
 import { MusicObject } from "./music-object";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { ScoreError } from "./error-utils";
 
 export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
@@ -40,7 +40,7 @@ export class ObjAccidental extends MusicObject {
                 this.rect = AnchoredRect.createSections(unitSize * 1, unitSize * 1, unitSize * 1, unitSize * 1);
                 break;
             default:
-                throw new MusicError(MusicErrorType.Score, "Invalid accidental value: " + this.accidental);
+                throw new ScoreError("Invalid accidental value: " + this.accidental);
         }
     }
 

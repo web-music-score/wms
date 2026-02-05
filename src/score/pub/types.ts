@@ -1,6 +1,6 @@
 import { Guard } from "@tspro/ts-utils-lib";
 import { Note } from "web-music-score/theory";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { ScoreError } from "../engine/error-utils";
 
 /** Staff preset values for score configuration. */
 export enum StaffPreset {
@@ -89,7 +89,7 @@ export function validateVoiceId(voiceId: unknown): VoiceId {
         return voiceId;
     }
     else {
-        throw new MusicError(MusicErrorType.Score, `Voice id ${voiceId} is invalid!`);
+        throw new ScoreError(`Voice id ${voiceId} is invalid!`);
     }
 }
 
@@ -110,7 +110,7 @@ export function validateStringNumber(stringNum: unknown): VerseNumber {
         return stringNum;
     }
     else {
-        throw new MusicError(MusicErrorType.Score, `String number ${stringNum} is invalid!`);
+        throw new ScoreError(`String number ${stringNum} is invalid!`);
     }
 }
 
@@ -131,7 +131,7 @@ export function validateVerseNumber(verseNum: unknown): VerseNumber {
         return verseNum;
     }
     else {
-        throw new MusicError(MusicErrorType.Score, `Verse number ${verseNum} is invalid!`);
+        throw new ScoreError(`Verse number ${verseNum} is invalid!`);
     }
 }
 

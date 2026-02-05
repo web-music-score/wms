@@ -9,7 +9,7 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
 import { AnchoredRect, Guard, Rect, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { StaffGroup } from "./layout-object";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { ScoreError } from "./error-utils";
 
 export class ObjDocument extends MusicObject {
     private needLayout: boolean = true;
@@ -89,16 +89,16 @@ export class ObjDocument extends MusicObject {
 
             if (treble && bass && treble.type === "staff" && bass.type === "staff" && treble.grandId !== undefined && treble.grandId === bass.grandId) {
                 if (usedGrandIdes.includes(treble.grandId)) {
-                    throw new MusicError(MusicErrorType.Score, `Grand staff error: grandId "${treble.grandId}" already used!`);
+                    throw new ScoreError(`Grand staff error: grandId "${treble.grandId}" already used!`);
                 }
                 else if (treble.clef !== Clef.G) {
-                    throw new MusicError(MusicErrorType.Score, `Grand staff error: Invalid treble clef "${treble.clef}"!`);
+                    throw new ScoreError(`Grand staff error: Invalid treble clef "${treble.clef}"!`);
                 }
                 else if (bass.clef !== Clef.F) {
-                    throw new MusicError(MusicErrorType.Score, `Grand staff error: Invalid treble clef "${treble.clef}"!`);
+                    throw new ScoreError(`Grand staff error: Invalid treble clef "${treble.clef}"!`);
                 }
                 else if (treble.isOctaveDown || bass.isOctaveDown) {
-                    throw new MusicError(MusicErrorType.Score, `Grand staff error: cannot use isOctaveDown option!`);
+                    throw new ScoreError(`Grand staff error: cannot use isOctaveDown option!`);
                 }
 
                 usedGrandIdes.push(treble.grandId);
@@ -109,7 +109,7 @@ export class ObjDocument extends MusicObject {
                 cfgId += 2;
             }
             else if (treble && treble.type === "staff" && treble.grandId !== undefined) {
-                throw new MusicError(MusicErrorType.Score, `Grand staff error: invalid use of grandId "${treble.grandId}"!`);
+                throw new ScoreError(`Grand staff error: invalid use of grandId "${treble.grandId}"!`);
             }
             else {
                 cfgId++;

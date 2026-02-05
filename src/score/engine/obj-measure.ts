@@ -3,7 +3,7 @@ import * as Theory from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import * as Pub from "../pub";
-import { DrawSymbol, View } from "./view";
+import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
@@ -22,11 +22,11 @@ import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos 
 import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
+import { ScoreError } from "./error-utils";
 
 export function getExtensionAnchorY(linePos: ExtensionLinePos) {
     switch (linePos) {
@@ -78,7 +78,7 @@ function getVerseLayoutGroupId(verse: Pub.VerseNumber): LayoutGroupId {
         case 2: return LayoutGroupId.LyricsVerse2;
         case 3: return LayoutGroupId.LyricsVerse3;
         default:
-            throw new MusicError(MusicErrorType.Unknown, "VerseNumber is not 1, 2 or 3.");
+            throw new ScoreError("VerseNumber is not 1, 2 or 3.");
     }
 }
 
@@ -420,7 +420,7 @@ export class ObjMeasure extends MusicObject {
                     this.alterKeySignature = Theory.getScale(tonic, scaleType);
                 }
                 catch (e) {
-                    throw new MusicError(MusicErrorType.Score, "Cannot set key signature because invalid args: " + args);
+                    throw new ScoreError("Cannot set key signature because invalid args: " + args);
                 }
             }
         }
@@ -613,13 +613,13 @@ export class ObjMeasure extends MusicObject {
 
     addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, annotationOptions: Pub.AnnotationOptions) {
         if (!Guard.isNonEmptyString(annotationKind))
-            throw new MusicError(MusicErrorType.Score, `Annotation error: invalid annotation kind.`);
+            throw new ScoreError(`Annotation error: invalid annotation kind.`);
 
         if (annotationGroup === Pub.AnnotationGroup.Label && !Guard.isNonEmptyString(annotationOptions.labelText))
-            throw new MusicError(MusicErrorType.Score, "Annotation error: label text is empty.");
+            throw new ScoreError("Annotation error: label text is empty.");
 
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
-            throw new MusicError(MusicErrorType.Score, "Annotation error: ending passages is undefined.");
+            throw new ScoreError("Annotation error: ending passages is undefined.");
 
         if (isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
             if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup) {
@@ -627,7 +627,7 @@ export class ObjMeasure extends MusicObject {
                 return;
             }
             else {
-                throw new MusicError(MusicErrorType.Score, `Annotation error: no note for "${annotationKind}".`);
+                throw new ScoreError(`Annotation error: no note for "${annotationKind}".`);
             }
         }
 
@@ -648,7 +648,7 @@ export class ObjMeasure extends MusicObject {
         switch (annotationKind) {
             case Pub.Navigation.Ending:
                 if (this.navigationSet.has(annotationKind))
-                    throw new MusicError(MusicErrorType.Score, "Cannot add ending becaure measure already has one.");
+                    throw new ScoreError("Cannot add ending becaure measure already has one.");
                 createLayoutObject = (line) => {
                     const anchor = this;
                     let passages = annotationOptions.endingPassages!;
@@ -764,7 +764,7 @@ export class ObjMeasure extends MusicObject {
         let anchor = this.lastAddedRhythmSymbol;
 
         if (!(anchor instanceof ObjNoteGroup)) {
-            throw new MusicError(MusicErrorType.Score, "Connective can be added to note group only.");
+            throw new ScoreError("Connective can be added to note group only.");
         }
 
         if (connective === Pub.Connective.Tie) {
@@ -800,12 +800,12 @@ export class ObjMeasure extends MusicObject {
                 musicObj.setLink(extension);
             }
             else {
-                throw new MusicError(MusicErrorType.Score, "Cannot add extension becaue no compatible music object to attach it to.");
+                throw new ScoreError("Cannot add extension becaue no compatible music object to attach it to.");
             }
         });
 
         if (this.addExtensionTo.length === 0) {
-            throw new MusicError(MusicErrorType.Score, "Cannot add extension because music object to attach it to is undefined.");
+            throw new ScoreError("Cannot add extension because music object to attach it to is undefined.");
         }
 
         this.disableExtensionLine();
@@ -939,7 +939,7 @@ export class ObjMeasure extends MusicObject {
             }
         }
 
-        throw new MusicError(MusicErrorType.Score, "Error in rhythm column. Should never get here.");
+        throw new ScoreError("Error in rhythm column. Should never get here.");
     }
 
     getMeasureTicks() {

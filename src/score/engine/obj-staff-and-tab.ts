@@ -1,6 +1,5 @@
 import { getTuningStrings, Note, validateTuningName } from "web-music-score/theory";
 import { ImageAsset, View } from "./view";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { Clef, colorKey, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
@@ -11,6 +10,7 @@ import { ObjEnding } from "./obj-ending";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
+import { ScoreError } from "./error-utils";
 
 type NotationLineObject = {
     getRect: () => AnchoredRect,
@@ -197,7 +197,7 @@ export class ObjStaff extends ObjNotationLine {
             this.middleLineDiatonicId = this.clefLineDiatonicId - 2;
         }
         else {
-            throw new MusicError(MusicErrorType.Score, `Invalid staffConfig.clef ${staffConfig.clef}.`);
+            throw new ScoreError(`Invalid staffConfig.clef ${staffConfig.clef}.`);
         }
 
         this.topLineDiatonicId = this.middleLineDiatonicId + 4;
@@ -273,7 +273,7 @@ export class ObjStaff extends ObjNotationLine {
             return this.joinedGrandStaff.getDiatonicIdY(diatonicId);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Staff does not contain diatonicId " + diatonicId);
+            throw new ScoreError("Staff does not contain diatonicId " + diatonicId);
         }
     }
 
@@ -285,7 +285,7 @@ export class ObjStaff extends ObjNotationLine {
             return this.joinedGrandStaff;
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Staff does not contain diatonicId " + diatonicId);
+            throw new ScoreError("Staff does not contain diatonicId " + diatonicId);
         }
     }
 

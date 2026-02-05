@@ -1,10 +1,10 @@
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { MMeasure, MScoreRow, MStaff, MTab, MusicInterface } from "./mobjects";
 import { WmsView } from "./wms-view";
 import { MRenderContext } from "./deprecated";
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
 import { warnDeprecated } from "shared-src";
 import { Utils } from "@tspro/ts-utils-lib";
+import { ScoreError } from "../engine/error-utils";
 
 /** Score event type. */
 export type ScoreEventType = "enter" | "leave" | "click";
@@ -167,7 +167,7 @@ export class ScoreObjectEvent extends ScoreEvent {
         super(type);
 
         if (arguments.length === 0)
-            throw new MusicError(MusicErrorType.Score, "Empty objects array in ScoreObjectEvent!");
+            throw new ScoreError("Empty objects array in ScoreObjectEvent!");
     }
 
     /**

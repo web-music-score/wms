@@ -6,8 +6,8 @@ import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
 import { MConnective, TieType, Connective, colorKey } from "../pub";
 import { DocumentSettings } from "./settings";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
+import { ScoreError } from "./error-utils";
 
 export class ObjConnective extends MusicObject {
     private lx = 0;
@@ -133,7 +133,7 @@ export class ObjConnective extends MusicObject {
             ry = leftPos.y + (rightPos.y - leftPos.y) * tLeft / (tLeft + tRight);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Cannot layout connective object because no valid left and right note groups.");
+            throw new ScoreError("Cannot layout connective object because no valid left and right note groups.");
         }
 
         let spanDy = arcDir === "up" ? -1 : 1;

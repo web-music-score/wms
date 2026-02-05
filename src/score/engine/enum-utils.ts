@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError, MusicErrorType } from "core/error";
+import { ScoreError } from "./error-utils";
 
 export function resolveEnumValue<E extends Utils.Enum.EnumObject>(input: string, enumObject: E): Utils.Enum.EnumValue<E> | undefined {
     const normalized = input.toLowerCase();
@@ -9,7 +9,7 @@ export function resolveEnumValue<E extends Utils.Enum.EnumObject>(input: string,
 export function resolveRequiredEnumValue<E extends Utils.Enum.EnumObject>(input: string, enumObject: E): Utils.Enum.EnumValue<E> {
     const enumValue = resolveEnumValue(input, enumObject);
     if (enumValue === undefined)
-        throw new MusicError(MusicErrorType.Score, `Invalid enum value "${input}" for enum object: ${Utils.Str.stringify(enumObject)}`);
+        throw new ScoreError(`Invalid enum value "${input}" for enum object: ${Utils.Str.stringify(enumObject)}`);
     return enumValue;
 }
 

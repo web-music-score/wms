@@ -4,7 +4,7 @@ import { View } from "./view";
 import { ObjText } from "./obj-text";
 import { ObjMeasure } from "./obj-measure";
 import { MEnding, Navigation } from "../pub";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { ScoreError } from "./error-utils";
 
 export class ObjEnding extends MusicObject {
     private endingText: ObjText;
@@ -18,10 +18,10 @@ export class ObjEnding extends MusicObject {
         this.mi = new MEnding(this);
 
         if (!Guard.isIntegerGte(passages.length, 1)) {
-            throw new MusicError(MusicErrorType.Score, "Passages is empty.");
+            throw new ScoreError("Passages is empty.");
         }
         else if (!this.passages.every(p => Guard.isIntegerGte(p, 1))) {
-            throw new MusicError(MusicErrorType.Score, "Invalid passages: " + this.passages);
+            throw new ScoreError("Invalid passages: " + this.passages);
         }
 
         // Sort ascending

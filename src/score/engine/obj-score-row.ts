@@ -5,13 +5,13 @@ import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
 import { View } from "./view";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
 import { ObjFermata } from "./obj-symbol";
+import { ScoreError } from "./error-utils";
 
 export class ScoreRowRegions {
     public instrWidth = 0;
@@ -154,7 +154,7 @@ export class ObjScoreRow extends MusicObject {
             return topStaff;
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Top staff is required!");
+            throw new ScoreError("Top staff is required!");
         }
     }
 
@@ -164,7 +164,7 @@ export class ObjScoreRow extends MusicObject {
             return bottomStaff;
         }
         else {
-            throw new MusicError(MusicErrorType.Score, "Bottom staff is required!");
+            throw new ScoreError("Bottom staff is required!");
         }
     }
 

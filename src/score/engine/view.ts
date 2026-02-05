@@ -5,8 +5,8 @@ import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "web-music-score/theory";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "./obj-measure";
+import { ScoreError } from "./error-utils";
 
 import GClefData from "./assets/G-clef.png";
 import FClefData from "./assets/F-clef.png";
@@ -263,7 +263,7 @@ export class View {
         if (Guard.isFinite(zoom) && Guard.isNumberGt(zoom, 0))
             this.updateSize({ zoom });
         else
-            throw new MusicError(MusicErrorType.Score, "Invalid zoom: " + zoom);
+            throw new ScoreError("Invalid zoom: " + zoom);
     }
 
     setStaffSize(staffSize: StaffSize) {
@@ -286,7 +286,7 @@ export class View {
         if (Guard.isFinite(staffSizePx) && Guard.isNumberGt(staffSizePx, 0))
             this.updateSize({ staffSizePx });
         else
-            throw new MusicError(MusicErrorType.Score, "Invalid staffSize: " + staffSize);
+            throw new ScoreError("Invalid staffSize: " + staffSize);
     }
 
     private updateSize({ zoom, staffSizePx }: { zoom?: number, staffSizePx?: number }) {

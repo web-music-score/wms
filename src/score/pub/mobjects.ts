@@ -22,7 +22,6 @@ import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
 import { PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { ObjLyrics } from "../engine/obj-lyrics";
 import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
@@ -31,13 +30,14 @@ import { isWmsViewHTMLElement } from "../custom-element/wms-view";
 import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 import { Player } from "./player";
 import { AssertUtil } from "shared-src";
+import { ScoreError } from "../engine/error-utils";
 
 function getMStaffOrMTab(line: unknown): MStaff | MTab {
     if (line instanceof ObjStaff || line instanceof ObjTab) {
         return line.getMusicInterface()
     }
     else {
-        throw new MusicError(MusicErrorType.Score, `Object is not staff or tab.`);
+        throw new ScoreError(`Object is not staff or tab.`);
     }
 }
 /** Abstract music interface object class. */
@@ -526,7 +526,7 @@ export class MStaffBarLine extends MusicInterface {
             return barLine.getMusicInterface()
         }
         else {
-            throw new MusicError(MusicErrorType.Score, `Bar line not left nor right.`);
+            throw new ScoreError(`Bar line not left nor right.`);
         }
     }
 

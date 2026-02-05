@@ -7,8 +7,8 @@ import { ObjText } from "./obj-text";
 import { Stem, MBeamGroup, MusicInterface, MStaffBeamGroup, TupletOptions } from "../pub";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { DocumentSettings } from "./settings";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjStaff } from "./obj-staff-and-tab";
+import { ScoreError } from "./error-utils";
 
 export enum BeamGroupType {
     RegularBeam,
@@ -111,10 +111,10 @@ export class ObjBeamGroup extends MusicObject {
         let beamGroupName = tupletRatio ? "Tuplet" : "BeamGroup";
 
         if (!symbols.every(s => s.measure === symbols[0].measure)) {
-            throw new MusicError(MusicErrorType.Score, `All ${beamGroupName} symbols are not in same measure.`);
+            throw new ScoreError(`All ${beamGroupName} symbols are not in same measure.`);
         }
         else if (symbols.length < 2) {
-            throw new MusicError(MusicErrorType.Score, `${beamGroupName} needs minimum 2 symbols, but ${symbols.length} given.`);
+            throw new ScoreError(`${beamGroupName} needs minimum 2 symbols, but ${symbols.length} given.`);
         }
 
         if (tupletRatio !== undefined) {
@@ -152,7 +152,7 @@ export class ObjBeamGroup extends MusicObject {
             symbols[0].measure.addBeamGroup(this);
         }
         else {
-            throw new MusicError(MusicErrorType.Score, `Cannot add ${beamGroupName} because some symbol already has one.`);
+            throw new ScoreError(`Cannot add ${beamGroupName} because some symbol already has one.`);
         }
 
         // If regular beam has zero left or right beam count then detach.
@@ -175,7 +175,7 @@ export class ObjBeamGroup extends MusicObject {
                 throw new InvalidBeamGroup(this, "Beam symbols have different voiceId.");
             }
             else {
-                throw new MusicError(MusicErrorType.Score, `Tuplet symbols have different voiceId.`);
+                throw new ScoreError(`Tuplet symbols have different voiceId.`);
             }
         }
 

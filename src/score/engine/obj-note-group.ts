@@ -1,4 +1,4 @@
-import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
@@ -10,10 +10,10 @@ import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
 import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
+import { ScoreError } from "./error-utils";
 
 function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
     return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -181,7 +181,7 @@ export class ObjNoteGroup extends MusicObject {
         super(col);
 
         if (!Guard.isIntegerGte(notes.length, 1)) {
-            throw new MusicError(MusicErrorType.Score, "Cannot create note group object because notes array is empty.");
+            throw new ScoreError("Cannot create note group object because notes array is empty.");
         }
 
         let { sortedNotes, sortedStrings } = sortNotesAndStrings(notes, options?.string);
@@ -274,10 +274,10 @@ export class ObjNoteGroup extends MusicObject {
 
     startConnective(connectiveProps: ConnectiveProps) {
         if (!this.row.hasStaff && connectiveProps.connective === Connective.Tie) {
-            throw new MusicError(MusicErrorType.Score, "Ties not implemented for guitar tabs alone, staff is required!");
+            throw new ScoreError("Ties not implemented for guitar tabs alone, staff is required!");
         }
         else if (!this.row.hasStaff && connectiveProps.connective === Connective.Slur) {
-            throw new MusicError(MusicErrorType.Score, "Slurs not implemented for guitar tabs alone, staff is required!");
+            throw new ScoreError("Slurs not implemented for guitar tabs alone, staff is required!");
         }
 
         this.startConnnectives.push(connectiveProps);
@@ -323,7 +323,7 @@ export class ObjNoteGroup extends MusicObject {
     getConnectiveAnchorPoint(connectiveProps: ConnectiveProps, line: ObjNotationLine, noteIndex: number, noteAnchor: NoteAnchor, side: "left" | "right"): { x: number, y: number } {
         if (line instanceof ObjStaff) {
             if (noteIndex < 0 || noteIndex >= this.notes.length) {
-                throw new MusicError(MusicErrorType.Score, "Invalid noteIndex: " + noteIndex);
+                throw new ScoreError("Invalid noteIndex: " + noteIndex);
             }
 
             let obj = this.staffObjects.find(obj => obj.staff === line);
@@ -381,7 +381,7 @@ export class ObjNoteGroup extends MusicObject {
                 case NoteAnchor.StemTip:
                     return { x: anchorX, y: stemTip!.anchorY + (stemDir === Stem.Up ? -padding : padding) }
                 default:
-                    throw new MusicError(MusicErrorType.Score, "Invalid noteAnchor: " + noteAnchor);
+                    throw new ScoreError("Invalid noteAnchor: " + noteAnchor);
             }
         }
         else if (line instanceof ObjTab) {
