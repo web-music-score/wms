@@ -55,7 +55,7 @@ export enum DrawSymbol {
     Dot,
     Fermata,
     Staccato,
-    Spiccato,
+    Staccatissimo,
     Accent,
     Marcato,
     Tenuto,
@@ -1088,7 +1088,7 @@ export class View {
                 return AnchoredRect.createCentered(0, 0, unitSize * 2, unitSize * 0.25);
             case DrawSymbol.Portato:
                 return AnchoredRect.createCentered(0, 0, unitSize * 2.3 + dotWidth, dotWidth);
-            case DrawSymbol.Spiccato:
+            case DrawSymbol.Staccatissimo:
                 return AnchoredRect.createCentered(0, 0, unitSize * 1.1, dotWidth * 1.3);
         }
     }
@@ -1211,7 +1211,7 @@ export class View {
                 this.stroke();
                 this.fillCircle(right - height / 2, anchorY, height / 2);
                 break;
-            case DrawSymbol.Spiccato:
+            case DrawSymbol.Staccatissimo:
                 this.beginPath();
                 this.moveTo(left, top);
                 this.lineTo(centerX, bottom);

@@ -260,8 +260,8 @@ export function sortNoteArticulations(articulations: AnnotationKind[]): Annotati
 export function getNoteArticulationDrawSymbol(kind: AnnotationKind): DrawSymbol {
     switch (kind) {
         case AnnotationKind.staccato: return DrawSymbol.Staccato;
-        case AnnotationKind.staccatissimo: return DrawSymbol.Spiccato;
-        case AnnotationKind.spiccato: return DrawSymbol.Spiccato;
+        case AnnotationKind.staccatissimo: return DrawSymbol.Staccatissimo;
+        case AnnotationKind.spiccato: return DrawSymbol.Staccatissimo;
         case AnnotationKind.accent: return DrawSymbol.Accent;
         case AnnotationKind.marcato: return DrawSymbol.Marcato;
         case AnnotationKind.tenuto: return DrawSymbol.Tenuto;
