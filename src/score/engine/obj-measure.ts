@@ -17,7 +17,7 @@ import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
-import { ObjSymbol, ObjFermata } from "./obj-symbol";
+import { ObjFermata } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
 import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, resolveAnnotationKind } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
@@ -621,11 +621,9 @@ export class ObjMeasure extends MusicObject {
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
             throw new MusicError(MusicErrorType.Score, "Error: endingPassages is undefined.");
 
-        if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup) {
-            const kind = resolveAnnotationKind(annotationKind);
-            if (kind && this.lastAddedRhythmSymbol.addArticulation(kind))
-                return;
-        }
+        if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup &&
+            this.lastAddedRhythmSymbol.addArticulation(annotationKind as Pub.AnnotationKind))
+            return;
 
         const anchorX = 0.5;
         const anchorY = getExtensionAnchorY("bottom");
