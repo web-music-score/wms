@@ -475,8 +475,11 @@ export class PlayerEngine {
                 let noteSeconds = getDuration(note.ticks + fermataHoldTicks - arpeggioDelayTicks, tempo);
 
                 if (noteSeconds > 0) {
-                    if (note.staccato) {
+                    if (note.staccato === "staccato") {
                         noteSeconds = Math.min(getDuration(RhythmProps.get(NoteLength.Eighth).ticks, tempo) / 2, noteSeconds / 2);
+                    }
+                    else if (note.staccato === "staccatissimo") {
+                        noteSeconds = Math.min(getDuration(RhythmProps.get(NoteLength.Eighth).ticks, tempo) / 4, noteSeconds / 4);
                     }
 
                     let volume = adjustVolume(col.getPlayerProps().getVolume());

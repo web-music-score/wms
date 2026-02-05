@@ -16,10 +16,10 @@ import { VerticalPos } from "./layout-object";
 import { IndexArray, UniMap, TriMap, AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 export type ScorePlayerNote = {
-    note: Note,
-    ticks: number,
-    staccato: boolean
-    slur: undefined | "first" | "slurred"
+    note: Note;
+    ticks: number;
+    staccato: "staccato" | "staccatissimo" | "none";
+    slur: undefined | "first" | "slurred";
 }
 
 export type RhythmSymbol = ObjNoteGroup | ObjRest;
@@ -277,7 +277,7 @@ export class ObjRhythmColumn extends MusicObject {
     getPlayerNotes() {
         let playerNotes: ScorePlayerNote[] = [];
 
-        function addNote(note: Note, ticks: number, staccato: boolean, slur: undefined | "first" | "slurred") {
+        function addNote(note: Note, ticks: number, staccato: "staccato" | "staccatissimo" | "none", slur: undefined | "first" | "slurred") {
             if (ticks <= 0) {
                 return;
             }
@@ -307,7 +307,12 @@ export class ObjRhythmColumn extends MusicObject {
 
                 symbol.notes.forEach(note => {
                     let ticks = symbol.getPlayTicks(note);
-                    let staccato = symbol.hasArticulation(AnnotationKind.staccato);
+                    let staccato: "staccato" | "staccatissimo" | "none" =
+                        symbol.hasArticulation(AnnotationKind.staccato)
+                            ? "staccato"
+                            : symbol.hasArticulation(AnnotationKind.staccatissimo)
+                                ? "staccatissimo"
+                                : "none";
 
                     addNote(note, ticks, staccato, slur);
                 });
