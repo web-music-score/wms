@@ -3,13 +3,12 @@ import * as Types from "./types";
 import { MDocument } from "./mobjects";
 import { ObjDocument } from "../engine/obj-document";
 import * as Theory from "web-music-score/theory";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated } from "shared-src";
-import { resolveEnumValue, resolveRequiredEnumValue } from "../engine/enum-utils";
+import { resolveEnumValue } from "../engine/enum-utils";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
