@@ -19,7 +19,7 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString } from "./annotation-utils";
+import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
@@ -613,17 +613,23 @@ export class ObjMeasure extends MusicObject {
 
     addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, annotationOptions: Pub.AnnotationOptions) {
         if (!Guard.isNonEmptyString(annotationKind))
-            throw new MusicError(MusicErrorType.Score, `Error: invalid annotation kind.`);
+            throw new MusicError(MusicErrorType.Score, `Annotation error: invalid annotation kind.`);
 
         if (annotationGroup === Pub.AnnotationGroup.Label && !Guard.isNonEmptyString(annotationOptions.labelText))
-            throw new MusicError(MusicErrorType.Score, "Error: labelText is empty.");
+            throw new MusicError(MusicErrorType.Score, "Annotation error: label text is empty.");
 
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
-            throw new MusicError(MusicErrorType.Score, "Error: endingPassages is undefined.");
+            throw new MusicError(MusicErrorType.Score, "Annotation error: ending passages is undefined.");
 
-        if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup &&
-            this.lastAddedRhythmSymbol.addArticulation(annotationKind as Pub.AnnotationKind))
-            return;
+        if (isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
+            if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup) {
+                this.lastAddedRhythmSymbol.addNoteArticulation(annotationKind as Pub.AnnotationKind);
+                return;
+            }
+            else {
+                throw new MusicError(MusicErrorType.Score, `Annotation error: no note for "${annotationKind}".`);
+            }
+        }
 
         const anchorX = 0.5;
         const anchorY = getExtensionAnchorY("bottom");

@@ -225,9 +225,9 @@ export class ObjNoteGroup extends MusicObject {
         return this.col.row;
     }
 
-    addArticulation(kind: AnnotationKind): boolean {
+    addNoteArticulation(kind: AnnotationKind) {
         if (!isNoteArticulation(kind))
-            return false;
+            return;
 
         // They are the same
         if (kind === AnnotationKind.staccatissimo)
@@ -237,8 +237,6 @@ export class ObjNoteGroup extends MusicObject {
             this.articulations.push(kind);
             this.articulations = sortNoteArticulations(this.articulations);
         }
-
-        return true;
     }
 
     hasArticulation(kind: AnnotationKind): boolean {
