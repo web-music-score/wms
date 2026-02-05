@@ -1,4 +1,6 @@
 # CHANGELOG
+## [6.4.0-pre.6] - Unreleased
+
 ## [6.4.0-pre.5] - 2026-02-05
 ### Added
 - Draw note articulations like staccato: staccatissimo, spiccato, tenuto, accent, marcato, portato.
