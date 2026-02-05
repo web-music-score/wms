@@ -5,7 +5,7 @@
 ### Fixed
 - Composer and arranger header texts were not picked.
 - TabConfig assert with tuning strings was wrong and threw.
-- There were some problems in repeats and endings player login, improved and fixed.
+- There were some problems in repeats and endings player logic, improved and fixed.
 
 ## [6.3.6] - 2026-02-02
 ### Fixed

@@ -24,8 +24,7 @@
     // Publish
     npm publish --access public --tag next
 
-    // Bump to next version
-    Set package.json "version" to "X.Y.Z-pre.N+1"
+    // Bump version
 
 ## Latest/Patches
     // Update CHANGELOG.md
@@ -54,5 +53,4 @@
     // Add "next" tag when publishing first stable vX.Y.0 (not for patches)
     npm dist-tag add web-music-score@X.Y.Z next
 
-    // Bump to next version
-    Set package.json "version" to "X.Y.Z+1"
+    // Bump version
