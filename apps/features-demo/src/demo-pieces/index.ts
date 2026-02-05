@@ -19,6 +19,7 @@ import { createStaffConfigTabDemo } from "./staff-tab";
 import { createStaffGroupsDemo } from "./staff-groups";
 import { createLyricsDemo } from "./lyrics";
 import { createDeprecatedTestsDemo } from "./deprecated-tests";
+import { createNoteArticulationsDemo } from "./note-articulations";
 import * as Score from "web-music-score/score";
 
 export class DemoPieces {
@@ -66,7 +67,7 @@ export class DemoPieces {
         demos.push(createStaffConfigTabDemo());
         demos.push(createStaffGroupsDemo());
         demos.push(createLyricsDemo());
-        demos.push(createDeprecatedTestsDemo());
+        demos.push(createNoteArticulationsDemo());
 
         // Sort by title
         pieces.sort((a, b) => DemoPieces.getTitle(a).localeCompare(DemoPieces.getTitle(b)));
