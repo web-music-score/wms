@@ -790,10 +790,10 @@ export class DocumentBuilder {
         if (group === Types.AnnotationGroup.Label && Guard.isNullish(options.labelText) && Guard.isNonEmptyString(args[0]))
             options.labelText = Guard.isNullish(args[0]) ? undefined : String(args.shift());
 
-        if (kind === Types.AnnotationKind.EndRepeat&& Guard.isNullish(options.repeatCount) && Guard.isIntegerGte(args[0], 2))
+        if (kind === Types.AnnotationKind.EndRepeat && Guard.isNullish(options.repeatCount) && Guard.isIntegerGte(args[0], 2))
             options.repeatCount = Guard.isNullish(args[0]) ? undefined : Number(args.shift());
 
-        if (kind === Types.AnnotationKind.Ending&& Guard.isNullish(options.endingPassages) && args.every(a => Guard.isIntegerGte(a, 1)))
+        if (kind === Types.AnnotationKind.Ending && Guard.isNullish(options.endingPassages) && args.every(a => Guard.isIntegerGte(a, 1)))
             options.endingPassages = args.length > 0 ? [...args.map(a => Number(a))] : 1;
 
         this.getMeasure().addAnnotation(staffTargets, group!, kind, options);
