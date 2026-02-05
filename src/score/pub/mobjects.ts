@@ -6,7 +6,7 @@ import { ObjConnective } from "../engine/obj-connective";
 import { ObjArpeggio } from "../engine/obj-arpeggio";
 import { ObjDocument } from "../engine/obj-document";
 import { ObjEnding } from "../engine/obj-ending";
-import { ObjDrawSymbol, ObjFermata } from "../engine/obj-fermata";
+import { ObjSymbol, ObjFermata } from "../engine/obj-symbol";
 import { ObjHeader } from "../engine/obj-header";
 import { ObjImage } from "../engine/obj-image";
 import { ObjMeasure } from "../engine/obj-measure";
@@ -342,23 +342,23 @@ export class MEnding extends MusicInterface {
 }
 
 /** DrawSymbol object. */
-export class MDrawSymbol extends MusicInterface {
+export class MSymbol extends MusicInterface {
     /** Object name. */
     static readonly Name: string = "DrawSymbol";
 
     /** @internal */
-    constructor(protected readonly obj: ObjDrawSymbol) {
-        super(obj instanceof ObjFermata ? MFermata.Name : MDrawSymbol.Name);
+    constructor(protected readonly obj: ObjSymbol) {
+        super(obj instanceof ObjFermata ? MFermata.Name : MSymbol.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjDrawSymbol {
+    getMusicObject(): ObjSymbol {
         return this.obj;
     }
 }
 
 /** Fermata object. */
-export class MFermata extends MDrawSymbol {
+export class MFermata extends MSymbol {
     /** Object name. */
     static readonly Name: string = "Fermata";
 

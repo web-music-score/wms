@@ -1,7 +1,7 @@
 import { VerticalPosition } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjEnding } from "./obj-ending";
-import { ObjFermata } from "./obj-fermata";
+import { ObjFermata } from "./obj-symbol";
 import { ObjMeasure } from "./obj-measure";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjText } from "./obj-text";

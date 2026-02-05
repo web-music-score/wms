@@ -1,20 +1,20 @@
-import { MDrawSymbol, MFermata } from "../pub";
+import { MSymbol, MFermata } from "../pub";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
 import { Rect } from "@tspro/ts-utils-lib";
 
-export class ObjDrawSymbol extends MusicObject {
-    readonly mi: MDrawSymbol;
+export class ObjSymbol extends MusicObject {
+    readonly mi: MSymbol;
 
     constructor(parent: ObjRhythmColumn | ObjBarLineLeft | ObjBarLineRight, readonly symbol: DrawSymbol, readonly flipX: boolean, readonly flipY: boolean, readonly color: string) {
         super(parent);
 
-        this.mi = this instanceof ObjFermata ? new MFermata(this) : new MDrawSymbol(this);
+        this.mi = this instanceof ObjFermata ? new MFermata(this) : new MSymbol(this);
     }
 
-    getMusicInterface(): MDrawSymbol {
+    getMusicInterface(): MSymbol {
         return this.mi;
     }
 
@@ -39,7 +39,8 @@ export class ObjDrawSymbol extends MusicObject {
     }
 }
 
-export class ObjFermata extends ObjDrawSymbol {
+/** @dprecated - Merge to ObjSymbol. */
+export class ObjFermata extends ObjSymbol {
     constructor(parent: ObjRhythmColumn | ObjBarLineRight, flipY: boolean, color: string) {
         super(parent, DrawSymbol.Fermata, false, flipY, color);
     }

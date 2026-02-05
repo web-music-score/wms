@@ -11,7 +11,7 @@ import { RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
-import { ObjFermata } from "./obj-fermata";
+import { ObjFermata } from "./obj-symbol";
 
 export class ScoreRowRegions {
     public instrWidth = 0;
