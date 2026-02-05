@@ -19,7 +19,7 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, resolveAnnotationKind } from "./annotation-utils";
+import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { MusicError, MusicErrorType } from "web-music-score/core";
