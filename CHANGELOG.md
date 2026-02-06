@@ -1,5 +1,14 @@
 # CHANGELOG
 ## [6.4.0-pre.6] - Unreleased
+### Added
+- Added `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.
+- `group?: AnnotationGroup` property to `AnnotationOptions`.
+
+### Deprecated
+Deprecated `addAnnotation()` overloads to more simple and future proof.
+- `addAnnotation(group, ...)`, use instead `addAnnotation(..., { group })`.
+- `addAnnotation("endRepeat", repeatCount)`, use instead `addAnnotation("endRepeat", { repeatCount })`.
+- `addAnnotation("ending", ...passages)`, use instead `addAnnotation("ending", { endingPassages })`.
 
 ## [6.4.0-pre.5] - 2026-02-05
 ### Added
