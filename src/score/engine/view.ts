@@ -11,13 +11,15 @@ import { ScoreError } from "./error-utils";
 import GClefData from "./assets/G-clef.png";
 import FClefData from "./assets/F-clef.png";
 import TimeSigCommonData from "./assets/time-sig-common.png";
+import TimeSigCutData from "./assets/time-sig-cut.png";
 
-export enum ImageAsset { GClef, FClef, TimeSigCommon }
+export enum ImageAsset { GClef, FClef, TimeSignCommon, TimeSignCut }
 
 const ImageData = new UniMap<ImageAsset, string>([
     [ImageAsset.GClef, GClefData],
     [ImageAsset.FClef, FClefData],
-    [ImageAsset.TimeSigCommon, TimeSigCommonData],
+    [ImageAsset.TimeSignCommon, TimeSigCommonData],
+    [ImageAsset.TimeSignCut, TimeSigCutData],
 ]);
 
 const getImageData = (asset: ImageAsset): string => ImageData.getOrDefault(asset, "");

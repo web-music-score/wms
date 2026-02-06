@@ -5,6 +5,8 @@ import { MusicError, MusicErrorType } from "web-music-score/core";
 /** Time signature enum.  */
 export enum TimeSignatures {
     /** 2/4 time signature. */
+    _2_2 = "2/2",
+    /** 2/4 time signature. */
     _2_4 = "2/4",
     /** 3/4 time signature. */
     _3_4 = "3/4",
@@ -38,7 +40,7 @@ export enum BeamGrouping {
 
 /** Time signature class. */
 export class TimeSignature {
-    readonly isCommon: boolean = false;
+    readonly type: "n/d" | "common" | "cut" = "n/d";
     /** Number of beats in measure, upper value (e.g. "3" in "3/4"). */
     readonly beatCount: number;
     /** Beat size of time signature, lower value (e.g. "4" in "3/4"). */
@@ -54,7 +56,7 @@ export class TimeSignature {
      * Create new time signature instance.
      * @param timeSignature - Commmon time signature "C".
      */
-    constructor(timeSignature: "C");
+    constructor(timeSignature: "C" | "C|");
     /**
      * Create new time signature instance.
      * @param timeSignature - For example "4/4".
@@ -74,17 +76,22 @@ export class TimeSignature {
         if (args[0] === "C") {
             this.beatCount = 4;
             this.beatSize = 4;
-            this.isCommon = true;
+            this.type = "common";
+        }
+        else if (args[0] === "C|") {
+            this.beatCount = 2;
+            this.beatSize = 2;
+            this.type = "cut";
         }
         else if (Guard.isEnumValue(args[0], TimeSignatures)) {
             let parts = args[0].split("/");
 
             this.beatCount = +parts[0];
             this.beatSize = +parts[1];
+            this.type = "n/d";
 
-            if (Guard.isEnumValue(args[1], BeamGrouping)) {
+            if (Guard.isEnumValue(args[1], BeamGrouping))
                 beamGrouping = args[1];
-            }
         }
         else if (Guard.isIntegerGte(args[0], 2) && Guard.isIntegerGte(args[1], 2)) {
             this.beatCount = args[0];
@@ -110,7 +117,14 @@ export class TimeSignature {
         this.beatLength = noteLength;
         this.measureTicks = this.beatCount * ticks;
 
-        if (this.is(2, 4)) {
+        // Beam grouping logic is based on subdivisions at the eighth-note level.
+
+        if (this.is(2, 2)) {
+            // 2/2 is not beamed like 4/4, even though total duration is the same.
+            // Cut time is felt in two beats, so beams should reflect two big groups, not four smaller ones.
+            this.beamGroupSizes = [[4], [4]];
+        }
+        else if (this.is(2, 4)) {
             this.beamGroupSizes = [[2], [2]];
         }
         else if (this.is(3, 4)) {

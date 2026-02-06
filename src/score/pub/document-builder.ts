@@ -410,11 +410,11 @@ export class DocumentBuilder {
     }
 
     /**
-     * Set common time signature "C" for current measure and forward.
-     * @param timeSignature - "C".
+     * Set common or cut time signature for current measure and forward.
+     * @param timeSignature - "C" or "C|".
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: "C"): DocumentBuilder;
+    setTimeSignature(timeSignature: "C" | "C|"): DocumentBuilder;
     /**
      * Set time signature for current measure and forward.
      * @param timeSignature - TimeSignature object instance.
@@ -440,8 +440,8 @@ export class DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "setTimeSignature", ...args);
 
-            if (args[0] === "C") {
-                this.getMeasure().setTimeSignature(new Theory.TimeSignature("C"));
+            if (args[0] === "C" || args[0] === "C|") {
+                this.getMeasure().setTimeSignature(new Theory.TimeSignature(args[0]));
             }
             else if (args[0] instanceof Theory.TimeSignature) {
                 this.getMeasure().setTimeSignature(args[0]);

@@ -23,7 +23,7 @@ export class ObjStaffSignature extends MusicObject {
     private ksNewAccidentals: ObjAccidental[] = [];
     private beatCountText?: ObjText;
     private beatSizeText?: ObjText;
-    private commonTsImage?: ObjImage;
+    private tsImage?: ObjImage;
     private tempoText?: ObjText;
 
     readonly mi: MStaffSignature;
@@ -103,22 +103,28 @@ export class ObjStaffSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color: ColorKey | "" = colorKey("staff.signature.time");
+            let color: ColorKey = colorKey("staff.signature.time");
 
-            if (timeSignature.isCommon) {
-                this.beatCountText = this.beatSizeText = undefined;
+            this.tsImage = this.beatCountText = this.beatSizeText = undefined;
 
-                let img = view.getImageAsset(ImageAsset.TimeSigCommon, imgColor(color));
-                this.commonTsImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
-            }
-            else {
-                this.commonTsImage = undefined;
-
-                let beatCount = timeSignature.beatCount.toString();
-                this.beatCountText = new ObjText(this, { text: beatCount, color, scale: 1.4 }, 0.5, 0.5);
-
-                let beatSize = timeSignature.beatSize.toString();
-                this.beatSizeText = new ObjText(this, { text: beatSize, color, scale: 1.4 }, 0.5, 0.5);
+            switch (timeSignature.type) {
+                case "common": {
+                    let img = view.getImageAsset(ImageAsset.TimeSignCommon, imgColor(color));
+                    this.tsImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
+                    break;
+                }
+                case "cut": {
+                    let img = view.getImageAsset(ImageAsset.TimeSignCut, imgColor(color));
+                    this.tsImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
+                    break;
+                }
+                default: {
+                    let beatCount = timeSignature.beatCount.toString();
+                    this.beatCountText = new ObjText(this, { text: beatCount, color, scale: 1.4 }, 0.5, 0.5);
+                    let beatSize = timeSignature.beatSize.toString();
+                    this.beatSizeText = new ObjText(this, { text: beatSize, color, scale: 1.4 }, 0.5, 0.5);
+                    break;
+                }
             }
         }
         else {
@@ -214,8 +220,8 @@ export class ObjStaffSignature extends MusicObject {
             }
         }
 
-        if (this.commonTsImage) {
-            let arr = this.commonTsImage.pick(x, y);
+        if (this.tsImage) {
+            let arr = this.tsImage.pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -298,16 +304,16 @@ export class ObjStaffSignature extends MusicObject {
 
         let right = x;
 
-        if (this.commonTsImage) {
-            this.commonTsImage?.layout(view);
+        if (this.tsImage) {
+            this.tsImage?.layout(view);
 
-            let tsWidth = this.commonTsImage.getRect().width;
+            let tsWidth = this.tsImage.getRect().width;
 
-            this.commonTsImage.setCenter(
+            this.tsImage.setCenter(
                 x + tsWidth / 2 + paddingX,
                 staff.getDiatonicIdY(staff.middleLineDiatonicId)
             );
-            this.rect.unionInPlace(this.commonTsImage.getRect());
+            this.rect.unionInPlace(this.tsImage.getRect());
             right = Math.max(right, this.rect.right);
 
             x = right;
@@ -368,7 +374,7 @@ export class ObjStaffSignature extends MusicObject {
         this.ksNewAccidentals.forEach(acc => acc.offset(dx, dy));
         this.beatCountText?.offset(dx, dy);
         this.beatSizeText?.offset(dx, dy);
-        this.commonTsImage?.offset(dx, dy);
+        this.tsImage?.offset(dx, dy);
         this.tempoText?.offset(dx, dy);
         this.rect.offsetInPlace(dx, dy);
     }
@@ -393,7 +399,7 @@ export class ObjStaffSignature extends MusicObject {
         // Draw time signature
         this.beatCountText?.draw(view, clipRect);
         this.beatSizeText?.draw(view, clipRect);
-        this.commonTsImage?.draw(view, clipRect);
+        this.tsImage?.draw(view, clipRect);
 
         // Draw tempo
         this.tempoText?.draw(view, clipRect);
@@ -404,7 +410,7 @@ export class ObjTabSignature extends MusicObject {
     private measureNumber?: ObjText;
     private beatCountText?: ObjText;
     private beatSizeText?: ObjText;
-    private commonTsImage?: ObjImage;
+    private tsImage?: ObjImage;
     private tempoText?: ObjText;
 
     readonly mi: MTabSignature;
@@ -435,21 +441,30 @@ export class ObjTabSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color: ColorKey = colorKey("staff.signature.time");
+            let color: ColorKey = colorKey("tab.signature.time");
 
-            if (timeSignature.isCommon) {
-                this.beatCountText = this.beatSizeText = undefined;
+            this.tsImage = this.beatCountText = this.beatSizeText = undefined;
 
-                let img = view.getImageAsset(ImageAsset.TimeSigCommon, imgColor(color));
-                this.commonTsImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
+            switch (timeSignature.type) {
+                case "common": {
+                    let img = view.getImageAsset(ImageAsset.TimeSignCommon, imgColor(color));
+                    this.tsImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
+                    break;
+                }
+                case "cut": {
+                    let img = view.getImageAsset(ImageAsset.TimeSignCut, imgColor(color));
+                    this.tsImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
+                    break;
+                }
+                default: {
+                    let beatCount = timeSignature.beatCount.toString();
+                    this.beatCountText = new ObjText(this, { text: beatCount, color, scale: 1.4 }, 0.5, 0.5);
+                    let beatSize = timeSignature.beatSize.toString();
+                    this.beatSizeText = new ObjText(this, { text: beatSize, color, scale: 1.4 }, 0.5, 0.5);
+                    break;
+                }
             }
-            else {
-                let beatCount = timeSignature.beatCount.toString();
-                this.beatCountText = new ObjText(this, { text: beatCount, color, scale: 1.4 }, 0.5, 0.5);
 
-                let beatSize = timeSignature.beatSize.toString();
-                this.beatSizeText = new ObjText(this, { text: beatSize, color, scale: 1.4 }, 0.5, 0.5);
-            }
         }
         else {
             this.beatCountText = this.beatSizeText = undefined;
@@ -487,8 +502,8 @@ export class ObjTabSignature extends MusicObject {
             }
         }
 
-        if (this.commonTsImage) {
-            let arr = this.commonTsImage.pick(x, y);
+        if (this.tsImage) {
+            let arr = this.tsImage.pick(x, y);
             if (arr.length > 0) {
                 return [this, ...arr];
             }
@@ -530,16 +545,16 @@ export class ObjTabSignature extends MusicObject {
             x = Math.max(x, this.rect.right);
         }
 
-        if (this.commonTsImage) {
-            this.commonTsImage?.layout(view);
+        if (this.tsImage) {
+            this.tsImage?.layout(view);
 
-            let tsWidth = this.commonTsImage.getRect().width;
+            let tsWidth = this.tsImage.getRect().width;
 
-            this.commonTsImage.setCenter(
+            this.tsImage.setCenter(
                 x + tsWidth / 2 + paddingX,
                 (tab.getBottomLineY() + tab.getTopLineY()) / 2
             );
-            this.rect.unionInPlace(this.commonTsImage.getRect());
+            this.rect.unionInPlace(this.tsImage.getRect());
             x = this.rect.right;
         }
         else {
@@ -579,7 +594,7 @@ export class ObjTabSignature extends MusicObject {
         this.measureNumber?.offset(dx, dy);
         this.beatCountText?.offset(dx, dy);
         this.beatSizeText?.offset(dx, dy);
-        this.commonTsImage?.offset(dx, dy);
+        this.tsImage?.offset(dx, dy);
         this.tempoText?.offset(dx, dy);
         this.rect.offsetInPlace(dx, dy);
     }
@@ -594,7 +609,7 @@ export class ObjTabSignature extends MusicObject {
         // Draw time signature
         this.beatCountText?.draw(view, clipRect);
         this.beatSizeText?.draw(view, clipRect);
-        this.commonTsImage?.draw(view, clipRect);
+        this.tsImage?.draw(view, clipRect);
 
         // Draw tempo
         this.tempoText?.draw(view, clipRect);
