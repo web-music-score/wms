@@ -103,7 +103,7 @@ export class ObjStaffSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color: ColorKey | "" = colorKey("staff.signature.time");
+            let color: ColorKey = colorKey("staff.signature.time");
 
             if (timeSignature.isCommon) {
                 this.beatCountText = this.beatSizeText = undefined;
@@ -432,7 +432,7 @@ export class ObjTabSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color: ColorKey = colorKey("staff.signature.time");
+            let color: ColorKey = colorKey("tab.signature.time");
 
             if (timeSignature.isCommon) {
                 this.beatCountText = this.beatSizeText = undefined;
