@@ -43,7 +43,7 @@ type AlterTempo = {
     }
 }
 
-function getExtensionTicks(extensionLength: number | Theory.NoteLengthStr | (Theory.NoteLengthStr | number)[]): number {
+function getExtensionTicks(extensionLength: number | Theory.NoteLengthValue | (Theory.NoteLengthValue | number)[]): number {
     if (typeof extensionLength === "string") {
         extensionLength = [extensionLength];
     }
@@ -467,7 +467,7 @@ export class ObjMeasure extends MusicObject {
         return this.tempo;
     }
 
-    setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLength | Theory.NoteLengthStr) {
+    setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLengthValue) {
         this.getPrevMeasure()?.endSection();
 
         if (beatLength === undefined) {
@@ -778,7 +778,7 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    addExtension(extensionLength: number | Theory.NoteLengthStr | (Theory.NoteLengthStr | number)[], extensionVisible: boolean) {
+    addExtension(extensionLength: number | Theory.NoteLengthValue | (Theory.NoteLengthValue | number)[], extensionVisible: boolean) {
         this.addExtensionTo.forEach(data => {
             const { layoutObj, color } = data;
             const { musicObj } = layoutObj;
@@ -865,7 +865,7 @@ export class ObjMeasure extends MusicObject {
         this.lastAddedRhythmSymbol = symbol;
     }
 
-    addNoteGroup(voiceId: Pub.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, options?: Pub.NoteOptions, tupletRatio?: Theory.TupletRatio): ObjNoteGroup {
+    addNoteGroup(voiceId: Pub.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, options?: Pub.NoteOptions, tupletRatio?: Theory.TupletRatio): ObjNoteGroup {
         let realNotes = notes.map(note => typeof note === "string" ? Theory.Note.getNote(note) : note);
         let col = this.getRhythmColumn(voiceId);
         let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio);
@@ -873,14 +873,14 @@ export class ObjMeasure extends MusicObject {
         return noteGroup;
     }
 
-    addRest(voiceId: Pub.VoiceId, restLength: Theory.NoteLength | Theory.NoteLengthStr, options?: Pub.RestOptions, tupletRatio?: Theory.TupletRatio): ObjRest {
+    addRest(voiceId: Pub.VoiceId, restLength: Theory.NoteLengthValue, options?: Pub.RestOptions, tupletRatio?: Theory.TupletRatio): ObjRest {
         let col = this.getRhythmColumn(voiceId);
         let rest = new ObjRest(col, voiceId, restLength, options, tupletRatio);
         this.addRhythmSymbol(rest);
         return rest;
     }
 
-    addLyrics(staffTargets: Pub.StaffTargets | undefined, verse: Pub.VerseNumber, lyricsText: string, lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions: Pub.LyricsOptions) {
+    addLyrics(staffTargets: Pub.StaffTargets | undefined, verse: Pub.VerseNumber, lyricsText: string, lyricsLength: Theory.NoteLengthValue, lyricsOptions: Pub.LyricsOptions) {
         this.forEachStaffTarget(staffTargets, VerticalPos.Below, (line: ObjNotationLine, vpos: VerticalPos) => {
             let col = this.getRhythmColumn({ verse, line, vpos });
 

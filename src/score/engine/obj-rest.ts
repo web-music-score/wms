@@ -1,4 +1,4 @@
-import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
+import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { colorKey, MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { View } from "./view";
@@ -64,7 +64,7 @@ export class ObjRest extends MusicObject {
 
     readonly mi: MRest;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLength | NoteLengthStr, readonly options?: RestOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLengthValue, readonly options?: RestOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         this.setDiatonicId = this.getDiatonicIdFromStaffPos(this.options?.staffPos) ?? ObjRest.UndefinedDiatonicId;

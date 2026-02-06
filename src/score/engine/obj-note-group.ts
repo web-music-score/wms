@@ -1,5 +1,5 @@
 import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
-import { Note, NoteLength, NoteLengthProps, NoteLengthStr, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
+import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
 import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind } from "../pub";
@@ -177,7 +177,7 @@ export class ObjNoteGroup extends MusicObject {
 
     readonly mi: MNoteGroup;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLength | NoteLengthStr, readonly options?: NoteOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLengthValue, readonly options?: NoteOptions, tupletRatio?: TupletRatio) {
         super(col);
 
         if (!Guard.isIntegerGte(notes.length, 1)) {

@@ -88,7 +88,9 @@ export enum NoteLength {
     SixtyFourthTriplet = "64t",
 }
 
-/** String values type of note length enum. */
+export type NoteLengthValue = NoteLength | `${NoteLength}`;
+
+/** String values type of note length enum. @deprecated Use NoteLengthValue instead. */
 export type NoteLengthStr = `${NoteLength}`;
 
 export function isNoteLength(noteLength: unknown): noteLength is NoteLength {
@@ -126,7 +128,7 @@ export class NoteLengthProps {
     /** Is note head solid (black)? */
     readonly isSolid: boolean;
 
-    private constructor(noteLength: NoteLength | NoteLengthStr | string) {
+    private constructor(noteLength: NoteLengthValue | string) {
         this.noteLength = validateNoteLength(noteLength);
         this.noteSize = parseInt(noteLength);
         this.isTriplet = noteLength.endsWith("t");
@@ -145,14 +147,14 @@ export class NoteLengthProps {
         }
     }
 
-    private static cache = new UniMap<NoteLength | NoteLengthStr | string, NoteLengthProps>();
+    private static cache = new UniMap<NoteLengthValue | string, NoteLengthProps>();
 
     /**
      * Get note length props.
      * @param noteLength - Note length.
      * @returns - Note length props.
      */
-    static get(noteLength: NoteLength | NoteLengthStr | string): NoteLengthProps {
+    static get(noteLength: NoteLengthValue | string): NoteLengthProps {
         return this.cache.getOrCreate(noteLength, () => new NoteLengthProps(noteLength));
     }
 
@@ -162,7 +164,7 @@ export class NoteLengthProps {
      * @param dotCount - Dot count.
      * @returns - Note length props.
      */
-    static create(noteLength: NoteLength | NoteLengthStr | string | number, dotCount: number = 0): NoteLengthProps {
+    static create(noteLength: NoteLengthValue | string | number, dotCount: number = 0): NoteLengthProps {
         let noteSize = typeof noteLength === "number" ? noteLength : this.get(noteLength).noteSize;
         return this.get(noteSize + (Guard.isIntegerGte(dotCount, 1) ? ".".repeat(dotCount) : "n"));
     }
@@ -174,7 +176,7 @@ export class NoteLengthProps {
      * @param b - NoteLengthProps, NoteLength/Str or noteSize
      * @returns - -1: a < b, 0: a === b, +1: a > b (note length/size comparisons)
      */
-    static cmp(a: NoteLengthProps | NoteLength | NoteLengthStr | number, b: NoteLengthProps | NoteLength | NoteLengthStr | number): -1 | 0 | 1 {
+    static cmp(a: NoteLengthProps | NoteLengthValue | number, b: NoteLengthProps | NoteLengthValue | number): -1 | 0 | 1 {
         let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
         let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
         // Reversed: smaller note size (1, 2, 4, etc.) is longer note (whole, half, quarter, etc.)
@@ -188,7 +190,7 @@ export class NoteLengthProps {
      * @param b - NoteLengthProps, NoteLength/Str or noteSize
      * @returns - true: a === b, false: a !== b (note length/size comparisons)
      */
-    static equals(a: NoteLengthProps | NoteLength | NoteLengthStr | number, b: NoteLengthProps | NoteLength | NoteLengthStr | number): boolean {
+    static equals(a: NoteLengthProps | NoteLengthValue | number, b: NoteLengthProps | NoteLengthValue | number): boolean {
         let aNoteSize = a instanceof NoteLengthProps ? a.noteSize : (typeof a === "number" ? a : NoteLengthProps.get(a).noteSize);
         let bNoteSize = b instanceof NoteLengthProps ? b.noteSize : (typeof b === "number" ? b : NoteLengthProps.get(b).noteSize);
         return aNoteSize === bNoteSize;
@@ -254,7 +256,7 @@ export class RhythmProps {
     /** Is note head solid (black)? */
     readonly isSolidNoteHead: boolean;
 
-    private constructor(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio) {
+    private constructor(noteLength: NoteLengthValue, dotCount?: number, tupletRatio?: TupletRatio) {
         this.noteLength = validateNoteLength(noteLength);
 
         let p = NoteLengthProps.get(noteLength); // Not this.noteLength, misses isTriplet (maxDotCount will be wrong)!
@@ -304,7 +306,7 @@ export class RhythmProps {
         return sym ? (sym + dots) : ("" + this.noteSize + (dots.length > 0 ? dots : "n"));
     }
 
-    private static cache = new UniMap<NoteLength | NoteLengthStr, RhythmProps>();
+    private static cache = new UniMap<NoteLengthValue, RhythmProps>();
 
     /**
      * Get rhythm props with given arguments.
@@ -313,7 +315,7 @@ export class RhythmProps {
      * @param tupletRatio - Tuplet ratio.
      * @returns - Rhythm props.
      */
-    static get(noteLength: NoteLength | NoteLengthStr, dotCount?: number, tupletRatio?: TupletRatio): RhythmProps {
+    static get(noteLength: NoteLengthValue, dotCount?: number, tupletRatio?: TupletRatio): RhythmProps {
         if (dotCount !== undefined || tupletRatio !== undefined) {
             return new RhythmProps(noteLength, dotCount, tupletRatio);
         }

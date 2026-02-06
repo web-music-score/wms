@@ -9,6 +9,31 @@ import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated, resolveEnumValue } from "shared-src";
 
+// Argument-compatible versions of enums (string template allowed).
+export type AnnotationGroupValue = Types.AnnotationGroup | `${Types.AnnotationGroup}`;
+export type AnnotationKindValue = Types.AnnotationKind | `${Types.AnnotationKind}`;
+export type AnnotationKindLabelValue = (
+    Types.AnnotationKind.PitchLabel | `${Types.AnnotationKind.PitchLabel}` |
+    Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.ChordLabel}`
+);
+export type StaffPresetValue = Types.StaffPreset | `${Types.StaffPreset}`;
+export type LyricsAlignValue = Types.LyricsAlign | `${Types.LyricsAlign}`;
+export type NavigationValue = Types.Navigation | `${Types.Navigation}`;
+export type NavigationEndingValue = Types.Navigation.Ending | `${Types.Navigation.Ending}`;
+export type NavigationEndRepeatValue = Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`;
+export type FermataValue = Types.Fermata | `${Types.Fermata}`;
+export type LabelValue = Types.Label | `${Types.Label}`;
+export type ConnectiveValue = Types.Connective | `${Types.Connective}`;
+export type ConnectiveTieValue = Types.Connective.Tie | `${Types.Connective.Tie}`;
+export type ConnectiveSlurValue = Types.Connective.Slur | `${Types.Connective.Slur}`;
+export type ConnectiveSlideValue = Types.Connective.Slide | `${Types.Connective.Slide}`;
+export type TieTypeValue = Types.TieType | `${Types.TieType}`;
+export type NoteAnchorValue = Types.NoteAnchor | `${Types.NoteAnchor}`;
+export type VerticalPositionValue = Types.VerticalPosition | `${Types.VerticalPosition}`;
+export type ScaleTypeValue = Theory.ScaleType | `${Theory.ScaleType}`;
+export type TimeSignatureValue = Theory.TimeSignatures | `${Theory.TimeSignatures}`;
+export type BeamGroupingValue = Theory.BeamGrouping | `${Theory.BeamGrouping}`;
+
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
 }
@@ -138,7 +163,7 @@ export type TupletBuilder = {
      * @param noteOptions - Theory.Note options.
      * @returns - This tuplet builder object.
      */
-    addNote: (note: Theory.Note | string | (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions) => TupletBuilder,
+    addNote: (note: Theory.Note | string | (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, noteOptions?: Types.NoteOptions) => TupletBuilder,
     /**
      * Add chord to a tuplet.
      * @param notes - Array of notes, each instance of Theory.Note or string (e.g. "D4"). 
@@ -146,14 +171,14 @@ export type TupletBuilder = {
      * @param noteOptions - Theory.Note options. 
      * @returns - This tuplet builder object. 
      */
-    addChord: (notes: (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions) => TupletBuilder,
+    addChord: (notes: (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, noteOptions?: Types.NoteOptions) => TupletBuilder,
     /**
      * Add rest to a tuplet.
      * @param restLength - Rest length (e.g. "4n").  
      * @param restOptions - Rest options.
      * @returns - This tuplet builder object. 
      */
-    addRest: (restLength: Theory.NoteLength | Theory.NoteLengthStr, restOptions?: Types.RestOptions) => TupletBuilder
+    addRest: (restLength: Theory.NoteLengthValue, restOptions?: Types.RestOptions) => TupletBuilder
 }
 
 /** Etension builder type. */
@@ -164,7 +189,7 @@ export type ExtensionBuilder = {
      * @param noteCount - Number of note lengths (default = 1).
      * @returns - this extension builder object.
      */
-    notes: (noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteCount?: number) => ExtensionBuilder,
+    notes: (noteLength: Theory.NoteLengthValue, noteCount?: number) => ExtensionBuilder,
     /**
      * Increase length of extension length by given number of measures.
      * @param measureCount - Number of measures.
@@ -243,13 +268,13 @@ export class DocumentBuilder {
      * Use staff preset values to set score confguration. This call will request new score row.
      * @param staffPreset - Staff preset (e.g. "treble").
      */
-    setScoreConfiguration(staffPreset: Types.StaffPreset | `${Types.StaffPreset}`): DocumentBuilder;
+    setScoreConfiguration(staffPreset: StaffPresetValue): DocumentBuilder;
     /**
      * Use staff preset values to set score confguration. This call will request new score row.
      * @param config - Score configuration (e.g. { type: "staff", clef: "G", isOctavewDown: true }).
      */
     setScoreConfiguration(config: Types.ScoreConfiguration): DocumentBuilder;
-    setScoreConfiguration(config: Types.StaffPreset | `${Types.StaffPreset}` | Types.ScoreConfiguration): DocumentBuilder {
+    setScoreConfiguration(config: StaffPresetValue | Types.ScoreConfiguration): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "setScoreConfiguration", config);
             if (Guard.isEnumValue(config, Types.StaffPreset)) {
@@ -351,7 +376,7 @@ export class DocumentBuilder {
      * @param scaleType - Scale type (e.g. string "Major" or ScaleType.Major).
      * @returns - This document builder instance.
      */
-    setKeySignature(tonic: string, scaleType: Theory.ScaleType | `${Theory.ScaleType}`): DocumentBuilder;
+    setKeySignature(tonic: string, scaleType: ScaleTypeValue): DocumentBuilder;
     /**
      * Set key signature for current measure and forward.
      * @param keySignature - KeySignature object instance.
@@ -402,7 +427,7 @@ export class DocumentBuilder {
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: Theory.TimeSignatures | `${Theory.TimeSignatures}`, beamGrouping?: Theory.BeamGrouping | `${Theory.BeamGrouping}`): DocumentBuilder;
+    setTimeSignature(timeSignature: TimeSignatureValue, beamGrouping?: BeamGroupingValue): DocumentBuilder;
     /**
      * Set time signature for current measure and forward.
      * @param beatCount - Beat count of time signature (e.g. 3 in "3/4").
@@ -410,7 +435,7 @@ export class DocumentBuilder {
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: Theory.BeamGrouping | `${Theory.BeamGrouping}`): DocumentBuilder;
+    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: BeamGroupingValue): DocumentBuilder;
     setTimeSignature(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "setTimeSignature", ...args);
@@ -445,8 +470,8 @@ export class DocumentBuilder {
      * @param beatLength - Length of one beat.
      * @returns - This document builder instance.
      */
-    setTempo(beatsPerMinute: number, beatLength: Theory.NoteLength | Theory.NoteLengthStr): DocumentBuilder;
-    setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLength | Theory.NoteLengthStr): DocumentBuilder {
+    setTempo(beatsPerMinute: number, beatLength: Theory.NoteLengthValue): DocumentBuilder;
+    setTempo(beatsPerMinute: number, beatLength?: Theory.NoteLengthValue): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "setTempo", beatsPerMinute, beatLength);
 
@@ -467,7 +492,7 @@ export class DocumentBuilder {
      * @param noteOptions - Theory.Note options.
      * @returns - This document builder instance.
      */
-    addNote(voiceId: Types.VoiceId, note: Theory.Note | string | (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions): DocumentBuilder {
+    addNote(voiceId: Types.VoiceId, note: Theory.Note | string | (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, noteOptions?: Types.NoteOptions): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addNote", voiceId, note, noteLength, noteOptions);
 
@@ -504,7 +529,7 @@ export class DocumentBuilder {
      * @param noteOptions - Theory.Note options. 
      * @returns - This document builder instance.
      */
-    addChord(voiceId: Types.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLength | Theory.NoteLengthStr, noteOptions?: Types.NoteOptions): DocumentBuilder {
+    addChord(voiceId: Types.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, noteOptions?: Types.NoteOptions): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addChord", voiceId, notes, noteLength, noteOptions);
 
@@ -528,7 +553,7 @@ export class DocumentBuilder {
      * @param restOptions - Rest options.
      * @returns - This document builder instance.
      */
-    addRest(voiceId: Types.VoiceId, restLength: Theory.NoteLength | Theory.NoteLengthStr, restOptions?: Types.RestOptions): DocumentBuilder {
+    addRest(voiceId: Types.VoiceId, restLength: Theory.NoteLengthValue, restOptions?: Types.RestOptions): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addRest", voiceId, restLength, restOptions);
 
@@ -634,9 +659,9 @@ export class DocumentBuilder {
         });
     }
 
-    private currentLyricsAlign: Types.LyricsAlign | `${Types.LyricsAlign}` = Types.LyricsAlign.Center;
+    private currentLyricsAlign: LyricsAlignValue = Types.LyricsAlign.Center;
 
-    private addLyricsInternal(staffTargets: Types.StaffTargets | undefined, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions) {
+    private addLyricsInternal(staffTargets: Types.StaffTargets | undefined, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLengthValue, lyricsOptions?: Types.LyricsOptions) {
         assertStaffTargets(staffTargets);
 
         AssertUtil.assert(
@@ -671,7 +696,7 @@ export class DocumentBuilder {
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyrics(verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
+    addLyrics(verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLengthValue, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addLyrics", verse, lyricsLength, lyricsText, lyricsOptions);
             this.addLyricsInternal(undefined, verse, lyricsText, lyricsLength, lyricsOptions);
@@ -687,7 +712,7 @@ export class DocumentBuilder {
      * @param lyricsOptions - Lyrics options.
      * @returns - This document builder instance.
      */
-    addLyricsTo(staffTargets: Types.StaffTargets, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLength | Theory.NoteLengthStr, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
+    addLyricsTo(staffTargets: Types.StaffTargets, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLengthValue, lyricsOptions?: Types.LyricsOptions): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addLyricsTo", verse, lyricsLength, lyricsText, lyricsOptions);
             this.addLyricsInternal(staffTargets, verse, lyricsText, lyricsLength, lyricsOptions);
@@ -700,7 +725,7 @@ export class DocumentBuilder {
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermata(fermata: Types.Fermata | `${Types.Fermata}` = Types.Fermata.AtNote): DocumentBuilder {
+    addFermata(fermata: FermataValue = Types.Fermata.AtNote): DocumentBuilder {
         return this.safe(() => {
             warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
 
@@ -721,7 +746,7 @@ export class DocumentBuilder {
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermataTo(staffTargets: Types.StaffTargets, fermata: Types.Fermata | `${Types.Fermata}` = Types.Fermata.AtNote): DocumentBuilder {
+    addFermataTo(staffTargets: Types.StaffTargets, fermata: FermataValue = Types.Fermata.AtNote): DocumentBuilder {
         return this.safe(() => {
             warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
@@ -741,23 +766,23 @@ export class DocumentBuilder {
      * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Types.Navigation | `${Types.Navigation}`): DocumentBuilder;
+    addNavigation(navigation: NavigationValue): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
      * @param navigation - Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigation(navigation: NavigationEndRepeatValue, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
      * @param navigation - Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigation(navigation: NavigationEndingValue, ...passages: number[]): DocumentBuilder;
 
-    addNavigation(navigation: Types.Navigation | `${Types.Navigation}`, ...args: unknown[]): DocumentBuilder {
+    addNavigation(navigation: NavigationValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
             this.addAnnotationInternal(undefined, Types.AnnotationGroup.Navigation, navigation, ...args);
@@ -770,7 +795,7 @@ export class DocumentBuilder {
      * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.Navigation | `${Types.Navigation}`): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationValue): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
@@ -778,7 +803,7 @@ export class DocumentBuilder {
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`, playCount: number): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationEndRepeatValue, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
@@ -786,9 +811,9 @@ export class DocumentBuilder {
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.Navigation.Ending | `${Types.Navigation.Ending}`, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationEndingValue, ...passages: number[]): DocumentBuilder;
 
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.Navigation | `${Types.Navigation}`, ...args: unknown[]): DocumentBuilder {
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTargets, navigation, ...args);
             this.addAnnotationInternal(staffTargets, Types.AnnotationGroup.Navigation, navigation, ...args);
@@ -852,8 +877,7 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     addAnnotation(
-        labelKind: Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.ChordLabel}` |
-            Types.AnnotationKind.PitchLabel | `${Types.AnnotationKind.PitchLabel}`,
+        labelKind: AnnotationKindLabelValue,
         labelText: string,
         options?: Types.AnnotationOptions
     ): DocumentBuilder;
@@ -910,8 +934,7 @@ export class DocumentBuilder {
      */
     addAnnotationTo(
         staffTargets: Types.StaffTargets,
-        labelKind: Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.ChordLabel}` |
-            Types.AnnotationKind.PitchLabel | `${Types.AnnotationKind.PitchLabel}`,
+        labelKind: AnnotationKindLabelValue,
         labelText: string,
         options?: Types.AnnotationOptions
     ): DocumentBuilder;
@@ -968,7 +991,7 @@ export class DocumentBuilder {
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabel(label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
+    addLabel(label: LabelValue, text: string): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addLabel", label, text);
 
@@ -992,7 +1015,7 @@ export class DocumentBuilder {
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabelTo(staffTargets: Types.StaffTargets, label: Types.Label | `${Types.Label}`, text: string): DocumentBuilder {
+    addLabelTo(staffTargets: Types.StaffTargets, label: LabelValue, text: string): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTargets, label, text);
 
@@ -1017,7 +1040,7 @@ export class DocumentBuilder {
      * @param notAnchor - Anchor point for note and this tie.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Types.Connective.Tie | `${Types.Connective.Tie}`, tieSpan?: number | Types.TieType | `${Types.TieType}`, notAnchor?: Types.NoteAnchor | `${Types.NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: ConnectiveTieValue, tieSpan?: number | TieTypeValue, notAnchor?: NoteAnchorValue): DocumentBuilder;
     /**
      * Add slur starting from last added note/chord.
      * @param connective - T.Connective type ("slur" or T.Connective.Slur).
@@ -1025,16 +1048,16 @@ export class DocumentBuilder {
      * @param notAnchor - Anchor point for note and this slur.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Types.Connective.Slur | `${Types.Connective.Slur}`, slurSpan?: number, notAnchor?: Types.NoteAnchor | `${Types.NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: ConnectiveSlurValue, slurSpan?: number, notAnchor?: NoteAnchorValue): DocumentBuilder;
     /**
      * Add slide starting from last added note/chord.
      * @param connective - T.Connective type ("slide" or T.Connective.Slide).
      * @param notAnchor - Anchor point for note and this slide.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Types.Connective.Slide | `${Types.Connective.Slide}`, notAnchor?: Types.NoteAnchor | `${Types.NoteAnchor}`): DocumentBuilder;
+    addConnective(connective: ConnectiveSlideValue, notAnchor?: NoteAnchorValue): DocumentBuilder;
 
-    addConnective(connective: Types.Connective | `${Types.Connective}`, ...args: unknown[]): DocumentBuilder {
+    addConnective(connective: ConnectiveValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addConnective", connective, ...args);
 
@@ -1127,7 +1150,7 @@ export class DocumentBuilder {
      * @param verticalPosition - Vertical position, are elements added above, below or both.
      * @returns - This document builder instance.
      */
-    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: Types.VerticalPosition | `${Types.VerticalPosition}` = Types.VerticalPosition.Auto): DocumentBuilder {
+    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPositionValue = Types.VerticalPosition.Auto): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addStaffGroup", groupName, staffsTabsAndGroups, verticalPosition);
 
