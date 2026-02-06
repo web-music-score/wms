@@ -2,14 +2,14 @@
 ## [6.4.0-pre.6] - Unreleased
 ### Added
 - Added `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.
-- `group?: AnnotationGroup` property to `AnnotationOptions`.
+- `AnnotationOptions { group?: AnnotationGroup }` property.
 - Cut time signature `"C|"`.
 
 ### Deprecated
-Deprecated `addAnnotation()` overloads to more simple and future proof.
-- `addAnnotation(group, ...)`, use instead `addAnnotation(..., { group })`.
-- `addAnnotation("endRepeat", repeatCount)`, use instead `addAnnotation("endRepeat", { repeatCount })`.
-- `addAnnotation("ending", ...passages)`, use instead `addAnnotation("ending", { endingPassages })`.
+Deprecated `addAnnotation()` overloads for simplicity and more future proof.
+- `addAnnotation(group, ...)`, use `addAnnotation(..., { group })` instead.
+- `addAnnotation("endRepeat", repeatCount)`, use `addAnnotation("endRepeat", { repeatCount })` instead.
+- `addAnnotation("ending", ...passages)`, use `addAnnotation("ending", { endingPassages })` instead.
 
 ### Fixed
 - Time signature in tab had staff's color.
