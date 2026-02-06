@@ -16,7 +16,7 @@ import { warnDeprecated } from "shared-src";
  */
 
 /**
- * @deprecated - MRenderContext is deprecated. Will be removed in future release. Use WmsView instead. 
+ * @deprecated MRenderContext is deprecated. Will be removed in future release. Use WmsView instead. 
  */
 export class MRenderContext extends WmsView {
     constructor() {
@@ -26,7 +26,7 @@ export class MRenderContext extends WmsView {
 }
 
 /**
- * @deprecated - MPlaybackButtons is deprecated. Will be removed in future release. Use WmsControls instead.
+ * @deprecated MPlaybackButtons is deprecated. Will be removed in future release. Use WmsControls instead.
  */
 export class MPlaybackButtons extends WmsControls {
     constructor() {
@@ -36,7 +36,7 @@ export class MPlaybackButtons extends WmsControls {
 }
 
 /**
- * @deprecated - MPlayer is deprecated. Will be removed in future release. Use Player instead. 
+ * @deprecated MPlayer is deprecated. Will be removed in future release. Use Player instead. 
  */
 export class MPlayer extends Player {
     constructor(doc: MDocument, playStateChangeListener?: PlayStateChangeListener) {

@@ -212,10 +212,10 @@ export type StaffTarget = number | string;
 /** Single or multiple staff/tab/group identifiers. */
 export type StaffTargets = StaffTarget | StaffTarget[];
 
-/** @deprecated - StaffTabOrGroup is deprecated. Will be removed in future release. Use StaffTarget instead. */
+/** @deprecated StaffTabOrGroup is deprecated. Will be removed in future release. Use StaffTarget instead. */
 export type { StaffTarget as StaffTabOrGroup }
 
-/** @deprecated - StaffTabOrGroups is deprecated. Will be removed in future release. Use StaffTargets instead. */
+/** @deprecated StaffTabOrGroups is deprecated. Will be removed in future release. Use StaffTargets instead. */
 export type { StaffTargets as StaffTabOrGroups }
 
 /** Measure options. */
@@ -232,7 +232,7 @@ export type NoteOptions = {
     color?: string,
     /** Arepggio direction for chords. true = "up". */
     arpeggio?: boolean | ArpeggioValue,
-    /** @deprecated - Use addAnnotation("stacato") instead. */
+    /** @deprecated Use addAnnotation("stacato") instead. */
     staccato?: boolean,
     /** Use diamond shaped note head. */
     diamond?: boolean,
@@ -287,7 +287,7 @@ export type LyricsOptions = {
 }
 
 /**
- * @deprecated - Fermata is deprecated. Will be removed in future release. Use Annotation with TemporalAnnotation instead.
+ * @deprecated Fermata is deprecated. Will be removed in future release. Use Annotation with TemporalAnnotation instead.
  */
 export enum Fermata {
     /** Anchor fermata to note/rest. @deprecated */
@@ -299,7 +299,7 @@ export enum Fermata {
 /** @deprecated */
 export type FermataValue = Fermata | `${Fermata}`;
 
-/** @deprecated - Label is deprecated. Will be removed in future release. Use Annotation with LabelAnnotation instead. */
+/** @deprecated Label is deprecated. Will be removed in future release. Use Annotation with LabelAnnotation instead. */
 export enum Label {
     /** "C", "C#", "Db", "D", etc. @deprecated */
     Note = "note",
@@ -336,7 +336,7 @@ export enum AnnotationGroup {
 
 export type AnnotationGroupValue = AnnotationGroup | `${AnnotationGroup}`;
 
-/** @deprecated - Annotation is deprecated. Will be removed in future release. Use AnnotationGroup instead. */
+/** @deprecated Annotation is deprecated. Will be removed in future release. Use AnnotationGroup instead. */
 export { AnnotationGroup as Annotation }
 
 /** Annotation kind enum */
@@ -540,7 +540,7 @@ export enum AnnotationKind {
 
     /** hold longer than written */
     fermata = "fermata",
-    /** @deprecated - Use addAnnotation("fermata", { anchor: "rightBarLine" }) */
+    /** @deprecated Use addAnnotation("fermata", { anchor: "rightBarLine" }) */
     measureEndFermata = "measureEndFermata",
 
     //////////////////////////////////////////////////

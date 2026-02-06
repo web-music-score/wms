@@ -13,12 +13,12 @@ import { WmsView, WmsViewProps } from "./wms-view";
  */
 
 /**
- * @deprecated - MusicScoreView is deprecated. Will be removed in future release. Use WmsViewProps instead. 
+ * @deprecated MusicScoreView is deprecated. Will be removed in future release. Use WmsViewProps instead. 
  */
 export interface MusicScoreViewProps extends WmsViewProps { }
 
 /**
- * @deprecated - MusicScoreView is deprecated. Will be removed in future release. Use WmsView instead.
+ * @deprecated MusicScoreView is deprecated. Will be removed in future release. Use WmsView instead.
  */
 export class MusicScoreView extends WmsView {
     constructor(props: MusicScoreViewProps) {
@@ -28,12 +28,12 @@ export class MusicScoreView extends WmsView {
 }
 
 /**
- * @deprecated - PlaybackButtonProps is deprecated. Will be removed in future release. Use WmsControlProps instead. 
+ * @deprecated PlaybackButtonProps is deprecated. Will be removed in future release. Use WmsControlProps instead. 
  */
 export interface PlaybackButtonsProps extends WmsControlsProps { }
 
 /**
- * @deprecated - PlaybackButtons is deprecated. Will be removed in future release. Use WmsControls instead.
+ * @deprecated PlaybackButtons is deprecated. Will be removed in future release. Use WmsControls instead.
  */
 export class PlaybackButtons extends WmsControls {
     constructor(props: PlaybackButtonsProps) {

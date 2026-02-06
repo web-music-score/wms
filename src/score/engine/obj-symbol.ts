@@ -39,7 +39,7 @@ export class ObjSymbol extends MusicObject {
     }
 }
 
-/** @deprecated - Merge to ObjSymbol. */
+/** @deprecated Merge to ObjSymbol. */
 export class ObjFermata extends ObjSymbol {
     constructor(parent: ObjRhythmColumn | ObjBarLineRight, flipY: boolean, color: string) {
         super(parent, DrawSymbol.Fermata, false, flipY, color);

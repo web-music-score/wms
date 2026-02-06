@@ -24,7 +24,7 @@ export const PitchNotationList: ReadonlyArray<PitchNotation> = Utils.Enum.getEnu
 export const DefaultPitchNotation = PitchNotation.Scientific;
 
 /**
- * @deprecated - Not required by this library, will be removed in future release.
+ * @deprecated Not required by this library, will be removed in future release.
  */
 export function validatePitchNotation(pn: unknown): PitchNotation {
     if (Guard.isEnumValue(pn, PitchNotation)) {
@@ -61,7 +61,7 @@ export const DefaultGuitarNoteLabel = GuitarNoteLabel.Default;
 export const GuitarNoteLabelList: ReadonlyArray<GuitarNoteLabel> = Utils.Enum.getEnumValues(GuitarNoteLabel);
 
 /**
- * @deprecated - Not required by this library, will be removed in future release.
+ * @deprecated Not required by this library, will be removed in future release.
  */
 export function validateGuitarNoteLabel(label: unknown): GuitarNoteLabel {
     if (Guard.isEnumValue(label, GuitarNoteLabel)) {

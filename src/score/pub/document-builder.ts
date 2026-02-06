@@ -696,7 +696,7 @@ export class DocumentBuilder {
 
     /**
      * Add fermata to current measure.
-     * @deprecated - addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @deprecated addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
@@ -716,7 +716,7 @@ export class DocumentBuilder {
 
     /**
      * Add fermata to current measure.
-     * @deprecated - addFermataTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @deprecated addFermataTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
@@ -886,7 +886,7 @@ export class DocumentBuilder {
      * // Use instead:
      * addAnnotation("endRepeat", { repeatCount: number }): DocumentBuilder;
      * ```
-     * @deprecated - Use AnnotationOptions instead for extra args. Will be removed in future release.
+     * @deprecated Use AnnotationOptions instead for extra args. Will be removed in future release.
      */
     addAnnotation(
         ...args: (number | string | Types.AnnotationOptions)[]
@@ -945,7 +945,7 @@ export class DocumentBuilder {
      * // Use instead:
      * addAnnotation(staffTargets, "endRepeat", { repeatCount: number }): DocumentBuilder;
      * ```
-     * @deprecated - Use AnnotationOptions instead for extra args. Will be removed in future release.
+     * @deprecated Use AnnotationOptions instead for extra args. Will be removed in future release.
      */
     addAnnotationTo(
         staffTargets: Types.StaffTargets,
@@ -961,7 +961,7 @@ export class DocumentBuilder {
 
     /**
      * Add label text to column of last added note/chord/rest in current measure.
-     * @deprecated - addLabel() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @deprecated addLabel() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      * @param label - T.Label type: "chord" or "note".
      * @param text - label text.
      * @returns - This document builder instance.
@@ -984,7 +984,7 @@ export class DocumentBuilder {
 
     /**
      * Add label text to column of last added note/chord/rest in current measure to given staff/tab/group.
-     * @deprecated - addLabelTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
+     * @deprecated addLabelTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param label - T.Label type "chord" or "note".
      * @param text - label text.

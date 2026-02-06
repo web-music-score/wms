@@ -118,7 +118,7 @@ export class ScoreTabEvent extends ScoreEvent {
  * 
  * This event class was deprecated because it does not support multiple staves or tabs per score row.
  * 
- * @deprecated - ScoreStaffPosEvent is deprecated. Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
+ * @deprecated ScoreStaffPosEvent is deprecated. Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
  */
 export class ScoreStaffPosEvent extends ScoreEvent {
     /**
@@ -133,7 +133,7 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     }
 
     /**
-     * @deprecated - renderContext is deprecated. Will be removed in future release. Use view instead.
+     * @deprecated renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
         warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
@@ -171,7 +171,7 @@ export class ScoreObjectEvent extends ScoreEvent {
     }
 
     /**
-     * @deprecated - renderContext is deprecated. Will be removed in future release. Use view instead.
+     * @deprecated renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
         warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
