@@ -90,7 +90,7 @@ export enum NoteLength {
 
 export type NoteLengthValue = NoteLength | `${NoteLength}`;
 
-/** String values type of note length enum. @deprecated Use NoteLengthValue instead. */
+/** @deprecated Will be removed. Use NoteLengthValue instead. */
 export type NoteLengthStr = `${NoteLength}`;
 
 export function isNoteLength(noteLength: unknown): noteLength is NoteLength {

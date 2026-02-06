@@ -54,6 +54,8 @@ export enum ScaleType {
     HeptatonicBlues = "Heptatonic Blues",
 }
 
+export type ScaleTypeValue = ScaleType | `${ScaleType}`;
+
 function getMode(scaleType: ScaleType) {
     switch (scaleType) {
         case ScaleType.Major: return 1;
@@ -471,7 +473,7 @@ export function getScaleFactoryList(): ReadonlyArray<ScaleFactory | string> {
     return ScaleFactoryList;
 }
 
-const ScaleFactoryMap = new UniMap<ScaleType | `${ScaleType}`, ScaleFactory>();
+const ScaleFactoryMap = new UniMap<ScaleTypeValue, ScaleFactory>();
 
 ScaleFactoryList.forEach(factory => {
     if (factory instanceof ScaleFactory) {
@@ -484,7 +486,7 @@ ScaleFactoryList.forEach(factory => {
  * @param scaleType - Scale type.
  * @returns - Scale factory.
  */
-export function getScaleFactory(scaleType: ScaleType | `${ScaleType}`): ScaleFactory {
+export function getScaleFactory(scaleType: ScaleTypeValue): ScaleFactory {
     let f = ScaleFactoryMap.get(resolveScaleType(scaleType));
     if (!f) {
         throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
@@ -536,13 +538,13 @@ export function resolveTonic(tonic: unknown): string {
  * @param tonic - Tonic (e.g. "C").
  * @param scaleType - Scale type (e.g. "Major").
  */
-export function getScale(tonic: string, scaleType: ScaleType | `${ScaleType}`): Scale;
+export function getScale(tonic: string, scaleType: ScaleTypeValue): Scale;
 /**
  * Get scale.
  * @param scale - Scale name (e.g. "C Major").
  */
 export function getScale(scale: string): Scale;
-export function getScale(arg0: string, arg1?: ScaleType | `${ScaleType}`): Scale {
+export function getScale(arg0: string, arg1?: ScaleTypeValue): Scale {
     let tonic: string;
     let scaleType: ScaleType;
 

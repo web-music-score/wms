@@ -26,6 +26,8 @@ export enum TimeSignatures {
     _12_8 = "12/8"
 }
 
+export type TimeSignaturesValue = TimeSignatures | `${TimeSignatures}`;
+
 /** Beam grouping enum. */
 export enum BeamGrouping {
     /** 2-3 beam grouping for 5/8 time signature. */
@@ -37,6 +39,8 @@ export enum BeamGrouping {
     /** 3-2-2 beam grouping for 7/8 time signature. */
     _3_2_2 = "3-2-2"
 }
+
+export type BeamGroupingValue = BeamGrouping | `${BeamGrouping}`;
 
 /** Time signature class. */
 export class TimeSignature {
@@ -62,14 +66,14 @@ export class TimeSignature {
      * @param timeSignature - For example "4/4".
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      */
-    constructor(timeSignature: TimeSignatures | `${TimeSignatures}`, beamGrouping?: BeamGrouping | `${BeamGrouping}`);
+    constructor(timeSignature: TimeSignaturesValue, beamGrouping?: BeamGroupingValue);
     /**
      * Create new time signature instance.
      * @param beatCount - Measure beat count.
      * @param beatSize - Size value: whole-note=1, half-note=2, quarter-note=4, etc.
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      */
-    constructor(beatCount: number, beatSize: number, beamGrouping?: BeamGrouping | `${BeamGrouping}`);
+    constructor(beatCount: number, beatSize: number, beamGrouping?: BeamGroupingValue);
     constructor(...args: unknown[]) {
         let beamGrouping: BeamGrouping | undefined;
 

@@ -18,6 +18,9 @@ export enum StaffPreset {
     /** GuitarCombined has treble clef and tab for guitar. */
     GuitarCombined = "guitarCombined"
 }
+
+export type StaffPresetValue = StaffPreset | `${StaffPreset}`;
+
 /** Clef for staff notation lines. */
 export enum Clef {
     /** G-clef (treble cleff) */
@@ -25,6 +28,8 @@ export enum Clef {
     /** F-clef (bass cleff) */
     F = "F"
 }
+
+export type ClefValue = Clef | `${Clef}`;
 
 /** Base config for staff and tab configs. */
 export type BaseConfig = {
@@ -47,7 +52,7 @@ export type StaffConfig = BaseConfig & {
     /** Config type, must be "staff" for staff config. */
     type: "staff";
     /** G-clef or F-clef for this staff config? */
-    clef: Clef | `${Clef}`;
+    clef: ClefValue;
     /** Set octave down with G-clef for guitar treble staff notation line. */
     isOctaveDown?: boolean;
     /** Lowest note (e.g. "C2")that can be presented in this staff notation line. */
@@ -134,6 +139,8 @@ export enum Stem {
     Down = "down"
 }
 
+export type StemValue = Stem | `${Stem}`;
+
 /** Arpeggio direction enum. */
 export enum Arpeggio {
     /** Upwards, chord played from lowes to highest. */
@@ -142,6 +149,8 @@ export enum Arpeggio {
     Down = "down"
 }
 
+export type ArpeggioValue = Arpeggio | `${Arpeggio}`;
+
 /** Special tie length enum. */
 export enum TieType {
     /** Stub tie is short tie that left anchors to note and has not right anchor point. */
@@ -149,6 +158,8 @@ export enum TieType {
     /** To measure end tie is tie that left anchors to note and right anchors to measure end. */
     ToMeasureEnd = "toMeasureEnd"
 }
+
+export type TieTypeValue = TieType | `${TieType}`;
 
 /** Anchor point enum for connectives (ties, slurs, slides). */
 export enum NoteAnchor {
@@ -164,6 +175,8 @@ export enum NoteAnchor {
     StemTip = "stemTip"
 }
 
+export type NoteAnchorValue = NoteAnchor | `${NoteAnchor}`;
+
 /** Connective enum. */
 export enum Connective {
     /** Tie, connects two or more adjacent notes of same pitch with arc. */
@@ -173,6 +186,11 @@ export enum Connective {
     /** Slide, connects two adjacent notes of different pitch with straight line. */
     Slide = "slide"
 }
+
+export type ConnectiveValue = Connective | `${Connective}`;
+export type ConnectiveTieValue = Connective.Tie | `${Connective.Tie}`;
+export type ConnectiveSlurValue = Connective.Slur | `${Connective.Slur}`;
+export type ConnectiveSlideValue = Connective.Slide | `${Connective.Slide}`;
 
 /** Vertical position enum used to layout notation elements. */
 export enum VerticalPosition {
@@ -185,6 +203,8 @@ export enum VerticalPosition {
     /** Add element both above and below staff/tab. */
     Both = "both"
 }
+
+export type VerticalPositionValue = VerticalPosition | `${VerticalPosition}`;
 
 /** Identifier (index or name) for staff, tab, or group. */
 export type StaffTarget = number | string;
@@ -207,11 +227,11 @@ export type MeasureOptions = {
 /** Options for notes/chords. */
 export type NoteOptions = {
     /** Stem direction. */
-    stem?: Stem | `${Stem}`,
+    stem?: StemValue,
     /** Set color. */
     color?: string,
     /** Arepggio direction for chords. true = "up". */
-    arpeggio?: boolean | Arpeggio | `${Arpeggio}`,
+    arpeggio?: boolean | ArpeggioValue,
     /** @deprecated - Use addAnnotation("stacato") instead. */
     staccato?: boolean,
     /** Use diamond shaped note head. */
@@ -246,6 +266,8 @@ export enum LyricsAlign {
     Right = "right"
 }
 
+export type LyricsAlignValue = LyricsAlign | `${LyricsAlign}`;
+
 /** Lyrics hyphen.*/
 export enum LyricsHyphen {
     /** Hyphen. */
@@ -254,12 +276,14 @@ export enum LyricsHyphen {
     Extender = "---"
 }
 
+export type LyricsHyphenValue = LyricsHyphen | `${LyricsHyphen}`;
+
 /** Lyrics options. */
 export type LyricsOptions = {
     /** Alignment of lyrics text/syllable. */
-    align?: LyricsAlign | `${LyricsAlign}`,
+    align?: LyricsAlignValue;
     /** Hyphen or extender after lyrics text/syllable. */
-    hyphen?: LyricsHyphen | `${LyricsHyphen}`
+    hyphen?: LyricsHyphenValue;
 }
 
 /**
@@ -272,6 +296,9 @@ export enum Fermata {
     AtMeasureEnd = "atMeasureEnd"
 }
 
+/** @deprecated */
+export type FermataValue = Fermata | `${Fermata}`;
+
 /** @deprecated - Label is deprecated. Will be removed in future release. Use Annotation with LabelAnnotation instead. */
 export enum Label {
     /** "C", "C#", "Db", "D", etc. @deprecated */
@@ -279,6 +306,9 @@ export enum Label {
     /** "C", "Am", "G7", etc. @deprecated */
     Chord = "chord"
 }
+
+/** @deprecated */
+export type LabelValue = Label | `${Label}`;
 
 /** Annotation group */
 export enum AnnotationGroup {
@@ -303,6 +333,8 @@ export enum AnnotationGroup {
     /** Miscellaneous annotation */
     Misc = "misc"
 }
+
+export type AnnotationGroupValue = AnnotationGroup | `${AnnotationGroup}`;
 
 /** @deprecated - Annotation is deprecated. Will be removed in future release. Use AnnotationGroup instead. */
 export { AnnotationGroup as Annotation }
@@ -540,7 +572,14 @@ export enum AnnotationKind {
     cue_notes = "cue notes",
 }
 
-/** Annotation kind text type. @deprecated - Do not use. */
+export type AnnotationKindValue = AnnotationKind | `${AnnotationKind}`;
+
+export type AnnotationKindLabelValue = (
+    AnnotationKind.PitchLabel | `${AnnotationKind.PitchLabel}` |
+    AnnotationKind.ChordLabel | `${AnnotationKind.ChordLabel}`
+);
+
+/** @deprecated Will be removed. Use AnnotationKindValue instead.*/
 export type AnnotationText = `${AnnotationKind}`;
 
 /** Annotation anchor */
@@ -553,12 +592,14 @@ export enum AnnotationAnchor {
     RightBarLine = "rightBarLine",
 }
 
+export type AnnotationAnchorValue = AnnotationAnchor | `${AnnotationAnchor}`;
+
 /** Annotation options */
 export type AnnotationOptions = {
     /** Annnotation group */
-    group?: AnnotationGroup | `${AnnotationGroup}`;
+    group?: AnnotationGroupValue;
     /** Anchor */
-    anchor?: AnnotationAnchor | `${AnnotationAnchor}`;
+    anchor?: AnnotationAnchorValue;
     /** Play count for repeats */
     repeatCount?: number;
     /** Passage number(s) for endings */
@@ -593,7 +634,11 @@ export enum Navigation {
     Ending = AnnotationKind.Ending
 }
 
-/** @deprecated - DynamicsAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
+export type NavigationValue = Navigation | `${Navigation}`;
+export type NavigationEndRepeatValue = Navigation.EndRepeat | `${Navigation.EndRepeat}`;
+export type NavigationEndingValue = Navigation.Ending | `${Navigation.Ending}`;
+
+/** @deprecated DynamicsAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
 export enum DynamicsAnnotation {
     /** pianississimo (very, very soft) */
     ppp = AnnotationKind.ppp,
@@ -621,7 +666,10 @@ export enum DynamicsAnnotation {
     dim = AnnotationKind.dim,
 }
 
-/** @deprecated - TempoAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
+/** @deprecated Will be removed. */
+export type DynamicsAnnotationValue = DynamicsAnnotation | `${DynamicsAnnotation}`;
+
+/** @deprecated TempoAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
 export enum TempoAnnotation {
     /** gradually faster */
     accel = AnnotationKind.accel,
@@ -633,11 +681,17 @@ export enum TempoAnnotation {
     a_tempo = AnnotationKind.a_tempo,
 }
 
-/** @deprecated - ArticulationAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
+/** @deprecated Will be removed. */
+export type TempoAnnotationValue = TempoAnnotation | `${TempoAnnotation}`;
+
+/** @deprecated ArticulationAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
 export enum ArticulationAnnotation {
     fermata = AnnotationKind.fermata,
     measureEndFermata = AnnotationKind.measureEndFermata,
 }
+
+/** @deprecated Will be removed. */
+export type ArticulationAnnotationValue = ArticulationAnnotation | `${ArticulationAnnotation}`;
 
 /** Play state enum. */
 export enum PlayState {

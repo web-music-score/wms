@@ -9,31 +9,6 @@ import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
 import { AssertUtil, warnDeprecated, resolveEnumValue } from "shared-src";
 
-// Argument-compatible versions of enums (string template allowed).
-export type AnnotationGroupValue = Types.AnnotationGroup | `${Types.AnnotationGroup}`;
-export type AnnotationKindValue = Types.AnnotationKind | `${Types.AnnotationKind}`;
-export type AnnotationKindLabelValue = (
-    Types.AnnotationKind.PitchLabel | `${Types.AnnotationKind.PitchLabel}` |
-    Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.ChordLabel}`
-);
-export type StaffPresetValue = Types.StaffPreset | `${Types.StaffPreset}`;
-export type LyricsAlignValue = Types.LyricsAlign | `${Types.LyricsAlign}`;
-export type NavigationValue = Types.Navigation | `${Types.Navigation}`;
-export type NavigationEndingValue = Types.Navigation.Ending | `${Types.Navigation.Ending}`;
-export type NavigationEndRepeatValue = Types.Navigation.EndRepeat | `${Types.Navigation.EndRepeat}`;
-export type FermataValue = Types.Fermata | `${Types.Fermata}`;
-export type LabelValue = Types.Label | `${Types.Label}`;
-export type ConnectiveValue = Types.Connective | `${Types.Connective}`;
-export type ConnectiveTieValue = Types.Connective.Tie | `${Types.Connective.Tie}`;
-export type ConnectiveSlurValue = Types.Connective.Slur | `${Types.Connective.Slur}`;
-export type ConnectiveSlideValue = Types.Connective.Slide | `${Types.Connective.Slide}`;
-export type TieTypeValue = Types.TieType | `${Types.TieType}`;
-export type NoteAnchorValue = Types.NoteAnchor | `${Types.NoteAnchor}`;
-export type VerticalPositionValue = Types.VerticalPosition | `${Types.VerticalPosition}`;
-export type ScaleTypeValue = Theory.ScaleType | `${Theory.ScaleType}`;
-export type TimeSignatureValue = Theory.TimeSignatures | `${Theory.TimeSignatures}`;
-export type BeamGroupingValue = Theory.BeamGrouping | `${Theory.BeamGrouping}`;
-
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
 }
@@ -268,13 +243,13 @@ export class DocumentBuilder {
      * Use staff preset values to set score confguration. This call will request new score row.
      * @param staffPreset - Staff preset (e.g. "treble").
      */
-    setScoreConfiguration(staffPreset: StaffPresetValue): DocumentBuilder;
+    setScoreConfiguration(staffPreset: Types.StaffPresetValue): DocumentBuilder;
     /**
      * Use staff preset values to set score confguration. This call will request new score row.
      * @param config - Score configuration (e.g. { type: "staff", clef: "G", isOctavewDown: true }).
      */
     setScoreConfiguration(config: Types.ScoreConfiguration): DocumentBuilder;
-    setScoreConfiguration(config: StaffPresetValue | Types.ScoreConfiguration): DocumentBuilder {
+    setScoreConfiguration(config: Types.StaffPresetValue | Types.ScoreConfiguration): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "setScoreConfiguration", config);
             if (Guard.isEnumValue(config, Types.StaffPreset)) {
@@ -376,7 +351,7 @@ export class DocumentBuilder {
      * @param scaleType - Scale type (e.g. string "Major" or ScaleType.Major).
      * @returns - This document builder instance.
      */
-    setKeySignature(tonic: string, scaleType: ScaleTypeValue): DocumentBuilder;
+    setKeySignature(tonic: string, scaleType: Theory.ScaleTypeValue): DocumentBuilder;
     /**
      * Set key signature for current measure and forward.
      * @param keySignature - KeySignature object instance.
@@ -427,7 +402,7 @@ export class DocumentBuilder {
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(timeSignature: TimeSignatureValue, beamGrouping?: BeamGroupingValue): DocumentBuilder;
+    setTimeSignature(timeSignature: Theory.TimeSignaturesValue, beamGrouping?: Theory.BeamGroupingValue): DocumentBuilder;
     /**
      * Set time signature for current measure and forward.
      * @param beatCount - Beat count of time signature (e.g. 3 in "3/4").
@@ -435,7 +410,7 @@ export class DocumentBuilder {
      * @param beamGrouping - Beam grouping (e.g. "3-2" for time signature "5/8").
      * @returns - This document builder instance.
      */
-    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: BeamGroupingValue): DocumentBuilder;
+    setTimeSignature(beatCount: number, beatSize: number, beamGrouping?: Theory.BeamGroupingValue): DocumentBuilder;
     setTimeSignature(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "setTimeSignature", ...args);
@@ -659,7 +634,7 @@ export class DocumentBuilder {
         });
     }
 
-    private currentLyricsAlign: LyricsAlignValue = Types.LyricsAlign.Center;
+    private currentLyricsAlign: Types.LyricsAlignValue = Types.LyricsAlign.Center;
 
     private addLyricsInternal(staffTargets: Types.StaffTargets | undefined, verse: Types.VerseNumber, lyricsText: string | string[], lyricsLength: Theory.NoteLengthValue, lyricsOptions?: Types.LyricsOptions) {
         assertStaffTargets(staffTargets);
@@ -725,7 +700,7 @@ export class DocumentBuilder {
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermata(fermata: FermataValue = Types.Fermata.AtNote): DocumentBuilder {
+    addFermata(fermata: Types.FermataValue = Types.Fermata.AtNote): DocumentBuilder {
         return this.safe(() => {
             warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
 
@@ -746,7 +721,7 @@ export class DocumentBuilder {
      * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
      * @returns - This document builder instance.
      */
-    addFermataTo(staffTargets: Types.StaffTargets, fermata: FermataValue = Types.Fermata.AtNote): DocumentBuilder {
+    addFermataTo(staffTargets: Types.StaffTargets, fermata: Types.FermataValue = Types.Fermata.AtNote): DocumentBuilder {
         return this.safe(() => {
             warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
@@ -766,23 +741,23 @@ export class DocumentBuilder {
      * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: NavigationValue): DocumentBuilder;
+    addNavigation(navigation: Types.NavigationValue): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
      * @param navigation - Navigation annotation to add.
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: NavigationEndRepeatValue, playCount: number): DocumentBuilder;
+    addNavigation(navigation: Types.NavigationEndRepeatValue, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
      * @param navigation - Navigation annotation to add.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigation(navigation: NavigationEndingValue, ...passages: number[]): DocumentBuilder;
+    addNavigation(navigation: Types.NavigationEndingValue, ...passages: number[]): DocumentBuilder;
 
-    addNavigation(navigation: NavigationValue, ...args: unknown[]): DocumentBuilder {
+    addNavigation(navigation: Types.NavigationValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
             this.addAnnotationInternal(undefined, Types.AnnotationGroup.Navigation, navigation, ...args);
@@ -795,7 +770,7 @@ export class DocumentBuilder {
      * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationValue): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationValue): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
@@ -803,7 +778,7 @@ export class DocumentBuilder {
      * @param playCount - Play count for the repeated section.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationEndRepeatValue, playCount: number): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationEndRepeatValue, playCount: number): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
@@ -811,9 +786,9 @@ export class DocumentBuilder {
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
      */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationEndingValue, ...passages: number[]): DocumentBuilder;
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationEndingValue, ...passages: number[]): DocumentBuilder;
 
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: NavigationValue, ...args: unknown[]): DocumentBuilder {
+    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTargets, navigation, ...args);
             this.addAnnotationInternal(staffTargets, Types.AnnotationGroup.Navigation, navigation, ...args);
@@ -877,7 +852,7 @@ export class DocumentBuilder {
      * @returns - This document builder instance.
      */
     addAnnotation(
-        labelKind: AnnotationKindLabelValue,
+        labelKind: Types.AnnotationKindLabelValue,
         labelText: string,
         options?: Types.AnnotationOptions
     ): DocumentBuilder;
@@ -934,7 +909,7 @@ export class DocumentBuilder {
      */
     addAnnotationTo(
         staffTargets: Types.StaffTargets,
-        labelKind: AnnotationKindLabelValue,
+        labelKind: Types.AnnotationKindLabelValue,
         labelText: string,
         options?: Types.AnnotationOptions
     ): DocumentBuilder;
@@ -991,7 +966,7 @@ export class DocumentBuilder {
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabel(label: LabelValue, text: string): DocumentBuilder {
+    addLabel(label: Types.LabelValue, text: string): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addLabel", label, text);
 
@@ -1015,7 +990,7 @@ export class DocumentBuilder {
      * @param text - label text.
      * @returns - This document builder instance.
      */
-    addLabelTo(staffTargets: Types.StaffTargets, label: LabelValue, text: string): DocumentBuilder {
+    addLabelTo(staffTargets: Types.StaffTargets, label: Types.LabelValue, text: string): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTargets, label, text);
 
@@ -1040,7 +1015,7 @@ export class DocumentBuilder {
      * @param notAnchor - Anchor point for note and this tie.
      * @returns - This document builder instance.
      */
-    addConnective(connective: ConnectiveTieValue, tieSpan?: number | TieTypeValue, notAnchor?: NoteAnchorValue): DocumentBuilder;
+    addConnective(connective: Types.ConnectiveTieValue, tieSpan?: number | Types.TieTypeValue, notAnchor?: Types.NoteAnchorValue): DocumentBuilder;
     /**
      * Add slur starting from last added note/chord.
      * @param connective - T.Connective type ("slur" or T.Connective.Slur).
@@ -1048,16 +1023,16 @@ export class DocumentBuilder {
      * @param notAnchor - Anchor point for note and this slur.
      * @returns - This document builder instance.
      */
-    addConnective(connective: ConnectiveSlurValue, slurSpan?: number, notAnchor?: NoteAnchorValue): DocumentBuilder;
+    addConnective(connective: Types.ConnectiveSlurValue, slurSpan?: number, notAnchor?: Types.NoteAnchorValue): DocumentBuilder;
     /**
      * Add slide starting from last added note/chord.
      * @param connective - T.Connective type ("slide" or T.Connective.Slide).
      * @param notAnchor - Anchor point for note and this slide.
      * @returns - This document builder instance.
      */
-    addConnective(connective: ConnectiveSlideValue, notAnchor?: NoteAnchorValue): DocumentBuilder;
+    addConnective(connective: Types.ConnectiveSlideValue, notAnchor?: Types.NoteAnchorValue): DocumentBuilder;
 
-    addConnective(connective: ConnectiveValue, ...args: unknown[]): DocumentBuilder {
+    addConnective(connective: Types.ConnectiveValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addConnective", connective, ...args);
 
@@ -1150,7 +1125,7 @@ export class DocumentBuilder {
      * @param verticalPosition - Vertical position, are elements added above, below or both.
      * @returns - This document builder instance.
      */
-    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: VerticalPositionValue = Types.VerticalPosition.Auto): DocumentBuilder {
+    addStaffGroup(groupName: string, staffsTabsAndGroups: number | string | (number | string)[], verticalPosition: Types.VerticalPositionValue = Types.VerticalPosition.Auto): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addStaffGroup", groupName, staffsTabsAndGroups, verticalPosition);
 

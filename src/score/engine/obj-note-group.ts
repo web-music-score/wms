@@ -2,7 +2,7 @@ import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
-import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind } from "../pub";
+import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind, ArpeggioValue } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -15,7 +15,7 @@ import { ObjRest } from "./obj-rest";
 import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 import { ScoreError } from "./error-utils";
 
-function getArpeggio(a: boolean | Arpeggio | `${Arpeggio}` | undefined): Arpeggio | undefined {
+function getArpeggio(a: boolean | ArpeggioValue | undefined): Arpeggio | undefined {
     return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
 }
 
