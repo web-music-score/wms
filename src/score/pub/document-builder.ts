@@ -119,7 +119,8 @@ function assertStaffTargets(staffTargets: Types.StaffTargets | undefined) {
 function assertAnnotationOptions(annotationOptions: Types.AnnotationOptions) {
     AssertUtil.assert(
         Guard.isObject(annotationOptions),
-        Guard.isUndefined(annotationOptions.anchor) || Guard.isEnumValue(annotationOptions.anchor, Types.AnnotationAnchor),
+        Guard.isEnumValueOrUndefined(annotationOptions.group, Types.AnnotationGroup),
+        Guard.isEnumValueOrUndefined(annotationOptions.anchor, Types.AnnotationAnchor),
         Guard.isUndefined(annotationOptions.repeatCount) || Guard.isIntegerGte(annotationOptions.repeatCount, 1),
         (
             Guard.isUndefined(annotationOptions.endingPassages) || Guard.isIntegerGte(annotationOptions.endingPassages, 1) ||
@@ -801,14 +802,22 @@ export class DocumentBuilder {
         let options = (Guard.isObject(args[args.length - 1]) ? args.pop() : {}) as Types.AnnotationOptions;
         assertAnnotationOptions(options);
 
-        // If there is group, it is first arg.        
-        let group = resolveEnumValue(String(args[0]), Types.AnnotationGroup);
-        if (group) args.shift();
+        let group = options.group;
 
-        // Kind is after that.
+        if (!group) {
+            // If there is group arg, it is first.        
+            let groupArg = resolveEnumValue(String(args[0]), Types.AnnotationGroup);
+            if (groupArg) {
+                // TODO: warnDeprecated("...");
+                args.shift();
+                group = groupArg;
+            }
+        }
+
+        // Kind arg is after that.
         let kind = String(args.shift());
 
-        // Resolve group if there was none.
+        // Resolve group from kind if there not defined so far.
         if (!group) {
             let resolvedKind = resolveAnnotationKind(kind);
             if (resolvedKind !== undefined) {
@@ -832,45 +841,57 @@ export class DocumentBuilder {
         if (kind === Types.AnnotationKind.Ending && Guard.isNullish(options.endingPassages) && args.every(a => Guard.isIntegerGte(a, 1)))
             options.endingPassages = args.length > 0 ? [...args.map(a => Number(a))] : 1;
 
-        this.getMeasure().addAnnotation(staffTargets, group!, kind, options);
+        this.getMeasure().addAnnotation(staffTargets, group as Types.AnnotationGroup, kind, options);
     }
 
     /**
-     * Add any annotation kind to current measure.
-     * @param group - Annotation group (e.g. "dynamic").
-     * @param kind - Annotation kind (e.g. "pp").
-     * @returns - This document builder instance.
-     */
-    addAnnotation(group: Types.AnnotationGroup | `${Types.AnnotationGroup}`, kind: string, options?: Types.AnnotationOptions): DocumentBuilder;
-    /**
-     * Add annotation kind to current measure.
-     * @param kind - Annotation kind (e.g. "pp").
-     * @returns - This document builder instance.
-     */
-    addAnnotation(kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, options?: Types.AnnotationOptions): DocumentBuilder;
-    /**
      * Add annotation with label text to current measure.
-     * @param kind - Annotation kind.
+     * @param labelKind - Annotation kind.
      * @param labelText - Label text.
+     * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotation(kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, labelText: string, options?: Types.AnnotationOptions): DocumentBuilder;
+    addAnnotation(
+        labelKind: Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.ChordLabel}` |
+            Types.AnnotationKind.PitchLabel | `${Types.AnnotationKind.PitchLabel}`,
+        labelText: string,
+        options?: Types.AnnotationOptions
+    ): DocumentBuilder;
+
     /**
-     * Add ending navigation to current measure.
-     * @deprecated - Use annotation options { endingPassages: [...passages] } instead. Will be removed in future release.
-     * @param kind - Text for ending navigation.
-     * @param passages - Passages that this ending is played.
+     * Add any annotation kind to current measure.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotation(kind: Types.AnnotationKind.Ending | `${Types.AnnotationKind.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotation(
+        kind: string,
+        options?: Types.AnnotationOptions
+    ): DocumentBuilder;
+
     /**
-     * Add end repeat navigation to current measure.
-     * @deprecated - Use annotation options { repeatCount: repeatCount } instead. Will be removed in future release.
-     * @param kind - Text for end repeat navigation.
-     * @param repeatCount - Play count for the repeated section.
-     * @returns - This document builder instance.
+     * Catch all overload for deprecated stuff. Wil be removed in future release.
+     * ```ts
+     * // Deprecated:
+     * addAnnotation(group: AnnotationGroup, kind: string, options?: AnnotationOptions): DocumentBuilder;
+     * // Use instead:
+     * addAnnotation(kind: string, { group: AnnotationGroup }): DocumentBuilder;
+     * 
+     * // Deprecated:
+     * addAnnotation("ending", ...endingPassages: number[]): DocumentBuilder;
+     * // Use instead:
+     * addAnnotation("ending", { endingPassages: number | number[] }): DocumentBuilder;
+     * 
+     * // Deprecated:
+     * addAnnotation("endRepeat", repeatCount?: number): DocumentBuilder;
+     * // Use instead:
+     * addAnnotation("endRepeat", { repeatCount: number }): DocumentBuilder;
+     * ```
+     * @deprecated - Use AnnotationOptions instead for extra args. Will be removed in future release.
      */
-    addAnnotation(kind: Types.AnnotationKind.EndRepeat | `${Types.AnnotationKind.EndRepeat}`, repeatCount?: number): DocumentBuilder;
+    addAnnotation(
+        ...args: (number | string | Types.AnnotationOptions)[]
+    ): DocumentBuilder;
 
     addAnnotation(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
@@ -880,46 +901,58 @@ export class DocumentBuilder {
     }
 
     /**
-     * Add any annotation kind to current measure to given staff/tab/group.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param group - Annotation group (e.g. "dynamic").
-     * @param kind - Annotation kind (e.g. "pp").
-     * @returns - This document builder instance.
-     */
-    addAnnotationTo(staffTargets: Types.StaffTargets, group: Types.AnnotationGroup | `${Types.AnnotationGroup}`, kind: string, options?: Types.AnnotationOptions): DocumentBuilder;
-    /**
-     * Add annotation kind to current measure to given staff/tab/group.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param kind - Annotation kind (e.g. "pp"). 
-     * @returns - This document builder instance.
-     */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, options?: Types.AnnotationOptions): DocumentBuilder;
-    /**
      * Add annotation with label text to current measure.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param kind - Annotation kind.
+     * @param labelKind - Annotation kind.
      * @param labelText - Label text.
+     * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, labelText: string, options?: Types.AnnotationOptions): DocumentBuilder;
+    addAnnotationTo(
+        staffTargets: Types.StaffTargets,
+        labelKind: Types.AnnotationKind.ChordLabel | `${Types.AnnotationKind.ChordLabel}` |
+            Types.AnnotationKind.PitchLabel | `${Types.AnnotationKind.PitchLabel}`,
+        labelText: string,
+        options?: Types.AnnotationOptions
+    ): DocumentBuilder;
+
     /**
-     * Add ending navigation to current measure to given staff/tab/group.
-     * @deprecated - Use annotation options { endingPassages: [...passages] } instead. Will be removed in future release.
+     * Add any annotation kind to current measure.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param kind - Text for ending navigation.
-     * @param passages - Passages that this ending is played.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKind.Ending | `${Types.AnnotationKind.Ending}`, ...passages: number[]): DocumentBuilder;
+    addAnnotationTo(
+        staffTargets: Types.StaffTargets,
+        kind: string,
+        options?: Types.AnnotationOptions
+    ): DocumentBuilder;
+
     /**
-     * Add end repeat navigation to current measure to given staff/tab/group.
-     * @deprecated - Use annotation options { repeatCount: repeatCount } instead. Will be removed in future release.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param kind - Text for end repeat navigation.
-     * @param repeatCount - Play count for the repeated section.
-     * @returns - This document builder instance.
+     * Catch all overload for deprecated stuff. Wil be removed in future release.
+     * ```ts
+     * // Deprecated:
+     * addAnnotation(staffTargets, group: AnnotationGroup, kind: string, options?: AnnotationOptions): DocumentBuilder;
+     * // Use instead:
+     * addAnnotation(staffTargets, kind: string, { group: AnnotationGroup }): DocumentBuilder;
+     * 
+     * // Deprecated:
+     * addAnnotation(staffTargets, "ending", ...endingPassages: number[]): DocumentBuilder;
+     * // Use instead:
+     * addAnnotation(staffTargets, "ending", { endingPassages: number | number[] }): DocumentBuilder;
+     * 
+     * // Deprecated:
+     * addAnnotation(staffTargets, "endRepeat", repeatCount?: number): DocumentBuilder;
+     * // Use instead:
+     * addAnnotation(staffTargets, "endRepeat", { repeatCount: number }): DocumentBuilder;
+     * ```
+     * @deprecated - Use AnnotationOptions instead for extra args. Will be removed in future release.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKind.EndRepeat | `${Types.AnnotationKind.EndRepeat}`, repeatCount?: number): DocumentBuilder;
+    addAnnotationTo(
+        staffTargets: Types.StaffTargets,
+        ...args: (number | string | Types.AnnotationOptions)[]
+    ): DocumentBuilder;
 
     addAnnotationTo(staffTargets: Types.StaffTargets, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
