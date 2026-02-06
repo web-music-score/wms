@@ -857,6 +857,7 @@ export class DocumentBuilder {
     addAnnotation(kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, labelText: string, options?: Types.AnnotationOptions): DocumentBuilder;
     /**
      * Add ending navigation to current measure.
+     * @deprecated - Use annotation options { endingPassages: [...passages] } instead. Will be removed in future release.
      * @param kind - Text for ending navigation.
      * @param passages - Passages that this ending is played.
      * @returns - This document builder instance.
@@ -864,6 +865,7 @@ export class DocumentBuilder {
     addAnnotation(kind: Types.AnnotationKind.Ending | `${Types.AnnotationKind.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure.
+     * @deprecated - Use annotation options { repeatCount: repeatCount } instead. Will be removed in future release.
      * @param kind - Text for end repeat navigation.
      * @param repeatCount - Play count for the repeated section.
      * @returns - This document builder instance.
@@ -902,6 +904,7 @@ export class DocumentBuilder {
     addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationGroup | `${Types.AnnotationKind}`, labelText: string, options?: Types.AnnotationOptions): DocumentBuilder;
     /**
      * Add ending navigation to current measure to given staff/tab/group.
+     * @deprecated - Use annotation options { endingPassages: [...passages] } instead. Will be removed in future release.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param kind - Text for ending navigation.
      * @param passages - Passages that this ending is played.
@@ -910,6 +913,7 @@ export class DocumentBuilder {
     addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKind.Ending | `${Types.AnnotationKind.Ending}`, ...passages: number[]): DocumentBuilder;
     /**
      * Add end repeat navigation to current measure to given staff/tab/group.
+     * @deprecated - Use annotation options { repeatCount: repeatCount } instead. Will be removed in future release.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param kind - Text for end repeat navigation.
      * @param repeatCount - Play count for the repeated section.
