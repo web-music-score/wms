@@ -138,6 +138,22 @@ export function createDeprecatedTestsDemo() {
         .addNote(0, "G4", "4n")
         .addNote(0, "C5", "4n")
         .addAnnotationTo(1, "ending", { endingPassages: 3 })
+        .endRow()
+
+        .addMeasure()
+        .addLyrics(1, "1. Any text", "1n", { align: "left" })
+        .addNote(0, "G4", "2n").addAnnotation("dynamics", "any text")
+        .addMeasure()
+        .addLyrics(1, "2. Any text", "1n", { align: "left" })
+        .addNote(0, "G4", "2n").addAnnotation("any text", { group: "dynamics" })
+        .endRow()
+
+        .addMeasure()
+        .addLyrics(1, "1. No depr. just testing", "1n", { align: "left" })
+        .addNote(0, "G4", "4n").addAnnotation("pitchLabel", "pitchLabel")
+        .addNote(0, "G4", "4n").addAnnotation("pitchLabel", "pitchLabel")
+        .addNote(0, "G4", "4n").addAnnotation("chordLabel", "chordLabel")
+        .addNote(0, "G4", "4n").addAnnotation("chordLabel", "chordLabel")
 
         .getDocument();
 }

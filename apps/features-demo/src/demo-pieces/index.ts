@@ -68,6 +68,7 @@ export class DemoPieces {
         demos.push(createStaffGroupsDemo());
         demos.push(createLyricsDemo());
         demos.push(createNoteArticulationsDemo());
+        demos.push(createDeprecatedTestsDemo());
 
         // Sort by title
         pieces.sort((a, b) => DemoPieces.getTitle(a).localeCompare(DemoPieces.getTitle(b)));
