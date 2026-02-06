@@ -555,6 +555,8 @@ export enum AnnotationAnchor {
 
 /** Annotation options */
 export type AnnotationOptions = {
+    /** Annnotation group */
+    group?: AnnotationGroup | `${AnnotationGroup}`;
     /** Anchor */
     anchor?: AnnotationAnchor | `${AnnotationAnchor}`;
     /** Play count for repeats */
