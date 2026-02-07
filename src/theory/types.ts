@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { InvalidArgError, MusicError, MusicErrorType } from "web-music-score/core";
+import { InvalidArgError } from "web-music-score/core";
 
 /** Symbol set enum. */
 export enum SymbolSet {
@@ -31,7 +31,7 @@ export function validatePitchNotation(pn: unknown): PitchNotation {
         return pn;
     }
     else {
-        throw new MusicError(`Invalid pitch notation "${pn}".`);
+        throw new InvalidArgError(`Invalid pitch notation "${pn}".`);
     }
 }
 

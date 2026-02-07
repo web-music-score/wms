@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError } from "web-music-score/core";
+import { InvalidArgError } from "web-music-score/core";
 import { getClosestString } from "./closest-string";
 
 export function resolveEnumValue<E extends Utils.Enum.EnumObject>(input: string, enumObject: E): Utils.Enum.EnumValue<E> | undefined {
@@ -10,7 +10,7 @@ export function resolveEnumValue<E extends Utils.Enum.EnumObject>(input: string,
 export function resolveRequiredEnumValue<E extends Utils.Enum.EnumObject>(input: string, enumObject: E): Utils.Enum.EnumValue<E> {
     const enumValue = resolveEnumValue(input, enumObject);
     if (enumValue === undefined)
-        throw new MusicError(`Invalid enum value "${input}" for enum object: ${Utils.Str.stringify(enumObject)}`);
+        throw new InvalidArgError(`Invalid enum value "${input}" for enum object: ${Utils.Str.stringify(enumObject)}`);
     return enumValue;
 }
 
