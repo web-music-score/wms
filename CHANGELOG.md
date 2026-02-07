@@ -1,16 +1,16 @@
 # CHANGELOG
 ## [6.4.0-pre.6] - Unreleased
 ### Added
-- Added `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.
-- `AnnotationOptions { group?: AnnotationGroup }` property.
+- `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.
+- `AnnotationOptions.group` property.
 - Cut time signature `"C|"`.
-- Exported and updated all error classes derived from Core.MusicError.
+- Separate error classes derived from Core.MusicError.
 
 ### Deprecated
-Deprecated `addAnnotation()` overloads for simplicity and more future proof.
-- `addAnnotation(group, ...)`, use `addAnnotation(..., { group })` instead.
-- `addAnnotation("endRepeat", repeatCount)`, use `addAnnotation("endRepeat", { repeatCount })` instead.
-- `addAnnotation("ending", ...passages)`, use `addAnnotation("ending", { endingPassages })` instead.
+Deprecated `addAnnotation(...)` overloads for simplicity and more future proof. Replacements:
+- `addAnnotation(group, kind)` => `addAnnotation(kind, { group })`.
+- `addAnnotation("endRepeat", 2)` => `addAnnotation("endRepeat", { repeatCount: 2 })`.
+- `addAnnotation("ending", 1, 2)` => `addAnnotation("ending", { endingPassages: [1, 2] })`.
 
 ### Fixed
 - Time signature in tab had staff's color.
