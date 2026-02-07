@@ -6,6 +6,12 @@ import { Interval } from "./interval";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { getClosestEnumValue, getClosestString } from "shared-src";
 
+class ScaleError extends MusicError {
+    constructor(message: string) {
+        super(MusicErrorType.Scale, message);
+    }
+}
+
 function getNaturalDiatonicId(chromaticId: number): number {
     // ChromaticId could map to several diatonicId/accidental combinations.
     let diatonicClass = Note.getDiatonicClass("CCDDEFFGGAAB"[Note.getChromaticClass(chromaticId)]);
@@ -74,7 +80,7 @@ function getMode(scaleType: ScaleType) {
         case ScaleType.MinorHexatonicBlues: return 6;
         case ScaleType.HeptatonicBlues: return 1;
         default:
-            throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
+            throw new ScaleError(`Invalid scaleType: ${scaleType}`);
     }
 }
 
@@ -179,7 +185,7 @@ export class Scale extends KeySignature {
      */
     getScaleNotes(bottomNote: string, numOctaves: number): ReadonlyArray<Note> {
         if (!Guard.isIntegerGte(numOctaves, 1)) {
-            throw new MusicError(MusicErrorType.Scale, `Invalid numOctaves: ${numOctaves}`);
+            throw new ScaleError(`Invalid numOctaves: ${numOctaves}`);
         }
 
         let scaleNoteList: Note[] = [];
@@ -258,13 +264,13 @@ export class Scale extends KeySignature {
         }
 
         if (note.chromaticId < rootNote.chromaticId) {
-            throw new MusicError(MusicErrorType.Scale, `Note is below rootNote.`);
+            throw new ScaleError(`Note is below rootNote.`);
         }
 
         let interval = Interval.get(rootNote, note);
 
         if (interval === undefined) {
-            throw new MusicError(MusicErrorType.Scale, `Interval is undefined.`);
+            throw new ScaleError(`Interval is undefined.`);
         }
         else {
             return interval;
@@ -381,7 +387,7 @@ export class ScaleFactory {
         });
 
         if (naturalScales.length === 0) {
-            throw new MusicError(MusicErrorType.Scale, `No natural scale in scale type "${this.type}".`);
+            throw new ScaleError(`No natural scale in scale type "${this.type}".`);
         }
 
         const SortByAccidentalCountFunc = (a: Scale, b: Scale) => a.getNumAccidentals() - b.getNumAccidentals();
@@ -427,7 +433,7 @@ export class ScaleFactory {
     getScale(tonic: string): Scale {
         let scale = this.scaleMap.get(resolveTonic(tonic));
         if (!scale) {
-            throw new MusicError(MusicErrorType.Scale, `Invalid scale: ${tonic} ${this.type}`);
+            throw new ScaleError(`Invalid scale: ${tonic} ${this.type}`);
         }
         else {
             return scale;
@@ -489,7 +495,7 @@ ScaleFactoryList.forEach(factory => {
 export function getScaleFactory(scaleType: ScaleTypeValue): ScaleFactory {
     let f = ScaleFactoryMap.get(resolveScaleType(scaleType));
     if (!f) {
-        throw new MusicError(MusicErrorType.Scale, `Invalid scaleType: ${scaleType}`);
+        throw new ScaleError(`Invalid scaleType: ${scaleType}`);
     }
     else {
         return f;
@@ -499,28 +505,28 @@ export function getScaleFactory(scaleType: ScaleTypeValue): ScaleFactory {
 export function validateScaleType(scaleType: unknown): ScaleType {
     if (Guard.isEnumValue(scaleType, ScaleType)) return scaleType;
 
-    throw new MusicError(MusicErrorType.Scale, `Invalid scale type "${scaleType}".`);
+    throw new ScaleError(`Invalid scale type "${scaleType}".`);
 }
 
 /** Currently only hints resolved value in error. */
 export function resolveScaleType(scaleType: unknown): ScaleType {
-    if(typeof scaleType !== "string")
-        throw new MusicError(MusicErrorType.Scale, `Scale type is not string.`);
+    if (typeof scaleType !== "string")
+        throw new ScaleError(`Scale type is not string.`);
 
     if (Guard.isEnumValue(scaleType, ScaleType)) return scaleType;
 
     const closest = getClosestEnumValue(scaleType, ScaleType);
 
     if (closest)
-        throw new MusicError(MusicErrorType.Scale, `Invalid scale type "${scaleType}". Did you mean "${closest}"?`);
+        throw new ScaleError(`Invalid scale type "${scaleType}". Did you mean "${closest}"?`);
 
-    throw new MusicError(MusicErrorType.Scale, `Invalid scale type "${scaleType}".`);
+    throw new ScaleError(`Invalid scale type "${scaleType}".`);
 }
 
 /** Currently only hints resolved value in error. */
 export function resolveTonic(tonic: unknown): string {
-    if(typeof tonic !== "string")
-        throw new MusicError(MusicErrorType.Scale, `Tonic is not string.`);
+    if (typeof tonic !== "string")
+        throw new ScaleError(`Tonic is not string.`);
 
     if (FullTonicList.includes(tonic))
         return tonic;
@@ -528,9 +534,9 @@ export function resolveTonic(tonic: unknown): string {
     const closest = getClosestString(tonic, FullTonicList);
 
     if (closest)
-        throw new MusicError(MusicErrorType.Scale, `Invalid tonic "${tonic}". Did you mean "${closest}"?`);
+        throw new ScaleError(`Invalid tonic "${tonic}". Did you mean "${closest}"?`);
 
-    throw new MusicError(MusicErrorType.Scale, `Invalid tonic: "${tonic}"`);
+    throw new ScaleError(`Invalid tonic: "${tonic}"`);
 }
 
 /**

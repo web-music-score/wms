@@ -6,7 +6,9 @@ export enum MusicErrorType {
     Note,
     Scale,
     KeySignature,
-    Timesignature,
+    TimeSignature,
+    /** @deprecated Typo, will be removed. */
+    Timesignature = MusicErrorType.TimeSignature,
     Score,
     Audio
 }

@@ -8,6 +8,12 @@ export { Instrument, linearToDecibels }
 
 initCore();
 
+class AudioError extends MusicError {
+    constructor(message: string) {
+        super(MusicErrorType.Audio, message);
+    }
+}
+
 function getNoteName(note: Note | number | string) {
     if (typeof note === "string") {
         return note;
@@ -61,7 +67,7 @@ export function addInstrument(instrument: Instrument | Instrument[]): void {
                 !Guard.isFunction(instr.playNote) ||
                 !Guard.isFunction(instr.stop)
             ) {
-                throw new MusicError(MusicErrorType.Audio, "Invalid instrument object: " + instr);
+                throw new AudioError("Invalid instrument object!");
             }
 
             if (InstrumentList.some(instr2 => instr2.getName() === instr.getName())) {

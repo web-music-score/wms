@@ -1,6 +1,12 @@
 import { Guard, IndexArray, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
+class InvalidArgError extends MusicError {
+    constructor(message: string) {
+        super(MusicErrorType.InvalidArg, message);
+    }
+}
+
 const MaxTupletRatioValue = 12;
 
 /*
@@ -99,7 +105,7 @@ export function isNoteLength(noteLength: unknown): noteLength is NoteLength {
 
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (isNoteLength(noteLength)) return noteLength;
-    throw new MusicError(MusicErrorType.InvalidArg, `Invalid noteLength: ${noteLength}`);
+    throw new InvalidArgError(`Invalid note length "${noteLength}".`);
 }
 
 /** Note length props class. */
@@ -139,12 +145,8 @@ export class NoteLengthProps {
         this.hasStem = this.noteSize > 1;
         this.isSolid = this.noteSize > 2;
 
-        if (this.dotCount > this.maxDotCount) {
-            throw new MusicError(MusicErrorType.Note, `dotCount ${this.dotCount} > maxDotCount ${this.maxDotCount}, for noteLength "${this.noteLength}".`);
-        }
-        else if (this.isTriplet && this.dotCount > 0) {
-            throw new MusicError(MusicErrorType.Note, `noteLength "${this.noteLength}" is both triplet and dotted!`);
-        }
+        if (this.dotCount > this.maxDotCount || this.isTriplet && this.dotCount > 0)
+            throw new InvalidArgError(`Invalid note length "${this.noteLength}".`);
     }
 
     private static cache = new UniMap<NoteLengthValue | string, NoteLengthProps>();
@@ -223,7 +225,7 @@ export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
         return tupletRatio;
     }
     else {
-        throw new MusicError(MusicErrorType.Note, `Invalid tupletRatio ${JSON.stringify(tupletRatio)}`);
+        throw new InvalidArgError(`Invalid tuplet ratio "${Utils.Str.stringify(tupletRatio)}".`);
     }
 }
 
@@ -279,10 +281,10 @@ export class RhythmProps {
         }
 
         if (this.dotCount > 0 && this.tupletRatio !== undefined) {
-            throw new MusicError(MusicErrorType.Note, `Note cannot be both dotted and tuplet!`);
+            throw new InvalidArgError(`Invalid rhythm props: note is dotted and tuplet.`);
         }
         else if (this.dotCount > p.maxDotCount) {
-            throw new MusicError(MusicErrorType.Note, `Too big dot count ${this.dotCount} for note length ${this.noteLength}.`);
+            throw new InvalidArgError(`Invalid rhythm props: dot count > max dot count.`);
         }
 
         for (let add = this.ticks / 2, i = 1; i <= this.dotCount; i++, add /= 2) {

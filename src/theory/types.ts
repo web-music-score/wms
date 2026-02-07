@@ -1,6 +1,12 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
+class InvalidArgError extends MusicError {
+    constructor(message: string) {
+        super(MusicErrorType.InvalidArg, message);
+    }
+}
+
 /** Symbol set enum. */
 export enum SymbolSet {
     /** Ascii symbols. */
@@ -31,7 +37,7 @@ export function validatePitchNotation(pn: unknown): PitchNotation {
         return pn;
     }
     else {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid pitchNotation: ${pn}`);
+        throw new InvalidArgError(`Invalid pitch notation "${pn}".`);
     }
 }
 
@@ -68,6 +74,6 @@ export function validateGuitarNoteLabel(label: unknown): GuitarNoteLabel {
         return label;
     }
     else {
-        throw new MusicError(MusicErrorType.Timesignature, `Invalid guitarNoteLabel: ${label}`);
+        throw new MusicError(MusicErrorType.InvalidArg, `Invalid guitarNoteLabel: ${label}`);
     }
 }

@@ -2,6 +2,12 @@ import { Guard, UniMap } from "@tspro/ts-utils-lib";
 import { PitchNotation, SymbolSet } from "./types";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
+class NoteError extends MusicError {
+    constructor(message: string) {
+        super(MusicErrorType.Note, message);
+    }
+}
+
 function mod(n: number, m: number): number {
     return ((n % m) + m) % m;
 }
@@ -100,7 +106,7 @@ export class Note {
             this.octave = Note.validateOctave(octave);
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid args: ${arg}, ${accidental}, ${octave}`);
+            throw new NoteError(`Invalid args: ${arg}, ${accidental}, ${octave}`);
         }
     }
 
@@ -175,10 +181,10 @@ export class Note {
             let p = Note.parseNote(noteName);
 
             if (!p)
-                throw new MusicError(MusicErrorType.Note, `Invalid note "${noteName}".`);
+                throw new NoteError(`Invalid note "${noteName}".`);
 
             if (p.octave === undefined)
-                throw new MusicError(MusicErrorType.Note, `Invalid note "${noteName}" (missing octave).`);
+                throw new NoteError(`Invalid note "${noteName}" (missing octave).`);
 
             return new Note(p.noteLetter, p.accidental, p.octave);
         });
@@ -201,7 +207,7 @@ export class Note {
      */
     static validateNote(noteName: string): true {
         if (this.isNote(noteName)) return true;
-        throw new MusicError(MusicErrorType.Note, `Invalid note "${noteName}"`);
+        throw new NoteError(`Invalid note "${noteName}"`);
     }
 
     /**
@@ -237,7 +243,7 @@ export class Note {
             return NoteLetters.indexOf(Note.validateNoteLetter(arg[0]));
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid arg: ${arg}`);
+            throw new NoteError(`Invalid arg: ${arg}`);
         }
     }
 
@@ -362,7 +368,7 @@ export class Note {
     static getScientificNoteName(noteName: string, symbolSet: SymbolSet): string {
         let p = Note.parseNote(noteName);
         if (!p) {
-            throw new MusicError(MusicErrorType.Note, `Invalid noteName: ${noteName}`);
+            throw new NoteError(`Invalid noteName: ${noteName}`);
         }
         let { noteLetter, accidental, octave } = p;
         return noteLetter + Note.getAccidentalSymbol(accidental, symbolSet) + (octave ?? "");
@@ -388,7 +394,7 @@ export class Note {
     static getAccidental(accidentalSymbol: string): Accidental {
         let accidental = AccidentalMap.get(accidentalSymbol);
         if (accidental === undefined) {
-            throw new MusicError(MusicErrorType.Note, `Invalid accidental: ${accidentalSymbol}`);
+            throw new NoteError(`Invalid accidental: ${accidentalSymbol}`);
         }
         return accidental;
     }
@@ -430,7 +436,7 @@ export class Note {
             return diatonicId;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid diatonicId: ${diatonicId}`);
+            throw new NoteError(`Invalid diatonicId: ${diatonicId}`);
         }
     }
 
@@ -444,7 +450,7 @@ export class Note {
             return diatonicClass;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid diatonicClass: ${diatonicClass}`);
+            throw new NoteError(`Invalid diatonicClass: ${diatonicClass}`);
         }
     }
 
@@ -458,7 +464,7 @@ export class Note {
             return chromaticId;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid chromaticId: ${chromaticId}`);
+            throw new NoteError(`Invalid chromaticId: ${chromaticId}`);
         }
     }
 
@@ -472,7 +478,7 @@ export class Note {
             return chromaticClass;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid chromaticClass: ${chromaticClass}`);
+            throw new NoteError(`Invalid chromaticClass: ${chromaticClass}`);
         }
     }
 
@@ -486,7 +492,7 @@ export class Note {
             return noteLetter as NoteLetter;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid note: ${noteLetter}`);
+            throw new NoteError(`Invalid note: ${noteLetter}`);
         }
     }
 
@@ -500,7 +506,7 @@ export class Note {
             return octave;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid octave: ${octave}`);
+            throw new NoteError(`Invalid octave: ${octave}`);
         }
     }
 
@@ -514,7 +520,7 @@ export class Note {
             return acc as Accidental;
         }
         else {
-            throw new MusicError(MusicErrorType.Note, `Invalid accidental: ${acc}`);
+            throw new NoteError(`Invalid accidental: ${acc}`);
         }
     }
 
