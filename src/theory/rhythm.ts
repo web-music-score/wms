@@ -1,9 +1,11 @@
 import { Guard, IndexArray, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
-class RhythmPropsError extends MusicError {
+export class NoteDurationError extends MusicError {
     constructor(message: string) {
-        super(MusicErrorType.Unknown, message);
+        super(MusicErrorType.NoteDuration, message);
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+        this.name = new.target.name;
     }
 }
 
@@ -105,7 +107,7 @@ export function isNoteLength(noteLength: unknown): noteLength is NoteLength {
 
 export function validateNoteLength(noteLength: unknown): NoteLength {
     if (isNoteLength(noteLength)) return noteLength;
-    throw new RhythmPropsError(`Invalid note length "${noteLength}".`);
+    throw new NoteDurationError(`Invalid note length "${noteLength}".`);
 }
 
 /** Note length props class. */
@@ -146,7 +148,7 @@ export class NoteLengthProps {
         this.isSolid = this.noteSize > 2;
 
         if (this.dotCount > this.maxDotCount || this.isTriplet && this.dotCount > 0)
-            throw new RhythmPropsError(`Invalid note length "${this.noteLength}".`);
+            throw new NoteDurationError(`Invalid note length "${this.noteLength}".`);
     }
 
     private static cache = new UniMap<NoteLengthValue | string, NoteLengthProps>();
@@ -225,7 +227,7 @@ export function validateTupletRatio(tupletRatio: unknown): TupletRatio {
         return tupletRatio;
     }
     else {
-        throw new RhythmPropsError(`Invalid tuplet ratio "${Utils.Str.stringify(tupletRatio)}".`);
+        throw new NoteDurationError(`Invalid tuplet ratio "${Utils.Str.stringify(tupletRatio)}".`);
     }
 }
 
@@ -281,10 +283,10 @@ export class RhythmProps {
         }
 
         if (this.dotCount > 0 && this.tupletRatio !== undefined) {
-            throw new RhythmPropsError(`Invalid rhythm props: note is dotted and tuplet.`);
+            throw new NoteDurationError(`Invalid rhythm props: note is dotted and tuplet.`);
         }
         else if (this.dotCount > p.maxDotCount) {
-            throw new RhythmPropsError(`Invalid rhythm props: dot count > max dot count.`);
+            throw new NoteDurationError(`Invalid rhythm props: dot count > max dot count.`);
         }
 
         for (let add = this.ticks / 2, i = 1; i <= this.dotCount; i++, add /= 2) {

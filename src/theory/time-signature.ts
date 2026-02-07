@@ -2,9 +2,11 @@ import { Guard } from "@tspro/ts-utils-lib";
 import { NoteLength, NoteLengthProps } from "./rhythm";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 
-class TimeSignatureError extends MusicError {
+export class TimeSignatureError extends MusicError {
     constructor(message: string) {
         super(MusicErrorType.TimeSignature, message);
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+        this.name = new.target.name;
     }
 }
 

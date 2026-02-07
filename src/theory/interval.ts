@@ -1,6 +1,6 @@
 import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { InvalidArgError, MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Interval direction type. */
 export type IntervalDirection = "Unison" | "Ascending" | "Descending";
@@ -127,12 +127,12 @@ export function validateIntervalQuality(quality: unknown): IntervalQuality {
     )
         return quality;
     else
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quality "${quality}".`);
+        throw new InvalidArgError(`Invalid interval quality "${quality}".`);
 }
 
 function formatQuantity(q: number) {
     if (!Guard.isIntegerGte(q, 1)) {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid interval quantity "${q}".`);
+        throw new InvalidArgError(`Invalid interval quantity "${q}".`);
     }
     else {
         return Utils.Math.toOrdinalNumber(q);
@@ -143,7 +143,8 @@ function formatQuantity(q: number) {
 class InvalidIntervalException extends Error {
     constructor(readonly msg: string) {
         super(msg);
-        this.name = "InvalidInterval";
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+        this.name = new.target.name;
     }
 }
 

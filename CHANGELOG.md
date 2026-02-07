@@ -4,6 +4,7 @@
 - Added `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.
 - `AnnotationOptions { group?: AnnotationGroup }` property.
 - Cut time signature `"C|"`.
+- Exported and updated all error classes derived from Core.MusicError.
 
 ### Deprecated
 Deprecated `addAnnotation()` overloads for simplicity and more future proof.

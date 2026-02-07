@@ -6,9 +6,11 @@ import { Interval } from "./interval";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { getClosestEnumValue, getClosestString } from "shared-src";
 
-class ScaleError extends MusicError {
+export class ScaleError extends MusicError {
     constructor(message: string) {
         super(MusicErrorType.Scale, message);
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+        this.name = new.target.name;
     }
 }
 

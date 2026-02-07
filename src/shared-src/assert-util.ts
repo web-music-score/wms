@@ -1,5 +1,5 @@
 import { Utils } from "@tspro/ts-utils-lib";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { InvalidArgError } from "web-music-score/core";
 
 export namespace AssertUtil {
     let assertFunctStr = "";
@@ -28,21 +28,21 @@ export namespace AssertUtil {
 
     export function assert(...conditions: boolean[]) {
         if (conditions.some(c => !c))
-            throw new MusicError(MusicErrorType.InvalidArg, assertFunctStr);
+            throw new InvalidArgError(assertFunctStr);
     }
 
     export function assertMsg(condition: boolean, msg: string) {
-        if (!condition) throw new MusicError(MusicErrorType.InvalidArg, msg);
+        if (!condition) throw new InvalidArgError(msg);
     }
 
     export function assertVar(condition: boolean, varName: string, varValue: unknown) {
         if (!condition)
-            throw new MusicError(MusicErrorType.InvalidArg, `Invalid value: ${varName} = ${varValue}`);
+            throw new InvalidArgError(`Invalid value: ${varName} = ${varValue}`);
     }
 
     export function requireVar<VAR_VALUE>(varName: string, varValue: VAR_VALUE | undefined | null): VAR_VALUE {
         if (varValue == null)
-            throw new MusicError(MusicErrorType.InvalidArg, `Invalid value: ${varName} = ${varValue}`);
+            throw new InvalidArgError(`Invalid value: ${varName} = ${varValue}`);
         return varValue;
     }
 }

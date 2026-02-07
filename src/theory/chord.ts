@@ -2,7 +2,7 @@ import { IndexArray, Utils } from "@tspro/ts-utils-lib";
 import { Note } from "./note";
 import { Degree, getScale, ScaleType } from "./scale";
 import { SymbolSet } from "./types";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { InvalidArgError } from "web-music-score/core";
 
 const isEqualNote = (n1: Note, n2: Note) => n1.chromaticClass === n2.chromaticClass;
 
@@ -28,7 +28,7 @@ function getOkayRootNote(wantedRootNote: Note): Note {
     return okayRootNoteCache.getOrCreate(wantedRootNote.chromaticClass, () => {
         let rootNote = OkayRootNoteList.find(note => isEqualNote(note, wantedRootNote));
         if (!rootNote) {
-            throw new MusicError(MusicErrorType.InvalidArg, `Invalid chord root note: ${wantedRootNote.formatOmitOctave(SymbolSet.Unicode)}`);
+            throw new InvalidArgError(`Invalid chord root note: ${wantedRootNote.formatOmitOctave(SymbolSet.Unicode)}`);
         }
         return rootNote;
     });
@@ -111,7 +111,8 @@ function canOmitDegree(chordInfo: ChordInfo, degree: Degree) {
 class InvalidChordException extends Error {
     constructor(readonly msg: string) {
         super(msg);
-        this.name = "InvalidChordException";
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+        this.name = new.target.name;
     }
 }
 

@@ -1,5 +1,5 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { InvalidArgError, MusicError, MusicErrorType } from "web-music-score/core";
 
 /** Symbol set enum. */
 export enum SymbolSet {
@@ -68,6 +68,6 @@ export function validateGuitarNoteLabel(label: unknown): GuitarNoteLabel {
         return label;
     }
     else {
-        throw new MusicError(MusicErrorType.InvalidArg, `Invalid guitarNoteLabel: ${label}`);
+        throw new InvalidArgError(`Invalid guitarNoteLabel: ${label}`);
     }
 }
