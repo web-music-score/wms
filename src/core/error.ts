@@ -3,12 +3,14 @@
 export enum MusicErrorType {
     Unknown,
     InvalidArg,
+    Score,
+    Audio,
     Note,
     Scale,
     KeySignature,
-    Timesignature,
-    Score,
-    Audio
+    TimeSignature,
+    /** @deprecated Typo, use TimeSignature instead. */
+    Timesignature = TimeSignature,
 }
 
 function isType(type: unknown): type is MusicErrorType {
@@ -16,7 +18,7 @@ function isType(type: unknown): type is MusicErrorType {
 }
 
 function formatType(type: MusicErrorType | undefined): string {
-    return type === undefined ? "" : `[${MusicErrorType[type]}] `;
+    return type === undefined ? "" : String(MusicErrorType[type]);
 }
 
 /** Music error class. */
@@ -40,9 +42,9 @@ export class MusicError extends Error {
             ? [MusicErrorType.Unknown, args[0]]
             : args as [MusicErrorType, string];
 
-        super(formatType(type) + msg);
-        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
+        super(`${formatType(type)} ${msg}`);
 
+        Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = "MusicError";
         this.type = type;
     }
