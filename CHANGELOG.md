@@ -1,4 +1,6 @@
 # CHANGELOG
+## [6.4.0-pre.7] - Unreleased
+
 ## [6.4.0-pre.6] - 2026-02-08
 ### Added
 - `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.
