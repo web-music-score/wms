@@ -143,9 +143,11 @@ export function createDeprecatedTestsDemo() {
         .addMeasure()
         .addLyrics(1, "1. Any text", "1n", { align: "left" })
         .addNote(0, "G4", "2n").addAnnotation("dynamics", "any text")
+        .addNote(0, "G4", "2n")
         .addMeasure()
         .addLyrics(1, "2. Any text", "1n", { align: "left" })
         .addNote(0, "G4", "2n").addAnnotation("any text", { group: "dynamics" })
+        .addNote(0, "G4", "2n")
         .endRow()
 
         .addMeasure()
