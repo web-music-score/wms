@@ -344,7 +344,7 @@ export class MEnding extends MusicInterface {
 /** DrawSymbol object. */
 export class MSymbol extends MusicInterface {
     /** Object name. */
-    static readonly Name: string = "DrawSymbol";
+    static readonly Name: string = "Symbol";
 
     /** @internal */
     constructor(protected readonly obj: ObjSymbol) {

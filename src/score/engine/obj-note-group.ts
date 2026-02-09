@@ -14,6 +14,7 @@ import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
 import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 import { ScoreError } from "./error-utils";
+import { ObjSymbol } from "./obj-symbol";
 
 function getArpeggio(a: boolean | ArpeggioValue | undefined): Arpeggio | undefined {
     return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -36,8 +37,7 @@ function sortNotesAndStrings(notes: ReadonlyArray<Note>, strings?: StringNumber 
 
 export class ObjStaffNoteGroup extends MusicObject {
     public noteHeadRects: AnchoredRect[] = [];
-    public articulations: { drawSymbol: DrawSymbol, rect: AnchoredRect }[] = [];
-    public dotRects: AnchoredRect[] = [];
+    public symbols: ObjSymbol[] = [];
     public accidentals: ObjAccidental[] = [];
     public stemTip?: AnchoredRect;
     public stemBase?: AnchoredRect;
@@ -73,6 +73,13 @@ export class ObjStaffNoteGroup extends MusicObject {
             }
         }
 
+        for (let i = 0; i < this.symbols.length; i++) {
+            let arr = this.symbols[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
         return [this];
     }
 
@@ -81,8 +88,7 @@ export class ObjStaffNoteGroup extends MusicObject {
         this.noteHeadRects.forEach(r => this.rect.unionInPlace(r));
         if (this.stemTip) this.rect.unionInPlace(this.stemTip);
         if (this.stemBase) this.rect.unionInPlace(this.stemBase);
-        this.articulations.forEach(ar => this.rect.unionInPlace(ar.rect));
-        this.dotRects.forEach(r => this.rect.unionInPlace(r));
+        this.symbols.forEach(s => this.rect.unionInPlace(s.getRect()));
         this.flagRects.forEach(r => this.rect.unionInPlace(r));
         this.accidentals.forEach(a => this.rect.unionInPlace(a.getRect()));
     }
@@ -102,8 +108,7 @@ export class ObjStaffNoteGroup extends MusicObject {
 
     offset(dx: number, dy: number) {
         this.noteHeadRects.forEach(n => n.offsetInPlace(dx, dy));
-        this.articulations.forEach(ar => ar.rect.offsetInPlace(dx, dy));
-        this.dotRects.forEach(n => n.offsetInPlace(dx, dy));
+        this.symbols.forEach(s => s.offset(dx, dy));
         this.accidentals.forEach(n => n.offset(dx, dy));
         this.stemTip?.offsetInPlace(dx, dy);
         this.stemBase?.offsetInPlace(dx, dy);
@@ -657,11 +662,13 @@ export class ObjNoteGroup extends MusicObject {
 
                 // Add dots
                 for (let i = 0; i < dotCount; i++) {
-                    let dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotRect.width / 2 + i * dotRect.width * 1.5;
-                    let dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
-                    let r = dotRect.offsetCopy(dotX, dotY);
-                    obj.dotRects.push(r);
-                    noteStaff.addObject(r);
+                    const dotX = noteHeadRect.right + DocumentSettings.NoteDotSpace * unitSize + dotRect.width / 2 + i * dotRect.width * 1.5;
+                    const dotY = noteY + this.getDotVerticalDisplacement(staff, note.diatonicId, stemDir) * unitSize;
+                    const sym = new ObjSymbol(this, DrawSymbol.Dot, false, false, this.color);
+                    sym.layout(view);
+                    sym.offset(dotX, dotY);
+                    obj.symbols.push(sym);
+                    noteStaff.addObject(sym);
                 }
 
                 // Add articulations
@@ -671,12 +678,12 @@ export class ObjNoteGroup extends MusicObject {
                     let arY = noteY + (isNoteOnLine ? 3 : 2) * unitSize * dy;
 
                     this.articulations.forEach((kind, kindId) => {
-                        let drawSymbol = getNoteArticulationDrawSymbol(kind);
-                        let rect = view.getSymbolRect(drawSymbol).offsetCopy(arX, arY);
-
-                        obj.articulations.push({ drawSymbol, rect });
-                        stemBaseStaff.addObject(rect);
-
+                        const drawSym = getNoteArticulationDrawSymbol(kind);
+                        const sym = new ObjSymbol(this, drawSym, false, false, this.color);
+                        sym.layout(view);
+                        sym.offset(arX, arY);
+                        obj.symbols.push(sym);
+                        stemBaseStaff.addObject(sym);
                         arY += unitSize * 2 * dy;
                     });
                 }
@@ -795,6 +802,9 @@ export class ObjNoteGroup extends MusicObject {
             // Draw accidentals
             obj.accidentals.forEach(d => d.draw(view, clipRect));
 
+            // Draw symbols
+            obj.symbols.forEach(s => s.draw(view, clipRect));
+
             view.color(this.color);
             view.lineWidth(1);
 
@@ -813,12 +823,6 @@ export class ObjNoteGroup extends MusicObject {
                         view.drawSymbol(DrawSymbol.NoteHeadStroked, r);
                 }
             });
-
-            // Draw articulations
-            obj.articulations.forEach(ar => view.drawSymbol(ar.drawSymbol, ar.rect));
-
-            // Draw dots
-            obj.dotRects.forEach(r => view.drawSymbol(DrawSymbol.Dot, r));
 
             // Draw stem
             if (obj.stemTip && obj.stemBase) {

@@ -1,7 +1,7 @@
 import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { colorKey, MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBeamGroup } from "./obj-beam-group";
@@ -9,10 +9,11 @@ import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ScoreError } from "./error-utils";
+import { ObjSymbol } from "./obj-symbol";
 
 export class ObjStaffRest extends MusicObject {
     public restRect = new AnchoredRect();
-    public dotRects: AnchoredRect[] = [];
+    public symbols: ObjSymbol[] = [];
 
     readonly mi: MStaffRest;
 
@@ -29,19 +30,30 @@ export class ObjStaffRest extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
-        return this.getRect().contains(x, y) ? [this] : [];
+        if (!this.getRect().contains(x, y)) {
+            return [];
+        }
+
+        for (let i = 0; i < this.symbols.length; i++) {
+            let arr = this.symbols[i].pick(x, y);
+            if (arr.length > 0) {
+                return [this, ...arr];
+            }
+        }
+
+        return [this];
     }
 
     offset(dx: number, dy: number) {
         this.restRect.offsetInPlace(dx, dy);
-        this.dotRects.forEach(r => r.offsetInPlace(dx, dy));
+        this.symbols.forEach(s => s.offset(dx, dy));
         this.requestRectUpdate();
         this.rest.requestRectUpdate();
     }
 
     updateRect() {
         this.rect = this.restRect.clone();
-        this.dotRects.forEach(r => this.rect.unionInPlace(r));
+        this.symbols.forEach(s => this.rect.unionInPlace(s.getRect()));
     }
 }
 
@@ -261,12 +273,12 @@ export class ObjRest extends MusicObject {
             obj.restRect = view.getRestRect(noteSize);
 
             for (let i = 0; i < dotCount; i++) {
-                let dotWidth = DocumentSettings.DotSize * unitSize;
-
-                let dotX = obj.restRect.rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
-                let dotY = this.getRestDotVerticalDisplacement(noteSize) * unitSize;
-
-                obj.dotRects.push(AnchoredRect.createCentered(dotX, dotY, dotWidth, dotWidth));
+                const dotX = obj.restRect.rightw + (DocumentSettings.RestDotSpace + DocumentSettings.DotSize * unitSize) + i * DocumentSettings.DotSize * unitSize * 1.5;
+                const dotY = this.getRestDotVerticalDisplacement(noteSize) * unitSize;
+                const sym = new ObjSymbol(this, DrawSymbol.Dot, false, false, this.color);
+                sym.layout(view);
+                sym.offset(dotX, dotY);
+                obj.symbols.push(sym);
             }
 
             obj.setAnchor(0, staff.getDiatonicIdY(diatonicId));
@@ -310,11 +322,9 @@ export class ObjRest extends MusicObject {
         view.color(this.color).lineWidth(1);
 
         this.staffObjects.forEach(obj => {
-            let { dotRects, restRect } = obj;
-
+            let { symbols, restRect } = obj;
             view.drawRest(noteSize, restRect.anchorX, restRect.anchorY);
-
-            dotRects.forEach(r => view.fillCircle(r.anchorX, r.anchorY, r.width / 2));
+            symbols.forEach(s => s.draw(view));
         });
     }
 }
