@@ -232,7 +232,7 @@ export type NoteOptions = {
     color?: string,
     /** Arepggio direction for chords. true = "up". */
     arpeggio?: boolean | ArpeggioValue,
-    /** @deprecated Use addAnnotation("stacato") instead. */
+    /** Add staccato dot. */
     staccato?: boolean,
     /** Use diamond shaped note head. */
     diamond?: boolean,
