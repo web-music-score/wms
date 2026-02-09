@@ -501,12 +501,11 @@ export class PlayerEngine {
             timeoutSeconds = getDuration(col.getTicksToNextColumn() + fermataHoldTicks, tempo);
         }
 
-        this.playTimer = _setTimeout(() => this.playStep(), timeoutSeconds * 1000);
-
-        // Next pos
-        this.playPos = this.getNextPlayPosition(this.playPos);
-
-        this.notifyPlayStateChanged();
+        this.playTimer = _setTimeout(() => {
+            this.playPos = this.getNextPlayPos();
+            this.notifyPlayStateChanged();
+            this.playStep();
+        }, timeoutSeconds * 1000);
     }
 
     play() {
@@ -542,38 +541,39 @@ export class PlayerEngine {
     }
 
     pause() {
-        // To pause, only stop timer
+        // To pause, stop timer
         if (this.playTimer) {
             _clearTimeout(this.playTimer);
             this.playTimer = undefined;
         }
 
         this.notifyCursorPositionChanged();
-
         this.notifyPlayStateChanged();
+
+        // Set playback to continue from next position.
+        this.playPos = this.getNextPlayPos();
     }
 
     stop() {
-        // To stop playing, set playPos to undefined...
-        this.playPos = undefined;
-
-        // ...and stop timer
+        // Stop timer
         if (this.playTimer) {
             _clearTimeout(this.playTimer);
             this.playTimer = undefined;
         }
 
-        this.notifyCursorPositionChanged();
+        // Set playPos to undefined.
+        this.playPos = undefined;
 
+        this.notifyCursorPositionChanged();
         this.notifyPlayStateChanged();
     }
 
-    private getNextPlayPosition(curPlayPos: number | undefined): number | undefined {
-        if (this.playPos !== undefined && ++this.playPos >= this.playerColumnSequence.length) {
-            this.playPos = undefined;
-        }
-
-        return this.playPos;
+    private getNextPlayPos() {
+        if (this.playPos === undefined) return undefined;
+        const nextPlayPos = this.playPos + 1;
+        if (nextPlayPos >= this.playerColumnSequence.length)
+            return undefined;
+        return nextPlayPos;
     }
 
     getPlayState(): PlayState {
