@@ -3,6 +3,7 @@
 ### Fixed
 - Time signature in tab had staff's color.
 - Typo MusicErrorType.Timesignature => MusicErrorType.TimeSignature.
+- Set play state to Stopped after last note stopped playing (was when last note started playing).
 
 ## [6.3.7] - 2026-02-05
 ### Fixed
