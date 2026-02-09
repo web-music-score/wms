@@ -518,6 +518,7 @@ export class PlayerEngine {
         else if (this.playState === PlayState.Paused) {
             // Continue by playing next step
             this.playStep();
+            this.notifyPlayStateChanged();
             return;
         }
 
