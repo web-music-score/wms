@@ -8,7 +8,7 @@ export const DocumentSettings = {
     MinStaffWidth: 75,
 
     MinColumnsWidth: 10,
-    ColumnWidthScale: 1.7,
+    ColumnWidthScale: 1.5,
 
     PostMeasureBreakWidth: 10,
 
