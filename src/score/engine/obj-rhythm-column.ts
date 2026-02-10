@@ -318,6 +318,12 @@ export class ObjRhythmColumn extends MusicObject {
         return playerNotes;
     }
 
+    getIdealMinWidth(view: View) {
+        const noteSizes = this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize);
+        const maxNoteSize = Math.min(8, Math.max(1, ...noteSizes));
+        return Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * DocumentSettings.ColumnWidthScale * view.unitSize;
+    }
+
     requestLayout() {
         if (!this.needLayout) {
             this.needLayout = true;
@@ -335,8 +341,11 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect = new AnchoredRect();
         this.requestRectUpdate();
 
-        let leftw = 0;
-        let rightw = 0;
+        // Calculate min column width
+        let leftw = this.getIdealMinWidth(view) / 2;
+        let rightw = leftw;
+
+        let arpeggioLeft = 0, arpeggioRight = 0;
 
         // Layout voice symbols
         this.voiceSymbol.forEach(symbol => {
@@ -346,6 +355,7 @@ export class ObjRhythmColumn extends MusicObject {
 
             leftw = Math.max(leftw, r.leftw);
             rightw = Math.max(rightw, r.rightw);
+            arpeggioLeft = arpeggioRight = -r.leftw - view.unitSize * 1.25;
         });
 
         if (this.arpeggioDir !== undefined) {
@@ -353,29 +363,18 @@ export class ObjRhythmColumn extends MusicObject {
             this.arpeggios.forEach(a => a.layout(view));
             const arpeggioWidth = this.arpeggios
                 .map(a => a.getRect().width)
-                .reduce((accState, cur) => Math.max(accState, cur))
-                + view.unitSize; // Add space
+                .reduce((accState, cur) => Math.max(accState, cur), 0);
             this.arpeggios.forEach(a => {
-                a.setAnchor(-leftw - arpeggioWidth / 2, a.line.getRect().anchorY);
+                a.setAnchor(arpeggioRight - arpeggioWidth / 2, a.line.getRect().anchorY);
+                arpeggioLeft = Math.min(arpeggioLeft, a.getRect().left);
                 a.line.addObject(a);
                 this.measure.addStaticObject(a.line, a);
             });
-            leftw += arpeggioWidth;
+            leftw = -arpeggioLeft;
         }
         else {
             this.arpeggios = [];
         }
-
-        // Calculate min column width
-        const noteSizes = this.voiceSymbol.mapToArray(s => s.rhythmProps.noteSize);
-        const maxNoteSize = Math.min(8, Math.max(1, ...noteSizes));
-        const MinColumnWidth = Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * view.unitSize * 0.75;
-
-        leftw = Math.max(leftw, MinColumnWidth / 2);
-        rightw = Math.max(rightw, MinColumnWidth / 2);
-
-        leftw *= DocumentSettings.ColumnWidthScale;
-        rightw *= DocumentSettings.ColumnWidthScale;
 
         this.rect.left = -leftw;
         this.rect.anchorX = 0;
