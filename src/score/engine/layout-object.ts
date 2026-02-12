@@ -29,19 +29,19 @@ export enum LayoutGroupId {
     LyricsVerse3
 }
 
-const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { reserveSpace?: boolean, rowAlign?: boolean, padding?: number }>([
+const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { rowAlign?: boolean, padding?: number }>([
     [LayoutGroupId.TabRhythm, { rowAlign: true }],
-    [LayoutGroupId.Annotation_Fermata, { reserveSpace: true, padding: 1 }],
-    [LayoutGroupId.Annotation_PitchLabel, { reserveSpace: true }],
+    [LayoutGroupId.Annotation_Fermata, { padding: 1 }],
+    [LayoutGroupId.Annotation_PitchLabel, {}],
     [LayoutGroupId.Annotation_Navigation, { rowAlign: true }],
     [LayoutGroupId.Annotation_Ending, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.Annotation_Tempo, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.Annotation_Dynamic, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.Annotation_Misc, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_ChordLabel, { reserveSpace: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse1, { reserveSpace: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse2, { reserveSpace: true, rowAlign: true }],
-    [LayoutGroupId.LyricsVerse3, { reserveSpace: true, rowAlign: true }],
+    [LayoutGroupId.Annotation_ChordLabel, { rowAlign: true }],
+    [LayoutGroupId.LyricsVerse1, { rowAlign: true }],
+    [LayoutGroupId.LyricsVerse2, { rowAlign: true }],
+    [LayoutGroupId.LyricsVerse3, { rowAlign: true }],
 ]);
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
@@ -156,12 +156,10 @@ export class LayoutGroup {
     private readonly layoutObject = asMulti(new IndexArray<LayoutObjectWrapper[]>());
 
     readonly rowAlign: boolean
-    readonly reserveSpace: boolean;
     readonly padding: number;
 
     constructor(readonly layoutGroupId: number) {
         this.rowAlign = LayoutGroupIdAttrs.get(layoutGroupId)?.rowAlign === true;
-        this.reserveSpace = LayoutGroupIdAttrs.get(layoutGroupId)?.reserveSpace === true;
         this.padding = LayoutGroupIdAttrs.get(layoutGroupId)?.padding ?? 0;
     }
 
