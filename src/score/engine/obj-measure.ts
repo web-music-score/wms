@@ -1487,8 +1487,9 @@ export class ObjMeasure extends MusicObject {
         const flexRectsWidth = Utils.Math.sum(flexRects.map(r => r.width));
 
         let widthLeft = Math.max(columnsWidth - flexRectsWidth, 0);
+        const threshold = widthLeft / 100; // 1% threshold
         let loopTimes = this.columns.length * 10;
-        while (widthLeft > 0 && --loopTimes >= 0 && this.columns.length > 0) {
+        while (widthLeft > threshold && --loopTimes >= 0 && this.columns.length > 0) {
             const colExtraValue = this.columns.map((_, i) => {
                 const left = Math.max(0, flexRects[i].leftw - minRects[i].leftw);
                 const right = Math.max(0, flexRects[i].rightw - minRects[i].rightw);
