@@ -9,11 +9,10 @@ import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { PlayerColumnProps } from "./player-engine";
 import { DocumentSettings } from "./settings";
-import { MusicError, MusicErrorType } from "web-music-score/core";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
-import { IndexArray, UniMap, TriMap, AnchoredRect } from "@tspro/ts-utils-lib";
+import { IndexArray, UniMap, TriMap, AnchoredRect, Assert } from "@tspro/ts-utils-lib";
 
 export type ScorePlayerNote = {
     note: Note,
@@ -42,6 +41,7 @@ export class ObjRhythmColumn extends MusicObject {
     private needLayout = true;
 
     private shapeRects: AnchoredRect[] = [];
+    private rectWithObjects = new AnchoredRect();
 
     readonly mi: MRhythmColumn;
 
@@ -61,37 +61,26 @@ export class ObjRhythmColumn extends MusicObject {
         return this.playerProps;
     }
 
-    /**
-     * Get next column in column's measure.
-     * @returns 
-     */
+    /** Get next column in column's measure. */
     getNextColumnInMeasure(): ObjRhythmColumn | undefined {
         let colId = this.measure.getColumns().indexOf(this);
+        Assert.isIntegerGte(colId, 0);
+        return this.measure.getColumn(colId + 1);
+    }
 
-        if (colId >= 0 && colId < this.measure.getColumnCount()) {
-            // Next column in measure or undefined
-            return this.measure.getColumn(colId + 1);
-        }
-        else {
-            throw new MusicError(MusicErrorType.Score, "Cannot get next column in measure because current column's id in mesure is invalid.");
-        }
+    /** Get next column in column's measure. */
+    getPrevColumnInMeasure(): ObjRhythmColumn | undefined {
+        let colId = this.measure.getColumns().indexOf(this);
+        Assert.isIntegerGte(colId, 0);
+        return this.measure.getColumn(colId - 1);
     }
 
     /**
      * Get next column. Goes into next measure if necessary.
      * Does not care navigation elements: repeats, endings, etc.
-     * @returns 
      */
     getNextColumn(): ObjRhythmColumn | undefined {
-        let nextCol = this.getNextColumnInMeasure();
-
-        if (nextCol) {
-            return nextCol;
-        }
-        else {
-            // Goto next measure
-            return this.measure.getNextMeasure()?.getColumn(0);
-        }
+        return this.getNextColumnInMeasure() ?? this.measure.getNextMeasure()?.getColumn(0);
     }
 
     getTicksToNextColumn(): number {
@@ -324,6 +313,10 @@ export class ObjRhythmColumn extends MusicObject {
         return Math.ceil(8 / maxNoteSize) * DocumentSettings.NoteHeadWidth * DocumentSettings.ColumnWidthScale * view.unitSize;
     }
 
+    getRectWithObjects(): AnchoredRect {
+        return this.rectWithObjects;
+    }
+
     requestLayout() {
         if (!this.needLayout) {
             this.needLayout = true;
@@ -381,6 +374,31 @@ export class ObjRhythmColumn extends MusicObject {
         this.rect.right = rightw;
         this.requestRectUpdate();
 
+        // Calculate rect with intersecting objects.
+        this.rectWithObjects = this.getRect().clone();
+        const extraSpace = view.unitSize / 2;
+
+        this.getAnchoredLayoutObjects().forEach(obj => {
+            const prevCol = this.getPrevColumnInMeasure();
+            if (prevCol) {
+                prevCol.getAnchoredLayoutObjects().forEach(prevObj => {
+                    if (prevObj.getRect().intersects(obj.getRect())) {
+                        this.rectWithObjects.left = Math.min(this.rectWithObjects.left, obj.getRect().left - extraSpace);
+                        this.requestRectUpdate();
+                    }
+                });
+            }
+            const nextCol = this.getNextColumnInMeasure();
+            if (nextCol) {
+                nextCol.getAnchoredLayoutObjects().forEach(nextObj => {
+                    if (nextObj.getRect().intersects(obj.getRect())) {
+                        this.rectWithObjects.right = Math.max(this.rectWithObjects.right, obj.getRect().right + extraSpace);
+                        this.requestRectUpdate();
+                    }
+                });
+            }
+        });
+
         // Update accidental states
         this.voiceSymbol.forEach(symbol => symbol.updateAccidentalState(accState));
 
@@ -415,48 +433,6 @@ export class ObjRhythmColumn extends MusicObject {
             }
             else {
                 this.staffMaxDiatonicId.delete(staff);
-            }
-        });
-    }
-
-    layoutReserveSpace(view: View) {
-        // Some layout objects need to reserve space so they do not overlap with neighbors.
-        const columns = this.measure.getColumns();
-
-        const extraSpace = view.unitSize;
-
-        this.getAnchoredLayoutObjects().forEach(obj => {
-            if (obj.layoutGroup.reserveSpace) {
-                const i = columns.indexOf(this);
-                if (i < 0) return;
-
-                const leftOverflow = obj.getRect().leftw - this.getRect().leftw;
-                if (leftOverflow > 0) {
-                    const prevCol = columns[i - 1] as ObjRhythmColumn | undefined;
-                    if (prevCol) {
-                        prevCol.getAnchoredLayoutObjects().forEach(prevObj => {
-                            if (prevObj.layoutGroupId === obj.layoutGroupId) {
-                                const rightOverflow = prevObj.getRect().rightw - prevCol.getRect().rightw;
-                                this.rect.left -= Math.max(rightOverflow + leftOverflow, 0) + extraSpace;
-                                this.requestRectUpdate();
-                            }
-                        });
-                    }
-                }
-
-                const rightOverflow = obj.getRect().rightw - this.getRect().rightw;
-                if (rightOverflow > 0) {
-                    const nextCol = columns[i + 1] as ObjRhythmColumn | undefined;
-                    if (nextCol) {
-                        nextCol.getAnchoredLayoutObjects().forEach(nextObj => {
-                            if (nextObj.layoutGroupId === obj.layoutGroupId) {
-                                const leftOverflow = nextObj.getRect().leftw - nextCol.getRect().leftw;
-                                this.rect.right += Math.max(rightOverflow + leftOverflow, 0) + extraSpace;
-                                this.requestRectUpdate();
-                            }
-                        });
-                    }
-                }
             }
         });
     }

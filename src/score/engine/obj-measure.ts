@@ -1504,9 +1504,6 @@ export class ObjMeasure extends MusicObject {
         const accState = new AccidentalState(this);
         this.columns.forEach(col => col.layout(view, accState));
 
-        // Some layout objects need to reserve space so they do not overlap with neighbors.
-        this.columns.forEach(col => col.layoutReserveSpace(view));
-
         // Layout measure end object
         this.barLineRight.layout(view);
 
@@ -1525,7 +1522,9 @@ export class ObjMeasure extends MusicObject {
 
         this.regions.columnsMin_4 = Math.max(
             DocumentSettings.MinColumnsWidth * unitSize,
-            this.columns.map(col => col.getRect().width).reduce((acc, cur) => (acc + cur), 0)
+            this.columns
+                .map(col => col.getRectWithObjects().width)
+                .reduce((acc, cur) => (acc + cur), 0)
         );
 
         this.regions.padding_5 = padding;
@@ -1561,19 +1560,49 @@ export class ObjMeasure extends MusicObject {
             this.endRepeatPlayCountText.setBottom(this.barLineRight.getRect().top);
         }
 
-        let columnsLeft = this.rect.left + this.regions.leftSolid;
-        let columnsRight = this.rect.right - this.regions.rightSolid;
-        let columnsWidth = columnsRight - columnsLeft;
-        let columnsMinWidth = this.regions.columnsMin;
+        // --- Spread and compute column positions in a flexible way ---
+        const columnsLeft = this.rect.left + this.regions.leftSolid;
+        const columnsRight = this.rect.right - this.regions.rightSolid;
+        const columnsWidth = columnsRight - columnsLeft;
 
-        let columnScale = columnsWidth / columnsMinWidth;
-        let curColumnLeft = columnsLeft;
+        const minRects = this.columns.map(col => col.getRect());
+        const flexRects = this.columns.map(col => col.getRectWithObjects().clone());
+        const flexRectsWidth = Utils.Math.sum(flexRects.map(r => r.width));
 
-        this.columns.forEach(col => {
-            let rect = col.getRect();
-            let columnAnchorX = curColumnLeft + rect.leftw * columnScale;
-            col.setAnchor(columnAnchorX, this.rect.anchorY);
-            curColumnLeft += rect.width * columnScale;
+        let widthLeft = Math.max(columnsWidth - flexRectsWidth, 0);
+        let loopTimes = this.columns.length * 10;
+        while (widthLeft > 0 && --loopTimes >= 0 && this.columns.length > 0) {
+            const colExtraValue = this.columns.map((_, i) => {
+                const left = Math.max(0, flexRects[i].leftw - minRects[i].leftw);
+                const right = Math.max(0, flexRects[i].rightw - minRects[i].rightw);
+                return +(left + right).toFixed(3);
+            });
+
+            const extraValueSet = Utils.Arr.removeDuplicates(colExtraValue).sort();
+            const addToMinValueMax = widthLeft / colExtraValue.reduce((prev, cur) => cur === extraValueSet[0] ? (prev + 1) : prev, 0);
+            const addToMinValue = Math.min(addToMinValueMax, (extraValueSet[1] ?? Infinity) - extraValueSet[0]);
+
+            if (Guard.isFinite(addToMinValue)) {
+                flexRects.forEach((rect, i) => {
+                    if (colExtraValue[i] === extraValueSet[0]) {
+                        rect.left -= addToMinValue / 2;
+                        rect.right += addToMinValue / 2;
+                        widthLeft -= addToMinValue;
+                    }
+                });
+            }
+            else {
+                // emergency exit
+                break;
+            }
+        }
+
+        // Set columns x-positions with computed rects.
+        let curLeft = columnsLeft;
+        flexRects.forEach((rect, i) => {
+            rect.offsetInPlace(curLeft - rect.left, 0);
+            this.columns[i].setAnchorX(rect.anchorX);
+            curLeft = rect.right;
         });
 
         // Reposition lonely rest in the middle of measure.
