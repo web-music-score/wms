@@ -2,7 +2,7 @@
 ## [6.4.0-pre.7] - Unreleased
 ### Fixed
 - Set play state to Stopped after last note stopped playing (was when last note started playing).
-- Improved way to compute and spread rhythm columns in measures.
+- Improved way to compute and spread rhythm columns in measures. Fixes unevenly spaced columns.
 
 ## [6.4.0-pre.6] - 2026-02-08
 ### Added
