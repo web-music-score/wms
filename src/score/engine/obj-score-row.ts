@@ -346,7 +346,7 @@ export class ObjScoreRow extends MusicObject {
         let minColumnsAreaWidth = 0;
 
         this.measures.forEach(m => {
-            targetColumnsAreaWidth -= (m.getTotalSolidWidth() + m.getPostMeasureBreakWidth());
+            targetColumnsAreaWidth -= (m.getTotalStaticWidth() + m.getPostMeasureBreakWidth());
             minColumnsAreaWidth += m.getMinColumnsWidth();
         });
 
@@ -355,7 +355,7 @@ export class ObjScoreRow extends MusicObject {
         let x = this.regions.staffLeft;
 
         this.measures.forEach(m => {
-            let newMeasureWidth = m.getTotalSolidWidth() + m.getMinColumnsWidth() * columnsAreaScale;
+            let newMeasureWidth = m.getTotalStaticWidth() + m.getMinColumnsWidth() * columnsAreaScale;
             m.layoutWidth(view, newMeasureWidth);
             let r = m.getRect();
             m.setLeft(x);
