@@ -82,19 +82,6 @@ function getVerseLayoutGroupId(verse: Pub.VerseNumber): LayoutGroupId {
     }
 }
 
-class MeasureRegions {
-    tabTuning_0 = 0;
-    signature_1 = 0;
-    leftBarLine_2 = 0;
-    padding_3 = 0;
-    columnsMin_4 = 0;
-    padding_5 = 0;
-    rightBarLine_6 = 0;
-    get leftSolid() { return this.tabTuning_0 + this.signature_1 + this.leftBarLine_2 + this.padding_3; }
-    get columnsMin() { return this.columnsMin_4; }
-    get rightSolid() { return this.padding_5 + this.rightBarLine_6; }
-}
-
 export class ObjMeasure extends MusicObject {
     private prevMeasure: ObjMeasure | undefined;
     private nextMeasure: ObjMeasure | undefined;
@@ -117,7 +104,13 @@ export class ObjMeasure extends MusicObject {
 
     private measureId: number;
 
-    private regions = new MeasureRegions();
+    private region_0_tabTuning = 0;
+    private region_1_signature = 0;
+    private region_2_leftBarLine = 0;
+    private region_3_padding = 0;
+    private region_4_columnsMin = 0;
+    private region_5_padding = 0;
+    private region_6_rightBarLine = 0;
 
     private needLayout = true;
 
@@ -965,24 +958,24 @@ export class ObjMeasure extends MusicObject {
             this.getRect().bottom);
     }
 
-    getLeftSolidWidth() {
-        return this.regions.leftSolid;
+    getLeftStaticWidth() {
+        return this.region_0_tabTuning + this.region_1_signature + this.region_2_leftBarLine + this.region_3_padding;
     }
 
     getMinColumnsWidth() {
-        return this.regions.columnsMin;
+        return this.region_4_columnsMin;
     }
 
-    getRightSolidWidth() {
-        return this.regions.rightSolid;
+    getRightStaticWidth() {
+        return this.region_5_padding + this.region_6_rightBarLine;
     }
 
-    getTotalSolidWidth() {
-        return this.getLeftSolidWidth() + this.getRightSolidWidth();
+    getTotalStaticWidth() {
+        return this.getLeftStaticWidth() + this.getRightStaticWidth();
     }
 
     getMinWidth() {
-        return this.getLeftSolidWidth() + this.getMinColumnsWidth() + this.getRightSolidWidth();
+        return this.getLeftStaticWidth() + this.getMinColumnsWidth() + this.getRightStaticWidth();
     }
 
     getStaffLineLeft() {
@@ -992,7 +985,7 @@ export class ObjMeasure extends MusicObject {
             return prev.getStaffLineRight();
         }
         else {
-            return this.getRect().left + this.regions.tabTuning_0;
+            return this.getRect().left + this.region_0_tabTuning;
         }
     }
 
@@ -1311,7 +1304,7 @@ export class ObjMeasure extends MusicObject {
         let isFirstMeasureInRow = this.isFirstMeasureInRow();
         let isAfterMeasureBreak = this.getPrevMeasure()?.hasPostMeasureBreak() === true;
 
-        this.regions.tabTuning_0 = isFirstMeasureInRow && this.row.hasTab ? unitSize * 4 : 0;
+        this.region_0_tabTuning = isFirstMeasureInRow && this.row.hasTab ? unitSize * 4 : 0;
 
         let showClef = isFirstMeasureInRow || isAfterMeasureBreak;
         let showMeasureNumber = this.options.showNumber === false ? false : (this.options.showNumber === true || isFirstMeasureInRow && !this.row.isFirstRow());
@@ -1405,7 +1398,7 @@ export class ObjMeasure extends MusicObject {
                     let obj = new ObjText(this, { text: note, scale: 0.8, color: Pub.colorKey("tab.tuning") }, 1, 0.5);
 
                     obj.layout(view);
-                    obj.setRight(this.regions.tabTuning_0 * 0.8);
+                    obj.setRight(this.region_0_tabTuning * 0.8);
                     obj.setCenterY(tab.getStringY(stringId));
 
                     this.tabStringNotes.push(obj);
@@ -1433,19 +1426,19 @@ export class ObjMeasure extends MusicObject {
 
         // Calculated region widths
         // this.regions.tabTuning_0 was already set above
-        this.regions.signature_1 = Math.max(0, ...this.signatures.map(signature => signature.getRect().width));
-        this.regions.leftBarLine_2 = this.barLineLeft.getRect().width;
-        this.regions.padding_3 = padding;
+        this.region_1_signature = Math.max(0, ...this.signatures.map(signature => signature.getRect().width));
+        this.region_2_leftBarLine = this.barLineLeft.getRect().width;
+        this.region_3_padding = padding;
 
-        this.regions.columnsMin_4 = Math.max(
+        this.region_4_columnsMin = Math.max(
             DocumentSettings.MinColumnsWidth * unitSize,
             this.columns
                 .map(col => col.getRectWithObjects().width)
                 .reduce((acc, cur) => (acc + cur), 0)
         );
 
-        this.regions.padding_5 = padding;
-        this.regions.rightBarLine_6 = this.barLineRight.getRect().width;
+        this.region_5_padding = padding;
+        this.region_6_rightBarLine = this.barLineRight.getRect().width;
     }
 
     layoutWidth(view: View, width: number) {
@@ -1460,13 +1453,13 @@ export class ObjMeasure extends MusicObject {
         this.rect.right = this.rect.left + width;
 
         this.signatures.forEach(signature => {
-            signature.setLeft(this.rect.left + this.regions.tabTuning_0);
+            signature.setLeft(this.rect.left + this.region_0_tabTuning);
             signature.setAnchorY(this.rect.anchorY);
         });
 
         let signaturesWidth = Math.max(0, ...this.signatures.map(signature => signature.getRect().width));
 
-        this.barLineLeft.setLeft(this.rect.left + this.regions.tabTuning_0 + signaturesWidth);
+        this.barLineLeft.setLeft(this.rect.left + this.region_0_tabTuning + signaturesWidth);
         this.barLineLeft.setAnchorY(this.rect.anchorY);
 
         this.barLineRight.setRight(this.rect.right);
@@ -1478,8 +1471,8 @@ export class ObjMeasure extends MusicObject {
         }
 
         // --- Spread and compute column positions in a flexible way ---
-        const columnsLeft = this.rect.left + this.regions.leftSolid;
-        const columnsRight = this.rect.right - this.regions.rightSolid;
+        const columnsLeft = this.rect.left + this.getLeftStaticWidth();
+        const columnsRight = this.rect.right - this.getRightStaticWidth();
         const columnsWidth = columnsRight - columnsLeft;
 
         const minRects = this.columns.map(col => col.getRect());
