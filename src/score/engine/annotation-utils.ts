@@ -251,10 +251,10 @@ export function isNoteArticulation(kind: AnnotationKind) {
     return NoteArticulationOrder.includes(kind);
 }
 
-export function sortNoteArticulations(articulations: AnnotationKind[]): AnnotationKind[] {
+export function sortNoteArticulations(articulations: { kind: AnnotationKind, color?: string }[]): { kind: AnnotationKind, color?: string }[] {
     return articulations.slice().sort((a, b) => {
-        let ao = NoteArticulationOrder.indexOf(a); if (ao < 0) ao = Infinity;
-        let bo = NoteArticulationOrder.indexOf(b); if (bo < 0) bo = Infinity;
+        let ao = NoteArticulationOrder.indexOf(a.kind); if (ao < 0) ao = Infinity;
+        let bo = NoteArticulationOrder.indexOf(b.kind); if (bo < 0) bo = Infinity;
         return ao - bo;
     });
 }

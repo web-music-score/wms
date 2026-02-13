@@ -2,7 +2,7 @@ import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
-import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind, ArpeggioValue } from "../pub";
+import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind, ArpeggioValue, AnnotationGroup } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -12,7 +12,7 @@ import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
-import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
+import { getAnnotationColor, getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 import { ScoreError } from "./error-utils";
 import { ObjSymbol } from "./obj-symbol";
 
@@ -166,7 +166,7 @@ export class ObjNoteGroup extends MusicObject {
     readonly oldStyleTriplet: boolean;
     readonly rhythmProps: RhythmProps;
 
-    private articulations: AnnotationKind[] = [];
+    private articulations: { kind: AnnotationKind, color?: string }[] = [];
 
     private startConnnectives: ConnectiveProps[] = [];
     private runningConnectives: ConnectiveProps[] = [];
@@ -207,7 +207,7 @@ export class ObjNoteGroup extends MusicObject {
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
 
-        if (options?.staccato) this.articulations = [AnnotationKind.staccato];
+        if (options?.staccato) this.articulations = [{ kind: AnnotationKind.staccato, color: options?.color }];
 
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
@@ -230,7 +230,7 @@ export class ObjNoteGroup extends MusicObject {
         return this.col.row;
     }
 
-    addNoteArticulation(kind: AnnotationKind) {
+    addNoteArticulation(kind: AnnotationKind, options: { color?: string }) {
         if (!isNoteArticulation(kind))
             return;
 
@@ -238,8 +238,8 @@ export class ObjNoteGroup extends MusicObject {
         if (kind === AnnotationKind.staccatissimo)
             kind = AnnotationKind.spiccato;
 
-        if (!this.articulations.includes(kind)) {
-            this.articulations.push(kind);
+        if (!this.articulations.find(a => a.kind === kind) !== undefined) {
+            this.articulations.push({ kind, color: options.color });
             this.articulations = sortNoteArticulations(this.articulations);
         }
     }
@@ -249,7 +249,7 @@ export class ObjNoteGroup extends MusicObject {
         if (kind === AnnotationKind.staccatissimo)
             kind = AnnotationKind.spiccato;
 
-        return this.articulations.includes(kind);
+        return this.articulations.find(ar => ar.kind === kind) !== undefined;
     }
 
     get minDiatonicId(): number {
@@ -677,9 +677,9 @@ export class ObjNoteGroup extends MusicObject {
                     let arX = noteX;
                     let arY = noteY + (isNoteOnLine ? 3 : 2) * unitSize * dy;
 
-                    this.articulations.forEach((kind, kindId) => {
-                        const drawSym = getNoteArticulationDrawSymbol(kind);
-                        const sym = new ObjSymbol(this, drawSym, false, false, this.color);
+                    this.articulations.forEach(ar => {
+                        const drawSym = getNoteArticulationDrawSymbol(ar.kind);
+                        const sym = new ObjSymbol(this, drawSym, false, false, ar.color ?? getAnnotationColor(staff, AnnotationGroup.Articulation, ar.kind));
                         sym.layout(view);
                         sym.offset(arX, arY);
                         obj.symbols.push(sym);

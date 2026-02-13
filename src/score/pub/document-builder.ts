@@ -125,7 +125,9 @@ function assertAnnotationOptions(annotationOptions: Types.AnnotationOptions) {
         (
             Guard.isUndefined(annotationOptions.endingPassages) || Guard.isIntegerGte(annotationOptions.endingPassages, 1) ||
             Guard.isArray(annotationOptions.endingPassages) && annotationOptions.endingPassages.every(p => Guard.isIntegerGte(p, 1))
-        )
+        ),
+        Guard.isNonEmptyStringOrUndefined(annotationOptions.labelText),
+        Guard.isStringOrUndefined(annotationOptions.color),
     );
 }
 

@@ -611,7 +611,7 @@ export class ObjMeasure extends MusicObject {
 
         if (isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
             if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup) {
-                this.lastAddedRhythmSymbol.addNoteArticulation(annotationKind as Pub.AnnotationKind);
+                this.lastAddedRhythmSymbol.addNoteArticulation(annotationKind as Pub.AnnotationKind, annotationOptions);
                 return;
             }
             else {
@@ -624,7 +624,9 @@ export class ObjMeasure extends MusicObject {
 
         let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
-        const getColor = (line: ObjNotationLine) => getAnnotationColor(line, annotationGroup, annotationKind);
+        const getColor = (line: ObjNotationLine) => (
+            annotationOptions.color ?? getAnnotationColor(line, annotationGroup, annotationKind)
+        );
 
         const colAnchor = this.lastAddedRhythmColumn;
 

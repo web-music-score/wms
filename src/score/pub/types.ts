@@ -604,6 +604,8 @@ export type AnnotationOptions = {
     endingPassages?: number | number[];
     /** Text for labels */
     labelText?: string;
+    /** Color */
+    color?: string;
 }
 
 /** Navigation annotations */
