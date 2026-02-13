@@ -1,5 +1,5 @@
 import { Note, getTempoString, KeySignature } from "web-music-score/theory";
-import { Clef, ColorKey, colorKey, MStaffSignature, MTabSignature } from "../pub";
+import { Clef, MStaffSignature, MTabSignature } from "../pub";
 import { MusicObject } from "./music-object";
 import { ImageAsset, View } from "./view";
 import { ObjImage } from "./obj-image";
@@ -43,7 +43,7 @@ export class ObjStaffSignature extends MusicObject {
     updateClefImage(view: View, showClef: boolean) {
         if (showClef) {
 
-            let color = colorKey("staff.signature.clef");
+            const color = this.doc.getColorWithKey("staff.signature.clef");
 
             let img = view.getImageAsset(this.staff.clefImageAsset, imgColor(color));
             this.clefImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
@@ -59,8 +59,8 @@ export class ObjStaffSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            let color = colorKey("staff.signature.measurenum");
-            let text = this.measure.getMeasureNumber().toString();
+            const color = this.doc.getColorWithKey("staff.signature.measurenum");
+            const text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
         else {
@@ -71,7 +71,7 @@ export class ObjStaffSignature extends MusicObject {
     updateKeySignature(showKeySignature: boolean) {
         if (showKeySignature) {
             let { measure } = this;
-            let color = colorKey("staff.signature.key");
+            const color = this.doc.getColorWithKey("staff.signature.key");
 
             let prevMeasure = measure.getPrevMeasure();
 
@@ -103,7 +103,7 @@ export class ObjStaffSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            let color: ColorKey = colorKey("staff.signature.time");
+            const color = this.doc.getColorWithKey("staff.signature.time");
 
             this.tsImage = this.beatCountText = this.beatSizeText = undefined;
 
@@ -134,8 +134,8 @@ export class ObjStaffSignature extends MusicObject {
 
     updateTempo(showTempo: boolean) {
         if (showTempo) {
-            let color = colorKey("staff.signature.tempo");
-            let text = getTempoString(this.measure.getTempo());
+            const color = this.doc.getColorWithKey("staff.signature.tempo");
+            const text = getTempoString(this.measure.getTempo());
             this.tempoText = new ObjText(this, { text, color }, 0.5, 1);
         }
         else {
@@ -429,8 +429,8 @@ export class ObjTabSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            let color = colorKey("tab.signature.measurenum");
-            let text = this.measure.getMeasureNumber().toString();
+            const color = this.doc.getColorWithKey("tab.signature.measurenum");
+            const text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
         else {
@@ -440,8 +440,8 @@ export class ObjTabSignature extends MusicObject {
 
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
-            let timeSignature = this.measure.getTimeSignature();
-            let color: ColorKey = colorKey("tab.signature.time");
+            const timeSignature = this.measure.getTimeSignature();
+            const color = this.doc.getColorWithKey("tab.signature.time");
 
             this.tsImage = this.beatCountText = this.beatSizeText = undefined;
 
@@ -473,8 +473,8 @@ export class ObjTabSignature extends MusicObject {
 
     updateTempo(showTempo: boolean) {
         if (showTempo) {
-            let color = colorKey("tab.signature.tempo");
-            let text = getTempoString(this.measure.getTempo());
+            const color = this.doc.getColorWithKey("tab.signature.tempo");
+            const text = getTempoString(this.measure.getTempo());
             this.tempoText = new ObjText(this, { text, color }, 0, 1);
         }
         else {

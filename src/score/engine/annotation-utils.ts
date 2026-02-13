@@ -59,8 +59,8 @@ export function getAnnotationDefaultVerticalPos(annotationGroup: AnnotationGroup
     return VerticalPos.Above;
 }
 
-export function getAnnotationColor(line: ObjNotationLine, annotationGroup: AnnotationGroup, annotationKind: string): string {
-    const fromStaffColor = (staffColor: ColorKey): string => line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) : staffColor;
+export function getAnnotationColorKey(line: ObjNotationLine, annotationGroup: AnnotationGroup, annotationKind: string): ColorKey {
+    const fromStaffColor = (staffColor: ColorKey): ColorKey => line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) as ColorKey : staffColor;
 
     switch (annotationGroup) {
         case AnnotationGroup.Navigation:

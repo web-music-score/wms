@@ -1,4 +1,4 @@
-import { Arpeggio, colorKey, MArpeggio } from "../pub";
+import { Arpeggio, MArpeggio } from "../pub";
 import { MusicObject } from "./music-object";
 import { View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
@@ -21,6 +21,10 @@ export class ObjArpeggio extends MusicObject {
 
     getMusicInterface(): MArpeggio {
         return this.mi;
+    }
+
+    get color(): string {
+        return this.col.doc.getColorWithKey(this.line instanceof ObjTab ? "tab.arpeggio" : "staff.arpeggio");
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -57,9 +61,7 @@ export class ObjArpeggio extends MusicObject {
 
         view.drawDebugRect(this.rect);
 
-        const color = colorKey(this.line instanceof ObjTab ? "tab.arpeggio" : "staff.arpeggio");
-
-        view.color(color);
+        view.color(this.color);
         view.lineWidth(2);
         view.beginPath();
 

@@ -710,8 +710,11 @@ export class View {
 
     drawBackground(rect?: Rect) {
         if (this.ctx) {
+            const bgcolor = this.doc
+                ? this.doc.getBackground(this.paint.colors["background"])
+                : this.paint.colors["background"];
             rect ??= new Rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-            this.ctx.canvas.style.background = this.paint.colors["background"];
+            this.ctx.canvas.style.background = bgcolor;
             this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
         }
     }

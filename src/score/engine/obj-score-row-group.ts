@@ -1,9 +1,9 @@
 import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
-import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
+import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjScoreRow } from "./obj-score-row";
-import { colorKey, MScoreRowGroup } from "../pub";
+import { MScoreRowGroup } from "../pub";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 
 function parseInstr(instr: string) {
@@ -28,7 +28,7 @@ export class ObjScoreRowGroup extends MusicObject {
     constructor(readonly lines: readonly ObjNotationLine[]) {
         super(lines[0].row);
 
-        const color = colorKey("rowgroup.instrument");
+        const color = this.row.doc.getColorWithKey("rowgroup.instrument");
 
         const instr = parseInstr(lines[0].getConfig().instrument ?? "");
 
@@ -102,8 +102,9 @@ export class ObjScoreRowGroup extends MusicObject {
         this.instrText.draw(view, clipRect);
 
         if (this.hasBrace) {
-            const r = this.braceRect;
-            view.color(colorKey("rowgroup.frame")).lineWidth(1).drawBracket(r, "{");
+            const rect = this.braceRect;
+            const color = this.row.doc.getColorWithKey("rowgroup.frame");
+            view.color(color).lineWidth(1).drawBracket(rect, "{");
         }
     }
 }

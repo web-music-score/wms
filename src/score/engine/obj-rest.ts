@@ -1,5 +1,5 @@
 import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
-import { colorKey, MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
+import { MRest, MStaffRest, MusicInterface, RestOptions, Stem, StringNumber, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
 import { AccidentalState } from "./acc-state";
@@ -86,7 +86,7 @@ export class ObjRest extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
 
-        this.color = options?.color ?? colorKey("staff.rest");
+        this.color = options?.color ?? this.doc.getColorWithKey("staff.rest");
 
         this.hide = options?.hide ?? false;
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;

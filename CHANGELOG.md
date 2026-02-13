@@ -2,6 +2,7 @@
 ## [6.4.0-pre.7] - Unreleased
 ### Added
 - "color" to AnnotationOptions.
+- DocumentOptions { showMeasureNumbers, color, background }
 
 ### Fixed
 - Set play state to Stopped after last note stopped playing (was when last note started playing).

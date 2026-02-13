@@ -1,6 +1,6 @@
 import { Note } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
-import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId, colorKey, AnnotationKind } from "../pub";
+import { Arpeggio, Stem, MRhythmColumn, getVoiceIds, VerseNumber, VoiceId, validateVoiceId, AnnotationKind } from "../pub";
 import { View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjArpeggio } from "./obj-arpeggio";
@@ -474,7 +474,9 @@ export class ObjRhythmColumn extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
-        view.color(colorKey("staff.frame"));
+        const color = this.doc.getColorWithKey("staff.frame");
+
+        view.color(color);
 
         // Draw ledger lines
         this.row.getStaves().forEach(staff => {

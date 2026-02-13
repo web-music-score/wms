@@ -1,4 +1,4 @@
-import { colorKey, getVoiceIds, MTabRhythm, VoiceId } from "../pub";
+import { getVoiceIds, MTabRhythm, VoiceId } from "../pub";
 import { DrawSymbol, View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjMeasure } from "./obj-measure";
@@ -108,7 +108,7 @@ export class ObjTabRhythm extends MusicObject {
                 let colX = sym.col.getRect().anchorX;
                 if (sym instanceof ObjNoteGroup) {
                     view.lineWidth(1);
-                    view.color(colorKey("tab.note"));
+                    view.color(this.doc.getColorWithKey("tab.note"));
 
                     if (sym.rhythmProps.noteSize >= 2) {
                         view.lineWidth(sym.rhythmProps.noteSize === 4 ? 2 : 1);
@@ -132,7 +132,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
                 else if (sym instanceof ObjRest) {
                     view.lineWidth(1);
-                    view.color(colorKey("tab.rest"));
+                    view.color(this.doc.getColorWithKey("tab.rest"));
 
                     let cx = colX;
                     let cy = (stemTop + stemBottom) / 2;
@@ -157,7 +157,7 @@ export class ObjTabRhythm extends MusicObject {
                     let rightBeamCount = right.hasTuplet() ? 1 : right instanceof ObjNoteGroup ? right.getLeftBeamCount() : 1;
                     let maxBeamCount = Math.max(leftBeamCount, rightBeamCount);
 
-                    view.color(colorKey("tab.note"));
+                    view.color(this.doc.getColorWithKey("tab.note"));
                     view.lineWidth(2);
 
                     for (let i = 0; i < maxBeamCount; i++) {
@@ -178,7 +178,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
 
                 if (beamGroup && beamGroup.isTuplet()) {
-                    view.color(colorKey("tab.note"));
+                    view.color(this.doc.getColorWithKey("tab.note"));
 
                     // Add tuplet number
                     let cx = (symbols[0].col.getRect().anchorX + symbols[symbols.length - 1].col.getRect().anchorX) / 2;

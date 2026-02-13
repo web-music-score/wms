@@ -2,7 +2,7 @@ import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { Note, NoteLengthProps, NoteLengthValue, RhythmProps, Tuplet, TupletRatio } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
-import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, colorKey, AnnotationKind, ArpeggioValue, AnnotationGroup } from "../pub";
+import { MNoteGroup, Stem, Arpeggio, NoteOptions, NoteAnchor, TieType, StringNumber, Connective, MusicInterface, MStaffNoteGroup, MTabNoteGroup, VoiceId, AnnotationKind, ArpeggioValue, AnnotationGroup } from "../pub";
 import { ConnectiveProps } from "./connective-props";
 import { AccidentalState } from "./acc-state";
 import { ObjAccidental } from "./obj-accidental";
@@ -12,7 +12,7 @@ import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
-import { getAnnotationColor, getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
+import { getAnnotationColorKey, getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 import { ScoreError } from "./error-utils";
 import { ObjSymbol } from "./obj-symbol";
 
@@ -202,7 +202,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
-        this.color = options?.color ?? colorKey("staff.note");
+        this.color = options?.color ?? this.doc.getColorWithKey("staff.note");
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
@@ -679,7 +679,8 @@ export class ObjNoteGroup extends MusicObject {
 
                     this.articulations.forEach(ar => {
                         const drawSym = getNoteArticulationDrawSymbol(ar.kind);
-                        const sym = new ObjSymbol(this, drawSym, false, false, ar.color ?? getAnnotationColor(staff, AnnotationGroup.Articulation, ar.kind));
+                        const color = ar.color ?? this.doc.getColorWithKey(getAnnotationColorKey(staff, AnnotationGroup.Articulation, ar.kind));
+                        const sym = new ObjSymbol(this, drawSym, false, false, color);
                         sym.layout(view);
                         sym.offset(arX, arY);
                         obj.symbols.push(sym);
@@ -732,8 +733,8 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const bgcolor = colorKey("background");
-            const color = colorKey("tab.note");
+            const bgcolor = this.doc.getBackground("background");
+            const color = this.doc.getColorWithKey("tab.note");
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers

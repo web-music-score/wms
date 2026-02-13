@@ -1,6 +1,6 @@
 import { getTuningStrings, Note, resolveTuningName } from "web-music-score/theory";
 import { ImageAsset, View } from "./view";
-import { Clef, colorKey, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
+import { Clef, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
@@ -131,7 +131,11 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     drawVerticalLine(view: View, left: number, width: number, isSystemBarLine = false) {
-        view.color(this.getConfig().type === "tab" ? colorKey("tab.frame") : colorKey("staff.frame"));
+        const color = this.row.doc.getColorWithKey(
+            this.getConfig().type === "tab" ? "tab.frame" : "staff.frame"
+        );
+
+        view.color(color);
 
         const i = this.row.getNotationLines().indexOf(this);
         const nextLine = i >= 0 ? this.row.getNotationLines()[i + 1] : undefined;

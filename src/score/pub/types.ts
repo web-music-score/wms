@@ -218,9 +218,19 @@ export type { StaffTarget as StaffTabOrGroup }
 /** @deprecated StaffTabOrGroups is deprecated. Will be removed in future release. Use StaffTargets instead. */
 export type { StaffTargets as StaffTabOrGroups }
 
+/** Document options. */
+export type DocumentOptions = {
+    /** Show all measure numbers? */
+    showMeasureNumbers?: boolean
+    /** Background color */
+    background?: string;
+    /** Foreground color */
+    color?: string;
+}
+
 /** Measure options. */
 export type MeasureOptions = {
-    /** show measure number? */
+    /** Show measure number? */
     showNumber?: boolean
 }
 

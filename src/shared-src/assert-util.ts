@@ -18,6 +18,10 @@ export namespace AssertUtil {
         assertFunctStr = `${className}.${fnName}(${formatArgs(...fnArgs)})`;
     }
 
+    export function setClassConstructor(className: string, ...fnArgs: unknown[]) {
+        assertFunctStr = `${className}(${formatArgs(...fnArgs)})`;
+    }
+
     export function setFunc(fnName: string, ...fnArgs: unknown[]) {
         assertFunctStr = `${fnName}(${formatArgs(...fnArgs)})`;
     }

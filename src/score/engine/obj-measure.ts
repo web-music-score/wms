@@ -19,7 +19,7 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationColor, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
+import { getAnnotationColorKey, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { ConnectiveProps } from "./connective-props";
@@ -624,9 +624,8 @@ export class ObjMeasure extends MusicObject {
 
         let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
-        const getColor = (line: ObjNotationLine) => (
-            annotationOptions.color ?? getAnnotationColor(line, annotationGroup, annotationKind)
-        );
+        const getColor = (line: ObjNotationLine) => annotationOptions.color ??
+            this.doc.getColorWithKey(getAnnotationColorKey(line, annotationGroup, annotationKind));
 
         const colAnchor = this.lastAddedRhythmColumn;
 
@@ -688,7 +687,7 @@ export class ObjMeasure extends MusicObject {
                 this.endRepeatPlayCount = annotationOptions.repeatCount ?? 2;
                 if (this.endRepeatPlayCount !== 2) {
                     const text = `${this.endRepeatPlayCount}x`;
-                    const color = Pub.colorKey("staff.frame");
+                    const color = this.doc.getColorWithKey("staff.frame");
                     this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
                 }
                 break;
@@ -1309,7 +1308,14 @@ export class ObjMeasure extends MusicObject {
         this.region_0_tabTuning = isFirstMeasureInRow && this.row.hasTab ? unitSize * 4 : 0;
 
         let showClef = isFirstMeasureInRow || isAfterMeasureBreak;
-        let showMeasureNumber = this.options.showNumber === false ? false : (this.options.showNumber === true || isFirstMeasureInRow && !this.row.isFirstRow());
+        let showMeasureNumber = isFirstMeasureInRow && !this.row.isFirstRow(); // Default
+        {
+            // Override default
+            if (this.doc.options.showMeasureNumbers === true) showMeasureNumber = true;
+            if (this.doc.options.showMeasureNumbers === false) showMeasureNumber = false;
+            if (this.options.showNumber === true) showMeasureNumber = true;
+            if (this.options.showNumber === false) showMeasureNumber = false;
+        }
         let showKeySignature = isFirstMeasureInRow || isAfterMeasureBreak || !!this.alterKeySignature;
         let showTimeSignature = !!this.alterTimeSignature;
         let showTempo = !!this.alterTempo;
@@ -1396,8 +1402,9 @@ export class ObjMeasure extends MusicObject {
         if (this.isFirstMeasureInRow()) {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    let note = tab.getTuningStrings()[stringId].format(Theory.PitchNotation.Helmholtz, Theory.SymbolSet.Unicode);
-                    let obj = new ObjText(this, { text: note, scale: 0.8, color: Pub.colorKey("tab.tuning") }, 1, 0.5);
+                    const note = tab.getTuningStrings()[stringId].format(Theory.PitchNotation.Helmholtz, Theory.SymbolSet.Unicode);
+                    const color = this.doc.getColorWithKey("tab.tuning");
+                    const obj = new ObjText(this, { text: note, scale: 0.8, color }, 1, 0.5);
 
                     obj.layout(view);
                     obj.setRight(this.region_0_tabTuning * 0.8);
@@ -1653,12 +1660,12 @@ export class ObjMeasure extends MusicObject {
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p), Pub.colorKey("staff.frame"));
+                    drawLine(line.getDiatonicIdY(p), this.doc.getColorWithKey("staff.frame"));
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId), Pub.colorKey("tab.frame"));
+                    drawLine(line.getStringY(stringId), this.doc.getColorWithKey("tab.frame"));
                 }
             }
         });
@@ -1674,8 +1681,9 @@ export class ObjMeasure extends MusicObject {
                 const left = this.getStaffLineLeft();
                 const top = tab.getTopLineY();
                 const bottom = tab.getBottomLineY();
+                const color = this.doc.getColorWithKey("tab.frame");
 
-                view.color(Pub.colorKey("tab.frame"))
+                view.color(color)
                     .lineWidth(1)
                     .strokeLine(left, top, left, bottom);
             });

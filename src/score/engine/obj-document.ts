@@ -3,7 +3,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId, Player } from "../pub";
+import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId, Player, DocumentOptions, ColorKey } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
@@ -35,7 +35,7 @@ export class ObjDocument extends MusicObject {
 
     private readonly mi: MDocument;
 
-    constructor() {
+    constructor(readonly options: DocumentOptions) {
         super(undefined);
 
         this.mi = new MDocument(this);
@@ -43,6 +43,14 @@ export class ObjDocument extends MusicObject {
 
     getMusicInterface(): MDocument {
         return this.mi;
+    }
+
+    getBackground(alt?: string) {
+        return this.options.background ?? alt ?? "white";
+    }
+
+    getColorWithKey(alt?: ColorKey) {
+        return this.options.color ?? alt ?? "black";
     }
 
     setScoreConfiguration(config: StaffPreset | ScoreConfiguration) {

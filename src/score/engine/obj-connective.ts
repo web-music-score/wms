@@ -4,7 +4,7 @@ import { View } from "./view";
 import { MusicObject } from "./music-object";
 import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
-import { MConnective, TieType, Connective, colorKey } from "../pub";
+import { MConnective, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ScoreError } from "./error-utils";
@@ -60,7 +60,9 @@ export class ObjConnective extends MusicObject {
         return this.mi;
     }
 
-    get doc() { return this.measure.doc; }
+    get color(): string {
+        return this.measure.doc.getColorWithKey(this.line instanceof ObjTab ? "tab.connective" : "staff.connective");
+    }
 
     isInsideMeasure() {
         return this.rightNoteGroup === undefined || this.leftNoteGroup.measure === this.rightNoteGroup.measure;
@@ -192,7 +194,7 @@ export class ObjConnective extends MusicObject {
         let t = lineWidthPx * 1.5;
         let s = lineWidthPx * 0.25;
 
-        view.color(this.line instanceof ObjTab ? colorKey("tab.connective") : colorKey("staff.connective"));
+        view.color(this.color);
         view.lineWidth(1);
 
         if (this.arcHeight === 0) {

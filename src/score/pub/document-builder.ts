@@ -13,6 +13,15 @@ function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: str
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
 }
 
+function assertDocumentOptions(options: Types.DocumentOptions) {
+    AssertUtil.assert(
+        Guard.isObject(options),
+        Guard.isBooleanOrUndefined(options.showMeasureNumbers),
+        Guard.isStringOrUndefined(options.background),
+        Guard.isStringOrUndefined(options.color),
+    );
+}
+
 function assertBaseConfig(baseConfig: Types.BaseConfig) {
     AssertUtil.assert(
         Guard.isObject(baseConfig),
@@ -208,8 +217,13 @@ export class DocumentBuilder {
     /**
      * Create new document builder instance.
      */
-    constructor() {
-        this.doc = new ObjDocument();
+    constructor(options?: Types.DocumentOptions) {
+        AssertUtil.setClassConstructor("DocumentBuilder", options);
+
+        options ??= {};
+        assertDocumentOptions(options);
+
+        this.doc = new ObjDocument(options);
     }
 
     /**
