@@ -286,9 +286,7 @@ export type LyricsOptions = {
     hyphen?: LyricsHyphenValue;
 }
 
-/**
- * @deprecated Fermata is deprecated. Will be removed in future release. Use Annotation with TemporalAnnotation instead.
- */
+/** @deprecated Fermata is deprecated. Will be removed in future release. */
 export enum Fermata {
     /** Anchor fermata to note/rest. @deprecated */
     AtNote = "atNote",
@@ -299,7 +297,7 @@ export enum Fermata {
 /** @deprecated */
 export type FermataValue = Fermata | `${Fermata}`;
 
-/** @deprecated Label is deprecated. Will be removed in future release. Use Annotation with LabelAnnotation instead. */
+/** @deprecated Label is deprecated. Will be removed in future release. */
 export enum Label {
     /** "C", "C#", "Db", "D", etc. @deprecated */
     Note = "note",
