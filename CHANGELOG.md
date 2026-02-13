@@ -5,6 +5,7 @@
 - Typo MusicErrorType.Timesignature => MusicErrorType.TimeSignature.
 - Set play state to Stopped after last note stopped playing (was when last note started playing).
 - Improved way to compute and spread rhythm columns in measures. Fixes unevenly spaced columns.
+- Add small padding for header.
 
 ## [6.3.7] - 2026-02-05
 ### Fixed
