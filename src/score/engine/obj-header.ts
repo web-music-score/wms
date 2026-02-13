@@ -64,36 +64,39 @@ export class ObjHeader extends MusicObject {
     }
 
     layout(view: View) {
-        let top = 0;
+        const p = view.unitSize;
 
-        const left = this.doc.regions.staffLeft;
-        const right = this.doc.regions.staffRight;
+        let top = p;
+        const left = this.doc.regions.staffLeft + p;
+        const right = this.doc.regions.staffRight - p;
 
-        this.rect = new AnchoredRect(left, right, 0, 0);
+        const rect = new AnchoredRect(left, right, top, top);
 
         if (this.titleText) {
             this.titleText.layout(view);
             this.titleText.setCenterX((left + right) / 2);
             this.titleText.setTop(top);
             top += this.titleText.getRect().height;
-            this.rect.unionInPlace(this.titleText.getRect());
+            rect.unionInPlace(this.titleText.getRect());
         }
 
         if (this.composerText) {
             this.composerText.layout(view);
-            this.composerText.setRight(right);
+            this.composerText.setRight(right - p);
             this.composerText.setTop(top);
             top += this.composerText.getRect().height;
-            this.rect.unionInPlace(this.composerText.getRect());
+            rect.unionInPlace(this.composerText.getRect());
         }
 
         if (this.arrangerText) {
             this.arrangerText.layout(view);
-            this.arrangerText.setRight(right);
+            this.arrangerText.setRight(right - p);
             this.arrangerText.setTop(top);
             top += this.arrangerText.getRect().height;
-            this.rect.unionInPlace(this.arrangerText.getRect());
+            rect.unionInPlace(this.arrangerText.getRect());
         }
+
+        this.rect = rect.inflateCopy(p);
     }
 
     offset(dx: number, dy: number) {
