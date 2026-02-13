@@ -82,7 +82,7 @@ export class ObjHeader extends MusicObject {
 
         if (this.composerText) {
             this.composerText.layout(view);
-            this.composerText.setRight(right - p);
+            this.composerText.setRight(right);
             this.composerText.setTop(top);
             top += this.composerText.getRect().height;
             rect.unionInPlace(this.composerText.getRect());
@@ -90,7 +90,7 @@ export class ObjHeader extends MusicObject {
 
         if (this.arrangerText) {
             this.arrangerText.layout(view);
-            this.arrangerText.setRight(right - p);
+            this.arrangerText.setRight(right);
             this.arrangerText.setTop(top);
             top += this.arrangerText.getRect().height;
             rect.unionInPlace(this.arrangerText.getRect());
