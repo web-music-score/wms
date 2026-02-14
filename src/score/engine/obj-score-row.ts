@@ -7,7 +7,7 @@ import { View } from "./view";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { MusicError, MusicErrorType } from "web-music-score/core";
 import { AnchoredRect, Guard, Utils } from "@tspro/ts-utils-lib";
-import { RhythmSymbol } from "./obj-rhythm-column";
+import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
@@ -271,6 +271,14 @@ export class ObjScoreRow extends MusicObject {
 
     getLastMeasure(): ObjMeasure | undefined {
         return this.measures.length > 0 ? this.measures[this.measures.length - 1] : undefined;
+    }
+
+    getFirstColumn(): ObjRhythmColumn | undefined {
+        return this.getFirstMeasure()?.getFirstColumn();
+    }
+
+    getLastColumn(): ObjRhythmColumn | undefined {
+        return this.getLastMeasure()?.getLastColumn();
     }
 
     solveAutoStemDir(symbols: ReadonlyArray<RhythmSymbol>): Stem.Up | Stem.Down {

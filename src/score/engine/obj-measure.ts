@@ -388,6 +388,14 @@ export class ObjMeasure extends MusicObject {
         return this.keySignature;
     }
 
+    getFirstColumn(): ObjRhythmColumn | undefined {
+        return this.columns.length === 0 ? undefined : this.columns[0];
+    }
+
+    getLastColumn(): ObjRhythmColumn | undefined {
+        return this.columns.length === 0 ? undefined : this.columns[this.columns.length - 1];
+    }
+
     // See MMeasure interface
     //setKeySignature(tonic: string, scaleType: ScaleType): void;
     //setKeySignature(keySignature: KeySignature): void;
