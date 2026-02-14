@@ -39,6 +39,7 @@ export class WmsView {
 
     /**
      * Set Paint for this render context.
+     * @deprecated All paint stuff is deprecated. Will be removed in future release.
      * @param paint - Paint.
      * @returns - This render context instance.
      */

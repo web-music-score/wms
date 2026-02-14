@@ -8,6 +8,10 @@
 - Set play state to Stopped after last note stopped playing (was when last note started playing).
 - Improved way to compute and spread rhythm columns in measures. Fixes unevenly spaced columns.
 
+### Deprecated
+- All paint stuff is deprecated. Will be removed in future release.
+  You can use "color" property of DocumentOptions, NoteOptions and RestOptions.
+
 ## [6.4.0-pre.6] - 2026-02-08
 ### Added
 - `resolveTuningName()`, `resolveScaleType()`, `resolveTonic()`.

@@ -3,6 +3,7 @@ import { WmsView as JsView, MDocument, Paint, ScoreEventListener } from "web-mus
 
 export interface WmsViewProps {
     doc?: MDocument;
+    /** @deprecated All paint stuff is deprecated. Will be removed in future release. */
     paint?: Paint;
     zoom?: number | string;
     staffSize?: number | string;

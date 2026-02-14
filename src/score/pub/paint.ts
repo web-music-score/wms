@@ -6,6 +6,7 @@ import { AssertUtil, warnDeprecated } from "shared-src";
 const norm = (s: string) => s.toLowerCase();
 
 /** Color keys.
+ * @deprecated All paint stuff is deprecated. Will be removed in future release.
  * ```ts
  * --- Deprecated since v6.4.0-pre.5 ---
  * "*.element.fermata"    => use "*.annotation.temporal"
@@ -89,12 +90,18 @@ export type ColorKey =
     "tab.annotation.ornament" |
     "tab.annotation.misc";
 
-/** Function to typecheck a valid ColorKey variable. */
+/**
+ * @deprecated All paint stuff is deprecated. Will be removed in future release.
+ * Function to typecheck a valid ColorKey variable.
+ * */
 export function colorKey(colorKey: ColorKey): ColorKey {
     return colorKey;
 }
 
-/** Color key parts. */
+/**
+ * @deprecated All paint stuff is deprecated. Will be removed in future release.
+ * Color key parts.
+ * */
 export type ColorKeyPart =
     "background" |
     "header" | "title" | "composer" | "arranger" |
@@ -166,6 +173,7 @@ function mapDeprecatedColorKeys(colorKey: ColorKey | ColorKeyPart | ColorKeyPart
 }
 
 /**
+ * @deprecated All paint stuff is deprecated. Will be removed in future release.
  * Paint class for coloring music scores.
  */
 export class Paint {
