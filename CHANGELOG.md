@@ -1,5 +1,5 @@
 # CHANGELOG
-## [6.3.8] - Unreleased
+## [6.3.8] - 2026-02-14
 ### Fixed
 - Time signature in tab had staff's color.
 - Typo MusicErrorType.Timesignature => MusicErrorType.TimeSignature.
