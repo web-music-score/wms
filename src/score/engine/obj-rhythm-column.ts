@@ -82,7 +82,15 @@ export class ObjRhythmColumn extends MusicObject {
      * Does not care navigation elements: repeats, endings, etc.
      */
     getNextColumn(): ObjRhythmColumn | undefined {
-        return this.getNextColumnInMeasure() ?? this.measure.getNextMeasure()?.getColumn(0);
+        return this.getNextColumnInMeasure() ?? this.measure.getNextMeasure()?.getFirstColumn();
+    }
+
+    /**
+     * Get prev column. Goes into prev measure if necessary.
+     * Does not care navigation elements: repeats, endings, etc.
+     */
+    getPrevColumn(): ObjRhythmColumn | undefined {
+        return this.getPrevColumnInMeasure() ?? this.measure.getPrevMeasure()?.getLastColumn();
     }
 
     getTicksToNextColumn(): number {
@@ -390,17 +398,28 @@ export class ObjRhythmColumn extends MusicObject {
         const extraSpace = view.unitSize / 2;
 
         this.getAnchoredLayoutObjects().forEach(obj => {
-            const prevCol = this.getPrevColumnInMeasure();
-            if (prevCol) {
+            const prevCol = this.getPrevColumn();
+
+            if (this === this.row.getFirstColumn()) {
+                this.rectWithObjects.left = Math.min(this.rectWithObjects.left, obj.getRect().left - extraSpace);
+                this.requestRectUpdate();
+            }
+            else if (prevCol && prevCol.row === this.row) {
                 prevCol.getAnchoredLayoutObjects().forEach(prevObj => {
                     if (prevObj.getRect().intersects(obj.getRect())) {
                         this.rectWithObjects.left = Math.min(this.rectWithObjects.left, obj.getRect().left - extraSpace);
-                        this.requestRectUpdate();
+                        this.requestRectUpdate(); 
                     }
                 });
             }
-            const nextCol = this.getNextColumnInMeasure();
-            if (nextCol) {
+
+            const nextCol = this.getNextColumn();
+
+            if (this === this.row.getLastColumn()) {
+                this.rectWithObjects.right = Math.max(this.rectWithObjects.right, obj.getRect().right + extraSpace);
+                this.requestRectUpdate();
+            }
+            else if (nextCol && nextCol.row === this.row) {
                 nextCol.getAnchoredLayoutObjects().forEach(nextObj => {
                     if (nextObj.getRect().intersects(obj.getRect())) {
                         this.rectWithObjects.right = Math.max(this.rectWithObjects.right, obj.getRect().right + extraSpace);
