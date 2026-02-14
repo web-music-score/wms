@@ -6,6 +6,7 @@
 - Set play state to Stopped after last note stopped playing (was when last note started playing).
 - Improved way to compute and spread rhythm columns in measures. Fixes unevenly spaced columns.
 - Add small padding for header, so texts do not touch edges.
+- Switched dynamics annotations to below staff by default.
 
 ## [6.3.7] - 2026-02-05
 ### Fixed

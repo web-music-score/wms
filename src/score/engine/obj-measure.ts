@@ -773,7 +773,7 @@ export class ObjMeasure extends MusicObject {
         switch (annotation) {
             case Annotation.Dynamics:
                 layoutGroupId = LayoutGroupId.Annotation_Dynamics;
-                defaultVerticalPos = VerticalPos.Above;
+                defaultVerticalPos = VerticalPos.Below; // Below by default.
                 textProps.italic = true;
                 linePos = "bottom";
                 break;
