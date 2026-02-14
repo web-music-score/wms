@@ -1,4 +1,7 @@
 # CHANGELOG
+## [6.3.9] - Unreleased
+### Fixed
+
 ## [6.3.8] - 2026-02-14
 ### Fixed
 - Time signature in tab had staff's color.
