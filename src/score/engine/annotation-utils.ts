@@ -28,34 +28,52 @@ export function getAnnotationKindTextReplacement(text: string): string {
 }
 
 export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, annotationKind: string): LayoutGroupId {
-    switch (annotationGroup) {
-        case AnnotationGroup.Dynamics:
-            return LayoutGroupId.Annotation_Dynamic;
-        case AnnotationGroup.Tempo:
-            return LayoutGroupId.Annotation_Tempo;
-        case AnnotationGroup.Navigation:
-            if (annotationKind === Navigation.Ending)
-                return LayoutGroupId.Annotation_Ending;
-            return LayoutGroupId.Annotation_Navigation;
-        case AnnotationGroup.Label:
-            if (annotationKind === AnnotationKind.ChordLabel)
-                return LayoutGroupId.Annotation_ChordLabel;
-            if (annotationKind === AnnotationKind.PitchLabel)
-                return LayoutGroupId.Annotation_PitchLabel;
-            break;
-        case AnnotationGroup.Temporal:
-            if (annotationKind === AnnotationKind.fermata || annotationKind === AnnotationKind.measureEndFermata)
-                return LayoutGroupId.Annotation_Fermata;
-            break;
+    switch (annotationKind) {
+        case AnnotationKind.fermata:
+        case AnnotationKind.measureEndFermata:
+            return LayoutGroupId.Annotation_Temporal_Fermata;
+        case Navigation.Ending:
+            return LayoutGroupId.Annotation_Navigation_Ending;
+        case AnnotationKind.ChordLabel:
+            return LayoutGroupId.Annotation_Label_ChordLabel;
+        case AnnotationKind.PitchLabel:
+            return LayoutGroupId.Annotation_Label_PitchLabel;
     }
 
-    return LayoutGroupId.Annotation_Misc
+    switch (annotationGroup) {
+        case AnnotationGroup.Navigation:
+            return LayoutGroupId.Annotation_Navigation;
+        case AnnotationGroup.Dynamics:
+            return LayoutGroupId.Annotation_Dynamics;
+        case AnnotationGroup.Tempo:
+            return LayoutGroupId.Annotation_Tempo;
+        case AnnotationGroup.Articulation:
+            return LayoutGroupId.Annotation_Articulation;
+        case AnnotationGroup.Expression:
+            return LayoutGroupId.Annotation_Expression;
+        case AnnotationGroup.Technique:
+            return LayoutGroupId.Annotation_Technique;
+        case AnnotationGroup.Temporal:
+            return LayoutGroupId.Annotation_Temporal;
+        case AnnotationGroup.Label:
+            return LayoutGroupId.Annotation_Label;
+        case AnnotationGroup.Ornament:
+            return LayoutGroupId.Annotation_Ornament;
+        case AnnotationGroup.Misc:
+        default:
+            return LayoutGroupId.Annotation_Misc;
+    }
 }
 
 export function getAnnotationDefaultVerticalPos(annotationGroup: AnnotationGroup, annotationKind: string): VerticalPos {
-    if (annotationKind === AnnotationKind.PitchLabel)
-        return VerticalPos.Below;
-
+    switch (annotationKind) {
+        case AnnotationKind.PitchLabel:
+            return VerticalPos.Below;
+    }
+    switch (annotationGroup) {
+        case AnnotationGroup.Dynamics:
+            return VerticalPos.Below;
+    }
     return VerticalPos.Above;
 }
 

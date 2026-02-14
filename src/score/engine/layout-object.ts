@@ -14,16 +14,23 @@ import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { AnchoredRect, asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
 import { ScoreError } from "./error-utils";
 
+/** Layout group ids in order, first is closest to staff, last is furthest from staff. */
 export enum LayoutGroupId {
     TabRhythm,
-    Annotation_Fermata,
-    Annotation_PitchLabel,
-    Annotation_Navigation,
-    Annotation_Ending,
+    Annotation_Label_PitchLabel,    // Below staff by default.
+    Annotation_Articulation,
+    Annotation_Technique,
+    Annotation_Ornament,
+    Annotation_Temporal_Fermata,
+    Annotation_Dynamics,            // Below staff by default.
+    Annotation_Expression,
     Annotation_Tempo,
-    Annotation_Dynamic,
+    Annotation_Temporal,
+    Annotation_Navigation,
+    Annotation_Navigation_Ending,
+    Annotation_Label,
+    Annotation_Label_ChordLabel,
     Annotation_Misc,
-    Annotation_ChordLabel,
     LyricsVerse1,
     LyricsVerse2,
     LyricsVerse3
@@ -31,14 +38,20 @@ export enum LayoutGroupId {
 
 const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { rowAlign?: boolean, padding?: number }>([
     [LayoutGroupId.TabRhythm, { rowAlign: true }],
-    [LayoutGroupId.Annotation_Fermata, { padding: 1 }],
-    [LayoutGroupId.Annotation_PitchLabel, {}],
-    [LayoutGroupId.Annotation_Navigation, { rowAlign: true }],
-    [LayoutGroupId.Annotation_Ending, { rowAlign: true, padding: 2 }],
+    [LayoutGroupId.Annotation_Temporal_Fermata, { padding: 1 }],
+    [LayoutGroupId.Annotation_Label_PitchLabel, { padding: 1 }],
+    [LayoutGroupId.Annotation_Navigation, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Navigation_Ending, { rowAlign: true, padding: 2 }],
     [LayoutGroupId.Annotation_Tempo, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Dynamic, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Dynamics, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Articulation, { padding: 1 }],
+    [LayoutGroupId.Annotation_Expression, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Technique, { padding: 1 }],
+    [LayoutGroupId.Annotation_Temporal, { rowAlign: true, padding: 1 }],
+    [LayoutGroupId.Annotation_Ornament, { padding: 1 }],
+    [LayoutGroupId.Annotation_Label, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.Annotation_Misc, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_ChordLabel, { rowAlign: true }],
+    [LayoutGroupId.Annotation_Label_ChordLabel, { rowAlign: true, padding: 1 }],
     [LayoutGroupId.LyricsVerse1, { rowAlign: true }],
     [LayoutGroupId.LyricsVerse2, { rowAlign: true }],
     [LayoutGroupId.LyricsVerse3, { rowAlign: true }],
