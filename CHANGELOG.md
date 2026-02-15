@@ -1,4 +1,6 @@
 # CHANGELOG
+## [6.4.0-pre.8] - Unreleased
+
 ## [6.4.0-pre.7] - 2026-02-15
 ### Added
 - "color" to AnnotationOptions.
