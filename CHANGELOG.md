@@ -1,5 +1,5 @@
 # CHANGELOG
-## [6.4.0-pre.7] - Unreleased
+## [6.4.0-pre.7] - 2026-02-15
 ### Added
 - "color" to AnnotationOptions.
 - DocumentOptions { showMeasureNumbers, color, background }
@@ -10,7 +10,7 @@
 
 ### Deprecated
 - All paint stuff is deprecated. Will be removed in future release.
-  You can use "color" property of DocumentOptions, NoteOptions and RestOptions.
+  You can use "color" property of DocumentOptions, NoteOptions and RestOptions, AnnotationOptions.
 
 ## [6.4.0-pre.6] - 2026-02-08
 ### Added
