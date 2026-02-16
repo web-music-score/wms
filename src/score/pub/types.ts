@@ -568,6 +568,8 @@ export enum AnnotationKind {
     _8va = "8va",
     /** play one octave lower */
     _8vb = "8vb",
+    /** return to written pitch */
+    loco = "loco",
     /** silent */
     tacet = "tacet",
     /** continue similarly */

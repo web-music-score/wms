@@ -230,6 +230,7 @@ const AnnotationKindToGroupMap = new UniMap<AnnotationKind, AnnotationGroup>([
     // Misc annotations
     [AnnotationKind._8va, AnnotationGroup.Misc],
     [AnnotationKind._8vb, AnnotationGroup.Misc],
+    [AnnotationKind.loco, AnnotationGroup.Misc],
     [AnnotationKind.tacet, AnnotationGroup.Misc],
     [AnnotationKind.sim, AnnotationGroup.Misc],
     [AnnotationKind.div, AnnotationGroup.Misc],

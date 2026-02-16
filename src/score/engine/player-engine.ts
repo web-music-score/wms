@@ -1,9 +1,9 @@
 import { Rect, UniMap, Utils, ValueSet } from "@tspro/ts-utils-lib";
-import { NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "web-music-score/theory";
+import { Note, NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "web-music-score/theory";
 import * as Audio from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, DynamicsAnnotation, TempoAnnotation } from "../pub";
+import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension, getTextContent } from "./extension";
@@ -51,10 +51,12 @@ type PlayerColumn = ObjRhythmColumn | ObjBarLineRight;
 export class PlayerColumnProps {
     private speed: number;
     private volume: number;
+    private octaveShift: number;
 
     constructor(readonly col: PlayerColumn) {
         this.speed = 1.0;
         this.volume = getDefaultVolume();
+        this.octaveShift = 0;
     }
 
     get measure() {
@@ -64,6 +66,7 @@ export class PlayerColumnProps {
     reset(): void {
         this.speed = 1.0;
         this.volume = getDefaultVolume();
+        this.octaveShift = 0;
     }
 
     setSpeed(speed: number): void {
@@ -78,12 +81,21 @@ export class PlayerColumnProps {
         let speed = Utils.Math.clamp(this.getSpeed(), 0.1, 10);
         return alterTempoSpeed(this.measure.getTempo(), speed);
     }
+
     setVolume(volume: number) {
         this.volume = volume;
     }
 
-    getVolume() {
+    getVolume(): number {
         return this.volume;
+    }
+
+    setOctaveShift(octaveShift: number) {
+        this.octaveShift = octaveShift;
+    }
+
+    getOctaveShift(): number {
+        return this.octaveShift;
     }
 
     hasFermata(): boolean {
@@ -306,12 +318,15 @@ export class PlayerEngine {
 
         let curSpeed = 1;
         let curVolume = getDefaultVolume();
+        let curOctaveShift = 0;
 
         let speedMap = new UniMap<ObjRhythmColumn, number[]>();
         let volumeMap = new UniMap<ObjRhythmColumn, number[]>();
+        let octaveShiftMap = new UniMap<ObjRhythmColumn, number[]>();
 
         const pushSpeed = (col: ObjRhythmColumn, speed: number) => speedMap.getOrCreate(col, []).push(speed);
         const pushVolume = (col: ObjRhythmColumn, volume: number) => volumeMap.getOrCreate(col, []).push(volume);
+        const pushOctaveShift = (col: ObjRhythmColumn, octaveShift: number) => octaveShiftMap.getOrCreate(col, []).push(octaveShift);
 
         this.playerColumnSequence.forEach((col, colId) => {
             if (!(col instanceof ObjRhythmColumn)) {
@@ -323,13 +338,20 @@ export class PlayerEngine {
 
                 let vol: number | undefined;
 
-                if (text === TempoAnnotation.a_tempo) {
+                if (text === AnnotationKind.a_tempo) {
                     curSpeed = 1;
                 }
                 else if ((vol = getDynamicsVolume(text)) !== undefined) {
                     curVolume = vol;
                 }
-                else if (isTempoText(text) || isDynamicsText(text)) {
+                else if (text === AnnotationKind.loco) {
+                    curOctaveShift = 0;
+                }
+                else if (
+                    isTempoText(text) ||
+                    isDynamicsText(text) ||
+                    text === AnnotationKind._8va || text === AnnotationKind._8vb
+                ) {
                     let extension = layoutObj.musicObj.getLink() instanceof Extension
                         ? layoutObj.musicObj.getLink() as Extension
                         : new Extension(layoutObj, col, Infinity, false, "solid", "bottom"); // Create dummy extension.
@@ -340,7 +362,7 @@ export class PlayerEngine {
                     let totalTicks = Utils.Math.sum(range.columnRange.map(c => c.getTicksToNextColumn()));
 
                     switch (text) {
-                        case TempoAnnotation.accel: {
+                        case AnnotationKind.accel: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed * AccelerandoSpeedMul;
                             let accuTicks = 0;
@@ -350,8 +372,8 @@ export class PlayerEngine {
                             });
                             break;
                         }
-                        case TempoAnnotation.rit:
-                        case TempoAnnotation.rall: {
+                        case AnnotationKind.rit:
+                        case AnnotationKind.rall: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed / RitardandoSpeedDiv;
                             let accuTicks = 0;
@@ -361,7 +383,7 @@ export class PlayerEngine {
                             });
                             break;
                         }
-                        case DynamicsAnnotation.cresc: {
+                        case AnnotationKind.cresc: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
                             if (range.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol > startVol) {
@@ -374,8 +396,8 @@ export class PlayerEngine {
                             });
                             break;
                         }
-                        case DynamicsAnnotation.decresc:
-                        case DynamicsAnnotation.dim: {
+                        case AnnotationKind.decresc:
+                        case AnnotationKind.dim: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
                             if (range.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol < startVol) {
@@ -388,17 +410,35 @@ export class PlayerEngine {
                             });
                             break;
                         }
+                        case AnnotationKind._8va: {
+                            range.columnRange.forEach(c => pushOctaveShift(c, 1));
+                            break;
+                        }
+                        case AnnotationKind._8vb: {
+                            range.columnRange.forEach(c => pushOctaveShift(c, -1));
+                            break;
+                        }
                     }
                 }
             });
 
             let speedArr = speedMap.getOrDefault(col, []);
-            if (speedArr.length > 0) curSpeed = Utils.Math.avg(...speedArr);
-            col.getPlayerProps().setSpeed(curSpeed);
-
             let volumeArr = volumeMap.getOrDefault(col, []);
-            if (volumeArr.length > 0) curVolume = Utils.Math.avg(...volumeArr);
+            let octaveShiftArr = octaveShiftMap.getOrDefault(col, []);
+
+            if (speedArr.length > 0)
+                curSpeed = Utils.Math.avg(...speedArr);
+
+            if (volumeArr.length > 0)
+                curVolume = Utils.Math.avg(...volumeArr);
+
+            curOctaveShift = octaveShiftArr.length > 0
+                ? octaveShiftArr[octaveShiftArr.length - 1]
+                : 0;
+
+            col.getPlayerProps().setSpeed(curSpeed);
             col.getPlayerProps().setVolume(curVolume);
+            col.getPlayerProps().setOctaveShift(curOctaveShift);
         });
 
     }
@@ -488,12 +528,19 @@ export class PlayerEngine {
                         volume *= SlurredVolumeFactor;
                     }
 
+                    let playNote = note.note;
+
+                    let octaveShift = col.getPlayerProps().getOctaveShift();
+
+                    if (octaveShift !== 0)
+                        playNote = new Note(playNote.diatonicId + octaveShift * 7, playNote.accidental);
+
                     if (arpeggioDelayTicks > 0) {
                         let arpeggioDelay = getDuration(arpeggioDelayTicks, tempo);
-                        _setTimeout(() => Audio.playNote(note.note, noteSeconds, volume), arpeggioDelay * 1000);
+                        _setTimeout(() => Audio.playNote(playNote, noteSeconds, volume), arpeggioDelay * 1000);
                     }
                     else {
-                        Audio.playNote(note.note, noteSeconds, volume);
+                        Audio.playNote(playNote, noteSeconds, volume);
                     }
                 }
             });

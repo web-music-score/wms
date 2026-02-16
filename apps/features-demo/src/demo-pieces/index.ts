@@ -12,6 +12,7 @@ import { createKeySignaturesDemo } from "demo-pieces/key-signatures";
 import { createStaffConfigGrandDemo } from "./staff-grand";
 import { createBeamsTupletsDemo } from "./beams-tuplets";
 import { createAnnotationTempoDemo } from "./annotation-tempo";
+import { createAnnotationOctaveShiftDemo } from "./annotation-octave-shift";
 import { createAnnotationDynamicsDemo } from "./annotation-dynamics";
 import { createFillWithRestsDemo } from "./fill-with-rests";
 import { createStaffConfigGuitarDemo } from "./staff-guitar";
@@ -61,6 +62,7 @@ export class DemoPieces {
         demos.push(createKeySignaturesDemo());
         demos.push(createStaffConfigGrandDemo());
         demos.push(createAnnotationTempoDemo());
+        demos.push(createAnnotationOctaveShiftDemo());
         demos.push(createAnnotationDynamicsDemo());
         demos.push(createFillWithRestsDemo());
         demos.push(createStaffConfigGuitarDemo());
