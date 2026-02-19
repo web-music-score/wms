@@ -85,7 +85,7 @@ export class LayoutObjectWrapper {
 
     private positionResolved = true;
 
-    constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjNotationLine, readonly layoutGroupId: LayoutGroupId, readonly verticalPos: VerticalPos) {
+    constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjNotationLine, readonly layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
         this.measure = requireParentMeasure(this.musicObj);
         this.row = this.measure.row;
 
@@ -102,6 +102,10 @@ export class LayoutObjectWrapper {
         this.layoutGroup.add(this);
     }
 
+    get verticalPos() {
+        return this.layoutGroup.verticalPos;
+    }
+
     resetPositionResolved() {
         this.positionResolved = false;
     }
@@ -112,39 +116,6 @@ export class LayoutObjectWrapper {
 
     isPositionResolved() {
         return this.positionResolved;
-    }
-
-    resolveClosestToStaffY(view: View): number {
-        const { musicObj, measure, verticalPos, line, layoutGroup } = this;
-        const padding = layoutGroup.getPadding(view);
-
-        let lineTop = line.getTopLineY() - view.unitSize;
-        let lineBottom = line.getBottomLineY() + view.unitSize;
-
-        let y = verticalPos === VerticalPos.Below
-            ? lineBottom + musicObj.getRect().toph
-            : lineTop - musicObj.getRect().bottomh;
-
-        let staticObjects = measure.getStaticObjects(line);
-        let objShapeRects = musicObj.getShapeRects().map(r =>
-            new AnchoredRect(r.left, r.anchorX, r.right, r.top - padding, r.anchorY, r.bottom + padding)
-        );
-
-        staticObjects.forEach(staticObj => {
-            let staticShapeRects = staticObj.getShapeRects();
-
-            objShapeRects.forEach(objR => {
-                staticShapeRects.forEach(staticR => {
-                    if (AnchoredRect.overlapX(objR, staticR)) {
-                        y = verticalPos === VerticalPos.Below
-                            ? Math.max(y, staticR.bottom + objR.toph + objR.anchorY)
-                            : Math.min(y, staticR.top - objR.bottomh - objR.anchorY);
-                    }
-                });
-            });
-        });
-
-        return y;
     }
 
     layout(view: View) {

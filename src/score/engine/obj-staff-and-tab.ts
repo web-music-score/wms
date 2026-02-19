@@ -13,9 +13,9 @@ import { ObjScoreRowGroup } from "./obj-score-row-group";
 import { ScoreError } from "./error-utils";
 
 type NotationLineObject = {
-    getRect: () => AnchoredRect,
-    offset?: (dx: number, dy: number) => void
-    offsetInPlace?: (dx: number, dy: number) => void
+    getRect: () => AnchoredRect;
+    offset?: (dx: number, dy: number) => void;
+    offsetInPlace?: (dx: number, dy: number) => void;
 }
 
 export abstract class ObjNotationLine extends MusicObject {
@@ -87,35 +87,89 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObj.setPositionResolved();
     }
 
-    private resolveSingleObject(view: View, layoutGroup: LayoutGroup, layoutObj: LayoutObjectWrapper) {
-        const { verticalPos } = layoutGroup;
-        const vdir = verticalPos === VerticalPos.Below ? 1 : -1;
-        let y = layoutObj.resolveClosestToStaffY(view) + layoutObj.layoutGroup.getPadding(view) * vdir;
-        this.setObjectY(layoutObj, y);
+    resolveNearestY(view: View, layoutObj: LayoutObjectWrapper): number {
+        const { musicObj, measure, verticalPos, line, layoutGroup } = layoutObj;
+        const padding = layoutGroup.getPadding(view);
+
+        let lineTop = line.getTopLineY() - view.unitSize;
+        let lineBottom = line.getBottomLineY() + view.unitSize;
+
+        let y = verticalPos === VerticalPos.Below
+            ? lineBottom + musicObj.getRect().toph
+            : lineTop - musicObj.getRect().bottomh;
+
+        let staticObjects = measure.getStaticObjects(line);
+        let objShapeRects = musicObj.getShapeRects().map(r =>
+            new AnchoredRect(r.left, r.anchorX, r.right, r.top - padding, r.anchorY, r.bottom + padding)
+        );
+
+        staticObjects.forEach(staticObj => {
+            let staticShapeRects = staticObj.getShapeRects();
+
+            objShapeRects.forEach(objR => {
+                staticShapeRects.forEach(staticR => {
+                    if (AnchoredRect.overlapX(objR, staticR)) {
+                        y = verticalPos === VerticalPos.Below
+                            ? Math.max(y, staticR.bottom + objR.toph + objR.anchorY)
+                            : Math.min(y, staticR.top - objR.bottomh - objR.anchorY);
+                    }
+                });
+            });
+        });
+
+        return y;
     }
 
-    private resolveRowObjects(view: View, layoutGroup: LayoutGroup, layoutObjects: LayoutObjectWrapper[]) {
+    private resolveIndividualObject(view: View, layoutGroup: LayoutGroup, layoutObj: LayoutObjectWrapper) {
         const { verticalPos } = layoutGroup;
-        const layoutObjArr = layoutObjects.filter(obj => !obj.isPositionResolved() && obj.verticalPos === verticalPos);
+        let layoutObjects = [layoutObj];
 
-        if (layoutObjArr.length === 0)
+        let link = layoutObj.musicObj.getLink();
+        if (link) {
+            if (link.getHead() === layoutObj.musicObj) {
+                let objectParts = [link.getHead(), ...link.getTails()];
+                layoutObjects = layoutGroup.getLayoutObjects().filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
+            }
+            else {
+                layoutObjects = [];
+            }
+        }
+
+        if (layoutObjects.length === 0)
             return;
 
-        const vdir = verticalPos === VerticalPos.Below ? 1 : -1;
-
-        let yArr = layoutObjArr.map(layoutObj => {
-            return layoutObj.resolveClosestToStaffY(view) +
-                layoutObj.layoutGroup.getPadding(view) * vdir;
+        let yArr = layoutObjects.map(layoutObj => {
+            return this.resolveNearestY(view, layoutObj) +
+                layoutObj.layoutGroup.getPadding(view) * (verticalPos === VerticalPos.Below ? 1 : -1);
         });
 
         const rowY = verticalPos === VerticalPos.Below
             ? Math.max(...yArr)
             : Math.min(...yArr);
 
-        layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
+        layoutObjects.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
     }
 
-    layoutSingleLayoutGroup(view: View, layoutGroup: LayoutGroup) {
+    private resolveLaneObjects(view: View, layoutGroup: LayoutGroup) {
+        const { verticalPos } = layoutGroup;
+        const layoutObjects = layoutGroup.getLayoutObjects();
+
+        if (layoutObjects.length === 0)
+            return;
+
+        let yArr = layoutObjects.map(layoutObj => {
+            return this.resolveNearestY(view, layoutObj) +
+                layoutObj.layoutGroup.getPadding(view) * (verticalPos === VerticalPos.Below ? 1 : -1);
+        });
+
+        const rowY = verticalPos === VerticalPos.Below
+            ? Math.max(...yArr)
+            : Math.min(...yArr);
+
+        layoutObjects.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
+    }
+
+    private layoutSingleLayoutGroup(view: View, layoutGroup: LayoutGroup) {
         // Get this row's objects
         let layoutGroupObjects = layoutGroup.getLayoutObjects().filter(layoutObj => !layoutObj.isPositionResolved());
 
@@ -132,25 +186,13 @@ export abstract class ObjNotationLine extends MusicObject {
         });
 
         if (layoutGroup.rowAlign) {
-            // Resolve row-aligned objects
-            this.resolveRowObjects(view, layoutGroup, layoutGroupObjects);
+            // Resolve lane objects
+            this.resolveLaneObjects(view, layoutGroup);
         }
         else {
-            // Resolve non-row-aligned objects
-            for (const layoutObj of layoutGroupObjects) {
-                let link = layoutObj.musicObj.getLink();
-                if (link) {
-                    if (link.getHead() === layoutObj.musicObj) {
-                        let objectParts = [link.getHead(), ...link.getTails()];
-                        let layoutObjs = layoutGroupObjects.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                        this.resolveRowObjects(view, layoutGroup, layoutObjs);
-                    }
-                    else continue;
-                }
-                else {
-                    this.resolveSingleObject(view, layoutGroup, layoutObj);
-                }
-            }
+            // Resolve individual objects
+            for (const layoutObj of layoutGroupObjects)
+                this.resolveIndividualObject(view, layoutGroup, layoutObj);
         }
     }
 
