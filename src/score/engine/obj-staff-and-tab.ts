@@ -87,13 +87,15 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObj.setPositionResolved();
     }
 
-    private resolveSingleObject(view: View, layoutObj: LayoutObjectWrapper, verticalPos: VerticalPos) {
+    private resolveSingleObject(view: View, layoutGroup: LayoutGroup, layoutObj: LayoutObjectWrapper) {
+        const { verticalPos } = layoutGroup;
         const vdir = verticalPos === VerticalPos.Below ? 1 : -1;
         let y = layoutObj.resolveClosestToStaffY(view) + layoutObj.layoutGroup.getPadding(view) * vdir;
         this.setObjectY(layoutObj, y);
     }
 
-    private resolveRowObjects(view: View, layoutObjects: LayoutObjectWrapper[], verticalPos: VerticalPos) {
+    private resolveRowObjects(view: View, layoutGroup: LayoutGroup, layoutObjects: LayoutObjectWrapper[]) {
+        const { verticalPos } = layoutGroup;
         const layoutObjArr = layoutObjects.filter(obj => !obj.isPositionResolved() && obj.verticalPos === verticalPos);
 
         if (layoutObjArr.length === 0)
@@ -115,10 +117,10 @@ export abstract class ObjNotationLine extends MusicObject {
 
     layoutSingleLayoutGroup(view: View, layoutGroup: LayoutGroup) {
         // Get this row's objects
-        let rowLayoutObjs = layoutGroup.getLayoutObjects().filter(layoutObj => !layoutObj.isPositionResolved());
+        let layoutGroupObjects = layoutGroup.getLayoutObjects().filter(layoutObj => !layoutObj.isPositionResolved());
 
         // Positioning horizontally to anchor
-        rowLayoutObjs.forEach(layoutObj => {
+        layoutGroupObjects.forEach(layoutObj => {
             let { musicObj, anchor } = layoutObj;
 
             if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine || musicObj instanceof ObjTabRhythm) {
@@ -131,22 +133,22 @@ export abstract class ObjNotationLine extends MusicObject {
 
         if (layoutGroup.rowAlign) {
             // Resolve row-aligned objects
-            this.resolveRowObjects(view, rowLayoutObjs, layoutGroup.verticalPos);
+            this.resolveRowObjects(view, layoutGroup, layoutGroupObjects);
         }
         else {
             // Resolve non-row-aligned objects
-            for (const layoutObj of rowLayoutObjs) {
+            for (const layoutObj of layoutGroupObjects) {
                 let link = layoutObj.musicObj.getLink();
                 if (link) {
                     if (link.getHead() === layoutObj.musicObj) {
                         let objectParts = [link.getHead(), ...link.getTails()];
-                        let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                        this.resolveRowObjects(view, layoutObjs, layoutGroup.verticalPos);
+                        let layoutObjs = layoutGroupObjects.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
+                        this.resolveRowObjects(view, layoutGroup, layoutObjs);
                     }
                     else continue;
                 }
                 else {
-                    this.resolveSingleObject(view, layoutObj, layoutGroup.verticalPos);
+                    this.resolveSingleObject(view, layoutGroup, layoutObj);
                 }
             }
         }
