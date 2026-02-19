@@ -74,7 +74,13 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObj.setPositionResolved();
     }
 
-    private alignObjectsY(view: View, layoutObjects: LayoutObjectWrapper[], verticalPos: VerticalPos) {
+    private resolveSingleObject(view: View, layoutObj: LayoutObjectWrapper, verticalPos: VerticalPos) {
+        const vdir = verticalPos === VerticalPos.Below ? 1 : -1;
+        let y = layoutObj.resolveClosestToStaffY(view) + layoutObj.layoutGroup.getPadding(view) * vdir;
+        this.setObjectY(layoutObj, y);
+    }
+
+    private resolveRowObjects(view: View, layoutObjects: LayoutObjectWrapper[], verticalPos: VerticalPos) {
         const layoutObjArr = layoutObjects.filter(obj => !obj.isPositionResolved() && obj.verticalPos === verticalPos);
 
         if (layoutObjArr.length === 0)
@@ -112,21 +118,24 @@ export abstract class ObjNotationLine extends MusicObject {
 
         if (layoutGroup.rowAlign) {
             // Resolve row-aligned objects
-            this.alignObjectsY(view, rowLayoutObjs, verticalPos);
+            this.resolveRowObjects(view, rowLayoutObjs, verticalPos);
         }
         else {
             // Resolve non-row-aligned objects
-            rowLayoutObjs.forEach(layoutObj => {
+            for (const layoutObj of rowLayoutObjs) {
                 let link = layoutObj.musicObj.getLink();
-                if (link && link.getHead() === layoutObj.musicObj) {
-                    let objectParts = [link.getHead(), ...link.getTails()];
-                    let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                    this.alignObjectsY(view, layoutObjs, verticalPos);
+                if (link) {
+                    if (link.getHead() === layoutObj.musicObj) {
+                        let objectParts = [link.getHead(), ...link.getTails()];
+                        let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
+                        this.resolveRowObjects(view, layoutObjs, verticalPos);
+                    }
+                    else continue;
                 }
                 else {
-                    this.alignObjectsY(view, [layoutObj], verticalPos);
+                    this.resolveSingleObject(view, layoutObj, verticalPos);
                 }
-            });
+            }
         }
     }
 
