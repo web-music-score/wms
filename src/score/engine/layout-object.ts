@@ -98,7 +98,7 @@ export class LayoutObjectWrapper {
         this.anchor = anchor;
         this.anchor.addAnchoredLayoutObject(this);
 
-        this.layoutGroup = this.line.getLayoutGroup(layoutGroupId);
+        this.layoutGroup = this.line.getLayoutGroup(layoutGroupId, verticalPos);
         this.layoutGroup.add(this);
     }
 
@@ -165,33 +165,34 @@ export class LayoutObjectWrapper {
 }
 
 export class LayoutGroup {
-    // key = VerticalPos
-    private readonly layoutObject = asMulti(new IndexArray<LayoutObjectWrapper[]>());
+    private readonly layoutObjects: LayoutObjectWrapper[] = [];
 
     readonly rowAlign: boolean
     readonly padding: number;
 
-    constructor(readonly layoutGroupId: number) {
+    constructor(readonly layoutGroupId: number, readonly verticalPos: VerticalPos) {
         this.rowAlign = LayoutGroupIdAttrs.get(layoutGroupId)?.rowAlign === true;
         this.padding = LayoutGroupIdAttrs.get(layoutGroupId)?.padding ?? 0;
     }
 
-    getLayoutObjects(verticalPos: VerticalPos): Readonly<LayoutObjectWrapper[]> {
-        return this.layoutObject.getAll(verticalPos);
+    getLayoutObjects(): readonly LayoutObjectWrapper[] {
+        return this.layoutObjects;
     }
 
     add(layoutObj: LayoutObjectWrapper) {
-        this.layoutObject.add(layoutObj.verticalPos, layoutObj);
+        this.layoutObjects.push(layoutObj);
     }
 
     remove(layoutObj: LayoutObjectWrapper) {
-        this.layoutObject.remove(layoutObj.verticalPos, layoutObj);
+        const i = this.layoutObjects.indexOf(layoutObj);
+        if (i >= 0)
+            this.layoutObjects.splice(i, 1);
     }
 
     layout(view: View) {
-        for (const w of this.layoutObject.values()) {
-            w.resetPositionResolved();
-            w.musicObj.layout(view);
+        for (const layoutObj of this.layoutObjects) {
+            layoutObj.resetPositionResolved();
+            layoutObj.musicObj.layout(view);
         }
     }
 

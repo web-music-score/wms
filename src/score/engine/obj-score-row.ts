@@ -187,7 +187,7 @@ export class ObjScoreRow extends MusicObject {
     }
 
     layoutLayoutGroups(view: View) {
-        this.notationLines.forEach(line => line.layoutLayoutGroups(view));
+        this.notationLines.forEach(line => line.layoutAllLayoutGroups(view));
     }
 
     pick(x: number, y: number): MusicObject[] {

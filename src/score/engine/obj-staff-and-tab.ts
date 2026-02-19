@@ -24,7 +24,8 @@ export abstract class ObjNotationLine extends MusicObject {
     public abstract readonly id: number;
     public abstract readonly name: string;
 
-    private layoutGroups = new UniMap<LayoutGroupId, LayoutGroup>();
+    // index = VerticalPos
+    private layoutGroups: UniMap<LayoutGroupId, LayoutGroup>[] = [];
 
     constructor(readonly row: ObjScoreRow) {
         super(row);
@@ -42,22 +43,34 @@ export abstract class ObjNotationLine extends MusicObject {
         this.objects.length = 0;
     }
 
-    getLayoutGroup(lauoutGroupId: LayoutGroupId): LayoutGroup {
-        return this.layoutGroups.getOrCreate(lauoutGroupId, () => new LayoutGroup(lauoutGroupId));
+    getLayoutGroup(lauoutGroupId: LayoutGroupId, verticalPos: VerticalPos): LayoutGroup {
+        if (this.layoutGroups[verticalPos] === undefined)
+            this.layoutGroups[verticalPos] = new UniMap();
+
+        return this.layoutGroups[verticalPos].getOrCreate(lauoutGroupId, () => new LayoutGroup(lauoutGroupId, verticalPos));
     }
 
     resetLayoutGroups(view: View) {
         // Clear resolved position and layout objects
-        this.layoutGroups.forEach(layoutGroup => layoutGroup.layout(view));
+        for (const verticalPos of [VerticalPos.Above, VerticalPos.Below]) {
+            if (!this.layoutGroups[verticalPos])
+                continue;
+
+            this.layoutGroups[verticalPos].forEach(layoutGroup => layoutGroup.layout(view));
+        }
     }
 
-    layoutLayoutGroups(view: View) {
-        // Layout in correct order of LayoutGroupId values.
-        for (const groupId of Utils.Enum.getEnumValues(LayoutGroupId)) {
-            const layoutGroup = this.getLayoutGroup(groupId);
-            if (layoutGroup) {
-                this.layoutLayoutGroup(view, layoutGroup, VerticalPos.Above);
-                this.layoutLayoutGroup(view, layoutGroup, VerticalPos.Below);
+    layoutAllLayoutGroups(view: View) {
+        for (const verticalPos of [VerticalPos.Above, VerticalPos.Below]) {
+            if (!this.layoutGroups[verticalPos])
+                continue;
+
+            // Layout in correct order of LayoutGroupId values.
+            for (const groupId of Utils.Enum.getEnumValues(LayoutGroupId)) {
+                const layoutGroup = this.layoutGroups[verticalPos].get(groupId);
+                if (layoutGroup) {
+                    this.layoutSingleLayoutGroup(view, layoutGroup);
+                }
             }
         }
     }
@@ -100,9 +113,9 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutObjArr.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
     }
 
-    layoutLayoutGroup(view: View, layoutGroup: LayoutGroup, verticalPos: VerticalPos) {
+    layoutSingleLayoutGroup(view: View, layoutGroup: LayoutGroup) {
         // Get this row's objects
-        let rowLayoutObjs = layoutGroup.getLayoutObjects(verticalPos).filter(layoutObj => !layoutObj.isPositionResolved());
+        let rowLayoutObjs = layoutGroup.getLayoutObjects().filter(layoutObj => !layoutObj.isPositionResolved());
 
         // Positioning horizontally to anchor
         rowLayoutObjs.forEach(layoutObj => {
@@ -118,7 +131,7 @@ export abstract class ObjNotationLine extends MusicObject {
 
         if (layoutGroup.rowAlign) {
             // Resolve row-aligned objects
-            this.resolveRowObjects(view, rowLayoutObjs, verticalPos);
+            this.resolveRowObjects(view, rowLayoutObjs, layoutGroup.verticalPos);
         }
         else {
             // Resolve non-row-aligned objects
@@ -128,12 +141,12 @@ export abstract class ObjNotationLine extends MusicObject {
                     if (link.getHead() === layoutObj.musicObj) {
                         let objectParts = [link.getHead(), ...link.getTails()];
                         let layoutObjs = rowLayoutObjs.filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
-                        this.resolveRowObjects(view, layoutObjs, verticalPos);
+                        this.resolveRowObjects(view, layoutObjs, layoutGroup.verticalPos);
                     }
                     else continue;
                 }
                 else {
-                    this.resolveSingleObject(view, layoutObj, verticalPos);
+                    this.resolveSingleObject(view, layoutObj, layoutGroup.verticalPos);
                 }
             }
         }
