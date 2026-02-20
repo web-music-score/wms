@@ -1023,18 +1023,7 @@ export class ObjMeasure extends MusicObject {
     }
 
     getStaticObjects(line: ObjNotationLine): ReadonlyArray<MusicObject> {
-        let layoutObjects = this.layoutObjects
-            .filter(layoutObj => layoutObj.line === line && layoutObj.isPositionResolved())
-            .map(layoutObj => layoutObj.musicObj);
-
-        let staticObjects = layoutObjects.length > 0
-            ? [...this.staticObjectsCache.getOrDefault(line, []), ...layoutObjects]
-            : this.staticObjectsCache.getOrDefault(line, []);
-
-        // Update rects.
-        staticObjects.forEach(obj => obj.getRect());
-
-        return staticObjects;
+        return this.staticObjectsCache.getOrDefault(line, []);
     }
 
     addStaticObject(line: ObjNotationLine, staticObj: MusicObject) {
@@ -1598,7 +1587,7 @@ export class ObjMeasure extends MusicObject {
             this.barLineRight.getRect().top,
             ...this.connectives.map(c => c.getRect().top),
             ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().top),
-            ...this.layoutObjects.filter(o => o.isPositionResolved()).map(o => o.musicObj.getRect().top)
+            ...this.layoutObjects.map(o => o.musicObj.getRect().top)
         );
 
         this.rect.bottom = Math.max(
@@ -1609,14 +1598,14 @@ export class ObjMeasure extends MusicObject {
             this.barLineRight.getRect().bottom,
             ...this.connectives.map(c => c.getRect().bottom),
             ...this.beamGroups.filter(b => !b.isEmpty()).map(b => b.getRect().bottom),
-            ...this.layoutObjects.filter(o => o.isPositionResolved()).map(o => o.musicObj.getRect().bottom)
+            ...this.layoutObjects.map(o => o.musicObj.getRect().bottom)
         );
 
         if (this.isLastMeasureInRow()) {
             // Expand width of last measure in case there is fermata.
             this.rect.right = Math.max(
                 this.rect.right,
-                ...this.layoutObjects.filter(o => o.isPositionResolved() && o.musicObj instanceof ObjFermata).map(o => o.musicObj.getRect().right)
+                ...this.layoutObjects.filter(o => o.musicObj instanceof ObjFermata).map(o => o.musicObj.getRect().right)
             );
         }
 

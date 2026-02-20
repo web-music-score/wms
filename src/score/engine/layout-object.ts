@@ -83,8 +83,6 @@ export class LayoutObjectWrapper {
     readonly row: ObjScoreRow;
     readonly layoutGroup: LayoutGroup;
 
-    private positionResolved = true;
-
     constructor(readonly musicObj: LayoutableMusicObject, readonly line: ObjNotationLine, readonly layoutGroupId: LayoutGroupId, verticalPos: VerticalPos) {
         this.measure = requireParentMeasure(this.musicObj);
         this.row = this.measure.row;
@@ -104,18 +102,6 @@ export class LayoutObjectWrapper {
 
     get verticalPos() {
         return this.layoutGroup.verticalPos;
-    }
-
-    resetPositionResolved() {
-        this.positionResolved = false;
-    }
-
-    setPositionResolved() {
-        this.positionResolved = true;
-    }
-
-    isPositionResolved() {
-        return this.positionResolved;
     }
 
     layout(view: View) {
@@ -161,10 +147,8 @@ export class LayoutGroup {
     }
 
     layout(view: View) {
-        for (const layoutObj of this.layoutObjects) {
-            layoutObj.resetPositionResolved();
+        for (const layoutObj of this.layoutObjects)
             layoutObj.musicObj.layout(view);
-        }
     }
 
     getPadding(view: View) {
