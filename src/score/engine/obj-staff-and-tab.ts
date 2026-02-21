@@ -87,28 +87,19 @@ export abstract class ObjNotationLine extends MusicObject {
         }
     }
 
-    private setObjectY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
-        if (y === undefined) {
-            return;
-        }
-
-        // Set y-position
+    private setObjectAnchorY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
+        if (y === undefined) return;
         layoutObj.setAnchorY(y - layoutObj.getRect().anchorY);
-
-        // Object resolved
         this.resolvedObjects.push(layoutObj.musicObj);
     }
 
     private resolveNearestY(view: View, layoutObj: LayoutObjectWrapper): number {
-        const { musicObj, measure, verticalPos, line, layoutGroup } = layoutObj;
+        const { musicObj, verticalPos, line, layoutGroup } = layoutObj;
         const padding = layoutGroup.getPadding(view);
 
-        let lineTop = line.getTopLineY() - view.unitSize;
-        let lineBottom = line.getBottomLineY() + view.unitSize;
-
-        let y = verticalPos === VerticalPos.Below
-            ? lineBottom + musicObj.getRect().toph
-            : lineTop - musicObj.getRect().bottomh;
+        let y = verticalPos === VerticalPos.Above
+            ? this.resolvedBaseY - musicObj.getRect().bottomh
+            : this.resolvedBaseY + musicObj.getRect().toph;
 
         let objShapeRects = musicObj.getShapeRects().map(r =>
             new AnchoredRect(r.left, r.anchorX, r.right, r.top - padding, r.anchorY, r.bottom + padding)
@@ -160,7 +151,15 @@ export abstract class ObjNotationLine extends MusicObject {
             ? Math.max(...yArr)
             : Math.min(...yArr);
 
-        layoutObjects.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
+        layoutObjects.forEach(layoutObj => this.setObjectAnchorY(layoutObj, rowY));
+    }
+
+    private resolveBaseY(verticalPos: VerticalPos) {
+        for (const o of this.resolvedObjects) {
+            this.resolvedBaseY = verticalPos === VerticalPos.Above
+                ? Math.min(this.resolvedBaseY, o.getRect().top)
+                : Math.max(this.resolvedBaseY, o.getRect().bottom);
+        }
     }
 
     private resolveLaneObjects(view: View, layoutGroup: LayoutGroup) {
@@ -170,16 +169,15 @@ export abstract class ObjNotationLine extends MusicObject {
         if (layoutObjects.length === 0)
             return;
 
-        let yArr = layoutObjects.map(layoutObj => {
-            return this.resolveNearestY(view, layoutObj) +
-                layoutObj.layoutGroup.getPadding(view) * (verticalPos === VerticalPos.Below ? 1 : -1);
-        });
+        this.resolveBaseY(verticalPos);
 
-        const rowY = verticalPos === VerticalPos.Below
-            ? Math.max(...yArr)
-            : Math.min(...yArr);
+        const anchorY = verticalPos === VerticalPos.Above
+            ? (this.resolvedBaseY - Math.max(...layoutObjects.map(o => o.getRect().bottomh)))
+            : (this.resolvedBaseY + Math.max(...layoutObjects.map(o => o.getRect().toph)));
 
-        layoutObjects.forEach(layoutObj => this.setObjectY(layoutObj, rowY));
+        layoutObjects.forEach(layoutObj => this.setObjectAnchorY(layoutObj, anchorY));
+
+        this.resolveBaseY(verticalPos);
     }
 
     private layoutSingleLayoutGroup(view: View, layoutGroup: LayoutGroup) {
