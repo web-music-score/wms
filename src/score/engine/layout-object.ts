@@ -36,25 +36,25 @@ export enum LayoutGroupId {
     LyricsVerse3
 }
 
-const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { rowAlign?: boolean, padding?: number }>([
-    [LayoutGroupId.TabRhythm, { rowAlign: true }],
-    [LayoutGroupId.Annotation_Label_PitchLabel, { padding: 1 }],
-    [LayoutGroupId.Annotation_Articulation, { padding: 1 }],
-    [LayoutGroupId.Annotation_Technique, { padding: 1 }],
-    [LayoutGroupId.Annotation_Ornament, { padding: 1 }],
-    [LayoutGroupId.Annotation_Temporal_Fermata, { padding: 1 }],
-    [LayoutGroupId.Annotation_Dynamics, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Expression, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Tempo, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Temporal, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Navigation, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Navigation_Ending, { rowAlign: true, padding: 2 }],
-    [LayoutGroupId.Annotation_Label, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Label_ChordLabel, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.Annotation_Misc, { rowAlign: true, padding: 1 }],
-    [LayoutGroupId.LyricsVerse1, { rowAlign: true }],
-    [LayoutGroupId.LyricsVerse2, { rowAlign: true }],
-    [LayoutGroupId.LyricsVerse3, { rowAlign: true }],
+const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { isLane: boolean, padding: number }>([
+    [LayoutGroupId.TabRhythm, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Label_PitchLabel, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_Articulation, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_Technique, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_Ornament, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_Temporal_Fermata, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_Dynamics, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Expression, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Tempo, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Temporal, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Navigation, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Navigation_Ending, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Label, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Label_ChordLabel, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_Misc, { isLane: true, padding: 0 }],
+    [LayoutGroupId.LyricsVerse1, { isLane: true, padding: 0 }],
+    [LayoutGroupId.LyricsVerse2, { isLane: true, padding: 0 }],
+    [LayoutGroupId.LyricsVerse3, { isLane: true, padding: 0 }],
 ]);
 
 function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
@@ -124,11 +124,11 @@ export class LayoutObjectWrapper {
 export class LayoutGroup {
     private readonly layoutObjects: LayoutObjectWrapper[] = [];
 
-    readonly rowAlign: boolean
+    readonly isLane: boolean
     readonly padding: number;
 
     constructor(readonly layoutGroupId: number, readonly verticalPos: VerticalPos) {
-        this.rowAlign = LayoutGroupIdAttrs.get(layoutGroupId)?.rowAlign === true;
+        this.isLane = LayoutGroupIdAttrs.get(layoutGroupId)?.isLane === true;
         this.padding = LayoutGroupIdAttrs.get(layoutGroupId)?.padding ?? 0;
     }
 
@@ -152,6 +152,6 @@ export class LayoutGroup {
     }
 
     getPadding(view: View) {
-        return this.padding * view.unitSize;
+        return Math.max(0.5, this.padding) * view.unitSize;
     }
 }
