@@ -3,6 +3,9 @@
 ### Added
 - Implemented octave shift annotation kinds "8va", "8vb" and "loco".
 
+### Changed
+- Updated annotation layout with lanes, and stuff.
+
 ## [6.4.0-pre.7] - 2026-02-15
 ### Added
 - "color" to AnnotationOptions.
