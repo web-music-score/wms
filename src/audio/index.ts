@@ -1,10 +1,11 @@
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
 import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
 import { Synthesizer } from "web-music-score/audio-synth";
-import { Instrument, linearToDecibels } from "./instrument";
+import { Instrument, InstrumentSamples, linearToDecibels } from "./instrument";
 import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { SamplerInstrument } from "./sampler-instrument";
 
-export { Instrument, linearToDecibels }
+export { Instrument, InstrumentSamples, linearToDecibels }
 
 initCore();
 
@@ -60,27 +61,30 @@ export function getCurrentInstrument(): string {
  * Add and use instrument.
  * @param instrument - Object that implements Instrument interface. Can be single instrument or array of instruments.
  */
-export function addInstrument(instrument: Instrument | Instrument[]): void {
+export function addInstrument(instrument: Instrument | InstrumentSamples | (Instrument | InstrumentSamples)[]): void {
     (Guard.isArray(instrument) ? instrument : [instrument])
         .forEach(instr => {
             if (
-                !Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) ||
-                !Guard.isFunction(instr.getName) ||
-                !Guard.isFunction(instr.playNote) ||
-                !Guard.isFunction(instr.stop)
+                Utils.Obj.hasProperties(instr, ["getName", "getSamples"]) &&
+                Guard.isFunction(instr.getName) &&
+                Guard.isFunction(instr.getSamples)
             ) {
-                throw new AudioError("Invalid instrument object!");
+                const genericInstr = new SamplerInstrument(instr.getName(), instr.getSamples());
+                InstrumentList.push(genericInstr);
+                useInstrument(genericInstr.getName());
             }
-
-            if (InstrumentList.some(instr2 => instr2.getName() === instr.getName())) {
-                console.warn(`Instrument "${instr.getName()}" already added!`);
+            else if (
+                Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
+                Guard.isFunction(instr.getName) &&
+                Guard.isFunction(instr.playNote) &&
+                Guard.isFunction(instr.stop)
+            ) {
+                InstrumentList.push(instr as Instrument);
+                useInstrument(instr.getName());
             }
             else {
-                InstrumentList.push(instr);
+                console.error("Object is not instrument or instrument samples!");
             }
-
-            // Set as current.
-            useInstrument(instr.getName());
         });
 }
 

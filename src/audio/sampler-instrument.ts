@@ -1,10 +1,8 @@
 import * as Tone from "tone";
+import { Instrument, linearToDecibels } from "./instrument";
+import { canUseToneJs } from "./can-use-tone-js";
 
-// Use direct paths. Instrument modules must not depend on the audio module.
-import { Instrument, linearToDecibels } from "../audio/instrument";
-import { canUseToneJs } from "../audio/can-use-tone-js";
-
-export class GenericInstrument implements Instrument {
+export class SamplerInstrument implements Instrument {
 
     private audioSource: Tone.Sampler | undefined = undefined;
 
