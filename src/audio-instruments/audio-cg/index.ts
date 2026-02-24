@@ -49,6 +49,6 @@ class ClassicalGuitarSamples implements InstrumentSamples {
     }
 }
 
-const ClassicalGuitar = new ClassicalGuitarSamples;
+const ClassicalGuitar: InstrumentSamples = new ClassicalGuitarSamples();
 
 export { ClassicalGuitar }
