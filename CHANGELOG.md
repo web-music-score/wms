@@ -2,8 +2,9 @@
 ## [6.4.0-pre.8] - Unreleased
 ### Added
 - Implemented octave shift annotation kinds "8va", "8vb" and "loco".
-- InstrumentSamples class. Use this for sampler instruments like "Classical Guitar" so they do not need to bundle with Tone.js.
 - Several built-in synth instruments.
+- InstrumentSamples class so that instruments do not bundle Tone.js but mp3 samples only.
+- New pkg `web-music-score-samples` for instruments samples.
 
 ### Changed
 - Updated annotation layout with lanes, and stuff.

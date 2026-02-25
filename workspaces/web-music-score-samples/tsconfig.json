@@ -26,29 +26,11 @@
         "removeComments": false,
         "skipLibCheck": true,
         "paths": {
-            "web-music-score/core": [
+            "web-music-score-samples/core": [
                 "core"
             ],
-            "web-music-score/audio": [
-                "audio"
-            ],
-            "web-music-score/audio-synth": [
-                "audio-instruments/audio-synth"
-            ],
-            "web-music-score/audio-cg": [
-                "audio-instruments/audio-cg"
-            ],
-            "web-music-score/theory": [
-                "theory"
-            ],
-            "web-music-score/score": [
-                "score"
-            ],
-            "web-music-score/react-ui": [
-                "react-ui"
-            ],
-            "web-music-score/pieces": [
-                "pieces"
+            "web-music-score-samples/classical-guitar": [
+                "classical-guitar"
             ]
         }
     },

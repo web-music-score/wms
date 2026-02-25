@@ -119,7 +119,8 @@
         "tone": "^15.1.22",
         "tsup": "^8.5.0",
         "typedoc": "^0.28.13",
-        "typescript": "latest"
+        "typescript": "latest",
+        "web-music-score-samples": "^1.0.0"
     },
     "workspaces": [
         ".",
@@ -128,7 +129,8 @@
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",
-        "build:all": "npm run build && npm run build:prod --workspaces --if-present",
+        "build:samples": "npm run build --workspace workspaces/web-music-score-samples/",
+        "build:all": "npm run build:samples && npm run build && npm run build:prod --workspaces --if-present",
         "start:features-demo": "npm run start --workspace features-demo",
         "start:cjs-react-example": "npm run start --workspace js-react-example",
         "start:ts-example": "npm run start --workspace ts-example",
