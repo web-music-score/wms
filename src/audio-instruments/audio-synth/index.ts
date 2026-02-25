@@ -33,7 +33,6 @@ class SynthesizerInstr implements Instrument {
                     release: 1.2
                 }
             }).connect(filter);
-
         }
         catch (e) {
             this.audioSource = undefined;
