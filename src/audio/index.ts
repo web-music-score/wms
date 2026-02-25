@@ -1,9 +1,9 @@
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
 import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
-import { Synthesizer } from "web-music-score/audio-synth";
 import { Instrument, InstrumentSamples, linearToDecibels } from "./instrument";
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { SamplerInstrument } from "./sampler-instrument";
+import { addBuiltInSynthesizers } from "./built-in-synthesizers";
 
 export { Instrument, InstrumentSamples, linearToDecibels }
 
@@ -28,9 +28,11 @@ function getNoteName(note: Note | number | string) {
     return note.format(PitchNotation.Scientific, SymbolSet.Ascii);
 }
 
-const InstrumentList: Instrument[] = [Synthesizer];
+const InstrumentList: Instrument[] = [];
+let currentInstrument: Instrument;
 
-let currentInstrument: Instrument = Synthesizer;
+// Add all builting synthesizers.
+addBuiltInSynthesizers();
 
 const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
     let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
@@ -62,30 +64,29 @@ export function getCurrentInstrument(): string {
  * @param instrument - Object that implements Instrument interface. Can be single instrument or array of instruments.
  */
 export function addInstrument(instrument: Instrument | InstrumentSamples | (Instrument | InstrumentSamples)[]): void {
-    (Guard.isArray(instrument) ? instrument : [instrument])
-        .forEach(instr => {
-            if (
-                Utils.Obj.hasProperties(instr, ["getName", "getSamples"]) &&
-                Guard.isFunction(instr.getName) &&
-                Guard.isFunction(instr.getSamples)
-            ) {
-                const genericInstr = new SamplerInstrument(instr.getName(), instr.getSamples());
-                InstrumentList.push(genericInstr);
-                useInstrument(genericInstr.getName());
-            }
-            else if (
-                Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
-                Guard.isFunction(instr.getName) &&
-                Guard.isFunction(instr.playNote) &&
-                Guard.isFunction(instr.stop)
-            ) {
-                InstrumentList.push(instr as Instrument);
-                useInstrument(instr.getName());
-            }
-            else {
-                console.error("Object is not instrument or instrument samples!");
-            }
-        });
+    for (const instr of Guard.isArray(instrument) ? instrument : [instrument]) {
+        if (
+            Utils.Obj.hasProperties(instr, ["getName", "getSamples"]) &&
+            Guard.isFunction(instr.getName) &&
+            Guard.isFunction(instr.getSamples)
+        ) {
+            const genericInstr = new SamplerInstrument(instr.getName(), instr.getSamples());
+            InstrumentList.push(genericInstr);
+            useInstrument(genericInstr.getName());
+        }
+        else if (
+            Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
+            Guard.isFunction(instr.getName) &&
+            Guard.isFunction(instr.playNote) &&
+            Guard.isFunction(instr.stop)
+        ) {
+            InstrumentList.push(instr as Instrument);
+            useInstrument(instr.getName());
+        }
+        else {
+            console.error("Object is not instrument or instrument samples!");
+        }
+    }
 }
 
 /**
@@ -93,11 +94,11 @@ export function addInstrument(instrument: Instrument | InstrumentSamples | (Inst
  * @param instrumentName - Instrument name.
  */
 export function useInstrument(instrumentName: string): void {
-    if (instrumentName === currentInstrument.getName()) {
+    if (currentInstrument && instrumentName === currentInstrument.getName())
         return;
-    }
 
-    currentInstrument.stop();
+    if (currentInstrument)
+        currentInstrument.stop();
 
     let instr = InstrumentList.find(instr => instr.getName() === instrumentName);
 
