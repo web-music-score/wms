@@ -7,7 +7,7 @@ import { Synthesizer } from "web-music-score/audio-synth";
 class SynthesizerCreator implements Instrument {
     private audioSource: Tone.PolySynth | undefined = undefined;
 
-    constructor(readonly name: string, createaudioSource: () => any) {
+    constructor(readonly name: string, createaudioSource: () => Tone.PolySynth) {
         if (!canUseToneJs()) {
             console.warn("Tone.js not available in this environment.");
             return;
