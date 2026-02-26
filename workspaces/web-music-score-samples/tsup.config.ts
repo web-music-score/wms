@@ -40,7 +40,7 @@ export default defineConfig([
         outDir: 'dist',
         target: 'es2015',
         format: ['iife'],
-        globalName: 'Samples_ClassicalGuitar',
+        globalName: 'WebMusicScoreSamples_ClassicalGuitar',
         dts: false,
         sourcemap: true,
         minify: true,
