@@ -16,7 +16,7 @@ import A5_mp3 from "./A5.mp3";
 
 // Use direct path to instrument.ts in audio module.
 // Instrument modules must not depend on the audio module.
-import { InstrumentSamples } from "web-music-score-samples/core";
+import { addToGlobalName, InstrumentSamples } from "web-music-score-samples/core";
 
 /**
  * Export classical guitar instrument object.
@@ -52,3 +52,5 @@ class ClassicalGuitarSamples implements InstrumentSamples {
 const ClassicalGuitar: InstrumentSamples = new ClassicalGuitarSamples();
 
 export { ClassicalGuitar }
+
+addToGlobalName("ClassicalGuitar", ClassicalGuitar);

@@ -15,3 +15,24 @@ export interface InstrumentSamples {
      */
     getSamples(): Record<string, string>;
 }
+
+declare global {
+    interface Window {
+        WebMusicScore?: {
+            Samples?: Record<string, InstrumentSamples>;
+        };
+    }
+}
+
+export function addToGlobalName(name: string, samples: InstrumentSamples) {
+    if (typeof window === "undefined") return;
+
+    const root = (window.WebMusicScore ??= {});
+    const samplesNs = (root.Samples ??= {});
+
+    if (samplesNs[name]) {
+        console.warn(`WebMusicScore.Samples.${name} already exists and will be overwritten.`);
+    }
+
+    samplesNs[name] = samples;
+}
