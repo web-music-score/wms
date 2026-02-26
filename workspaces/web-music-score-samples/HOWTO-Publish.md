@@ -8,11 +8,11 @@
     // Install
     npm install --workspaces
 
-    // Build in workspace
-    npm run build:samples
-
     // Goto working directory
     workspaces/web-music-score-samples/
+
+    // Build
+    npm run build
 
     // Login
     npm login
