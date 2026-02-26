@@ -129,8 +129,7 @@
     "scripts": {
         "build": "tsup",
         "watch": "tsup --watch",
-        "build:samples": "npm run build --workspace workspaces/web-music-score-samples/",
-        "build:all": "npm run build:samples && npm run build && npm run build:prod --workspaces --if-present",
+        "build:all": "npm run build && npm run build:prod --workspaces --if-present",
         "start:features-demo": "npm run start --workspace features-demo",
         "start:cjs-react-example": "npm run start --workspace js-react-example",
         "start:ts-example": "npm run start --workspace ts-example",
