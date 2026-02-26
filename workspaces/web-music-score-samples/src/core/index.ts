@@ -27,7 +27,13 @@ declare global {
 export function addToGlobalName(name: string, samples: InstrumentSamples) {
     if (typeof window === "undefined") return;
 
-    const root = (window.WebMusicScore ??= {});
+    const root = window.WebMusicScore;
+
+    if (!root) {
+        console.warn("WebMusicScore core not found. Load core bundle before samples.");
+        return;
+    }
+
     const samplesNs = (root.Samples ??= {});
 
     if (samplesNs[name]) {
