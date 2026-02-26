@@ -3,8 +3,8 @@
 ### Added
 - Implemented octave shift annotation kinds "8va", "8vb" and "loco".
 - Several built-in synth instruments.
-- InstrumentSamples class so that instruments do not bundle Tone.js but mp3 samples only.
-- New pkg `web-music-score-samples` for instruments samples.
+- Separate pkg `web-music-score-samples` (wms-samples repo) for instruments samples.
+- InstrumentSamples class, instruments do not bundle Tone.js but mp3 samples only.
 
 ### Changed
 - Updated annotation layout with lanes, and stuff.
