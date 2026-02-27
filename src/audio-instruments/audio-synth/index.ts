@@ -72,4 +72,6 @@ class SynthesizerInstr implements Instrument {
  */
 const Synthesizer: Instrument = new SynthesizerInstr();
 
+/** @deprecated. audio-synth module is deprecated and will be removed in future release. Use built-in synths and samples from web-music-score-samples instead. */
+
 export { Synthesizer }
