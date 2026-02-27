@@ -1,4 +1,6 @@
 # CHANGELOG
+## [6.4.0-pre.9] - Unreleased
+
 ## [6.4.0-pre.8] - 2026-02-27
 ### Added
 - Implemented octave shift annotation kinds "8va", "8vb" and "loco".
