@@ -1,5 +1,8 @@
 # CHANGELOG
 ## [6.4.0-pre.9] - Unreleased
+### Fixed
+- Instrument name "Violin (Synth)"
+- Replace existing instrument (was adding multiple instruments of same name).
 
 ## [6.4.0-pre.8] - 2026-02-27
 ### Added
