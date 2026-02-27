@@ -59,6 +59,21 @@ export function getCurrentInstrument(): string {
     return currentInstrument.getName();
 }
 
+function _addInstrument(instr: Instrument) {
+    const i = InstrumentList.findIndex(testInstr => testInstr.getName() === instr.getName());
+    
+    if (i < 0) {
+        // Add new instrument.
+        InstrumentList.push(instr);
+    }
+    else {
+        // Replace existing instrument.
+        InstrumentList[i] = instr;
+    }
+
+    useInstrument(instr.getName());
+}
+
 /**
  * Add and use instrument.
  * @param instrument - Object that implements Instrument interface. Can be single instrument or array of instruments.
@@ -71,8 +86,7 @@ export function addInstrument(instrument: Instrument | InstrumentSamples | (Inst
             Guard.isFunction(instr.getSamples)
         ) {
             const genericInstr = new SamplerInstrument(instr.getName(), instr.getSamples());
-            InstrumentList.push(genericInstr);
-            useInstrument(genericInstr.getName());
+            _addInstrument(genericInstr);
         }
         else if (
             Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
@@ -80,8 +94,7 @@ export function addInstrument(instrument: Instrument | InstrumentSamples | (Inst
             Guard.isFunction(instr.playNote) &&
             Guard.isFunction(instr.stop)
         ) {
-            InstrumentList.push(instr as Instrument);
-            useInstrument(instr.getName());
+            _addInstrument(instr as Instrument);
         }
         else {
             console.error("Object is not instrument or instrument samples!");
