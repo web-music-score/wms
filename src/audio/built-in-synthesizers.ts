@@ -214,7 +214,7 @@ export function addBuiltInSynthesizers() {
     addInstrument(new SynthesizerCreator("Electric Piano (Synth)", createElectricPiano));
     addInstrument(new SynthesizerCreator("Acoustic Guitar (Synth)", createAcousticGuitar));
     addInstrument(new SynthesizerCreator("Electric Guitar (Synth)", createElectricGuitar));
-    addInstrument(new SynthesizerCreator("Violin (synth)", createViolin));
+    addInstrument(new SynthesizerCreator("Violin (Synth)", createViolin));
     addInstrument(new SynthesizerCreator("Cello (Synth)", createCello));
     addInstrument(new SynthesizerCreator("Flute (Synth)", createFlute));
     addInstrument(new SynthesizerCreator("Trumpet (Synth)", createTrumpet));
