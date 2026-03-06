@@ -3,7 +3,7 @@ import { init as initCore, MusicError, MusicErrorType } from "web-music-score/co
 import { Instrument, InstrumentSamples, linearToDecibels } from "./instrument";
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { SamplerInstrument } from "./sampler-instrument";
-import { addBuiltInSynthesizers } from "./built-in-synthesizers";
+import { Synthesizer } from "web-music-score/audio-synth";
 
 export { Instrument, InstrumentSamples, linearToDecibels }
 
@@ -28,11 +28,8 @@ function getNoteName(note: Note | number | string) {
     return note.format(PitchNotation.Scientific, SymbolSet.Ascii);
 }
 
-const InstrumentList: Instrument[] = [];
-let currentInstrument: Instrument;
-
-// Add all builting synthesizers.
-addBuiltInSynthesizers();
+const InstrumentList: Instrument[] = [Synthesizer];
+let currentInstrument: Instrument = Synthesizer;
 
 const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
     let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
@@ -61,7 +58,7 @@ export function getCurrentInstrument(): string {
 
 function _addInstrument(instr: Instrument) {
     const i = InstrumentList.findIndex(testInstr => testInstr.getName() === instr.getName());
-    
+
     if (i < 0) {
         // Add new instrument.
         InstrumentList.push(instr);
