@@ -2,7 +2,7 @@ import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { PlayState } from "./types";
 import { MDocument } from "./mobjects";
 import { Player } from "./player";
-import { AssertUtil, warnDeprecated } from "shared-src";
+import { AssertUtil, warnOnce } from "shared-src";
 import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 
 export class WmsControls {
@@ -152,7 +152,7 @@ export class WmsControls {
      * @returns - This playback buttons class instance.
      */
     setPlayButton(playBtn: HTMLButtonElement | string, playLabel?: string): WmsControls {
-        warnDeprecated("setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        warnOnce("setPlayButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
         return this._setPlayButton(playBtn, playLabel);
     }
 
@@ -180,7 +180,7 @@ export class WmsControls {
      * @returns - This playback buttons class instance.
      */
     setStopButton(stopBtn: HTMLButtonElement | string, stopLabel?: string): WmsControls {
-        warnDeprecated("setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        warnOnce("setStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
         return this._setStopButton(stopBtn, stopLabel);
     }
 
@@ -211,7 +211,7 @@ export class WmsControls {
      * @returns - This playback buttons class instance.
      */
     setPlayStopButton(playStopBtn: HTMLButtonElement | string, playLabel?: string, stopLabel?: string): WmsControls {
-        warnDeprecated("setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        warnOnce("setPlayStopButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
         return this._setPlayStopButton(playStopBtn, playLabel, stopLabel);
     }
 
@@ -239,7 +239,7 @@ export class WmsControls {
      * @returns - This playback buttons class instance.
      */
     setPauseButton(pauseBtn: HTMLButtonElement | string, pauseLabel?: string): WmsControls {
-        warnDeprecated("setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
+        warnOnce("setPauseButton() is deprecated. Will be removed in future release. Use `setSinglePlay()`, `setSinglePlayStop()`, `setPlayStop()` or `setPlayPauseStop()` instead.");
         return this._setPauseButton(pauseBtn, pauseLabel);
     }
 

@@ -2,7 +2,7 @@ import { MMeasure, MScoreRow, MStaff, MTab, MusicInterface } from "./mobjects";
 import { WmsView } from "./wms-view";
 import { MRenderContext } from "./deprecated";
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
-import { warnDeprecated } from "shared-src";
+import { warnOnce } from "shared-src";
 import { Utils } from "@tspro/ts-utils-lib";
 import { ScoreError } from "../engine/error-utils";
 
@@ -136,7 +136,7 @@ export class ScoreStaffPosEvent extends ScoreEvent {
      * @deprecated renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
-        warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
+        warnOnce("renderContext is deprecated. Will be removed in future release. Use view instead.");
         return this.view;
     }
 }
@@ -174,7 +174,7 @@ export class ScoreObjectEvent extends ScoreEvent {
      * @deprecated renderContext is deprecated. Will be removed in future release. Use view instead.
      */
     get renderContext(): MRenderContext {
-        warnDeprecated("renderContext is deprecated. Will be removed in future release. Use view instead.");
+        warnOnce("renderContext is deprecated. Will be removed in future release. Use view instead.");
         return this.view;
     }
 

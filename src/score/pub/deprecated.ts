@@ -3,7 +3,7 @@ import { WmsControls } from "./wms-controls";
 import { MDocument } from "./mobjects";
 import { Player } from "./player";
 import { PlayStateChangeListener } from "./types";
-import { warnDeprecated } from "shared-src";
+import { warnOnce } from "shared-src";
 
 /**
  * Deprecated stuff.
@@ -21,7 +21,7 @@ import { warnDeprecated } from "shared-src";
 export class MRenderContext extends WmsView {
     constructor() {
         super();
-        warnDeprecated("MRenderContext is deprecated. Will be removed in future release. Use WmsView instead.");
+        warnOnce("MRenderContext is deprecated. Will be removed in future release. Use WmsView instead.");
     }
 }
 
@@ -31,7 +31,7 @@ export class MRenderContext extends WmsView {
 export class MPlaybackButtons extends WmsControls {
     constructor() {
         super();
-        warnDeprecated("MPlayerButtons is deprecated. Will be removed in future release. Use WmsControls instead.");
+        warnOnce("MPlayerButtons is deprecated. Will be removed in future release. Use WmsControls instead.");
     }
 }
 
@@ -41,6 +41,6 @@ export class MPlaybackButtons extends WmsControls {
 export class MPlayer extends Player {
     constructor(doc: MDocument, playStateChangeListener?: PlayStateChangeListener) {
         super(doc, playStateChangeListener);
-        warnDeprecated("MPlayer is deprecated. Will be removed in future release. Use Player instead.");
+        warnOnce("MPlayer is deprecated. Will be removed in future release. Use Player instead.");
     }
 }

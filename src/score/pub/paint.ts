@@ -1,7 +1,7 @@
 import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { colorNameToCode } from "color-name-to-code";
 import { isWmsViewHTMLElement } from "../custom-element/wms-view";
-import { AssertUtil, warnDeprecated } from "shared-src";
+import { AssertUtil, warnOnce } from "shared-src";
 
 const norm = (s: string) => s.toLowerCase();
 
@@ -166,7 +166,7 @@ function mapDeprecatedColorKeys(colorKey: ColorKey | ColorKeyPart | ColorKeyPart
     }
 
     if (!Utils.Obj.deepEqual(colorKey, newColorKey)) {
-        warnDeprecated(`Deprecated ColorKey: ${Utils.Str.stringify(colorKey)}`);
+        warnOnce(`Deprecated ColorKey: ${Utils.Str.stringify(colorKey)}`);
     }
 
     return newColorKey;
@@ -299,7 +299,7 @@ export class Paint {
         const colorKeyParts = Guard.isArray(colorKeyOrParts) ? colorKeyOrParts : colorKeyOrParts.split(".");
 
         if (colorKeyParts.includes("fermata"))
-            warnDeprecated(`Color key "fermata" is deprecated. Will be removed in future release. Use "annotation" instead.`);
+            warnOnce(`Color key "fermata" is deprecated. Will be removed in future release. Use "annotation" instead.`);
 
         // Set no colors
         if (colorKeyParts.length === 0)

@@ -7,7 +7,7 @@ import { ObjMeasure } from "../engine/obj-measure";
 import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
-import { AssertUtil, warnDeprecated, resolveEnumValue } from "shared-src";
+import { AssertUtil, warnOnce, resolveEnumValue } from "shared-src";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
@@ -718,7 +718,7 @@ export class DocumentBuilder {
      */
     addFermata(fermata: Types.FermataValue = Types.Fermata.AtNote): DocumentBuilder {
         return this.safe(() => {
-            warnDeprecated("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
+            warnOnce("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
 
             AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
             AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
@@ -739,7 +739,7 @@ export class DocumentBuilder {
      */
     addFermataTo(staffTargets: Types.StaffTargets, fermata: Types.FermataValue = Types.Fermata.AtNote): DocumentBuilder {
         return this.safe(() => {
-            warnDeprecated("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
+            warnOnce("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
 
             AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTargets, fermata);
             assertStaffTargets(staffTargets);
@@ -824,7 +824,7 @@ export class DocumentBuilder {
             // If there is group arg, it is first.        
             let groupArg = resolveEnumValue(String(args[0]), Types.AnnotationGroup);
             if (groupArg) {
-                // TODO: warnDeprecated("...");
+                // TODO: warnOnce("...");
                 args.shift();
                 group = groupArg;
             }
