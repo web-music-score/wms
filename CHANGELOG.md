@@ -1,5 +1,5 @@
 # CHANGELOG
-## [6.4.0-pre.9] - Unreleased
+## [6.4.0-pre.9] - 2026-03-07
 ### Changed
 - Removed built-in synthesizers (new plan for sampled instruments).
 - Removed interface InstrumentSamples.
