@@ -14,6 +14,15 @@ function splitUrl(url: string) {
         }
 }
 
+/**
+ * Instrument with samples.
+ * 
+ * ```ts
+ * // Example:
+ * const instr = new SamplesInstrument("https://cdn.jsdelivr.net/npm/web-music-score-samples@2.0.0/samples/classical-guitar.json");
+ * ```
+ * 
+ */
 export class SamplesInstrument implements Instrument {
 
     private name: string;
