@@ -4,6 +4,7 @@ import { Instrument, linearToDecibels } from "./instrument";
 import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { SamplesInstrument } from "./samples-instrument";
+import { warnOnce } from "shared-src";
 
 export { Instrument, linearToDecibels }
 
@@ -101,7 +102,7 @@ export function addInstrument(instrument: Instrument | Instrument[]): void {
 // Cache instruments by name for simple optimization.
 let _getInstrumentMap = new UniMap<string, Instrument>();
 
-function _getInstrument(): Instrument | undefined {
+function _getInstrument(): Instrument {
     let instr = _getInstrumentMap.get(currentInstrument);
     if (instr)
         return instr;
@@ -112,10 +113,14 @@ function _getInstrument(): Instrument | undefined {
         instr instanceof SamplesInstrument && instr.getFilename() === currentInstrument
     ));
 
-    if (instr)
+    if (instr) {
         _getInstrumentMap.set(currentInstrument, instr);
+        return instr;
+    }
 
-    return instr;
+    warnOnce(`Instrument "${currentInstrument}" not found. Fallback to Synthesizer.`);
+
+    return Synthesizer;
 }
 
 /**
@@ -126,7 +131,7 @@ export function useInstrument(instrumentName: string): void {
     if (instrumentName === currentInstrument)
         return;
 
-    _getInstrument()?.stop();
+    _getInstrument().stop();
 
     currentInstrument = instrumentName;
 }
@@ -139,7 +144,7 @@ export function useInstrument(instrumentName: string): void {
  */
 export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
     if (!mutePlayback) {
-        _getInstrument()?.playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
+        _getInstrument().playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
     }
 }
 
@@ -147,7 +152,7 @@ export function playNote(note: Note | string | number, duration?: number, linear
  * Stop playback on current instrument.
  */
 export function stop() {
-    _getInstrument()?.stop();
+    _getInstrument().stop();
 }
 
 /**
