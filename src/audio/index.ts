@@ -6,7 +6,7 @@ import { Synthesizer } from "web-music-score/audio-synth";
 import { SamplesInstrument } from "./samples-instrument";
 import { warnOnce } from "shared-src";
 
-export { Instrument, linearToDecibels }
+export { Instrument, linearToDecibels, SamplesInstrument }
 
 initCore();
 
