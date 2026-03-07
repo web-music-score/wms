@@ -2,6 +2,9 @@
 ## [6.4.0-pre.9] - Unreleased
 ### Changed
 - Removed built-in synthesizers (new plan for sampled instruments).
+- Removed interface InstrumentSamples.
+- Use `web-music-score-samples@2.0.0` samples for classical guitar.
+- Instruments are automatically registered, no need to manually add anymore. Samples are loaded dynamically on play.
 
 ### Fixed
 - Replace existing instrument (was adding multiple instruments of same name).

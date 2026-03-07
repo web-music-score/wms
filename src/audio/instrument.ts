@@ -1,6 +1,3 @@
-
-export type { InstrumentSamples } from "web-music-score-samples/core";
-
 /**
  * Instrument interface.
  * <p>To create your own instrument just create a class that implement this simple interface.</p>

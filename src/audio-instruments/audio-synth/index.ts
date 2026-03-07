@@ -9,6 +9,8 @@ import { canUseToneJs } from "../../audio/can-use-tone-js";
 
 import * as Tone from "tone";
 
+/** @deprecated. audio-synth module is deprecated and will be removed in future release. Use built-in synths and samples from web-music-score-samples instead. */
+
 class SynthesizerInstr implements Instrument {
     private audioSource: Tone.PolySynth | undefined = undefined;
 
@@ -71,7 +73,5 @@ class SynthesizerInstr implements Instrument {
  * Synthesizer is default instrument and enabled out of the box.
  */
 const Synthesizer: Instrument = new SynthesizerInstr();
-
-/** @deprecated. audio-synth module is deprecated and will be removed in future release. Use built-in synths and samples from web-music-score-samples instead. */
 
 export { Synthesizer }

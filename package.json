@@ -119,8 +119,7 @@
         "tone": "^15.1.22",
         "tsup": "^8.5.0",
         "typedoc": "^0.28.13",
-        "typescript": "latest",
-        "web-music-score-samples": "^1.0.0"
+        "typescript": "latest"
     },
     "workspaces": [
         ".",

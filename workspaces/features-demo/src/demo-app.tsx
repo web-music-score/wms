@@ -1,18 +1,14 @@
 import * as React from "react";
 import * as Audio from "web-music-score/audio";
-import { ClassicalGuitar } from "web-music-score/audio-cg";
 import * as Score from "web-music-score/score";
 import * as ScoreUI from "web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
-
-Audio.addInstrument(ClassicalGuitar);
 
 function DemoApp() {
     const [doc, setDoc] = React.useState(DemoPieces.getInstance().getDefault() as (Score.MDocument | undefined));
     const [instrument, setInstrument] = React.useState(Audio.getCurrentInstrument());
     const [hoverObjectText, setHoverObjectText] = React.useState("");
     const [hoverStaffText, setHoverStaffText] = React.useState("");
-
 
     const onChangePiece = (title: string) => {
         let newDoc = DemoPieces.getInstance().getDocument(title);
