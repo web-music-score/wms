@@ -1,5 +1,7 @@
 # CHANGELOG
 ## [6.4.0-pre.10] - Unreleased
+### Changed
+- Use Synthesizer as fallback if instrument not found.
 
 ## [6.4.0-pre.9] - 2026-03-07
 ### Changed
