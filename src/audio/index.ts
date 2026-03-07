@@ -1,7 +1,7 @@
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
 import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
 import { Instrument, linearToDecibels } from "./instrument";
-import { Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { SamplesInstrument } from "./samples-instrument";
 
@@ -53,7 +53,7 @@ let mutePlayback: boolean = false;
  * @returns - Array of available instrument names.
  */
 export function getInstrumentList(): ReadonlyArray<string> {
-    return InstrumentList.map(instr => instr.getName());
+    return Utils.Arr.removeDuplicates(InstrumentList.map(instr => instr.getName()));
 }
 
 /**
@@ -62,21 +62,6 @@ export function getInstrumentList(): ReadonlyArray<string> {
  */
 export function getCurrentInstrument(): string {
     return currentInstrument;
-}
-
-function _addInstrument(instr: Instrument) {
-    const i = InstrumentList.findIndex(testInstr => testInstr.getName() === instr.getName());
-
-    if (i < 0) {
-        // Add new instrument.
-        InstrumentList.push(instr);
-    }
-    else {
-        // Replace existing instrument.
-        InstrumentList[i] = instr;
-    }
-
-    currentInstrument = instr.getName();
 }
 
 /**
@@ -91,7 +76,21 @@ export function addInstrument(instrument: Instrument | Instrument[]): void {
             Guard.isFunction(instr.playNote) &&
             Guard.isFunction(instr.stop)
         ) {
-            _addInstrument(instr as Instrument);
+            const i = InstrumentList.findIndex(testInstr => testInstr.getName() === instr.getName());
+
+            if (i < 0) {
+                // Add new instrument.
+                InstrumentList.push(instr);
+            }
+            else {
+                // Replace existing instrument.
+                InstrumentList[i] = instr;
+            }
+
+            currentInstrument = instr.getName();
+
+            // Clear cache
+            _getInstrumentMap.clear();
         }
         else {
             console.error("Object is not instrument or instrument samples!");
@@ -99,24 +98,24 @@ export function addInstrument(instrument: Instrument | Instrument[]): void {
     }
 }
 
-// Cache last instrument for simple optimization.
-let _lastInstrument: Instrument | undefined;
+// Cache instruments by name for simple optimization.
+let _getInstrumentMap = new UniMap<string, Instrument>();
 
 function _getInstrument(): Instrument | undefined {
-    const test = (instr: Instrument, name: string) => (
-        instr.getName() === name ||
-        // Accept filename in case samples json not fetched and parsed yet.
-        instr instanceof SamplesInstrument && instr.getFilename() === name
-    );
-
-    if (_lastInstrument && test(_lastInstrument, currentInstrument)) {
-        return _lastInstrument;
-    }
-    else {
-        const instr = InstrumentList.find(instr => test(instr, currentInstrument));
-        _lastInstrument = instr;
+    let instr = _getInstrumentMap.get(currentInstrument);
+    if (instr)
         return instr;
-    }
+
+    instr = InstrumentList.find(instr => (
+        instr.getName() === currentInstrument ||
+        // Accept filename in case samples json not fetched and parsed yet.
+        instr instanceof SamplesInstrument && instr.getFilename() === currentInstrument
+    ));
+
+    if (instr)
+        _getInstrumentMap.set(currentInstrument, instr);
+
+    return instr;
 }
 
 /**
