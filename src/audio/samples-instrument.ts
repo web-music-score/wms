@@ -14,26 +14,19 @@ function splitUrl(url: string) {
         }
 }
 
-/**
- * Instrument with samples.
- * 
- * ```ts
- * // Example:
- * const instr = new SamplesInstrument("https://cdn.jsdelivr.net/npm/web-music-score-samples@2.0.0/samples/classical-guitar.json");
- * ```
- * 
- */
 export class SamplesInstrument implements Instrument {
 
     private name: string;
-    private fileName: string;
     private samples: Record<string, string> = {};
     private audioSource: Tone.Sampler | undefined = undefined;
-    private initialized = false;
 
-    constructor(jsonUrl: string) {
+    private loaded = false;
+    private initialized = false;
+    private initializeOnLoad = false;
+
+    constructor(jsonUrl: string, private readonly onLoad?: (instr: SamplesInstrument) => void) {
         // Use json filename as temporary instrument name.
-        this.name = this.fileName = splitUrl(jsonUrl).file;
+        this.name = splitUrl(jsonUrl).file;
 
         if (!canUseToneJs()) {
             console.warn("Tone.js not available in this environment.");
@@ -43,13 +36,13 @@ export class SamplesInstrument implements Instrument {
         fetch(jsonUrl)
             .then(res => {
                 res.json()
-                    .then(data => this.parseJson(jsonUrl, data))
+                    .then(data => this.load(jsonUrl, data))
                     .catch(_ => console.error(`Failed to parse json for instrument "${this.getName()}".`));
             })
             .catch(_ => console.error(`Failed to fetch json for instrument "${this.getName()}".`));
     }
 
-    private parseJson(jsonUrl: string, data: any) {
+    private load(jsonUrl: string, data: any) {
         const { base } = splitUrl(jsonUrl);
 
         if (typeof data.instrument === "string")
@@ -59,10 +52,25 @@ export class SamplesInstrument implements Instrument {
             if (typeof data.samples[note] === "string")
                 this.samples[note] = base + data.samples[note];
         }
+
+        this.loaded = true;
+
+        if (this.onLoad) this.onLoad(this);
+
+        if(this.initializeOnLoad) {
+            this.initialized = this.initializeOnLoad = false;
+            this.initialize();
+        }
     }
 
-    private initializeOnPlay() {
+    initialize() {
         if (this.initialized) return;
+
+        if (!this.loaded) {
+            // Attempt to initialize before loaded. Schedule after loaded.
+            this.initializeOnLoad = true;
+            return;
+        }
 
         try {
             this.audioSource = new Tone.Sampler(this.samples).toDestination();
@@ -79,12 +87,8 @@ export class SamplesInstrument implements Instrument {
         return this.name;
     }
 
-    getFilename(): string {
-        return this.fileName;
-    }
-
     playNote(note: string, duration: number, linearVolume: number) {
-        this.initializeOnPlay();
+        this.initialize();
 
         if (!this.audioSource) {
             return;

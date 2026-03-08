@@ -6,7 +6,7 @@ import { Synthesizer } from "web-music-score/audio-synth";
 import { SamplesInstrument } from "./samples-instrument";
 import { warnOnce } from "shared-src";
 
-export { Instrument, linearToDecibels, SamplesInstrument }
+export { Instrument, linearToDecibels }
 
 initCore();
 
@@ -29,16 +29,17 @@ function getNoteName(note: Note | number | string) {
     return note.format(PitchNotation.Scientific, SymbolSet.Ascii);
 }
 
-function getSamplesInstrument(file: string) {
-    return new SamplesInstrument("https://cdn.jsdelivr.net/npm/web-music-score-samples@2.0.0/samples/" + file)
+const instrumentMap = new UniMap<string, Instrument>();
+let currentInstrument = "";
+
+function getSamplesUrl(filename: string) {
+    return "https://cdn.jsdelivr.net/npm/web-music-score-samples@2.0.0/samples/" + filename;
 }
 
-const InstrumentList: Instrument[] = [
-    Synthesizer,
-    getSamplesInstrument("classical-guitar.json")
-];
+addInstrument(Synthesizer);
+addInstrument(getSamplesUrl("classical-guitar.json"), "Classical Guitar");
 
-let currentInstrument: string = Synthesizer.getName();
+currentInstrument = Synthesizer.getName();
 
 const DefaultDuration = (function calcDuration(noteSize: number, beatsPerMinute: number, timeTisgnature: string): number {
     let beatSize = parseInt(timeTisgnature.split("/")[1] ?? "4");
@@ -54,7 +55,7 @@ let mutePlayback: boolean = false;
  * @returns - Array of available instrument names.
  */
 export function getInstrumentList(): ReadonlyArray<string> {
-    return Utils.Arr.removeDuplicates(InstrumentList.map(instr => instr.getName()));
+    return [...instrumentMap.keys()];
 }
 
 /**
@@ -66,57 +67,59 @@ export function getCurrentInstrument(): string {
 }
 
 /**
- * Add and use instrument.
- * @param instrument - Object that implements Instrument interface. Can be single instrument or array of instruments.
+ * Add instrument.
+ * @param instrument - Instrument.
+ * @param instrumentName - Use name for this instrument.
  */
-export function addInstrument(instrument: Instrument | Instrument[]): void {
-    for (const instr of Guard.isArray(instrument) ? instrument : [instrument]) {
-        if (
-            Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
-            Guard.isFunction(instr.getName) &&
-            Guard.isFunction(instr.playNote) &&
-            Guard.isFunction(instr.stop)
-        ) {
-            const i = InstrumentList.findIndex(testInstr => testInstr.getName() === instr.getName());
+export function addInstrument(samplesJson: string, instrumentName?: string): void;
+/**
+ * Add instrument.
+ * @param instrument - Instrument.
+ * @param instrumentName - Use name for this instrument.
+ */
+export function addInstrument(instrument: Instrument): void;
+/**
+ * Add multiple instruments.
+ * @param instrument - Instrument array.
+ */
+export function addInstrument(instrumentArr: Instrument[]): void;
+export function addInstrument(instr: Instrument | Instrument[] | string, instrumentName?: string): void {
+    if (Guard.isArray(instr)) {
+        instr.forEach(instr => addInstrument(instr));
+        return;
+    }
 
-            if (i < 0) {
-                // Add new instrument.
-                InstrumentList.push(instr);
-            }
-            else {
-                // Replace existing instrument.
-                InstrumentList[i] = instr;
-            }
-
-            currentInstrument = instr.getName();
-
-            // Clear cache
-            _getInstrumentMap.clear();
+    if (Guard.isString(instr)) {
+        if (Guard.isString(instrumentName)) {
+            instrumentMap.set(instrumentName, new SamplesInstrument(instr));
+            currentInstrument = instrumentName;
         }
         else {
-            console.error("Object is not instrument or instrument samples!");
+            function onLoad(instr: SamplesInstrument) {
+                instrumentMap.set(instr.getName(), instr);
+                currentInstrument = instr.getName();
+            }
+            new SamplesInstrument(instr, onLoad);
         }
+    }
+    else if (
+        Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
+        Guard.isFunction(instr.getName) &&
+        Guard.isFunction(instr.playNote) &&
+        Guard.isFunction(instr.stop)
+    ) {
+        instrumentMap.set(instr.getName(), instr);
+        currentInstrument = instr.getName();
+    }
+    else {
+        console.error("Invalid instrument!");
     }
 }
 
-// Cache instruments by name for simple optimization.
-let _getInstrumentMap = new UniMap<string, Instrument>();
+function getInstrForPlayback(): Instrument {
+    let instr = instrumentMap.get(currentInstrument);
 
-function _getInstrument(): Instrument {
-    let instr = _getInstrumentMap.get(currentInstrument);
-    if (instr)
-        return instr;
-
-    instr = InstrumentList.find(instr => (
-        instr.getName() === currentInstrument ||
-        // Accept filename in case samples json not fetched and parsed yet.
-        instr instanceof SamplesInstrument && instr.getFilename() === currentInstrument
-    ));
-
-    if (instr) {
-        _getInstrumentMap.set(currentInstrument, instr);
-        return instr;
-    }
+    if (instr) return instr;
 
     warnOnce(`Instrument "${currentInstrument}" not found. Fallback to Synthesizer.`);
 
@@ -131,9 +134,24 @@ export function useInstrument(instrumentName: string): void {
     if (instrumentName === currentInstrument)
         return;
 
-    _getInstrument().stop();
+    getInstrForPlayback().stop();
 
     currentInstrument = instrumentName;
+
+    initInstrument(instrumentName);
+}
+
+/**
+ * Initialize instrument, load samples to be ready for playback.
+ * If instrument is not manually initialized then it will be initialized
+ * on the run so there might be silent notes in the beginning.
+ * @param instrumentName - Instrument name.
+ */
+export function initInstrument(instrumentName: string): void {
+    const instr = instrumentMap.get(instrumentName);
+
+    if (instr instanceof SamplesInstrument)
+        instr.initialize();
 }
 
 /**
@@ -144,7 +162,7 @@ export function useInstrument(instrumentName: string): void {
  */
 export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
     if (!mutePlayback) {
-        _getInstrument().playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
+        getInstrForPlayback().playNote(getNoteName(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
     }
 }
 
@@ -152,7 +170,7 @@ export function playNote(note: Note | string | number, duration?: number, linear
  * Stop playback on current instrument.
  */
 export function stop() {
-    _getInstrument().stop();
+    getInstrForPlayback().stop();
 }
 
 /**
