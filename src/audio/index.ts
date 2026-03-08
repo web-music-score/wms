@@ -68,14 +68,13 @@ export function getCurrentInstrument(): string {
 
 /**
  * Add instrument.
- * @param instrument - Instrument.
- * @param instrumentName - Use name for this instrument.
+ * @param samplesJson - Url to samples json file.
+ * @param instrumentName - Optional instrument name. If not given then instrument is added only after fetched name from the json.
  */
 export function addInstrument(samplesJson: string, instrumentName?: string): void;
 /**
  * Add instrument.
  * @param instrument - Instrument.
- * @param instrumentName - Use name for this instrument.
  */
 export function addInstrument(instrument: Instrument): void;
 /**
