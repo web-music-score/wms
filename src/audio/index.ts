@@ -5,6 +5,7 @@ import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { SamplesInstrument } from "./samples-instrument";
 import { warnOnce } from "shared-src";
+import { getMidiInstrumentName } from "./midi";
 
 export { Instrument, linearToDecibels }
 
@@ -131,34 +132,49 @@ function getInstrForPlayback(): Instrument {
 
     if (instr) return instr;
 
-    warnOnce(`Instrument "${currentInstrument}" not found. Fallback to Synthesizer.`);
+    warnOnce(`Instrument "${currentInstrument}" not available. Fallback to Synthesizer.`);
 
     return Synthesizer;
 }
 
 /**
  * Set instrument to use in playback.
- * @param instrumentName - Instrument name.
+ * @param instrument - Instrument name (string) or 0-based midi program (number).
  */
-export function useInstrument(instrumentName: string): void {
-    if (instrumentName === currentInstrument)
+export function useInstrument(instrument: string | number): void {
+    if (Guard.isNumber(instrument)) {
+        const name = getMidiInstrumentName(instrument);
+        if (!name)
+            throw new AudioError(`Invalid midi program number "${instrument}".`);
+        instrument = name;
+    }
+
+    if (instrument === currentInstrument)
         return;
 
     getInstrForPlayback().stop();
 
-    currentInstrument = instrumentName;
+    currentInstrument = instrument;
 
-    initInstrument(instrumentName);
+    initInstrument(instrument);
 }
 
 /**
  * Initialize instrument, load samples to be ready for playback.
  * If instrument is not manually initialized then it will be initialized
  * on the run so there might be silent notes in the beginning.
- * @param instrumentName - Instrument name.
+ * 
+ * @param instrument - Instrument name (string) or 0-based midi program (number).
  */
-export function initInstrument(instrumentName: string): void {
-    const instr = instrumentMap.get(instrumentName);
+export function initInstrument(instrument: string | number): void {
+    if (Guard.isNumber(instrument)) {
+        const name = getMidiInstrumentName(instrument);
+        if (!name)
+            throw new AudioError(`Invalid midi program number "${instrument}".`);
+        instrument = name;
+    }
+
+    const instr = instrumentMap.get(instrument);
 
     if (instr instanceof SamplesInstrument)
         instr.initialize();
