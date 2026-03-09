@@ -35,17 +35,18 @@ let currentInstrument = "";
 addInstrument(Synthesizer);
 
 const samples = [
-    ["piano", "Piano"],
-    ["electric-piano", "Electric Piano"],
-    ["classical-guitar", "Classical Guitar"],
-    ["acoustic-guitar", "Acoustic Guitar"],
+    ["001-acoustic-grand-piano", "Acoustic Grand Piano"],
+    ["003-electric-grand-piano", "Electric Grand Piano"],
+    ["014-xylophone", "Xylophone"],
+    ["025-acoustic-guitar-nylon", "Acoustic Guitar (nylon)"],
+    ["026-acoustic-guitar-steel", "Acoustic Guitar (steel)"],
 ];
 
-// const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0/samples/";
-const samplesBaseUrl = "http://localhost:3000/samples/";
+// const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0/";
+const samplesBaseUrl = "http://localhost:3000/";
 
 for (const [folder, name] of samples) {
-    addInstrument(`${samplesBaseUrl}${folder}/samples.json`, name);
+    addInstrument(`${samplesBaseUrl}/samples/${folder}/samples.json`, name);
 }
 
 currentInstrument = Synthesizer.getName();
