@@ -35,11 +35,12 @@ let currentInstrument = "";
 addInstrument(Synthesizer);
 
 const samples = [
-    ["001-acoustic-grand-piano", "Acoustic Grand Piano"],
-    ["003-electric-grand-piano", "Electric Grand Piano"],
-    ["014-xylophone", "Xylophone"],
-    ["025-acoustic-guitar-nylon", "Acoustic Guitar (nylon)"],
-    ["026-acoustic-guitar-steel", "Acoustic Guitar (steel)"],
+    ["000-acoustic-grand-piano", "Acoustic Grand Piano"],
+    ["002-electric-grand-piano", "Electric Grand Piano"],
+    ["013-xylophone", "Xylophone"],
+    ["024-acoustic-guitar-nylon", "Acoustic Guitar (nylon)"],
+    ["025-acoustic-guitar-steel", "Acoustic Guitar (steel)"],
+    ["046-orchestral-harp", "Orchestral Harp"],
 ];
 
 // const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0/";
