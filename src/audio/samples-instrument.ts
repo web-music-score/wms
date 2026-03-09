@@ -1,6 +1,7 @@
 import * as Tone from "tone";
 import { Instrument, linearToDecibels } from "./instrument";
 import { canUseToneJs } from "./can-use-tone-js";
+import { Guard } from "@tspro/ts-utils-lib";
 
 function splitUrl(url: string) {
     const i = url.lastIndexOf("/");
@@ -15,16 +16,16 @@ function splitUrl(url: string) {
 }
 
 export class SamplesInstrument implements Instrument {
-
     private name: string;
     private samples: Record<string, string> = {};
+    private gain = 1.0;
     private audioSource: Tone.Sampler | undefined = undefined;
 
     private loaded = false;
     private initialized = false;
     private initializeOnLoad = false;
 
-    constructor(jsonUrl: string, private readonly onLoad?: (instr: SamplesInstrument) => void) {
+    constructor(private readonly jsonUrl: string, private readonly onLoad?: (instr: SamplesInstrument) => void) {
         // Use json filename as temporary instrument name.
         this.name = splitUrl(jsonUrl).file;
 
@@ -37,16 +38,19 @@ export class SamplesInstrument implements Instrument {
             .then(res => {
                 res.json()
                     .then(data => this.load(jsonUrl, data))
-                    .catch(_ => console.error(`Failed to parse json for instrument "${this.getName()}".`));
+                    .catch(_ => console.error(`Failed to parse samples json "${jsonUrl}".`));
             })
-            .catch(_ => console.error(`Failed to fetch json for instrument "${this.getName()}".`));
+            .catch(_ => console.error(`Failed to fetch samples json "${jsonUrl}".`));
     }
 
     private load(jsonUrl: string, data: any) {
         const { base } = splitUrl(jsonUrl);
 
-        if (typeof data.instrument === "string")
-            this.name = data.instrument;
+        if (Guard.isString(data.name))
+            this.name = data.name;
+
+        if (Guard.isFinite(+data.gain))
+            this.gain = +data.gain;
 
         for (const note in data.samples) {
             if (typeof data.samples[note] === "string")
@@ -57,7 +61,7 @@ export class SamplesInstrument implements Instrument {
 
         if (this.onLoad) this.onLoad(this);
 
-        if(this.initializeOnLoad) {
+        if (this.initializeOnLoad) {
             this.initialized = this.initializeOnLoad = false;
             this.initialize();
         }
@@ -73,11 +77,12 @@ export class SamplesInstrument implements Instrument {
         }
 
         try {
-            this.audioSource = new Tone.Sampler(this.samples).toDestination();
+            const gain = new Tone.Gain(this.gain).toDestination();
+            this.audioSource = new Tone.Sampler(this.samples).connect(gain);
         }
         catch (e) {
             this.audioSource = undefined;
-            console.error(`Failed to initialize instrument "${this.getName()}".`);
+            console.error(`Failed to initialize instrument "${this.name}".`);
         }
 
         this.initialized = true;
@@ -94,7 +99,7 @@ export class SamplesInstrument implements Instrument {
             return;
         }
         try {
-            this.audioSource.volume.value = linearToDecibels(linearVolume * 0.6);
+            this.audioSource.volume.value = linearToDecibels(linearVolume);
             this.audioSource.triggerAttackRelease(note, duration);
         }
         catch (error) { }

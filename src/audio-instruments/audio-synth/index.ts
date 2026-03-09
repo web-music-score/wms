@@ -23,6 +23,7 @@ class SynthesizerInstr implements Instrument {
         try {
             const reverb = new Tone.Reverb({ decay: 3, wet: 0.4 }).toDestination();
             const filter = new Tone.Filter(800, "lowpass").connect(reverb);
+            const gain = new Tone.Gain(0.75).connect(filter);
 
             this.audioSource = new Tone.PolySynth(Tone.Synth, {
                 oscillator: {
@@ -34,7 +35,7 @@ class SynthesizerInstr implements Instrument {
                     sustain: 0.1,
                     release: 1.2
                 }
-            }).connect(filter);
+            }).connect(gain);
         }
         catch (e) {
             this.audioSource = undefined;

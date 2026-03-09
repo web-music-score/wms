@@ -32,12 +32,21 @@ function getNoteName(note: Note | number | string) {
 const instrumentMap = new UniMap<string, Instrument>();
 let currentInstrument = "";
 
-function getSamplesUrl(filename: string) {
-    return "https://cdn.jsdelivr.net/npm/web-music-score-samples@2.0.0/samples/" + filename;
-}
-
 addInstrument(Synthesizer);
-addInstrument(getSamplesUrl("classical-guitar.json"), "Classical Guitar");
+
+const samples = [
+    ["piano", "Piano"],
+    ["electric-piano", "Electric Piano"],
+    ["classical-guitar", "Classical Guitar"],
+    ["acoustic-guitar", "Acoustic Guitar"],
+];
+
+// const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0/samples/";
+const samplesBaseUrl = "http://localhost:3000/samples/";
+
+for (const [folder, name] of samples) {
+    addInstrument(`${samplesBaseUrl}${folder}/samples.json`, name);
+}
 
 currentInstrument = Synthesizer.getName();
 
