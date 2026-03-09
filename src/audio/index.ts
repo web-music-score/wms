@@ -38,9 +38,13 @@ addInstrument(Synthesizer);
 const samples = [
     ["000-acoustic-grand-piano", "Acoustic Grand Piano"],
     ["002-electric-grand-piano", "Electric Grand Piano"],
+    ["006-harpsichord", "Harpsichord"],
+    ["009-glockenspiel", "Glockenspiel"],
     ["013-xylophone", "Xylophone"],
     ["024-acoustic-guitar-nylon", "Acoustic Guitar (nylon)"],
     ["025-acoustic-guitar-steel", "Acoustic Guitar (steel)"],
+    ["026-electric-guitar-jazz", "Electric Guitar (jazz)"],
+    ["027-electric-guitar-clean", "Electric Guitar (clean)"],
     ["046-orchestral-harp", "Orchestral Harp"],
 ];
 
