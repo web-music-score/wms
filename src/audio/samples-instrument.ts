@@ -21,6 +21,15 @@ function getSemitones(note1: string, note2: string) {
     return Note.getNote(note2).chromaticId - Note.getNote(note1).chromaticId;
 }
 
+type SamplesJson = {
+    name: string;
+    gain?: number;
+    loop?: boolean;
+    loopStart?: number;
+    loopEnd?: number;
+    samples: Record<string, string | { file: string, loop?: boolean, loopStart?: number, loopEnd?: number }>;
+}
+
 class SampleBuffer {
     private audioBuffer: Tone.ToneAudioBuffer | undefined;
     private activePlayers = new ValueSet<Tone.Player>();
@@ -109,21 +118,40 @@ export class SamplesInstrument implements Instrument {
             .catch(_ => console.error(`Failed to fetch samples json "${jsonUrl}".`));
     }
 
-    private load(jsonUrl: string, data: any) {
+    private load(jsonUrl: string, jsonData: SamplesJson) {
         const { base } = splitUrl(jsonUrl);
 
-        if (Guard.isString(data.name))
-            this.name = data.name;
+        this.name = String(jsonData.name);
 
-        const gain = Guard.isNumber(data.gain) ? data.gain : 1.0;
-        const loopStart = Guard.isNumber(data.loopStart) ? data.loopStart : undefined;
-        const loopEnd = Guard.isNumber(data.loopEnd) ? data.loopEnd : undefined;
+        const gain = Guard.isNumber(jsonData.gain) ? jsonData.gain : 1.0;
+
+        const loopStart = Guard.isNumber(jsonData.loopStart) ? jsonData.loopStart : undefined;
+        const loopEnd = Guard.isNumber(jsonData.loopEnd) ? jsonData.loopEnd : undefined;
         const loop = loopStart !== undefined || loopEnd !== undefined;
 
-        for (const note in data.samples) {
-            if (Guard.isString(data.samples[note])) {
-                const file = base + data.samples[note];
+        for (const note in jsonData.samples) {
+            const sample = jsonData.samples[note];
+            if (Guard.isString(sample)) {
+                const file = base + sample;
                 this.sampleBuffers.push(new SampleBuffer(note, file, gain, loop, loopStart, loopEnd));
+            }
+            else if (Guard.isObject(sample)) {
+                const file = base + sample.file;
+                if (Guard.isTrue(sample.loop)) {
+                    const loop = true;
+                    const loopStart = sample.loopStart;
+                    const loopEnd = sample.loopEnd;
+                    this.sampleBuffers.push(new SampleBuffer(note, file, gain, loop, loopStart, loopEnd));
+                }
+                else if (Guard.isFalse(sample.loop)) {
+                    const loop = false;
+                    const loopStart = undefined;
+                    const loopEnd = undefined;
+                    this.sampleBuffers.push(new SampleBuffer(note, file, gain, loop, loopStart, loopEnd));
+                }
+                else if (Guard.isUndefined(sample.loop)) {
+                    this.sampleBuffers.push(new SampleBuffer(note, file, gain, loop, loopStart, loopEnd));
+                }
             }
         }
 
