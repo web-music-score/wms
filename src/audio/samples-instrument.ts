@@ -1,7 +1,8 @@
 import * as Tone from "tone";
 import { Instrument, linearToDecibels } from "./instrument";
 import { canUseToneJs } from "./can-use-tone-js";
-import { Guard } from "@tspro/ts-utils-lib";
+import { Guard, UniMap, ValueSet } from "@tspro/ts-utils-lib";
+import { Note } from "web-music-score/theory";
 
 function splitUrl(url: string) {
     const i = url.lastIndexOf("/");
@@ -15,11 +16,76 @@ function splitUrl(url: string) {
         }
 }
 
+function getSemitones(note1: string, note2: string) {
+    // Note.getNote() caches notes to Map, does not parse note every time.
+    return Note.getNote(note2).chromaticId - Note.getNote(note1).chromaticId;
+}
+
+class SampleBuffer {
+    private audioBuffer: Tone.ToneAudioBuffer | undefined;
+    private activePlayers = new ValueSet<Tone.Player>();
+    private gainNode: Tone.Gain;
+
+    constructor(
+        readonly note: string,
+        readonly file: string,
+        readonly gain: number,
+        readonly loop: boolean,
+        readonly loopStart?: number | undefined,
+        readonly loopEnd?: number | undefined
+    ) {
+        this.gainNode = new Tone.Gain(this.gain).toDestination();
+    }
+
+    load() {
+        this.audioBuffer = new Tone.ToneAudioBuffer(this.file);
+    }
+
+    playNote(note: string, duration: number, linearVolume: number) {
+        if (!this.audioBuffer || !this.audioBuffer.loaded)
+            return;
+
+        const loop = this.loop;
+        const loopStart = this.loopStart ?? 0;
+        const loopEnd = this.loopEnd ?? this.audioBuffer.duration;
+
+        const player = new Tone.Player({
+            url: this.audioBuffer,
+            loop,
+            loopStart,
+            loopEnd
+        }).connect(this.gainNode);
+
+        const semitones = getSemitones(this.note, note);
+
+        player.playbackRate = Math.pow(2, semitones / 12);
+        player.volume.value = linearToDecibels(linearVolume);
+
+        this.activePlayers.add(player);
+
+        player.onstop = () => {
+            this.activePlayers.delete(player);
+            player.dispose();
+        };
+
+        const now = Tone.now();
+
+        player.start(now);
+        player.stop(now + duration);
+    }
+
+    stopAll() {
+        this.activePlayers.forEach(p => {
+            p.stop();
+            p.dispose();
+        });
+        this.activePlayers.clear();
+    }
+}
+
 export class SamplesInstrument implements Instrument {
     private name: string;
-    private samples: Record<string, string> = {};
-    private gain = 1.0;
-    private audioSource: Tone.Sampler | undefined = undefined;
+    private sampleBuffers: SampleBuffer[] = [];
 
     private loaded = false;
     private initialized = false;
@@ -49,12 +115,16 @@ export class SamplesInstrument implements Instrument {
         if (Guard.isString(data.name))
             this.name = data.name;
 
-        if (Guard.isFinite(+data.gain))
-            this.gain = +data.gain;
+        const gain = Guard.isNumber(data.gain) ? data.gain : 1.0;
+        const loopStart = Guard.isNumber(data.loopStart) ? data.loopStart : undefined;
+        const loopEnd = Guard.isNumber(data.loopEnd) ? data.loopEnd : undefined;
+        const loop = loopStart !== undefined || loopEnd !== undefined;
 
         for (const note in data.samples) {
-            if (typeof data.samples[note] === "string")
-                this.samples[note] = base + data.samples[note];
+            if (Guard.isString(data.samples[note])) {
+                const file = base + data.samples[note];
+                this.sampleBuffers.push(new SampleBuffer(note, file, gain, loop, loopStart, loopEnd));
+            }
         }
 
         this.loaded = true;
@@ -76,16 +146,31 @@ export class SamplesInstrument implements Instrument {
             return;
         }
 
-        try {
-            const gain = new Tone.Gain(this.gain).toDestination();
-            this.audioSource = new Tone.Sampler(this.samples).connect(gain);
-        }
-        catch (e) {
-            this.audioSource = undefined;
-            console.error(`Failed to initialize instrument "${this.name}".`);
-        }
+        this.sampleBuffers.forEach(buf => buf.load());
 
         this.initialized = true;
+    }
+
+    private closestSampleBufferMap = new UniMap<string, SampleBuffer>();
+
+    private getClosestSampleBuffer(note: string): SampleBuffer | undefined {
+        let closestBuf = this.closestSampleBufferMap.get(note);
+        if (closestBuf)
+            return closestBuf;
+
+        let closestDist = Infinity;
+        this.sampleBuffers.forEach(buf => {
+            const dist = Math.abs(getSemitones(note, buf.note));
+            if (dist < closestDist) {
+                closestDist = dist;
+                closestBuf = buf;
+            }
+        });
+
+        if (closestBuf)
+            this.closestSampleBufferMap.set(note, closestBuf);
+
+        return closestBuf;
     }
 
     getName(): string {
@@ -95,23 +180,16 @@ export class SamplesInstrument implements Instrument {
     playNote(note: string, duration: number, linearVolume: number) {
         this.initialize();
 
-        if (!this.audioSource) {
+        if (!this.initialized)
             return;
-        }
-        try {
-            this.audioSource.volume.value = linearToDecibels(linearVolume);
-            this.audioSource.triggerAttackRelease(note, duration);
-        }
-        catch (error) { }
+
+        const buf = this.getClosestSampleBuffer(note);
+
+        if (buf)
+            buf.playNote(note, duration, linearVolume);
     }
 
     stop() {
-        if (!this.audioSource) {
-            return;
-        }
-        try {
-            this.audioSource.releaseAll();
-        }
-        catch (error) { }
+        this.sampleBuffers.forEach(buf => buf.stopAll());
     }
 }
