@@ -47,7 +47,9 @@ class SampleBuffer {
     }
 
     load() {
-        this.audioBuffer = new Tone.ToneAudioBuffer(this.file);
+        Tone.ToneAudioBuffer.fromUrl(this.file)
+            .then(buf => this.audioBuffer = buf)
+            .catch(err => console.error("Audio load failed:", err));
     }
 
     playNote(note: string, duration: number, linearVolume: number) {
