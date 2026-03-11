@@ -59,6 +59,7 @@ const samples = [
     ["057-trombone", "Trombone"],
     ["071-clarinet", "Clarinet"],
     ["073-flute", "Flute"],
+    ["075-pan-flute", "Pan Flute"],
     ["074-recorder", "Recorder"],
     ["079-ocarina", "Ocarina"],
     ["080-lead-1-square", "Lead 1 (square)"],
