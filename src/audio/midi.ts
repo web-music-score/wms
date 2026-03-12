@@ -1,4 +1,5 @@
-import { addInstrument } from ".";
+import { registerInstrument } from "./manage";
+import { SamplesInstrument } from "./samples-instrument";
 
 const GM_INSTRUMENTS: { name: string, folder?: string }[] = [
     // Piano
@@ -113,7 +114,7 @@ const GM_INSTRUMENTS: { name: string, folder?: string }[] = [
     { name: "FX 1 (rain)", folder: "096-fx-1-rain" },
     { name: "FX 2 (soundtrack)", folder: "097-fx-2-soundtrack" },
     { name: "FX 3 (crystal)", folder: "098-fx-3-crystal" },
-    { name: "FX 4 (atmosphere)", folder: "099-fx-4-atmoshpere" },
+    { name: "FX 4 (atmosphere)", folder: "099-fx-4-atmosphere" },
     { name: "FX 5 (brightness)", folder: "100-fx-5-brightness" },
     { name: "FX 6 (goblins)", folder: "101-fx-6-goblins" },
     { name: "FX 7 (echoes)", folder: "102-fx-7-echoes" },
@@ -163,6 +164,11 @@ const samplesBaseUrl = "http://localhost:3000/";
 
 export function registerMidiInstruments() {
     for (const { name, folder } of GM_INSTRUMENTS) {
-        addInstrument(`${samplesBaseUrl}/samples/${folder}/samples.json`, name);
+        if (folder) {
+            registerInstrument(
+                new SamplesInstrument(`${samplesBaseUrl}/samples/${folder}/samples.json`),
+                name
+            );
+        }
     }
 }

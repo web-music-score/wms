@@ -5,7 +5,6 @@
 - All 128 midi instruments (except percussives).
 
 ### Changed
-- Audio.addInstrument() accepts url to samples json.
 - Use Synthesizer as fallback if instrument not found.
 
 ## [6.4.0-pre.9] - 2026-03-07
