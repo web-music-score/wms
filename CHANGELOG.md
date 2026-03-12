@@ -1,7 +1,8 @@
 # CHANGELOG
 ## [6.4.0-pre.10] - Unreleased
 ### Added
-- Audio.initInstrument() to init instrument.
+- Audio.initInstrument() to init/preload instrument.
+- All 128 midi instruments (except percussives).
 
 ### Changed
 - Audio.addInstrument() accepts url to samples json.

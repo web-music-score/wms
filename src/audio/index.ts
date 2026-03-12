@@ -5,7 +5,7 @@ import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { SamplesInstrument } from "./samples-instrument";
 import { warnOnce } from "shared-src";
-import { getMidiInstrumentName } from "./midi";
+import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
 
 export { Instrument, linearToDecibels }
 
@@ -35,42 +35,7 @@ let currentInstrument = "";
 
 addInstrument(Synthesizer);
 
-const samples = [
-    ["000-acoustic-grand-piano", "Acoustic Grand Piano"],
-    ["001-bright-acoustic-piano", "Bright Acoustic Piano"],
-    ["002-electric-grand-piano", "Electric Grand Piano"],
-    ["004-electric-piano-1", "Electric Piano 1"],
-    ["006-harpsichord", "Harpsichord"],
-    ["009-glockenspiel", "Glockenspiel"],
-    ["013-xylophone", "Xylophone"],
-    ["019-church-organ", "Church Organ"],
-    ["024-acoustic-guitar-nylon", "Acoustic Guitar (nylon)"],
-    ["025-acoustic-guitar-steel", "Acoustic Guitar (steel)"],
-    ["026-electric-guitar-jazz", "Electric Guitar (jazz)"],
-    ["027-electric-guitar-clean", "Electric Guitar (clean)"],
-    ["032-acoustic-bass", "Acoustic Bass"],
-    ["033-electric-bass-finger", "Electric Bass (finger)"],
-    ["040-violin", "Violin"],
-    ["041-viola", "Viola"],
-    ["042-cello", "Cello"],
-    ["046-orchestral-harp", "Orchestral Harp"],
-    ["052-choir-aahs", "Choir Aahs"],
-    ["056-trumpet", "Trumpet"],
-    ["057-trombone", "Trombone"],
-    ["071-clarinet", "Clarinet"],
-    ["073-flute", "Flute"],
-    ["075-pan-flute", "Pan Flute"],
-    ["074-recorder", "Recorder"],
-    ["079-ocarina", "Ocarina"],
-    ["080-lead-1-square", "Lead 1 (square)"],
-];
-
-// const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0/";
-const samplesBaseUrl = "http://localhost:3000/";
-
-for (const [folder, name] of samples) {
-    addInstrument(`${samplesBaseUrl}/samples/${folder}/samples.json`, name);
-}
+registerMidiInstruments();
 
 currentInstrument = Synthesizer.getName();
 
