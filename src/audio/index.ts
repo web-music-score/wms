@@ -2,7 +2,7 @@ import { init as initCore, MusicError, MusicErrorType } from "web-music-score/co
 import { Instrument, linearToDecibels } from "./instrument";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { registerMidiInstruments } from "./midi";
-import { getCurrentInstrument, getInstrumentList, getInstrumnt, addInstrument, initInstrument, useInstrument } from "./manage";
+import { getCurrentInstrument, getInstrumentList, addInstrument, initInstrument, useInstrument, getDefaultInstrumentName } from "./manage";
 import { playNote, stop, mute, unmute, isMuted } from "./playback"
 
 export {
@@ -22,10 +22,13 @@ export {
 
 initCore();
 
+// For legacy support
 addInstrument(Synthesizer);
+
+// Add midi instruments
 registerMidiInstruments();
 
-useInstrument(Synthesizer.getName());
+useInstrument(getDefaultInstrumentName());
 
 export class AudioError extends MusicError {
     constructor(message: string) {

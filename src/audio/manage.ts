@@ -1,7 +1,6 @@
 import { Guard, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { Instrument } from "./instrument";
 import { warnOnce } from "shared-src";
-import { Synthesizer } from "web-music-score/audio-synth";
 import { getMidiInstrumentName } from "./midi";
 import { SamplesInstrument } from "./samples-instrument";
 
@@ -37,9 +36,9 @@ export function getInstrumnt(name?: string): Instrument {
 
     if (instr) return instr;
 
-    warnOnce(`Instrument "${name}" not available. Fallback to Synthesizer.`);
+    warnOnce(`Instrument "${name}" not available. Fallback to default.`);
 
-    return Synthesizer;
+    return getDefaultInstrument();
 }
 
 /**
@@ -53,8 +52,8 @@ export function useInstrument(instrument: string | number): void {
             instrument = name;
         }
         else {
-            warnOnce(`Invalid midi program (${instrument}). Fallback to Synthesizer.`);
-            instrument = Synthesizer.getName();
+            warnOnce(`Invalid midi program (${instrument}). Fallback to default.`);
+            instrument = getDefaultInstrumentName();
         }
     }
 
@@ -106,4 +105,12 @@ export function addInstrument(instr: Instrument | Instrument[]): void {
     ) {
         registerInstrument(instr, instr.getName());
     }
+}
+
+export function getDefaultInstrumentName(): string {
+    return getMidiInstrumentName(0)!;
+}
+
+export function getDefaultInstrument(): Instrument {
+    return instrumentMap.get(getDefaultInstrumentName())!;
 }
