@@ -44,9 +44,7 @@ class SampleBuffer {
         readonly loopEnd?: number | undefined
     ) {
         this.gainNode = new Tone.Gain(this.gain).toDestination();
-    }
 
-    load() {
         Tone.ToneAudioBuffer.fromUrl(this.file)
             .then(buf => this.audioBuffer = buf)
             .catch(err => console.error("Audio load failed:", err));
@@ -98,30 +96,30 @@ export class SamplesInstrument implements Instrument {
     private name: string;
     private sampleBuffers: SampleBuffer[] = [];
 
-    private loaded = false;
     private initialized = false;
-    private initializeOnLoad = false;
 
-    constructor(private readonly jsonUrl: string, private readonly onLoad?: (instr: SamplesInstrument) => void) {
+    constructor(private readonly jsonUrl: string) {
         // Use json filename as temporary instrument name.
         this.name = splitUrl(jsonUrl).file;
+    }
 
+    private loadJson() {
         if (!canUseToneJs()) {
             console.warn("Tone.js not available in this environment.");
             return;
         }
 
-        fetch(jsonUrl)
+        fetch(this.jsonUrl)
             .then(res => {
                 res.json()
-                    .then(data => this.load(jsonUrl, data))
-                    .catch(_ => console.error(`Failed to parse samples json "${jsonUrl}".`));
+                    .then(data => this.parseJson(data))
+                    .catch(_ => console.error(`Failed to parse samples json "${this.jsonUrl}".`));
             })
-            .catch(_ => console.error(`Failed to fetch samples json "${jsonUrl}".`));
+            .catch(_ => console.error(`Failed to fetch samples json "${this.jsonUrl}".`));
     }
 
-    private load(jsonUrl: string, jsonData: SamplesJson) {
-        const { base } = splitUrl(jsonUrl);
+    private parseJson(jsonData: SamplesJson) {
+        const { base } = splitUrl(this.jsonUrl);
 
         this.name = String(jsonData.name);
 
@@ -156,27 +154,12 @@ export class SamplesInstrument implements Instrument {
                 }
             }
         }
-
-        this.loaded = true;
-
-        if (this.onLoad) this.onLoad(this);
-
-        if (this.initializeOnLoad) {
-            this.initialized = this.initializeOnLoad = false;
-            this.initialize();
-        }
     }
 
     initialize() {
         if (this.initialized) return;
 
-        if (!this.loaded) {
-            // Attempt to initialize before loaded. Schedule after loaded.
-            this.initializeOnLoad = true;
-            return;
-        }
-
-        this.sampleBuffers.forEach(buf => buf.load());
+        this.loadJson();
 
         this.initialized = true;
     }
@@ -209,9 +192,6 @@ export class SamplesInstrument implements Instrument {
 
     playNote(note: string, duration: number, linearVolume: number) {
         this.initialize();
-
-        if (!this.initialized)
-            return;
 
         const buf = this.getClosestSampleBuffer(note);
 
