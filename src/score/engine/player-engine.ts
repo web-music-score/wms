@@ -589,6 +589,8 @@ export class PlayerEngine {
     }
 
     pause() {
+        Audio.stop(); // FIXME: Temp fix to stop all playback.
+
         // To pause, stop timer
         if (this.playTimer) {
             _clearTimeout(this.playTimer);
@@ -603,6 +605,8 @@ export class PlayerEngine {
     }
 
     stop() {
+        Audio.stop(); // FIXME: Temp fix to stop all playback.
+
         // Stop timer
         if (this.playTimer) {
             _clearTimeout(this.playTimer);

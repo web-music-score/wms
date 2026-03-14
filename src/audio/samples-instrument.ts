@@ -79,7 +79,7 @@ class SampleBuffer {
 
         const now = Tone.now();
 
-        player.start(now);
+        player.start(now, 0);
         player.stop(now + duration);
     }
 
@@ -193,6 +193,8 @@ export class SamplesInstrument implements Instrument {
     playNote(note: string, duration: number, linearVolume: number) {
         this.initialize();
 
+        if (!this.initialized) return;
+
         const buf = this.getClosestSampleBuffer(note);
 
         if (buf)
@@ -200,6 +202,8 @@ export class SamplesInstrument implements Instrument {
     }
 
     stop() {
+        if (!this.initialized) return;
+
         this.sampleBuffers.forEach(buf => buf.stopAll());
     }
 }
