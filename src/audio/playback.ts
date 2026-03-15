@@ -1,5 +1,6 @@
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
-import { getInstrumntForPlayback } from "./manage";
+import { getDefaultInstrument, getInstrumentList, getValidInstrumnt } from "./manage";
+import { SamplesInstrument } from "./samples-instrument";
 
 function getStringNote(note: Note | number | string): string {
     if (typeof note === "string") {
@@ -21,27 +22,48 @@ const DefaultVolume = 1;
 
 let mutePlayback: boolean = false;
 
+/** Play context. */
+export type PlayContext = number | string | {};
+
 /**
- * Play a note using current instrument.
+ * Play a note.
  * @param note - Note instance of Note object, note name (e.g. "C4"), or midiNumber.
  * @param duration - Play duration in seconds.
  * @param linearVolume - Linear volume in range [0, 1].
+ * @param instrument - Instrument name or midi program number.
+ * @param playCtx - Play context.
  */
-export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
+export function playNote(note: Note | string | number, duration?: number, linearVolume?: number, instrument?: string | number, playCtx?: PlayContext) {
     if (mutePlayback) return;
 
-    getInstrumntForPlayback().playNote(getStringNote(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
+    const instr = getValidInstrumnt(instrument ?? getDefaultInstrument());
+
+    duration ??= DefaultDuration;
+    linearVolume ??= DefaultVolume;
+
+    if (instr instanceof SamplesInstrument)
+        instr.playNote(getStringNote(note), duration, linearVolume, playCtx);
+    else
+        instr.playNote(getStringNote(note), duration, linearVolume);
 }
 
 /**
- * Stop playback on current instrument.
+ * Stop playback.
+ * @param playCtx - Play context.
  */
-export function stop() {
-    getInstrumntForPlayback().stop();
+export function stop(playCtx?: PlayContext) {
+    getInstrumentList().forEach(instrument => {
+        const instr = getValidInstrumnt(instrument);
+
+        if (instr instanceof SamplesInstrument)
+            instr.stop(playCtx);
+        else
+            instr.stop();
+    });
 }
 
 /**
- * Mute playback on current instrument.
+ * Mute playback.
  */
 export function mute() {
     stop();
@@ -49,7 +71,7 @@ export function mute() {
 }
 
 /**
- * Unmute playback on current instrument.
+ * Unmute playback.
  */
 export function unmute() {
     mutePlayback = false;

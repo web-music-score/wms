@@ -28,14 +28,32 @@ export function registerInstrument(instr: Instrument, name: string): void {
     defaultInstrument = name;
 }
 
-export function getInstrumntForPlayback(name?: string): Instrument {
-    name ??= getDefaultInstrument();
+function getValidInstrumentName(instrument?: string | number | undefined): string {
+    if (Guard.isNumber(instrument)) {
+        const name = getMidiInstrumentName(instrument);
+        if (name) {
+            return name;
+        }
+        else {
+            warnOnce(`Invalid midi program "${instrument}". Using fallback instrument.`);
+            return getFallbackInstrumentName();
+        }
+    }
+    else if (!Guard.isString(instrument)) {
+        warnOnce(`Invalid instrument name "${instrument}". Using fallback instrument.`);
+        return getFallbackInstrumentName();
+    }
+    else {
+        return instrument;
+    }
+}
 
-    let instr = instrumentMap.get(name);
+export function getValidInstrumnt(instrument?: string | number | undefined): Instrument {
+    let instr = instrumentMap.get(getValidInstrumentName(instrument));
 
     if (instr) return instr;
 
-    warnOnce(`Instrument "${name}" not available. Using fallback instrument.`);
+    warnOnce(`Instrument "${instrument}" not available. Using fallback instrument.`);
 
     return getFallbackInstrument();
 }
@@ -52,20 +70,7 @@ export function useInstrument(instrument: string | number): void {
  * @param instrument - Instrument name (string) or 0-based midi program (number).
  */
 export function setDefaultInstrument(instrument: string | number): void {
-    if (Guard.isNumber(instrument)) {
-        const name = getMidiInstrumentName(instrument);
-        if (name) {
-            instrument = name;
-        }
-        else {
-            warnOnce(`Invalid midi program "${instrument}". Using fallback instrument.`);
-            instrument = getFallbackInstrumentName();
-        }
-    }
-    else if (!Guard.isString(instrument)) {
-        warnOnce(`Invalid instrument name "${instrument}". Using fallback instrument.`);
-        instrument = getFallbackInstrumentName();
-    }
+    instrument = getValidInstrumentName(instrument);
 
     if (instrument === defaultInstrument)
         return;
@@ -97,7 +102,7 @@ export function preloadInstrument(instrument: string | number): void {
         else return;
     }
 
-    const instr = getInstrumntForPlayback(instrument);
+    const instr = getValidInstrumnt(instrument);
 
     if (instr instanceof SamplesInstrument)
         instr.initialize();

@@ -3,6 +3,9 @@ import { Instrument, linearToDecibels } from "./instrument";
 import { canUseToneJs } from "./can-use-tone-js";
 import { Guard, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { Note } from "web-music-score/theory";
+import { PlayContext } from "./playback";
+
+const DefaultPlayCtx: PlayContext = {};
 
 function splitUrl(url: string) {
     const i = url.lastIndexOf("/");
@@ -32,7 +35,7 @@ type SamplesJson = {
 
 class SampleBuffer {
     private audioBuffer: Tone.ToneAudioBuffer | undefined;
-    private activePlayers = new ValueSet<Tone.Player>();
+    private activePlayerContexts = new UniMap<PlayContext, ValueSet<Tone.Player>>();
     private gainNode: Tone.Gain;
 
     constructor(
@@ -50,7 +53,7 @@ class SampleBuffer {
             .catch(err => console.error("Audio load failed:", err));
     }
 
-    playNote(note: string, duration: number, linearVolume: number) {
+    playNote(note: string, duration: number, linearVolume: number, playCtx?: PlayContext) {
         if (!this.audioBuffer || !this.audioBuffer.loaded)
             return;
 
@@ -70,10 +73,12 @@ class SampleBuffer {
         player.playbackRate = Math.pow(2, semitones / 12);
         player.volume.value = linearToDecibels(linearVolume);
 
-        this.activePlayers.add(player);
+        const activePlayers = this.activePlayerContexts.getOrCreate(playCtx ?? DefaultPlayCtx, () => new ValueSet<Tone.Player>())
+
+        activePlayers.add(player);
 
         player.onstop = () => {
-            this.activePlayers.delete(player);
+            activePlayers.delete(player);
             player.dispose();
         };
 
@@ -83,12 +88,28 @@ class SampleBuffer {
         player.stop(now + duration);
     }
 
-    stopAll() {
-        this.activePlayers.forEach(p => {
+    stop(playCtx?: PlayContext) {
+        function stopPlayer(p: Tone.Player) {
             p.stop();
             p.dispose();
-        });
-        this.activePlayers.clear();
+        }
+
+        if (playCtx) {
+            // Stop players of given context.
+            const activePlayers = this.activePlayerContexts.get(playCtx)
+            if (activePlayers) {
+                activePlayers.forEach(stopPlayer);
+                this.activePlayerContexts.delete(activePlayers);
+            }
+        }
+        else {
+            // Stop all players.
+            this.activePlayerContexts.forEach(activePlayers => {
+                activePlayers.forEach(stopPlayer);
+            });
+            this.activePlayerContexts.clear();
+        }
+
     }
 }
 
@@ -190,7 +211,7 @@ export class SamplesInstrument implements Instrument {
         return this.name;
     }
 
-    playNote(note: string, duration: number, linearVolume: number) {
+    playNote(note: string, duration: number, linearVolume: number, playCtx?: PlayContext) {
         this.initialize();
 
         if (!this.initialized) return;
@@ -198,12 +219,12 @@ export class SamplesInstrument implements Instrument {
         const buf = this.getClosestSampleBuffer(note);
 
         if (buf)
-            buf.playNote(note, duration, linearVolume);
+            buf.playNote(note, duration, linearVolume, playCtx);
     }
 
-    stop() {
+    stop(playCtx?: PlayContext) {
         if (!this.initialized) return;
 
-        this.sampleBuffers.forEach(buf => buf.stopAll());
+        this.sampleBuffers.forEach(buf => buf.stop(playCtx));
     }
 }

@@ -5,6 +5,9 @@
 - Audio.preloadInstrument(), Audio.setDefaultInstrument(), Audio.getDefultInstrument(),
   Audio.getMidiInstrumentName().
 
+### Changed
+- Updated Audio.playNote(..., instrument?, playCtx?) and Audio.stop(playCtx?).
+
 ### Deprecated
 - Audio.addInstrument() - No more add instruments, supports midi instruments instead.
 - Audio.useInstrument() - Use Audio.setDefaultInstrument() instead.

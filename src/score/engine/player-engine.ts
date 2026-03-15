@@ -529,6 +529,7 @@ export class PlayerEngine {
                     }
 
                     let playNote = note.note;
+                    let instrument = undefined;
 
                     let octaveShift = col.getPlayerProps().getOctaveShift();
 
@@ -537,10 +538,10 @@ export class PlayerEngine {
 
                     if (arpeggioDelayTicks > 0) {
                         let arpeggioDelay = getDuration(arpeggioDelayTicks, tempo);
-                        _setTimeout(() => Audio.playNote(playNote, noteSeconds, volume), arpeggioDelay * 1000);
+                        _setTimeout(() => Audio.playNote(playNote, noteSeconds, volume, instrument, this), arpeggioDelay * 1000);
                     }
                     else {
-                        Audio.playNote(playNote, noteSeconds, volume);
+                        Audio.playNote(playNote, noteSeconds, volume, instrument, this);
                     }
                 }
             });
@@ -589,7 +590,7 @@ export class PlayerEngine {
     }
 
     pause() {
-        Audio.stop(); // FIXME: Temp fix to stop all playback.
+        Audio.stop(this);
 
         // To pause, stop timer
         if (this.playTimer) {
@@ -605,7 +606,7 @@ export class PlayerEngine {
     }
 
     stop() {
-        Audio.stop(); // FIXME: Temp fix to stop all playback.
+        Audio.stop(this);
 
         // Stop timer
         if (this.playTimer) {
