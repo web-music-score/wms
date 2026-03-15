@@ -17,8 +17,7 @@ export function getInstrumentList(): ReadonlyArray<string> {
 }
 
 /**
- * Get current instrument name.
- * @returns - Name of current instrument.
+ * @deprecated Use getDefaultInstrument() instead.
  */
 export function getCurrentInstrument(): string {
     return defaultInstrument;

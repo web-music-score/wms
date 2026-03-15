@@ -7,13 +7,14 @@ import { playNote, stop, mute, unmute, isMuted } from "./playback"
 
 export {
     Instrument,
-    linearToDecibels,
-    getCurrentInstrument,
-    getInstrumentList,
     addInstrument,
+    linearToDecibels,
+    getInstrumentList,
     preloadInstrument,
+    getMidiInstrumentName,
     setDefaultInstrument,
     getDefaultInstrument,
+    getCurrentInstrument,
     useInstrument,
     playNote,
     stop,
