@@ -5,6 +5,9 @@ import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
 import { getCurrentInstrument, getInstrumentList, addInstrument, preloadInstrument, setDefaultInstrument, getDefaultInstrument, useInstrument } from "./manage";
 import { playNote, stop, mute, unmute, isMuted } from "./playback"
 
+/** Instrument name (string), midi program (number) or undefined. */
+export type InstrumentValue = string | number | undefined;
+
 export {
     Instrument,
     addInstrument,

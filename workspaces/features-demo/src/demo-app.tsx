@@ -6,9 +6,11 @@ import { DemoPieces } from "demo-pieces";
 
 function DemoApp() {
     const [doc, setDoc] = React.useState(DemoPieces.getInstance().getDefault() as (Score.MDocument | undefined));
-    const [instrument, setInstrument] = React.useState(Audio.getCurrentInstrument());
+    const [instrument, setInstrument] = React.useState(Audio.getDefaultInstrument());
     const [hoverObjectText, setHoverObjectText] = React.useState("");
     const [hoverStaffText, setHoverStaffText] = React.useState("");
+
+    if (doc) doc.preloadInstruments();
 
     const onChangePiece = (title: string) => {
         let newDoc = DemoPieces.getInstance().getDocument(title);

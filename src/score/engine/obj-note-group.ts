@@ -15,6 +15,7 @@ import { ObjRest } from "./obj-rest";
 import { getAnnotationColorKey, getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 import { ScoreError } from "./error-utils";
 import { ObjSymbol } from "./obj-symbol";
+import { InstrumentValue } from "web-music-score/audio";
 
 function getArpeggio(a: boolean | ArpeggioValue | undefined): Arpeggio | undefined {
     return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -182,7 +183,7 @@ export class ObjNoteGroup extends MusicObject {
 
     readonly mi: MNoteGroup;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLengthValue, readonly options?: NoteOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, readonly notes: ReadonlyArray<Note>, noteLength: NoteLengthValue, readonly options: NoteOptions, tupletRatio: TupletRatio | undefined, private readonly instrument: InstrumentValue) {
         super(col);
 
         if (!Guard.isIntegerGte(notes.length, 1)) {
@@ -211,6 +212,8 @@ export class ObjNoteGroup extends MusicObject {
 
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
+        this.doc.registerInstrument(this.instrument);
+
         this.mi = new MNoteGroup(this);
     }
 
@@ -228,6 +231,10 @@ export class ObjNoteGroup extends MusicObject {
 
     get row() {
         return this.col.row;
+    }
+
+    getInstrument(): InstrumentValue {
+        return this.instrument;
     }
 
     addNoteArticulation(kind: AnnotationKind, options: { color?: string }) {

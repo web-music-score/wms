@@ -3,6 +3,7 @@ import { Instrument } from "./instrument";
 import { warnOnce } from "shared-src";
 import { getMidiInstrumentName } from "./midi";
 import { SamplesInstrument } from "./samples-instrument";
+import { InstrumentValue } from ".";
 
 const instrumentMap = new UniMap<string, Instrument>();
 
@@ -28,7 +29,7 @@ export function registerInstrument(instr: Instrument, name: string): void {
     defaultInstrument = name;
 }
 
-function getValidInstrumentName(instrument?: string | number | undefined): string {
+function getValidInstrumentName(instrument?: InstrumentValue): string {
     if (Guard.isNumber(instrument)) {
         const name = getMidiInstrumentName(instrument);
         if (name) {
@@ -48,7 +49,7 @@ function getValidInstrumentName(instrument?: string | number | undefined): strin
     }
 }
 
-export function getValidInstrumnt(instrument?: string | number | undefined): Instrument {
+export function getValidInstrumnt(instrument?: InstrumentValue): Instrument {
     let instr = instrumentMap.get(getValidInstrumentName(instrument));
 
     if (instr) return instr;

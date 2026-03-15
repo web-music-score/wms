@@ -27,6 +27,7 @@ import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { ScoreError } from "./error-utils";
+import { InstrumentValue } from "web-music-score/audio";
 
 export function getExtensionAnchorY(linePos: ExtensionLinePos) {
     switch (linePos) {
@@ -867,15 +868,15 @@ export class ObjMeasure extends MusicObject {
         this.lastAddedRhythmSymbol = symbol;
     }
 
-    addNoteGroup(voiceId: Pub.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, options?: Pub.NoteOptions, tupletRatio?: Theory.TupletRatio): ObjNoteGroup {
+    addNoteGroup(voiceId: Pub.VoiceId, notes: (Theory.Note | string)[], noteLength: Theory.NoteLengthValue, options: Pub.NoteOptions, tupletRatio: Theory.TupletRatio | undefined, instrument: InstrumentValue): ObjNoteGroup {
         let realNotes = notes.map(note => typeof note === "string" ? Theory.Note.getNote(note) : note);
         let col = this.getRhythmColumn(voiceId);
-        let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio);
+        let noteGroup = new ObjNoteGroup(col, voiceId, realNotes, noteLength, options, tupletRatio, instrument);
         this.addRhythmSymbol(noteGroup);
         return noteGroup;
     }
 
-    addRest(voiceId: Pub.VoiceId, restLength: Theory.NoteLengthValue, options?: Pub.RestOptions, tupletRatio?: Theory.TupletRatio): ObjRest {
+    addRest(voiceId: Pub.VoiceId, restLength: Theory.NoteLengthValue, options: Pub.RestOptions, tupletRatio: Theory.TupletRatio | undefined): ObjRest {
         let col = this.getRhythmColumn(voiceId);
         let rest = new ObjRest(col, voiceId, restLength, options, tupletRatio);
         this.addRhythmSymbol(rest);
@@ -1273,7 +1274,7 @@ export class ObjMeasure extends MusicObject {
                 }
             }
 
-            rests.reverse().forEach(rest => this.addRest(id, Theory.NoteLengthProps.create(rest.noteLength, rest.dotCount).noteLength));
+            rests.reverse().forEach(rest => this.addRest(id, Theory.NoteLengthProps.create(rest.noteLength, rest.dotCount).noteLength, {}, undefined));
         }
     }
 

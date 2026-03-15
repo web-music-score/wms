@@ -1,3 +1,4 @@
+import * as Audio from "web-music-score/audio";
 import { StaffPos, View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
@@ -33,6 +34,8 @@ export class ObjDocument extends MusicObject {
 
     private staffGroups = new UniMap<string, StaffGroup>();
 
+    private instrumentSet = new ValueSet<string | number>();
+
     private readonly mi: MDocument;
 
     constructor(readonly options: DocumentOptions) {
@@ -51,6 +54,14 @@ export class ObjDocument extends MusicObject {
 
     getColorWithKey(alt?: ColorKey) {
         return this.options.color ?? alt ?? "black";
+    }
+
+    registerInstrument(instrument: Audio.InstrumentValue) {
+        if (instrument) this.instrumentSet.add(instrument);
+    }
+
+    preloadInstruments() {
+        this.instrumentSet.forEach(instr => Audio.preloadInstrument(instr));
     }
 
     setScoreConfiguration(config: StaffPreset | ScoreConfiguration) {

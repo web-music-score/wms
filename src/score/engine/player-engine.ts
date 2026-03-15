@@ -529,7 +529,7 @@ export class PlayerEngine {
                     }
 
                     let playNote = note.note;
-                    let instrument = undefined;
+                    let instrument = note.instrument;
 
                     let octaveShift = col.getPlayerProps().getOctaveShift();
 

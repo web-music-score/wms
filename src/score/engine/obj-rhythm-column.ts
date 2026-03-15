@@ -13,9 +13,11 @@ import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
 import { IndexArray, UniMap, TriMap, AnchoredRect, Rect, Assert } from "@tspro/ts-utils-lib";
+import { InstrumentValue } from "web-music-score/audio";
 
 export type ScorePlayerNote = {
     note: Note;
+    instrument: InstrumentValue;
     ticks: number;
     staccato: "staccato" | "staccatissimo" | "none";
     slur: undefined | "first" | "slurred";
@@ -274,7 +276,7 @@ export class ObjRhythmColumn extends MusicObject {
     getPlayerNotes() {
         let playerNotes: ScorePlayerNote[] = [];
 
-        function addNote(note: Note, ticks: number, staccato: "staccato" | "staccatissimo" | "none", slur: undefined | "first" | "slurred") {
+        function addNote(note: Note, instrument: InstrumentValue, ticks: number, staccato: "staccato" | "staccatissimo" | "none", slur: undefined | "first" | "slurred") {
             if (ticks <= 0) {
                 return;
             }
@@ -292,7 +294,7 @@ export class ObjRhythmColumn extends MusicObject {
 
             if (!hasSameDiatonicId) {
                 // Add note to list
-                playerNotes.push({ note, ticks, staccato, slur });
+                playerNotes.push({ note, instrument, ticks, staccato, slur });
             }
         }
 
@@ -300,7 +302,8 @@ export class ObjRhythmColumn extends MusicObject {
             const symbol = this.getVoiceSymbol(voiceId);
 
             if (symbol instanceof ObjNoteGroup) {
-                let slur = symbol.getPlaySlur();
+                const slur = symbol.getPlaySlur();
+                const instrument = symbol.getInstrument();
 
                 symbol.notes.forEach(note => {
                     let ticks = symbol.getPlayTicks(note);
@@ -311,7 +314,7 @@ export class ObjRhythmColumn extends MusicObject {
                                 ? "staccatissimo"
                                 : "none";
 
-                    addNote(note, ticks, staccato, slur);
+                    addNote(note, instrument, ticks, staccato, slur);
                 });
             }
         });
@@ -408,7 +411,7 @@ export class ObjRhythmColumn extends MusicObject {
                 prevCol.getAnchoredLayoutObjects().forEach(prevObj => {
                     if (prevObj.getRect().intersects(obj.getRect())) {
                         this.rectWithObjects.left = Math.min(this.rectWithObjects.left, obj.getRect().left - extraSpace);
-                        this.requestRectUpdate(); 
+                        this.requestRectUpdate();
                     }
                 });
             }

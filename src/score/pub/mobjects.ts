@@ -305,6 +305,13 @@ export class MDocument extends MusicInterface {
 
         return false;
     }
+
+    /**
+     * Preload required instruments.
+     */
+    preloadInstruments() {
+        this.obj.preloadInstruments();
+    }
 }
 
 /** Ending object. */

@@ -8,6 +8,7 @@ import { RhythmSymbol } from "../engine/obj-rhythm-column";
 import { ObjBeamGroup } from "../engine/obj-beam-group";
 import { resolveAnnotationGroup, resolveAnnotationKind } from "../engine/annotation-utils";
 import { AssertUtil, warnOnce, resolveEnumValue } from "shared-src";
+import { InstrumentValue } from "web-music-score/audio";
 
 function assertObjHasNoProp(obj: Record<string, unknown>, prop: string, msg: string) {
     AssertUtil.assertMsg(!Guard.isTypedObject(obj, [prop]), msg);
@@ -475,6 +476,32 @@ export class DocumentBuilder {
         });
     }
 
+    private instruments: InstrumentValue[/* VoiceId */] = [];
+
+    /**
+     * Set instrument to use for playback for given voiceId(s).
+     * @param voiceId - Voice id or array.
+     * @param instrument - Instrument name (string) or midi program (number).
+     * @returns - This document builder instance.
+     */
+    setInstrument(voiceId: Types.VoiceId | Types.VoiceId[], instrument: InstrumentValue): DocumentBuilder {
+        return this.safe(() => {
+            AssertUtil.setClassFunc("DocumentBuilder", "setInstrument", voiceId, instrument);
+
+            AssertUtil.assert(
+                Types.isVoiceId(voiceId) || Guard.isArray(voiceId) && voiceId.every(voiceId2 => Types.isVoiceId(voiceId2)),
+                Guard.isIntegerBetween(instrument, 0, 127) || Guard.isNonEmptyString(instrument) || Guard.isUndefined(instrument)
+            );
+
+            if (Guard.isArray(voiceId)) {
+                voiceId.forEach(voiceId2 => this.instruments[voiceId2] = instrument);
+            }
+            else {
+                this.instruments[voiceId] = instrument;
+            }
+        });
+    }
+
     /**
      * Add note to current measure.
      * @param voiceId - Voice id to add note to.
@@ -496,18 +523,20 @@ export class DocumentBuilder {
                 Theory.isNoteLength(noteLength)
             );
 
-            const constNoteOptions = noteOptions ?? {}
-            assertNoteOptions(constNoteOptions);
+            const noteOptionsEx = noteOptions ?? {};
+            assertNoteOptions(noteOptionsEx);
+
+            const instrument = this.instruments[voiceId];
 
             if (Guard.isArray(note)) {
-                let string = constNoteOptions.string;
+                let string = noteOptionsEx.string;
                 note.forEach((note, noteId) => {
-                    constNoteOptions.string = Guard.isArray(string) ? string[noteId] : string;
-                    this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions);
+                    noteOptionsEx.string = Guard.isArray(string) ? string[noteId] : string;
+                    this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptionsEx, undefined, instrument);
                 });
             }
             else {
-                this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions);
+                this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptionsEx, undefined, instrument);
             }
         });
     }
@@ -530,10 +559,12 @@ export class DocumentBuilder {
                 Theory.isNoteLength(noteLength)
             );
 
-            noteOptions ??= {}
-            assertNoteOptions(noteOptions);
+            const noteOptionsEx = noteOptions ?? {};
+            assertNoteOptions(noteOptionsEx);
 
-            this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptions);
+            const instrument = this.instruments[voiceId];
+
+            this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptionsEx, undefined, instrument);
         });
     }
 
@@ -556,7 +587,7 @@ export class DocumentBuilder {
             restOptions ??= {}
             assertRestOptions(restOptions);
 
-            this.getMeasure().addRest(voiceId, restLength, restOptions);
+            this.getMeasure().addRest(voiceId, restLength, restOptions, undefined);
         });
     }
 
@@ -595,19 +626,21 @@ export class DocumentBuilder {
                         Theory.isNoteLength(noteLength)
                     );
 
-                    noteOptions ??= {}
-                    assertNoteOptions(noteOptions);
+                    const noteOptionsEx = noteOptions ?? {};
+                    assertNoteOptions(noteOptionsEx);
+
+                    const instrument = this.instruments[voiceId];
 
                     if (Guard.isArray(note)) {
-                        let string = noteOptions.string;
+                        let string = noteOptionsEx.string;
                         note.forEach((note, noteId) => {
-                            noteOptions.string = Guard.isArray(string) ? string[noteId] : string;
-                            let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions, tupletRatio);
+                            noteOptionsEx.string = Guard.isArray(string) ? string[noteId] : string;
+                            let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptionsEx, tupletRatio, instrument);
                             tupletSymbols.push(s);
                         });
                     }
                     else {
-                        let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptions, tupletRatio);
+                        let s = this.getMeasure().addNoteGroup(voiceId, [note], noteLength, noteOptionsEx, tupletRatio, instrument);
                         tupletSymbols.push(s);
                     }
 
@@ -621,10 +654,12 @@ export class DocumentBuilder {
                         Theory.isNoteLength(noteLength)
                     );
 
-                    noteOptions ??= {}
-                    assertNoteOptions(noteOptions);
+                    const noteOptionsEx = noteOptions ?? {};
+                    assertNoteOptions(noteOptionsEx);
 
-                    let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptions, tupletRatio);
+                    const instrument = this.instruments[voiceId];
+
+                    let s = this.getMeasure().addNoteGroup(voiceId, notes, noteLength, noteOptionsEx, tupletRatio, instrument);
                     tupletSymbols.push(s);
 
                     return helper;

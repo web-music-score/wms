@@ -76,7 +76,7 @@ export class ObjRest extends MusicObject {
 
     readonly mi: MRest;
 
-    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLengthValue, readonly options?: RestOptions, tupletRatio?: TupletRatio) {
+    constructor(readonly col: ObjRhythmColumn, readonly voiceId: VoiceId, noteLength: NoteLengthValue, readonly options: RestOptions, tupletRatio: TupletRatio | undefined) {
         super(col);
 
         this.setDiatonicId = this.getDiatonicIdFromStaffPos(this.options?.staffPos) ?? ObjRest.UndefinedDiatonicId;
