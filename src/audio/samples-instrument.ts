@@ -79,6 +79,8 @@ class SampleBuffer {
 
         player.onstop = () => {
             activePlayers.delete(player);
+            if (activePlayers.isEmpty())
+                this.activePlayerContexts.delete(activePlayers);
             player.dispose();
         };
 
@@ -89,7 +91,7 @@ class SampleBuffer {
     }
 
     stop(playCtx?: PlayContext) {
-        function stopPlayer(p: Tone.Player) {
+        const stopPlayer = (p: Tone.Player) => {
             p.stop();
             p.dispose();
         }
