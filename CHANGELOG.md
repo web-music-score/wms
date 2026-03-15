@@ -1,11 +1,15 @@
 # CHANGELOG
 ## [6.4.0-pre.10] - Unreleased
 ### Added
-- Audio.initInstrument() to init/preload instrument.
 - All 128 midi instruments (except percussives).
+- Audio.preloadInstrument(), Audio.setDefaultInstrument(), Audio.getDefultInstrument()
 
 ### Changed
 - Use Synthesizer as fallback if instrument not found.
+
+### Deprecated
+- Audio.useInstrument() - use Audio.setDefaultInstrument() instead.
+- Audio.addInstrument() - No more add instruments, supports midi instruments instead.
 
 ## [6.4.0-pre.9] - 2026-03-07
 ### Changed

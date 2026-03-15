@@ -20,7 +20,7 @@ function DemoApp() {
     }
 
     const onChangeInstrument = (instrument: string) => {
-        Audio.useInstrument(instrument);
+        Audio.setDefaultInstrument(instrument);
         setInstrument(instrument);
     }
 

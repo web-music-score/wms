@@ -1,5 +1,5 @@
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
-import { getInstrumnt } from "./manage";
+import { getInstrumntForPlayback } from "./manage";
 
 function getStringNote(note: Note | number | string): string {
     if (typeof note === "string") {
@@ -30,14 +30,14 @@ let mutePlayback: boolean = false;
 export function playNote(note: Note | string | number, duration?: number, linearVolume?: number) {
     if (mutePlayback) return;
 
-    getInstrumnt().playNote(getStringNote(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
+    getInstrumntForPlayback().playNote(getStringNote(note), duration ?? DefaultDuration, linearVolume ?? DefaultVolume);
 }
 
 /**
  * Stop playback on current instrument.
  */
 export function stop() {
-    getInstrumnt().stop();
+    getInstrumntForPlayback().stop();
 }
 
 /**

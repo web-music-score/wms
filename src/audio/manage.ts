@@ -6,7 +6,7 @@ import { SamplesInstrument } from "./samples-instrument";
 
 const instrumentMap = new UniMap<string, Instrument>();
 
-let currentInstrument = "";
+let defaultInstrument = "";
 
 /**
  * Get instrument name list.
@@ -21,67 +21,84 @@ export function getInstrumentList(): ReadonlyArray<string> {
  * @returns - Name of current instrument.
  */
 export function getCurrentInstrument(): string {
-    return currentInstrument;
+    return defaultInstrument;
 }
 
 export function registerInstrument(instr: Instrument, name: string): void {
     instrumentMap.set(name, instr);
-    currentInstrument = name;
+    defaultInstrument = name;
 }
 
-export function getInstrumnt(name?: string): Instrument {
-    name ??= currentInstrument;
+export function getInstrumntForPlayback(name?: string): Instrument {
+    name ??= getDefaultInstrument();
 
     let instr = instrumentMap.get(name);
 
     if (instr) return instr;
 
-    warnOnce(`Instrument "${name}" not available. Fallback to default.`);
+    warnOnce(`Instrument "${name}" not available. Using fallback instrument.`);
 
-    return getDefaultInstrument();
+    return getFallbackInstrument();
 }
 
 /**
- * Set instrument to use in playback.
- * @param instrument - Instrument name (string) or 0-based midi program (number).
+ * @deprecated Use setDefaultInstrument() instead.
  */
 export function useInstrument(instrument: string | number): void {
+    setDefaultInstrument(instrument);
+}
+
+/**
+ * Set default instrument to use in playback.
+ * @param instrument - Instrument name (string) or 0-based midi program (number).
+ */
+export function setDefaultInstrument(instrument: string | number): void {
     if (Guard.isNumber(instrument)) {
         const name = getMidiInstrumentName(instrument);
         if (name) {
             instrument = name;
         }
         else {
-            warnOnce(`Invalid midi program (${instrument}). Fallback to default.`);
-            instrument = getDefaultInstrumentName();
+            warnOnce(`Invalid midi program "${instrument}". Using fallback instrument.`);
+            instrument = getFallbackInstrumentName();
         }
     }
+    else if (!Guard.isString(instrument)) {
+        warnOnce(`Invalid instrument name "${instrument}". Using fallback instrument.`);
+        instrument = getFallbackInstrumentName();
+    }
 
-    if (instrument === currentInstrument)
+    if (instrument === defaultInstrument)
         return;
 
-    getInstrumnt().stop();
+    defaultInstrument = instrument;
 
-    currentInstrument = instrument;
-
-    initInstrument(instrument);
+    preloadInstrument(instrument);
 }
 
 /**
- * Initialize instrument, preload samples to be ready for playback.
- * If instrument is not manually initialized then it will be initialized
+ * Get default instrument.
+ * @returns Default instrument name.
+ */
+export function getDefaultInstrument(): string {
+    return defaultInstrument;
+}
+
+/**
+ * Preload samples samples to be ready for playback.
+ * If instrument is not manually preloaded it will be loaded
  * on the run so there might be silent notes in the beginning.
  * 
  * @param instrument - Instrument name (string) or 0-based midi program (number).
  */
-export function initInstrument(instrument: string | number): void {
+export function preloadInstrument(instrument: string | number): void {
     if (Guard.isNumber(instrument)) {
         const name = getMidiInstrumentName(instrument);
         if (name) instrument = name;
         else return;
     }
 
-    const instr = getInstrumnt(instrument);
+    const instr = getInstrumntForPlayback(instrument);
 
     if (instr instanceof SamplesInstrument)
         instr.initialize();
@@ -89,6 +106,9 @@ export function initInstrument(instrument: string | number): void {
 
 /**
  * Add instrument(s).
+ * 
+ * @deprecated Midi instruments are supported.
+ * 
  * @param instr - Instrument or array.
  */
 export function addInstrument(instr: Instrument | Instrument[]): void {
@@ -107,10 +127,10 @@ export function addInstrument(instr: Instrument | Instrument[]): void {
     }
 }
 
-export function getDefaultInstrumentName(): string {
+export function getFallbackInstrumentName(): string {
     return getMidiInstrumentName(0)!;
 }
 
-export function getDefaultInstrument(): Instrument {
-    return instrumentMap.get(getDefaultInstrumentName())!;
+export function getFallbackInstrument(): Instrument {
+    return instrumentMap.get(getFallbackInstrumentName())!;
 }

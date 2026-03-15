@@ -1,8 +1,8 @@
 import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
 import { Instrument, linearToDecibels } from "./instrument";
 import { Synthesizer } from "web-music-score/audio-synth";
-import { registerMidiInstruments } from "./midi";
-import { getCurrentInstrument, getInstrumentList, addInstrument, initInstrument, useInstrument, getDefaultInstrumentName } from "./manage";
+import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
+import { getCurrentInstrument, getInstrumentList, addInstrument, preloadInstrument, setDefaultInstrument, getDefaultInstrument, useInstrument } from "./manage";
 import { playNote, stop, mute, unmute, isMuted } from "./playback"
 
 export {
@@ -11,7 +11,9 @@ export {
     getCurrentInstrument,
     getInstrumentList,
     addInstrument,
-    initInstrument,
+    preloadInstrument,
+    setDefaultInstrument,
+    getDefaultInstrument,
     useInstrument,
     playNote,
     stop,
@@ -22,13 +24,14 @@ export {
 
 initCore();
 
-// For legacy support
-addInstrument(Synthesizer);
-
 // Add midi instruments
 registerMidiInstruments();
 
-useInstrument(getDefaultInstrumentName());
+// Add synthesizer for legacy support
+addInstrument(Synthesizer);
+
+// Set Acoustic Grand Piano as default instrument
+setDefaultInstrument(getMidiInstrumentName(0)!);
 
 export class AudioError extends MusicError {
     constructor(message: string) {
