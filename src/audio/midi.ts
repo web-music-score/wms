@@ -159,8 +159,8 @@ export function getMidiInstrumentName(programNumber: number): string | undefined
     return GM_INSTRUMENTS[programNumber]?.name;
 }
 
-// const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0/";
-const samplesBaseUrl = "http://localhost:3000/";
+const samplesBaseUrl = "https://cdn.jsdelivr.net/npm/web-music-score-samples@3.0.0";
+// const samplesBaseUrl = "http://localhost:3000";
 
 export function registerMidiInstruments() {
     for (const { name, folder } of GM_INSTRUMENTS) {
