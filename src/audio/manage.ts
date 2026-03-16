@@ -78,7 +78,7 @@ export function setDefaultInstrument(instrument: string | number): void {
 
     defaultInstrument = instrument;
 
-    loadInstrument(instrument).catch(err => console.error("Instrument load failed:", err));
+    loadInstrument(instrument).catch(err => console.error("Failed to load instrument:", err));
 }
 
 /**
