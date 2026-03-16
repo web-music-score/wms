@@ -17,13 +17,6 @@ export function getInstrumentList(): ReadonlyArray<string> {
     return [...instrumentMap.keys()];
 }
 
-/**
- * @deprecated Use getDefaultInstrument() instead.
- */
-export function getCurrentInstrument(): string {
-    return defaultInstrument;
-}
-
 export function registerInstrument(instr: Instrument, name: string): void {
     instrumentMap.set(name, instr);
     defaultInstrument = name;
@@ -57,13 +50,6 @@ export function getValidInstrumnt(instrument?: InstrumentValue): Instrument {
     warnOnce(`Instrument "${instrument}" not available. Using fallback instrument.`);
 
     return getFallbackInstrument();
-}
-
-/**
- * @deprecated Use setDefaultInstrument() instead.
- */
-export function useInstrument(instrument: string | number): void {
-    setDefaultInstrument(instrument);
 }
 
 /**
@@ -118,13 +104,27 @@ export function loadInstrument(instrument: string | number): Promise<void> {
     });
 }
 
-/**
- * Add instrument(s).
- * 
- * @deprecated Midi instruments are supported.
- * 
- * @param instr - Instrument or array.
- */
+export function getFallbackInstrumentName(): string {
+    return getMidiInstrumentName(0)!;
+}
+
+export function getFallbackInstrument(): Instrument {
+    return instrumentMap.get(getFallbackInstrumentName())!;
+}
+
+// ----------------- deprecated stuff ----------------
+
+/** @deprecated useInstrument() is deprecated, will be removed in future release. Use setDefaultInstrument() instead. */
+export function useInstrument(instrument: string | number): void {
+    setDefaultInstrument(instrument);
+}
+
+/** @deprecated getCurrentInstrument() is deprecated, will be removed in future release. Use getDefaultInstrument() instead. */
+export function getCurrentInstrument(): string {
+    return defaultInstrument;
+}
+
+/** @deprecated addInstrument() is deprecated, will be removed in future release. Current platform supports midi instruments built-in. */
 export function addInstrument(instr: Instrument | Instrument[]): void {
     if (Guard.isArray(instr)) {
         instr.forEach(instr => addInstrument(instr));
@@ -139,12 +139,4 @@ export function addInstrument(instr: Instrument | Instrument[]): void {
     ) {
         registerInstrument(instr, instr.getName());
     }
-}
-
-export function getFallbackInstrumentName(): string {
-    return getMidiInstrumentName(0)!;
-}
-
-export function getFallbackInstrument(): Instrument {
-    return instrumentMap.get(getFallbackInstrumentName())!;
 }

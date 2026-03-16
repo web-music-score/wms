@@ -3,27 +3,34 @@ import { Instrument, linearToDecibels } from "./instrument";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
 import { getCurrentInstrument, getInstrumentList, addInstrument, loadInstrument, setDefaultInstrument, getDefaultInstrument, useInstrument } from "./manage";
-import { playNote, stop, mute, unmute, isMuted } from "./playback"
+import { PlayContext, playNote, stop, mute, unmute, isMuted } from "./playback"
 
 /** Instrument name (string), midi program (number) or undefined. */
-export type InstrumentValue = string | number | undefined;
+type InstrumentValue = string | number | undefined;
 
 export {
-    Instrument,
-    addInstrument,
-    linearToDecibels,
+    InstrumentValue,
     getInstrumentList,
     loadInstrument,
     getMidiInstrumentName,
     setDefaultInstrument,
     getDefaultInstrument,
-    getCurrentInstrument,
-    useInstrument,
+    PlayContext,
     playNote,
     stop,
     mute,
     unmute,
-    isMuted
+    isMuted,
+    /* @deprecated */
+    Instrument,
+    /* @deprecated */
+    addInstrument,
+    /* @deprecated */
+    linearToDecibels,
+    /* @deprecated */
+    getCurrentInstrument,
+    /* @deprecated */
+    useInstrument,
 };
 
 initCore();

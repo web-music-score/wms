@@ -1,21 +1,4 @@
-/**
- * Instrument interface.
- * <p>To create your own instrument just create a class that implement this simple interface.</p>
- * 
- * ```ts
- *   import * as Audio from "web-music-score/audio";
- * 
- *   class MyCoolInstrument implements Audio.Instrument {
- *       constructor() { }
- *       getName() { return "My Cool Instrument"; }
- *       playNote(note: string, duration: number, linearVolume: number) { }
- *       stop() { }
- *   }
- * 
- *   // Add and use my cool instrument.
- *   Audio.addInstrument(new MyCoolInstrument());
- * ```
- */
+/** @deprecated Instrument is deprecated, will be removed in future release. Current platform supports midi instruments built-in. */
 export interface Instrument {
     /**
      * Get instrument name.
@@ -37,11 +20,7 @@ export interface Instrument {
     stop(): void;
 }
 
-/**
- * Linear volume to decibels converter.
- * @param linearVolume - Linear volume in range [0, 1].
- * @returns - Volume in decibels.
- */
+/** @deprecated linearToDecibels() is deprecated, will be removed in future release. Instrument that required this is deprecated. Current platform supports midi instruments built-in. */
 export function linearToDecibels(linearVolume: number): number {
     return (!isFinite(linearVolume) || linearVolume <= 0)
         ? -Infinity
