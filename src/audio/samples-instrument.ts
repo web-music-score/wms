@@ -5,6 +5,7 @@ import { Guard, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { Note } from "web-music-score/theory";
 import { PlayContext } from "./playback";
 import { warnOnce } from "shared-src";
+import { Synthesizer } from "web-music-score/audio-synth";
 
 const DefaultPlayCtx: PlayContext = {};
 
@@ -226,7 +227,11 @@ export class SamplesInstrument implements Instrument {
             .then(_ => { })
             .catch(err => console.error("Instrument load failed:", err));
 
-        if (!this.loaded) return;
+        if (!this.loaded) {
+            // Use synth fallback
+            Synthesizer.playNote(note, duration, linearVolume);
+            return;
+        }
 
         const buf = this.getClosestSampleBuffer(note);
 
