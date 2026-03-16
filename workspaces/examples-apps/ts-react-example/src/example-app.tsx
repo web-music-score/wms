@@ -1,10 +1,9 @@
 import * as React from "react";
-import { ClassicalGuitar } from "web-music-score/audio-cg";
 import * as Audio from "web-music-score/audio";
 import * as ScoreUI from "web-music-score/react-ui";
 import { createFrereJacques } from "web-music-score/pieces";
 
-Audio.addInstrument(ClassicalGuitar);
+Audio.setDefaultInstrument(0);
 
 function ExampleApp() {
     const [doc] = React.useState(createFrereJacques());
