@@ -4,6 +4,7 @@ import { canUseToneJs } from "./can-use-tone-js";
 import { Guard, UniMap, ValueSet } from "@tspro/ts-utils-lib";
 import { Note } from "web-music-score/theory";
 import { PlayContext } from "./playback";
+import { warnOnce } from "shared-src";
 
 const DefaultPlayCtx: PlayContext = {};
 
@@ -47,10 +48,13 @@ class SampleBuffer {
         readonly loopEnd?: number | undefined
     ) {
         this.gainNode = new Tone.Gain(this.gain).toDestination();
+    }
 
-        Tone.ToneAudioBuffer.fromUrl(this.file)
-            .then(buf => this.audioBuffer = buf)
-            .catch(err => console.error("Audio load failed:", err));
+    load(): Promise<void> {
+        return Tone.ToneAudioBuffer.fromUrl(this.file)
+            .then(buf => {
+                this.audioBuffer = buf;
+            });
     }
 
     playNote(note: string, duration: number, linearVolume: number, playCtx?: PlayContext) {
@@ -73,14 +77,16 @@ class SampleBuffer {
         player.playbackRate = Math.pow(2, semitones / 12);
         player.volume.value = linearToDecibels(linearVolume);
 
-        const activePlayers = this.activePlayerContexts.getOrCreate(playCtx ?? DefaultPlayCtx, () => new ValueSet<Tone.Player>())
+        playCtx ??= DefaultPlayCtx;
+
+        const activePlayers = this.activePlayerContexts.getOrCreate(playCtx, () => new ValueSet<Tone.Player>())
 
         activePlayers.add(player);
 
         player.onstop = () => {
             activePlayers.delete(player);
             if (activePlayers.isEmpty())
-                this.activePlayerContexts.delete(activePlayers);
+                this.activePlayerContexts.delete(playCtx);
             player.dispose();
         };
 
@@ -101,7 +107,7 @@ class SampleBuffer {
             const activePlayers = this.activePlayerContexts.get(playCtx)
             if (activePlayers) {
                 activePlayers.forEach(stopPlayer);
-                this.activePlayerContexts.delete(activePlayers);
+                this.activePlayerContexts.delete(playCtx);
             }
         }
         else {
@@ -119,29 +125,21 @@ export class SamplesInstrument implements Instrument {
     private name: string;
     private sampleBuffers: SampleBuffer[] = [];
 
-    private initialized = false;
+    private loadPromise?: Promise<void>;
+    private loaded = false;
 
     constructor(private readonly jsonUrl: string) {
         // Use json filename as temporary instrument name.
         this.name = splitUrl(jsonUrl).file;
     }
 
-    private loadJson() {
-        if (!canUseToneJs()) {
-            console.warn("Tone.js not available in this environment.");
-            return;
-        }
-
-        fetch(this.jsonUrl)
-            .then(res => {
-                res.json()
-                    .then(data => this.parseJson(data))
-                    .catch(_ => console.error(`Failed to parse samples json "${this.jsonUrl}".`));
-            })
-            .catch(_ => console.error(`Failed to fetch samples json "${this.jsonUrl}".`));
+    private loadJson(): Promise<void> {
+        return fetch(this.jsonUrl)
+            .then(res => res.json())
+            .then(data => this.parseJson(data));
     }
 
-    private parseJson(jsonData: SamplesJson) {
+    private parseJson(jsonData: SamplesJson): Promise<void> {
         const { base } = splitUrl(this.jsonUrl);
 
         this.name = String(jsonData.name);
@@ -154,6 +152,7 @@ export class SamplesInstrument implements Instrument {
 
         for (const note in jsonData.samples) {
             const sample = jsonData.samples[note];
+
             if (Guard.isString(sample)) {
                 const file = base + sample;
                 this.sampleBuffers.push(new SampleBuffer(note, file, gain, loop, loopStart, loopEnd));
@@ -177,14 +176,23 @@ export class SamplesInstrument implements Instrument {
                 }
             }
         }
+
+        return Promise.all(this.sampleBuffers.map(buf => buf.load()))
+            .then(() => { });
     }
 
-    initialize() {
-        if (this.initialized) return;
-
-        this.loadJson();
-
-        this.initialized = true;
+    load(): Promise<void> {
+        if (this.loadPromise) {
+            return this.loadPromise;
+        }
+        if (!canUseToneJs()) {
+            warnOnce("Tone.js not available in this environment.")
+            this.loadPromise = Promise.resolve();
+        }
+        else {
+            this.loadPromise = this.loadJson().then(() => { this.loaded = true; });
+        }
+        return this.loadPromise;
     }
 
     private closestSampleBufferMap = new UniMap<string, SampleBuffer>();
@@ -214,9 +222,11 @@ export class SamplesInstrument implements Instrument {
     }
 
     playNote(note: string, duration: number, linearVolume: number, playCtx?: PlayContext) {
-        this.initialize();
+        this.load()
+            .then(_ => { })
+            .catch(err => console.error("Instrument load failed:", err));
 
-        if (!this.initialized) return;
+        if (!this.loaded) return;
 
         const buf = this.getClosestSampleBuffer(note);
 
@@ -225,7 +235,7 @@ export class SamplesInstrument implements Instrument {
     }
 
     stop(playCtx?: PlayContext) {
-        if (!this.initialized) return;
+        if (!this.loaded) return;
 
         this.sampleBuffers.forEach(buf => buf.stop(playCtx));
     }

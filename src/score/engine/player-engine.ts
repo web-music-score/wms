@@ -576,6 +576,10 @@ export class PlayerEngine {
             return;
         }
 
+        // Load instruments but do not wait until done to start playing.
+        doc.loadInstruments()
+            .catch(err => console.error("Failed to load instrument:", err));
+
         let firstMeasure = doc.getFirstMeasure();
 
         if (firstMeasure) {

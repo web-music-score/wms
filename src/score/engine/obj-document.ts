@@ -34,7 +34,8 @@ export class ObjDocument extends MusicObject {
 
     private staffGroups = new UniMap<string, StaffGroup>();
 
-    private instrumentSet = new ValueSet<string | number>();
+    private instrumentsToLoad = new ValueSet<string | number>();
+    private instrumentsToLoadPromise?: Promise<void>;
 
     private readonly mi: MDocument;
 
@@ -56,12 +57,17 @@ export class ObjDocument extends MusicObject {
         return this.options.color ?? alt ?? "black";
     }
 
-    registerInstrument(instrument: Audio.InstrumentValue) {
-        if (instrument) this.instrumentSet.add(instrument);
+    addInstrumentForLoad(instrument: Audio.InstrumentValue) {
+        if (instrument) this.instrumentsToLoad.add(instrument);
     }
 
-    preloadInstruments() {
-        this.instrumentSet.forEach(instr => Audio.preloadInstrument(instr));
+    loadInstruments(): Promise<void> {
+        if (!this.instrumentsToLoadPromise) {
+            this.instrumentsToLoadPromise = Promise.all(
+                this.instrumentsToLoad.map(instr => Audio.loadInstrument(instr))
+            ).then(() => { });
+        }
+        return this.instrumentsToLoadPromise;
     }
 
     setScoreConfiguration(config: StaffPreset | ScoreConfiguration) {

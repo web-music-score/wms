@@ -2,7 +2,7 @@ import { init as initCore, MusicError, MusicErrorType } from "web-music-score/co
 import { Instrument, linearToDecibels } from "./instrument";
 import { Synthesizer } from "web-music-score/audio-synth";
 import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
-import { getCurrentInstrument, getInstrumentList, addInstrument, preloadInstrument, setDefaultInstrument, getDefaultInstrument, useInstrument } from "./manage";
+import { getCurrentInstrument, getInstrumentList, addInstrument, loadInstrument, setDefaultInstrument, getDefaultInstrument, useInstrument } from "./manage";
 import { playNote, stop, mute, unmute, isMuted } from "./playback"
 
 /** Instrument name (string), midi program (number) or undefined. */
@@ -13,7 +13,7 @@ export {
     addInstrument,
     linearToDecibels,
     getInstrumentList,
-    preloadInstrument,
+    loadInstrument,
     getMidiInstrumentName,
     setDefaultInstrument,
     getDefaultInstrument,

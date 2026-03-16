@@ -309,8 +309,8 @@ export class MDocument extends MusicInterface {
     /**
      * Preload required instruments.
      */
-    preloadInstruments() {
-        this.obj.preloadInstruments();
+    loadInstruments(): Promise<void> {
+        return this.obj.loadInstruments();
     }
 }
 

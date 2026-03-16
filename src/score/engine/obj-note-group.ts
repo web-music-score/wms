@@ -212,7 +212,7 @@ export class ObjNoteGroup extends MusicObject {
 
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
-        this.doc.registerInstrument(this.instrument);
+        this.doc.addInstrumentForLoad(this.instrument);
 
         this.mi = new MNoteGroup(this);
     }

@@ -4,20 +4,28 @@ import * as Score from "web-music-score/score";
 import * as ScoreUI from "web-music-score/react-ui";
 import { DemoPieces } from "demo-pieces";
 
+function initDoc(doc: Score.MDocument | undefined) {
+    if (doc) {
+        doc.loadInstruments()
+            .catch(err => console.error("Failed to load instrument:", err));
+    }
+    return doc;
+}
+
+const DefaultDoc = initDoc(DemoPieces.getInstance().getDefault());
+
 function DemoApp() {
-    const [doc, setDoc] = React.useState(DemoPieces.getInstance().getDefault() as (Score.MDocument | undefined));
+    const [doc, setDoc] = React.useState(DefaultDoc);
     const [instrument, setInstrument] = React.useState(Audio.getDefaultInstrument());
     const [hoverObjectText, setHoverObjectText] = React.useState("");
     const [hoverStaffText, setHoverStaffText] = React.useState("");
-
-    if (doc) doc.preloadInstruments();
 
     const onChangePiece = (title: string) => {
         let newDoc = DemoPieces.getInstance().getDocument(title);
 
         if (DemoPieces.getTitle(newDoc) !== DemoPieces.getTitle(doc)) {
             Score.Player.stopAll();
-            setDoc(newDoc);
+            setDoc(initDoc(newDoc));
         }
     }
 

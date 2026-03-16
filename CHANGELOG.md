@@ -2,8 +2,9 @@
 ## [6.4.0-pre.10] - Unreleased
 ### Added
 - All 128 midi instruments (except percussives).
-- Audio.preloadInstrument(), Audio.setDefaultInstrument(), Audio.getDefultInstrument(),
+- Audio.loadInstrument(), Audio.setDefaultInstrument(), Audio.getDefultInstrument(),
   Audio.getMidiInstrumentName().
+- MDocument.loadInstruments().
 
 ### Changed
 - Updated Audio.playNote(..., instrument?, playCtx?) and Audio.stop(playCtx?).

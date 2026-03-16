@@ -78,7 +78,7 @@ export function setDefaultInstrument(instrument: string | number): void {
 
     defaultInstrument = instrument;
 
-    preloadInstrument(instrument);
+    loadInstrument(instrument).catch(err => console.error("Instrument load failed:", err));
 }
 
 /**
@@ -90,23 +90,32 @@ export function getDefaultInstrument(): string {
 }
 
 /**
- * Preload samples samples to be ready for playback.
- * If instrument is not manually preloaded it will be loaded
+ * Load samples samples to be ready for playback.
+ * If instrument is not manually loaded it will be loaded
  * on the run so there might be silent notes in the beginning.
  * 
  * @param instrument - Instrument name (string) or 0-based midi program (number).
  */
-export function preloadInstrument(instrument: string | number): void {
-    if (Guard.isNumber(instrument)) {
-        const name = getMidiInstrumentName(instrument);
-        if (name) instrument = name;
-        else return;
-    }
+export function loadInstrument(instrument: string | number): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        if (Guard.isNumber(instrument)) {
+            const name = getMidiInstrumentName(instrument);
+            if (name) instrument = name;
+            else {
+                resolve();
+                return;
+            }
+        }
 
-    const instr = getValidInstrumnt(instrument);
+        const instr = getValidInstrumnt(instrument);
 
-    if (instr instanceof SamplesInstrument)
-        instr.initialize();
+        if (instr instanceof SamplesInstrument) {
+            resolve(instr.load());
+        }
+        else {
+            resolve();
+        }
+    });
 }
 
 /**
