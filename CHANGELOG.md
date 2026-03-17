@@ -14,6 +14,9 @@
 - Audio.useInstrument() - Use Audio.setDefaultInstrument() instead.
 - Audio.getCurrentInstrument() - Use getDefaultInstrument() instead.
 
+### Fixed
+- Note chromaticId was one octave too high on Cb*.
+
 ## [6.4.0-pre.9] - 2026-03-07
 ### Changed
 - Removed built-in synthesizers (new plan for sampled instruments).
