@@ -49,7 +49,7 @@
     // Publish
     npm publish --access public
 
-    // Add "next" tag when publishing first stable vX.Y.0 (not for patches)
+    // Add "next" tag when publishing stable and there is not new next.
     npm dist-tag add web-music-score@X.Y.Z next
 
     // Bump version
