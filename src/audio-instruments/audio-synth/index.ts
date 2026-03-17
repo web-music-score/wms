@@ -12,9 +12,12 @@ import * as Tone from "tone";
 /** @deprecated. audio-synth module is deprecated and will be removed in future release. Use built-in synths and samples from web-music-score-samples instead. */
 
 class SynthesizerInstr implements Instrument {
-    private audioSource: Tone.PolySynth | undefined = undefined;
+    private audioSource?: Tone.PolySynth;
+    private initialized = false;
 
-    constructor() {
+    constructor() { }
+
+    private init() {
         if (!canUseToneJs()) {
             console.warn("Tone.js not available in this environment.");
             return;
@@ -37,11 +40,11 @@ class SynthesizerInstr implements Instrument {
                 }
             }).connect(gain);
         }
-        catch (e) {
-            this.audioSource = undefined;
-            console.error(`Failed to initialize instrument "${this.getName()}".`);
-
+        catch (err) {
+            console.error("Failed to initialize synthesizer:", err)
         }
+
+        this.initialized = true;
     }
 
     getName(): string {
@@ -49,22 +52,18 @@ class SynthesizerInstr implements Instrument {
     }
 
     playNote(note: string, duration: number, linearVolume: number) {
-        try {
-            if (this.audioSource) {
-                this.audioSource.volume.value = linearToDecibels(linearVolume);
-                this.audioSource.triggerAttackRelease(note, duration);
-            }
+        if (!this.initialized) this.init();
+
+        if (this.audioSource) {
+            this.audioSource.volume.value = linearToDecibels(linearVolume);
+            this.audioSource.triggerAttackRelease(note, duration);
         }
-        catch (err) { }
     }
 
     stop() {
-        try {
-            if (this.audioSource) {
-                this.audioSource.releaseAll();
-            }
+        if (this.audioSource) {
+            this.audioSource.releaseAll();
         }
-        catch (err) { }
     }
 }
 

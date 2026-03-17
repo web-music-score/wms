@@ -1,6 +1,7 @@
 # CHANGELOG
 ## [6.4.1] - Unreleased
 ### Fixed
+- Removed multiple browser errors of audio used before user gesture.
 
 ## [6.4.0] - 2026-03-17
 ### Added

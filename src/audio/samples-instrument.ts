@@ -38,7 +38,7 @@ type SamplesJson = {
 class SampleBuffer {
     private audioBuffer: Tone.ToneAudioBuffer | undefined;
     private activePlayerContexts = new UniMap<PlayContext, ValueSet<Tone.Player>>();
-    private gainNode: Tone.Gain;
+    private gainNode?: Tone.Gain;
 
     constructor(
         readonly note: string,
@@ -47,15 +47,18 @@ class SampleBuffer {
         readonly loop: boolean,
         readonly loopStart?: number | undefined,
         readonly loopEnd?: number | undefined
-    ) {
-        this.gainNode = new Tone.Gain(this.gain).toDestination();
+    ) { }
+
+    private getGainNode() {
+        if (!this.gainNode) {
+            this.gainNode = new Tone.Gain(this.gain).toDestination();
+        }
+        return this.gainNode;
     }
 
     load(): Promise<void> {
-        return Tone.ToneAudioBuffer.fromUrl(this.file)
-            .then(buf => {
-                this.audioBuffer = buf;
-            });
+        const buf = new Tone.ToneAudioBuffer();
+        return buf.load(this.file).then(buf => { this.audioBuffer = buf });
     }
 
     playNote(note: string, duration: number, linearVolume: number, playCtx?: PlayContext) {
@@ -71,7 +74,7 @@ class SampleBuffer {
             loop,
             loopStart,
             loopEnd
-        }).connect(this.gainNode);
+        }).connect(this.getGainNode());
 
         const semitones = getSemitones(this.note, note);
 
