@@ -293,7 +293,12 @@ export class Note {
      * @returns - Transpose chromatic id.
      */
     static getChromaticIdInOctave(chromaticId: number, octave: number) {
-        return Note.getChromaticClass(chromaticId) + octave * 12 + C0_chromaticId;
+        /*
+         * Do not use mod() or getChromaticClass() here.
+         * If chromaticId is -1 then chromaticClass is 11.
+         * But -1 is required.
+         */
+        return (chromaticId % 12) + octave * 12 + C0_chromaticId;
     }
 
     /**
