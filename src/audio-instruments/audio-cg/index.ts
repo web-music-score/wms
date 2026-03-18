@@ -1,9 +1,5 @@
-/**
- * Make this module "audio-cg" in typedoc instead of "audio-instruments/audio-cg".
- * @module audio-cg
- */
-
-/** @deprecated. audio-cg module is deprecated and will be removed in future release. Use built-in synths and samples from web-music-score-samples instead. */
+// Make this module "audio-cg" in typedoc instead of "audio-instruments/audio-cg".
+/** @module audio-cg */
 
 import { Instrument } from "audio/instrument";
 import { SamplesInstrument } from "audio/samples-instrument"
@@ -24,6 +20,7 @@ class ClassicalGuitarWrapper implements Instrument {
     }
 }
 
+/** @deprecated This instrument is deprecatedand will be removed in future release. New platform has built-in midi instrument support. */
 const ClassicalGuitar: Instrument = new ClassicalGuitarWrapper();
 
 export { ClassicalGuitar }

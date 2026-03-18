@@ -1,15 +1,11 @@
-/**
- * Make this module "audio-synth" in typedoc instead of "audio-instruments/audio-synth".
- * @module audio-synth
- */
+// Make this module "audio-synth" in typedoc instead of "audio-instruments/audio-synth".
+/**@module audio-synth */
 
 // Use direct paths. Instrument modules must not depend on the audio module.
 import { Instrument, linearToDecibels } from "../../audio/instrument";
 import { canUseToneJs } from "../../audio/can-use-tone-js";
 
 import * as Tone from "tone";
-
-/** @deprecated. audio-synth module is deprecated and will be removed in future release. Use built-in synths and samples from web-music-score-samples instead. */
 
 class SynthesizerInstr implements Instrument {
     private audioSource?: Tone.PolySynth;
@@ -67,11 +63,7 @@ class SynthesizerInstr implements Instrument {
     }
 }
 
-/**
- * Export synthesizer instrument object.
- * 
- * Synthesizer is default instrument and enabled out of the box.
- */
+/** @deprecated This instrument is deprecatedand will be removed in future release. New platform has built-in midi instrument support. */
 const Synthesizer: Instrument = new SynthesizerInstr();
 
 export { Synthesizer }
