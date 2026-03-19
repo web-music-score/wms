@@ -45,26 +45,18 @@
                 .getDocument();
         }
 
-        function createPaint() {
-            return new Score.Paint()
-                .setColor("background", "#ddd")
-                .setColor("staff", "red");
-        }
-
         function createPlayerFor(doc) {
             return new Score.Player(doc);
         }
     </script>
 
     <script>
-        const paint1 = createPaint();
         const doc1 = createDoc();
         const player1 = createPlayerFor(doc1);
 
         new Score.WmsView()
             .setCanvas("scoreCanvas")
             .setDocument(doc1)
-            .setPaint(paint1)
             .draw();
 
         new Score.WmsControls()
@@ -82,14 +74,12 @@
     <br />
 
     <script>
-        const paint2 = createPaint();
         const doc2 = createDoc();
         const player2 = createPlayerFor(doc2);
 
         doc2.bindElement("wms-view");
         //doc2.bindElement("wms-buttons");
         player2.bindElement("wms-buttons");
-        paint2.bindElement("wms-view");
     </script>
 
     <h2>Using Custom HTML Elements (Programmatic)</h2>
@@ -100,7 +90,6 @@
     <br />
 
     <script>
-        const paint3 = createPaint();
         const doc3 = createDoc();
         const player3 = createPlayerFor(doc3);
 
@@ -119,7 +108,6 @@
         doc3.bindElement(viewEl);
         doc3.bindElement(controlsEl);
         //player3.bindElement(controlsEl);
-        paint3.bindElement(viewEl);
     </script>
 </body>
 
