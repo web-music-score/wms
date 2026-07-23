@@ -1,6 +1,6 @@
 # CHANGELOG
-## [6.4.2] - Unreleased
-### Fixed
+## [7.0.0-pre.0] - Unreleased
+### **Breaking Changes**
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
