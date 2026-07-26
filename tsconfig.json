@@ -32,12 +32,6 @@
             "web-music-score/audio": [
                 "audio"
             ],
-            "web-music-score/audio-synth": [
-                "audio-instruments/audio-synth"
-            ],
-            "web-music-score/audio-cg": [
-                "audio-instruments/audio-cg"
-            ],
             "web-music-score/theory": [
                 "theory"
             ],

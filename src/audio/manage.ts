@@ -111,32 +111,3 @@ export function getFallbackInstrumentName(): string {
 export function getFallbackInstrument(): Instrument {
     return instrumentMap.get(getFallbackInstrumentName())!;
 }
-
-// ----------------- deprecated stuff ----------------
-
-/** @deprecated useInstrument() is deprecated, will be removed in future release. Use setDefaultInstrument() instead. */
-export function useInstrument(instrument: string | number): void {
-    setDefaultInstrument(instrument);
-}
-
-/** @deprecated getCurrentInstrument() is deprecated, will be removed in future release. Use getDefaultInstrument() instead. */
-export function getCurrentInstrument(): string {
-    return defaultInstrument;
-}
-
-/** @deprecated addInstrument() is deprecated, will be removed in future release. Current platform supports midi instruments built-in. */
-export function addInstrument(instr: Instrument | Instrument[]): void {
-    if (Guard.isArray(instr)) {
-        instr.forEach(instr => addInstrument(instr));
-        return;
-    }
-
-    if (
-        Utils.Obj.hasProperties(instr, ["getName", "playNote", "stop"]) &&
-        Guard.isFunction(instr.getName) &&
-        Guard.isFunction(instr.playNote) &&
-        Guard.isFunction(instr.stop)
-    ) {
-        registerInstrument(instr, instr.getName());
-    }
-}

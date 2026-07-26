@@ -34,26 +34,6 @@
                 "default": "./dist/audio/index.mjs"
             }
         },
-        "./audio-synth": {
-            "require": {
-                "types": "./dist/audio-synth/index.d.ts",
-                "default": "./dist/audio-synth/index.js"
-            },
-            "import": {
-                "types": "./dist/audio-synth/index.d.ts",
-                "default": "./dist/audio-synth/index.mjs"
-            }
-        },
-        "./audio-cg": {
-            "require": {
-                "types": "./dist/audio-cg/index.d.ts",
-                "default": "./dist/audio-cg/index.js"
-            },
-            "import": {
-                "types": "./dist/audio-cg/index.d.ts",
-                "default": "./dist/audio-cg/index.mjs"
-            }
-        },
         "./theory": {
             "require": {
                 "types": "./dist/theory/index.d.ts",

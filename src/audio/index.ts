@@ -1,8 +1,6 @@
 import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
-import { Instrument, linearToDecibels } from "./instrument";
-import { Synthesizer } from "web-music-score/audio-synth";
 import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
-import { getCurrentInstrument, getInstrumentList, addInstrument, loadInstrument, setDefaultInstrument, getDefaultInstrument, useInstrument } from "./manage";
+import { getInstrumentList, loadInstrument, setDefaultInstrument, getDefaultInstrument } from "./manage";
 import { PlayContext, playNote, stop, mute, unmute, isMuted } from "./playback"
 
 /** Instrument name (string), midi program (number) or undefined. */
@@ -20,26 +18,13 @@ export {
     stop,
     mute,
     unmute,
-    isMuted,
-    /* @deprecated */
-    Instrument,
-    /* @deprecated */
-    addInstrument,
-    /* @deprecated */
-    linearToDecibels,
-    /* @deprecated */
-    getCurrentInstrument,
-    /* @deprecated */
-    useInstrument,
+    isMuted
 };
 
 initCore();
 
 // Add midi instruments
 registerMidiInstruments();
-
-// Add synthesizer for legacy support
-addInstrument(Synthesizer);
 
 // Set Acoustic Grand Piano as default instrument
 setDefaultInstrument(getMidiInstrumentName(0)!);

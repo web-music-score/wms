@@ -1,5 +1,5 @@
 import { defineConfig } from 'tsup'
-import pkg from './package.json' assert { type: 'json' }
+import pkg from './package.json' with { type: 'json' }
 import { tsupPluginInlineAssets } from "@tspro/tsup-plugin-inline-assets";
 
 const bannerText = `/* WebMusicScore v${pkg.version} | (c) 2023-${new Date().getFullYear()} Stefan Brockmann | MIT License | Includes: Tone.js (MIT License), Color Name to Code (MIT License) */`;
@@ -10,8 +10,6 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
-            'audio-synth/index': 'src/audio-instruments/audio-synth/index.ts',
-            'audio-cg/index': 'src/audio-instruments/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
             'react-ui/index': 'src/react-ui/index.ts',
@@ -39,8 +37,6 @@ export default defineConfig([
         entry: {
             'core/index': 'src/core/index.ts',
             'audio/index': 'src/audio/index.ts',
-            'audio-synth/index': 'src/audio-instruments/audio-synth/index.ts',
-            'audio-cg/index': 'src/audio-instruments/audio-cg/index.ts',
             'theory/index': 'src/theory/index.ts',
             'score/index': 'src/score/index.ts',
             'react-ui/index': 'src/react-ui/index.ts',
@@ -82,32 +78,6 @@ export default defineConfig([
         define: {
             __LIB_VERSION__: JSON.stringify(pkg.version),
             __LIB_INFO__: JSON.stringify(`WebMusicScore v${pkg.version} (iife)`)
-        },
-        esbuildPlugins: [tsupPluginInlineAssets()],
-        outExtension({ format }) {
-            return format === 'iife' ? { js: '.js' } : {};
-        }
-    },
-
-    // audio-cg IIFE bundle
-    {
-        entry: {
-            'iife/audio-cg': 'src/audio-instruments/audio-cg/index.ts'
-        },
-        outDir: 'dist',
-        target: 'es2015',
-        format: ['iife'],
-        globalName: 'Audio_CG',
-        dts: false,
-        sourcemap: true,
-        minify: true,
-        clean: false, // Don't wipe dist from the previous build
-        banner: {
-            js: bannerText
-        },
-        define: {
-            __LIB_VERSION__: JSON.stringify(pkg.version),
-            __LIB_INFO__: JSON.stringify(`Audio_CG v${pkg.version} (iife)`)
         },
         esbuildPlugins: [tsupPluginInlineAssets()],
         outExtension({ format }) {

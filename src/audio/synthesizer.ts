@@ -1,10 +1,5 @@
-// Make this module "audio-synth" in typedoc instead of "audio-instruments/audio-synth".
-/**@module audio-synth */
-
-// Use direct paths. Instrument modules must not depend on the audio module.
-import { Instrument, linearToDecibels } from "../../audio/instrument";
-import { canUseToneJs } from "../../audio/can-use-tone-js";
-
+import { canUseToneJs } from "./can-use-tone-js";
+import { Instrument, linearToDecibels } from "./instrument";
 import * as Tone from "tone";
 
 class SynthesizerInstr implements Instrument {
@@ -63,7 +58,6 @@ class SynthesizerInstr implements Instrument {
     }
 }
 
-/** @deprecated This instrument is deprecatedand will be removed in future release. New platform has built-in midi instrument support. */
 const Synthesizer: Instrument = new SynthesizerInstr();
 
 export { Synthesizer }

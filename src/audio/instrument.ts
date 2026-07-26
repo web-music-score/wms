@@ -1,4 +1,4 @@
-/** @deprecated Instrument is deprecated, will be removed in future release. Current platform supports midi instruments built-in. */
+
 export interface Instrument {
     /**
      * Get instrument name.
@@ -20,7 +20,6 @@ export interface Instrument {
     stop(): void;
 }
 
-/** @deprecated linearToDecibels() is deprecated, will be removed in future release. Instrument that required this is deprecated. Current platform supports midi instruments built-in. */
 export function linearToDecibels(linearVolume: number): number {
     return (!isFinite(linearVolume) || linearVolume <= 0)
         ? -Infinity
