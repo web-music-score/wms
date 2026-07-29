@@ -4,13 +4,10 @@
     "author": "Stefan B.",
     "license": "MIT",
     "private": false,
-    "homepage": "https://web-music-score.org",
+    "homepage": "https://web-music-score.github.io",
     "repository": {
         "type": "git",
         "url": "https://github.com/web-music-score/wms.git"
-    },
-    "bugs": {
-        "url": "https://github.com/web-music-score/wms/issues/new/choose"
     },
     "description": "Web Music Score is a TypeScript/JavaScript music notation web component and player.",
     "exports": {
@@ -90,8 +87,8 @@
         "react": "^18.0.0 || ^19.0.0"
     },
     "devDependencies": {
-        "@tspro/tsup-plugin-inline-assets": "^1.0.4",
-        "@tspro/ts-utils-lib": "^3.5.0",
+        "@tspro/tsup-plugin-inline-assets": "^1.0.6",
+        "@tspro/ts-utils-lib": "^3.5.2",
         "@types/react": "^18.0.0",
         "@types/react-dom": "^18.0.0",
         "color-name-to-code": "^1.0.1",
