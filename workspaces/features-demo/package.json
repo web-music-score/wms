@@ -1,6 +1,6 @@
 {
     "name": "features-demo",
-    "version": "6.4.2",
+    "version": "6.4.3",
     "private": true,
     "devDependencies": {
         "@babel/cli": "^7.27.2",
@@ -21,7 +21,7 @@
         "terser-webpack-plugin": "^5.6.1",
         "ts-loader": "^9.5.2",
         "typescript": "^5.8.3",
-        "web-music-score": "^6.4.2",
+        "web-music-score": "^6.4.3",
         "webpack": "^5.99.9",
         "webpack-cli": "^6.0.1",
         "webpack-dev-server": "^5.2.2"
