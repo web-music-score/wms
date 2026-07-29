@@ -1,6 +1,9 @@
 # CHANGELOG
-## [6.4.2] - Unreleased
+## [6.4.2] - 2026-07-29
 ### Fixed
+- Update package.json links and some deps.
+- Update README.md homepage link, remove bug report section.
+- Use web-music-score-samples@3.0.2.
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
