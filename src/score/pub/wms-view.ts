@@ -1,9 +1,8 @@
-import { Assert, Guard, Utils } from "@tspro/ts-utils-lib";
+import { Guard, Utils } from "@tspro/ts-utils-lib";
 import { View } from "../engine/view";
 import { StaffSize } from "./types";
 import { ScoreEventListener } from "./event";
 import { MDocument, MMeasure, MScoreRow, MStaff, MusicInterface } from "./mobjects";
-import { Paint } from "./paint";
 import { AssertUtil } from "shared-src";
 import { isWmsViewHTMLElement } from "../custom-element/wms-view";
 
@@ -35,19 +34,6 @@ export class WmsView {
         if(!isWmsViewHTMLElement(el)) return undefined;
 
         return el.wmsView;
-    }
-
-    /**
-     * Set Paint for this render context.
-     * @deprecated All paint stuff is deprecated. Will be removed in future release.
-     * @param paint - Paint.
-     * @returns - This render context instance.
-     */
-    setPaint(paint?: Paint) {
-        AssertUtil.assertVar(Guard.isUndefined(paint) || paint instanceof Paint, "paint", paint);
-
-        this._view.setPaint(paint);
-        return this;
     }
 
     /**

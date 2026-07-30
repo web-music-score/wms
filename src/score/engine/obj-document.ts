@@ -4,7 +4,7 @@ import { MusicObject } from "./music-object";
 import { ObjScoreRow, ScoreRowRegions } from "./obj-score-row";
 import { ObjMeasure } from "./obj-measure";
 import { ObjHeader } from "./obj-header";
-import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId, Player, DocumentOptions, ColorKey } from "../pub";
+import { Clef, MDocument, MeasureOptions, ScoreConfiguration, StaffConfig, StaffPreset, TabConfig, VerticalPosition, VoiceId, Player, DocumentOptions } from "../pub";
 import { DocumentSettings } from "./settings";
 import { RhythmSymbol } from "./obj-rhythm-column";
 import { ConnectiveProps } from "./connective-props";
@@ -49,12 +49,12 @@ export class ObjDocument extends MusicObject {
         return this.mi;
     }
 
-    getBackground(alt?: string) {
-        return this.options.background ?? alt ?? "white";
+    getBackground() {
+        return this.options.background ?? "white";
     }
 
-    getColorWithKey(alt?: ColorKey) {
-        return this.options.color ?? alt ?? "black";
+    getColor() {
+        return this.options.color ?? "black";
     }
 
     addInstrumentForLoad(instrument: Audio.InstrumentValue) {

@@ -12,7 +12,7 @@ import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjRest } from "./obj-rest";
-import { getAnnotationColorKey, getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
+import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulations } from "./annotation-utils";
 import { ScoreError } from "./error-utils";
 import { ObjSymbol } from "./obj-symbol";
 import { InstrumentValue } from "web-music-score/audio";
@@ -203,7 +203,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
-        this.color = options?.color ?? this.doc.getColorWithKey("staff.note");
+        this.color = options?.color ?? this.doc.getColor();
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
@@ -686,7 +686,7 @@ export class ObjNoteGroup extends MusicObject {
 
                     this.articulations.forEach(ar => {
                         const drawSym = getNoteArticulationDrawSymbol(ar.kind);
-                        const color = ar.color ?? this.doc.getColorWithKey(getAnnotationColorKey(staff, AnnotationGroup.Articulation, ar.kind));
+                        const color = ar.color ?? this.doc.getColor();
                         const sym = new ObjSymbol(this, drawSym, false, false, color);
                         sym.layout(view);
                         sym.offset(arX, arY);
@@ -740,8 +740,8 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const bgcolor = this.doc.getBackground("background");
-            const color = this.doc.getColorWithKey("tab.note");
+            const bgcolor = this.doc.getBackground();
+            const color = this.doc.getColor();
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers

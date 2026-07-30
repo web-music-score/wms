@@ -496,7 +496,7 @@ export class ObjRhythmColumn extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
-        const color = this.doc.getColorWithKey("staff.frame");
+        const color = this.doc.getColor();
 
         view.color(color);
 

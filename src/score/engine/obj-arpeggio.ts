@@ -24,7 +24,7 @@ export class ObjArpeggio extends MusicObject {
     }
 
     get color(): string {
-        return this.col.doc.getColorWithKey(this.line instanceof ObjTab ? "tab.arpeggio" : "staff.arpeggio");
+        return this.col.doc.getColor();
     }
 
     pick(x: number, y: number): MusicObject[] {

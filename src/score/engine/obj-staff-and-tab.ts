@@ -207,9 +207,7 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     drawVerticalLine(view: View, left: number, width: number, isSystemBarLine = false) {
-        const color = this.row.doc.getColorWithKey(
-            this.getConfig().type === "tab" ? "tab.frame" : "staff.frame"
-        );
+        const color = this.row.doc.getColor();
 
         view.color(color);
 

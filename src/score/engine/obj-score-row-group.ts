@@ -28,7 +28,7 @@ export class ObjScoreRowGroup extends MusicObject {
     constructor(readonly lines: readonly ObjNotationLine[]) {
         super(lines[0].row);
 
-        const color = this.row.doc.getColorWithKey("rowgroup.instrument");
+        const color = this.row.doc.getColor();
 
         const instr = parseInstr(lines[0].getConfig().instrument ?? "");
 
@@ -103,7 +103,7 @@ export class ObjScoreRowGroup extends MusicObject {
 
         if (this.hasBrace) {
             const rect = this.braceRect;
-            const color = this.row.doc.getColorWithKey("rowgroup.frame");
+            const color = this.row.doc.getColor();
             view.color(color).lineWidth(1).drawBracket(rect, "{");
         }
     }

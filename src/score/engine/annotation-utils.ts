@@ -1,8 +1,7 @@
 import { UniMap, Utils } from "@tspro/ts-utils-lib";
-import { AnnotationGroup, Navigation, ColorKey, AnnotationKind } from "../pub";
+import { AnnotationGroup, Navigation, AnnotationKind } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
-import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { DrawSymbol } from "./view";
 
 export function getNavigationString(navigation: Navigation): string {
@@ -75,34 +74,6 @@ export function getAnnotationDefaultVerticalPos(annotationGroup: AnnotationGroup
             return VerticalPos.Below;
     }
     return VerticalPos.Above;
-}
-
-export function getAnnotationColorKey(line: ObjNotationLine, annotationGroup: AnnotationGroup, annotationKind: string): ColorKey {
-    const fromStaffColor = (staffColor: ColorKey): ColorKey => line instanceof ObjTab ? ("tab" + staffColor.substring("staff".length)) as ColorKey : staffColor;
-
-    switch (annotationGroup) {
-        case AnnotationGroup.Navigation:
-            return fromStaffColor("staff.annotation.navigation");
-        case AnnotationGroup.Dynamics:
-            return fromStaffColor("staff.annotation.dynamics");
-        case AnnotationGroup.Tempo:
-            return fromStaffColor("staff.annotation.tempo");
-        case AnnotationGroup.Articulation:
-            return fromStaffColor("staff.annotation.articulation");
-        case AnnotationGroup.Expression:
-            return fromStaffColor("staff.annotation.expression");
-        case AnnotationGroup.Technique:
-            return fromStaffColor("staff.annotation.technique");
-        case AnnotationGroup.Temporal:
-            return fromStaffColor("staff.annotation.temporal");
-        case AnnotationGroup.Label:
-            return fromStaffColor("staff.annotation.label");
-        case AnnotationGroup.Ornament:
-            return fromStaffColor("staff.annotation.ornament");
-        case AnnotationGroup.Misc:
-        default:
-            return fromStaffColor("staff.annotation.misc");
-    }
 }
 
 export function isDynamicsText(annotationKind: string): boolean {

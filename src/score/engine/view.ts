@@ -1,12 +1,13 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffEvent, ScoreStaffPosEvent, ScoreObjectEvent, Paint, ColorKey, StaffSize, WmsView, Player } from "../pub";
+import { ScoreEventListener, ScoreStaffEvent, ScoreStaffPosEvent, ScoreObjectEvent, StaffSize, WmsView, Player } from "../pub";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
 import { NoteLength, NoteLengthProps, validateNoteLength } from "web-music-score/theory";
 import { ObjMeasure } from "./obj-measure";
 import { ScoreError } from "./error-utils";
+import { colorNameToCode } from "color-name-to-code";
 
 import GClefData from "./assets/G-clef.png";
 import FClefData from "./assets/F-clef.png";
@@ -31,6 +32,19 @@ type HTMLImageData = {
     colorized: boolean;
     img?: HTMLImageElement;
 }
+
+function colorNameToRGBA(colorName: string, alpha = 1): [number, number, number, number] {
+    const hex = colorNameToCode(colorName).replace("#", ""); // "FF0000"
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    const a = Math.round(alpha * 255);
+    return [r, g, b, a];
+}
+
+const HilightStaffPosColor = "#55cc55";
+const HilightObjectColor = "#55cc55";
+const PlayCursorColor = "#44aa44";
 
 export type StaffPos = { staff: ObjStaff, measure?: ObjMeasure, diatonicId: number, accidental?: number }
 
@@ -88,8 +102,6 @@ export class View {
     private ctx?: CanvasRenderingContext2D;
 
     private _doc?: ObjDocument;
-
-    private paint: Paint = Paint.default;
 
     private cursorOverlays = new UniMap<Player, Overlay>();
     private mousePos?: Vec; // Mouse coord in document space
@@ -161,7 +173,7 @@ export class View {
     private onImageLoaded(data: HTMLImageData) {
         if (data.loaded || !data.img) return;
 
-        const color = this.paint.getColor(data.color);
+        const color = data.color;
 
         if (data.colorized ||
             color === "" || color === "black" ||
@@ -174,7 +186,7 @@ export class View {
         }
 
         // rgb values
-        const [nr, ng, nb, na] = Paint.colorNameToRGBA(color);
+        const [nr, ng, nb, na] = colorNameToRGBA(color);
 
         // threshold to decide what counts as "black"
         const threshold = 40; // 0..255; tweak as needed
@@ -257,10 +269,6 @@ export class View {
         this.hilightedStaffPos = undefined;
     }
 
-    setPaint(paint?: Paint) {
-        this.paint = paint ?? Paint.default;
-    }
-
     setZoom(zoom: number) {
         if (Guard.isFinite(zoom) && Guard.isNumberGt(zoom, 0))
             this.updateSize({ zoom });
@@ -306,10 +314,6 @@ export class View {
 
     get unitSize(): number {
         return this.staffSpacePx;
-    }
-
-    getPaint() {
-        return this.paint;
     }
 
     setCanvas(canvas: HTMLCanvasElement) {
@@ -671,7 +675,7 @@ export class View {
         if (clipRect && !clipRect.intersects(r))
             return;
 
-        this.fillColor(this.paint.colors["hilight.staffpos"])
+        this.fillColor(HilightStaffPosColor)
             .fillRect(r.left, r.top, r.width, r.height);
 
         if (mousePos !== undefined) {
@@ -685,7 +689,7 @@ export class View {
         if (!r || clipRect && !clipRect.intersects(r))
             return;
 
-        this.lineColor(this.paint.colors["hilight.object"]);
+        this.lineColor(HilightObjectColor);
         this.strokeRect(r.left, r.top, r.width, r.height);
     }
 
@@ -694,7 +698,7 @@ export class View {
             if (clipRect && !clipRect.intersects(o.rect))
                 continue;
 
-            this.color(this.paint.colors["play.cursor"])
+            this.color(PlayCursorColor)
                 .lineWidth(2)
                 .strokeLine(o.rect.centerX, o.rect.top, o.rect.centerX, o.rect.bottom);
         }
@@ -710,10 +714,10 @@ export class View {
 
     drawBackground(rect?: Rect) {
         if (this.ctx) {
-            const bgcolor = this.doc
-                ? this.doc.getBackground(this.paint.colors["background"])
-                : this.paint.colors["background"];
+            const bgcolor = this.doc ? this.doc.getBackground() : "white";
+
             rect ??= new Rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+
             this.ctx.canvas.style.background = bgcolor;
             this.ctx.clearRect(rect.left, rect.top, rect.width, rect.height);
         }
@@ -849,19 +853,19 @@ export class View {
         }
     }
 
-    color(color: string | ColorKey): View {
+    color(color: string): View {
         if (this.ctx)
-            this.ctx.strokeStyle = this.ctx.fillStyle = this.paint.getColor(color);
+            this.ctx.strokeStyle = this.ctx.fillStyle = colorNameToCode(color);
         return this;
     }
 
     lineColor(color: string): View {
-        if (this.ctx) this.ctx.strokeStyle = this.paint.getColor(color);
+        if (this.ctx) this.ctx.strokeStyle = colorNameToCode(color);
         return this;
     }
 
     fillColor(color: string): View {
-        if (this.ctx) this.ctx.fillStyle = this.paint.getColor(color);
+        if (this.ctx) this.ctx.fillStyle = colorNameToCode(color);
         return this;
 
     }

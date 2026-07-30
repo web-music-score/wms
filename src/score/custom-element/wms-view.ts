@@ -1,4 +1,4 @@
-import { WmsView, MDocument, Paint } from "../pub";
+import { WmsView, MDocument } from "../pub";
 import { Utils } from "@tspro/ts-utils-lib";
 
 const defaultCanvasClass = "wms-canvas";
@@ -12,7 +12,6 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
     private _canvas?: HTMLCanvasElement;
     private _view: WmsView;
     private _doc?: MDocument;
-    private _paint?: Paint;
     private _connected = false;
 
     constructor() {
@@ -81,21 +80,11 @@ export class WmsViewHTMLElement extends BaseHTMLElement {
         return this._doc;
     }
 
-    set paint(paint: Paint | undefined) {
-        this._paint = paint;
-        this.update();
-    }
-
-    get paint(): Paint | undefined {
-        return this._paint;
-    }
-
     private update() {
         if (!this._connected) return;
         if (!this._view) return;
 
         if (this._doc) this._view.setDocument(this._doc);
-        if (this._paint) this._view.setPaint(this._paint);
 
         this._view?.draw();
     }

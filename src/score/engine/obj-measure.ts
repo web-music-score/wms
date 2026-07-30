@@ -19,7 +19,7 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjFermata } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationColorKey, getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
+import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { ConnectiveProps } from "./connective-props";
@@ -633,8 +633,7 @@ export class ObjMeasure extends MusicObject {
 
         let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
-        const getColor = (line: ObjNotationLine) => annotationOptions.color ??
-            this.doc.getColorWithKey(getAnnotationColorKey(line, annotationGroup, annotationKind));
+        const color = annotationOptions.color ?? this.doc.getColor();
 
         const colAnchor = this.lastAddedRhythmColumn;
 
@@ -650,7 +649,6 @@ export class ObjMeasure extends MusicObject {
                 createLayoutObject = (line) => {
                     const anchor = this;
                     let passages = annotationOptions.endingPassages!;
-                    const color = getColor(line);
                     return new ObjEnding(anchor, color, Guard.isArray(passages) ? passages : [passages]);
                 }
                 break;
@@ -661,7 +659,6 @@ export class ObjMeasure extends MusicObject {
                 createLayoutObject = (line) => {
                     const anchor = this.barLineRight;
                     const text = getNavigationString(annotationKind);
-                    const color = getColor(line);
                     return new ObjText(anchor, { text, color }, 1, 1);
                 }
                 this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.Navigation.EndRepeat, {});
@@ -671,7 +668,6 @@ export class ObjMeasure extends MusicObject {
                 createLayoutObject = (line) => {
                     const anchor = this.barLineRight;
                     const text = getNavigationString(annotationKind);
-                    const color = getColor(line);
                     return new ObjText(anchor, { text, color }, 1, 1);
                 }
                 break;
@@ -680,7 +676,6 @@ export class ObjMeasure extends MusicObject {
                 createLayoutObject = (line) => {
                     const anchor = this.barLineLeft;
                     const text = getNavigationString(annotationKind);
-                    const color = getColor(line);
                     return new ObjSpecialText(anchor, text, color);
                 }
                 break;
@@ -688,7 +683,6 @@ export class ObjMeasure extends MusicObject {
                 createLayoutObject = (line) => {
                     const anchor = this.barLineRight;
                     const text = getNavigationString(annotationKind);
-                    const color = getColor(line);
                     return new ObjSpecialText(anchor, text, color);
                 }
                 break;
@@ -696,7 +690,7 @@ export class ObjMeasure extends MusicObject {
                 this.endRepeatPlayCount = annotationOptions.repeatCount ?? 2;
                 if (this.endRepeatPlayCount !== 2) {
                     const text = `${this.endRepeatPlayCount}x`;
-                    const color = this.doc.getColorWithKey("staff.frame");
+                    const color = this.doc.getColor();
                     this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
                 }
                 break;
@@ -705,13 +699,12 @@ export class ObjMeasure extends MusicObject {
             case Pub.AnnotationKind.fermata:
             case Pub.AnnotationKind.measureEndFermata:
                 if (fermataAnchor) {
-                    createLayoutObject = (line, vpos) => new ObjFermata(fermataAnchor, vpos === VerticalPos.Below, getColor(line));
+                    createLayoutObject = (line, vpos) => new ObjFermata(fermataAnchor, vpos === VerticalPos.Below, color);
                 }
                 break;
             case Pub.AnnotationKind.ChordLabel: {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
-                        const color = getColor(line);
                         const text = String(annotationOptions.labelText);
                         return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
                     }
@@ -721,7 +714,6 @@ export class ObjMeasure extends MusicObject {
             case Pub.AnnotationKind.PitchLabel: {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
-                        const color = getColor(line);
                         const text = String(annotationOptions.labelText);
                         return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
                     }
@@ -731,7 +723,6 @@ export class ObjMeasure extends MusicObject {
             default: {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
-                        const color = getColor(line);
                         const text = getAnnotationKindTextReplacement(annotationKind);
                         return new ObjText(colAnchor, { text, color, italic: true }, anchorX, anchorY);
                     }
@@ -747,7 +738,7 @@ export class ObjMeasure extends MusicObject {
 
             this.forEachStaffTarget(staffTargets, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
                 const layoutObj = this.addLayoutObject(createLayoutObject(line, vpos), line, layoutGroupId, vpos);
-                this.enableExtensionLine(layoutObj, getColor(line));
+                this.enableExtensionLine(layoutObj, color);
             });
         }
 
@@ -1401,7 +1392,7 @@ export class ObjMeasure extends MusicObject {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     const note = tab.getTuningStrings()[stringId].format(Theory.PitchNotation.Helmholtz, Theory.SymbolSet.Unicode);
-                    const color = this.doc.getColorWithKey("tab.tuning");
+                    const color = this.doc.getColor();
                     const obj = new ObjText(this, { text: note, scale: 0.8, color }, 1, 0.5);
 
                     obj.layout(view);
@@ -1658,12 +1649,12 @@ export class ObjMeasure extends MusicObject {
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p), this.doc.getColorWithKey("staff.frame"));
+                    drawLine(line.getDiatonicIdY(p), this.doc.getColor());
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId), this.doc.getColorWithKey("tab.frame"));
+                    drawLine(line.getStringY(stringId), this.doc.getColor());
                 }
             }
         });
@@ -1679,7 +1670,7 @@ export class ObjMeasure extends MusicObject {
                 const left = this.getStaffLineLeft();
                 const top = tab.getTopLineY();
                 const bottom = tab.getBottomLineY();
-                const color = this.doc.getColorWithKey("tab.frame");
+                const color = this.doc.getColor();
 
                 view.color(color)
                     .lineWidth(1)

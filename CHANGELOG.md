@@ -1,6 +1,9 @@
 # CHANGELOG
 ## [7.0.0-pre.0] - Unreleased
 ### **Breaking Changes**
+- Removed deprecated audio-synth and audio-cg modules.
+- Removed deprecated functions from audio module.
+- Removed deprecated Paint/coloring system.
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

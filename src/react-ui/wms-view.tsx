@@ -1,10 +1,8 @@
 import * as React from "react";
-import { WmsView as JsView, MDocument, Paint, ScoreEventListener } from "web-music-score/score";
+import { WmsView as JsView, MDocument, ScoreEventListener } from "web-music-score/score";
 
 export interface WmsViewProps {
     doc?: MDocument;
-    /** @deprecated All paint stuff is deprecated. Will be removed in future release. */
-    paint?: Paint;
     zoom?: number | string;
     staffSize?: number | string;
     onScoreEvent?: ScoreEventListener;
@@ -38,9 +36,6 @@ export class WmsView extends React.Component<WmsViewProps, {}> {
         super(props);
 
         this.view = new JsView();
-
-        if (props.paint !== undefined)
-            this.view.setPaint(props.paint);
 
         if (props.zoom !== undefined)
             this.view.setZoom(+props.zoom);

@@ -43,7 +43,7 @@ export class ObjStaffSignature extends MusicObject {
     updateClefImage(view: View, showClef: boolean) {
         if (showClef) {
 
-            const color = this.doc.getColorWithKey("staff.signature.clef");
+            const color = this.doc.getColor();
 
             let img = view.getImageAsset(this.staff.clefImageAsset, imgColor(color));
             this.clefImage = img ? new ObjImage(this, img, 0, 0.5, 0.1) : undefined;
@@ -59,7 +59,7 @@ export class ObjStaffSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            const color = this.doc.getColorWithKey("staff.signature.measurenum");
+            const color = this.doc.getColor();
             const text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
@@ -71,7 +71,7 @@ export class ObjStaffSignature extends MusicObject {
     updateKeySignature(showKeySignature: boolean) {
         if (showKeySignature) {
             let { measure } = this;
-            const color = this.doc.getColorWithKey("staff.signature.key");
+            const color = this.doc.getColor();
 
             let prevMeasure = measure.getPrevMeasure();
 
@@ -103,7 +103,7 @@ export class ObjStaffSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             let timeSignature = this.measure.getTimeSignature();
-            const color = this.doc.getColorWithKey("staff.signature.time");
+            const color = this.doc.getColor();
 
             this.tsImage = this.beatCountText = this.beatSizeText = undefined;
 
@@ -134,7 +134,7 @@ export class ObjStaffSignature extends MusicObject {
 
     updateTempo(showTempo: boolean) {
         if (showTempo) {
-            const color = this.doc.getColorWithKey("staff.signature.tempo");
+            const color = this.doc.getColor();
             const text = getTempoString(this.measure.getTempo());
             this.tempoText = new ObjText(this, { text, color }, 0.5, 1);
         }
@@ -429,7 +429,7 @@ export class ObjTabSignature extends MusicObject {
 
     updateMeasureNumber(showMeasureNumber: boolean) {
         if (showMeasureNumber) {
-            const color = this.doc.getColorWithKey("tab.signature.measurenum");
+            const color = this.doc.getColor();
             const text = this.measure.getMeasureNumber().toString();
             this.measureNumber = new ObjText(this, { text, color }, 0, 1);
         }
@@ -441,7 +441,7 @@ export class ObjTabSignature extends MusicObject {
     updateTimeSignature(view: View, showTimeSignature: boolean) {
         if (showTimeSignature) {
             const timeSignature = this.measure.getTimeSignature();
-            const color = this.doc.getColorWithKey("tab.signature.time");
+            const color = this.doc.getColor();
 
             this.tsImage = this.beatCountText = this.beatSizeText = undefined;
 
@@ -473,7 +473,7 @@ export class ObjTabSignature extends MusicObject {
 
     updateTempo(showTempo: boolean) {
         if (showTempo) {
-            const color = this.doc.getColorWithKey("tab.signature.tempo");
+            const color = this.doc.getColor();
             const text = getTempoString(this.measure.getTempo());
             this.tempoText = new ObjText(this, { text, color }, 0, 1);
         }
