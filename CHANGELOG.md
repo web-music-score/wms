@@ -4,6 +4,7 @@
 - Removed deprecated audio-synth and audio-cg modules.
 - Removed deprecated functions from audio module.
 - Removed deprecated Paint/coloring system.
+- Removed deprecated MusicScoreView (-> WmsView), PlaybackButtons (-> WmsControls) from react-ui module.
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
