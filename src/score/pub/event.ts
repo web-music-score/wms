@@ -112,26 +112,6 @@ export class ScoreTabEvent extends ScoreEvent {
 }
 
 /**
- * Score staff pos event.
- * 
- * This event class was deprecated because it does not support multiple staves or tabs per score row.
- * 
- * @deprecated ScoreStaffPosEvent is deprecated. Will be removed in future release. Use ScoreStaffEvent and ScoreTabEvent instead.
- */
-export class ScoreStaffPosEvent extends ScoreEvent {
-    /**
-     * 
-     * @param type - Event type: "enter", "leave" or "click".
-     * @param view - Score.WmsView object.
-     * @param scoreRow
-     * @param diatonicId
-     */
-    constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
-        super(type);
-    }
-}
-
-/**
  * Score object event for clicking/entering/leaving score object.
  */
 export class ScoreObjectEvent extends ScoreEvent {

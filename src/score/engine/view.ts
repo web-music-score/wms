@@ -1,6 +1,6 @@
 import { Utils, Vec, Device, UniMap, AnchoredRect, Rect, BiMap, Guard } from "@tspro/ts-utils-lib";
 import { ObjDocument } from "./obj-document";
-import { ScoreEventListener, ScoreStaffEvent, ScoreStaffPosEvent, ScoreObjectEvent, StaffSize, WmsView, Player } from "../pub";
+import { ScoreEventListener, ScoreStaffEvent, ScoreObjectEvent, StaffSize, WmsView, Player } from "../pub";
 import { DebugSettings, DocumentSettings } from "./settings";
 import { MusicObject } from "./music-object";
 import { ObjStaff } from "./obj-staff-and-tab";
@@ -362,8 +362,6 @@ export class View {
         if (changed && this.curStaffPos && this.scoreEventListener) {
             let { staff, measure, diatonicId, accidental } = this.curStaffPos;
 
-            this.scoreEventListener(new ScoreStaffPosEvent("leave", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
-
             if (measure && accidental !== undefined)
                 this.scoreEventListener(new ScoreStaffEvent("leave", this.getMusicInterface(), staff.getMusicInterface(), measure.getMusicInterface(), diatonicId, accidental));
         }
@@ -371,16 +369,12 @@ export class View {
         if (changed && staffPos && this.scoreEventListener) {
             let { staff, measure, diatonicId, accidental } = staffPos;
 
-            this.scoreEventListener(new ScoreStaffPosEvent("enter", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
-
             if (measure && accidental !== undefined)
                 this.scoreEventListener(new ScoreStaffEvent("enter", this.getMusicInterface(), staff.getMusicInterface(), measure.getMusicInterface(), diatonicId, accidental));
         }
 
         if (click && staffPos && this.scoreEventListener) {
             let { staff, measure, diatonicId, accidental } = staffPos;
-
-            this.scoreEventListener(new ScoreStaffPosEvent("click", this.getMusicInterface(), staff.row.getMusicInterface(), diatonicId));
 
             if (measure && accidental !== undefined)
                 this.scoreEventListener(new ScoreStaffEvent("click", this.getMusicInterface(), staff.getMusicInterface(), measure.getMusicInterface(), diatonicId, accidental));

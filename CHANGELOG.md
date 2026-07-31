@@ -7,6 +7,7 @@
 - Removed deprecated MusicScoreView (-> WmsView), PlaybackButtons (-> WmsControls) from react-ui module.
 - Removed deprecated MRenderContext (-> WmsView), MPlaybackButtons (-> WmsControls), MPlayer (-> Player)
   from score module.
+- Removed deprecated event class ScoreStaffPosEvent from score module.
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
