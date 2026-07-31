@@ -1,8 +1,6 @@
 import { MMeasure, MScoreRow, MStaff, MTab, MusicInterface } from "./mobjects";
 import { WmsView } from "./wms-view";
-import { MRenderContext } from "./deprecated";
 import { Note, PitchNotation, SymbolSet } from "web-music-score/theory";
-import { warnOnce } from "shared-src";
 import { Utils } from "@tspro/ts-utils-lib";
 import { ScoreError } from "../engine/error-utils";
 
@@ -131,14 +129,6 @@ export class ScoreStaffPosEvent extends ScoreEvent {
     constructor(type: ScoreEventType, readonly view: WmsView, readonly scoreRow: MScoreRow, readonly diatonicId: number) {
         super(type);
     }
-
-    /**
-     * @deprecated renderContext is deprecated. Will be removed in future release. Use view instead.
-     */
-    get renderContext(): MRenderContext {
-        warnOnce("renderContext is deprecated. Will be removed in future release. Use view instead.");
-        return this.view;
-    }
 }
 
 /**
@@ -168,14 +158,6 @@ export class ScoreObjectEvent extends ScoreEvent {
 
         if (arguments.length === 0)
             throw new ScoreError("Empty objects array in ScoreObjectEvent!");
-    }
-
-    /**
-     * @deprecated renderContext is deprecated. Will be removed in future release. Use view instead.
-     */
-    get renderContext(): MRenderContext {
-        warnOnce("renderContext is deprecated. Will be removed in future release. Use view instead.");
-        return this.view;
     }
 
     /** Top object. */
