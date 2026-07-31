@@ -1,4 +1,3 @@
-export * from "./deprecated";
 export * from "./document-builder";
 export * from "./event";
 export * from "./mobjects";
