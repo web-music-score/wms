@@ -327,9 +327,6 @@ export enum AnnotationGroup {
 
 export type AnnotationGroupValue = AnnotationGroup | `${AnnotationGroup}`;
 
-/** @deprecated Annotation is deprecated. Will be removed in future release. Use AnnotationGroup instead. */
-export { AnnotationGroup as Annotation }
-
 /** Annotation kind enum */
 export enum AnnotationKind {
     //////////////////////////////////////////////////

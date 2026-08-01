@@ -14,6 +14,7 @@
 - Removed deprecated enum value AnnotationKind.measureEndFermata (-> { anchor: "rightBarLine" }).
 - Removed deprecated enums DynamicsAnnotation (-> AnnotationKind), TempoAnnotation (-> AnnotationKind)
   and ArticulationAnnotation (-> AnnotationKind).
+- Removed deprecated enum Annotation (-> AnnotationGroup).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
