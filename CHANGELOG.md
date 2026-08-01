@@ -22,6 +22,7 @@
 - Removed special case target for grand staff.
 - Remove AnnotationKind.PitchLabel, .ChordLabel and AnnotationOptions.labelText.
   (-> addAnnotation("Am", { group: AnnotationGroup.ChordLabel })).
+- Simplified addAnnotation, simply addAnnotation(annotationKind, annotationOptions).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
