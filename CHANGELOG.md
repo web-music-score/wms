@@ -15,6 +15,8 @@
 - Removed deprecated enums DynamicsAnnotation (-> AnnotationKind), TempoAnnotation (-> AnnotationKind)
   and ArticulationAnnotation (-> AnnotationKind).
 - Removed deprecated enum Annotation (-> AnnotationGroup).
+- Removed deprecated enum Label (-> AnnotationKind), addLabel (-> addAnnotation) and
+  addLabelTo (-> addAnnotationTo).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

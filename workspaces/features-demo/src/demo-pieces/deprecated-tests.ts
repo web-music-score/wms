@@ -20,20 +20,6 @@ export function createDeprecatedTestsDemo() {
         .setTimeSignature("C")
         .setTempo(160)
 
-        // --- Deprecated and Non-Deprecated Label Tests ---
-        .addLyrics(1, "1. Label", "1n", { align: "left" })
-        .addNote(0, "B3", "4n").addLabel("note", "B3")
-        .addNote(0, "E5", "4n").addLabelTo("grpBelow", "note", "E5")
-        .addChord(0, ["C4", "E4", "G4"], "4n").addLabel("chord", "C")
-        .addChord(0, ["A4", "C5", "E5"], "4n").addLabelTo("grpAbove", "chord", "Am")
-        .addMeasure()
-        .addLyrics(1, "2. Label", "1n", { align: "left" })
-        .addNote(0, "B3", "4n").addAnnotation("pitchLabel", "B3")
-        .addNote(0, "E5", "4n").addAnnotationTo("grpBelow", "pitchLabel", "E5")
-        .addChord(0, ["C4", "E4", "G4"], "4n").addAnnotation("chordLabel", "C")
-        .addChord(0, ["A4", "C5", "E5"], "4n").addAnnotationTo("grpAbove", "chordLabel", "Am")
-        .endRow()
-
         // --- Deprecated and Non-Deprecated Navigation Tests ---
         .addMeasure()
         .addLyrics(1, "1. EndRepeat", "1n", { align: "left" })

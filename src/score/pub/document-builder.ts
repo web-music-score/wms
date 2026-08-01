@@ -969,55 +969,6 @@ export class DocumentBuilder {
     }
 
     /**
-     * Add label text to column of last added note/chord/rest in current measure.
-     * @deprecated addLabel() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param label - T.Label type: "chord" or "note".
-     * @param text - label text.
-     * @returns - This document builder instance.
-     */
-    addLabel(label: Types.LabelValue, text: string): DocumentBuilder {
-        return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addLabel", label, text);
-
-            AssertUtil.assert(
-                Guard.isEnumValue(label, Types.Label),
-                Guard.isNonEmptyString(text)
-            );
-
-            if (label === Types.Label.Chord)
-                this.addAnnotation(Types.AnnotationKind.ChordLabel, text);
-            else if (label === Types.Label.Note)
-                this.addAnnotation(Types.AnnotationKind.PitchLabel, text);
-        });
-    }
-
-    /**
-     * Add label text to column of last added note/chord/rest in current measure to given staff/tab/group.
-     * @deprecated addLabelTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param label - T.Label type "chord" or "note".
-     * @param text - label text.
-     * @returns - This document builder instance.
-     */
-    addLabelTo(staffTargets: Types.StaffTargets, label: Types.LabelValue, text: string): DocumentBuilder {
-        return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addLabelTo", staffTargets, label, text);
-
-            assertStaffTargets(staffTargets);
-
-            AssertUtil.assert(
-                Guard.isEnumValue(label, Types.Label),
-                Guard.isNonEmptyString(text)
-            );
-
-            if (label === Types.Label.Chord)
-                this.addAnnotationTo(staffTargets, Types.AnnotationKind.ChordLabel, text);
-            else if (label === Types.Label.Note)
-                this.addAnnotationTo(staffTargets, Types.AnnotationKind.PitchLabel, text);
-        });
-    }
-
-    /**
      * Add tie starting from last added note/chord.
      * @param connective - T.Connective type ("tie" or T.Connective.Tie).
      * @param tieSpan - How many notes across this tie spans.

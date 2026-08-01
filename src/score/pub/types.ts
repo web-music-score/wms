@@ -290,17 +290,6 @@ export type LyricsOptions = {
     hyphen?: LyricsHyphenValue;
 }
 
-/** @deprecated Label is deprecated. Will be removed in future release. */
-export enum Label {
-    /** "C", "C#", "Db", "D", etc. @deprecated */
-    Note = "note",
-    /** "C", "Am", "G7", etc. @deprecated */
-    Chord = "chord"
-}
-
-/** @deprecated */
-export type LabelValue = Label | `${Label}`;
-
 /** Annotation group */
 export enum AnnotationGroup {
     /** Navigation annotation */
