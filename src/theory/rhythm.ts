@@ -98,9 +98,6 @@ export enum NoteLength {
 
 export type NoteLengthValue = NoteLength | `${NoteLength}`;
 
-/** @deprecated Will be removed. Use NoteLengthValue instead. */
-export type NoteLengthStr = `${NoteLength}`;
-
 export function isNoteLength(noteLength: unknown): noteLength is NoteLength {
     return Guard.isEnumValue(noteLength, NoteLength);
 }
