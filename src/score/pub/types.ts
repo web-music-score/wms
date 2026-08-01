@@ -631,60 +631,6 @@ export type NavigationValue = Navigation | `${Navigation}`;
 export type NavigationEndRepeatValue = Navigation.EndRepeat | `${Navigation.EndRepeat}`;
 export type NavigationEndingValue = Navigation.Ending | `${Navigation.Ending}`;
 
-/** @deprecated DynamicsAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
-export enum DynamicsAnnotation {
-    /** pianississimo (very, very soft) */
-    ppp = AnnotationKind.ppp,
-    /** pianissimo (very soft) */
-    pp = AnnotationKind.pp,
-    /** piano (soft) */
-    p = AnnotationKind.p,
-    /** mezzo-piano (moderately soft) */
-    mp = AnnotationKind.mp,
-    /** mezzo */
-    m = AnnotationKind.m,
-    /** mezzo-forte (moderately loud) */
-    mf = AnnotationKind.mf,
-    /** forte (loud) */
-    f = AnnotationKind.f,
-    /** fortissimo (very loud) */
-    ff = AnnotationKind.ff,
-    /** fortississimo (very, very loud) */
-    fff = AnnotationKind.fff,
-    /** crescendo (gradually louder) */
-    cresc = AnnotationKind.cresc,
-    /** diminuendo (gradually softer) */
-    decresc = AnnotationKind.decresc,
-    /** diminuendo (gradually softer) */
-    dim = AnnotationKind.dim,
-}
-
-/** @deprecated Will be removed. */
-export type DynamicsAnnotationValue = DynamicsAnnotation | `${DynamicsAnnotation}`;
-
-/** @deprecated TempoAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
-export enum TempoAnnotation {
-    /** gradually faster */
-    accel = AnnotationKind.accel,
-    /** gradually slower */
-    rit = AnnotationKind.rit,
-    /** gradually slower */
-    rall = AnnotationKind.rall,
-    /** return to original tempo */
-    a_tempo = AnnotationKind.a_tempo,
-}
-
-/** @deprecated Will be removed. */
-export type TempoAnnotationValue = TempoAnnotation | `${TempoAnnotation}`;
-
-/** @deprecated ArticulationAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
-export enum ArticulationAnnotation {
-    fermata = AnnotationKind.fermata,
-}
-
-/** @deprecated Will be removed. */
-export type ArticulationAnnotationValue = ArticulationAnnotation | `${ArticulationAnnotation}`;
-
 /** Play state enum. */
 export enum PlayState {
     /** Playing. */

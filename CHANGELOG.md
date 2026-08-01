@@ -12,6 +12,8 @@
 - Removed deprecated types StaffTabOrGroup (-> StaffTarget), StaffTabOrGroups (-> StaffTargets).
 - Removed deprecated enum Fermata and addFermata (-> addAnnotation) and addFermataTo (-> addAnnotationTo).
 - Removed deprecated enum value AnnotationKind.measureEndFermata (-> { anchor: "rightBarLine" }).
+- Removed deprecated enums DynamicsAnnotation (-> AnnotationKind), TempoAnnotation (-> AnnotationKind)
+  and ArticulationAnnotation (-> AnnotationKind).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
