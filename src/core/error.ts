@@ -9,9 +9,7 @@ export enum MusicErrorType {
     NoteDuration,
     Scale,
     KeySignature,
-    TimeSignature,
-    /** @deprecated Typo, will be removed. */
-    Timesignature = MusicErrorType.TimeSignature,
+    TimeSignature
 }
 
 function isType(type: unknown): type is MusicErrorType {
