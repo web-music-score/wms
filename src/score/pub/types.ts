@@ -212,12 +212,6 @@ export type StaffTarget = number | string;
 /** Single or multiple staff/tab/group identifiers. */
 export type StaffTargets = StaffTarget | StaffTarget[];
 
-/** @deprecated StaffTabOrGroup is deprecated. Will be removed in future release. Use StaffTarget instead. */
-export type { StaffTarget as StaffTabOrGroup }
-
-/** @deprecated StaffTabOrGroups is deprecated. Will be removed in future release. Use StaffTargets instead. */
-export type { StaffTargets as StaffTabOrGroups }
-
 /** Document options. */
 export type DocumentOptions = {
     /** Show all measure numbers? */
