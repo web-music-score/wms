@@ -581,16 +581,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (staffTargets === undefined) {
-            if (
-                lines.length >= 2 &&
-                lines[0] instanceof ObjStaff && lines[1] instanceof ObjStaff &&
-                lines[0].staffConfig.grandId !== undefined && lines[0].staffConfig.grandId === lines[1].staffConfig.grandId
-            ) {
-                addToStaffTarget(defaultVerticalPos === VerticalPos.Below ? 1 : 0, defaultVerticalPos);
-            }
-            else {
-                addToStaffTarget(0, defaultVerticalPos);
-            }
+            addToStaffTarget(0, defaultVerticalPos);
         }
         else if (Guard.isArray(staffTargets)) {
             staffTargets.forEach(staffTarget => addToStaffTarget(staffTarget, defaultVerticalPos));

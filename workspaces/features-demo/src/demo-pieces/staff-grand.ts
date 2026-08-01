@@ -12,7 +12,7 @@ export function createStaffConfigGrandDemo() {
 
         .setTimeSignature("6/8")
         .setKeySignature(scale)
-        .addScaleArpeggio(scale, "C2", 4)
+        .addScaleArpeggio(scale, "C2", 4, 1)
         .endSection()
 
         .addMeasure()

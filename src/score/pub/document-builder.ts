@@ -1157,7 +1157,7 @@ export class DocumentBuilder {
      * @param numOctaves - Number of octaves to add.
      * @returns - This document builder instance.
      */
-    addScaleArpeggio(scale: Theory.Scale, bottomNote: string, numOctaves: number): DocumentBuilder {
+    addScaleArpeggio(scale: Theory.Scale, bottomNote: string, numOctaves: number, pitchLabelTarget?: Types.StaffTarget): DocumentBuilder {
         return this.safe(() => {
             AssertUtil.setClassFunc("DocumentBuilder", "addScaleArpeggio", scale, bottomNote, numOctaves);
 
@@ -1177,7 +1177,10 @@ export class DocumentBuilder {
                 let note = notes[i];
 
                 this.addNote(0, note, ts.beatLength);
-                this.addAnnotation(Types.AnnotationKind.PitchLabel, note.formatOmitOctave(Theory.SymbolSet.Unicode));
+
+                if (pitchLabelTarget !== undefined) {
+                    this.addAnnotationTo(pitchLabelTarget, Types.AnnotationKind.PitchLabel, note.formatOmitOctave(Theory.SymbolSet.Unicode));
+                }
             }
         });
     }
