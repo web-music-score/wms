@@ -531,8 +531,6 @@ export enum AnnotationKind {
 
     /** hold longer than written */
     fermata = "fermata",
-    /** @deprecated Use addAnnotation("fermata", { anchor: "rightBarLine" }) */
-    measureEndFermata = "measureEndFermata",
 
     //////////////////////////////////////////////////
     // AnnotationGroup.Label
@@ -682,7 +680,6 @@ export type TempoAnnotationValue = TempoAnnotation | `${TempoAnnotation}`;
 /** @deprecated ArticulationAnnotation is deprecated. Will be removed in future release. Use AnnotationKind instead. */
 export enum ArticulationAnnotation {
     fermata = AnnotationKind.fermata,
-    measureEndFermata = AnnotationKind.measureEndFermata,
 }
 
 /** @deprecated Will be removed. */

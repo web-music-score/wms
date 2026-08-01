@@ -637,10 +637,9 @@ export class ObjMeasure extends MusicObject {
 
         const colAnchor = this.lastAddedRhythmColumn;
 
-        const fermataAnchor = (
-            annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine ||
-            annotationKind === Pub.AnnotationKind.measureEndFermata
-        ) ? this.barLineRight : this.lastAddedRhythmColumn;
+        const fermataAnchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
+            ? this.barLineRight
+            : this.lastAddedRhythmColumn;
 
         switch (annotationKind) {
             case Pub.Navigation.Ending:
@@ -697,7 +696,6 @@ export class ObjMeasure extends MusicObject {
             case Pub.Navigation.StartRepeat:
                 break;
             case Pub.AnnotationKind.fermata:
-            case Pub.AnnotationKind.measureEndFermata:
                 if (fermataAnchor) {
                     createLayoutObject = (line, vpos) => new ObjFermata(fermataAnchor, vpos === VerticalPos.Below, color);
                 }

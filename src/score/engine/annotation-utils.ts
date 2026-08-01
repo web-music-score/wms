@@ -29,7 +29,6 @@ export function getAnnotationKindTextReplacement(text: string): string {
 export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, annotationKind: string): LayoutGroupId {
     switch (annotationKind) {
         case AnnotationKind.fermata:
-        case AnnotationKind.measureEndFermata:
             return LayoutGroupId.Annotation_Temporal_Fermata;
         case Navigation.Ending:
             return LayoutGroupId.Annotation_Navigation_Ending;
@@ -192,7 +191,6 @@ const AnnotationKindToGroupMap = new UniMap<AnnotationKind, AnnotationGroup>([
 
     // Temporal effect annotations
     [AnnotationKind.fermata, AnnotationGroup.Temporal],
-    [AnnotationKind.measureEndFermata, AnnotationGroup.Temporal],
 
     // Label annotations
     [AnnotationKind.PitchLabel, AnnotationGroup.Label],

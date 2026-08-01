@@ -19,7 +19,7 @@ export function createFermataDemo() {
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
         .addNote(0, "C3", "4n")
-        .addAnnotation("temporal", "measureEndFermata")
+        .addAnnotation("temporal", "fermata", { anchor: "rightBarLine" })
 
         .addMeasure()
         .addNote(0, "C3", "8n")
@@ -36,7 +36,7 @@ export function createFermataDemo() {
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
         .addRest(0, "4n")
-        .addAnnotationTo("both", "measureEndFermata")
+        .addAnnotationTo("both", "fermata", { anchor: "rightBarLine" })
 
         .getDocument();
 }
