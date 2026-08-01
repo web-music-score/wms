@@ -1,5 +1,4 @@
-import { Guard, Utils } from "@tspro/ts-utils-lib";
-import { InvalidArgError } from "web-music-score/core";
+import { Utils } from "@tspro/ts-utils-lib";
 
 /** Symbol set enum. */
 export enum SymbolSet {
@@ -22,18 +21,6 @@ export const PitchNotationList: ReadonlyArray<PitchNotation> = Utils.Enum.getEnu
 
 /** Default pitch notation (PitchNotation.Scientific). */
 export const DefaultPitchNotation = PitchNotation.Scientific;
-
-/**
- * @deprecated Not required by this library, will be removed in future release.
- */
-export function validatePitchNotation(pn: unknown): PitchNotation {
-    if (Guard.isEnumValue(pn, PitchNotation)) {
-        return pn;
-    }
-    else {
-        throw new InvalidArgError(`Invalid pitch notation "${pn}".`);
-    }
-}
 
 /**
  * Get name of given pitch notation.
@@ -59,15 +46,3 @@ export const DefaultGuitarNoteLabel = GuitarNoteLabel.Default;
 
 /** Array of available guitar note labels. */
 export const GuitarNoteLabelList: ReadonlyArray<GuitarNoteLabel> = Utils.Enum.getEnumValues(GuitarNoteLabel);
-
-/**
- * @deprecated Not required by this library, will be removed in future release.
- */
-export function validateGuitarNoteLabel(label: unknown): GuitarNoteLabel {
-    if (Guard.isEnumValue(label, GuitarNoteLabel)) {
-        return label;
-    }
-    else {
-        throw new InvalidArgError(`Invalid guitarNoteLabel: ${label}`);
-    }
-}
