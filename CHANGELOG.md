@@ -10,6 +10,7 @@
 - Removed deprecated event class ScoreStaffPosEvent from score module.
 - Removed typo/deprecated enum value MusicErrorType.Timesignature.
 - Removed deprecated types StaffTabOrGroup (-> StaffTarget), StaffTabOrGroups (-> StaffTargets).
+- Removed deprecated enum Fermata and addFermata (-> addAnnotation) and addFermataTo (-> addAnnotationTo).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

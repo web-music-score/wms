@@ -746,48 +746,6 @@ export class DocumentBuilder {
     }
 
     /**
-     * Add fermata to current measure.
-     * @deprecated addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
-     * @returns - This document builder instance.
-     */
-    addFermata(fermata: Types.FermataValue = Types.Fermata.AtNote): DocumentBuilder {
-        return this.safe(() => {
-            warnOnce("addFermata() is deprecated. Will be removed in future release. Use addAnnotation() instead.");
-
-            AssertUtil.setClassFunc("DocumentBuilder", "addFermata", fermata);
-            AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
-
-            if (fermata === Types.Fermata.AtNote)
-                this.addAnnotation(Types.AnnotationKind.fermata, {});
-            else if (fermata === Types.Fermata.AtMeasureEnd)
-                this.addAnnotation(Types.AnnotationKind.fermata, { anchor: "rightBarLine" });
-        });
-    }
-
-    /**
-     * Add fermata to current measure.
-     * @deprecated addFermataTo() is deprecated. Will be removed in future release. Use addAnnotation() instead.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param fermata - Fermata position: "atNote" (default) or "atMeasureEnd".
-     * @returns - This document builder instance.
-     */
-    addFermataTo(staffTargets: Types.StaffTargets, fermata: Types.FermataValue = Types.Fermata.AtNote): DocumentBuilder {
-        return this.safe(() => {
-            warnOnce("addFermataTo() is deprecated. Will be removed in future release. Use addAnnotationTo() instead.");
-
-            AssertUtil.setClassFunc("DocumentBuilder", "addFermataTo", staffTargets, fermata);
-            assertStaffTargets(staffTargets);
-            AssertUtil.assert(Guard.isEnumValue(fermata, Types.Fermata));
-
-            if (fermata === Types.Fermata.AtNote)
-                this.addAnnotationTo(staffTargets, Types.AnnotationKind.fermata, {});
-            else if (fermata === Types.Fermata.AtMeasureEnd)
-                this.addAnnotationTo(staffTargets, Types.AnnotationKind.fermata, { anchor: "rightBarLine" });
-        });
-    }
-
-    /**
      * Add navigation to current measure.
      * @param navigation - Navigation annotation to add.
      * @returns - This document builder instance.

@@ -34,27 +34,6 @@ export function createDeprecatedTestsDemo() {
         .addChord(0, ["A4", "C5", "E5"], "4n").addAnnotationTo("grpAbove", "chordLabel", "Am")
         .endRow()
 
-        // --- Deprecated and Non-Deprecated Fermata Tests ---
-        .addMeasure()
-        .addLyrics(1, "1. Fermata", "1n", { align: "left" })
-        .addNote(0, "C4", "4n").addFermata("atNote")
-        .addNote(0, "E4", "4n").addFermataTo("grpBelow", "atNote")
-        .addNote(0, "G4", "4n").addFermataTo("grpBoth", "atMeasureEnd")
-        .addNote(0, "C5", "4n")
-        .addMeasure()
-        .addLyrics(1, "2. Fermata", "1n", { align: "left" })
-        .addNote(0, "C4", "4n").addAnnotation("articulation", "fermata")
-        .addNote(0, "E4", "4n").addAnnotationTo("grpBelow", "articulation", "fermata")
-        .addNote(0, "G4", "4n").addAnnotationTo("grpBoth", "measureEndFermata")
-        .addNote(0, "C5", "4n")
-        .addMeasure()
-        .addLyrics(1, "3. Fermata", "1n", { align: "left" })
-        .addNote(0, "C4", "4n").addAnnotation("fermata")
-        .addNote(0, "E4", "4n").addAnnotationTo("grpBelow", "fermata")
-        .addNote(0, "G4", "4n").addAnnotationTo("grpBoth", "fermata", { anchor: "rightBarLine" })
-        .addNote(0, "C5", "4n")
-        .endRow()
-
         // --- Deprecated and Non-Deprecated Navigation Tests ---
         .addMeasure()
         .addLyrics(1, "1. EndRepeat", "1n", { align: "left" })
