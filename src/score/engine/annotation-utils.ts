@@ -19,11 +19,11 @@ export function getNavigationString(navigation: Navigation): string {
     }
 }
 
-export function getAnnotationKindTextReplacement(text: string): string {
-    switch (text) {
-        case AnnotationKind.trill: return "tr";
-    }
-    return text;
+export function getAnnotationKindTextReplacement(kind: string, group: AnnotationGroup): string {
+    if (kind === AnnotationKind.trill && group === AnnotationGroup.Ornament)
+        return "tr";
+
+    return kind;
 }
 
 export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, annotationKind: string): LayoutGroupId {
@@ -32,10 +32,6 @@ export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, ann
             return LayoutGroupId.Annotation_Temporal_Fermata;
         case Navigation.Ending:
             return LayoutGroupId.Annotation_Navigation_Ending;
-        case AnnotationKind.ChordLabel:
-            return LayoutGroupId.Annotation_Label_ChordLabel;
-        case AnnotationKind.PitchLabel:
-            return LayoutGroupId.Annotation_Label_PitchLabel;
     }
 
     switch (annotationGroup) {
@@ -53,8 +49,10 @@ export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, ann
             return LayoutGroupId.Annotation_Technique;
         case AnnotationGroup.Temporal:
             return LayoutGroupId.Annotation_Temporal;
-        case AnnotationGroup.Label:
-            return LayoutGroupId.Annotation_Label;
+        case AnnotationGroup.ChordLabel:
+            return LayoutGroupId.Annotation_ChordLabel;
+        case AnnotationGroup.PitchLabel:
+            return LayoutGroupId.Annotation_PitchLabel;
         case AnnotationGroup.Ornament:
             return LayoutGroupId.Annotation_Ornament;
         case AnnotationGroup.Misc:
@@ -64,11 +62,9 @@ export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, ann
 }
 
 export function getAnnotationDefaultVerticalPos(annotationGroup: AnnotationGroup, annotationKind: string): VerticalPos {
-    switch (annotationKind) {
-        case AnnotationKind.PitchLabel:
-            return VerticalPos.Below;
-    }
     switch (annotationGroup) {
+        case AnnotationGroup.PitchLabel:
+            return VerticalPos.Below;
         case AnnotationGroup.Dynamics:
             return VerticalPos.Below;
     }
@@ -191,10 +187,6 @@ const AnnotationKindToGroupMap = new UniMap<AnnotationKind, AnnotationGroup>([
 
     // Temporal effect annotations
     [AnnotationKind.fermata, AnnotationGroup.Temporal],
-
-    // Label annotations
-    [AnnotationKind.PitchLabel, AnnotationGroup.Label],
-    [AnnotationKind.ChordLabel, AnnotationGroup.Label],
 
     // Misc annotations
     [AnnotationKind._8va, AnnotationGroup.Misc],

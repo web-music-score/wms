@@ -136,7 +136,6 @@ function assertAnnotationOptions(annotationOptions: Types.AnnotationOptions) {
             Guard.isUndefined(annotationOptions.endingPassages) || Guard.isIntegerGte(annotationOptions.endingPassages, 1) ||
             Guard.isArray(annotationOptions.endingPassages) && annotationOptions.endingPassages.every(p => Guard.isIntegerGte(p, 1))
         ),
-        Guard.isNonEmptyStringOrUndefined(annotationOptions.labelText),
         Guard.isStringOrUndefined(annotationOptions.color),
     );
 }
@@ -204,7 +203,7 @@ export type ExtensionBuilder = {
  *     .setMeasuresPerRow(4)
  *     .addMeasure()
  *     .addNote(1, "C3", "4n")
- *     .addChord(1, ["C3", "E3", "G3"], "4n").addAnnotation("chordLabel", "C")
+ *     .addChord(1, ["C3", "E3", "G3"], "4n").addAnnotation("pp")
  *     .addRest(1, "4n")
  *     // etc.
  *     .getDEocument();
@@ -840,10 +839,6 @@ export class DocumentBuilder {
             Guard.isNonEmptyString(kind)
         );
 
-        // Add optional args for different kinds into options.
-        if (group === Types.AnnotationGroup.Label && Guard.isNullish(options.labelText) && Guard.isNonEmptyString(args[0]))
-            options.labelText = Guard.isNullish(args[0]) ? undefined : String(args.shift());
-
         if (kind === Types.AnnotationKind.EndRepeat && Guard.isNullish(options.repeatCount) && Guard.isIntegerGte(args[0], 2))
             options.repeatCount = Guard.isNullish(args[0]) ? undefined : Number(args.shift());
 
@@ -852,19 +847,6 @@ export class DocumentBuilder {
 
         this.getMeasure().addAnnotation(staffTargets, group as Types.AnnotationGroup, kind, options);
     }
-
-    /**
-     * Add annotation with label text to current measure.
-     * @param labelKind - Annotation kind.
-     * @param labelText - Label text.
-     * @param options - Annotation options.
-     * @returns - This document builder instance.
-     */
-    addAnnotation(
-        labelKind: Types.AnnotationKindLabelValue,
-        labelText: string,
-        options?: Types.AnnotationOptions
-    ): DocumentBuilder;
 
     /**
      * Add any annotation kind to current measure.
@@ -907,21 +889,6 @@ export class DocumentBuilder {
             this.addAnnotationInternal(undefined, ...args);
         });
     }
-
-    /**
-     * Add annotation with label text to current measure.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param labelKind - Annotation kind.
-     * @param labelText - Label text.
-     * @param options - Annotation options.
-     * @returns - This document builder instance.
-     */
-    addAnnotationTo(
-        staffTargets: Types.StaffTargets,
-        labelKind: Types.AnnotationKindLabelValue,
-        labelText: string,
-        options?: Types.AnnotationOptions
-    ): DocumentBuilder;
 
     /**
      * Add any annotation kind to current measure.
@@ -1179,7 +1146,7 @@ export class DocumentBuilder {
                 this.addNote(0, note, ts.beatLength);
 
                 if (pitchLabelTarget !== undefined) {
-                    this.addAnnotationTo(pitchLabelTarget, Types.AnnotationKind.PitchLabel, note.formatOmitOctave(Theory.SymbolSet.Unicode));
+                    this.addAnnotationTo(pitchLabelTarget, note.formatOmitOctave(Theory.SymbolSet.Unicode), { group: "pitchLabel" });
                 }
             }
         });

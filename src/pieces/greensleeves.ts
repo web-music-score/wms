@@ -20,7 +20,7 @@ export function createGreensleeves(): MDocument {
 
         .addMeasure()
         .addNavigation(Navigation.StartRepeat)
-        .addNote(0, "C4", "4n", { stem: "up" }).addAnnotation("chordLabel", "Am")
+        .addNote(0, "C4", "4n", { stem: "up" }).addAnnotation("Am", { group: "chordLabel" })
         .addNote(0, "D4", "8n")
         .addNote(0, "E4", "8.")
         .addNote(0, "F4", "16n")

@@ -607,9 +607,6 @@ export class ObjMeasure extends MusicObject {
         if (!Guard.isNonEmptyString(annotationKind))
             throw new ScoreError(`Annotation error: invalid annotation kind.`);
 
-        if (annotationGroup === Pub.AnnotationGroup.Label && !Guard.isNonEmptyString(annotationOptions.labelText))
-            throw new ScoreError("Annotation error: label text is empty.");
-
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
             throw new ScoreError("Annotation error: ending passages is undefined.");
 
@@ -695,29 +692,12 @@ export class ObjMeasure extends MusicObject {
                     createLayoutObject = (line, vpos) => new ObjSymbol(fermataAnchor, DrawSymbol.Fermata, false, vpos === VerticalPos.Below, color);
                 }
                 break;
-            case Pub.AnnotationKind.ChordLabel: {
-                if (colAnchor) {
-                    createLayoutObject = (line, vpos) => {
-                        const text = String(annotationOptions.labelText);
-                        return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
-                    }
-                }
-                break;
-            }
-            case Pub.AnnotationKind.PitchLabel: {
-                if (colAnchor) {
-                    createLayoutObject = (line, vpos) => {
-                        const text = String(annotationOptions.labelText);
-                        return new ObjText(colAnchor, { text, color }, anchorX, anchorY);
-                    }
-                }
-                break;
-            }
             default: {
                 if (colAnchor) {
                     createLayoutObject = (line, vpos) => {
-                        const text = getAnnotationKindTextReplacement(annotationKind);
-                        return new ObjText(colAnchor, { text, color, italic: true }, anchorX, anchorY);
+                        const text = getAnnotationKindTextReplacement(annotationKind, annotationGroup);
+                        const italic = false;
+                        return new ObjText(colAnchor, { text, color, italic }, anchorX, anchorY);
                     }
                 }
             }

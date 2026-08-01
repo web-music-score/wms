@@ -306,8 +306,10 @@ export enum AnnotationGroup {
     Technique = "technique",
     /** Temporal annotation */
     Temporal = "temporal",
-    /** Label annotation */
-    Label = "label",
+    /** PitchLabel annotation */
+    PitchLabel = "pitchLabel",
+    /** ChordLabel annotation */
+    ChordLabel = "chordLabel",
     /** Ornament annotation */
     Ornament = "ornament",
     /** Miscellaneous annotation */
@@ -519,15 +521,6 @@ export enum AnnotationKind {
     fermata = "fermata",
 
     //////////////////////////////////////////////////
-    // AnnotationGroup.Label
-    //////////////////////////////////////////////////
-
-    /** Pitch label */
-    PitchLabel = "pitchLabel",
-    /** Chord label */
-    ChordLabel = "chordLabel",
-
-    //////////////////////////////////////////////////
     // AnnotationGroup.Misc
     //////////////////////////////////////////////////
 
@@ -551,11 +544,6 @@ export enum AnnotationKind {
 
 export type AnnotationKindValue = AnnotationKind | `${AnnotationKind}`;
 
-export type AnnotationKindLabelValue = (
-    AnnotationKind.PitchLabel | `${AnnotationKind.PitchLabel}` |
-    AnnotationKind.ChordLabel | `${AnnotationKind.ChordLabel}`
-);
-
 /** Annotation anchor */
 export enum AnnotationAnchor {
     /** Add annotation at certain time position in measure (e.g. time position of last added note) */
@@ -578,8 +566,6 @@ export type AnnotationOptions = {
     repeatCount?: number;
     /** Passage number(s) for endings */
     endingPassages?: number | number[];
-    /** Text for labels */
-    labelText?: string;
     /** Color */
     color?: string;
 }

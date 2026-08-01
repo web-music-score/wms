@@ -17,7 +17,7 @@ import { ScoreError } from "./error-utils";
 /** Layout group ids in order, first is closest to staff, last is furthest from staff. */
 export enum LayoutGroupId {
     TabRhythm,
-    Annotation_Label_PitchLabel,    // Below staff by default.
+    Annotation_PitchLabel,    // Below staff by default.
     Annotation_Articulation,
     Annotation_Technique,
     Annotation_Ornament,
@@ -28,8 +28,7 @@ export enum LayoutGroupId {
     Annotation_Temporal,
     Annotation_Navigation,
     Annotation_Navigation_Ending,
-    Annotation_Label,
-    Annotation_Label_ChordLabel,
+    Annotation_ChordLabel,
     Annotation_Misc,
     LyricsVerse1,
     LyricsVerse2,
@@ -38,7 +37,7 @@ export enum LayoutGroupId {
 
 const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { isLane: boolean, padding: number }>([
     [LayoutGroupId.TabRhythm, { isLane: true, padding: 0 }],
-    [LayoutGroupId.Annotation_Label_PitchLabel, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_PitchLabel, { isLane: false, padding: 0 }],
     [LayoutGroupId.Annotation_Articulation, { isLane: false, padding: 0 }],
     [LayoutGroupId.Annotation_Technique, { isLane: false, padding: 0 }],
     [LayoutGroupId.Annotation_Ornament, { isLane: false, padding: 0 }],
@@ -49,8 +48,7 @@ const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { isLane: boolean, padding:
     [LayoutGroupId.Annotation_Temporal, { isLane: true, padding: 0 }],
     [LayoutGroupId.Annotation_Navigation, { isLane: true, padding: 0 }],
     [LayoutGroupId.Annotation_Navigation_Ending, { isLane: true, padding: 0 }],
-    [LayoutGroupId.Annotation_Label, { isLane: true, padding: 0 }],
-    [LayoutGroupId.Annotation_Label_ChordLabel, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_ChordLabel, { isLane: true, padding: 0 }],
     [LayoutGroupId.Annotation_Misc, { isLane: true, padding: 0 }],
     [LayoutGroupId.LyricsVerse1, { isLane: true, padding: 0 }],
     [LayoutGroupId.LyricsVerse2, { isLane: true, padding: 0 }],

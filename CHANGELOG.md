@@ -20,6 +20,8 @@
 - Removed deprecated WmsControls.setPlayButton, setStopButton, setPlayStopButton, setPauseButton
   (-> setSinglePlay, setSinglePlayStop, setPlayStop, setPlayPauseStop).
 - Removed special case target for grand staff.
+- Remove AnnotationKind.PitchLabel, .ChordLabel and AnnotationOptions.labelText.
+  (-> addAnnotation("Am", { group: AnnotationGroup.ChordLabel })).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

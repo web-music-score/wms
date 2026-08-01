@@ -14,7 +14,7 @@ export function createAndanteByDiabelli(): MDocument {
         .setKeySignature("D", "Major")
         .setTimeSignature("3/4")
         .setTempo(80)
-        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("dynamics", "p")
+        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("p", {group: "dynamics"})
         .addNote(0, "F#4", "8n", { stem: "up" })
         .addNote(0, "G4", "8n").addConnective("slur", 2, "below")
         .addNote(0, "F#4", "8n")
@@ -31,7 +31,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "A2", "2.")
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("dynamics", "f")
+        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("f")
         .addNote(0, "A3", "8n")
         .addNote(0, "G#3", "8n").addConnective("slur", 2, "below")
         .addNote(0, "A3", "8n")
@@ -49,7 +49,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "D3", "2.")
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("dynamics", "p")
+        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("p")
         .addNote(0, "F#4", "8n")
         .addNote(0, "G4", "8n").addConnective("slur", 2, "below")
         .addNote(0, "F#4", "8n")
@@ -67,7 +67,7 @@ export function createAndanteByDiabelli(): MDocument {
         .endRow()
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("dynamics", "f")
+        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("f")
         .addNote(0, "A3", "8n")
         .addNote(0, "G#3", "8n").addConnective("slur", 2, "below")
         .addNote(0, "A3", "8n")
@@ -84,7 +84,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNavigation("endRepeat")
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "D4" }).addAnnotation("dynamics", "f")
+        .addRest(0, "8n", { staffPos: "D4" }).addAnnotation("f")
         .addNote(0, "D4", "8n")
         .addNote(0, "E4", "8n").addConnective("slur", 2, "below")
         .addNote(0, "D4", "8n")
@@ -102,7 +102,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "A2", "2.")
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("dynamics", "p")
+        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("p")
         .addNote(0, "E3", "8n")
         .addNote(0, "D#3", "8n").addConnective("slur", 2, "below")
         .addNote(0, "E3", "8n")
@@ -120,7 +120,7 @@ export function createAndanteByDiabelli(): MDocument {
         .endRow()
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("dynamics", "f")
+        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("f")
         .addNote(0, "G4", "8n")
         .addNote(0, "A4", "8n").addConnective("slur", 2, "below")
         .addNote(0, "G4", "8n")
@@ -137,7 +137,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(1, "D3", "2.")
 
         .addMeasure()
-        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("dynamics", "ff")
+        .addRest(0, "8n", { staffPos: "B3" }).addAnnotation("ff")
         .addNote(0, "A3", "8n")
         .addNote(0, "G#3", "8n").addConnective("slur", 2, "below")
         .addNote(0, "A3", "8n")
