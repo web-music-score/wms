@@ -3,7 +3,7 @@ import * as Theory from "web-music-score/theory";
 import { Tempo, getDefaultTempo, TimeSignature, getDefaultTimeSignature } from "web-music-score/theory";
 import { MusicObject } from "./music-object";
 import * as Pub from "../pub";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { AccidentalState } from "./acc-state";
 import { ObjStaffSignature, ObjTabSignature } from "./obj-signature";
 import { ObjBarLineRight, ObjBarLineLeft } from "./obj-bar-line";
@@ -17,7 +17,7 @@ import { ObjBeamGroup } from "./obj-beam-group";
 import { DocumentSettings } from "./settings";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
-import { ObjFermata } from "./obj-symbol";
+import { ObjSymbol } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
 import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
@@ -605,7 +605,11 @@ export class ObjMeasure extends MusicObject {
     }
 
     hasFermata(anchor: ObjRhythmColumn | ObjBarLineRight) {
-        return this.layoutObjects.some(layoutObj => layoutObj.musicObj instanceof ObjFermata && layoutObj.anchor === anchor);
+        return this.layoutObjects.some(layoutObj => (
+            layoutObj.musicObj instanceof ObjSymbol &&
+            layoutObj.musicObj.symbol === DrawSymbol.Fermata &&
+            layoutObj.anchor === anchor
+        ));
     }
 
     addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, annotationOptions: Pub.AnnotationOptions) {
@@ -697,7 +701,7 @@ export class ObjMeasure extends MusicObject {
                 break;
             case Pub.AnnotationKind.fermata:
                 if (fermataAnchor) {
-                    createLayoutObject = (line, vpos) => new ObjFermata(fermataAnchor, vpos === VerticalPos.Below, color);
+                    createLayoutObject = (line, vpos) => new ObjSymbol(fermataAnchor, DrawSymbol.Fermata, false, vpos === VerticalPos.Below, color);
                 }
                 break;
             case Pub.AnnotationKind.ChordLabel: {
@@ -1595,7 +1599,9 @@ export class ObjMeasure extends MusicObject {
             // Expand width of last measure in case there is fermata.
             this.rect.right = Math.max(
                 this.rect.right,
-                ...this.layoutObjects.filter(o => o.musicObj instanceof ObjFermata).map(o => o.musicObj.getRect().right)
+                ...this.layoutObjects.filter(o => (
+                    o.musicObj instanceof ObjSymbol && o.musicObj.symbol === DrawSymbol.Fermata
+                )).map(o => o.musicObj.getRect().right)
             );
         }
 

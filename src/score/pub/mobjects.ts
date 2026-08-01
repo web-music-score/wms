@@ -6,7 +6,7 @@ import { ObjConnective } from "../engine/obj-connective";
 import { ObjArpeggio } from "../engine/obj-arpeggio";
 import { ObjDocument } from "../engine/obj-document";
 import { ObjEnding } from "../engine/obj-ending";
-import { ObjSymbol, ObjFermata } from "../engine/obj-symbol";
+import { ObjSymbol } from "../engine/obj-symbol";
 import { ObjHeader } from "../engine/obj-header";
 import { ObjImage } from "../engine/obj-image";
 import { ObjMeasure } from "../engine/obj-measure";
@@ -355,27 +355,11 @@ export class MSymbol extends MusicInterface {
 
     /** @internal */
     constructor(protected readonly obj: ObjSymbol) {
-        super(obj instanceof ObjFermata ? MFermata.Name : MSymbol.Name);
+        super(MSymbol.Name);
     }
 
     /** @internal */
     getMusicObject(): ObjSymbol {
-        return this.obj;
-    }
-}
-
-/** Fermata object. */
-export class MFermata extends MSymbol {
-    /** Object name. */
-    static readonly Name: string = "Fermata";
-
-    /** @internal */
-    constructor(obj: ObjFermata) {
-        super(obj);
-    }
-
-    /** @internal */
-    getMusicObject(): ObjFermata {
         return this.obj;
     }
 }

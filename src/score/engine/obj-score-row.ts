@@ -3,14 +3,14 @@ import { ObjMeasure } from "./obj-measure";
 import { getVoiceIds, MScoreRow, StaffConfig, Stem, TabConfig } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjDocument } from "./obj-document";
-import { View } from "./view";
+import { DrawSymbol, View } from "./view";
 import { ObjTab, ObjStaff, ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect, Guard, Rect, Utils } from "@tspro/ts-utils-lib";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjRest } from "./obj-rest";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
-import { ObjFermata } from "./obj-symbol";
+import { ObjSymbol } from "./obj-symbol";
 import { ScoreError } from "./error-utils";
 
 export class ScoreRowRegions {
@@ -387,7 +387,7 @@ export class ObjScoreRow extends MusicObject {
         const fermata = this.getLastMeasure()?.getBarLineRight()
             .getAnchoredLayoutObjects()
             .map(o => o.musicObj)
-            .find(o => o instanceof ObjFermata);
+            .find(o => o instanceof ObjSymbol && o.symbol === DrawSymbol.Fermata);
 
         if (fermata) {
             right = Math.max(right, fermata.getRect().right);

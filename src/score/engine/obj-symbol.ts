@@ -1,8 +1,6 @@
-import { MSymbol, MFermata } from "../pub";
+import { MSymbol } from "../pub";
 import { MusicObject } from "./music-object";
 import { DrawSymbol, View } from "./view";
-import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { ObjBarLineRight } from "./obj-bar-line";
 import { Rect } from "@tspro/ts-utils-lib";
 
 export class ObjSymbol extends MusicObject {
@@ -11,7 +9,7 @@ export class ObjSymbol extends MusicObject {
     constructor(parent: MusicObject, readonly symbol: DrawSymbol, readonly flipX: boolean, readonly flipY: boolean, readonly color: string) {
         super(parent);
 
-        this.mi = this instanceof ObjFermata ? new MFermata(this) : new MSymbol(this);
+        this.mi = new MSymbol(this);
     }
 
     getMusicInterface(): MSymbol {
@@ -36,16 +34,5 @@ export class ObjSymbol extends MusicObject {
 
         view.color(this.color);
         view.drawSymbol(this.symbol, this.rect, this.flipX, this.flipY);
-    }
-}
-
-/** @deprecated Merge to ObjSymbol. */
-export class ObjFermata extends ObjSymbol {
-    constructor(parent: ObjRhythmColumn | ObjBarLineRight, flipY: boolean, color: string) {
-        super(parent, DrawSymbol.Fermata, false, flipY, color);
-    }
-
-    getMusicInterface(): MFermata {
-        return this.mi;
     }
 }
