@@ -17,6 +17,9 @@
 - Removed deprecated enum Annotation (-> AnnotationGroup).
 - Removed deprecated enum Label (-> AnnotationKind), addLabel (-> addAnnotation) and
   addLabelTo (-> addAnnotationTo).
+- Removed deprecated WmsControls.setPlayButton, setStopButton, setPlayStopButton, setPauseButton
+  (-> setSinglePlay, setSinglePlayStop, setPlayStop, setPlayPauseStop).
+
 
 ## [6.4.1] - 2026-03-22
 ### Fixed
