@@ -567,9 +567,6 @@ export type AnnotationKindLabelValue = (
     AnnotationKind.ChordLabel | `${AnnotationKind.ChordLabel}`
 );
 
-/** @deprecated Will be removed. Use AnnotationKindValue instead.*/
-export type AnnotationText = `${AnnotationKind}`;
-
 /** Annotation anchor */
 export enum AnnotationAnchor {
     /** Add annotation at certain time position in measure (e.g. time position of last added note) */
