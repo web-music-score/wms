@@ -129,7 +129,7 @@ export class ObjMeasure extends MusicObject {
 
     private needBeamsUpdate = true;
 
-    private navigationSet = new ValueSet<string>();
+    private navigationSet = new ValueSet<Pub.Navigation>();
     private isEndSong: boolean = false;
     private isEndSection: boolean = false;
     private endRepeatPlayCount: number = 2; // play twice.
@@ -721,7 +721,7 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (annotationGroup === Pub.AnnotationGroup.Navigation)
-            this.navigationSet.add(annotationKind);
+            this.navigationSet.add(annotationKind as Pub.Navigation);
     }
 
     addConnective(connective: Pub.Connective.Tie, tieSpan?: number | Pub.TieType, notAnchor?: Pub.NoteAnchor): void;
