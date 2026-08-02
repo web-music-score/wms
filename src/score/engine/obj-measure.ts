@@ -129,7 +129,7 @@ export class ObjMeasure extends MusicObject {
 
     private needBeamsUpdate = true;
 
-    private navigationSet = new ValueSet<Pub.Navigation>();
+    private navigationSet = new ValueSet<string>();
     private isEndSong: boolean = false;
     private isEndSection: boolean = false;
     private endRepeatPlayCount: number = 2; // play twice.
@@ -605,20 +605,10 @@ export class ObjMeasure extends MusicObject {
 
     addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, annotationOptions: Pub.AnnotationOptions) {
         if (!Guard.isNonEmptyString(annotationKind))
-            throw new ScoreError(`Annotation error: invalid annotation kind.`);
+            throw new ScoreError(`Annotation error: Invalid annotation kind.`);
 
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
-            throw new ScoreError("Annotation error: ending passages is undefined.");
-
-        if (isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
-            if (this.lastAddedRhythmSymbol instanceof ObjNoteGroup) {
-                this.lastAddedRhythmSymbol.addNoteArticulation(annotationKind as Pub.AnnotationKind, annotationOptions);
-                return;
-            }
-            else {
-                throw new ScoreError(`Annotation error: no note for "${annotationKind}".`);
-            }
-        }
+            throw new ScoreError("Annotation error: Ending passages is undefined.");
 
         const anchorX = 0.5;
         const anchorY = getExtensionAnchorY("bottom");
@@ -627,78 +617,93 @@ export class ObjMeasure extends MusicObject {
 
         const color = annotationOptions.color ?? this.doc.getColor();
 
-        const colAnchor = this.lastAddedRhythmColumn;
+        if (annotationGroup === Pub.AnnotationGroup.Articulation && isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
+            const lastNote = this.lastAddedRhythmSymbol instanceof ObjNoteGroup ? this.lastAddedRhythmSymbol : undefined
 
-        const fermataAnchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
-            ? this.barLineRight
-            : this.lastAddedRhythmColumn;
+            if (lastNote) {
+                lastNote.addNoteArticulation(annotationKind as Pub.AnnotationKind, annotationOptions);
+                return;
+            }
 
-        switch (annotationKind) {
-            case Pub.Navigation.Ending:
-                if (this.navigationSet.has(annotationKind))
-                    throw new ScoreError("Cannot add ending becaure measure already has one.");
-                createLayoutObject = (line) => {
-                    const anchor = this;
-                    let passages = annotationOptions.endingPassages!;
-                    return new ObjEnding(anchor, color, Guard.isArray(passages) ? passages : [passages]);
-                }
-                break;
-            case Pub.Navigation.DC_al_Coda:
-            case Pub.Navigation.DC_al_Fine:
-            case Pub.Navigation.DS_al_Coda:
-            case Pub.Navigation.DS_al_Fine:
-                createLayoutObject = (line) => {
-                    const anchor = this.barLineRight;
-                    const text = getNavigationString(annotationKind);
-                    return new ObjText(anchor, { text, color }, 1, 1);
-                }
-                this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.Navigation.EndRepeat, {});
-                this.endSong();
-                break;
-            case Pub.Navigation.Fine:
-                createLayoutObject = (line) => {
-                    const anchor = this.barLineRight;
-                    const text = getNavigationString(annotationKind);
-                    return new ObjText(anchor, { text, color }, 1, 1);
-                }
-                break;
-            case Pub.Navigation.Segno:
-            case Pub.Navigation.Coda:
-                createLayoutObject = (line) => {
-                    const anchor = this.barLineLeft;
-                    const text = getNavigationString(annotationKind);
-                    return new ObjSpecialText(anchor, text, color);
-                }
-                break;
-            case Pub.Navigation.toCoda:
-                createLayoutObject = (line) => {
-                    const anchor = this.barLineRight;
-                    const text = getNavigationString(annotationKind);
-                    return new ObjSpecialText(anchor, text, color);
-                }
-                break;
-            case Pub.Navigation.EndRepeat:
-                this.endRepeatPlayCount = annotationOptions.repeatCount ?? 2;
-                if (this.endRepeatPlayCount !== 2) {
-                    const text = `${this.endRepeatPlayCount}x`;
-                    const color = this.doc.getColor();
-                    this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
-                }
-                break;
-            case Pub.Navigation.StartRepeat:
-                break;
-            case Pub.AnnotationKind.fermata:
-                if (fermataAnchor) {
-                    createLayoutObject = (line, vpos) => new ObjSymbol(fermataAnchor, DrawSymbol.Fermata, false, vpos === VerticalPos.Below, color);
-                }
-                break;
-            default: {
-                if (colAnchor) {
-                    createLayoutObject = (line, vpos) => {
-                        const text = getAnnotationKindTextReplacement(annotationKind, annotationGroup);
-                        const italic = false;
-                        return new ObjText(colAnchor, { text, color, italic }, anchorX, anchorY);
+            throw new ScoreError(`Annotation error: Note articulation "${annotationKind}" requires note.`);
+        }
+        else if (annotationGroup === Pub.AnnotationGroup.Navigation) {
+            switch (annotationKind) {
+                case Pub.Navigation.Ending:
+                    if (this.navigationSet.has(annotationKind))
+                        throw new ScoreError("Cannot add ending becaure measure already has one.");
+                    createLayoutObject = (line) => {
+                        const anchor = this;
+                        let passages = annotationOptions.endingPassages!;
+                        return new ObjEnding(anchor, color, Guard.isArray(passages) ? passages : [passages]);
                     }
+                    break;
+                case Pub.Navigation.DC_al_Coda:
+                case Pub.Navigation.DC_al_Fine:
+                case Pub.Navigation.DS_al_Coda:
+                case Pub.Navigation.DS_al_Fine:
+                    createLayoutObject = (line) => {
+                        const anchor = this.barLineRight;
+                        const text = getNavigationString(annotationKind);
+                        return new ObjText(anchor, { text, color }, 1, 1);
+                    }
+                    this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.Navigation.EndRepeat, {});
+                    this.endSong();
+                    break;
+                case Pub.Navigation.Fine:
+                    createLayoutObject = (line) => {
+                        const anchor = this.barLineRight;
+                        const text = getNavigationString(annotationKind);
+                        return new ObjText(anchor, { text, color }, 1, 1);
+                    }
+                    break;
+                case Pub.Navigation.Segno:
+                case Pub.Navigation.Coda:
+                    createLayoutObject = (line) => {
+                        const anchor = this.barLineLeft;
+                        const text = getNavigationString(annotationKind);
+                        return new ObjSpecialText(anchor, text, color);
+                    }
+                    break;
+                case Pub.Navigation.toCoda:
+                    createLayoutObject = (line) => {
+                        const anchor = this.barLineRight;
+                        const text = getNavigationString(annotationKind);
+                        return new ObjSpecialText(anchor, text, color);
+                    }
+                    break;
+                case Pub.Navigation.EndRepeat:
+                    this.endRepeatPlayCount = annotationOptions.repeatCount ?? 2;
+                    if (this.endRepeatPlayCount !== 2) {
+                        const text = `${this.endRepeatPlayCount}x`;
+                        const color = this.doc.getColor();
+                        this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
+                    }
+                    break;
+                case Pub.Navigation.StartRepeat:
+                    break;
+                default:
+                    throw new ScoreError(`Annotation error: Invalid navigation "${annotationKind}".`);
+
+            }
+        }
+        else if (annotationGroup === Pub.AnnotationGroup.Temporal && annotationKind === Pub.AnnotationKind.fermata) {
+            const fermataAnchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
+                ? this.barLineRight
+                : this.lastAddedRhythmColumn;
+
+            if (fermataAnchor) {
+                createLayoutObject = (line, vpos) => new ObjSymbol(fermataAnchor, DrawSymbol.Fermata, false, vpos === VerticalPos.Below, color);
+            }
+        }
+        else {
+            const colAnchor = this.lastAddedRhythmColumn;
+
+            if (colAnchor) {
+                createLayoutObject = (line, vpos) => {
+                    const text = getAnnotationKindTextReplacement(annotationKind, annotationGroup);
+                    const italic = false;
+                    return new ObjText(colAnchor, { text, color, italic }, anchorX, anchorY);
                 }
             }
         }
@@ -715,7 +720,7 @@ export class ObjMeasure extends MusicObject {
             });
         }
 
-        if (Guard.isEnumValue(annotationKind, Pub.Navigation))
+        if (annotationGroup === Pub.AnnotationGroup.Navigation)
             this.navigationSet.add(annotationKind);
     }
 
