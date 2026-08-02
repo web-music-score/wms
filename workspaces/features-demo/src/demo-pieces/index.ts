@@ -1,5 +1,6 @@
 import { createAll } from "web-music-score/pieces";
 import { createNavigationRepeatEndingDemo } from "demo-pieces/navigation-repeats-endings";
+import { createNavigationRepeatEnding2Demo } from "./navigation-repeats-endings-2";
 import { createNavigationDCAlFineDemo } from "demo-pieces/navigation-DC_al_Fine";
 import { createNavigationDCAlCodaDemo } from "demo-pieces/navigation-DC_al_Coda";
 import { createNavigationDSAlFineDemo } from "demo-pieces/navigation-DS_al_Fine";
@@ -19,7 +20,6 @@ import { createStaffConfigGuitarDemo } from "./staff-guitar";
 import { createStaffConfigTabDemo } from "./staff-tab";
 import { createStaffGroupsDemo } from "./staff-groups";
 import { createLyricsDemo } from "./lyrics";
-import { createDeprecatedTestsDemo } from "./deprecated-tests";
 import { createNoteArticulationsDemo } from "./note-articulations";
 import * as Score from "web-music-score/score";
 
@@ -50,6 +50,7 @@ export class DemoPieces {
         // Add features demos
         let demos: Score.MDocument[] = [];
         demos.push(createNavigationRepeatEndingDemo());
+        demos.push(createNavigationRepeatEnding2Demo());
         demos.push(createNavigationDCAlFineDemo());
         demos.push(createNavigationDCAlCodaDemo());
         demos.push(createNavigationDSAlFineDemo());
@@ -70,7 +71,6 @@ export class DemoPieces {
         demos.push(createStaffGroupsDemo());
         demos.push(createLyricsDemo());
         demos.push(createNoteArticulationsDemo());
-        demos.push(createDeprecatedTestsDemo());
 
         // Sort by title
         pieces.sort((a, b) => DemoPieces.getTitle(a).localeCompare(DemoPieces.getTitle(b)));

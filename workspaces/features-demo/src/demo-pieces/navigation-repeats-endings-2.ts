@@ -1,8 +1,8 @@
 import * as Score from "web-music-score/score";
 
-export function createDeprecatedTestsDemo() {
+export function createNavigationRepeatEnding2Demo() {
     return new Score.DocumentBuilder()
-        .setHeader("Deprecated Tests")
+        .setHeader("Navigation: Repeat & Ending (2)")
         .setScoreConfiguration([
             { type: "staff", clef: "G" },
             { type: "staff", clef: "G" },
@@ -103,24 +103,6 @@ export function createDeprecatedTestsDemo() {
         .addNote(0, "G4", "4n")
         .addNote(0, "C5", "4n")
         .addAnnotationTo(1, "ending", { endingPassages: 3 })
-        .endRow()
-
-        .addMeasure()
-        .addLyrics(1, "1. Any text", "1n", { align: "left" })
-        .addNote(0, "G4", "2n").addAnnotation("any text", "dynamics")
-        .addNote(0, "G4", "2n")
-        .addMeasure()
-        .addLyrics(1, "2. Any text", "1n", { align: "left" })
-        .addNote(0, "G4", "2n").addAnnotation("any text", "dynamics")
-        .addNote(0, "G4", "2n")
-        .endRow()
-
-        .addMeasure()
-        .addLyrics(1, "1. No depr. just testing", "1n", { align: "left" })
-        .addNote(0, "G4", "4n").addAnnotation("pitchLabel", "pitchLabel")
-        .addNote(0, "G4", "4n").addAnnotation("pitchLabel", "pitchLabel")
-        .addNote(0, "G4", "4n").addAnnotation("chordLabel", "chordLabel")
-        .addNote(0, "G4", "4n").addAnnotation("chordLabel", "chordLabel")
 
         .getDocument();
 }
