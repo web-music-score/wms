@@ -25,6 +25,7 @@
 - Simplified addAnnotation and removed group from options, now:
     addAnnotation(annotationKind, annotationOptions)
     addAnnotation(annotationKind, annotationGroup, annotationOptions)
+- Removed function addNavigation (-> addAnnotation) and enum Navigation (-> enum AnnotationKind).
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

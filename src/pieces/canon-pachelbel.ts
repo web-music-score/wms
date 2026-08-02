@@ -279,7 +279,7 @@ export function createCanonInD(): MDocument {
         .addNote(1, ["G2", "A2"], "2n")
 
         .addMeasure()
-        .addNavigation("startRepeat")
+        .addAnnotation("startRepeat")
         .addNote(0, "D5", "4.")
         .addNote(0, "A5", "8n")
         .addNote(0, ["A5", "B5", "A5", "G5"], "8n")
@@ -302,7 +302,7 @@ export function createCanonInD(): MDocument {
         .addNote(0, ["D5", "C5", "B5", "C5"], "8n")
         .addNote(0, "C#5", "2n")
         .addNote(1, ["G2", "A2"], "2n")
-        .addNavigation("endRepeat")
+        .addAnnotation("endRepeat")
 
         .addMeasure()
         .addNote(0, "D5", "1n")

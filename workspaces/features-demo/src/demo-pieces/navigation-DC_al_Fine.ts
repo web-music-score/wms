@@ -12,13 +12,13 @@ export function createNavigationDCAlFineDemo() {
         .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNavigation("startRepeat")
+        .addAnnotation("startRepeat")
         .addNote(0, "G4", "2n")
-        .addNavigation("endRepeat")
+        .addAnnotation("endRepeat")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("Fine")
+        .addAnnotation("Fine")
         .endRow()
 
         .addMeasure()
@@ -29,7 +29,7 @@ export function createNavigationDCAlFineDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("D.C. al Fine")
+        .addAnnotation("D.C. al Fine")
 
         .getDocument();
 }

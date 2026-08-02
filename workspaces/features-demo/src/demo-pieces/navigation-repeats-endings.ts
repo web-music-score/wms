@@ -10,27 +10,27 @@ export function createNavigationRepeatEndingDemo() {
         .setTimeSignature("3/4")
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
-        .addNavigation("endRepeat", 3)
+        .addAnnotation("endRepeat", { repeatCount: 3 })
 
         .addMeasure()
-        .addNavigation("startRepeat")
+        .addAnnotation("startRepeat")
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
         .endRow()
 
         .addMeasure()
-        .addNavigation("ending", 1, 2)
+        .addAnnotation("ending", { endingPassages: [1, 2] })
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
 
         .addMeasure()
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
-        .addNavigation("endRepeat")
+        .addAnnotation("endRepeat")
         .endRow()
 
         .addMeasure()
-        .addNavigation("ending", 3)
+        .addAnnotation("ending", { endingPassages: 3 })
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
 
@@ -40,18 +40,18 @@ export function createNavigationRepeatEndingDemo() {
         .endRow()
 
         .addMeasure()
-        .addNavigation("startRepeat")
+        .addAnnotation("startRepeat")
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
 
         .addMeasure()
-        .addNavigation("ending", 1)
+        .addAnnotation("ending", { endingPassages: 1 })
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "2n")
-        .addNavigation("endRepeat")
+        .addAnnotation("endRepeat")
 
         .addMeasure()
-        .addNavigation("ending", 2)
+        .addAnnotation("ending", { endingPassages: 2 })
         .addNote(0, "A3", "2.")
 
         .getDocument();

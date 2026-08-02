@@ -743,83 +743,6 @@ export class DocumentBuilder {
         });
     }
 
-    /**
-     * Add navigation to current measure.
-     * @param navigation - Navigation annotation to add.
-     * @returns - This document builder instance.
-     */
-    addNavigation(navigation: Types.NavigationValue): DocumentBuilder;
-    /**
-     * Add end repeat navigation to current measure.
-     * @param navigation - Navigation annotation to add.
-     * @param playCount - Play count for the repeated section.
-     * @returns - This document builder instance.
-     */
-    addNavigation(navigation: Types.NavigationEndRepeatValue, playCount: number): DocumentBuilder;
-    /**
-     * Add ending navigation to current measure.
-     * @param navigation - Navigation annotation to add.
-     * @param passages - Passages that this ending is played.
-     * @returns - This document builder instance.
-     */
-    addNavigation(navigation: Types.NavigationEndingValue, ...passages: number[]): DocumentBuilder;
-
-    addNavigation(navigation: Types.NavigationValue, ...args: unknown[]): DocumentBuilder {
-        return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
-
-            if (navigation === Types.Navigation.EndRepeat) {
-                this.addAnnotationInternal(undefined, navigation, Types.AnnotationGroup.Navigation, { repeatCount: Guard.isNumber(args[0]) ? +args[0] : undefined });
-            }
-            else if (navigation === Types.Navigation.Ending) {
-                this.addAnnotationInternal(undefined, navigation, Types.AnnotationGroup.Navigation, { endingPassages: args.map(p => Guard.isNumber(p) ? p : undefined).filter(p => p !== undefined) });
-            }
-            else {
-                this.addAnnotationInternal(undefined, navigation, Types.AnnotationGroup.Navigation);
-            }
-        });
-    }
-
-    /**
-     * Add navigation to current measure to given staff/tab/group.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param navigation - Navigation annotation to add.
-     * @returns - This document builder instance.
-     */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationValue): DocumentBuilder;
-    /**
-     * Add end repeat navigation to current measure to given staff/tab/group.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param navigation - Navigation annotation to add.
-     * @param playCount - Play count for the repeated section.
-     * @returns - This document builder instance.
-     */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationEndRepeatValue, playCount: number): DocumentBuilder;
-    /**
-     * Add ending navigation to current measure to given staff/tab/group.
-     * @param staffTargets - Single or multiple staff/tab/group identifiers.
-     * @param navigation - Navigation annotation to add.
-     * @param passages - Passages that this ending is played.
-     * @returns - This document builder instance.
-     */
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationEndingValue, ...passages: number[]): DocumentBuilder;
-
-    addNavigationTo(staffTargets: Types.StaffTargets, navigation: Types.NavigationValue, ...args: unknown[]): DocumentBuilder {
-        return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTargets, navigation, ...args);
-
-            if (navigation === Types.Navigation.EndRepeat) {
-                this.addAnnotationInternal(staffTargets, navigation, Types.AnnotationGroup.Navigation, { repeatCount: Guard.isNumber(args[0]) ? +args[0] : undefined });
-            }
-            else if (navigation === Types.Navigation.Ending) {
-                this.addAnnotationInternal(staffTargets, navigation, Types.AnnotationGroup.Navigation, { endingPassages: args.map(p => Guard.isNumber(p) ? p : undefined).filter(p => p !== undefined) });
-            }
-            else {
-                this.addAnnotationInternal(staffTargets, navigation, Types.AnnotationGroup.Navigation);
-            }
-        });
-    }
-
     private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, group: Types.AnnotationGroup | undefined, options?: Types.AnnotationOptions) {
         assertStaffTargets(staffTargets);
 
@@ -851,7 +774,7 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotation(kind: string | Types.AnnotationKindValue, options?: Types.AnnotationOptions): DocumentBuilder;
+    addAnnotation(kind: Types.AnnotationKindValue, options?: Types.AnnotationOptions): DocumentBuilder;
 
     /**
      * Add any annotation kind to current measure.
@@ -860,7 +783,7 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotation(kind: string | Types.AnnotationKindValue, group: Types.AnnotationGroupValue, options?: Types.AnnotationOptions): DocumentBuilder;
+    addAnnotation(kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, options?: Types.AnnotationOptions): DocumentBuilder;
 
     addAnnotation(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
@@ -882,7 +805,7 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: string | Types.AnnotationKind, options?: Types.AnnotationOptions): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue, options?: Types.AnnotationOptions): DocumentBuilder;
 
     /**
      * Add any annotation kind to current measure.
@@ -892,7 +815,7 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: string | Types.AnnotationKindValue, group: Types.AnnotationGroupValue, options?: Types.AnnotationOptions): DocumentBuilder;
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, options?: Types.AnnotationOptions): DocumentBuilder;
 
     addAnnotationTo(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {

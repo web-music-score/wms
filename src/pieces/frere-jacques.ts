@@ -34,7 +34,7 @@ export function createFrereJacques(): MDocument {
         .addRest(1, "1n", { staffPos: "F3" })
 
         .addMeasure()
-        .addNavigation("startRepeat")
+        .addAnnotation("startRepeat")
         .addNote(0, "F#4", "4n").addLyrics(1, "Bro", "4n", { hyphen: "-" })
         .addNote(0, "G4", "4n").addLyrics(1, "ther", "4n")
         .addNote(0, "A4", "2n").addLyrics(1, "John?", "4n")
@@ -110,7 +110,7 @@ export function createFrereJacques(): MDocument {
         .addRest(1, "4n")
 
         .addMeasure()
-        .addNavigation("endRepeat")
+        .addAnnotation("endRepeat")
         .addNote(0, "D4", "4n").addLyrics(1, "Are", "4n")
         .addNote(0, "E4", "4n").addLyrics(1, "you", "4n")
         .addNote(0, "F#4", "4n").addLyrics(1, "sleep", "4n", { hyphen: "-" })

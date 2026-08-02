@@ -12,12 +12,12 @@ export function createNavigationDSAlFineDemo() {
         .addNote(0, "G4", "2n")
 
         .addMeasure()
-        .addNavigation("Segno")
+        .addAnnotation("Segno")
         .addNote(0, "G4", "2n")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("Fine")
+        .addAnnotation("Fine")
         .endRow()
 
         .addMeasure()
@@ -28,7 +28,7 @@ export function createNavigationDSAlFineDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("D.S. al Fine")
+        .addAnnotation("D.S. al Fine")
 
         .getDocument();
 }

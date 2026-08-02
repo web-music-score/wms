@@ -16,7 +16,7 @@ export function createNavigationDCAlCodaDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("toCoda")
+        .addAnnotation("toCoda")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
@@ -27,11 +27,11 @@ export function createNavigationDCAlCodaDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("D.C. al Coda")
+        .addAnnotation("D.C. al Coda")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("Coda")
+        .addAnnotation("Coda")
 
         .getDocument();
 }

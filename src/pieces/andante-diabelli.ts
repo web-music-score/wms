@@ -81,7 +81,7 @@ export function createAndanteByDiabelli(): MDocument {
         .addNote(0, "D3", "4n") // Stem up...
         .addNote(1, "D3", "4n") // ...and down
         .addRest(1, "4n", { staffPos: "B3" })
-        .addNavigation("endRepeat")
+        .addAnnotation("endRepeat")
 
         .addMeasure()
         .addRest(0, "8n", { staffPos: "D4" }).addAnnotation("f")

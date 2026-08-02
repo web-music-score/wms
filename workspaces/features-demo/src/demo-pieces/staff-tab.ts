@@ -105,18 +105,18 @@ export function createStaffConfigTabDemo() {
         .setTempo(160)
         .addNote(0, "C3", "2n", { string: 5 })
         .addNote(0, "G3", "2n", { string: 4 })
-        .addNavigation("startRepeat")
+        .addAnnotation("startRepeat")
 
         .addMeasure()
         .addNote(0, "G3", "2n", { string: 3 })
         .addNote(0, "C4", "2n", { string: 2 })
-        .addNavigation("ending", 1)
-        .addNavigation("endRepeat")
+        .addAnnotation("ending", {endingPassages: 1})
+        .addAnnotation("endRepeat")
 
         .addMeasure()
         .addNote(0, "D4", "2n", { string: 2 })
         .addNote(0, "E4", "2n", { string: 2 })
-        .addNavigation("ending", 2)
+        .addAnnotation("ending", {endingPassages: 2})
 
         .addMeasure()
         .addNote(0, "C3", "8t", { string: 5 })

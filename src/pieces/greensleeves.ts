@@ -1,4 +1,4 @@
-import { MDocument, Navigation, DocumentBuilder } from "web-music-score/score";
+import { MDocument, DocumentBuilder } from "web-music-score/score";
 
 /**
  * Create Greensleeves music piece.<br />
@@ -19,7 +19,7 @@ export function createGreensleeves(): MDocument {
         .addNote(0, "A3", "8n")
 
         .addMeasure()
-        .addNavigation(Navigation.StartRepeat)
+        .addAnnotation("startRepeat")
         .addNote(0, "C4", "4n", { stem: "up" }).addAnnotation("Am", "chordLabel")
         .addNote(0, "D4", "8n")
         .addNote(0, "E4", "8.")
@@ -183,8 +183,8 @@ export function createGreensleeves(): MDocument {
         .addNote(1, "B2", "4n")
 
         .addMeasure()
-        .addNavigation("ending", 1)
-        .addNavigation("endRepeat")
+        .addAnnotation("ending", { endingPassages: 1 })
+        .addAnnotation("endRepeat")
         .addNote(0, "A3", "4.", { stem: "up" }).addAnnotation("Am", "chordLabel")
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "8n")
@@ -194,7 +194,7 @@ export function createGreensleeves(): MDocument {
         .addNote(1, "A2", "4.")
 
         .addMeasure()
-        .addNavigation("ending", 2)
+        .addAnnotation("ending", { endingPassages: 2 })
         .addNote(0, "A3", "4.", { stem: "up" }).addAnnotation("Am", "chordLabel")
         .addNote(0, "A3", "4.").addAnnotation("fermata")
         .addNote(1, "A2", "8n", { stem: "down" })

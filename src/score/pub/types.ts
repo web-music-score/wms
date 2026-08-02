@@ -568,36 +568,6 @@ export type AnnotationOptions = {
     color?: string;
 }
 
-/** Navigation annotations */
-export enum Navigation {
-    /** Repeat back to beginning and play to the "Fine" marking. */
-    DC_al_Fine = AnnotationKind.DC_al_Fine,
-    /** Repeat back to beginning and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
-    DC_al_Coda = AnnotationKind.DC_al_Coda,
-    /** Repeat back to Segno sign (𝄋) and play to the "Fine" marking. */
-    DS_al_Fine = AnnotationKind.DS_al_Fine,
-    /** Repeat back to Segno sign (𝄋) and play to the "to Coda 𝄌", then jump to the "𝄌 Coda". */
-    DS_al_Coda = AnnotationKind.DS_al_Coda,
-    /** "𝄌 Coda" section. */
-    Coda = AnnotationKind.Coda,
-    /** From "toCoda 𝄌" jump to the "𝄌 Coda" section. */
-    toCoda = AnnotationKind.toCoda,
-    /** Jump here from D.S. al Fine or D.S. al Coda. */
-    Segno = AnnotationKind.Segno,
-    /** Stop playing after D.C. al Fine or D.S. al Fine. */
-    Fine = AnnotationKind.Fine,
-    /** Start of repeat section. */
-    StartRepeat = AnnotationKind.StartRepeat,
-    /** End of repeat section. Jump to start of repeat section. */
-    EndRepeat = AnnotationKind.EndRepeat,
-    /** Jump to ending with correct passage number. */
-    Ending = AnnotationKind.Ending
-}
-
-export type NavigationValue = Navigation | `${Navigation}`;
-export type NavigationEndRepeatValue = Navigation.EndRepeat | `${Navigation.EndRepeat}`;
-export type NavigationEndingValue = Navigation.Ending | `${Navigation.Ending}`;
-
 /** Play state enum. */
 export enum PlayState {
     /** Playing. */

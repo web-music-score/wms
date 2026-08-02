@@ -3,7 +3,7 @@ import { Note, NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "web-music
 import * as Audio from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { Navigation, PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind } from "../pub";
+import { PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { Extension, getTextContent } from "./extension";
@@ -228,46 +228,46 @@ export class PlayerEngine {
 
             measureSequence.push(curMeasure);
 
-            if (curMeasure.hasNavigation(Navigation.StartRepeat)) {
+            if (curMeasure.hasAnnotationKind(AnnotationKind.StartRepeat)) {
                 startRepeatMeasure = curMeasure;
                 isEndRepeatUnderEnding = false;
             }
 
-            if (curMeasure.hasNavigation(Navigation.Segno)) {
+            if (curMeasure.hasAnnotationKind(AnnotationKind.Segno)) {
                 segnoMeasure = curMeasure;
             }
 
-            if (alCoda && curMeasure.hasNavigation(Navigation.toCoda)) {
+            if (alCoda && curMeasure.hasAnnotationKind(AnnotationKind.toCoda)) {
                 // Played to coda mark, jump to designated coda section.
-                while (curMeasure && !curMeasure.hasNavigation(Navigation.Coda)) {
+                while (curMeasure && !curMeasure.hasAnnotationKind(AnnotationKind.Coda)) {
                     curMeasure = curMeasure.getNextMeasure();
                 }
             }
-            else if (alFine && curMeasure.hasNavigation(Navigation.Fine)) {
+            else if (alFine && curMeasure.hasAnnotationKind(AnnotationKind.Fine)) {
                 // Reached Fine.
                 curMeasure = undefined;
             }
-            else if (curMeasure.hasNavigation(Navigation.DC_al_Coda)) {
+            else if (curMeasure.hasAnnotationKind(AnnotationKind.DC_al_Coda)) {
                 alCoda = true;
                 curMeasure = this.doc.getFirstMeasure();
                 doNotRepeatRepeats = true;
             }
-            else if (curMeasure.hasNavigation(Navigation.DC_al_Fine)) {
+            else if (curMeasure.hasAnnotationKind(AnnotationKind.DC_al_Fine)) {
                 alFine = true;
                 curMeasure = this.doc.getFirstMeasure();
                 doNotRepeatRepeats = true;
             }
-            else if (curMeasure.hasNavigation(Navigation.DS_al_Coda)) {
+            else if (curMeasure.hasAnnotationKind(AnnotationKind.DS_al_Coda)) {
                 alCoda = true;
                 curMeasure = segnoMeasure;
                 doNotRepeatRepeats = true;
             }
-            else if (curMeasure.hasNavigation(Navigation.DS_al_Fine)) {
+            else if (curMeasure.hasAnnotationKind(AnnotationKind.DS_al_Fine)) {
                 alFine = true;
                 curMeasure = segnoMeasure;
                 doNotRepeatRepeats = true;
             }
-            else if (curMeasure.hasNavigation(Navigation.EndRepeat) && (!doNotRepeatRepeats || isEndRepeatUnderEnding)) {
+            else if (curMeasure.hasAnnotationKind(AnnotationKind.EndRepeat) && (!doNotRepeatRepeats || isEndRepeatUnderEnding)) {
                 const playCount = curMeasure.getEndRepeatPlayCount();
                 const unexpectedEnding = false;
 
@@ -456,7 +456,7 @@ export class PlayerEngine {
             if (
                 !next ||
                 m.hasEndSong() || m.hasEndSection() ||
-                next.hasNavigation(Navigation.StartRepeat) && !next.hasNavigation(Navigation.Ending)
+                next.hasAnnotationKind(AnnotationKind.StartRepeat) && !next.hasAnnotationKind(AnnotationKind.Ending)
             ) {
                 // Hit song end, new-section or start-repeat. No passage found.
                 return undefined;

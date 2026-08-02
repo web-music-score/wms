@@ -1,19 +1,19 @@
 import { UniMap, Utils } from "@tspro/ts-utils-lib";
-import { AnnotationGroup, Navigation, AnnotationKind } from "../pub";
+import { AnnotationGroup, AnnotationKind } from "../pub";
 import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { DrawSymbol } from "./view";
 
-export function getNavigationString(navigation: Navigation): string {
+export function getNavigationString(navigation: AnnotationKind): string {
     switch (navigation) {
-        case Navigation.DC_al_Coda: return "D.C. al Coda";
-        case Navigation.DC_al_Fine: return "D.C. al Fine";
-        case Navigation.DS_al_Coda: return "D.S. al Coda";
-        case Navigation.DS_al_Fine: return "D.S. al Fine";
-        case Navigation.Fine: return "Fine";
-        case Navigation.Segno: return ObjSpecialText.Segno;
-        case Navigation.Coda: return ObjSpecialText.Coda;
-        case Navigation.toCoda: return ObjSpecialText.toCoda;
+        case AnnotationKind.DC_al_Coda: return "D.C. al Coda";
+        case AnnotationKind.DC_al_Fine: return "D.C. al Fine";
+        case AnnotationKind.DS_al_Coda: return "D.S. al Coda";
+        case AnnotationKind.DS_al_Fine: return "D.S. al Fine";
+        case AnnotationKind.Fine: return "Fine";
+        case AnnotationKind.Segno: return ObjSpecialText.Segno;
+        case AnnotationKind.Coda: return ObjSpecialText.Coda;
+        case AnnotationKind.toCoda: return ObjSpecialText.toCoda;
         default:
             return navigation[0].toUpperCase() + navigation.substring(1);
     }
@@ -30,7 +30,7 @@ export function getAnnotationLayoutGroupId(annotationGroup: AnnotationGroup, ann
     switch (annotationKind) {
         case AnnotationKind.fermata:
             return LayoutGroupId.Annotation_Temporal_Fermata;
-        case Navigation.Ending:
+        case AnnotationKind.Ending:
             return LayoutGroupId.Annotation_Navigation_Ending;
     }
 

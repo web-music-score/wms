@@ -13,7 +13,7 @@ export function createNavigationDSAlCodaDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("Segno")
+        .addAnnotation("Segno")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
@@ -24,7 +24,7 @@ export function createNavigationDSAlCodaDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("toCoda")
+        .addAnnotation("toCoda")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
@@ -35,11 +35,11 @@ export function createNavigationDSAlCodaDemo() {
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("D.S. al Coda")
+        .addAnnotation("D.S. al Coda")
 
         .addMeasure()
         .addNote(0, "G4", "2n")
-        .addNavigation("Coda")
+        .addAnnotation("Coda")
 
         .getDocument();
 }
