@@ -129,7 +129,6 @@ function assertStaffTargets(staffTargets: Types.StaffTargets | undefined) {
 function assertAnnotationOptions(annotationOptions: Types.AnnotationOptions) {
     AssertUtil.assert(
         Guard.isObject(annotationOptions),
-        Guard.isEnumValueOrUndefined(annotationOptions.group, Types.AnnotationGroup),
         Guard.isEnumValueOrUndefined(annotationOptions.anchor, Types.AnnotationAnchor),
         Guard.isUndefined(annotationOptions.repeatCount) || Guard.isIntegerGte(annotationOptions.repeatCount, 1),
         (
@@ -770,13 +769,13 @@ export class DocumentBuilder {
             AssertUtil.setClassFunc("DocumentBuilder", "addNavigation", navigation, ...args);
 
             if (navigation === Types.Navigation.EndRepeat) {
-                this.addAnnotationInternal(undefined, navigation, { group: Types.AnnotationGroup.Navigation, repeatCount: Guard.isNumber(args[0]) ? +args[0] : undefined });
+                this.addAnnotationInternal(undefined, navigation, Types.AnnotationGroup.Navigation, { repeatCount: Guard.isNumber(args[0]) ? +args[0] : undefined });
             }
             else if (navigation === Types.Navigation.Ending) {
-                this.addAnnotationInternal(undefined, navigation, { group: Types.AnnotationGroup.Navigation, endingPassages: args.map(p => Guard.isNumber(p) ? p : undefined).filter(p => p !== undefined) });
+                this.addAnnotationInternal(undefined, navigation, Types.AnnotationGroup.Navigation, { endingPassages: args.map(p => Guard.isNumber(p) ? p : undefined).filter(p => p !== undefined) });
             }
             else {
-                this.addAnnotationInternal(undefined, navigation, { group: Types.AnnotationGroup.Navigation });
+                this.addAnnotationInternal(undefined, navigation, Types.AnnotationGroup.Navigation);
             }
         });
     }
@@ -810,26 +809,24 @@ export class DocumentBuilder {
             AssertUtil.setClassFunc("DocumentBuilder", "addNavigationTo", staffTargets, navigation, ...args);
 
             if (navigation === Types.Navigation.EndRepeat) {
-                this.addAnnotationInternal(staffTargets, navigation, { group: Types.AnnotationGroup.Navigation, repeatCount: Guard.isNumber(args[0]) ? +args[0] : undefined });
+                this.addAnnotationInternal(staffTargets, navigation, Types.AnnotationGroup.Navigation, { repeatCount: Guard.isNumber(args[0]) ? +args[0] : undefined });
             }
             else if (navigation === Types.Navigation.Ending) {
-                this.addAnnotationInternal(staffTargets, navigation, { group: Types.AnnotationGroup.Navigation, endingPassages: args.map(p => Guard.isNumber(p) ? p : undefined).filter(p => p !== undefined) });
+                this.addAnnotationInternal(staffTargets, navigation, Types.AnnotationGroup.Navigation, { endingPassages: args.map(p => Guard.isNumber(p) ? p : undefined).filter(p => p !== undefined) });
             }
             else {
-                this.addAnnotationInternal(staffTargets, navigation, { group: Types.AnnotationGroup.Navigation });
+                this.addAnnotationInternal(staffTargets, navigation, Types.AnnotationGroup.Navigation);
             }
         });
     }
 
-    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, options?: Types.AnnotationOptions) {
+    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, group: Types.AnnotationGroup | undefined, options?: Types.AnnotationOptions) {
         assertStaffTargets(staffTargets);
 
         if (options === undefined)
             options = {}
 
         assertAnnotationOptions(options);
-
-        let group = options.group;
 
         // Resolve group from kind if there not defined so far.
         if (!group) {
@@ -854,10 +851,27 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotation(kind: string | Types.AnnotationKind, options?: Types.AnnotationOptions): DocumentBuilder {
+    addAnnotation(kind: string | Types.AnnotationKindValue, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    /**
+     * Add any annotation kind to current measure.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param group - Annotation group (e.g. "dynamics").
+     * @param options - Annotation options.
+     * @returns - This document builder instance.
+     */
+    addAnnotation(kind: string | Types.AnnotationKindValue, group: Types.AnnotationGroupValue, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    addAnnotation(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", kind, options);
-            this.addAnnotationInternal(undefined, kind, options);
+            const kind = args.shift() as string;
+            const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
+            const options = Guard.isObject(args[0])
+                ? args.shift() as Types.AnnotationOptions
+                : {} as Types.AnnotationOptions;
+
+            AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
+            this.addAnnotationInternal(undefined, kind, group, options);
         });
     }
 
@@ -868,10 +882,29 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addAnnotationTo(staffTargets: Types.StaffTargets, kind: string | Types.AnnotationKind, options?: Types.AnnotationOptions): DocumentBuilder {
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: string | Types.AnnotationKind, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    /**
+     * Add any annotation kind to current measure.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param group - Annotation group (e.g. "dynamics").
+     * @param options - Annotation options.
+     * @returns - This document builder instance.
+     */
+    addAnnotationTo(staffTargets: Types.StaffTargets, kind: string | Types.AnnotationKindValue, group: Types.AnnotationGroupValue, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    addAnnotationTo(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", staffTargets, kind, options);
-            this.addAnnotationInternal(staffTargets, kind, options);
+            const staffTargets = args.shift() as Types.StaffTargets;
+            const kind = args.shift() as string;
+            const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
+            const options = Guard.isObject(args[0])
+                ? args.shift() as Types.AnnotationOptions
+                : {} as Types.AnnotationOptions;
+
+            AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", ...args);
+            this.addAnnotationInternal(staffTargets, kind, group, options);
         });
     }
 
@@ -1086,7 +1119,7 @@ export class DocumentBuilder {
                 this.addNote(0, note, ts.beatLength);
 
                 if (pitchLabelTarget !== undefined) {
-                    this.addAnnotationTo(pitchLabelTarget, note.formatOmitOctave(Theory.SymbolSet.Unicode), { group: "pitchLabel" });
+                    this.addAnnotationTo(pitchLabelTarget, note.formatOmitOctave(Theory.SymbolSet.Unicode), "pitchLabel");
                 }
             }
         });

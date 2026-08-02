@@ -16,7 +16,7 @@ export function createAnnotationTempoDemo() {
         .addNote(0, "G3", "8n")
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
-        .addNote(0, "C4", "8n").addAnnotation("a tempo", { group: "tempo" })
+        .addNote(0, "C4", "8n").addAnnotation("a tempo", "tempo")
 
         .addMeasure()
         .setTempo(80)

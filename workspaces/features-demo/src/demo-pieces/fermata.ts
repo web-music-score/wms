@@ -19,7 +19,7 @@ export function createFermataDemo() {
         .addNote(0, "C3", "8n")
         .addNote(0, "D3", "8n")
         .addNote(0, "C3", "4n")
-        .addAnnotation("fermata", { group: "temporal", anchor: "rightBarLine" })
+        .addAnnotation("fermata", "temporal", { anchor: "rightBarLine" })
 
         .addMeasure()
         .addNote(0, "C3", "8n")

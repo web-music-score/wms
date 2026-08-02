@@ -558,8 +558,6 @@ export type AnnotationAnchorValue = AnnotationAnchor | `${AnnotationAnchor}`;
 
 /** Annotation options */
 export type AnnotationOptions = {
-    /** Annnotation group */
-    group?: AnnotationGroupValue;
     /** Anchor */
     anchor?: AnnotationAnchorValue;
     /** Play count for repeats */

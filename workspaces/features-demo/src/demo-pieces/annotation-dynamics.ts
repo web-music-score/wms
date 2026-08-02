@@ -13,7 +13,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "C4", "8n")
-        .addNote(0, "G4", "8n").addAnnotation("pp", {group: "dynamics"})
+        .addNote(0, "G4", "8n").addAnnotation("pp", "dynamics")
         .addNote(0, "F#4", "8n")
         .addNote(0, "E4", "8n")
         .addNote(0, "D4", "8n")

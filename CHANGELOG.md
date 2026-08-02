@@ -21,8 +21,10 @@
   (-> setSinglePlay, setSinglePlayStop, setPlayStop, setPlayPauseStop).
 - Removed special case target for grand staff.
 - Remove AnnotationKind.PitchLabel, .ChordLabel and AnnotationOptions.labelText.
-  (-> addAnnotation("Am", { group: AnnotationGroup.ChordLabel })).
-- Simplified addAnnotation, simply addAnnotation(annotationKind, annotationOptions).
+  (-> addAnnotation("Am", "chordLabel")).
+- Simplified addAnnotation and removed group from options, now:
+    addAnnotation(annotationKind, annotationOptions)
+    addAnnotation(annotationKind, annotationGroup, annotationOptions)
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

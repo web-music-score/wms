@@ -14,7 +14,7 @@ export function createAndanteByDiabelli(): MDocument {
         .setKeySignature("D", "Major")
         .setTimeSignature("3/4")
         .setTempo(80)
-        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("p", {group: "dynamics"})
+        .addRest(0, "8n", { staffPos: "G4" }).addAnnotation("p", "dynamics")
         .addNote(0, "F#4", "8n", { stem: "up" })
         .addNote(0, "G4", "8n").addConnective("slur", 2, "below")
         .addNote(0, "F#4", "8n")
