@@ -723,7 +723,7 @@ export class ObjMeasure extends MusicObject {
         this.annotationKindSet.add(annotationKind);
     }
 
-    addConnective(connective: Pub.Connective, span: number | Pub.TieType, noteAnchor: Pub.NoteAnchor): void {
+    addConnective(connective: Pub.Connective, span: number | Pub.TieType, noteAnchor: Pub.NoteAnchor, options: Pub.ConnectiveOptions): void {
         let startNote = this.lastAddedRhythmSymbol;
 
         if (!(startNote instanceof ObjNoteGroup)) {
@@ -731,13 +731,13 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (connective === Pub.Connective.Tie) {
-            startNote.startConnective(new ConnectiveProps(Pub.Connective.Tie, span, noteAnchor, startNote));
+            startNote.startConnective(new ConnectiveProps(Pub.Connective.Tie, span, noteAnchor, startNote, options));
         }
         else if (connective === Pub.Connective.Slur) {
-            startNote.startConnective(new ConnectiveProps(Pub.Connective.Slur, span, noteAnchor, startNote));
+            startNote.startConnective(new ConnectiveProps(Pub.Connective.Slur, span, noteAnchor, startNote, options));
         }
         else if (connective === Pub.Connective.Slide) {
-            startNote.startConnective(new ConnectiveProps(Pub.Connective.Slide, span, noteAnchor, startNote));
+            startNote.startConnective(new ConnectiveProps(Pub.Connective.Slide, span, noteAnchor, startNote, options));
         }
     }
 

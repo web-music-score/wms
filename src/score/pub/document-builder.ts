@@ -113,6 +113,12 @@ function assertLyricsOptions(lyricsOptions: Types.LyricsOptions) {
     );
 }
 
+function assertConnectiveOptions(connectiveOptions: Types.ConnectiveOptions) {
+    AssertUtil.assert(
+        Guard.isStringOrUndefined(connectiveOptions.color),
+    );
+}
+
 function assertMeasureOptions(measureOptions: Types.MeasureOptions) {
     AssertUtil.assert(
         Guard.isObject(measureOptions),
@@ -837,24 +843,27 @@ export class DocumentBuilder {
      * @param connective - T.Connective type ("tie" or T.Connective.Tie).
      * @param tieSpan - How many notes across this tie spans.
      * @param notAnchor - Anchor point for note and this tie.
+     * @param options - Optional values.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Types.ConnectiveTieValue, tieSpan?: number | Types.TieTypeValue, notAnchor?: Types.NoteAnchorValue): DocumentBuilder;
+    addConnective(connective: Types.ConnectiveTieValue, tieSpan?: number | Types.TieTypeValue, notAnchor?: Types.NoteAnchorValue, options?: Types.ConnectiveOptions): DocumentBuilder;
     /**
      * Add slur starting from last added note/chord.
      * @param connective - T.Connective type ("slur" or T.Connective.Slur).
      * @param slurSpan - How many notes across this slur spans.
      * @param notAnchor - Anchor point for note and this slur.
+     * @param options - Optional values.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Types.ConnectiveSlurValue, slurSpan?: number, notAnchor?: Types.NoteAnchorValue): DocumentBuilder;
+    addConnective(connective: Types.ConnectiveSlurValue, slurSpan?: number, notAnchor?: Types.NoteAnchorValue, options?: Types.ConnectiveOptions): DocumentBuilder;
     /**
      * Add slide starting from last added note/chord.
      * @param connective - T.Connective type ("slide" or T.Connective.Slide).
      * @param notAnchor - Anchor point for note and this slide.
+     * @param options - Optional values.
      * @returns - This document builder instance.
      */
-    addConnective(connective: Types.ConnectiveSlideValue, notAnchor?: Types.NoteAnchorValue): DocumentBuilder;
+    addConnective(connective: Types.ConnectiveSlideValue, notAnchor?: Types.NoteAnchorValue, options?: Types.ConnectiveOptions): DocumentBuilder;
 
     addConnective(connective: Types.ConnectiveValue, ...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
@@ -862,25 +871,29 @@ export class DocumentBuilder {
 
             AssertUtil.assert(Guard.isEnumValue(connective, Types.Connective));
 
+            const options = (Guard.isObject(args[args.length - 1]) ? args.pop() : {}) as Types.ConnectiveOptions;
+
+            assertConnectiveOptions(options);
+
             if (connective === Types.Connective.Tie) {
                 AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]) || Guard.isEnumValue(args[0], Types.TieType));
                 AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], Types.NoteAnchor));
                 const tieSpan = Guard.isInteger(args[0]) || Guard.isEnumValue(args[0], Types.TieType) ? args[0] : 2;
                 const noteAnchor = Guard.isEnumValue(args[1], Types.NoteAnchor) ? args[1] : Types.NoteAnchor.Auto;
-                this.getMeasure().addConnective(connective as Types.Connective.Tie, tieSpan, noteAnchor);
+                this.getMeasure().addConnective(connective as Types.Connective.Tie, tieSpan, noteAnchor, options);
             }
             else if (connective === Types.Connective.Slur) {
                 AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]));
                 AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], Types.NoteAnchor));
                 const slurSpan = Guard.isInteger(args[0]) ? args[0] : 2;
                 const noteAnchor = Guard.isEnumValue(args[1], Types.NoteAnchor) ? args[1] : Types.NoteAnchor.Auto;
-                this.getMeasure().addConnective(connective as Types.Connective.Slur, slurSpan, noteAnchor);
+                this.getMeasure().addConnective(connective as Types.Connective.Slur, slurSpan, noteAnchor, options);
             }
             else if (connective === Types.Connective.Slide) {
                 AssertUtil.assert(Guard.isEnumValueOrUndefined(args[0], Types.NoteAnchor));
                 const slideSpan = 2;
                 const noteAnchor = Guard.isEnumValue(args[0], Types.NoteAnchor) ? args[0] : Types.NoteAnchor.Auto;
-                this.getMeasure().addConnective(connective as Types.Connective.Slide, slideSpan, noteAnchor);
+                this.getMeasure().addConnective(connective as Types.Connective.Slide, slideSpan, noteAnchor, options);
             }
         });
     }

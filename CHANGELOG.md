@@ -29,7 +29,8 @@
 - Renamed AnnotationOptions fields "repeatCount" -> "playCount" and "endingPassages" -> "playNumbers".
 
 ### Added
-- "color" to LyricsOptions.
+- "color" field to LyricsOptions.
+- ConnectiveOptions with "color" field.
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

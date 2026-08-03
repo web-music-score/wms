@@ -192,6 +192,12 @@ export type ConnectiveTieValue = Connective.Tie | `${Connective.Tie}`;
 export type ConnectiveSlurValue = Connective.Slur | `${Connective.Slur}`;
 export type ConnectiveSlideValue = Connective.Slide | `${Connective.Slide}`;
 
+/** Connective options. */
+export type ConnectiveOptions = {
+    /** Color of connective. */
+    color?: string
+}
+
 /** Vertical position enum used to layout notation elements. */
 export enum VerticalPosition {
     /** Automatic/default layout position depending on element. */
@@ -215,11 +221,11 @@ export type StaffTargets = StaffTarget | StaffTarget[];
 /** Document options. */
 export type DocumentOptions = {
     /** Show all measure numbers? */
-    showMeasureNumbers?: boolean
+    showMeasureNumbers?: boolean,
     /** Background color */
-    background?: string;
+    background?: string,
     /** Foreground color */
-    color?: string;
+    color?: string
 }
 
 /** Measure options. */

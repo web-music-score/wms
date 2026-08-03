@@ -1,7 +1,7 @@
 import { Note } from "web-music-score/theory";
 import { ObjConnective } from "./obj-connective";
 import { ObjNoteGroup } from "./obj-note-group";
-import { Connective, NoteAnchor, Stem, TieType, TieTypeValue } from "../pub/types";
+import { Connective, ConnectiveOptions, NoteAnchor, Stem, TieType, TieTypeValue } from "../pub/types";
 import { ObjMeasure } from "./obj-measure";
 import { ObjNotationLine, ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { Guard } from "@tspro/ts-utils-lib";
@@ -10,9 +10,11 @@ import { ScoreError } from "./error-utils";
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
     arcDir: "up" | "down" = "down";
+    color: string;
 
-    constructor(readonly connective: Connective, readonly span: number | TieTypeValue, public noteAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup) {
+    constructor(readonly connective: Connective, readonly span: number | TieTypeValue, public noteAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup, options: ConnectiveOptions) {
         this.noteGroups = [startNoteGroup];
+        this.color = options.color ?? startNoteGroup.doc.getColor();
     }
 
     getStartNoteGroup() {

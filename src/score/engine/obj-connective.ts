@@ -61,7 +61,7 @@ export class ObjConnective extends MusicObject {
     }
 
     get color(): string {
-        return this.measure.doc.getColor();
+        return this.connectiveProps.color;
     }
 
     isInsideMeasure() {
