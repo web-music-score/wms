@@ -28,6 +28,9 @@
 - Removed function addNavigation (-> addAnnotation) and enum Navigation (-> enum AnnotationKind).
 - Renamed AnnotationOptions fields "repeatCount" -> "playCount" and "endingPassages" -> "playNumbers".
 
+### Added
+- "color" to LyricsOptions.
+
 ## [6.4.1] - 2026-03-22
 ### Fixed
 - Removed multiple browser errors of audio used before user gesture.

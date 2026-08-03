@@ -288,6 +288,8 @@ export type LyricsOptions = {
     align?: LyricsAlignValue;
     /** Hyphen or extender after lyrics text/syllable. */
     hyphen?: LyricsHyphenValue;
+    /** Color of lyrics */
+    color?: string;
 }
 
 /** Annotation group */

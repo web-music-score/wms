@@ -108,7 +108,8 @@ function assertLyricsOptions(lyricsOptions: Types.LyricsOptions) {
     AssertUtil.assert(
         Guard.isObject(lyricsOptions),
         Guard.isEnumValueOrUndefined(lyricsOptions.align, Types.LyricsAlign),
-        Guard.isEnumValueOrUndefined(lyricsOptions.hyphen, Types.LyricsHyphen)
+        Guard.isEnumValueOrUndefined(lyricsOptions.hyphen, Types.LyricsHyphen),
+        Guard.isStringOrUndefined(lyricsOptions.color)
     );
 }
 

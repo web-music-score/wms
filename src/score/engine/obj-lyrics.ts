@@ -8,13 +8,14 @@ import { ObjNotationLine } from "./obj-staff-and-tab";
 import { VerticalPos } from "./layout-object";
 import { Guard, Rect } from "@tspro/ts-utils-lib";
 import { ObjMeasure } from "./obj-measure";
+import { ObjDocument } from "./obj-document";
 
 export class ObjLyrics extends MusicObject {
     private nextLyricsObject?: ObjLyrics;
 
     readonly rhythmProps: RhythmProps;
 
-    private readonly color: string = "black";
+    private readonly color: string;
     private readonly hyphen?: LyricsHyphen;
     private readonly text: ObjText;
 
@@ -29,6 +30,8 @@ export class ObjLyrics extends MusicObject {
 
         this.hyphen = Guard.isEnumValue(lyricsOptions?.hyphen, LyricsHyphen) ? lyricsOptions?.hyphen : undefined;
 
+        this.color = lyricsOptions?.color ?? this.doc.getColor();
+
         this.text = new ObjText(this, { text: lyricsText, color: this.color, scale: 0.8 }, halign, 0);
         this.rect = this.text.getRect().clone();
 
@@ -41,6 +44,10 @@ export class ObjLyrics extends MusicObject {
 
     get measure(): ObjMeasure {
         return this.col.measure;
+    }
+
+    get doc(): ObjDocument {
+        return this.col.measure.doc;
     }
 
     getText(): string {
@@ -72,8 +79,6 @@ export class ObjLyrics extends MusicObject {
         this.text.draw(view, clipRect);
 
         if (this.hyphen !== undefined) {
-            view.color(this.color).lineWidth(1);
-
             // Draw hyphen/extender line between this and next lyrics.
             let l = this.getRect();
             let r = this.nextLyricsObject?.getRect();
@@ -86,6 +91,8 @@ export class ObjLyrics extends MusicObject {
                 let cx = r ? (l.right + r.left) / 2 : (l.right + w / 0.85)
                 let cy = l.centerY;
 
+                view.color(this.color).lineWidth(1);
+                view.beginPath();
                 view.moveTo(cx - w / 2, cy);
                 view.lineTo(cx + w / 2, cy);
                 view.stroke();
