@@ -723,29 +723,21 @@ export class ObjMeasure extends MusicObject {
         this.annotationKindSet.add(annotationKind);
     }
 
-    addConnective(connective: Pub.Connective.Tie, tieSpan?: number | Pub.TieType, notAnchor?: Pub.NoteAnchor): void;
-    addConnective(connective: Pub.Connective.Slur, slurSpan?: number, notAnchor?: Pub.NoteAnchor): void;
-    addConnective(connective: Pub.Connective.Slide, notAnchor?: Pub.NoteAnchor): void;
-    addConnective(connective: Pub.Connective, ...args: unknown[]): void {
-        let anchor = this.lastAddedRhythmSymbol;
+    addConnective(connective: Pub.Connective, span: number | Pub.TieType, noteAnchor: Pub.NoteAnchor): void {
+        let startNote = this.lastAddedRhythmSymbol;
 
-        if (!(anchor instanceof ObjNoteGroup)) {
+        if (!(startNote instanceof ObjNoteGroup)) {
             throw new ScoreError("Connective can be added to note group only.");
         }
 
         if (connective === Pub.Connective.Tie) {
-            let tieSpan = Guard.isInteger(args[0]) || Guard.isEnumValue(args[0], Pub.TieType) ? args[0] : 2;
-            let noteAnchor = Guard.isEnumValue(args[1], Pub.NoteAnchor) ? args[1] : Pub.NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Pub.Connective.Tie, tieSpan, noteAnchor, anchor));
+            startNote.startConnective(new ConnectiveProps(Pub.Connective.Tie, span, noteAnchor, startNote));
         }
         else if (connective === Pub.Connective.Slur) {
-            let slurSpan = Guard.isInteger(args[0]) ? args[0] : 2;
-            let noteAnchor = Guard.isEnumValue(args[1], Pub.NoteAnchor) ? args[1] : Pub.NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Pub.Connective.Slur, slurSpan, noteAnchor, anchor));
+            startNote.startConnective(new ConnectiveProps(Pub.Connective.Slur, span, noteAnchor, startNote));
         }
         else if (connective === Pub.Connective.Slide) {
-            let noteAnchor = Guard.isEnumValue(args[0], Pub.NoteAnchor) ? args[0] : Pub.NoteAnchor.Auto;
-            anchor.startConnective(new ConnectiveProps(Pub.Connective.Slide, 2, noteAnchor, anchor));
+            startNote.startConnective(new ConnectiveProps(Pub.Connective.Slide, span, noteAnchor, startNote));
         }
     }
 

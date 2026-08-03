@@ -865,21 +865,22 @@ export class DocumentBuilder {
             if (connective === Types.Connective.Tie) {
                 AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]) || Guard.isEnumValue(args[0], Types.TieType));
                 AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], Types.NoteAnchor));
-                let tieSpan = args[0] as number | Types.TieType | undefined;
-                let noteAnchor = args[1] as Types.NoteAnchor | undefined;
+                const tieSpan = Guard.isInteger(args[0]) || Guard.isEnumValue(args[0], Types.TieType) ? args[0] : 2;
+                const noteAnchor = Guard.isEnumValue(args[1], Types.NoteAnchor) ? args[1] : Types.NoteAnchor.Auto;
                 this.getMeasure().addConnective(connective as Types.Connective.Tie, tieSpan, noteAnchor);
             }
             else if (connective === Types.Connective.Slur) {
                 AssertUtil.assert(Guard.isIntegerOrUndefined(args[0]));
                 AssertUtil.assert(Guard.isEnumValueOrUndefined(args[1], Types.NoteAnchor));
-                let slurSpan = args[0] as number | undefined;
-                let noteAnchor = args[1] as Types.NoteAnchor | undefined;
+                const slurSpan = Guard.isInteger(args[0]) ? args[0] : 2;
+                const noteAnchor = Guard.isEnumValue(args[1], Types.NoteAnchor) ? args[1] : Types.NoteAnchor.Auto;
                 this.getMeasure().addConnective(connective as Types.Connective.Slur, slurSpan, noteAnchor);
             }
             else if (connective === Types.Connective.Slide) {
                 AssertUtil.assert(Guard.isEnumValueOrUndefined(args[0], Types.NoteAnchor));
-                let noteAnchor = args[0] as Types.NoteAnchor | undefined;
-                this.getMeasure().addConnective(connective as Types.Connective.Slide, noteAnchor);
+                const slideSpan = 2;
+                const noteAnchor = Guard.isEnumValue(args[0], Types.NoteAnchor) ? args[0] : Types.NoteAnchor.Auto;
+                this.getMeasure().addConnective(connective as Types.Connective.Slide, slideSpan, noteAnchor);
             }
         });
     }
