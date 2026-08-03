@@ -560,10 +560,10 @@ export type AnnotationAnchorValue = AnnotationAnchor | `${AnnotationAnchor}`;
 export type AnnotationOptions = {
     /** Anchor */
     anchor?: AnnotationAnchorValue;
-    /** Play count for repeats */
-    repeatCount?: number;
-    /** Passage number(s) for endings */
-    endingPassages?: number | number[];
+    /** Play count to use with "endRepeat" annotation. */
+    playCount?: number;
+    /** Play numbers/passes to use with "ending" annotation. */
+    playNumbers?: number | number[];
     /** Color */
     color?: string;
 }

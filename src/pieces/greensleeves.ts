@@ -183,7 +183,7 @@ export function createGreensleeves(): MDocument {
         .addNote(1, "B2", "4n")
 
         .addMeasure()
-        .addAnnotation("ending", { endingPassages: 1 })
+        .addAnnotation("ending", { playNumbers: 1 })
         .addAnnotation("endRepeat")
         .addNote(0, "A3", "4.", { stem: "up" }).addAnnotation("Am", "chordLabel")
         .addNote(0, "A3", "4n")
@@ -194,7 +194,7 @@ export function createGreensleeves(): MDocument {
         .addNote(1, "A2", "4.")
 
         .addMeasure()
-        .addAnnotation("ending", { endingPassages: 2 })
+        .addAnnotation("ending", { playNumbers: 2 })
         .addNote(0, "A3", "4.", { stem: "up" }).addAnnotation("Am", "chordLabel")
         .addNote(0, "A3", "4.").addAnnotation("fermata")
         .addNote(1, "A2", "8n", { stem: "down" })

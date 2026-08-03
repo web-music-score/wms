@@ -607,8 +607,8 @@ export class ObjMeasure extends MusicObject {
         if (!Guard.isNonEmptyString(annotationKind))
             throw new ScoreError(`Annotation error: Invalid annotation kind.`);
 
-        if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.endingPassages))
-            throw new ScoreError("Annotation error: Ending passages is undefined.");
+        if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.playNumbers))
+            throw new ScoreError(`Annotation error: "playNumbers" of ending is undefined.`);
 
         const anchorX = 0.5;
         const anchorY = getExtensionAnchorY("bottom");
@@ -634,8 +634,8 @@ export class ObjMeasure extends MusicObject {
                         throw new ScoreError("Cannot add ending becaure measure already has one.");
                     createLayoutObject = (line) => {
                         const anchor = this;
-                        let passages = annotationOptions.endingPassages!;
-                        return new ObjEnding(anchor, color, Guard.isArray(passages) ? passages : [passages]);
+                        let playNumbers = annotationOptions.playNumbers!;
+                        return new ObjEnding(anchor, color, Guard.isArray(playNumbers) ? playNumbers : [playNumbers]);
                     }
                     break;
                 case Pub.AnnotationKind.DC_al_Coda:
@@ -673,7 +673,7 @@ export class ObjMeasure extends MusicObject {
                     }
                     break;
                 case Pub.AnnotationKind.EndRepeat:
-                    this.endRepeatPlayCount = annotationOptions.repeatCount ?? 2;
+                    this.endRepeatPlayCount = annotationOptions.playCount ?? 2;
                     if (this.endRepeatPlayCount !== 2) {
                         const text = `${this.endRepeatPlayCount}x`;
                         const color = this.doc.getColor();

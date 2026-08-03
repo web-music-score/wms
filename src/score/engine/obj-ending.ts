@@ -12,22 +12,22 @@ export class ObjEnding extends MusicObject {
 
     readonly mi: MEnding;
 
-    constructor(readonly measure: ObjMeasure, readonly color: string, readonly passages: number[]) {
+    constructor(readonly measure: ObjMeasure, readonly color: string, readonly playNumbers: number[]) {
         super(measure);
 
         this.mi = new MEnding(this);
 
-        if (!Guard.isIntegerGte(passages.length, 1)) {
-            throw new ScoreError("Passages is empty.");
-        }
-        else if (!this.passages.every(p => Guard.isIntegerGte(p, 1))) {
-            throw new ScoreError("Invalid passages: " + this.passages);
+        if (
+            !Guard.isIntegerGte(playNumbers.length, 1) ||
+            !this.playNumbers.every(p => Guard.isIntegerGte(p, 1))
+        ) {
+            throw new ScoreError(`Invalid ending playNumbers: ${this.playNumbers}.`);
         }
 
         // Sort ascending
-        this.passages.sort((a, b) => a - b);
+        this.playNumbers.sort((a, b) => a - b);
 
-        const text = this.passages.map(p => p + ".").join("");
+        const text = this.playNumbers.map(p => p + ".").join("");
 
         this.endingText = new ObjText(this, { text, color }, 0, 1);
     }
@@ -49,12 +49,12 @@ export class ObjEnding extends MusicObject {
             measure.isLastMeasure();
     }
 
-    hasPassage(pass: number) {
-        return this.passages.some(p => p === pass);
+    hasPlayNumber(playNumber: number) {
+        return this.playNumbers.some(p => p === playNumber);
     }
 
-    getHighestPassage() {
-        return Math.max(0, ...this.passages);
+    getHighestPlayNumber() {
+        return Math.max(0, ...this.playNumbers);
     }
 
     pick(x: number, y: number): MusicObject[] {

@@ -26,6 +26,7 @@
     addAnnotation(annotationKind, annotationOptions)
     addAnnotation(annotationKind, annotationGroup, annotationOptions)
 - Removed function addNavigation (-> addAnnotation) and enum Navigation (-> enum AnnotationKind).
+- Renamed AnnotationOptions fields "repeatCount" -> "playCount" and "endingPassages" -> "playNumbers".
 
 ## [6.4.1] - 2026-03-22
 ### Fixed

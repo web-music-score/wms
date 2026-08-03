@@ -211,10 +211,10 @@ export class PlayerEngine {
                 const curPass = endingsPassed.length === 0 ? 1 : endingsPassed[endingsPassed.length - 1].pass + 1;
                 const prevFirstEnding = endingsPassed.slice().reverse().find(e => e.pass === 1)?.ending;
 
-                if (curEnding.hasPassage(curPass)) {
+                if (curEnding.hasPlayNumber(curPass)) {
                     endingsPassed.push({ pass: curPass, ending: curEnding });
                 }
-                else if (curEnding.hasPassage(1) && prevFirstEnding !== curEnding) {
+                else if (curEnding.hasPlayNumber(1) && prevFirstEnding !== curEnding) {
                     endingsPassed.push({ pass: 1, ending: curEnding });
                 }
                 else {
@@ -448,7 +448,7 @@ export class PlayerEngine {
         while (m) {
             const ending = m.getEnding();
 
-            if (ending && ending.hasPassage(passage))
+            if (ending && ending.hasPlayNumber(passage))
                 return ending;
 
             let next = m.getNextMeasure();

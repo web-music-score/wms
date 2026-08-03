@@ -130,10 +130,10 @@ function assertAnnotationOptions(annotationOptions: Types.AnnotationOptions) {
     AssertUtil.assert(
         Guard.isObject(annotationOptions),
         Guard.isEnumValueOrUndefined(annotationOptions.anchor, Types.AnnotationAnchor),
-        Guard.isUndefined(annotationOptions.repeatCount) || Guard.isIntegerGte(annotationOptions.repeatCount, 1),
+        Guard.isUndefined(annotationOptions.playCount) || Guard.isIntegerGte(annotationOptions.playCount, 1),
         (
-            Guard.isUndefined(annotationOptions.endingPassages) || Guard.isIntegerGte(annotationOptions.endingPassages, 1) ||
-            Guard.isArray(annotationOptions.endingPassages) && annotationOptions.endingPassages.every(p => Guard.isIntegerGte(p, 1))
+            Guard.isUndefined(annotationOptions.playNumbers) || Guard.isIntegerGte(annotationOptions.playNumbers, 1) ||
+            Guard.isArray(annotationOptions.playNumbers) && annotationOptions.playNumbers.every(p => Guard.isIntegerGte(p, 1))
         ),
         Guard.isStringOrUndefined(annotationOptions.color),
     );

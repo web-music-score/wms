@@ -333,8 +333,8 @@ export class MEnding extends MusicInterface {
      * Get passages.
      * @returns - Array of passage numbers, e.g. passage number 1 means that this ending is played on first pass.
      */
-    getPassages(): ReadonlyArray<number> {
-        return this.obj.passages;
+    getPlayNumbers(): ReadonlyArray<number> {
+        return this.obj.playNumbers;
     }
 
     /**
@@ -342,9 +342,9 @@ export class MEnding extends MusicInterface {
      * @param passage - Passage number to find out.
      * @returns - Boolean whether this ending has asked passage number.
      */
-    hasPassage(passage: number): boolean {
+    hasPlayNumber(passage: number): boolean {
         AssertUtil.assertVar(Guard.isIntegerGte(passage, 1), "passage", passage);
-        return this.obj.hasPassage(passage);
+        return this.obj.hasPlayNumber(passage);
     }
 }
 

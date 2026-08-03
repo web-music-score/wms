@@ -110,13 +110,13 @@ export function createStaffConfigTabDemo() {
         .addMeasure()
         .addNote(0, "G3", "2n", { string: 3 })
         .addNote(0, "C4", "2n", { string: 2 })
-        .addAnnotation("ending", {endingPassages: 1})
+        .addAnnotation("ending", { playNumbers: 1 })
         .addAnnotation("endRepeat")
 
         .addMeasure()
         .addNote(0, "D4", "2n", { string: 2 })
         .addNote(0, "E4", "2n", { string: 2 })
-        .addAnnotation("ending", {endingPassages: 2})
+        .addAnnotation("ending", { playNumbers: 2 })
 
         .addMeasure()
         .addNote(0, "C3", "8t", { string: 5 })
