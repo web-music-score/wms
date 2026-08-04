@@ -33,6 +33,9 @@
 - "color" field to LyricsOptions.
 - ConnectiveOptions with "color" field.
 
+### Fixed
+- Span/extension range.
+
 ## [6.4.1] - 2026-03-22
 ### Fixed
 - Removed multiple browser errors of audio used before user gesture.
