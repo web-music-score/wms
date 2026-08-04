@@ -44,35 +44,6 @@ type AlterTempo = {
     }
 }
 
-function getExtensionTicks(extensionLength: number | Theory.NoteLengthValue | (Theory.NoteLengthValue | number)[]): number {
-    if (typeof extensionLength === "string") {
-        extensionLength = [extensionLength];
-    }
-    if (Guard.isArray(extensionLength)) {
-        let totalTicks = 0;
-        for (let i = 0; i < extensionLength.length;) {
-            let str = extensionLength[i];
-            let num = extensionLength[i + 1];
-            if (typeof str === "string") {
-                i++;
-                let ticks = Theory.RhythmProps.get(str).ticks;
-                if (typeof num === "number") {
-                    i++;
-                    ticks *= num;
-                }
-                totalTicks += ticks;
-            }
-            else {
-                i++;
-            }
-        }
-        return totalTicks;
-    }
-    else {
-        return extensionLength;
-    }
-}
-
 function getVerseLayoutGroupId(verse: Pub.VerseNumber): LayoutGroupId {
     switch (verse) {
         case 1: return LayoutGroupId.LyricsVerse1;
@@ -119,7 +90,6 @@ export class ObjMeasure extends MusicObject {
 
     private lastAddedRhythmColumn?: ObjRhythmColumn;
     private lastAddedRhythmSymbol?: RhythmSymbol;
-    private addExtensionTo: { layoutObj: LayoutObjectWrapper, color: string }[] = [];
 
     private layoutObjects: LayoutObjectWrapper[] = [];
 
@@ -603,7 +573,7 @@ export class ObjMeasure extends MusicObject {
         ));
     }
 
-    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, annotationOptions: Pub.AnnotationOptions) {
+    addAnnotation(staffTargets: Pub.StaffTargets | undefined, annotationGroup: Pub.AnnotationGroup, annotationKind: string, spanProps: { ticks: number, visible: boolean } | undefined, annotationOptions: Pub.AnnotationOptions) {
         if (!Guard.isNonEmptyString(annotationKind))
             throw new ScoreError(`Annotation error: Invalid annotation kind.`);
 
@@ -647,7 +617,7 @@ export class ObjMeasure extends MusicObject {
                         const text = getNavigationString(annotationKind);
                         return new ObjText(anchor, { text, color }, 1, 1);
                     }
-                    this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.AnnotationKind.EndRepeat, {});
+                    this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.AnnotationKind.EndRepeat, undefined, {});
                     this.endSong();
                     break;
                 case Pub.AnnotationKind.Fine:
@@ -709,18 +679,34 @@ export class ObjMeasure extends MusicObject {
         }
 
         if (createLayoutObject) {
-            this.disableExtensionLine();
-
             const layoutGroupId = getAnnotationLayoutGroupId(annotationGroup, annotationKind);
             const defaultVerticalPos = getAnnotationDefaultVerticalPos(annotationGroup, annotationKind);
 
             this.forEachStaffTarget(staffTargets, defaultVerticalPos, (line: ObjNotationLine, vpos: VerticalPos) => {
                 const layoutObj = this.addLayoutObject(createLayoutObject(line, vpos), line, layoutGroupId, vpos);
-                this.enableExtensionLine(layoutObj, color);
+
+                if (spanProps) {
+                    const { musicObj } = layoutObj;
+                    const anchor = musicObj.getParent();
+
+                    if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
+                        const { ticks, visible } = spanProps;
+
+                        const lineStyle: ExtensionLineStyle = "dashed";
+                        const linePos: ExtensionLinePos = "bottom";
+
+                        musicObj.userData["span-color"] = color;
+
+                        const extension = new Extension(layoutObj, anchor, ticks, visible, lineStyle, linePos);
+                        musicObj.setLink(extension);
+                    }
+                }
             });
         }
 
         this.annotationKindSet.add(annotationKind);
+
+        this.requestLayout();
     }
 
     addConnective(connective: Pub.Connective, span: number | Pub.TieType, noteAnchor: Pub.NoteAnchor, options: Pub.ConnectiveOptions): void {
@@ -741,43 +727,6 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    addExtension(extensionLength: number | Theory.NoteLengthValue | (Theory.NoteLengthValue | number)[], extensionVisible: boolean) {
-        this.addExtensionTo.forEach(data => {
-            const { layoutObj, color } = data;
-            const { musicObj } = layoutObj;
-
-            musicObj.userData["extension-color"] = color;
-
-            const anchor = musicObj.getParent();
-
-            if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
-                let lineStyle: ExtensionLineStyle = "dashed";
-                let linePos: ExtensionLinePos = "bottom";
-
-                let extension = new Extension(layoutObj, anchor, getExtensionTicks(extensionLength), extensionVisible, lineStyle, linePos);
-                musicObj.setLink(extension);
-            }
-            else {
-                throw new ScoreError("Cannot add extension becaue no compatible music object to attach it to.");
-            }
-        });
-
-        if (this.addExtensionTo.length === 0) {
-            throw new ScoreError("Cannot add extension because music object to attach it to is undefined.");
-        }
-
-        this.disableExtensionLine();
-        this.requestLayout();
-    }
-
-    private enableExtensionLine(layoutObj: LayoutObjectWrapper, color: string) {
-        this.addExtensionTo.push({ layoutObj, color });
-    }
-
-    private disableExtensionLine() {
-        this.addExtensionTo = [];
-    }
-
     getEnding(): ObjEnding | undefined {
         return this.layoutObjects.map(layoutObj => layoutObj.musicObj).find(musicObj => musicObj instanceof ObjEnding);
     }
@@ -789,7 +738,6 @@ export class ObjMeasure extends MusicObject {
     endSong() {
         this.isEndSong = true;
         this.requestLayout();
-        this.disableExtensionLine();
     }
 
     hasEndSong() {
@@ -799,7 +747,6 @@ export class ObjMeasure extends MusicObject {
     endSection() {
         this.isEndSection = true;
         this.requestLayout();
-        this.disableExtensionLine();
     }
 
     hasEndSection() {
@@ -808,7 +755,6 @@ export class ObjMeasure extends MusicObject {
 
     endRow() {
         this.doc.requestNewRow();
-        this.disableExtensionLine();
     }
 
     private addRhythmSymbol(symbol: RhythmSymbol) {
@@ -1061,7 +1007,8 @@ export class ObjMeasure extends MusicObject {
 
                     measure.addLayoutObject(
                         new ObjExtensionLine(measure, lineMatch, extension, extCols),
-                        lineMatch, layoutGroupId, verticalPos);
+                        lineMatch, layoutGroupId, verticalPos
+                    );
                 }
             }
         });

@@ -57,7 +57,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "G3", "2n")
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("dim.").addExtension(ext => ext.infinity())
+        .addNote(0, "G3", "8n").addSpan("dim.", span => span.infinity())
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "C4", "8n")
@@ -78,7 +78,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "C4", "8n")
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("cresc.").addExtension(ext => ext.infinity())
+        .addNote(0, "G3", "8n").addSpan("cresc.", span => span.infinity())
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "C4", "8n")
@@ -109,7 +109,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "C4", "8n")
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("cresc.").addExtension(ext => ext.notes("1n"))
+        .addNote(0, "G3", "8n").addSpan("cresc.", span => span.notes("1n"))
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "F#4", "8n")
@@ -119,7 +119,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "C4", "8n")
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("dim.").addExtension(ext => ext.notes("1n"))
+        .addNote(0, "G3", "8n").addSpan("dim.", span => span.notes("1n"))
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "C4", "8n")
@@ -130,7 +130,7 @@ export function createAnnotationDynamicsDemo() {
         .endRow()
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("dim.").addExtension(ext => ext.notes("2n"))
+        .addNote(0, "G3", "8n").addSpan("dim.", span => span.notes("2n"))
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "E4", "8n")
@@ -140,7 +140,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "C4", "8n").addAnnotation("ff")
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("dim.").addExtension(ext => ext.notes("2n"))
+        .addNote(0, "G3", "8n").addSpan("dim.", span => span.notes("2n"))
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "C4", "8n")
@@ -152,7 +152,7 @@ export function createAnnotationDynamicsDemo() {
         .addMeasure()
         .addNote(0, "G3", "8n").addAnnotation("pp")
         .addNote(0, "A3", "8n")
-        .addNote(0, "B3", "8n").addAnnotation("cresc.").addExtension(ext => ext.notes("2n"))
+        .addNote(0, "B3", "8n").addSpan("cresc.", span => span.notes("2n"))
         .addNote(0, "E4", "8n")
         .addNote(0, "G3", "8n")
         .addNote(0, "A3", "8n")

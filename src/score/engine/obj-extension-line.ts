@@ -146,7 +146,7 @@ export class ObjExtensionLine extends MusicObject {
         let { rect } = this;
 
         const head = this.extension.headObj.musicObj;
-        const color = String(head.userData["extension-color"]);
+        const color = String(head.userData["span-color"] ?? this.measure.doc.getColor());
 
         if (this.extension.getLineStyle() === "dashed")
             view.setLineDash([7, 3]);

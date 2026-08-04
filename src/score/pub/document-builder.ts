@@ -173,32 +173,34 @@ export type TupletBuilder = {
     addRest: (restLength: Theory.NoteLengthValue, restOptions?: Types.RestOptions) => TupletBuilder
 }
 
-/** Etension builder type. */
-export type ExtensionBuilder = {
+/** Span builder type. */
+export type SpanBuilder = {
     /**
-     * Increase extension length by note length multiplied by number of notes.
+     * Increase span length by note length multiplied by number of notes.
      * @param noteLength - Length of note (e.g. "2n").
      * @param noteCount - Number of note lengths (default = 1).
      * @returns - this extension builder object.
      */
-    notes: (noteLength: Theory.NoteLengthValue, noteCount?: number) => ExtensionBuilder,
+    notes: (noteLength: Theory.NoteLengthValue, noteCount?: number) => SpanBuilder,
     /**
-     * Increase length of extension length by given number of measures.
+     * Increase span length by given number of measures.
      * @param measureCount - Number of measures.
      * @returns - this extension builder object.
      */
-    measures: (measureCount: number) => ExtensionBuilder,
+    measures: (measureCount: number) => SpanBuilder,
     /**
-     * Create as long extension line as possible.
+     * Create span as long as possible.
      * @returns - this extension builder object.
      */
-    infinity: () => ExtensionBuilder,
+    infinity: () => SpanBuilder,
     /**
-     * Create an invisible extension.
+     * Create an invisible span.
      * @returns - this extension builder object.
      */
-    hide: () => ExtensionBuilder
+    hide: () => SpanBuilder
 }
+
+export type SpanBuilderFunc = (span: SpanBuilder) => void;
 
 /**
  * Document builder class.
@@ -750,7 +752,7 @@ export class DocumentBuilder {
         });
     }
 
-    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, group: Types.AnnotationGroup | undefined, options?: Types.AnnotationOptions) {
+    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, group: Types.AnnotationGroup | undefined, spanBuilder: SpanBuilderFunc | undefined, options?: Types.AnnotationOptions) {
         assertStaffTargets(staffTargets);
 
         if (options === undefined)
@@ -772,11 +774,48 @@ export class DocumentBuilder {
             Guard.isNonEmptyString(kind)
         );
 
-        this.getMeasure().addAnnotation(staffTargets, group as Types.AnnotationGroup, kind, options);
+        let spanProps: { ticks: number, visible: boolean } | undefined = undefined;
+
+        if (spanBuilder) {
+            spanProps = { ticks: 0, visible: true }
+
+            const helper: SpanBuilder = {
+                notes: (noteLength, noteCount) => {
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan span", noteLength, noteCount);
+                    AssertUtil.assert(Theory.isNoteLength(noteLength));
+                    AssertUtil.assert(Guard.isUndefined(noteCount) || Guard.isNumber(noteCount) && noteCount >= 0);
+                    spanProps!.ticks += Theory.RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
+                    return helper;
+                },
+                measures: (measureCount) => {
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan measures", measureCount);
+                    AssertUtil.assert(Guard.isNumber(measureCount) && measureCount >= 1);
+                    spanProps!.ticks += this.getMeasure().getMeasureTicks() * measureCount;
+                    return helper;
+                },
+                infinity: () => {
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan infinity");
+                    spanProps!.ticks = Infinity;
+                    return helper;
+                },
+                hide: () => {
+                    AssertUtil.setClassFunc("DocumentBuilder", "addspan hide");
+                    spanProps!.visible = false;
+                    return helper;
+                }
+            };
+
+            spanBuilder(helper);
+        }
+        else {
+            spanProps = undefined;
+        }
+
+        this.getMeasure().addAnnotation(staffTargets, group as Types.AnnotationGroup, kind, spanProps, options);
     }
 
     /**
-     * Add any annotation kind to current measure.
+     * Add annotation to current measure.
      * @param kind - Annotation kind (e.g. "pp").
      * @param options - Annotation options.
      * @returns - This document builder instance.
@@ -784,7 +823,7 @@ export class DocumentBuilder {
     addAnnotation(kind: Types.AnnotationKindValue, options?: Types.AnnotationOptions): DocumentBuilder;
 
     /**
-     * Add any annotation kind to current measure.
+     * Add annotation to current measure.
      * @param kind - Annotation kind (e.g. "pp").
      * @param group - Annotation group (e.g. "dynamics").
      * @param options - Annotation options.
@@ -796,17 +835,15 @@ export class DocumentBuilder {
         return this.safe(() => {
             const kind = args.shift() as string;
             const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
-            const options = Guard.isObject(args[0])
-                ? args.shift() as Types.AnnotationOptions
-                : {} as Types.AnnotationOptions;
+            const options = (Guard.isObject(args[0]) ? args.shift() : {}) as Types.AnnotationOptions;
 
             AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
-            this.addAnnotationInternal(undefined, kind, group, options);
+            this.addAnnotationInternal(undefined, kind, group, undefined, options);
         });
     }
 
     /**
-     * Add any annotation kind to current measure.
+     * Add annotation to current measure.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param kind - Annotation kind (e.g. "pp").
      * @param options - Annotation options.
@@ -815,7 +852,7 @@ export class DocumentBuilder {
     addAnnotationTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue, options?: Types.AnnotationOptions): DocumentBuilder;
 
     /**
-     * Add any annotation kind to current measure.
+     * Add annotation to current measure.
      * @param staffTargets - Single or multiple staff/tab/group identifiers.
      * @param kind - Annotation kind (e.g. "pp").
      * @param group - Annotation group (e.g. "dynamics").
@@ -829,12 +866,75 @@ export class DocumentBuilder {
             const staffTargets = args.shift() as Types.StaffTargets;
             const kind = args.shift() as string;
             const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
-            const options = Guard.isObject(args[0])
-                ? args.shift() as Types.AnnotationOptions
-                : {} as Types.AnnotationOptions;
+            const options = (Guard.isObject(args[0]) ? args.shift() : {}) as Types.AnnotationOptions;
 
             AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", ...args);
-            this.addAnnotationInternal(staffTargets, kind, group, options);
+            this.addAnnotationInternal(staffTargets, kind, group, undefined, options);
+        });
+    }
+
+    /**
+     * Add annotation with span to current measure.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param span - Span builder (e.g. span => span.measures(2)).
+     * @param options - Annotation options.
+     * @returns - This document builder instance.
+     */
+    addSpan(kind: Types.AnnotationKindValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    /**
+     * Add annotation with span to current measure.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param group - Annotation group (e.g. "dynamics").
+     * @param span - Span builder (e.g. span => span.measures(2)).
+     * @param options - Annotation options.
+     * @returns - This document builder instance.
+     */
+    addSpan(kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    addSpan(...args: unknown[]): DocumentBuilder {
+        return this.safe(() => {
+            const kind = args.shift() as string;
+            const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
+            const span = args.shift() as SpanBuilderFunc;
+            const options = (Guard.isObject(args[0]) ? args.shift() : {}) as Types.AnnotationOptions;
+
+            AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
+            this.addAnnotationInternal(undefined, kind, group, span, options);
+        });
+    }
+
+    /**
+     * Add annotation with span to current measure.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param span - Span builder (e.g. span => span.measures(2)).
+     * @param options - Annotation options.
+     * @returns - This document builder instance.
+     */
+    addSpanTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    /**
+     * Add annotation with span to current measure.
+     * @param staffTargets - Single or multiple staff/tab/group identifiers.
+     * @param kind - Annotation kind (e.g. "pp").
+     * @param group - Annotation group (e.g. "dynamics").
+     * @param span - Span builder (e.g. span => span.measures(2)).
+     * @param options - Annotation options.
+     * @returns - This document builder instance.
+     */
+    addSpanTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+
+    addSpanTo(...args: unknown[]): DocumentBuilder {
+        return this.safe(() => {
+            const staffTargets = args.shift() as Types.StaffTargets;
+            const kind = args.shift() as string;
+            const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
+            const span = args.shift() as SpanBuilderFunc;
+            const options = (Guard.isObject(args[0]) ? args.shift() : {}) as Types.AnnotationOptions;
+
+            AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", ...args);
+            this.addAnnotationInternal(staffTargets, kind, group, span, options);
         });
     }
 
@@ -895,64 +995,6 @@ export class DocumentBuilder {
                 const noteAnchor = Guard.isEnumValue(args[0], Types.NoteAnchor) ? args[0] : Types.NoteAnchor.Auto;
                 this.getMeasure().addConnective(connective as Types.Connective.Slide, slideSpan, noteAnchor, options);
             }
-        });
-    }
-
-    /**
-     * Add extension line to previously added annotation or label element.
-     * ```ts
-     *     // Example
-     *     addExtension(ext => ext.notes("1n", 2))          // length is 2 whole notes
-     *     addExtension(ext => ext.measures(3).hide())      // length is 3 measures, hidden
-     *     addExtension(ext => ext.measures(1).notes("8n")) // length is 1 measure + 1 eigth note
-     *     addExtension(ext => ext.infinity())              // length is as long as possible
-     * ```
-     * @param extensionBuilder - Extension builder function used to build exstension.
-     * @returns - This document builder instance.
-     */
-    addExtension(extensionBuilder?: (ext: ExtensionBuilder) => void): DocumentBuilder {
-        return this.safe(() => {
-            AssertUtil.setClassFunc("DocumentBuilder", "addExtension");
-
-            AssertUtil.assertMsg(Guard.isFunctionOrUndefined(extensionBuilder), "addExtension() has new usage, e.g. addExtension(ext => ext.measures(2)).");
-
-            let ticks: number = 0;
-            let visible: boolean = true;
-
-            const helper: ExtensionBuilder = {
-                notes: (noteLength, noteCount) => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addExtension.notes", noteLength, noteCount);
-                    AssertUtil.assert(Theory.isNoteLength(noteLength));
-                    AssertUtil.assert(Guard.isUndefined(noteCount) || Guard.isNumber(noteCount) && noteCount >= 0);
-                    ticks += Theory.RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
-                    return helper;
-                },
-                measures: (measureCount) => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addExtension.measures", measureCount);
-                    AssertUtil.assert(Guard.isNumber(measureCount) && measureCount >= 1);
-                    ticks += this.getMeasure().getMeasureTicks() * measureCount;
-                    return helper;
-                },
-                infinity: () => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addExtension.infinity");
-                    ticks = Infinity;
-                    return helper;
-                },
-                hide: () => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addExtension.hide");
-                    visible = false;
-                    return helper;
-                }
-            };
-
-            if (extensionBuilder) {
-                extensionBuilder(helper);
-            }
-            else {
-                ticks = Infinity;
-            }
-
-            this.getMeasure().addExtension(ticks, visible);
         });
     }
 
