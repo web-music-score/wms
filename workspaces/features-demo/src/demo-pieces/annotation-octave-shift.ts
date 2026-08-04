@@ -40,7 +40,7 @@ export function createAnnotationOctaveShiftDemo() {
         .addNote(0, "G3", "4n")
 
         .addMeasure()
-        .addNote(0, "G3", "4n").addSpan("8vb", span => span.notes("4n", 2))
+        .addNote(0, "G3", "4n").addSpan("8vb", span => span.beats(2))
         .addNote(0, "G3", "4n")
         .addNote(0, "G3", "4n")
         .addNote(0, "G3", "4n")
