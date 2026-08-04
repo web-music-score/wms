@@ -200,8 +200,6 @@ export type SpanBuilder = {
     hide: () => SpanBuilder
 }
 
-export type SpanBuilderFunc = (span: SpanBuilder) => void;
-
 /**
  * Document builder class.
  * ```ts
@@ -752,7 +750,7 @@ export class DocumentBuilder {
         });
     }
 
-    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, group: Types.AnnotationGroup | undefined, spanBuilder: SpanBuilderFunc | undefined, options?: Types.AnnotationOptions) {
+    private addAnnotationInternal(staffTargets: Types.StaffTargets | undefined, kind: string, group: Types.AnnotationGroup | undefined, spanBuilder: ((span: SpanBuilder) => void) | undefined, options?: Types.AnnotationOptions) {
         assertStaffTargets(staffTargets);
 
         if (options === undefined)
@@ -880,7 +878,7 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addSpan(kind: Types.AnnotationKindValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+    addSpan(kind: Types.AnnotationKindValue, span: (span: SpanBuilder) => void, options?: Types.AnnotationOptions): DocumentBuilder;
 
     /**
      * Add annotation with span to current measure.
@@ -890,13 +888,13 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addSpan(kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+    addSpan(kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, span: (span: SpanBuilder) => void, options?: Types.AnnotationOptions): DocumentBuilder;
 
     addSpan(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             const kind = args.shift() as string;
             const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
-            const span = args.shift() as SpanBuilderFunc;
+            const span = args.shift() as (span: SpanBuilder) => void;
             const options = (Guard.isObject(args[0]) ? args.shift() : {}) as Types.AnnotationOptions;
 
             AssertUtil.setClassFunc("DocumentBuilder", "addAnnotation", ...args);
@@ -912,7 +910,7 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addSpanTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+    addSpanTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue, span: (span: SpanBuilder) => void, options?: Types.AnnotationOptions): DocumentBuilder;
 
     /**
      * Add annotation with span to current measure.
@@ -923,14 +921,14 @@ export class DocumentBuilder {
      * @param options - Annotation options.
      * @returns - This document builder instance.
      */
-    addSpanTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, span: SpanBuilderFunc, options?: Types.AnnotationOptions): DocumentBuilder;
+    addSpanTo(staffTargets: Types.StaffTargets, kind: Types.AnnotationKindValue | string, group: Types.AnnotationGroupValue, span: (span: SpanBuilder) => void, options?: Types.AnnotationOptions): DocumentBuilder;
 
     addSpanTo(...args: unknown[]): DocumentBuilder {
         return this.safe(() => {
             const staffTargets = args.shift() as Types.StaffTargets;
             const kind = args.shift() as string;
             const group = Guard.isString(args[0]) ? args.shift() as Types.AnnotationGroup : undefined;
-            const span = args.shift() as SpanBuilderFunc;
+            const span = args.shift() as (span: SpanBuilder) => void;
             const options = (Guard.isObject(args[0]) ? args.shift() : {}) as Types.AnnotationOptions;
 
             AssertUtil.setClassFunc("DocumentBuilder", "addAnnotationTo", ...args);
