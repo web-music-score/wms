@@ -183,6 +183,12 @@ export type SpanBuilder = {
      */
     notes: (noteLength: Theory.NoteLengthValue, noteCount?: number) => SpanBuilder,
     /**
+     * Increase span length by number of beats.
+     * @param beatCount - Number of beats.
+     * @returns - this extension builder object.
+     */
+    beats: (beatCount: number) => SpanBuilder,
+    /**
      * Increase span length by given number of measures.
      * @param measureCount - Number of measures.
      * @returns - this extension builder object.
@@ -779,25 +785,32 @@ export class DocumentBuilder {
 
             const helper: SpanBuilder = {
                 notes: (noteLength, noteCount) => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan span", noteLength, noteCount);
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan.notes", noteLength, noteCount);
                     AssertUtil.assert(Theory.isNoteLength(noteLength));
                     AssertUtil.assert(Guard.isUndefined(noteCount) || Guard.isNumber(noteCount) && noteCount >= 0);
                     spanProps!.ticks += Theory.RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
                     return helper;
                 },
+                beats: (beatCount: number) => {
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan.beats", beatCount);
+                    AssertUtil.assert(Guard.isNumber(beatCount) && beatCount >= 0);
+                    const ts = this.getMeasure().getTimeSignature();
+                    spanProps!.ticks += ts.measureTicks / ts.beatCount * beatCount;
+                    return helper;
+                },
                 measures: (measureCount) => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan measures", measureCount);
-                    AssertUtil.assert(Guard.isNumber(measureCount) && measureCount >= 1);
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan.measures", measureCount);
+                    AssertUtil.assert(Guard.isNumber(measureCount) && measureCount >= 0);
                     spanProps!.ticks += this.getMeasure().getMeasureTicks() * measureCount;
                     return helper;
                 },
                 infinity: () => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan infinity");
+                    AssertUtil.setClassFunc("DocumentBuilder", "addSpan.infinity");
                     spanProps!.ticks = Infinity;
                     return helper;
                 },
                 hide: () => {
-                    AssertUtil.setClassFunc("DocumentBuilder", "addspan hide");
+                    AssertUtil.setClassFunc("DocumentBuilder", "addspan.hide");
                     spanProps!.visible = false;
                     return helper;
                 }
