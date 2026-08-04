@@ -97,7 +97,7 @@ export class Extension extends MusicObjectLink {
 
         let curColumn: ObjRhythmColumn | undefined = startColumn;
         let range = new ExtensionRange(curColumn);
-        let ticksLeft = length;
+        let ticksLeft = Math.max(0, length - 1);
 
         while (true) {
             if (!curColumn || ticksLeft <= 0) return range;

@@ -140,7 +140,7 @@ export function createAnnotationDynamicsDemo() {
         .addNote(0, "C4", "8n").addAnnotation("dynamics", "ff")
 
         .addMeasure()
-        .addNote(0, "G3", "8n").addAnnotation("dynamics", "dim.").addExtension(ext => ext.notes("2n"))
+        .addNote(0, "G3", "8n").addAnnotation("dynamics", "dim.").addExtension(ext => ext.notes("4n", 3))
         .addNote(0, "A3", "8n")
         .addNote(0, "B3", "8n")
         .addNote(0, "C4", "8n")
@@ -152,7 +152,7 @@ export function createAnnotationDynamicsDemo() {
         .addMeasure()
         .addNote(0, "G3", "8n").addAnnotation("dynamics", "pp")
         .addNote(0, "A3", "8n")
-        .addNote(0, "B3", "8n").addAnnotation("dynamics", "cresc.").addExtension(ext => ext.notes("2n"))
+        .addNote(0, "B3", "8n").addAnnotation("dynamics", "cresc.").addExtension(ext => ext.notes("4n", 3))
         .addNote(0, "E4", "8n")
         .addNote(0, "G3", "8n")
         .addNote(0, "A3", "8n")
