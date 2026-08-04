@@ -1,5 +1,7 @@
 # CHANGELOG
 ## [6.4.3] - Unreleased
+### Fixed
+- Fixed extension range.
 
 ## [6.4.2] - 2026-07-29
 ### Fixed
