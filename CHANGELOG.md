@@ -28,7 +28,7 @@
 - Removed function addNavigation (-> addAnnotation) and enum Navigation (-> enum AnnotationKind).
 - Renamed AnnotationOptions fields "repeatCount" -> "playCount" and "endingPassages" -> "playNumbers".
 - Replaced addAnnotation().addExtension() with addSpan().
-- Removed MusicErrorType, simplified errors.
+- Removed enum MusicErrorType, simplified errors.
 
 ### Added
 - "color" field to LyricsOptions.
