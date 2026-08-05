@@ -1,10 +1,10 @@
 import { Guard, UniMap } from "@tspro/ts-utils-lib";
 import { PitchNotation, SymbolSet } from "./types";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { MusicError } from "web-music-score/core";
 
 export class NoteError extends MusicError {
     constructor(message: string) {
-        super(MusicErrorType.Note, message);
+        super("NoteError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = new.target.name;
     }

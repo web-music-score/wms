@@ -1,29 +1,8 @@
 
-/** Enum of music error types. */
-export enum MusicErrorType {
-    Unknown,
-    InvalidArg,
-    Score,
-    Audio,
-    Note,
-    NoteDuration,
-    Scale,
-    KeySignature,
-    TimeSignature
-}
-
-function isType(type: unknown): type is MusicErrorType {
-    return typeof type === "number" && type in MusicErrorType;
-}
-
-function formatType(type: MusicErrorType | undefined): string {
-    return type === undefined ? "" : String(MusicErrorType[type]);
-}
-
 /** Music error class. */
 export class MusicError extends Error {
     /** Music error type. */
-    readonly type: MusicErrorType;
+    readonly type: string;
 
     /**
      * Create new music error instance.
@@ -35,13 +14,13 @@ export class MusicError extends Error {
      * @param type - Music error type.
      * @param message - Error message.
      */
-    constructor(type: MusicErrorType, message: string);
-    constructor(...args: [string] | [MusicErrorType, string]) {
+    constructor(type: string, message: string);
+    constructor(...args: [string] | [string, string]) {
         const [type, msg] = args.length === 1
-            ? [MusicErrorType.Unknown, args[0]]
-            : args as [MusicErrorType, string];
+            ? ["MusicError", args[0]]
+            : args;
 
-        super(`${formatType(type)} ${msg}`);
+        super(`${type}: ${msg}`);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = new.target.name;
         this.type = type;
@@ -50,7 +29,7 @@ export class MusicError extends Error {
 
 export class InvalidArgError extends MusicError {
     constructor(message: string) {
-        super(MusicErrorType.InvalidArg, message);
+        super("InvalidArgError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = new.target.name;
     }

@@ -1,4 +1,4 @@
-import { init as initCore, MusicError, MusicErrorType } from "web-music-score/core";
+import { init as initCore, MusicError } from "web-music-score/core";
 import { getMidiInstrumentName, registerMidiInstruments } from "./midi";
 import { getInstrumentList, loadInstrument, setDefaultInstrument, getDefaultInstrument } from "./manage";
 import { PlayContext, playNote, stop, mute, unmute, isMuted } from "./playback"
@@ -31,7 +31,7 @@ setDefaultInstrument(getMidiInstrumentName(0)!);
 
 export class AudioError extends MusicError {
     constructor(message: string) {
-        super(MusicErrorType.Audio, message);
+        super("AudioError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = new.target.name;
     }

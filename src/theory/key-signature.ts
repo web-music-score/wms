@@ -1,11 +1,11 @@
 import { Guard } from "@tspro/ts-utils-lib";
 import { Accidental, Note } from "./note";
 import { getScale, ScaleType } from "./scale";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { MusicError } from "web-music-score/core";
 
 export class KeySignatureError extends MusicError {
     constructor(message: string) {
-        super(MusicErrorType.KeySignature, message);
+        super("KeySignatureError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = new.target.name;
     }

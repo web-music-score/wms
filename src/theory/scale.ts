@@ -3,12 +3,12 @@ import { Note } from "./note";
 import { SymbolSet } from "./types";
 import { AccidentalType, KeySignature } from "./key-signature";
 import { Interval } from "./interval";
-import { MusicError, MusicErrorType } from "web-music-score/core";
+import { MusicError } from "web-music-score/core";
 import { getClosestEnumValue, getClosestString } from "shared-src";
 
 export class ScaleError extends MusicError {
     constructor(message: string) {
-        super(MusicErrorType.Scale, message);
+        super("ScaleError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
         this.name = new.target.name;
     }
