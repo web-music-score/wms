@@ -708,7 +708,7 @@ export class View {
 
     drawBackground(rect?: Rect) {
         if (this.ctx) {
-            const bgcolor = this.doc ? this.doc.background : "white";
+            const bgcolor = this.doc ? this.doc.bgcolor : "white";
 
             rect ??= new Rect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
 

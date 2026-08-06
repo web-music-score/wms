@@ -743,14 +743,14 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const { background, color } = this.doc;
+            const { bgcolor, color } = this.doc;
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers
                 let stringNumber = this.runningStringNumbers[noteIndex];
                 if (Guard.isIntegerBetween(stringNumber, 1, 6)) {
                     let fretId = note.chromaticId - tab.getTuningStrings()[stringNumber - 1].chromaticId;
-                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: background }, 0.5, 0.5);
+                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor }, 0.5, 0.5);
                     fretNumber.layout(view);
 
                     fretNumber.setAnchor(this.col.getRect().anchorX, tab.getStringY(stringNumber - 1));
