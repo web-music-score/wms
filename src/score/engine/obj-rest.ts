@@ -10,6 +10,9 @@ import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ScoreError } from "./error-utils";
 import { ObjSymbol } from "./obj-symbol";
+import { ObjDocument } from "./obj-document";
+import { ObjMeasure } from "./obj-measure";
+import { ObjScoreRow } from "./obj-score-row";
 
 export class ObjStaffRest extends MusicObject {
     public restRect = new AnchoredRect();
@@ -86,7 +89,7 @@ export class ObjRest extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
 
-        this.color = options?.color ?? this.doc.getColor();
+        this.color = options?.color ?? this.doc.color;
 
         this.hide = options?.hide ?? false;
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
@@ -100,15 +103,15 @@ export class ObjRest extends MusicObject {
         return this.mi;
     }
 
-    get doc() {
+    get doc(): ObjDocument {
         return this.col.doc;
     }
 
-    get measure() {
+    get measure(): ObjMeasure {
         return this.col.measure;
     }
 
-    get row() {
+    get row(): ObjScoreRow {
         return this.col.row;
     }
 

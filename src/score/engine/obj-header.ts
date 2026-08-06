@@ -18,15 +18,15 @@ export class ObjHeader extends MusicObject {
         this.mi = new MHeader(this);
 
         this.titleText = this.title
-            ? new ObjText(this, { text: this.title, color: doc.getColor(), scale: 2 }, 0.5, 0)
+            ? new ObjText(this, { text: this.title, color: doc.color, scale: 2 }, 0.5, 0)
             : undefined;
 
         this.composerText = this.composer
-            ? new ObjText(this, { text: this.composer, color: doc.getColor() }, 1, 0)
+            ? new ObjText(this, { text: this.composer, color: doc.color }, 1, 0)
             : undefined;
 
         this.arrangerText = this.arranger
-            ? new ObjText(this, { text: "Arr.: " + this.arranger, color: doc.getColor() }, 1, 0)
+            ? new ObjText(this, { text: "Arr.: " + this.arranger, color: doc.color }, 1, 0)
             : undefined;
     }
 

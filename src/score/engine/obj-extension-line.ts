@@ -10,6 +10,7 @@ import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjScoreRow } from "./obj-score-row";
+import { ObjDocument } from "./obj-document";
 
 export type ExtensionStartObject = ObjText | ObjSpecialText;
 export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
@@ -50,8 +51,12 @@ export class ObjExtensionLine extends MusicObject {
         this.mi = new MExtensionLine(this);
     }
 
-    get row() {
+    get row(): ObjScoreRow {
         return this.measure.row;
+    }
+
+    get doc(): ObjDocument {
+        return this.measure.row.doc;
     }
 
     getMusicInterface(): MExtensionLine {
@@ -146,7 +151,7 @@ export class ObjExtensionLine extends MusicObject {
         let { rect } = this;
 
         const head = this.extension.headObj.musicObj;
-        const color = String(head.userData["span-color"] ?? this.measure.doc.getColor());
+        const color = String(head.userData["span-color"] ?? this.doc.color);
 
         if (this.extension.getLineStyle() === "dashed")
             view.setLineDash([7, 3]);

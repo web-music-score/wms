@@ -4,6 +4,7 @@ import { View } from "./view";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { ObjDocument } from "./obj-document";
 
 export class ObjArpeggio extends MusicObject {
     private topArrowHeight: number = 0;
@@ -23,8 +24,12 @@ export class ObjArpeggio extends MusicObject {
         return this.mi;
     }
 
+    get doc(): ObjDocument {
+        return this.col.doc;
+    }
+
     get color(): string {
-        return this.col.doc.getColor();
+        return this.doc.color;
     }
 
     pick(x: number, y: number): MusicObject[] {

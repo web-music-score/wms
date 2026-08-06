@@ -49,11 +49,11 @@ export class ObjDocument extends MusicObject {
         return this.mi;
     }
 
-    getBackground() {
+    get background() {
         return this.options.background ?? "white";
     }
 
-    getColor() {
+    get color() {
         return this.options.color ?? "black";
     }
 

@@ -28,6 +28,7 @@ import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { ScoreError } from "./error-utils";
 import { InstrumentValue } from "web-music-score/audio";
+import { ObjDocument } from "./obj-document";
 
 export function getExtensionAnchorY(linePos: ExtensionLinePos) {
     switch (linePos) {
@@ -143,7 +144,7 @@ export class ObjMeasure extends MusicObject {
         return this.mi;
     }
 
-    get doc() {
+    get doc(): ObjDocument {
         return this.row.doc;
     }
 
@@ -585,7 +586,7 @@ export class ObjMeasure extends MusicObject {
 
         let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
-        const color = annotationOptions.color ?? this.doc.getColor();
+        const color = annotationOptions.color ?? this.doc.color;
 
         if (annotationGroup === Pub.AnnotationGroup.Articulation && isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
             const lastNote = this.lastAddedRhythmSymbol instanceof ObjNoteGroup ? this.lastAddedRhythmSymbol : undefined
@@ -646,7 +647,7 @@ export class ObjMeasure extends MusicObject {
                     this.endRepeatPlayCount = annotationOptions.playCount ?? 2;
                     if (this.endRepeatPlayCount !== 2) {
                         const text = `${this.endRepeatPlayCount}x`;
-                        const color = this.doc.getColor();
+                        const color = this.doc.color;
                         this.endRepeatPlayCountText = new ObjText(this, { text, color, scale: 0.8 }, 0.5, 1);
                     }
                     break;
@@ -1308,7 +1309,7 @@ export class ObjMeasure extends MusicObject {
             this.row.getTabs().forEach(tab => {
                 for (let stringId = 0; stringId < 6; stringId++) {
                     const note = tab.getTuningStrings()[stringId].format(Theory.PitchNotation.Helmholtz, Theory.SymbolSet.Unicode);
-                    const color = this.doc.getColor();
+                    const color = this.doc.color;
                     const obj = new ObjText(this, { text: note, scale: 0.8, color }, 1, 0.5);
 
                     obj.layout(view);
@@ -1567,12 +1568,12 @@ export class ObjMeasure extends MusicObject {
         this.row.getNotationLines().forEach(line => {
             if (line instanceof ObjStaff) {
                 for (let p = line.bottomLineDiatonicId; p <= line.topLineDiatonicId; p += 2) {
-                    drawLine(line.getDiatonicIdY(p), this.doc.getColor());
+                    drawLine(line.getDiatonicIdY(p), this.doc.color);
                 }
             }
             else if (line instanceof ObjTab) {
                 for (let stringId = 0; stringId < 6; stringId++) {
-                    drawLine(line.getStringY(stringId), this.doc.getColor());
+                    drawLine(line.getStringY(stringId), this.doc.color);
                 }
             }
         });
@@ -1588,7 +1589,7 @@ export class ObjMeasure extends MusicObject {
                 const left = this.getStaffLineLeft();
                 const top = tab.getTopLineY();
                 const bottom = tab.getBottomLineY();
-                const color = this.doc.getColor();
+                const color = this.doc.color;
 
                 view.color(color)
                     .lineWidth(1)

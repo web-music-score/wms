@@ -11,6 +11,7 @@ import { ObjExtensionLine } from "./obj-extension-line";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
 import { ScoreError } from "./error-utils";
+import { ObjDocument } from "./obj-document";
 
 type NotationLineObject = {
     getRect: () => AnchoredRect;
@@ -31,6 +32,10 @@ export abstract class ObjNotationLine extends MusicObject {
 
     constructor(readonly row: ObjScoreRow) {
         super(row);
+    }
+
+    get doc(): ObjDocument {
+        return this.row.doc;
     }
 
     getRowGroup(): ObjScoreRowGroup {
@@ -207,7 +212,7 @@ export abstract class ObjNotationLine extends MusicObject {
     }
 
     drawVerticalLine(view: View, left: number, width: number, isSystemBarLine = false) {
-        const color = this.row.doc.getColor();
+        const color = this.doc.color;
 
         view.color(color);
 

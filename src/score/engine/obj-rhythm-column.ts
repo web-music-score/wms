@@ -14,6 +14,8 @@ import { ObjLyrics } from "./obj-lyrics";
 import { VerticalPos } from "./layout-object";
 import { IndexArray, UniMap, TriMap, AnchoredRect, Rect, Assert } from "@tspro/ts-utils-lib";
 import { InstrumentValue } from "web-music-score/audio";
+import { ObjDocument } from "./obj-document";
+import { ObjScoreRow } from "./obj-score-row";
 
 export type ScorePlayerNote = {
     note: Note;
@@ -109,11 +111,11 @@ export class ObjRhythmColumn extends MusicObject {
         return this.shapeRects;
     }
 
-    get doc() {
+    get doc(): ObjDocument {
         return this.measure.doc;
     }
 
-    get row() {
+    get row(): ObjScoreRow {
         return this.measure.row;
     }
 
@@ -496,7 +498,7 @@ export class ObjRhythmColumn extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
-        const color = this.doc.getColor();
+        const color = this.doc.color;
 
         view.color(color);
 

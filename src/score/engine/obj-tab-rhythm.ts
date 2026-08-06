@@ -8,6 +8,7 @@ import { AnchoredRect, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { ObjNoteGroup } from "./obj-note-group";
 import { ObjRest } from "./obj-rest";
 import { ObjText } from "./obj-text";
+import { ObjDocument } from "./obj-document";
 
 export class ObjTabRhythm extends MusicObject {
 
@@ -29,7 +30,9 @@ export class ObjTabRhythm extends MusicObject {
         return this.mi;
     }
 
-    get doc() { return this.measure.doc; }
+    get doc(): ObjDocument {
+        return this.measure.doc;
+    }
 
     pick(x: number, y: number): MusicObject[] {
         return this.rect.contains(x, y) ? [this] : [];
@@ -108,7 +111,7 @@ export class ObjTabRhythm extends MusicObject {
                 let colX = sym.col.getRect().anchorX;
                 if (sym instanceof ObjNoteGroup) {
                     view.lineWidth(1);
-                    view.color(sym.color ?? this.doc.getColor());
+                    view.color(sym.color ?? this.doc.color);
 
                     if (sym.rhythmProps.noteSize >= 2) {
                         view.lineWidth(sym.rhythmProps.noteSize === 4 ? 2 : 1);
@@ -132,7 +135,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
                 else if (sym instanceof ObjRest) {
                     view.lineWidth(1);
-                    view.color(sym.color ?? this.doc.getColor());
+                    view.color(sym.color ?? this.doc.color);
 
                     let cx = colX;
                     let cy = (stemTop + stemBottom) / 2;
@@ -157,7 +160,7 @@ export class ObjTabRhythm extends MusicObject {
                     let rightBeamCount = right.hasTuplet() ? 1 : right instanceof ObjNoteGroup ? right.getLeftBeamCount() : 1;
                     let maxBeamCount = Math.max(leftBeamCount, rightBeamCount);
 
-                    view.color(sym.color ?? this.doc.getColor());
+                    view.color(sym.color ?? this.doc.color);
                     view.lineWidth(2);
 
                     for (let i = 0; i < maxBeamCount; i++) {
@@ -178,7 +181,7 @@ export class ObjTabRhythm extends MusicObject {
                 }
 
                 if (beamGroup && beamGroup.isTuplet()) {
-                    view.color(sym.color ?? this.doc.getColor());
+                    view.color(sym.color ?? this.doc.color);
 
                     // Add tuplet number
                     let cx = (symbols[0].col.getRect().anchorX + symbols[symbols.length - 1].col.getRect().anchorX) / 2;

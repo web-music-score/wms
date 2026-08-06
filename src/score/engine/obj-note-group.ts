@@ -16,6 +16,9 @@ import { getNoteArticulationDrawSymbol, isNoteArticulation, sortNoteArticulation
 import { ScoreError } from "./error-utils";
 import { ObjSymbol } from "./obj-symbol";
 import { InstrumentValue } from "web-music-score/audio";
+import { ObjDocument } from "./obj-document";
+import { ObjMeasure } from "./obj-measure";
+import { ObjScoreRow } from "./obj-score-row";
 
 function getArpeggio(a: boolean | ArpeggioValue | undefined): Arpeggio | undefined {
     return Guard.isEnumValue(a, Arpeggio) ? a : (a === true ? Arpeggio.Up : undefined);
@@ -203,7 +206,7 @@ export class ObjNoteGroup extends MusicObject {
         this.runningDiatonicId = this.setDiatonicId;
         this.runningStemDir = Stem.Up;
         this.runningStringNumbers = [];
-        this.color = options?.color ?? this.doc.getColor();
+        this.color = options?.color ?? this.doc.color;
         this.diamond = options?.diamond ?? false;
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
@@ -221,15 +224,15 @@ export class ObjNoteGroup extends MusicObject {
         return this.mi;
     }
 
-    get doc() {
+    get doc(): ObjDocument {
         return this.col.doc;
     }
 
-    get measure() {
+    get measure(): ObjMeasure {
         return this.col.measure;
     }
 
-    get row() {
+    get row(): ObjScoreRow {
         return this.col.row;
     }
 
@@ -686,7 +689,7 @@ export class ObjNoteGroup extends MusicObject {
 
                     this.articulations.forEach(ar => {
                         const drawSym = getNoteArticulationDrawSymbol(ar.kind);
-                        const color = ar.color ?? this.doc.getColor();
+                        const color = ar.color ?? this.doc.color;
                         const sym = new ObjSymbol(this, drawSym, false, false, color);
                         sym.layout(view);
                         sym.offset(arX, arY);
@@ -740,15 +743,14 @@ export class ObjNoteGroup extends MusicObject {
             }
 
             let obj = new ObjTabNoteGroup(tab, this);
-            const bgcolor = this.doc.getBackground();
-            const color = this.doc.getColor();
+            const { background, color } = this.doc;
 
             this.notes.forEach((note, noteIndex) => {
                 // Add tab fret numbers
                 let stringNumber = this.runningStringNumbers[noteIndex];
                 if (Guard.isIntegerBetween(stringNumber, 1, 6)) {
                     let fretId = note.chromaticId - tab.getTuningStrings()[stringNumber - 1].chromaticId;
-                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor }, 0.5, 0.5);
+                    let fretNumber = new ObjText(this, { text: String(fretId), color, bgcolor: background }, 0.5, 0.5);
                     fretNumber.layout(view);
 
                     fretNumber.setAnchor(this.col.getRect().anchorX, tab.getStringY(stringNumber - 1));

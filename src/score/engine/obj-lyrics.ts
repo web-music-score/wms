@@ -30,7 +30,7 @@ export class ObjLyrics extends MusicObject {
 
         this.hyphen = Guard.isEnumValue(lyricsOptions?.hyphen, LyricsHyphen) ? lyricsOptions?.hyphen : undefined;
 
-        this.color = lyricsOptions?.color ?? this.doc.getColor();
+        this.color = lyricsOptions?.color ?? this.doc.color;
 
         this.text = new ObjText(this, { text: lyricsText, color: this.color, scale: 0.8 }, halign, 0);
         this.rect = this.text.getRect().clone();

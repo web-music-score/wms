@@ -7,6 +7,8 @@ import { DocumentSettings } from "./settings";
 import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect, UniMap } from "@tspro/ts-utils-lib";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
+import { ObjDocument } from "./obj-document";
+import { ObjScoreRow } from "./obj-score-row";
 
 enum BarLineType { None, Single, Double, EndSong, StartRepeat, EndRepeat, EndStartRepeat }
 
@@ -60,8 +62,13 @@ abstract class ObjBarLine extends MusicObject {
 
     abstract solveBarLineType(): BarLineType;
 
-    get doc() { return this.measure.doc; }
-    get row() { return this.measure.row; }
+    get doc(): ObjDocument {
+        return this.measure.doc;
+    }
+
+    get row(): ObjScoreRow {
+        return this.measure.row;
+    }
 
     pick(x: number, y: number): MusicObject[] {
         if (!this.getRect().contains(x, y)) {

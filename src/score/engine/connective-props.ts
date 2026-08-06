@@ -6,6 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { ObjNotationLine, ObjStaff, ObjTab } from "./obj-staff-and-tab";
 import { Guard } from "@tspro/ts-utils-lib";
 import { ScoreError } from "./error-utils";
+import { ObjDocument } from "./obj-document";
 
 export class ConnectiveProps {
     noteGroups: ObjNoteGroup[];
@@ -14,10 +15,14 @@ export class ConnectiveProps {
 
     constructor(readonly connective: Connective, readonly span: number | TieTypeValue, public noteAnchor: NoteAnchor, startNoteGroup: ObjNoteGroup, options: ConnectiveOptions) {
         this.noteGroups = [startNoteGroup];
-        this.color = options.color ?? startNoteGroup.doc.getColor();
+        this.color = options.color ?? startNoteGroup.doc.color;
     }
 
-    getStartNoteGroup() {
+    get doc(): ObjDocument {
+        return this.noteGroups[0].doc;
+    }
+
+    getStartNoteGroup(): ObjNoteGroup {
         return this.noteGroups[0];
     }
 

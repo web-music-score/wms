@@ -59,7 +59,7 @@ export class PlayerColumnProps {
         this.octaveShift = 0;
     }
 
-    get measure() {
+    get measure(): ObjMeasure {
         return this.col.measure;
     }
 
