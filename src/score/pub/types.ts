@@ -242,8 +242,6 @@ export type NoteOptions = {
     color?: string,
     /** Arepggio direction for chords. true = "up". */
     arpeggio?: boolean | ArpeggioValue,
-    /** Add staccato dot. */
-    staccato?: boolean,
     /** Use diamond shaped note head. */
     diamond?: boolean,
     /** Set string number (array of numbers for chord) to use in guitar tab. */

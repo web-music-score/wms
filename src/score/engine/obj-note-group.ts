@@ -211,8 +211,6 @@ export class ObjNoteGroup extends MusicObject {
         this.arpeggio = getArpeggio(options?.arpeggio);
         this.oldStyleTriplet = tupletRatio === undefined && NoteLengthProps.get(noteLength).isTriplet;
 
-        if (options?.staccato) this.articulations = [{ kind: AnnotationKind.staccato, color: options?.color }];
-
         this.rhythmProps = RhythmProps.get(noteLength, undefined, tupletRatio ?? this.oldStyleTriplet ? Tuplet.Triplet : undefined);
 
         this.doc.addInstrumentForLoad(this.instrument);

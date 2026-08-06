@@ -29,6 +29,7 @@
 - Renamed AnnotationOptions fields "repeatCount" -> "playCount" and "endingPassages" -> "playNumbers".
 - Replaced addAnnotation().addExtension() with addSpan().
 - Removed enum MusicErrorType, simplified errors.
+- Removed NoteOptions "staccato" field (-> addAnnotation("staccato")).
 
 ### Added
 - "color" field to LyricsOptions.

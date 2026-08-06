@@ -76,7 +76,6 @@ function assertNoteOptions(noteOptions: Types.NoteOptions) {
         Guard.isEnumValueOrUndefined(noteOptions.stem, Types.Stem),
         Guard.isStringOrUndefined(noteOptions.color),
         Guard.isBooleanOrUndefined(noteOptions.arpeggio) || Guard.isEnumValue(noteOptions.arpeggio, Types.Arpeggio),
-        Guard.isBooleanOrUndefined(noteOptions.staccato),
         Guard.isBooleanOrUndefined(noteOptions.diamond),
         (
             Guard.isUndefined(noteOptions.string) ||
