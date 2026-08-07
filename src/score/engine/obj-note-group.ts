@@ -687,7 +687,7 @@ export class ObjNoteGroup extends MusicObject {
 
                     this.articulations.forEach(ar => {
                         const drawSym = getNoteArticulationDrawSymbol(ar.kind);
-                        const color = ar.color ?? this.doc.color;
+                        const color = ar.color ?? this.color;
                         const sym = new ObjSymbol(this, drawSym, false, false, color);
                         sym.layout(view);
                         sym.offset(arX, arY);
