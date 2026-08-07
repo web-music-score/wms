@@ -60,7 +60,7 @@ export class ObjExtensionLine extends MusicObject {
     }
 
     get color(): string {
-        return String((this.extension.headObj.musicObj as any).color ?? this.doc.color);
+        return (this.extension.headObj.musicObj as { color?: string }).color ?? this.doc.color;
     }
 
     getMusicInterface(): MExtensionLine {
