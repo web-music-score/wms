@@ -25,14 +25,6 @@ export function createNoteOptionsDemo() {
         .addChord(0, ["C4", "E4", "G4", "B4", "C5"], "2n", { arpeggio: "down" })
 
         .addMeasure()
-        .addNote(0, "E4", "8n", { staccato: true, stem: "up" }).addLyrics(1, "staccato", "8n")
-        .addNote(0, "F#4", "8n", { staccato: true })
-        .addNote(0, "G4", "4n", { staccato: true })
-        .addNote(0, "B4", "8n", { staccato: true, stem: "down" })
-        .addNote(0, "C5", "8n", { staccato: true })
-        .addNote(0, "D5", "4n", { staccato: true })
-
-        .addMeasure()
         .addNote(0, "E4", "8n", { diamond: true, stem: "up" }).addLyrics(1, "diamond", "8n")
         .addNote(0, "F#4", "8n", { diamond: true })
         .addNote(0, "G4", "4n", { diamond: true })
