@@ -8,6 +8,7 @@ export class ObjImage extends MusicObject {
 
     constructor(parent: MusicObject, readonly image: HTMLImageElement, readonly anchorX: number, readonly anchorY: number, readonly imageScale: number) {
         super(parent);
+
         this.mi = new MImage(this);
     }
 

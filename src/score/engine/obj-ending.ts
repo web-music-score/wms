@@ -15,8 +15,6 @@ export class ObjEnding extends MusicObject {
     constructor(readonly measure: ObjMeasure, readonly color: string, readonly playNumbers: number[]) {
         super(measure);
 
-        this.mi = new MEnding(this);
-
         if (
             !Guard.isIntegerGte(playNumbers.length, 1) ||
             !this.playNumbers.every(p => Guard.isIntegerGte(p, 1))
@@ -30,6 +28,8 @@ export class ObjEnding extends MusicObject {
         const text = this.playNumbers.map(p => p + ".").join("");
 
         this.endingText = new ObjText(this, { text, color }, 0, 1);
+
+        this.mi = new MEnding(this);
     }
 
     getMusicInterface(): MEnding {

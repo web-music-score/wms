@@ -9,6 +9,7 @@ export class ObjAccidental extends MusicObject {
     readonly mi: MAccidental;
     constructor(parent: MusicObject, readonly diatonicId: number, readonly accidental: Accidental, readonly color: string = "black") {
         super(parent);
+
         this.mi = new MAccidental(this);
     }
 

@@ -15,8 +15,6 @@ export class ObjHeader extends MusicObject {
     constructor(readonly doc: ObjDocument, readonly title?: string, readonly composer?: string, readonly arranger?: string) {
         super(doc);
 
-        this.mi = new MHeader(this);
-
         this.titleText = this.title
             ? new ObjText(this, { text: this.title, color: doc.color, scale: 2 }, 0.5, 0)
             : undefined;
@@ -28,6 +26,8 @@ export class ObjHeader extends MusicObject {
         this.arrangerText = this.arranger
             ? new ObjText(this, { text: "Arr.: " + this.arranger, color: doc.color }, 1, 0)
             : undefined;
+
+        this.mi = new MHeader(this);
     }
 
     getMusicInterface(): MHeader {

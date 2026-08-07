@@ -114,8 +114,6 @@ export class ObjMeasure extends MusicObject {
     constructor(readonly row: ObjScoreRow, private readonly options: Pub.MeasureOptions) {
         super(row);
 
-        this.mi = new Pub.MMeasure(this);
-
         // Set prevMeasure
         this.prevMeasure = row.doc.getLastMeasure();
 
@@ -138,6 +136,7 @@ export class ObjMeasure extends MusicObject {
             this.addLayoutObject(new ObjTabRhythm(this, tab), tab, LayoutGroupId.TabRhythm, VerticalPos.Above);
         });
 
+        this.mi = new Pub.MMeasure(this);
     }
 
     getMusicInterface(): Pub.MMeasure {

@@ -106,8 +106,6 @@ export class ObjBeamGroup extends MusicObject {
     private constructor(private readonly symbols: RhythmSymbol[], readonly tupletRatio: TupletRatio & TupletOptions | undefined) {
         super(symbols[0].measure);
 
-        this.mi = new MBeamGroup(this);
-
         let beamGroupName = tupletRatio ? "Tuplet" : "BeamGroup";
 
         if (!symbols.every(s => s.measure === symbols[0].measure)) {
@@ -190,6 +188,8 @@ export class ObjBeamGroup extends MusicObject {
                 });
             }
         });
+
+        this.mi = new MBeamGroup(this);
     }
 
     get stemDir(): Stem.Up | Stem.Down {

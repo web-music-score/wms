@@ -17,6 +17,7 @@ export class ObjArpeggio extends MusicObject {
 
     constructor(readonly col: ObjRhythmColumn, readonly line: ObjNotationLine, readonly arpeggioDir: Arpeggio) {
         super(col);
+
         this.mi = new MArpeggio(this);
     }
 
