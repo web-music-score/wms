@@ -695,8 +695,6 @@ export class ObjMeasure extends MusicObject {
                         const lineStyle: ExtensionLineStyle = "dashed";
                         const linePos: ExtensionLinePos = "bottom";
 
-                        musicObj.userData["span-color"] = color;
-
                         const extension = new Extension(layoutObj, anchor, ticks, visible, lineStyle, linePos);
                         musicObj.setLink(extension);
                     }

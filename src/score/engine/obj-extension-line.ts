@@ -59,6 +59,10 @@ export class ObjExtensionLine extends MusicObject {
         return this.measure.row.doc;
     }
 
+    get color(): string {
+        return String((this.extension.headObj.musicObj as any).color ?? this.doc.color);
+    }
+
     getMusicInterface(): MExtensionLine {
         return this.mi;
     }
@@ -150,13 +154,10 @@ export class ObjExtensionLine extends MusicObject {
 
         let { rect } = this;
 
-        const head = this.extension.headObj.musicObj;
-        const color = String(head.userData["span-color"] ?? this.doc.color);
-
         if (this.extension.getLineStyle() === "dashed")
             view.setLineDash([7, 3]);
 
-        view.color(color).lineWidth(1);
+        view.color(this.color).lineWidth(1);
 
         view.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);
 
