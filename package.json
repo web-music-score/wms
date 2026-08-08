@@ -1,16 +1,9 @@
 {
     "name": "@tspro/web-music-score",
-    "version": "5.5.1",
-    "author": "PahkaSoft",
+    "version": "5.5.2",
+    "author": "WebMusicScore",
     "license": "MIT",
     "private": false,
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/pahkasoft/web-music-score.git"
-    },
-    "bugs": {
-        "url": "https://github.com/pahkasoft/web-music-score/issues/new/choose"
-    },
     "description": "TS/JS component for rendering and playing music scores in the browser.",
     "exports": {
         "./core": {
@@ -118,7 +111,7 @@
         "tone": "^15.1.22",
         "tsup": "^8.5.0",
         "typedoc": "^0.28.13",
-        "typescript": "latest"
+        "typescript": "^5.8.3"
     },
     "workspaces": [
         ".",

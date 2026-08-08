@@ -1,4 +1,8 @@
 # Changelog
+## [5.5.2] - 2026-01-05
+### Fixed
+- Updated README.md and package.json to remove old links.
+
 ## [5.5.1] - 2026-01-05
 ### Deprecated
 - Deprecated `@tspro/web-music-score`, use `web-music-score` instead.

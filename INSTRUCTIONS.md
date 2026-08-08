@@ -23,3 +23,4 @@
 ## Publish
     npm login
     npm publish --access public
+    npm deprecate @tspro/web-music-score "This package is deprecated. Please use 'web-music-score' instead."
