@@ -1,31 +1,5 @@
 # HOW-TO Publish
 
-## Pre-Release
-    // Update CHANGELOG.md
-
-    // Version: "X.Y.Z-pre.N"
-
-    // Install
-    npm install --workspaces
-
-    // Build
-    npm run build
-
-    // Commit
-    git commit -a -m "vX.Y.Z-pre.N"
-
-    // Add Tag
-    git tag vX.Y.Z-pre.N
-
-    // Login
-    npm login
-
-    // Publish
-    npm publish --access public --tag next
-
-    // Bump version
-
-
 ## Latest
     // Update CHANGELOG.md
 
