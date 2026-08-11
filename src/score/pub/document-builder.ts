@@ -178,6 +178,12 @@ export type ExtensionBuilder = {
      */
     notes: (noteLength: Theory.NoteLengthValue, noteCount?: number) => ExtensionBuilder,
     /**
+     * Increase span length by number of beats.
+     * @param beatCount - Number of beats.
+     * @returns - this extension builder object.
+     */
+    beats: (beatCount: number) => ExtensionBuilder,
+    /**
      * Increase length of extension length by given number of measures.
      * @param measureCount - Number of measures.
      * @returns - this extension builder object.
@@ -1140,10 +1146,16 @@ export class DocumentBuilder {
                     ticks += Theory.RhythmProps.get(noteLength).ticks * (noteCount ?? 1);
                     return helper;
                 },
+                beats: (beatCount) => {
+                    AssertUtil.setClassFunc("DocumentBuilder", "addExtension.beats", beatCount);
+                    AssertUtil.assert(Guard.isNumber(beatCount) && beatCount >= 1);
+                    ticks += this.getMeasure().getTimeSignature().beatTicks * beatCount;
+                    return helper;
+                },
                 measures: (measureCount) => {
                     AssertUtil.setClassFunc("DocumentBuilder", "addExtension.measures", measureCount);
                     AssertUtil.assert(Guard.isNumber(measureCount) && measureCount >= 1);
-                    ticks += this.getMeasure().getMeasureTicks() * measureCount;
+                    ticks += this.getMeasure().getTimeSignature().measureTicks * measureCount;
                     return helper;
                 },
                 infinity: () => {

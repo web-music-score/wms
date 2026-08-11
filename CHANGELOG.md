@@ -1,5 +1,8 @@
 # CHANGELOG
-## [6.4.3] - Unreleased
+## [6.5.0] - Unreleased
+### Added
+- Added function beats(beatCount) to ExtensionBuilder.
+
 ### Fixed
 - Fixed extension range.
 
