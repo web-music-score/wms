@@ -184,6 +184,10 @@ export class TimeSignature {
         }
     }
 
+    get beatTicks(): number {
+        return this.measureTicks / this.beatCount;
+    }
+
     /**
      * Test whether this time signature has given beat count and size.
      * @param beatCount - Beat count.

@@ -793,14 +793,13 @@ export class DocumentBuilder {
                 beats: (beatCount: number) => {
                     AssertUtil.setClassFunc("DocumentBuilder", "addSpan.beats", beatCount);
                     AssertUtil.assert(Guard.isNumber(beatCount) && beatCount >= 0);
-                    const ts = this.getMeasure().getTimeSignature();
-                    spanProps!.ticks += ts.measureTicks / ts.beatCount * beatCount;
+                    spanProps!.ticks += this.getMeasure().getTimeSignature().beatTicks * beatCount;
                     return helper;
                 },
                 measures: (measureCount) => {
                     AssertUtil.setClassFunc("DocumentBuilder", "addSpan.measures", measureCount);
                     AssertUtil.assert(Guard.isNumber(measureCount) && measureCount >= 0);
-                    spanProps!.ticks += this.getMeasure().getMeasureTicks() * measureCount;
+                    spanProps!.ticks += this.getMeasure().getTimeSignature().measureTicks * measureCount;
                     return helper;
                 },
                 infinity: () => {
