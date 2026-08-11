@@ -1,4 +1,7 @@
 # CHANGELOG
+## [6.5.1] - Unreleased
+### Fixed
+
 ## [6.5.0] - 2026-08-11
 ### Added
 - Added function beats(beatCount) to ExtensionBuilder.
