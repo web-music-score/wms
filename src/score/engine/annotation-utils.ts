@@ -4,7 +4,7 @@ import { ObjSpecialText } from "./obj-special-text";
 import { LayoutGroupId, VerticalPos } from "./layout-object";
 import { DrawSymbol } from "./view";
 
-export function getNavigationString(navigation: AnnotationKind): string {
+export function getNavigationString(navigation: string): string {
     switch (navigation) {
         case AnnotationKind.DC_al_Coda: return "D.C. al Coda";
         case AnnotationKind.DC_al_Fine: return "D.C. al Fine";
@@ -15,7 +15,7 @@ export function getNavigationString(navigation: AnnotationKind): string {
         case AnnotationKind.Coda: return ObjSpecialText.Coda;
         case AnnotationKind.toCoda: return ObjSpecialText.toCoda;
         default:
-            return navigation[0].toUpperCase() + navigation.substring(1);
+            return navigation;
     }
 }
 

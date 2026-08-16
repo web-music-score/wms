@@ -21,7 +21,7 @@ import { Guard } from "@tspro/ts-utils-lib";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
 import { ObjExtensionLine } from "../engine/obj-extension-line";
-import { PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
+import { AnnotationGroup, PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
 import { ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { ObjLyrics } from "../engine/obj-lyrics";
 import { ObjTabRhythm } from "../engine/obj-tab-rhythm";
@@ -31,6 +31,7 @@ import { isWmsControlsHTMLElement } from "../custom-element/wms-controls";
 import { Player } from "./player";
 import { AssertUtil } from "shared-src";
 import { ScoreError } from "../engine/error-utils";
+import { ObjAnnotation } from "score/engine/obj-annotation";
 
 function getMStaffOrMTab(line: unknown): MStaff | MTab {
     if (line instanceof ObjStaff || line instanceof ObjTab) {
@@ -1066,6 +1067,38 @@ export class MText extends MusicInterface {
      */
     getText(): string {
         return this.obj.getText();
+    }
+}
+
+/** Annotation object. */
+export class MAnnotation extends MusicInterface {
+    /** Object name. */
+    static readonly Name = "Annotation";
+
+    /** @internal */
+    constructor(private readonly obj: ObjAnnotation) {
+        super(MAnnotation.Name);
+    }
+
+    /** @internal */
+    getMusicObject(): ObjAnnotation {
+        return this.obj;
+    }
+
+    /**
+     * Get annotation kind.
+     * @returns - Annotation kind.
+     */
+    getKind(): string {
+        return this.obj.kind;
+    }
+
+    /**
+     * Get annotation group.
+     * @returns - Annotation group.
+     */
+    getGroup(): AnnotationGroup {
+        return this.obj.group;
     }
 }
 

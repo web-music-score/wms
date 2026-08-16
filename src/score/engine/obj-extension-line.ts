@@ -7,15 +7,14 @@ import { Extension } from "./extension";
 import { MExtensionLine } from "../pub";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
-import { ObjText } from "./obj-text";
-import { ObjSpecialText } from "./obj-special-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjDocument } from "./obj-document";
+import { ObjAnnotation } from "./obj-annotation";
 
-export type ExtensionStartObject = ObjText | ObjSpecialText;
+export type ExtensionStartObject = ObjAnnotation;
 export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
 export type ExtensionLineRightObject = ObjRhythmColumn | ObjBarLineRight;
-export type ExtensionStopObject = ObjBarLineRight | ObjText | ObjSpecialText;
+export type ExtensionStopObject = ObjBarLineRight | ObjAnnotation;
 export type ExtensionObjectAll = ExtensionStartObject | ExtensionLineLeftObject | ExtensionLineRightObject | ExtensionStopObject;
 
 function getRow(obj: ExtensionObjectAll | undefined): ObjScoreRow | undefined {
@@ -33,11 +32,11 @@ function getRow(obj: ExtensionObjectAll | undefined): ObjScoreRow | undefined {
 }
 
 function isExtensionStartObject(obj: unknown) {
-    return obj instanceof ObjText || obj instanceof ObjSpecialText;
+    return obj instanceof ObjAnnotation;
 }
 
 function isExtensionStopObject(obj: unknown) {
-    return obj instanceof ObjBarLineRight || obj instanceof ObjText || obj instanceof ObjSpecialText;
+    return obj instanceof ObjBarLineRight || obj instanceof ObjAnnotation;
 }
 
 export class ObjExtensionLine extends MusicObject {

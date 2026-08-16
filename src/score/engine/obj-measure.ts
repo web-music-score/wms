@@ -19,7 +19,7 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjSymbol } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getAnnotationKindTextReplacement, getNavigationString, isNoteArticulation } from "./annotation-utils";
+import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getNavigationString, isNoteArticulation } from "./annotation-utils";
 import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
 import { ObjExtensionLine } from "./obj-extension-line";
 import { ConnectiveProps } from "./connective-props";
@@ -29,6 +29,7 @@ import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { ScoreError } from "./error-utils";
 import { InstrumentValue } from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
+import { ObjAnnotation } from "./obj-annotation";
 
 export function getExtensionAnchorY(linePos: ExtensionLinePos) {
     switch (linePos) {
@@ -580,9 +581,6 @@ export class ObjMeasure extends MusicObject {
         if (annotationKind === Pub.AnnotationKind.Ending && Guard.isUndefined(annotationOptions.playNumbers))
             throw new ScoreError(`Annotation error: "playNumbers" of ending is undefined.`);
 
-        const anchorX = 0.5;
-        const anchorY = getExtensionAnchorY("bottom");
-
         let createLayoutObject: ((line: ObjNotationLine, vpos: VerticalPos) => LayoutableMusicObject) | undefined;
 
         const color = annotationOptions.color ?? this.doc.color;
@@ -614,8 +612,7 @@ export class ObjMeasure extends MusicObject {
                 case Pub.AnnotationKind.DS_al_Fine:
                     createLayoutObject = (line) => {
                         const anchor = this.barLineRight;
-                        const text = getNavigationString(annotationKind);
-                        return new ObjText(anchor, { text, color }, 1, 1);
+                        return new ObjAnnotation(anchor, annotationKind, annotationGroup, 1, 1, false, false, color);
                     }
                     this.addAnnotation(staffTargets, Pub.AnnotationGroup.Navigation, Pub.AnnotationKind.EndRepeat, undefined, {});
                     this.endSong();
@@ -623,23 +620,25 @@ export class ObjMeasure extends MusicObject {
                 case Pub.AnnotationKind.Fine:
                     createLayoutObject = (line) => {
                         const anchor = this.barLineRight;
-                        const text = getNavigationString(annotationKind);
-                        return new ObjText(anchor, { text, color }, 1, 1);
+                        return new ObjAnnotation(anchor, annotationKind, annotationGroup, 1, 1, false, false, color);
                     }
                     break;
                 case Pub.AnnotationKind.Segno:
+                    createLayoutObject = (line) => {
+                        const anchor = this.barLineLeft;
+                        return new ObjAnnotation(anchor, annotationKind, annotationGroup, 0.5, 1, false, false, color);
+                    }
+                    break;
                 case Pub.AnnotationKind.Coda:
                     createLayoutObject = (line) => {
                         const anchor = this.barLineLeft;
-                        const text = getNavigationString(annotationKind);
-                        return new ObjSpecialText(anchor, text, color);
+                        return new ObjAnnotation(anchor, annotationKind, annotationGroup, 0.1, 1, false, false, color);
                     }
                     break;
                 case Pub.AnnotationKind.toCoda:
                     createLayoutObject = (line) => {
                         const anchor = this.barLineRight;
-                        const text = getNavigationString(annotationKind);
-                        return new ObjSpecialText(anchor, text, color);
+                        return new ObjAnnotation(anchor, annotationKind, annotationGroup, 0.9, 1, false, false, color);
                     }
                     break;
                 case Pub.AnnotationKind.EndRepeat:
@@ -653,28 +652,28 @@ export class ObjMeasure extends MusicObject {
                 case Pub.AnnotationKind.StartRepeat:
                     break;
                 default:
-                    throw new ScoreError(`Annotation error: Invalid navigation "${annotationKind}".`);
+                    createLayoutObject = (line) => {
+                        const anchor = this.barLineRight;
+                        return new ObjAnnotation(anchor, annotationKind, annotationGroup, 0.5, 1, false, false, color);
+                    }
+                    break;
 
             }
         }
         else if (annotationGroup === Pub.AnnotationGroup.Temporal && annotationKind === Pub.AnnotationKind.fermata) {
-            const fermataAnchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
+            const anchor = annotationOptions.anchor === Pub.AnnotationAnchor.RightBarLine
                 ? this.barLineRight
                 : this.lastAddedRhythmColumn;
-
-            if (fermataAnchor) {
-                createLayoutObject = (line, vpos) => new ObjSymbol(fermataAnchor, DrawSymbol.Fermata, false, vpos === VerticalPos.Below, color);
+            if (anchor) {
+                createLayoutObject = (line, vpos) => new ObjAnnotation(anchor, annotationKind, annotationGroup, 0.5, 0.5, false, vpos === VerticalPos.Below, color);
             }
         }
         else {
-            const colAnchor = this.lastAddedRhythmColumn;
-
-            if (colAnchor) {
-                createLayoutObject = (line, vpos) => {
-                    const text = getAnnotationKindTextReplacement(annotationKind, annotationGroup);
-                    const italic = false;
-                    return new ObjText(colAnchor, { text, color, italic }, anchorX, anchorY);
-                }
+            const anchor = this.lastAddedRhythmColumn;
+            if (anchor) {
+                const anchorX = 0.5;
+                const anchorY = getExtensionAnchorY("bottom");
+                createLayoutObject = (line, vpos) => new ObjAnnotation(anchor, annotationKind, annotationGroup, anchorX, anchorY, false, false, color);
             }
         }
 
@@ -689,7 +688,7 @@ export class ObjMeasure extends MusicObject {
                     const { musicObj } = layoutObj;
                     const anchor = musicObj.getParent();
 
-                    if (musicObj instanceof ObjText && anchor instanceof ObjRhythmColumn) {
+                    if (musicObj instanceof ObjAnnotation && anchor instanceof ObjRhythmColumn) {
                         const { ticks, visible } = spanProps;
 
                         const lineStyle: ExtensionLineStyle = "dashed";

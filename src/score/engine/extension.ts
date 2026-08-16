@@ -1,11 +1,10 @@
 import { AnnotationKind } from "../pub";
 import { MusicObject, MusicObjectLink } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
-import { ObjText } from "./obj-text";
-import { ObjSpecialText } from "./obj-special-text";
 import { ObjMeasure } from "./obj-measure";
 import { LayoutObjectWrapper } from "./layout-object";
 import { ExtensionStopObject } from "./obj-extension-line";
+import { ObjAnnotation } from "./obj-annotation";
 
 export type ExtensionLineStyle = "solid" | "dashed";
 export type ExtensionLinePos = "bottom" | "middle";
@@ -18,8 +17,8 @@ function getTextAnchorY(linePos: ExtensionLinePos) {
 }
 
 export function getTextContent(obj: MusicObject): string {
-    if (obj instanceof ObjText || obj instanceof ObjSpecialText)
-        return obj.getText();
+    if (obj instanceof ObjAnnotation)
+        return obj.kind;
     if (obj instanceof ObjMeasure)
         return "[measure]";
     return "";
@@ -28,15 +27,19 @@ export function getTextContent(obj: MusicObject): string {
 export class ExtensionRange {
     public readonly columnRange: ObjRhythmColumn[];
     public stopObject?: ExtensionStopObject;
+
     constructor(public readonly startColumn: ObjRhythmColumn) {
         this.columnRange = [startColumn];
     }
+
     get endColumn(): ObjRhythmColumn {
         return this.columnRange[this.columnRange.length - 1];
     }
+
     addColumn(col: ObjRhythmColumn) {
         if (this.endColumn !== col) this.columnRange.push(col);
     }
+
     setStopObject(obj: ExtensionStopObject) {
         this.stopObject = obj;
     }
@@ -84,7 +87,7 @@ export class Extension extends MusicObjectLink {
         const stoppingCol = col.getAnchoredLayoutObjects()
             .filter(obj => obj !== this.headObj && obj.layoutGroupId === this.headObj.layoutGroupId)
             .map(obj => obj.musicObj)
-            .filter(obj => obj instanceof ObjText || obj instanceof ObjSpecialText)[0];
+            .filter(obj => obj instanceof ObjAnnotation)[0];
 
         return stoppingCol ? stoppingCol : (
             col === cols[cols.length - 1] &&

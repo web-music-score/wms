@@ -96,7 +96,7 @@ export abstract class ObjNotationLine extends MusicObject {
 
     private setObjectAnchorY(layoutObj: LayoutObjectWrapper, y: number | undefined) {
         if (y === undefined) return;
-        layoutObj.setAnchorY(y - layoutObj.getRect().anchorY);
+        layoutObj.setAnchorY(y);
         this.resolvedObjects.push(layoutObj.musicObj);
     }
 

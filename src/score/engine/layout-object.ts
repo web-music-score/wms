@@ -13,6 +13,7 @@ import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { AnchoredRect, asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
 import { ScoreError } from "./error-utils";
+import { ObjAnnotation } from "./obj-annotation";
 
 /** Layout group ids in order, first is closest to staff, last is furthest from staff. */
 export enum LayoutGroupId {
@@ -69,7 +70,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
 
 export enum VerticalPos { Above = 0, Below = 1 }
 
-export type LayoutableMusicObject = ObjText | ObjSpecialText | ObjExtensionLine | ObjSymbol | ObjEnding | ObjLyrics | ObjTabRhythm;
+export type LayoutableMusicObject = ObjAnnotation | ObjExtensionLine | ObjEnding | ObjLyrics | ObjTabRhythm;
 
 export class StaffGroup {
     constructor(readonly groupName: string, readonly staffsTabsAndGroups: number | string | (number | string)[], readonly verticalPosition: VerticalPosition) { }
