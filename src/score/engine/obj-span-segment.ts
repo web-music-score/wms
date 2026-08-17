@@ -3,21 +3,21 @@ import { MusicObject } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
 import { ObjMeasure } from "./obj-measure";
-import { Extension } from "./extension";
-import { MExtensionLine } from "../pub";
+import { SpanProps } from "./span-props";
+import { MSpanSegment } from "../pub";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ObjScoreRow } from "./obj-score-row";
 import { ObjDocument } from "./obj-document";
 import { ObjAnnotation } from "./obj-annotation";
 
-export type ExtensionStartObject = ObjAnnotation;
-export type ExtensionLineLeftObject = ObjBarLineLeft | MusicObject;
-export type ExtensionLineRightObject = ObjRhythmColumn | ObjBarLineRight;
-export type ExtensionStopObject = ObjBarLineRight | ObjAnnotation;
-export type ExtensionObjectAll = ExtensionStartObject | ExtensionLineLeftObject | ExtensionLineRightObject | ExtensionStopObject;
+export type SpanStartObject = ObjAnnotation;
+export type SpanSegmentLeftObject = ObjBarLineLeft | MusicObject;
+export type SpanSegmentRightObject = ObjRhythmColumn | ObjBarLineRight;
+export type SpanStopObject = ObjBarLineRight | ObjAnnotation;
+export type SpanPartObject = SpanStartObject | SpanSegmentLeftObject | SpanSegmentRightObject | SpanStopObject;
 
-function getRow(obj: ExtensionObjectAll | undefined): ObjScoreRow | undefined {
+function getRow(obj: SpanPartObject | undefined): ObjScoreRow | undefined {
     let o: MusicObject | undefined = obj;
 
     while (o) {
@@ -31,23 +31,23 @@ function getRow(obj: ExtensionObjectAll | undefined): ObjScoreRow | undefined {
     return undefined;
 }
 
-function isExtensionStartObject(obj: unknown) {
+function isSpanStartObject(obj: unknown) {
     return obj instanceof ObjAnnotation;
 }
 
-function isExtensionStopObject(obj: unknown) {
+function isSpanStopObject(obj: unknown) {
     return obj instanceof ObjBarLineRight || obj instanceof ObjAnnotation;
 }
 
-export class ObjExtensionLine extends MusicObject {
-    readonly mi: MExtensionLine;
+export class ObjSpanSegment extends MusicObject {
+    readonly mi: MSpanSegment;
 
-    constructor(readonly measure: ObjMeasure, readonly line: ObjNotationLine, readonly extension: Extension, readonly cols: ExtensionObjectAll[]) {
+    constructor(readonly measure: ObjMeasure, readonly line: ObjNotationLine, readonly spanProps: SpanProps, readonly cols: SpanPartObject[]) {
         super(measure);
 
-        extension.addTail(this);
+        spanProps.addSpanSegment(this);
 
-        this.mi = new MExtensionLine(this);
+        this.mi = new MSpanSegment(this);
     }
 
     get row(): ObjScoreRow {
@@ -59,21 +59,21 @@ export class ObjExtensionLine extends MusicObject {
     }
 
     get color(): string {
-        return (this.extension.headObj.musicObj as { color?: string }).color ?? this.doc.color;
+        return (this.spanProps.headObj.musicObj as { color?: string }).color ?? this.doc.color;
     }
 
-    getMusicInterface(): MExtensionLine {
+    getMusicInterface(): MSpanSegment {
         return this.mi;
     }
 
-    private getLeftObj(): ExtensionObjectAll {
+    private getLeftObj(): SpanPartObject {
         return this.cols[0];
     }
 
     private getLineLeft(view: View): number {
         let obj = this.getLeftObj();
 
-        if (isExtensionStartObject(obj))
+        if (isSpanStartObject(obj))
             return obj.getRect().right + view.unitSize;
 
         if (obj instanceof ObjBarLineLeft)
@@ -88,10 +88,10 @@ export class ObjExtensionLine extends MusicObject {
         return obj.getRect().right;
     }
 
-    private getRightObj(): ExtensionObjectAll {
+    private getRightObj(): SpanPartObject {
         const obj = this.cols[this.cols.length - 1];
 
-        if (isExtensionStopObject(obj)) {
+        if (isSpanStopObject(obj)) {
             const objRow = getRow(obj);
 
             const prevObj = this.cols[this.cols.length - 2];
@@ -108,7 +108,7 @@ export class ObjExtensionLine extends MusicObject {
     private getLineRight(view: View): number {
         let obj = this.getRightObj();
 
-        if (isExtensionStopObject(obj))
+        if (isSpanStopObject(obj))
             return obj.getRect().left - view.unitSize;
 
         if (obj instanceof ObjRhythmColumn) {
@@ -153,7 +153,7 @@ export class ObjExtensionLine extends MusicObject {
 
         let { rect } = this;
 
-        if (this.extension.getLineStyle() === "dashed")
+        if (this.spanProps.getLineStyle() === "dashed")
             view.setLineDash([7, 3]);
 
         view.color(this.color).lineWidth(1);
@@ -163,10 +163,10 @@ export class ObjExtensionLine extends MusicObject {
         view.setLineDash([]);
 
         // Draw tip end of last line
-        let tails = this.extension.getTails();
-        let last = tails[tails.length - 1];
+        let { spanSegments } = this.spanProps;
+        let last = spanSegments[spanSegments.length - 1];
 
-        if (this === last && !isExtensionStopObject(this.getRightObj())) {
+        if (this === last && !isSpanStopObject(this.getRightObj())) {
             let tipH = rect.anchorY > this.line.getRect().anchorY ? -view.unitSize : view.unitSize;
             view.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
         }

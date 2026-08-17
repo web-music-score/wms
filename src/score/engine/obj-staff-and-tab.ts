@@ -7,11 +7,12 @@ import { DocumentSettings } from "./settings";
 import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
-import { ObjExtensionLine } from "./obj-extension-line";
+import { ObjSpanSegment } from "./obj-span-segment";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
 import { ObjScoreRowGroup } from "./obj-score-row-group";
 import { ScoreError } from "./error-utils";
 import { ObjDocument } from "./obj-document";
+import { ObjAnnotation } from "./obj-annotation";
 
 type NotationLineObject = {
     getRect: () => AnchoredRect;
@@ -133,10 +134,10 @@ export abstract class ObjNotationLine extends MusicObject {
         const { verticalPos } = layoutGroup;
         let layoutObjects = [layoutObj];
 
-        let link = layoutObj.musicObj.getLink();
-        if (link) {
-            if (link.getHead() === layoutObj.musicObj) {
-                let objectParts = [link.getHead(), ...link.getTails()];
+        if (layoutObj.musicObj instanceof ObjAnnotation) {
+            const spanProps = layoutObj.musicObj.getSpanProps();
+            if (spanProps) {
+                let objectParts = [spanProps.annotationObj, ...spanProps.spanSegments];
                 layoutObjects = layoutGroup.getLayoutObjects().filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
             }
             else {
@@ -192,7 +193,7 @@ export abstract class ObjNotationLine extends MusicObject {
         layoutGroupObjects.forEach(layoutObj => {
             let { musicObj, anchor } = layoutObj;
 
-            if (musicObj instanceof ObjEnding || musicObj instanceof ObjExtensionLine || musicObj instanceof ObjTabRhythm) {
+            if (musicObj instanceof ObjEnding || musicObj instanceof ObjSpanSegment || musicObj instanceof ObjTabRhythm) {
                 musicObj.layoutFitToMeasure(view);
             }
             else {

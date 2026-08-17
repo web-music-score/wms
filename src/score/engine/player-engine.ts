@@ -6,9 +6,11 @@ import { ObjMeasure } from "./obj-measure";
 import { PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
-import { Extension, getTextContent } from "./extension";
+import { SpanProps } from "./span-props";
 import { getDynamicsVolume, isDynamicsText, isTempoText } from "./annotation-utils";
 import { ObjEnding } from "./obj-ending";
+import { ObjAnnotation } from "./obj-annotation";
+import { MusicObject } from "./music-object";
 
 function _setTimeout(cb: () => any, ms: number): number | undefined {
     return typeof window === "undefined"
@@ -33,6 +35,10 @@ function calcTicksDuration(ticks: number, tempo: Tempo): number {
     let beatTicks = RhythmProps.get(tempo.options.beatLength, tempo.options.dotCount).ticks;
     let ticksPerMinute = tempo.beatsPerMinute * beatTicks;
     return 60 * ticks / ticksPerMinute;
+}
+
+function getAnnotationKindFromObject(obj?: MusicObject): string {
+    return obj instanceof ObjAnnotation ? obj.kind : "";
 }
 
 function getDefaultVolume(): number {
@@ -334,7 +340,7 @@ export class PlayerEngine {
             }
 
             col.getAnchoredLayoutObjects().forEach(layoutObj => {
-                const text = getTextContent(layoutObj.musicObj);
+                const text = getAnnotationKindFromObject(layoutObj.musicObj);
 
                 let vol: number | undefined;
 
@@ -352,21 +358,21 @@ export class PlayerEngine {
                     isDynamicsText(text) ||
                     text === AnnotationKind._8va || text === AnnotationKind._8vb
                 ) {
-                    let extension = layoutObj.musicObj.getLink() instanceof Extension
-                        ? layoutObj.musicObj.getLink() as Extension
-                        : new Extension(layoutObj, col, Infinity, false, "solid", "bottom"); // Create dummy extension.
+                    let spanProps = layoutObj.musicObj instanceof ObjAnnotation && layoutObj.musicObj.hasSpan()
+                        ? layoutObj.musicObj.getSpanProps()!
+                        : new SpanProps(layoutObj, col, Infinity, false, "solid", "bottom"); // Create dummy extension.
 
-                    const range = extension.getRange();
-                    const stopText = range.stopObject ? getTextContent(range.stopObject) : "";
+                    const spanRange = spanProps.getRange();
+                    const stopText = getAnnotationKindFromObject(spanRange.stopObject);
 
-                    let totalTicks = Utils.Math.sum(range.columnRange.map(c => c.getTicksToNextColumn()));
+                    let totalTicks = Utils.Math.sum(spanRange.columnRange.map(c => c.getTicksToNextColumn()));
 
                     switch (text) {
                         case AnnotationKind.accel: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed * AccelerandoSpeedMul;
                             let accuTicks = 0;
-                            range.columnRange.forEach(c => {
+                            spanRange.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushSpeed(c, startSpeed + (endSpeed - startSpeed) * accuTicks / totalTicks);
                             });
@@ -377,7 +383,7 @@ export class PlayerEngine {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed / RitardandoSpeedDiv;
                             let accuTicks = 0;
-                            range.columnRange.forEach(c => {
+                            spanRange.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushSpeed(c, startSpeed + (endSpeed - startSpeed) * accuTicks / totalTicks);
                             });
@@ -386,11 +392,11 @@ export class PlayerEngine {
                         case AnnotationKind.cresc: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
-                            if (range.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol > startVol) {
+                            if (spanRange.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol > startVol) {
                                 endVol = vol;
                             }
                             let accuTicks = 0;
-                            range.columnRange.forEach(c => {
+                            spanRange.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushVolume(c, startVol + (endVol - startVol) * accuTicks / totalTicks);
                             });
@@ -400,22 +406,22 @@ export class PlayerEngine {
                         case AnnotationKind.dim: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
-                            if (range.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol < startVol) {
+                            if (spanRange.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol < startVol) {
                                 endVol = vol;
                             }
                             let accuTicks = 0;
-                            range.columnRange.forEach(c => {
+                            spanRange.columnRange.forEach(c => {
                                 accuTicks += c.getTicksToNextColumn();
                                 pushVolume(c, startVol + (endVol - startVol) * accuTicks / totalTicks);
                             });
                             break;
                         }
                         case AnnotationKind._8va: {
-                            range.columnRange.forEach(c => pushOctaveShift(c, 1));
+                            spanRange.columnRange.forEach(c => pushOctaveShift(c, 1));
                             break;
                         }
                         case AnnotationKind._8vb: {
-                            range.columnRange.forEach(c => pushOctaveShift(c, -1));
+                            spanRange.columnRange.forEach(c => pushOctaveShift(c, -1));
                             break;
                         }
                     }

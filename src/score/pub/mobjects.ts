@@ -20,7 +20,7 @@ import { ObjText } from "../engine/obj-text";
 import { Guard } from "@tspro/ts-utils-lib";
 import { ObjBeamGroup, ObjStaffBeamGroup } from "../engine/obj-beam-group";
 import { ObjSpecialText } from "../engine/obj-special-text";
-import { ObjExtensionLine } from "../engine/obj-extension-line";
+import { ObjSpanSegment } from "../engine/obj-span-segment";
 import { AnnotationGroup, PlayStateChangeListener, VoiceId, isVoiceId } from "./types";
 import { ObjStaff, ObjTab } from "../engine/obj-staff-and-tab";
 import { ObjLyrics } from "../engine/obj-lyrics";
@@ -1126,18 +1126,18 @@ export class MLyrics extends MusicInterface {
     }
 }
 
-/** Extension line object. */
-export class MExtensionLine extends MusicInterface {
+/** Span segment object. */
+export class MSpanSegment extends MusicInterface {
     /** OBject name. */
-    static readonly Name = "ExtensionLine";
+    static readonly Name = "SpanSegment";
 
     /** @internal */
-    constructor(private readonly obj: ObjExtensionLine) {
-        super(MExtensionLine.Name);
+    constructor(private readonly obj: ObjSpanSegment) {
+        super(MSpanSegment.Name);
     }
 
     /** @internal */
-    getMusicObject(): ObjExtensionLine {
+    getMusicObject(): ObjSpanSegment {
         return this.obj;
     }
 }

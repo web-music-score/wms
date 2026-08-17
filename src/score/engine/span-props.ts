@@ -1,32 +1,25 @@
 import { AnnotationKind } from "../pub";
-import { MusicObject, MusicObjectLink } from "./music-object";
+import { MusicObject } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjMeasure } from "./obj-measure";
 import { LayoutObjectWrapper } from "./layout-object";
-import { ExtensionStopObject } from "./obj-extension-line";
+import { SpanStopObject, ObjSpanSegment } from "./obj-span-segment";
 import { ObjAnnotation } from "./obj-annotation";
+import { Assert } from "@tspro/ts-utils-lib";
 
 export type ExtensionLineStyle = "solid" | "dashed";
 export type ExtensionLinePos = "bottom" | "middle";
 
-function getTextAnchorY(linePos: ExtensionLinePos) {
+export function getExtensionLineAnchorY(linePos: ExtensionLinePos) {
     switch (linePos) {
         case "bottom": return 0.8;
         case "middle": return 0.5;
     }
 }
 
-export function getTextContent(obj: MusicObject): string {
-    if (obj instanceof ObjAnnotation)
-        return obj.kind;
-    if (obj instanceof ObjMeasure)
-        return "[measure]";
-    return "";
-}
-
-export class ExtensionRange {
+export class SpanRange {
     public readonly columnRange: ObjRhythmColumn[];
-    public stopObject?: ExtensionStopObject;
+    public stopObject?: SpanStopObject;
 
     constructor(public readonly startColumn: ObjRhythmColumn) {
         this.columnRange = [startColumn];
@@ -40,12 +33,15 @@ export class ExtensionRange {
         if (this.endColumn !== col) this.columnRange.push(col);
     }
 
-    setStopObject(obj: ExtensionStopObject) {
+    setStopObject(obj: SpanStopObject) {
         this.stopObject = obj;
     }
 }
 
-export class Extension extends MusicObjectLink {
+export class SpanProps {
+    readonly annotationObj: ObjAnnotation;
+    readonly spanSegments: ObjSpanSegment[];
+
     private readonly length: number;
     private readonly visible: boolean;
 
@@ -55,7 +51,10 @@ export class Extension extends MusicObjectLink {
     private readonly startColumn: ObjRhythmColumn;
 
     constructor(readonly headObj: LayoutObjectWrapper, startColumn: ObjRhythmColumn, length: number, visible: boolean, lineStyle: ExtensionLineStyle, linePos: ExtensionLinePos) {
-        super(headObj.musicObj);
+        Assert.assert(headObj.musicObj instanceof ObjAnnotation, "Head object must be annotation!");
+
+        this.annotationObj = headObj.musicObj as ObjAnnotation;
+        this.spanSegments = [];
 
         this.length = length + 1; // + 1 just to connect with following elem.
         this.visible = visible;
@@ -64,6 +63,10 @@ export class Extension extends MusicObjectLink {
         this.linePos = linePos;
 
         this.startColumn = startColumn;
+    }
+
+    addSpanSegment(obj: ObjSpanSegment) {
+        this.spanSegments.push(obj);
     }
 
     isVisible() {
@@ -80,7 +83,7 @@ export class Extension extends MusicObjectLink {
 
     private static StopNavigations = [AnnotationKind.EndRepeat, AnnotationKind.Ending];
 
-    private whatStopped(col: ObjRhythmColumn): ExtensionStopObject | undefined {
+    private whatStopped(col: ObjRhythmColumn): SpanStopObject | undefined {
         const m = col.measure;
         const cols = m.getColumns();
 
@@ -91,15 +94,15 @@ export class Extension extends MusicObjectLink {
 
         return stoppingCol ? stoppingCol : (
             col === cols[cols.length - 1] &&
-            m.hasEndSection() || m.hasEndSong() || Extension.StopNavigations.some(nav => m.hasAnnotationKind(nav))
+            m.hasEndSection() || m.hasEndSong() || SpanProps.StopNavigations.some(nav => m.hasAnnotationKind(nav))
         ) ? m.getBarLineRight() : undefined;
     }
 
-    getRange(): ExtensionRange {
+    getRange(): SpanRange {
         let { startColumn, length } = this;
 
         let curColumn: ObjRhythmColumn | undefined = startColumn;
-        let range = new ExtensionRange(curColumn);
+        let range = new SpanRange(curColumn);
         let ticksLeft = Math.max(0, length - 1);
 
         while (true) {

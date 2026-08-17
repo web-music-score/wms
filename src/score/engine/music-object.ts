@@ -2,39 +2,8 @@ import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { MusicInterface } from "../pub";
 import { LayoutObjectWrapper } from "./layout-object";
 
-export class MusicObjectLink {
-    private head: MusicObject;
-    private tail: MusicObject[];
-
-    constructor(head: MusicObject) {
-        this.head = head;
-        this.tail = [];
-    }
-
-    getHead(): MusicObject {
-        return this.head;
-    }
-
-    getTails(): ReadonlyArray<MusicObject> {
-        return this.tail;
-    }
-
-    addTail(obj: MusicObject) {
-        this.tail.push(obj);
-    }
-
-    detachTail(obj: MusicObject) {
-        let i = this.tail.indexOf(obj);
-        if (i >= 0) {
-            this.tail.splice(i, 1);
-        }
-    }
-}
-
 export abstract class MusicObject {
     private anchoredLayoutObjects: LayoutObjectWrapper[] = [];
-
-    private link?: MusicObjectLink = undefined;
 
     constructor(protected readonly parent: MusicObject | undefined) { }
 
@@ -109,18 +78,6 @@ export abstract class MusicObject {
 
     getAnchoredLayoutObjects(): ReadonlyArray<LayoutObjectWrapper> {
         return this.anchoredLayoutObjects;
-    }
-
-    setLink(link: MusicObjectLink): void {
-        this.link = link;
-    }
-
-    getLink(): MusicObjectLink | undefined {
-        return this.link;
-    }
-
-    isLinked(): boolean {
-        return this.link !== null;
     }
 
     intersects(clipRect?: Rect): boolean {

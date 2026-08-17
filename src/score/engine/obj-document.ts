@@ -254,10 +254,6 @@ export class ObjDocument extends MusicObject {
         return voiceSymbols;
     }
 
-    removeLayoutObjects(musicObj: MusicObject) {
-        this.forEachMeasure(m => m.removeLayoutObjects(musicObj));
-    }
-
     private forEachMeasure(func: (m: ObjMeasure) => void) {
         let m = this.getFirstMeasure();
         while (m) {
@@ -303,8 +299,9 @@ export class ObjDocument extends MusicObject {
         // Update running parameters
         this.getFirstMeasure()?.updateRunningArguments();
 
-        // Recreate extensions.
-        this.forEachMeasure(m => m.createExtensions());
+        // Recreate spans.
+        this.forEachMeasure(m => m.removeSpanSegments());
+        this.forEachMeasure(m => m.createSpanSegments());
 
         // Create connectives.
         this.allConnectiveProps.forEach(props => props.removeConnectives());

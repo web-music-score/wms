@@ -7,7 +7,7 @@ import { ObjSpecialText } from "./obj-special-text";
 import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { View } from "./view";
-import { ObjExtensionLine } from "./obj-extension-line";
+import { ObjSpanSegment } from "./obj-span-segment";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
@@ -70,7 +70,7 @@ function requireParentMeasure(p: MusicObject | undefined): ObjMeasure {
 
 export enum VerticalPos { Above = 0, Below = 1 }
 
-export type LayoutableMusicObject = ObjAnnotation | ObjExtensionLine | ObjEnding | ObjLyrics | ObjTabRhythm;
+export type LayoutableMusicObject = ObjAnnotation | ObjSpanSegment | ObjEnding | ObjLyrics | ObjTabRhythm;
 
 export class StaffGroup {
     constructor(readonly groupName: string, readonly staffsTabsAndGroups: number | string | (number | string)[], readonly verticalPosition: VerticalPosition) { }

@@ -19,9 +19,9 @@ import { ObjText } from "./obj-text";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjSymbol } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
-import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, getNavigationString, isNoteArticulation } from "./annotation-utils";
-import { Extension, ExtensionLinePos, ExtensionLineStyle } from "./extension";
-import { ObjExtensionLine } from "./obj-extension-line";
+import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, isNoteArticulation } from "./annotation-utils";
+import { SpanProps, ExtensionLinePos, ExtensionLineStyle, getExtensionLineAnchorY } from "./span-props";
+import { ObjSpanSegment } from "./obj-span-segment";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
@@ -30,13 +30,6 @@ import { ScoreError } from "./error-utils";
 import { InstrumentValue } from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjAnnotation } from "./obj-annotation";
-
-export function getExtensionAnchorY(linePos: ExtensionLinePos) {
-    switch (linePos) {
-        case "bottom": return 0.8;
-        case "middle": return 0.5;
-    }
-}
 
 type AlterTempo = {
     beatsPerMinute: number,
@@ -672,7 +665,7 @@ export class ObjMeasure extends MusicObject {
             const anchor = this.lastAddedRhythmColumn;
             if (anchor) {
                 const anchorX = 0.5;
-                const anchorY = getExtensionAnchorY("bottom");
+                const anchorY = getExtensionLineAnchorY("bottom");
                 createLayoutObject = (line, vpos) => new ObjAnnotation(anchor, annotationKind, annotationGroup, anchorX, anchorY, false, false, color);
             }
         }
@@ -694,8 +687,7 @@ export class ObjMeasure extends MusicObject {
                         const lineStyle: ExtensionLineStyle = "dashed";
                         const linePos: ExtensionLinePos = "bottom";
 
-                        const extension = new Extension(layoutObj, anchor, ticks, visible, lineStyle, linePos);
-                        musicObj.setLink(extension);
+                        musicObj.setSpanProps(new SpanProps(layoutObj, anchor, ticks, visible, lineStyle, linePos));
                     }
                 }
             });
@@ -934,25 +926,6 @@ export class ObjMeasure extends MusicObject {
         this.staticObjectsCache.getOrCreate(line, []).push(staticObj);
     }
 
-    removeLayoutObjects(musicObj: MusicObject) {
-        this.layoutObjects = this.layoutObjects.filter(layoutObj => {
-            if (layoutObj.musicObj === musicObj) {
-
-                let link = layoutObj.musicObj.getLink();
-                if (link) {
-                    link.detachTail(layoutObj.musicObj);
-                }
-
-                layoutObj.layoutGroup.remove(layoutObj);
-
-                return false; // removed, filter out
-            }
-            else {
-                return true; // keep
-            }
-        });
-    }
-
     addConnectiveObject(connective: ObjConnective) {
         this.connectives.push(connective);
         this.requestLayout();
@@ -965,24 +938,39 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    createExtensions() {
+    removeSpanSegments() {
         this.layoutObjects.forEach(layoutObj => {
-            let { musicObj, measure, layoutGroupId, verticalPos, line } = layoutObj;
+            let { musicObj } = layoutObj;
 
-            if (musicObj.getLink() instanceof Extension) {
-                let extension = musicObj.getLink() as Extension;
+            if (musicObj instanceof ObjAnnotation && musicObj.hasSpan()) {
+                let spanProps = musicObj.getSpanProps()!;
 
-                if (extension.getHead() !== musicObj)
+                // Remove old span segments
+                spanProps.spanSegments.forEach(seg => {
+                    const m = seg.measure;
+                    const i = m.layoutObjects.findIndex(o => o.musicObj === seg);
+                    if (i >= 0) {
+                        m.layoutObjects.splice(i, 1);
+                    }
+                });
+
+                spanProps.spanSegments.length = 0;
+            }
+        });
+    }
+
+    createSpanSegments() {
+        this.layoutObjects.forEach(layoutObj => {
+            let { musicObj, layoutGroupId, verticalPos, line } = layoutObj;
+
+            if (musicObj instanceof ObjAnnotation && musicObj.hasSpan()) {
+                let spanProps = musicObj.getSpanProps()!;
+
+                if (!spanProps.isVisible())
                     return;
 
-                // Remove old extnsion lines
-                extension.getTails().forEach(musicObj2 => measure.removeLayoutObjects(musicObj2));
-
-                if (!extension.isVisible())
-                    return;
-
-                // Create new extension lines
-                const range = extension.getRange();
+                // Create new span segments
+                const range = spanProps.getRange();
                 const rcols = range.columnRange.slice();
 
                 for (let isFirst = true; rcols.length > 1; isFirst = false) {
@@ -1003,7 +991,7 @@ export class ObjMeasure extends MusicObject {
                     ];
 
                     measure.addLayoutObject(
-                        new ObjExtensionLine(measure, lineMatch, extension, extCols),
+                        new ObjSpanSegment(measure, lineMatch, spanProps, extCols),
                         lineMatch, layoutGroupId, verticalPos
                     );
                 }

@@ -2,10 +2,11 @@ import { DrawSymbol, View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { AnnotationGroup, AnnotationKind, MAnnotation } from "../pub";
-import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
+import { Rect } from "@tspro/ts-utils-lib";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjSymbol } from "./obj-symbol";
 import { getAnnotationKindTextReplacement, getNavigationString } from "./annotation-utils";
+import { SpanProps } from "./span-props";
 
 export class ObjAnnotation extends MusicObject {
     public static toCoda = "𝄌 toCoda";
@@ -13,6 +14,8 @@ export class ObjAnnotation extends MusicObject {
     public static Segno = "𝄋";
 
     private component: ObjText | ObjSpecialText | ObjSymbol;
+
+    private spanProps?: SpanProps;
 
     readonly mi: MAnnotation;
 
@@ -54,6 +57,18 @@ export class ObjAnnotation extends MusicObject {
 
     getMusicInterface(): MAnnotation {
         return this.mi;
+    }
+
+    setSpanProps(spanProps: SpanProps) {
+        this.spanProps = spanProps;
+    }
+
+    getSpanProps(): SpanProps |undefined {
+        return this.spanProps;
+    }
+
+    hasSpan(): boolean {
+        return !!this.spanProps;
     }
 
     pick(x: number, y: number): MusicObject[] {
