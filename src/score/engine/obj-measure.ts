@@ -957,6 +957,8 @@ export class ObjMeasure extends MusicObject {
             const m = seg.measure;
             const i = m.layoutObjects.findIndex(o => o.musicObj === seg);
             if (i >= 0) {
+                const layoutObj = m.layoutObjects[i];
+                layoutObj.layoutGroup.remove(layoutObj);
                 m.layoutObjects.splice(i, 1);
             }
         });
