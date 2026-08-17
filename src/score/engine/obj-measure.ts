@@ -939,22 +939,25 @@ export class ObjMeasure extends MusicObject {
     }
 
     removeSpanSegments() {
+        const segmentsToRemove: ObjSpanSegment[] = [];
+
         this.layoutObjects.forEach(layoutObj => {
             let { musicObj } = layoutObj;
 
-            if (musicObj instanceof ObjAnnotation && musicObj.hasSpan()) {
-                let spanProps = musicObj.getSpanProps()!;
+            if (musicObj instanceof ObjAnnotation) {
+                let spanProps = musicObj.getSpanProps();
+                if (spanProps) {
+                    spanProps.spanSegments.forEach(seg => segmentsToRemove.push(seg));
+                    spanProps.spanSegments.length = 0;
+                }
+            }
+        });
 
-                // Remove old span segments
-                spanProps.spanSegments.forEach(seg => {
-                    const m = seg.measure;
-                    const i = m.layoutObjects.findIndex(o => o.musicObj === seg);
-                    if (i >= 0) {
-                        m.layoutObjects.splice(i, 1);
-                    }
-                });
-
-                spanProps.spanSegments.length = 0;
+        segmentsToRemove.forEach(seg => {
+            const m = seg.measure;
+            const i = m.layoutObjects.findIndex(o => o.musicObj === seg);
+            if (i >= 0) {
+                m.layoutObjects.splice(i, 1);
             }
         });
     }
