@@ -45,6 +45,8 @@ export class ObjExtensionLine extends MusicObject {
     constructor(readonly measure: ObjMeasure, readonly line: ObjNotationLine, readonly extension: Extension, readonly cols: ExtensionObjectAll[]) {
         super(measure);
 
+        this.setLink(extension);
+
         extension.addTail(this);
 
         this.mi = new MExtensionLine(this);

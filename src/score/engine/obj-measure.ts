@@ -1031,25 +1031,6 @@ export class ObjMeasure extends MusicObject {
         this.staticObjectsCache.getOrCreate(line, []).push(staticObj);
     }
 
-    removeLayoutObjects(musicObj: MusicObject) {
-        this.layoutObjects = this.layoutObjects.filter(layoutObj => {
-            if (layoutObj.musicObj === musicObj) {
-
-                let link = layoutObj.musicObj.getLink();
-                if (link) {
-                    link.detachTail(layoutObj.musicObj);
-                }
-
-                layoutObj.layoutGroup.remove(layoutObj);
-
-                return false; // removed, filter out
-            }
-            else {
-                return true; // keep
-            }
-        });
-    }
-
     addConnectiveObject(connective: ObjConnective) {
         this.connectives.push(connective);
         this.requestLayout();
@@ -1062,46 +1043,58 @@ export class ObjMeasure extends MusicObject {
         }
     }
 
-    createExtensions() {
-        this.layoutObjects.forEach(layoutObj => {
-            let { musicObj, measure, layoutGroupId, verticalPos, line } = layoutObj;
+    removeExtensions() {
+        this.layoutObjects = this.layoutObjects.filter(layoutObj => {
+            let { musicObj } = layoutObj;
 
             if (musicObj.getLink() instanceof Extension) {
                 let extension = musicObj.getLink() as Extension;
 
-                if (extension.getHead() !== musicObj)
-                    return;
+                if (musicObj !== extension.getHead()) {
+                    extension.detachTail(musicObj);
+                    layoutObj.layoutGroup.remove(layoutObj);
+                    return false; // Extension tail, remove.
+                }
+            }
 
-                // Remove old extnsion lines
-                extension.getTails().forEach(musicObj2 => measure.removeLayoutObjects(musicObj2));
+            return true; // Not extension tail, keep.
+        });
+    }
 
-                if (!extension.isVisible())
-                    return;
+    createExtensions() {
+        this.layoutObjects.forEach(layoutObj => {
+            let { musicObj, layoutGroupId, verticalPos, line } = layoutObj;
 
-                // Create new extension lines
-                const range = extension.getRange();
-                const rcols = range.columnRange.slice();
+            if (musicObj.getLink() instanceof Extension) {
+                let extension = musicObj.getLink() as Extension;
 
-                for (let isFirst = true; rcols.length > 1; isFirst = false) {
-                    const { measure } = rcols[0];
-                    const i = rcols.findIndex(col => col.measure !== measure);
-                    const mcols = rcols.splice(0, i > 0 ? i : rcols.length);
-                    if (mcols.length < 2) continue;
+                if (musicObj === extension.getHead() && extension.isVisible()) {
+                    // Create new extension lines
+                    const range = extension.getRange();
+                    const rcols = range.columnRange.slice();
 
-                    const lineMatch = measure.row.findMatchingLine(line);
-                    if (!lineMatch) continue;
+                    for (let isFirst = true; rcols.length > 1; isFirst = false) {
+                        const { measure } = rcols[0];
+                        const i = rcols.findIndex(col => col.measure !== measure);
+                        const mcols = rcols.splice(0, i > 0 ? i : rcols.length);
+                        if (mcols.length < 2) continue;
 
-                    const isLast = rcols.length === 0;
+                        const lineMatch = measure.row.findMatchingLine(line);
+                        if (!lineMatch) continue;
 
-                    const extCols = [
-                        ...(isFirst ? [musicObj] : []),
-                        ...mcols,
-                        ...(isLast && range.stopObject ? [range.stopObject] : [])
-                    ];
+                        const isLast = rcols.length === 0;
 
-                    measure.addLayoutObject(
-                        new ObjExtensionLine(measure, lineMatch, extension, extCols),
-                        lineMatch, layoutGroupId, verticalPos);
+                        const extCols = [
+                            ...(isFirst ? [musicObj] : []),
+                            ...mcols,
+                            ...(isLast && range.stopObject ? [range.stopObject] : [])
+                        ];
+
+                        measure.addLayoutObject(
+                            new ObjExtensionLine(measure, lineMatch, extension, extCols),
+                            lineMatch, layoutGroupId, verticalPos
+                        );
+                    }
                 }
             }
         });

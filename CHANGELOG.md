@@ -2,6 +2,7 @@
 ## [6.5.1] - Unreleased
 ### Fixed
 - Set object anchorY correctly.
+- Added missing setLink() call for extension lines, and correctly remove extension lines.
 
 ## [6.5.0] - 2026-08-11
 ### Added
