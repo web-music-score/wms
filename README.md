@@ -1,7 +1,7 @@
 # Web Music Score
 Web Music Score is a TS/JS music score viewer and player for the web.
 
-📚 Documentation: [web-music-score.org](https://web-music-score.org)
+📚 Documentation: [web-music-score.github.io](https://web-music-score.github.io)
 
 ## Report a Bug
 Found a bug or have a feature suggestion?
