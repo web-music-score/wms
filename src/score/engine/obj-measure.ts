@@ -20,7 +20,7 @@ import { ObjSpecialText } from "./obj-special-text";
 import { ObjSymbol } from "./obj-symbol";
 import { LayoutGroupId, LayoutObjectWrapper, LayoutableMusicObject, VerticalPos } from "./layout-object";
 import { getAnnotationDefaultVerticalPos, getAnnotationLayoutGroupId, isNoteArticulation } from "./annotation-utils";
-import { SpanProps, ExtensionLinePos, ExtensionLineStyle, getExtensionLineAnchorY } from "./span-props";
+import { SpanProps } from "./span-props";
 import { ObjSpanSegment } from "./obj-span-segment";
 import { ConnectiveProps } from "./connective-props";
 import { ObjStaff, ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
@@ -664,9 +664,7 @@ export class ObjMeasure extends MusicObject {
         else {
             const anchor = this.lastAddedRhythmColumn;
             if (anchor) {
-                const anchorX = 0.5;
-                const anchorY = getExtensionLineAnchorY("bottom");
-                createLayoutObject = (line, vpos) => new ObjAnnotation(anchor, annotationKind, annotationGroup, anchorX, anchorY, false, false, color);
+                createLayoutObject = (line, vpos) => new ObjAnnotation(anchor, annotationKind, annotationGroup, 0.5, 0.5, false, false, color);
             }
         }
 
@@ -683,11 +681,7 @@ export class ObjMeasure extends MusicObject {
 
                     if (musicObj instanceof ObjAnnotation && anchor instanceof ObjRhythmColumn) {
                         const { ticks, visible } = spanProps;
-
-                        const lineStyle: ExtensionLineStyle = "dashed";
-                        const linePos: ExtensionLinePos = "bottom";
-
-                        musicObj.setSpanProps(new SpanProps(layoutObj, anchor, ticks, visible, lineStyle, linePos));
+                        musicObj.setSpanProps(new SpanProps(layoutObj, anchor, ticks, visible));
                     }
                 }
             });

@@ -15,6 +15,7 @@ import { createBeamsTupletsDemo } from "./beams-tuplets";
 import { createAnnotationTempoDemo } from "./annotation-tempo";
 import { createAnnotationOctaveShiftDemo } from "./annotation-octave-shift";
 import { createAnnotationDynamicsDemo } from "./annotation-dynamics";
+import { createAnnotationHairpinDemo } from "./annotation-hairpin";
 import { createFillWithRestsDemo } from "./fill-with-rests";
 import { createStaffConfigGuitarDemo } from "./staff-guitar";
 import { createStaffConfigTabDemo } from "./staff-tab";
@@ -67,6 +68,7 @@ export class DemoPieces {
         demos.push(createAnnotationTempoDemo());
         demos.push(createAnnotationOctaveShiftDemo());
         demos.push(createAnnotationDynamicsDemo());
+        demos.push(createAnnotationHairpinDemo());
         demos.push(createFillWithRestsDemo());
         demos.push(createStaffConfigGuitarDemo());
         demos.push(createStaffConfigTabDemo());

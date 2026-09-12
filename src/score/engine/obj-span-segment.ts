@@ -3,8 +3,8 @@ import { MusicObject } from "./music-object";
 import { ObjRhythmColumn } from "./obj-rhythm-column";
 import { ObjBarLineLeft, ObjBarLineRight } from "./obj-bar-line";
 import { ObjMeasure } from "./obj-measure";
-import { SpanProps } from "./span-props";
-import { MSpanSegment } from "../pub";
+import { SpanProps, SpanType } from "./span-props";
+import { AnnotationKind, MSpanSegment } from "../pub";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ObjScoreRow } from "./obj-score-row";
@@ -60,6 +60,10 @@ export class ObjSpanSegment extends MusicObject {
 
     get color(): string {
         return (this.spanProps.headObj.musicObj as { color?: string }).color ?? this.doc.color;
+    }
+
+    get type(): SpanType {
+        return this.spanProps.type;
     }
 
     getMusicInterface(): MSpanSegment {
@@ -132,7 +136,23 @@ export class ObjSpanSegment extends MusicObject {
 
         [lineLeft, lineRight] = [Math.min(lineLeft, lineRight), Math.max(lineLeft, lineRight)];
 
-        this.rect = new AnchoredRect(lineLeft, lineRight, -recth / 2, recth / 2);
+        this.rect = new AnchoredRect(lineLeft, lineRight, -recth, recth);
+
+        if (this.type === SpanType.Line) {
+            let offsetY: number;
+
+            switch (this.spanProps.linePos) {
+                case "bottom":
+                    offsetY = view.unitSize * 1.1;
+                    break;
+                case "middle":
+                default:
+                    offsetY = 0;
+                    break;
+            }
+
+            this.rect.anchorY -= offsetY;
+        }
     }
 
     pick(x: number, y: number): MusicObject[] {
@@ -151,24 +171,49 @@ export class ObjSpanSegment extends MusicObject {
         if (!this.intersects(clipRect))
             return;
 
-        let { rect } = this;
+        const rowSegments = this.spanProps.spanSegments.filter(s => s.row === this.row);
 
-        if (this.spanProps.getLineStyle() === "dashed")
-            view.setLineDash([7, 3]);
+        if (rowSegments.length === 0)
+            return;
+
+        const left = rowSegments[0];
+        const right = rowSegments[rowSegments.length - 1];
+
+        const thisRect = this.getRect();
+        const leftRect = left.getRect();
+        const rightRect = right.getRect();
 
         view.color(this.color).lineWidth(1);
 
-        view.strokeLine(rect.left, rect.anchorY, rect.right, rect.anchorY);
+        view.save();
+        view.clipRect(thisRect.left, thisRect.top, thisRect.width, thisRect.height);
 
-        view.setLineDash([]);
+        if (this.type === SpanType.Line) {
 
-        // Draw tip end of last line
-        let { spanSegments } = this.spanProps;
-        let last = spanSegments[spanSegments.length - 1];
+            if (this.spanProps.lineStyle === "dashed")
+                view.setLineDash([7, 3]);
 
-        if (this === last && !isSpanStopObject(this.getRightObj())) {
-            let tipH = rect.anchorY > this.line.getRect().anchorY ? -view.unitSize : view.unitSize;
-            view.strokeLine(rect.right, rect.anchorY, rect.right, rect.anchorY + tipH);
+            view.strokeLine(leftRect.left, leftRect.centerY, rightRect.right, rightRect.centerY);
+
+            view.setLineDash([]);
+
+            // Draw tip end of last line
+            if (this === right && !isSpanStopObject(this.getRightObj())) {
+                let tipY = rightRect.centerY > this.line.getRect().anchorY ? rightRect.top : rightRect.bottom;
+                view.strokeLine(rightRect.right, rightRect.centerY, rightRect.right, tipY);
+            }
         }
+        else if (this.type === SpanType.Hairpin) {
+            if (this.spanProps.annotationObj.kind === "<") {
+                view.strokeLine(leftRect.left, leftRect.centerY, rightRect.right, rightRect.centerY - rightRect.height / 2 * 0.75);
+                view.strokeLine(leftRect.left, leftRect.centerY, rightRect.right, rightRect.centerY + rightRect.height / 2 * 0.75);
+            }
+            else if (this.spanProps.annotationObj.kind === ">") {
+                view.strokeLine(rightRect.right, rightRect.centerY, leftRect.left, leftRect.centerY - leftRect.height / 2 * 0.75);
+                view.strokeLine(rightRect.right, rightRect.centerY, leftRect.left, leftRect.centerY + leftRect.height / 2 * 0.75);
+            }
+        }
+
+        view.restore();
     }
 }

@@ -2,7 +2,7 @@ import { DrawSymbol, View } from "./view";
 import { MusicObject } from "./music-object";
 import { ObjText } from "./obj-text";
 import { AnnotationGroup, AnnotationKind, MAnnotation } from "../pub";
-import { Rect } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Rect } from "@tspro/ts-utils-lib";
 import { ObjSpecialText } from "./obj-special-text";
 import { ObjSymbol } from "./obj-symbol";
 import { getAnnotationKindTextReplacement, getNavigationString } from "./annotation-utils";
@@ -16,6 +16,7 @@ export class ObjAnnotation extends MusicObject {
     private component: ObjText | ObjSpecialText | ObjSymbol;
 
     private spanProps?: SpanProps;
+    private isHairpin: boolean;
 
     readonly mi: MAnnotation;
 
@@ -52,6 +53,8 @@ export class ObjAnnotation extends MusicObject {
             this.component = new ObjText(this, { text, color }, 0.5, 1);
         }
 
+        this.isHairpin = kind === "<" || kind === ">";
+
         this.mi = new MAnnotation(this);
     }
 
@@ -63,7 +66,7 @@ export class ObjAnnotation extends MusicObject {
         this.spanProps = spanProps;
     }
 
-    getSpanProps(): SpanProps |undefined {
+    getSpanProps(): SpanProps | undefined {
         return this.spanProps;
     }
 
@@ -72,10 +75,18 @@ export class ObjAnnotation extends MusicObject {
     }
 
     pick(x: number, y: number): MusicObject[] {
+        if (this.isHairpin)
+            return [];
+
         return this.rect.contains(x, y) ? [this] : [];
     }
 
     layout(view: View) {
+        if (this.isHairpin) {
+            this.rect = new AnchoredRect();
+            return;
+        }
+
         this.component.layout(view);
 
         this.rect = this.component.getRect().clone();
@@ -90,7 +101,7 @@ export class ObjAnnotation extends MusicObject {
     }
 
     draw(view: View, clipRect?: Rect) {
-        if (!this.intersects(clipRect))
+        if (!this.intersects(clipRect) || this.isHairpin)
             return;
 
         view.drawDebugRect(this.rect);

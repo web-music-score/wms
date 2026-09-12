@@ -34,6 +34,7 @@
 ### Added
 - "color" field to LyricsOptions.
 - ConnectiveOptions with "color" field.
+- "<" (cresc.) and ">" (dim.) hairpin annotation spans.
 
 ### Fixed
 - Span/extension range.

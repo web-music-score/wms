@@ -360,7 +360,7 @@ export class PlayerEngine {
                 ) {
                     let spanProps = layoutObj.musicObj instanceof ObjAnnotation && layoutObj.musicObj.hasSpan()
                         ? layoutObj.musicObj.getSpanProps()!
-                        : new SpanProps(layoutObj, col, Infinity, false, "solid", "bottom"); // Create dummy extension.
+                        : new SpanProps(layoutObj, col, Infinity, false); // Create dummy extension.
 
                     const spanRange = spanProps.getRange();
                     const stopText = getAnnotationKindFromObject(spanRange.stopObject);
@@ -389,7 +389,8 @@ export class PlayerEngine {
                             });
                             break;
                         }
-                        case AnnotationKind.cresc: {
+                        case AnnotationKind.cresc:
+                        case AnnotationKind.cresc_hairpin: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
                             if (spanRange.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol > startVol) {
@@ -403,7 +404,9 @@ export class PlayerEngine {
                             break;
                         }
                         case AnnotationKind.decresc:
-                        case AnnotationKind.dim: {
+                        case AnnotationKind.dim: 
+                        case AnnotationKind.decresc_hairpin:
+                        case AnnotationKind.dim_hairpin: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
                             if (spanRange.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol < startVol) {

@@ -381,6 +381,12 @@ export enum AnnotationKind {
     decresc = "decresc.",
     /** diminuendo (gradually softer) */
     dim = "dim.",
+    /** crescendo hairpin (gradually louder) */
+    cresc_hairpin = "<",
+    /** diminuendo hairpin (gradually softer) */
+    decresc_hairpin = ">",
+    /** diminuendo hairpin (gradually softer) */
+    dim_hairpin = ">",
     /** forte then immediately piano */
     fp = "fp",
     /** sudden strong accent */
