@@ -85,8 +85,12 @@ export class ObjSpanSegment extends MusicObject {
 
         if (obj instanceof ObjRhythmColumn) {
             const mcols = obj.measure.getColumns();
-            if (obj === mcols[0])
-                return obj.measure.getRect().left;
+            if (obj === mcols[0]) {
+                if (obj.measure.isFirstMeasureInRow())
+                    return obj.measure.getColumnsContentRect().left;
+                else
+                    return obj.measure.getRect().left;
+            }
         }
 
         return obj.getRect().right;
