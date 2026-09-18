@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## [7.0.0-pre.1] - Unreleased
+### Changes
+
 ## [7.0.0-pre.0] - 2026-09-19
 ### **Breaking Changes**
 - Removed deprecated audio-synth and audio-cg modules.
