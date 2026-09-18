@@ -140,9 +140,6 @@ export abstract class ObjNotationLine extends MusicObject {
                 let objectParts = [spanProps.annotationObj, ...spanProps.spanSegments];
                 layoutObjects = layoutGroup.getLayoutObjects().filter(layoutObj => objectParts.some(o => o === layoutObj.musicObj));
             }
-            else {
-                layoutObjects = [];
-            }
         }
 
         if (layoutObjects.length === 0)
