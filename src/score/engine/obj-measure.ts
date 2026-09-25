@@ -578,6 +578,15 @@ export class ObjMeasure extends MusicObject {
 
         const color = annotationOptions.color ?? this.doc.color;
 
+        // If hairpin does not have span, add span of some length.
+        if (!spanProps && annotationGroup === Pub.AnnotationGroup.Dynamics && (
+            annotationKind === Pub.AnnotationKind.cresc_hairpin ||
+            annotationKind === Pub.AnnotationKind.decresc_hairpin ||
+            annotationKind === Pub.AnnotationKind.dim_hairpin
+        )) {
+            spanProps = { ticks: this.getMeasureTicks(), visible: true }
+        }
+
         if (annotationGroup === Pub.AnnotationGroup.Articulation && isNoteArticulation(annotationKind as Pub.AnnotationKind)) {
             const lastNote = this.lastAddedRhythmSymbol instanceof ObjNoteGroup ? this.lastAddedRhythmSymbol : undefined
 
