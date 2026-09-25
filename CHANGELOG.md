@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## [7.0.0-pre.2] - Unreleased
+
 ## [7.0.0-pre.1] - 2026-09-25
 ### Fixed
 - Add default span for hairpin annotations without span.
