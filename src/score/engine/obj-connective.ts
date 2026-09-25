@@ -6,7 +6,7 @@ import { ConnectiveProps } from "./connective-props";
 import { ObjMeasure } from "./obj-measure";
 import { MConnective, TieType, Connective } from "../pub";
 import { DocumentSettings } from "./settings";
-import { ObjNotationLine, ObjTab } from "./obj-staff-and-tab";
+import { ObjNotationLine, ObjStaff } from "./obj-staff-and-tab";
 import { ScoreError } from "./error-utils";
 
 export class ObjConnective extends MusicObject {
@@ -138,7 +138,8 @@ export class ObjConnective extends MusicObject {
             throw new ScoreError("Cannot layout connective object because no valid left and right note groups.");
         }
 
-        let spanDy = arcDir === "up" ? -1 : 1;
+        const spanDy = arcDir === "up" && (line instanceof ObjStaff) ? -1 : 1;
+
         let arcHeight = spanDy * unitSize * Math.log2(rx - lx) / 3;
 
         this.lx = lx;

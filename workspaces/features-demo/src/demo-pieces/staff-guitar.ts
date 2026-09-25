@@ -39,7 +39,7 @@ export function createStaffConfigGuitarDemo() {
         .endRow()
 
         .addMeasure()
-        .addNote(0, "F3", "2n", { string: 4 }).addConnective("tie")
+        .addNote(0, "F3", "2n", { string: 4 }).addConnective("tie", 2, "above")
         .addNote(0, "F3", "2n", { string: 4 })
 
         .addMeasure()

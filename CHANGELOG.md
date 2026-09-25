@@ -4,6 +4,7 @@
 ### Changes
 - Add default span for hairpin annotations without span.
 - Add padding for PitchLabel and ChordLabel layout groups.
+- In tab always connective arc dir = "down".
 
 ## [7.0.0-pre.0] - 2026-09-19
 ### **Breaking Changes**
