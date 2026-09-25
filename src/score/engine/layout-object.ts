@@ -1,17 +1,14 @@
 import { VerticalPosition } from "../pub";
 import { MusicObject } from "./music-object";
 import { ObjEnding } from "./obj-ending";
-import { ObjSymbol } from "./obj-symbol";
 import { ObjMeasure } from "./obj-measure";
-import { ObjSpecialText } from "./obj-special-text";
-import { ObjText } from "./obj-text";
 import { ObjScoreRow } from "./obj-score-row";
 import { View } from "./view";
 import { ObjSpanSegment } from "./obj-span-segment";
 import { ObjNotationLine } from "./obj-staff-and-tab";
 import { ObjLyrics } from "./obj-lyrics";
 import { ObjTabRhythm } from "./obj-tab-rhythm";
-import { AnchoredRect, asMulti, IndexArray, UniMap } from "@tspro/ts-utils-lib";
+import { AnchoredRect, UniMap } from "@tspro/ts-utils-lib";
 import { ScoreError } from "./error-utils";
 import { ObjAnnotation } from "./obj-annotation";
 
@@ -38,7 +35,7 @@ export enum LayoutGroupId {
 
 const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { isLane: boolean, padding: number }>([
     [LayoutGroupId.TabRhythm, { isLane: true, padding: 0 }],
-    [LayoutGroupId.Annotation_PitchLabel, { isLane: false, padding: 0 }],
+    [LayoutGroupId.Annotation_PitchLabel, { isLane: false, padding: 1 }],
     [LayoutGroupId.Annotation_Articulation, { isLane: false, padding: 0 }],
     [LayoutGroupId.Annotation_Technique, { isLane: false, padding: 0 }],
     [LayoutGroupId.Annotation_Ornament, { isLane: false, padding: 0 }],
@@ -49,7 +46,7 @@ const LayoutGroupIdAttrs = new UniMap<LayoutGroupId, { isLane: boolean, padding:
     [LayoutGroupId.Annotation_Temporal, { isLane: true, padding: 0 }],
     [LayoutGroupId.Annotation_Navigation, { isLane: true, padding: 0 }],
     [LayoutGroupId.Annotation_Navigation_Ending, { isLane: true, padding: 0 }],
-    [LayoutGroupId.Annotation_ChordLabel, { isLane: true, padding: 0 }],
+    [LayoutGroupId.Annotation_ChordLabel, { isLane: true, padding: 1 }],
     [LayoutGroupId.Annotation_Misc, { isLane: true, padding: 0 }],
     [LayoutGroupId.LyricsVerse1, { isLane: true, padding: 0 }],
     [LayoutGroupId.LyricsVerse2, { isLane: true, padding: 0 }],
