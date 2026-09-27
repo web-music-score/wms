@@ -561,8 +561,9 @@ export class ObjMeasure extends MusicObject {
 
     hasFermata(anchor: ObjRhythmColumn | ObjBarLineRight) {
         return this.layoutObjects.some(layoutObj => (
-            layoutObj.musicObj instanceof ObjSymbol &&
-            layoutObj.musicObj.symbol === DrawSymbol.Fermata &&
+            layoutObj.musicObj instanceof ObjAnnotation &&
+            layoutObj.musicObj.group === Pub.AnnotationGroup.Temporal &&
+            layoutObj.musicObj.kind === Pub.AnnotationKind.fermata &&
             layoutObj.anchor === anchor
         ));
     }
