@@ -1504,12 +1504,10 @@ export class ObjMeasure extends MusicObject {
         );
 
         if (this.isLastMeasureInRow()) {
-            // Expand width of last measure in case there is fermata.
+            // Expand width of last measure.
             this.rect.right = Math.max(
                 this.rect.right,
-                ...this.layoutObjects.filter(o => (
-                    o.musicObj instanceof ObjSymbol && o.musicObj.symbol === DrawSymbol.Fermata
-                )).map(o => o.musicObj.getRect().right)
+                ...this.layoutObjects.filter(o => o.musicObj instanceof ObjAnnotation).map(o => o.musicObj.getRect().right)
             );
         }
 
