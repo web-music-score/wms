@@ -1,6 +1,11 @@
 # CHANGELOG
 
-## [7.0.0-pre.2] - Unreleased
+## [7.0.0] - 2026-09-27
+**Publish as stable 7.0.0.**
+
+### Fixed
+- Expand last measure of row with annotations.
+- Fermata was not playing.
 
 ## [7.0.0-pre.1] - 2026-09-25
 ### Fixed
