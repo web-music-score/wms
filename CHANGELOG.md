@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## [7.0.1] - Unreleased
+
 ## [7.0.0] - 2026-09-27
 **Publish as stable 7.0.0.**
 
