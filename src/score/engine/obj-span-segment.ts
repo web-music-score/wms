@@ -187,6 +187,8 @@ export class ObjSpanSegment extends MusicObject {
         const leftRect = left.getRect();
         const rightRect = right.getRect();
 
+        const last = this.spanProps.spanSegments[this.spanProps.spanSegments.length - 1];
+
         view.color(this.color).lineWidth(1);
 
         view.save();
@@ -202,7 +204,7 @@ export class ObjSpanSegment extends MusicObject {
             view.setLineDash([]);
 
             // Draw tip end of last line
-            if (this === right && !isSpanStopObject(this.getRightObj())) {
+            if (this === last && !isSpanStopObject(this.getRightObj())) {
                 let tipY = rightRect.centerY > this.line.getRect().anchorY ? rightRect.top : rightRect.bottom;
                 view.strokeLine(rightRect.right, rightRect.centerY, rightRect.right, tipY);
             }

@@ -2,6 +2,9 @@
 
 ## [7.0.1] - Unreleased
 
+### Fixed
+- Tip of extension line was rendered for wrong segments.
+
 ## [7.0.0] - 2026-09-27
 **Publish as stable 7.0.0.**
 
