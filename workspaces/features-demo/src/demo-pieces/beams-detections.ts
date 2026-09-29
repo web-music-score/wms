@@ -205,6 +205,7 @@ export function createBeamsDetectionDemo() {
         .addNote(0, "G3", "8.")
         .addNote(0, "G3", "16n")
         .addNote(0, "G3", "16n")
+        .fillWithRests()
 
         .getDocument();
 }
