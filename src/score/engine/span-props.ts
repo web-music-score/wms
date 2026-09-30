@@ -74,6 +74,8 @@ export class SpanProps {
     private static StopNavigations = [AnnotationKind.EndRepeat, AnnotationKind.Ending];
 
     private whatStopped(col: ObjRhythmColumn): SpanStopObject | undefined {
+        if (col === this.startColumn) return undefined;
+
         const m = col.measure;
         const cols = m.getColumns();
 
@@ -99,6 +101,7 @@ export class SpanProps {
             if (!curColumn || ticksLeft <= 0) return range;
 
             const stopObject = this.whatStopped(curColumn);
+
             if (stopObject !== undefined) {
                 range.setStopObject(stopObject);
                 return range;
