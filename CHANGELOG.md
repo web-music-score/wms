@@ -4,6 +4,7 @@
 - Do not draw extension line over signature in first measure of row.
 - Added little more space betwen rows.
 - Added more volume range on ppp - fff.
+- Fixed volume of mp and mf.
 
 ## [6.5.1] - 2026-09-10
 ### Fixed

@@ -112,6 +112,14 @@ export function isDynamicsText(annotationKind: string): boolean {
 export function getDynamicsVolume(annotationKind: string): number | undefined {
     if (/^(p+|f+|m|mp|mf)$/.test(annotationKind)) {
         let volume = 0.5 - Utils.Str.charCount(annotationKind, "p") * 0.15 + Utils.Str.charCount(annotationKind, "f") * 0.15;
+
+        if (annotationKind === "mp") {
+            volume += 0.075;
+        }
+        else if (annotationKind === "mf") {
+            volume -= 0.075;
+        }
+
         return Utils.Math.clamp(volume, 0, 1);
     }
     else {
