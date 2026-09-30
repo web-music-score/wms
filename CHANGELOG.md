@@ -2,6 +2,7 @@
 ## [6.5.2] - Unreleased
 ### Fixed
 - Do not draw extension line over signature in first measure of row.
+- Added little more space betwen rows.
 
 ## [6.5.1] - 2026-09-10
 ### Fixed
