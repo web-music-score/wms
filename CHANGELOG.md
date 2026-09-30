@@ -6,6 +6,7 @@
 - Tip of extension line was rendered for wrong segments.
 - Added little more space between rows.
 - Added more volume range on ppp - fff.
+- Fixed volume of mp and mf.
 
 ## [7.0.0] - 2026-09-27
 **Publish as stable 7.0.0.**
