@@ -78,6 +78,8 @@ export class Extension extends MusicObjectLink {
     private static StopNavigations = [Navigation.EndRepeat, Navigation.Ending];
 
     private whatStopped(col: ObjRhythmColumn): ExtensionStopObject | undefined {
+        if (col === this.startColumn) return undefined;
+
         const m = col.measure;
         const cols = m.getColumns();
 
@@ -103,6 +105,7 @@ export class Extension extends MusicObjectLink {
             if (!curColumn || ticksLeft <= 0) return range;
 
             const stopObject = this.whatStopped(curColumn);
+
             if (stopObject !== undefined) {
                 range.setStopObject(stopObject);
                 return range;

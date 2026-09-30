@@ -5,6 +5,7 @@
 - Added little more space betwen rows.
 - Added more volume range on ppp - fff.
 - Fixed volume of mp and mf.
+- Extension stop object cannot be anchored to extension start column.
 
 ## [6.5.1] - 2026-09-10
 ### Fixed
