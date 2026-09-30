@@ -337,7 +337,7 @@ export class ObjDocument extends MusicObject {
         // Stack rows on top of each other
         this.rows.forEach(row => {
             row.setLeft(0);
-            row.setTop(this.rect.bottom + unitSize * 2);
+            row.setTop(this.rect.bottom + unitSize * 5);
             this.rect.unionInPlace(row.getRect());
         });
 
