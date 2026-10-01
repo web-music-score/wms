@@ -4,7 +4,7 @@ import { Clef, getVoiceIds, MStaff, MTab, StaffConfig, TabConfig, VoiceId } from
 import { MusicObject } from "./music-object";
 import { ObjScoreRow } from "./obj-score-row";
 import { DocumentSettings } from "./settings";
-import { AnchoredRect, Guard, Rect, UniMap, Utils } from "@tspro/ts-utils-lib";
+import { AnchoredRect, Guard, Rect, UniMap, Utils, ValueSet } from "@tspro/ts-utils-lib";
 import { LayoutGroup, LayoutGroupId, LayoutObjectWrapper, VerticalPos } from "./layout-object";
 import { ObjEnding } from "./obj-ending";
 import { ObjSpanSegment } from "./obj-span-segment";
@@ -207,6 +207,20 @@ export abstract class ObjNotationLine extends MusicObject {
             for (const layoutObj of layoutGroupObjects)
                 this.resolveIndividualObject(view, layoutGroup, layoutObj);
         }
+
+        // Spread layout objects with same anchor next to each other.
+        const anchorSet = new ValueSet<MusicObject>();
+        layoutGroupObjects.forEach(o => anchorSet.add(o.anchor));
+
+        anchorSet.forEach(anchor => {
+            let anchorObjects = layoutGroupObjects.filter(o => o.anchor === anchor);
+            for (let i = 1; i < anchorObjects.length; i++) {
+                let prev = anchorObjects[i - 1];
+                let cur = anchorObjects[i];
+                let dx = prev.getRect().right - cur.getRect().left;
+                cur.offset(dx, 0);
+            }
+        });
     }
 
     drawVerticalLine(view: View, left: number, width: number, isSystemBarLine = false) {
@@ -219,7 +233,7 @@ export abstract class ObjNotationLine extends MusicObject {
         const isGroupLine = this.getRowGroup().lines.length > 1;
         const isGrandTreble = this instanceof ObjStaff && this.isGrandTreble();
 
-        // SystemBarLine is the left mose vertical bar line.
+        // SystemBarLine is the left most vertical bar line.
 
         const top = this.getTopLineY();
         const bottom = nextLine && (isSystemBarLine || isGroupLine || isGrandTreble)

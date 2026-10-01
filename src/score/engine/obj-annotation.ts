@@ -82,14 +82,15 @@ export class ObjAnnotation extends MusicObject {
     }
 
     layout(view: View) {
-        if (this.isHairpin) {
-            this.rect = new AnchoredRect();
-            return;
-        }
-
         this.component.layout(view);
 
-        this.rect = this.component.getRect().clone();
+        if (this.isHairpin) {
+            const dummy = view.unitSize / 5;
+            this.rect = new AnchoredRect(-dummy, dummy, -dummy, dummy);
+        }
+        else {
+            this.rect = this.component.getRect().clone();
+        }
 
         this.rect.anchorX = this.rect.left + this.rect.width * this.anchorX;
         this.rect.anchorY = this.rect.top + this.rect.height * this.anchorY;
@@ -98,6 +99,12 @@ export class ObjAnnotation extends MusicObject {
     offset(dx: number, dy: number) {
         this.component.offset(dx, dy);
         this.rect.offsetInPlace(dx, dy);
+
+        // Annotation was moved => update left of first span segment to right of annotation.
+        const firstSegment = this.spanProps?.spanSegments[0];
+        if (firstSegment) {
+            firstSegment.getRect().left = this.rect.right;
+        }
     }
 
     draw(view: View, clipRect?: Rect) {

@@ -8,6 +8,7 @@
 - Added more volume range on ppp - fff.
 - Fixed volume of mp and mf.
 - Span stop object cannot be anchored to span start column.
+- Spread layout objects with same anchor next to each other for each layout group.
 
 ## [7.0.0] - 2026-09-27
 **Publish as stable 7.0.0.**
