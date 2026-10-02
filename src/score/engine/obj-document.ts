@@ -272,7 +272,17 @@ export class ObjDocument extends MusicObject {
     }
 
     finalise() {
-        
+        // Create beams.
+        this.forEachMeasure(m => m.createBeams());
+
+        // Create span segments.
+        this.forEachMeasure(m => m.createSpanSegments());
+
+        // Update running parameters
+        this.getFirstMeasure()?.updateRunningArguments();
+
+        // Create connectives.
+        this.allConnectiveProps.forEach(props => props.createConnectives());
     }
 
     requestLayout() {
@@ -296,20 +306,6 @@ export class ObjDocument extends MusicObject {
         }
 
         let { unitSize } = view;
-
-        // Recreate beams.
-        this.forEachMeasure(m => m.createBeams());
-
-        // Update running parameters
-        this.getFirstMeasure()?.updateRunningArguments();
-
-        // Recreate spans.
-        this.forEachMeasure(m => m.removeSpanSegments());
-        this.forEachMeasure(m => m.createSpanSegments());
-
-        // Create connectives.
-        this.allConnectiveProps.forEach(props => props.removeConnectives());
-        this.allConnectiveProps.forEach(props => props.createConnectives());
 
         // Reset layout groups
         this.rows.forEach(row => row.resetLayoutGroups(view));

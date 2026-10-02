@@ -85,15 +85,6 @@ export class ConnectiveProps {
         }
     }
 
-    removeConnectives() {
-        this.noteGroups.forEach(n => {
-            n.measure.removeConnectiveObjects();
-            n.removeConnectiveProps();
-        });
-
-        this.noteGroups.length = 1;
-    }
-
     createConnectives() {
         if (this.noteGroups.length === 0) {
             return;
