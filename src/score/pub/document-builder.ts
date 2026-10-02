@@ -320,7 +320,10 @@ export class DocumentBuilder {
     private getDocumentCallCounter = 0;
 
     /**
-     * Get music document after finished building.
+     * Get the music document after building is finished.
+     *
+     * Should be called only once, since this call sets up some document-wide stuff.
+     * 
      * @returns - Music document.
      */
     getDocument(): MDocument {
