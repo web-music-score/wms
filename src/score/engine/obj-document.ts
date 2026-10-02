@@ -271,6 +271,10 @@ export class ObjDocument extends MusicObject {
             view.updateCursorOverlay(player, cursorRect);
     }
 
+    finalise() {
+        
+    }
+
     requestLayout() {
         this.needLayout = true;
     }

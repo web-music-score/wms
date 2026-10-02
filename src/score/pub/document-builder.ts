@@ -317,12 +317,22 @@ export class DocumentBuilder {
         return this.doc.getLastMeasure() ?? this.doc.addMeasure(DocumentBuilder.DefaultMeasureOptions);
     }
 
+    private getDocumentCallCounter = 0;
+
     /**
      * Get music document after finished building.
      * @returns - Music document.
      */
     getDocument(): MDocument {
         this.getMeasure(); // Ensures document has at least one measure.
+
+        if (++this.getDocumentCallCounter > 1) {
+            console.warn("Warning! DocumentBuilder.getDocument() called more than once! Some stuff only finalised the first time!");
+        }
+        else {
+            this.doc.finalise();
+        }
+
         return this.doc.getMusicInterface();
     }
 
