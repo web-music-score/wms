@@ -482,6 +482,10 @@ export class ObjNoteGroup extends MusicObject {
         });
     }
 
+    removeConnectiveProps() {
+        this.runningConnectives = [];
+    }
+
     getPlaySlur(): "first" | "slurred" | undefined {
         let slurs = this.runningConnectives
             .filter(c => c.connective === Connective.Slur)

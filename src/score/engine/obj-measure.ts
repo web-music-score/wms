@@ -931,6 +931,39 @@ export class ObjMeasure extends MusicObject {
         this.requestLayout();
     }
 
+    removeConnectiveObjects() {
+        if (this.connectives.length > 0) {
+            this.connectives = [];
+            this.requestLayout();
+        }
+    }
+
+    removeSpanSegments() {
+        const segmentsToRemove: ObjSpanSegment[] = [];
+
+        this.layoutObjects.forEach(layoutObj => {
+            let { musicObj } = layoutObj;
+
+            if (musicObj instanceof ObjAnnotation) {
+                let spanProps = musicObj.getSpanProps();
+                if (spanProps) {
+                    spanProps.spanSegments.forEach(seg => segmentsToRemove.push(seg));
+                    spanProps.spanSegments.length = 0;
+                }
+            }
+        });
+
+        segmentsToRemove.forEach(seg => {
+            const m = seg.measure;
+            const i = m.layoutObjects.findIndex(o => o.musicObj === seg);
+            if (i >= 0) {
+                const layoutObj = m.layoutObjects[i];
+                layoutObj.layoutGroup.remove(layoutObj);
+                m.layoutObjects.splice(i, 1);
+            }
+        });
+    }
+
     createSpanSegments() {
         this.layoutObjects.forEach(layoutObj => {
             let { musicObj, layoutGroupId, verticalPos, line } = layoutObj;
@@ -998,12 +1031,24 @@ export class ObjMeasure extends MusicObject {
     }
 
     createBeams() {
+        // Remove old beams, but keep tuplets.
+        this.beamGroups = this.beamGroups.filter(beamGroup => {
+            if (beamGroup.isTuplet()) {
+                return true;
+            }
+            else {
+                beamGroup.detach();
+                return false;
+            }
+        });
+
         let ts = this.getTimeSignature();
 
         if (ts.beamGroupSizes.length === 0) {
             return;
         }
 
+        // Create beams.
         Pub.getVoiceIds().forEach(voiceId => {
             let symbols = this.getVoiceSymbols(voiceId).slice();
 

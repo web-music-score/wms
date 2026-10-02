@@ -272,16 +272,18 @@ export class ObjDocument extends MusicObject {
     }
 
     finalise() {
-        // Create beams.
+        // Recreate beams.
         this.forEachMeasure(m => m.createBeams());
-
-        // Create span segments.
-        this.forEachMeasure(m => m.createSpanSegments());
 
         // Update running parameters
         this.getFirstMeasure()?.updateRunningArguments();
 
-        // Create connectives.
+        // Recreate span segments.
+        this.forEachMeasure(m => m.removeSpanSegments());
+        this.forEachMeasure(m => m.createSpanSegments());
+
+        // Recreate connectives.
+        this.allConnectiveProps.forEach(props => props.removeConnectives());
         this.allConnectiveProps.forEach(props => props.createConnectives());
     }
 
