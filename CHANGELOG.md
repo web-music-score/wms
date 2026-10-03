@@ -1,5 +1,6 @@
 # CHANGELOG
-## [6.5.2] - Unreleased
+
+## [6.5.2] - 2026-10-03
 ### Fixed
 - Do not draw extension line over signature in first measure of row.
 - Added little more space betwen rows.
