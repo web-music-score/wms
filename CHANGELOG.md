@@ -1,5 +1,7 @@
 # CHANGELOG
 
+## [6.5.3] - Unreleased
+
 ## [6.5.2] - 2026-10-03
 ### Fixed
 - Do not draw extension line over signature in first measure of row.
