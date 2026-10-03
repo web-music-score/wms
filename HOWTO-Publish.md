@@ -21,9 +21,6 @@
     npm login
 
     // Publish
-    npm publish --access public
-
-    // Add "next" tag when publishing stable and there is not new next.
-    npm dist-tag add web-music-score@X.Y.Z next
+    npm publish --access public --tag v6
 
     // Bump version
