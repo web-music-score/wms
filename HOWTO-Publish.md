@@ -21,6 +21,6 @@
     npm login
 
     // Publish
-    npm publish --access public --tag v6
+    npm publish --access public --tag six
 
     // Bump version
