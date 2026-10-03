@@ -20,7 +20,7 @@ export function createColorsDemo() {
         .addMeasure()
         .setTimeSignature("C")
         .addNote(0, "G3", "4n").addAnnotation("ppp", { color: "yellow" })
-        .addNote(0, "G#3", "4n").addSpan("fff", span => span.beats(2), { color: "red" })
+        .addNote(0, "G#3", "4n").addSpan("cresc.", span => span.beats(2), { color: "red" })
         .addNote(0, "A3", "4n")
         .addNote(0, "A3", "4n")
 
