@@ -1,7 +1,6 @@
 # CHANGELOG
 
-## [7.0.1] - Unreleased
-
+## [7.0.1] - 2026-10-03
 ### Fixed
 - Tip of extension line was rendered for wrong segments.
 - Added little more space between rows.
