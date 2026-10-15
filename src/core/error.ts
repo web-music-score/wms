@@ -43,9 +43,10 @@ export class MusicError extends Error {
             ? [MusicErrorType.Unknown, args[0]]
             : args as [MusicErrorType, string];
 
-        super(`${formatType(type)} ${msg}`);
+        super(msg);
+
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = "MusicError";
         this.type = type;
     }
 }
@@ -54,6 +55,6 @@ export class InvalidArgError extends MusicError {
     constructor(message: string) {
         super(MusicErrorType.InvalidArg, message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = "InvalidArgError";
     }
 }

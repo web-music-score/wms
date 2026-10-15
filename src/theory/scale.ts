@@ -10,7 +10,7 @@ export class ScaleError extends MusicError {
     constructor(message: string) {
         super(MusicErrorType.Scale, message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = "ScaleError";
     }
 }
 

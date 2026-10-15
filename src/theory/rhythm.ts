@@ -5,7 +5,7 @@ export class NoteDurationError extends MusicError {
     constructor(message: string) {
         super(MusicErrorType.NoteDuration, message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = "NoteDurationError";
     }
 }
 

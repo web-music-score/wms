@@ -144,7 +144,7 @@ class InvalidIntervalException extends Error {
     constructor(readonly msg: string) {
         super(msg);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = "InvalidIntervalException";
     }
 }
 

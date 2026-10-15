@@ -6,7 +6,7 @@ export class NoteError extends MusicError {
     constructor(message: string) {
         super(MusicErrorType.Note, message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = "NoteError";
     }
 }
 
