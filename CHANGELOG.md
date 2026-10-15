@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## [7.0.2] - Unreleased
+### Fixed
+- Error name was minified, and e.toString() had duplicate error name.
 
 ## [7.0.1] - 2026-10-03
 ### Fixed
