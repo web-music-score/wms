@@ -4,6 +4,9 @@
 ### Fixed
 - Error name was minified, and e.toString() had duplicate error name.
 
+### Deprecated
+- MusicError.type, use Error.name property instead. It has the same value.
+
 ## [7.0.1] - 2026-10-03
 ### Fixed
 - Tip of extension line was rendered for wrong segments.

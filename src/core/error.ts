@@ -1,7 +1,7 @@
 
 /** Music error class. */
 export class MusicError extends Error {
-    /** Music error type. */
+    /** @deprecated - Use Error.name property instead. */
     readonly type: string;
 
     /**
@@ -11,20 +11,20 @@ export class MusicError extends Error {
     constructor(message: string);
     /**
      * Create new musicerror instance.
-     * @param type - Music error type.
+     * @param name - Eerror name.
      * @param message - Error message.
      */
-    constructor(type: string, message: string);
+    constructor(name: string, message: string);
     constructor(...args: [string] | [string, string]) {
-        const [type, msg] = args.length === 1
+        const [name, msg] = args.length === 1
             ? ["MusicError", args[0]]
             : args;
 
         super(msg);
 
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = type;
-        this.type = type;
+        this.name = name;
+        this.type = name;
     }
 }
 
