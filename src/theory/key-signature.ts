@@ -7,7 +7,6 @@ export class KeySignatureError extends MusicError {
     constructor(message: string) {
         super("KeySignatureError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
     }
 }
 

@@ -5,7 +5,6 @@ export class RhythmError extends MusicError {
     constructor(message: string) {
         super("RhythmError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
     }
 }
 

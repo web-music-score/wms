@@ -6,7 +6,6 @@ export class TimeSignatureError extends MusicError {
     constructor(message: string) {
         super("TimeSignatureError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
     }
 }
 

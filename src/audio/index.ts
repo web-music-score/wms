@@ -33,6 +33,5 @@ export class AudioError extends MusicError {
     constructor(message: string) {
         super("AudioError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
     }
 }

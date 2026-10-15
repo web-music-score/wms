@@ -20,9 +20,10 @@ export class MusicError extends Error {
             ? ["MusicError", args[0]]
             : args;
 
-        super(`${type}: ${msg}`);
+        super(msg);
+
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
+        this.name = type;
         this.type = type;
     }
 }
@@ -31,6 +32,5 @@ export class InvalidArgError extends MusicError {
     constructor(message: string) {
         super("InvalidArgError", message);
         Object.setPrototypeOf(this, new.target.prototype); // Fix prototype chain
-        this.name = new.target.name;
     }
 }
