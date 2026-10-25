@@ -3,14 +3,13 @@ import { Note, NoteLength, RhythmProps, Tempo, alterTempoSpeed } from "web-music
 import * as Audio from "web-music-score/audio";
 import { ObjDocument } from "./obj-document";
 import { ObjMeasure } from "./obj-measure";
-import { PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind } from "../pub";
+import { PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind, AnnotationGroup } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
 import { SpanProps } from "./span-props";
 import { getDynamicsVolume, isDynamicsText, isTempoText } from "./annotation-utils";
 import { ObjEnding } from "./obj-ending";
 import { ObjAnnotation } from "./obj-annotation";
-import { MusicObject } from "./music-object";
 
 function _setTimeout(cb: () => any, ms: number): number | undefined {
     return typeof window === "undefined"
@@ -37,10 +36,6 @@ function calcTicksDuration(ticks: number, tempo: Tempo): number {
     return 60 * ticks / ticksPerMinute;
 }
 
-function getAnnotationKindFromObject(obj?: MusicObject): string {
-    return obj instanceof ObjAnnotation ? obj.kind : "";
-}
-
 function getDefaultVolume(): number {
     return getDynamicsVolume("m")!;
 }
@@ -58,21 +53,17 @@ export class PlayerColumnProps {
     private speed: number;
     private volume: number;
     private octaveShift: number;
+    private fermataHoldTicks: number; // TODO
 
     constructor(readonly col: PlayerColumn) {
         this.speed = 1.0;
         this.volume = getDefaultVolume();
         this.octaveShift = 0;
+        this.fermataHoldTicks = 0;
     }
 
     get measure(): ObjMeasure {
         return this.col.measure;
-    }
-
-    reset(): void {
-        this.speed = 1.0;
-        this.volume = getDefaultVolume();
-        this.octaveShift = 0;
     }
 
     setSpeed(speed: number): void {
@@ -315,8 +306,12 @@ export class PlayerEngine {
     }
 
     private updatePlayerProps() {
-        // Reset player props
-        this.playerColumnSequence.forEach(col => col.getPlayerProps().reset());
+        // Init player props to default values.
+        this.playerColumnSequence.forEach(col => {
+            col.getPlayerProps().setSpeed(1.0);
+            col.getPlayerProps().setVolume(getDefaultVolume());
+            col.getPlayerProps().setOctaveShift(0);
+        });
 
         if (!this.doc) {
             return;
@@ -334,40 +329,43 @@ export class PlayerEngine {
         const pushVolume = (col: ObjRhythmColumn, volume: number) => volumeMap.getOrCreate(col, []).push(volume);
         const pushOctaveShift = (col: ObjRhythmColumn, octaveShift: number) => octaveShiftMap.getOrCreate(col, []).push(octaveShift);
 
-        this.playerColumnSequence.forEach((col, colId) => {
+        for (let colId = 0; colId < this.playerColumnSequence.length; colId++) {
+            const col = this.playerColumnSequence[colId];
+
             if (!(col instanceof ObjRhythmColumn)) {
                 return;
             }
 
             col.getAnchoredLayoutObjects().forEach(layoutObj => {
-                const text = getAnnotationKindFromObject(layoutObj.musicObj);
+                const ann = layoutObj.musicObj instanceof ObjAnnotation ? layoutObj.musicObj : undefined;
+
+                if (!ann) return;
 
                 let vol: number | undefined;
 
-                if (text === AnnotationKind.a_tempo) {
+                if (ann.group === AnnotationGroup.Tempo && ann.kind === AnnotationKind.a_tempo) {
                     curSpeed = 1;
                 }
-                else if ((vol = getDynamicsVolume(text)) !== undefined) {
+                else if (ann.group === AnnotationGroup.Dynamics && (vol = getDynamicsVolume(ann.kind)) !== undefined) {
                     curVolume = vol;
                 }
-                else if (text === AnnotationKind.loco) {
+                else if (ann.group === AnnotationGroup.Misc && ann.kind === AnnotationKind.loco) {
                     curOctaveShift = 0;
                 }
                 else if (
-                    isTempoText(text) ||
-                    isDynamicsText(text) ||
-                    text === AnnotationKind._8va || text === AnnotationKind._8vb
+                    ann.group === AnnotationGroup.Tempo && isTempoText(ann.kind) ||
+                    ann.group === AnnotationGroup.Dynamics && isDynamicsText(ann.kind) ||
+                    ann.group === AnnotationGroup.Misc && (ann.kind === AnnotationKind._8va || ann.kind === AnnotationKind._8vb)
                 ) {
-                    let spanProps = layoutObj.musicObj instanceof ObjAnnotation && layoutObj.musicObj.hasSpan()
-                        ? layoutObj.musicObj.getSpanProps()!
-                        : new SpanProps(layoutObj, col, Infinity, false); // Create dummy extension.
+                    let spanProps = ann.getSpanProps()
+                        ?? new SpanProps(layoutObj, col, Infinity, false); // Create dummy extension.
 
                     const spanRange = spanProps.getRange();
-                    const stopText = getAnnotationKindFromObject(spanRange.stopObject);
+                    const stopAnn = spanRange.stopObject instanceof ObjAnnotation ? spanRange.stopObject : undefined
 
                     let totalTicks = Utils.Math.sum(spanRange.columnRange.map(c => c.getTicksToNextColumn()));
 
-                    switch (text) {
+                    switch (ann.kind) {
                         case AnnotationKind.accel: {
                             let startSpeed = curSpeed;
                             let endSpeed = startSpeed * AccelerandoSpeedMul;
@@ -393,7 +391,10 @@ export class PlayerEngine {
                         case AnnotationKind.cresc_hairpin: {
                             let startVol = curVolume;
                             let endVol = startVol + CrescendoVolumeAdd;
-                            if (spanRange.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol > startVol) {
+                            if (
+                                stopAnn && stopAnn.group === AnnotationGroup.Dynamics &&
+                                (vol = getDynamicsVolume(stopAnn.kind)) !== undefined && vol > startVol
+                            ) {
                                 endVol = vol;
                             }
                             let accuTicks = 0;
@@ -404,12 +405,15 @@ export class PlayerEngine {
                             break;
                         }
                         case AnnotationKind.decresc:
-                        case AnnotationKind.dim: 
+                        case AnnotationKind.dim:
                         case AnnotationKind.decresc_hairpin:
                         case AnnotationKind.dim_hairpin: {
                             let startVol = curVolume;
                             let endVol = startVol - DiminuendoVolumeSub;
-                            if (spanRange.stopObject && (vol = getDynamicsVolume(stopText)) !== undefined && vol < startVol) {
+                            if (
+                                stopAnn && stopAnn.group === AnnotationGroup.Dynamics &&
+                                (vol = getDynamicsVolume(stopAnn.kind)) !== undefined && vol < startVol
+                            ) {
                                 endVol = vol;
                             }
                             let accuTicks = 0;
@@ -448,8 +452,7 @@ export class PlayerEngine {
             col.getPlayerProps().setSpeed(curSpeed);
             col.getPlayerProps().setVolume(curVolume);
             col.getPlayerProps().setOctaveShift(curOctaveShift);
-        });
-
+        }
     }
 
     private static resolveNextEnding(curEnding: ObjEnding, passage: number): ObjEnding | undefined {
