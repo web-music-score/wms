@@ -73,13 +73,11 @@ export class PlayerColumnProps {
     private speed: number;
     private volume: number;
     private octaveShift: number;
-    private fermataHoldTicks: number; // TODO
 
     constructor(readonly col: PlayerColumn) {
         this.speed = 1.0;
         this.volume = getDefaultVolume();
         this.octaveShift = 0;
-        this.fermataHoldTicks = 0;
     }
 
     get measure(): ObjMeasure {
@@ -109,22 +107,18 @@ export class PlayerColumnProps {
         return this.octaveShift;
     }
 
-    hasFermata(): boolean {
-        return this.measure.hasFermata(this.col);
-    }
-
     getFermataHoldTicks(): number {
-        if (!this.hasFermata()) {
+        const { col } = this;
+
+        if (!this.measure.hasFermata(col)) {
             return 0;
         }
-
-        const { col } = this;
 
         if (col instanceof ObjBarLineRight) {
             return this.measure.getMeasureTicks() / 2;
         }
         else {
-            let symbols = getVoiceIds().map(i => col.getVoiceSymbol(i)).filter(s => !!s) as RhythmSymbol[];
+            let symbols = getVoiceIds().map(i => col.getVoiceSymbol(i)).filter(s => !!s);
             let symbolsTicks = symbols.map(s => s.rhythmProps.ticks);
 
             if (symbolsTicks.length === 0) {
