@@ -6,7 +6,7 @@ import { ObjMeasure } from "./obj-measure";
 import { PlayState, PlayStateChangeListener, getVoiceIds, AnnotationKind, AnnotationGroup } from "../pub";
 import { ObjRhythmColumn, RhythmSymbol } from "./obj-rhythm-column";
 import { ObjBarLineRight } from "./obj-bar-line";
-import { SpanProps } from "./span-props";
+import { SpanProps, SpanRange } from "./span-props";
 import { getDynamicsVolume, isDynamicsText, isTempoText } from "./annotation-utils";
 import { ObjEnding } from "./obj-ending";
 import { ObjAnnotation } from "./obj-annotation";
@@ -47,6 +47,26 @@ function adjustVolume(linearVolume: number) {
 // Make bad slur effect by softening slurred notes.
 const SlurredVolumeFactor = 0.5;
 
+function requiresDummySpan(annotation: ObjAnnotation) {
+    const { kind, group } = annotation;
+
+    return (
+        group === AnnotationGroup.Tempo && (
+            kind === AnnotationKind.accel ||
+            kind === AnnotationKind.rit ||
+            kind === AnnotationKind.rall
+        ) ||
+        group === AnnotationGroup.Dynamics && (
+            kind === AnnotationKind.cresc ||
+            kind === AnnotationKind.cresc_hairpin ||
+            kind === AnnotationKind.decresc ||
+            kind === AnnotationKind.dim ||
+            kind === AnnotationKind.decresc_hairpin ||
+            kind === AnnotationKind.dim_hairpin
+        )
+    );
+}
+
 type PlayerColumn = ObjRhythmColumn | ObjBarLineRight;
 
 export class PlayerColumnProps {
@@ -66,8 +86,10 @@ export class PlayerColumnProps {
         return this.col.measure;
     }
 
-    setSpeed(speed: number): void {
-        this.speed = speed;
+    init() {
+        this.speed = 1.0;
+        this.volume = getDefaultVolume();
+        this.octaveShift = 0;
     }
 
     getSpeed(): number {
@@ -79,16 +101,8 @@ export class PlayerColumnProps {
         return alterTempoSpeed(this.measure.getTempo(), speed);
     }
 
-    setVolume(volume: number) {
-        this.volume = volume;
-    }
-
     getVolume(): number {
         return this.volume;
-    }
-
-    setOctaveShift(octaveShift: number) {
-        this.octaveShift = octaveShift;
     }
 
     getOctaveShift(): number {
@@ -119,6 +133,95 @@ export class PlayerColumnProps {
             else {
                 // Return average
                 return Utils.Math.sum(symbolsTicks) / symbolsTicks.length;
+            }
+        }
+    }
+
+    applyAnnotation(ann: ObjAnnotation) {
+        const { kind, group } = ann;
+
+        if (group === AnnotationGroup.Dynamics) {
+            const vol = getDynamicsVolume(kind);
+            if (vol !== undefined) {
+                this.volume = vol;
+            }
+        }
+        else if (group === AnnotationGroup.Tempo) {
+            if (kind === AnnotationKind.a_tempo) {
+                this.speed = 1;
+            }
+        }
+        else if (group === AnnotationGroup.Misc) {
+            if (kind === AnnotationKind.loco) {
+                this.octaveShift = 0;
+            }
+            else if (kind === AnnotationKind._8va) {
+                this.octaveShift = 1;
+            }
+            else if (kind === AnnotationKind._8vb) {
+                this.octaveShift = -1;
+            }
+        }
+    }
+
+    applySpan(ann: ObjAnnotation, spanRange: SpanRange, t: number) {
+        const stopAnn = spanRange.stopObject instanceof ObjAnnotation ? spanRange.stopObject : undefined;
+
+        const { kind, group } = ann;
+
+        if (group === AnnotationGroup.Dynamics) {
+            let vol: number | undefined;
+            if ((vol = getDynamicsVolume(kind))) {
+                // Set volume
+                if (t >= 0 && t < 1) this.applyAnnotation(ann);
+            }
+            else if (kind === AnnotationKind.cresc || kind === AnnotationKind.cresc_hairpin) {
+                // Gradually louder
+                let startVol = this.volume;
+                let endVol = startVol + CrescendoVolumeAdd;
+                if (
+                    stopAnn && stopAnn.group === AnnotationGroup.Dynamics &&
+                    (vol = getDynamicsVolume(stopAnn.kind)) !== undefined && vol > startVol
+                ) {
+                    endVol = vol;
+                }
+                this.volume = startVol + (endVol - startVol) * t;
+            }
+            else if (kind === AnnotationKind.decresc || kind === AnnotationKind.dim || kind === AnnotationKind.decresc_hairpin || kind === AnnotationKind.dim_hairpin) {
+                // Gradually quieter
+                let startVol = this.volume;
+                let endVol = startVol - DiminuendoVolumeSub;
+                if (
+                    stopAnn && stopAnn.group === AnnotationGroup.Dynamics &&
+                    (vol = getDynamicsVolume(stopAnn.kind)) !== undefined && vol < startVol
+                ) {
+                    endVol = vol;
+                }
+                this.volume = startVol + (endVol - startVol) * t;
+            }
+        }
+        else if (group === AnnotationGroup.Tempo) {
+            if (kind === AnnotationKind.accel) {
+                // Gradually faster
+                let startSpeed = this.speed;
+                let endSpeed = startSpeed * AccelerandoSpeedMul;
+                this.speed = startSpeed + (endSpeed - startSpeed) * t;
+            }
+            else if (kind === AnnotationKind.rit || kind === AnnotationKind.rall) {
+                // Gradually slower
+                let startSpeed = this.speed;
+                let endSpeed = startSpeed / RitardandoSpeedDiv;
+                this.speed = startSpeed + (endSpeed - startSpeed) * t;
+            }
+        }
+        else if (group === AnnotationGroup.Misc) {
+            if (kind === AnnotationKind._8va) {
+                // Octave higher
+                if (t >= 0 && t < 1) this.applyAnnotation(ann);
+            }
+            else if (kind === AnnotationKind._8vb) {
+                // Octave lower
+                if (t >= 0 && t < 1) this.applyAnnotation(ann);
             }
         }
     }
@@ -307,151 +410,59 @@ export class PlayerEngine {
 
     private updatePlayerProps() {
         // Init player props to default values.
-        this.playerColumnSequence.forEach(col => {
-            col.getPlayerProps().setSpeed(1.0);
-            col.getPlayerProps().setVolume(getDefaultVolume());
-            col.getPlayerProps().setOctaveShift(0);
-        });
+        this.playerColumnSequence.forEach(col => col.getPlayerProps().init());
 
         if (!this.doc) {
             return;
         }
 
-        let curSpeed = 1;
-        let curVolume = getDefaultVolume();
-        let curOctaveShift = 0;
+        for (let curColId = 0; curColId < this.playerColumnSequence.length; curColId++) {
+            const curCol = this.playerColumnSequence[curColId];
 
-        let speedMap = new UniMap<ObjRhythmColumn, number[]>();
-        let volumeMap = new UniMap<ObjRhythmColumn, number[]>();
-        let octaveShiftMap = new UniMap<ObjRhythmColumn, number[]>();
-
-        const pushSpeed = (col: ObjRhythmColumn, speed: number) => speedMap.getOrCreate(col, []).push(speed);
-        const pushVolume = (col: ObjRhythmColumn, volume: number) => volumeMap.getOrCreate(col, []).push(volume);
-        const pushOctaveShift = (col: ObjRhythmColumn, octaveShift: number) => octaveShiftMap.getOrCreate(col, []).push(octaveShift);
-
-        for (let colId = 0; colId < this.playerColumnSequence.length; colId++) {
-            const col = this.playerColumnSequence[colId];
-
-            if (!(col instanceof ObjRhythmColumn)) {
+            if (!(curCol instanceof ObjRhythmColumn)) {
                 return;
             }
 
-            col.getAnchoredLayoutObjects().forEach(layoutObj => {
+            curCol.getAnchoredLayoutObjects().forEach(layoutObj => {
                 const ann = layoutObj.musicObj instanceof ObjAnnotation ? layoutObj.musicObj : undefined;
 
                 if (!ann) return;
 
-                let vol: number | undefined;
+                let spanProps = ann.getSpanProps();
 
-                if (ann.group === AnnotationGroup.Tempo && ann.kind === AnnotationKind.a_tempo) {
-                    curSpeed = 1;
+                if (!spanProps && requiresDummySpan(ann)) {
+                    // Create dummy span.
+                    spanProps = new SpanProps(layoutObj, curCol, Infinity, false);
                 }
-                else if (ann.group === AnnotationGroup.Dynamics && (vol = getDynamicsVolume(ann.kind)) !== undefined) {
-                    curVolume = vol;
-                }
-                else if (ann.group === AnnotationGroup.Misc && ann.kind === AnnotationKind.loco) {
-                    curOctaveShift = 0;
-                }
-                else if (
-                    ann.group === AnnotationGroup.Tempo && isTempoText(ann.kind) ||
-                    ann.group === AnnotationGroup.Dynamics && isDynamicsText(ann.kind) ||
-                    ann.group === AnnotationGroup.Misc && (ann.kind === AnnotationKind._8va || ann.kind === AnnotationKind._8vb)
-                ) {
-                    let spanProps = ann.getSpanProps()
-                        ?? new SpanProps(layoutObj, col, Infinity, false); // Create dummy extension.
 
+                if (!spanProps) {
+                    // Handle simple annotations
+                    for (let applyColId = curColId; applyColId < this.playerColumnSequence.length; applyColId++) {
+                        const applyCol = this.playerColumnSequence[applyColId];
+
+                        if (applyCol instanceof ObjRhythmColumn) {
+                            applyCol.getPlayerProps().applyAnnotation(ann);
+                        }
+                    }
+                }
+                else {
+                    // Handle span annotations
                     const spanRange = spanProps.getRange();
-                    const stopAnn = spanRange.stopObject instanceof ObjAnnotation ? spanRange.stopObject : undefined
 
                     let totalTicks = Utils.Math.sum(spanRange.columnRange.map(c => c.getTicksToNextColumn()));
+                    let accuTicks = 0;
 
-                    switch (ann.kind) {
-                        case AnnotationKind.accel: {
-                            let startSpeed = curSpeed;
-                            let endSpeed = startSpeed * AccelerandoSpeedMul;
-                            let accuTicks = 0;
-                            spanRange.columnRange.forEach(c => {
-                                accuTicks += c.getTicksToNextColumn();
-                                pushSpeed(c, startSpeed + (endSpeed - startSpeed) * accuTicks / totalTicks);
-                            });
-                            break;
-                        }
-                        case AnnotationKind.rit:
-                        case AnnotationKind.rall: {
-                            let startSpeed = curSpeed;
-                            let endSpeed = startSpeed / RitardandoSpeedDiv;
-                            let accuTicks = 0;
-                            spanRange.columnRange.forEach(c => {
-                                accuTicks += c.getTicksToNextColumn();
-                                pushSpeed(c, startSpeed + (endSpeed - startSpeed) * accuTicks / totalTicks);
-                            });
-                            break;
-                        }
-                        case AnnotationKind.cresc:
-                        case AnnotationKind.cresc_hairpin: {
-                            let startVol = curVolume;
-                            let endVol = startVol + CrescendoVolumeAdd;
-                            if (
-                                stopAnn && stopAnn.group === AnnotationGroup.Dynamics &&
-                                (vol = getDynamicsVolume(stopAnn.kind)) !== undefined && vol > startVol
-                            ) {
-                                endVol = vol;
-                            }
-                            let accuTicks = 0;
-                            spanRange.columnRange.forEach(c => {
-                                accuTicks += c.getTicksToNextColumn();
-                                pushVolume(c, startVol + (endVol - startVol) * accuTicks / totalTicks);
-                            });
-                            break;
-                        }
-                        case AnnotationKind.decresc:
-                        case AnnotationKind.dim:
-                        case AnnotationKind.decresc_hairpin:
-                        case AnnotationKind.dim_hairpin: {
-                            let startVol = curVolume;
-                            let endVol = startVol - DiminuendoVolumeSub;
-                            if (
-                                stopAnn && stopAnn.group === AnnotationGroup.Dynamics &&
-                                (vol = getDynamicsVolume(stopAnn.kind)) !== undefined && vol < startVol
-                            ) {
-                                endVol = vol;
-                            }
-                            let accuTicks = 0;
-                            spanRange.columnRange.forEach(c => {
-                                accuTicks += c.getTicksToNextColumn();
-                                pushVolume(c, startVol + (endVol - startVol) * accuTicks / totalTicks);
-                            });
-                            break;
-                        }
-                        case AnnotationKind._8va: {
-                            spanRange.columnRange.forEach(c => pushOctaveShift(c, 1));
-                            break;
-                        }
-                        case AnnotationKind._8vb: {
-                            spanRange.columnRange.forEach(c => pushOctaveShift(c, -1));
-                            break;
+                    for (let applyColId = curColId; applyColId < this.playerColumnSequence.length; applyColId++) {
+                        const applyCol = this.playerColumnSequence[applyColId];
+
+                        if (applyCol instanceof ObjRhythmColumn) {
+                            const t = Math.min(1, accuTicks / totalTicks)
+                            applyCol.getPlayerProps().applySpan(ann, spanRange, t);
+                            accuTicks += applyCol.getTicksToNextColumn();
                         }
                     }
                 }
             });
-
-            let speedArr = speedMap.getOrDefault(col, []);
-            let volumeArr = volumeMap.getOrDefault(col, []);
-            let octaveShiftArr = octaveShiftMap.getOrDefault(col, []);
-
-            if (speedArr.length > 0)
-                curSpeed = Utils.Math.avg(...speedArr);
-
-            if (volumeArr.length > 0)
-                curVolume = Utils.Math.avg(...volumeArr);
-
-            curOctaveShift = octaveShiftArr.length > 0
-                ? octaveShiftArr[octaveShiftArr.length - 1]
-                : 0;
-
-            col.getPlayerProps().setSpeed(curSpeed);
-            col.getPlayerProps().setVolume(curVolume);
-            col.getPlayerProps().setOctaveShift(curOctaveShift);
         }
     }
 
