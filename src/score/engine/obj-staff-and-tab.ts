@@ -218,7 +218,7 @@ export abstract class ObjNotationLine extends MusicObject {
                 let prev = anchorObjects[i - 1];
                 let cur = anchorObjects[i];
                 let dx = prev.getRect().right - cur.getRect().left;
-                cur.offset(dx, 0);
+                if(dx > 0) cur.offset(dx, 0);
             }
         });
     }

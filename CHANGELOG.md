@@ -3,6 +3,7 @@
 ## [7.0.2] - Unreleased
 ### Fixed
 - Error name was minified, and e.toString() had duplicate error name.
+- Span segment was moved wrongly.
 
 ### Deprecated
 - MusicError.type, use Error.name property instead. It has the same value.
