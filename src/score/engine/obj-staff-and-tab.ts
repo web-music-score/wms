@@ -208,12 +208,11 @@ export abstract class ObjNotationLine extends MusicObject {
                 this.resolveIndividualObject(view, layoutGroup, layoutObj);
         }
 
-        // Spread layout objects with same anchor next to each other.
-        const anchorSet = new ValueSet<MusicObject>();
-        layoutGroupObjects.forEach(o => anchorSet.add(o.anchor));
+        // Spread annotation objects with same anchor next to each other.
+        const annotationObjects = layoutGroupObjects.filter(o => o.musicObj instanceof ObjAnnotation);
 
-        anchorSet.forEach(anchor => {
-            let anchorObjects = layoutGroupObjects.filter(o => o.anchor === anchor);
+        new ValueSet<MusicObject>(annotationObjects.map(o => o.anchor)).forEach(anchor => {
+            let anchorObjects = annotationObjects.filter(o => o.anchor === anchor);
             for (let i = 1; i < anchorObjects.length; i++) {
                 let prev = anchorObjects[i - 1];
                 let cur = anchorObjects[i];
