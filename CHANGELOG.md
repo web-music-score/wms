@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [7.0.2] - Unreleased
+## [7.0.2] - 2026-10-30
 ### Fixed
 - Error name was minified, and e.toString() had duplicate error name.
 - Span segment was moved wrongly.
