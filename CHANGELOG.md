@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [6.5.3] - Unreleased
+## [6.5.3] - 2026-10-30
 ### Fixed
 - Error name was minified, and simplified e.toString() message.
 
